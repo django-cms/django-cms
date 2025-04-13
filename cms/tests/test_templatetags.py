@@ -8,16 +8,16 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
+from django.template import Context, Template
 from django.test import RequestFactory
 from django.test.utils import override_settings
+from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.html import escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from sekizai.context import SekizaiContext
-from django.template import Template, Context
-from django.urls import NoReverseMatch
 
 import cms
 from cms.api import add_plugin, create_page, create_page_content
