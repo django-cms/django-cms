@@ -4,8 +4,8 @@ from os.path import join
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.db import models
-from django.db.models import Prefetch
+from django.db import IntegrityError, models
+from django.db.models import F, Prefetch, Q
 from django.db.models.base import ModelState
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import Concat
@@ -484,6 +484,7 @@ class Page(MP_Node):
         for page_url in page_urls:
             new_url = model_to_dict(page_url)
             new_url.pop("id", None)  # No PK
+            new_url.pop("site", None)  # Let the save method handle this
             new_url["page"] = new_page
 
             if parent_page:
@@ -772,10 +773,40 @@ class Page(MP_Node):
 
     def update_urls(self, language=None, **data):
         if language:
-            page_urls = self.get_urls().filter(language=language)
+            page_urls_qs = self.get_urls().filter(language=language)
         else:
-            page_urls = self.get_urls().all()
-        return page_urls.update(**data)
+            page_urls_qs = self.get_urls().all()
+
+        if "path" in data and data["path"] is not None:
+            new_path = data["path"]
+            languages_to_check = (
+                [language] if language else list(page_urls_qs.values_list("language", flat=True).distinct())
+            )
+
+            for lang in languages_to_check:
+                # Check if the new path exists for this language on another page on the same site
+                existing_url_collision = (
+                    PageUrl.objects.filter(
+                        language=lang,
+                        path=new_path,
+                        page__site=self.site,
+                    )
+                    .exclude(pk__in=page_urls_qs.filter(language=lang).values("pk"))
+                    .exists()
+                )
+
+                if existing_url_collision:
+                    page_pks_being_updated = list(
+                        page_urls_qs.filter(language=lang).values_list("page__pk", flat=True)
+                    )
+                    raise IntegrityError(
+                        f"Cannot update URL path. A page URL with path='{new_path}' "
+                        f"and language='{lang}' already exists for another page "
+                        f"on the same site (not page(s): {page_pks_being_updated})."
+                    )
+
+        # If no collision detected, proceed with the update
+        return page_urls_qs.update(**data)
 
     def get_fallbacks(self, language):
         return i18n.get_fallback_languages(language, site_id=self.site_id)
@@ -1068,14 +1099,25 @@ class PageUrl(models.Model):
         verbose_name=_("page"),
         related_name="urls",
     )
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        verbose_name=_("site"),
+    )
     managed = models.BooleanField(default=False)
     objects = PageUrlManager()
 
     class Meta:
         app_label = "cms"
         default_permissions = []
-        (UniqueConstraint(fields=["path", "language"], name="unique_together_path_language"),)
-        (UniqueConstraint(fields=["page", "language"], name="unique_together_page_language"),)
+        constraints = [
+            UniqueConstraint(
+                fields=["path", "language", "site"],
+                name="unique_together_path_language_site",
+                condition=models.Q(path__isnull=False) if hasattr(models, "Q") else None,
+            ),
+            UniqueConstraint(fields=["page", "language"], name="unique_together_page_language"),
+        ]
 
     def __str__(self):
         return f"{self.path or self.slug} ({self.language})"
@@ -1095,6 +1137,12 @@ class PageUrl(models.Model):
     def get_path_for_base(self, base_path=""):
         old_base, sep, slug = self.path.rpartition("/")
         return f"{base_path}/{slug}" if base_path else slug
+
+    def save(self, *args, **kwargs):
+        # Ensure site always matches page.site
+        if not self.pk or not self.site_id:
+            self.site = self.page.site
+        super().save(*args, **kwargs)
 
 
 class PageType(Page):
