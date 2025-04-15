@@ -91,7 +91,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:9.0.1
+        image: mysql:9.1
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
