@@ -1114,7 +1114,6 @@ class PageUrl(models.Model):
             UniqueConstraint(
                 fields=["path", "language", "site"],
                 name="unique_together_path_language_site",
-                condition=models.Q(path__isnull=False) if hasattr(models, "Q") else None,
             ),
             UniqueConstraint(fields=["page", "language"], name="unique_together_page_language"),
         ]
