@@ -18,7 +18,7 @@ jobs:
         python-version: ['3.11']
         requirements-file: ['requirements_base.txt']
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     steps:
