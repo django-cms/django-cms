@@ -1,3 +1,21 @@
+Bug Fixes:
+----------
+* Django 5.2 tried to adding object tools to the page tree throwing an error  (#8200) (52af3ffc9) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 4.1.4 (2025-04-04)
 ==================
 
