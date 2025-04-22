@@ -10,7 +10,7 @@ Statistics:
 
 This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
+* Fabian Braun (1 pull requests)
 
 With the review help of the following contributors:
 
