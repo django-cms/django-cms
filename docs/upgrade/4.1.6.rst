@@ -12,13 +12,13 @@
     process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
 
 
-Welcome to django CMS 4.1.5!
+Welcome to django CMS 4.1.6!
 
 
 Django and Python compatibility
 ===============================
 
-django CMS supports **Django 3.2 to 5.1**. We highly recommend and only
+django CMS supports **Django 3.2 to 5.2**. We highly recommend and only
 support the latest release of each series.
 
 It supports **Python 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
