@@ -3,7 +3,7 @@
 
 Bug Fixes:
 ----------
-* Django 5.2 tried to adding object tools to the page tree throwing an error  (#8200) (52af3ffc9) -- Fabian Braun
+* Django 5.2 tried adding object tools to the page tree throwing an error  (#8200) (52af3ffc9) -- Fabian Braun
 
 Statistics:
 -----------
