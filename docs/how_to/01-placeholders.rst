@@ -41,6 +41,7 @@ you would like to use:
 .. code-block::
 
     from django.db import models
+    from django.utils.functional import cached_property
     from cms.models.fields import PlaceholderRelationField
     from cms.utils.placeholder import get_placeholder_from_slot
 
@@ -154,6 +155,27 @@ Preview buttons:**
 
 .. note::
 
+    If using class based views, you can set the toolbar object in the ``get_context_data``
+    method of your view and add a stub view usable when you
+    :ref:`register the model for frontend editing <register_model_frontend_editing>`.
+
+    .. code-block:: python
+
+        from django.views.generic.detail import DetailView
+
+        class MyModelDetailView(DetailView):
+            # your detail view attributes
+
+            def get_context_data(self, **kwargs):
+                context = super().get_context_data(**kwargs)
+                self.request.toolbar.set_object(self.object)
+                return context
+
+        def my_model_endpoint_view(request, my_model):
+            return MyModelDetailView.as_view()(request, pk=my_model.pk)
+
+.. note::
+
     If you want to render plugins from a specific language, you can use the tag like
     this:
 
@@ -193,6 +215,8 @@ Let the model know about this template by declaring the ``get_template()`` metho
 
         ...
 
+.. _register_model_frontend_editing:
+
 Registering the model for frontend editing
 ------------------------------------------
 
@@ -202,7 +226,7 @@ The final step is to register the model for frontend editing. Since django CMS 4
 done by adding a :class:`~cms.app_base.CMSAppConfig` class to the app's `cms_config.py`
 file:
 
-.. code-block::
+.. code-block:: python
 
     from cms.app_base import CMSAppConfig
     from . import models, views
@@ -211,6 +235,15 @@ file:
     class MyAppConfig(CMSAppConfig):
         cms_enabled = True
         cms_toolbar_enabled_models = [(models.MyModel, views.render_my_model)]
+
+.. note::
+
+    If using class based views, use the stub view in ``cms_toolbar_enabled_models`` attribute.
+
+    .. code-block:: python
+
+        cms_toolbar_enabled_models = [(models.MyModel, views.my_model_endpoint_view)]
+
 
 Adding content to a placeholder
 -------------------------------
