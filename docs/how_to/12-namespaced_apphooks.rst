@@ -144,7 +144,7 @@ Let us quickly create the new app:
    .. code-block::
 
        class Entry(models.Model):
-           app_config = models.ForeignKey(FaqConfigModel, null=False)  # We need to assign an FAQ entry to its app instance
+           app_config = models.ForeignKey(FaqConfigModel, null=False, on_delete=models.PROTECT)  # We need to assign an FAQ entry to its app instance
            question = models.TextField(blank=True, default='')
            answer = models.TextField()
 
@@ -185,9 +185,9 @@ Let us quickly create the new app:
                except ObjectDoesNotExist:
                    return None
 
-          def  get_config_add_url(self):
+           def  get_config_add_url(self):
                try:
-                  return reverse("admin:{}_{}_add".format(self.app_config._meta.app_label, self.app_config._meta.model_name))
+                   return reverse("admin:{}_{}_add".format(self.app_config._meta.app_label, self.app_config._meta.model_name))
                except AttributeError:
                    return reverse(
                        "admin:{}_{}_add".format(self.app_config._meta.app_label, self.app_config._meta.module_name)

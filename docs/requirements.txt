@@ -4,8 +4,6 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
---extra-index-url https://www.piwheels.org/simple
-
 alabaster==1.0.0
     # via sphinx
 anyio==4.9.0
@@ -73,7 +71,7 @@ docutils==0.20.1
     #   sphinx
 furo==2024.8.6
     # via -r requirements.in
-h11==0.14.0
+h11==0.16.0
     # via uvicorn
 idna==3.10
     # via
