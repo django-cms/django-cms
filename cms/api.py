@@ -47,6 +47,7 @@ from cms import constants
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.forms.validators import validate_url_uniqueness
 from cms.models import PageContent, PageUrl
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import (
@@ -345,42 +346,10 @@ def create_page_content(
         _thread_locals.user = created_by
         created_by = get_clean_username(created_by)
 
-    if path is not None:
-        # For collision checks, we need to consider the context of the path
-        # Check if the path exists on another page on the same site
-        existing_url_collision = PageUrl.objects.filter(
-            language=language,
-            path=path,
-            page__site=page.site,
-        ).exclude(page=page)
-
-        # A collision exists only if:
-        # 1. There's a matching path
-        # 2. The matching path is not the parent of our page
-        # 3. The matching path is not the child of our page
-        if existing_url_collision.exists():
-            # For parent pages, the collision is not a problem if it's their child
-            if page.parent_id is not None:
-                parent_path = (
-                    PageUrl.objects.filter(page=page.parent_id, language=language)
-                    .values_list("path", flat=True)
-                    .first()
-                    or ""
-                )
-
-                expected_path = f"{parent_path}/{slug}" if parent_path else slug
-
-                # If the path doesn't match what we'd expect from the parent, it's a real collision
-                if path != expected_path:
-                    raise IntegrityError(
-                        f"Cannot save page content. A page URL with path='{path}' "
-                        f"and language='{language}' already exists for another page on the same site."
-                    )
-            else:
-                raise IntegrityError(
-                    f"Cannot save page content. A page URL with path='{path}' "
-                    f"and language='{language}' already exists for another page on the same site."
-                )
+    try:
+        validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+    except ValidationError as e:
+        raise IntegrityError(e)
 
     page.urls.update_or_create(
         page=page,
@@ -389,7 +358,6 @@ def create_page_content(
             slug=slug,
             path=path,
             managed=not bool(overwrite_url),
-            site=page.site,
         ),
     )
 

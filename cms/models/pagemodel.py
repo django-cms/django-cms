@@ -1099,11 +1099,6 @@ class PageUrl(models.Model):
         verbose_name=_("page"),
         related_name="urls",
     )
-    site = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
-        verbose_name=_("site"),
-    )
     managed = models.BooleanField(default=False)
     objects = PageUrlManager()
 
@@ -1111,10 +1106,6 @@ class PageUrl(models.Model):
         app_label = "cms"
         default_permissions = []
         constraints = [
-            UniqueConstraint(
-                fields=["path", "language", "site"],
-                name="unique_together_path_language_site",
-            ),
             UniqueConstraint(fields=["page", "language"], name="unique_together_page_language"),
         ]
 
@@ -1136,12 +1127,6 @@ class PageUrl(models.Model):
     def get_path_for_base(self, base_path=""):
         old_base, sep, slug = self.path.rpartition("/")
         return f"{base_path}/{slug}" if base_path else slug
-
-    def save(self, *args, **kwargs):
-        # Ensure site always matches page.site
-        if not self.pk or not self.site_id:
-            self.site = self.page.site
-        super().save(*args, **kwargs)
 
 
 class PageType(Page):
