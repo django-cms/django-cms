@@ -282,12 +282,6 @@ def _scan_placeholders(
     return nodes
 
 
-def _scan_static_placeholders(nodelist):
-    from cms.templatetags.cms_tags import StaticPlaceholderNode
-
-    return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
-
-
 def get_placeholders(template):
     compiled_template = get_template(template)
 
@@ -309,24 +303,6 @@ def get_placeholders(template):
             placeholders.append(placeholder)
             clean_placeholders.append(slot)
     return placeholders
-
-
-def get_static_placeholders(template, context):
-    compiled_template = get_template(template)
-    nodes = _scan_static_placeholders(_get_nodelist(compiled_template))
-    placeholders = [node.get_declaration(context) for node in nodes]
-    placeholders_with_code = []
-
-    for placeholder in placeholders:
-        if placeholder.slot:
-            placeholders_with_code.append(placeholder)
-        else:
-            warnings.warn(
-                "Unable to resolve static placeholder "
-                f'name in template "{template}"',
-                Warning,
-            )
-    return placeholders_with_code
 
 
 def _get_block_nodes(extend_node):

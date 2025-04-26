@@ -71,7 +71,7 @@ SHORTCUTS_BREAK = 'Shortcuts Break'
 @toolbar_pool.register
 class PlaceholderToolbar(CMSToolbar):
     """
-    Adds placeholder edit buttons if placeholders or static placeholders are detected in the template
+    Adds placeholder edit buttons if placeholders are detected in the template
     """
 
     def populate(self):

@@ -2,7 +2,6 @@
 {% load cms_tags %}
 
 {% block content %}
-{# static_placeholder "logo" #}
 {% for example in examples %}
     <div>{% render_placeholder example.placeholder %}</div>
 {% empty %}

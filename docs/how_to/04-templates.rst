@@ -223,7 +223,6 @@ Example: application template
     {% for item in object_list %}
         {{ item }}
     {% endfor %}
-    {% static_placeholder "sidebar" %}
     {% endblock main %}
 
 ``CMS_TEMPLATE`` memorises the path of the cms template so the application
@@ -235,15 +234,15 @@ Template Inheritance in Page Content Translations
 Default Behavior (without versioning)
 -------------------------------------
 
-In django CMS (version 4 and above), when creating page content translations, all content is immediately 
-published. When creating a translation of an existing page, the template from the original page content is 
-copied to the new translation. This behavior can be seen in the `create_translation` method. The template 
+In django CMS (version 4 and above), when creating page content translations, all content is immediately
+published. When creating a translation of an existing page, the template from the original page content is
+copied to the new translation. This behavior can be seen in the `create_translation` method. The template
 is explicitly copied from the original page content to ensure consistent layout across languages.
 
 Note for django CMS versions prior to 4.2:
 
-In older versions of django CMS (prior to 4.2), when creating page content translations, the template is not 
-automatically copied from the original page content. Instead, the default site template (or the template 
+In older versions of django CMS (prior to 4.2), when creating page content translations, the template is not
+automatically copied from the original page content. Instead, the default site template (or the template
 from the last published version) is applied, and manual adjustments may be necessary to ensure consistency.
 
 Behavior with djangocms-versioning

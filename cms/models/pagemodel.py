@@ -126,7 +126,6 @@ class Page(MP_Node):
         permissions = [
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
-            ('edit_static_placeholder', 'Can edit static placeholders'),
         ]
         verbose_name = _("page")
         verbose_name_plural = _("pages")

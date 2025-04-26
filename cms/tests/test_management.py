@@ -11,7 +11,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models import Page, StaticPlaceholder
+from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
@@ -322,9 +322,6 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         col4 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         # add a *nested* link plugin
         add_plugin(ph_en, "LinkPlugin", lang, target=col4, name="A Link", external_link="https://www.django-cms.org")
-        static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()), site_id=1)
-        static_placeholder.save()
-        add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
 
     def setUp(self):
         pages = Page.objects.all()
@@ -369,14 +366,6 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(link_en.external_link, link_de.external_link)
         self.assertEqual(link_en.position, link_de.position)
 
-        stack_plugins = CMSPlugin.objects.filter(placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
-
-        stack_text_en, _ = stack_plugins.get(language='en', plugin_type='TextPlugin').get_plugin_instance()
-        stack_text_de, _ = stack_plugins.get(language='de', plugin_type='TextPlugin').get_plugin_instance()
-
-        self.assertEqual(stack_text_en.plugin_type, stack_text_de.plugin_type)
-        self.assertEqual(stack_text_en.body, stack_text_de.body)
-
     def test_copy_langs_no_content(self):
         """
         Various checks here:
@@ -411,15 +400,6 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             first_plugin_de, _ = root_plugins.get(language='de', parent=None).get_plugin_instance()
 
         self.assertIsNone(first_plugin_de)
-
-        stack_plugins = CMSPlugin.objects.filter(
-            placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
-
-        stack_text_en, _ = stack_plugins.get(language='en',
-                                             plugin_type='TextPlugin').get_plugin_instance()
-        with self.assertRaises(CMSPlugin.DoesNotExist):
-            stack_text_de, _ = stack_plugins.get(language='de',
-                                                 plugin_type='TextPlugin').get_plugin_instance()
 
     def test_copy_sites(self):
         """
