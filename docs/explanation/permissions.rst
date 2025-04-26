@@ -28,18 +28,47 @@ You can find the permissions you can set for a user or groups in the Django admi
 Page permissions mode.
 
 Filtering by ``cms`` will show the ones that belong to the CMS application. Permissions that a CMS
-editor will need are likely to include:
+editor will need are likely to include the following core package permissions:
 
-* ``cms | cms plugin``
-* ``cms | page``
-* ``cms | placeholder``
-* ``cms | placeholder reference``
-* ``cms | static placeholder``
-* ``cms | placeholder reference``
-* ``cms | title``
+* ``django CMS | cms plugin``
+* ``django CMS | page``
+* ``django CMS | placeholder``
+* ``django CMS | placeholder reference``
+* ``django CMS | static placeholder``
 
 Most of these offer the usual add/change/delete options, though there are some exceptions, such as
-``cms | placeholder | Can use Structure mode``.
+``django CMS | placeholder | Can use Structure mode``.
+
+In addition to the core package permissions, an editor will likely need the following permissions
+from 3rd-party packages:
+
+* `djangocms-alias <https://pypi.org/project/djangocms-alias/>`_
+
+  * ``django CMS Alias | alias``
+  * ``django CMS Alias | alias content``
+  * ``django CMS Alias | category``
+
+* `djangocms-frontend <https://pypi.org/project/djangocms-frontend/>`_
+
+  * ``django CMS Frontend | UI item``
+  * After adding these permissions, save and use the ``python manage.py frontend sync_permissions``
+    command as documented in `djangocms-frontend's documentation
+    <https://djangocms-frontend.readthedocs.io/en/stable/tutorial/builtin_components.html#assigning-permissions>`_
+
+* `djangocms-text <https://pypi.org/project/djangocms-text/>`_
+
+  * ``django CMS Rich Text | text``
+
+* `djangocms-versioning <https://pypi.org/project/djangocms-versioning/>`_
+
+  * ``django CMS Versioning | alias content version``
+  * ``django CMS Versioning | page content version``
+  * ``django CMS Versioning | version``
+
+Typically when adding other 3rd party packages or custom plugins you may need to add additional
+permissions to enable their features. Sometimes documentation for such needed permissions may be
+missing, in that case you can compare the list of available permissions with the package enabled
+and disabled on your site.
 
 See :ref:`use-permissions-on-groups` below on applying permissions to groups rather than users.
 
