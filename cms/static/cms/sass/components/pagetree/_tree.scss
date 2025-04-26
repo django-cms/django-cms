@@ -58,6 +58,12 @@
     padding: 0 !important;
     box-shadow: $pagetree-box-shadow !important;
 }
+#content-main .cms-pagetree.cms-pagetree a {
+    // Necessary since django admin adds a decoration to every link except some
+    // This is needed to get a higher specifity
+    text-decoration: none;
+}
+
 .cms-pagetree {
     border: $pagetree-border;
     // box-shadow: $pagetree-box-shadow;
