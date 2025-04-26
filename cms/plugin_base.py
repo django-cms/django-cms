@@ -1,6 +1,7 @@
 import json
 import re
 from functools import lru_cache, wraps
+from operator import attrgetter
 from typing import Callable, Optional, TypeVar, cast
 
 from django import forms
@@ -363,7 +364,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @lru_cache
-    def _get_template_for_conf(cls, page: Optional[Page], instance: Optional[CMSPlugin]):
+    def _get_template_for_conf(cls, page: Optional[Page], instance: Optional[CMSPlugin] = None):
         """Cache page template because page.get_template() might have to fetch the page content object from the db
          since django CMS 4"""
         if page:
@@ -738,7 +739,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Useful in cases like djangocms-text
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
-        return plugin_pool.registered_plugins
+        return sorted(plugin_pool.get_all_plugins(page=page), key=attrgetter("module", "name"))
 
     @classmethod
     @template_slot_caching
