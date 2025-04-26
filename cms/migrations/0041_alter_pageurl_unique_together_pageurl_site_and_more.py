@@ -4,24 +4,6 @@ from collections import defaultdict
 from django.db import migrations, models
 
 
-def deduplicate_urls(apps, schema_editor):
-    """
-    Deduplicate paths in the PageUrl model.
-    """
-    PageUrl = apps.get_model('cms', 'PageUrl')
-    Page = apps.get_model('cms', 'Page')
-
-    for page in Page.objects.all().prefetch_related('pageurl_set'):
-        urls = defaultdict(list)
-        for page_url in page.pageurl_set.order_by("-pk"):
-            urls[page_url.language].append(page_url)
-        for urls_per_language in urls.values():
-            if len(urls_per_language) > 1:
-                # Keep the first URL and delete the rest
-                for page_url in urls_per_language[1:]:
-                    page_url.delete()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -34,11 +16,6 @@ class Migration(migrations.Migration):
             name='pageurl',
             unique_together=set(),
         ),
-        migrations.RunPython(
-            deduplicate_urls,
-            reverse_code=migrations.RunPython.noop,
-        ),
-        migrations.RunPython(deduplicate_urls, reverse_code=migrations.RunPython.noop),
         migrations.AddConstraint(
             model_name='pageurl',
             constraint=models.UniqueConstraint(fields=('page', 'language'), name='unique_together_page_language'),
