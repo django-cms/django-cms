@@ -53,24 +53,65 @@ Syntax and conventions
 Python
 ------
 
-We try to conform to `PEP8`_ as much as possible. A few highlights:
+We try to conform to `PEP8`_ as much as possible. New code must follow the ruff
+formatter (and the pre-commit hook will ensure this). A few highlights:
 
-- Indentation should be exactly 4 spaces. Not 2, not 6, not 8. **4**. Also, tabs
-  are evil.
-- We try (loosely) to keep the line length at 79 characters. Generally the rule
-  is "it should look good in a terminal-base editor" (eg vim), but we try not be
-  too inflexible about it.
+- **Line Length**: Default is 119 characters.
+
+- **Indentation**: 4 spaces per indentation level; not more, not less.
+
+- **Quotes**: We use double quotes (`"`).
+
+- **Trailing Commas**: Included where syntactically valid, such as in function arguments and list literals.
+
+- **Function Definitions**: Parameters are each on their own line if the function signature spans multiple lines.
+
+- **Docstrings**: Single-line docstrings use double quotes and are formatted with consistent indentation.
+
+- **Blank Lines**: Two blank lines before top-level definitions; one blank line between methods inside a class.
+
+- **Imports**: Grouped and ordered: standard library, third-party, then local imports. Each group is separated by a blank line.
 
 
-HTML, CSS and JavaScript
-------------------------
+HTML
+----
 
-As of django CMS 3.2, we are using the same guidelines as described in `Aldryn
-Boilerplate`_
+- **Naming**: Use clear, meaningful names.
+- **Indentation**: 4 spaces, no tabs.
+- **IDs vs Classes**: Prefer classes.
+- **Modularity**: Create reusable components.
 
-Frontend code should be formatted for readability. If in doubt, follow existing
-examples, or ask.
+CSS
+---
 
+- **Naming**: Follow `BEM (Block Element Modifier) <http://getbem.com/>`_.
+- **Nesting**: Keep Sass nesting shallow (1–2 levels).
+- **Formatting**:
+  - 4 spaces indentation.
+  - One selector per line.
+  - Lowercase properties/values (unless uppercase is needed).
+- **Ordering**:
+  1. Positioning
+  2. Box model
+  3. Typography
+  4. Visual
+  5. Miscellaneous
+
+JavaScript
+----------
+
+- **Naming**:
+  - `camelCase` for variables/functions
+  - `PascalCase` for classes
+  - `UPPER_CASE` for constants
+- **Formatting**:
+  - 4 spaces indentation
+  - Always use semicolons
+  - Use single quotes (unlike Python quotes!)
+- **Implementation**:
+  - Wrap code in IIFEs
+  - Use `'use strict';`
+- **Patterns**: Prefer modular, reusable patterns.
 
 .. _js_linting:
 
