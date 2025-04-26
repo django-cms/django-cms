@@ -107,7 +107,7 @@ JavaScript
 - **Formatting**:
   - 4 spaces indentation
   - Always use semicolons
-  - Use single quotes
+  - Use single quotes (unlike Python quotes!)
 - **Implementation**:
   - Wrap code in IIFEs
   - Use `'use strict';`
