@@ -34,7 +34,6 @@ editor will need are likely to include the following core package permissions:
 * ``django CMS | page``
 * ``django CMS | placeholder``
 * ``django CMS | placeholder reference``
-* ``django CMS | static placeholder``
 
 Most of these offer the usual add/change/delete options, though there are some exceptions, such as
 ``django CMS | placeholder | Can use Structure mode``.
