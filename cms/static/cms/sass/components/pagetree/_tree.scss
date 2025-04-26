@@ -60,7 +60,7 @@
 }
 #content-main .cms-pagetree.cms-pagetree a {
     // Necessary since django admin adds a decoration to every link except some
-    // This is needed to get a higher specifity
+    // This is needed to get a higher specificity
     text-decoration: none;
 }
 
