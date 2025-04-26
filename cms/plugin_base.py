@@ -739,7 +739,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Useful in cases like djangocms-text
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
-        return sorted(plugin_pool.get_all_plugins(page=page), key=attrgetter("module", "name"))
+        return sorted(plugin_pool.get_all_plugins(slot, page), key=attrgetter("module", "name"))
 
     @classmethod
     @template_slot_caching
@@ -750,12 +750,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         # Placeholder overrides are highest in priority
         child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
-
-        if child_classes:
-            return child_classes
-
         # Get all child plugin candidates
         installed_plugins = cls.get_child_plugin_candidates(slot, page)
+
+        if child_classes:
+            return [plugin.__name__ for plugin in installed_plugins if plugin.__name__ in child_classes]
+
 
         child_classes = []
         plugin_type = cls.__name__

@@ -210,6 +210,26 @@ class PluginsTestCase(PluginsTestBaseCase):
                 FilteredSelectMultiple,
             )
 
+    def test_restricted_plugin(self):
+        CMS_PLACEHOLDER_CONF = {"body": {"plugins": ["TextPlugin"]}}
+        add_page_endpoint = self.get_page_add_uri("en")
+
+        # try to add a new plugin
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            page_data = self.get_new_page_data()
+            self.client.post(add_page_endpoint, page_data)
+            page = Page.objects.first()
+            installed_plugins = plugin_pool.get_all_plugins("body", page)
+            installed_plugins = [cls.__name__ for cls in installed_plugins]
+            self.assertEqual(["TextPlugin"], installed_plugins)
+
+        # try to add a new plugin to a colmn plugin - still only text
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
+
+            child_plugins = ColumnPlugin.get_child_classes("body", page)
+            self.assertEqual(["TextPlugin"], child_plugins)
+
     def test_excluded_plugin(self):
         """
         Test that you can't add a text plugin
