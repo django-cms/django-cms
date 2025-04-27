@@ -835,12 +835,13 @@ class PluginsTestCase(PluginsTestBaseCase):
             CMS_PLACEHOLDER_CONF = {
                 "body": {
                     "child_classes": {
+                        # Config includes existing LinkPlugin and non-existing PicturePlugin
                         "ChildClassesPlugin": ["LinkPlugin", "PicturePlugin"],
                     }
                 }
             }
             with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
-                self.assertEqual(["LinkPlugin", "PicturePlugin"], plugin.get_child_classes(placeholder.slot, page))
+                self.assertEqual(["LinkPlugin"], plugin.get_child_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -885,11 +886,15 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
         ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
-        ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(
-            cache_parent_classes=False,
-            parent_classes=["ParentPlugin"],
-            render_plugin=False,
-            ))
+        ChildPlugin = type(
+            "ChildPlugin",
+            (CMSPluginBase,),
+            dict(
+                cache_parent_classes=False,
+                parent_classes=["ParentPlugin"],
+                render_plugin=False,
+            ),
+        )
         restriction_cache = {}  # cache is empty
 
         with register_plugins(ParentPlugin, ChildPlugin):
@@ -916,11 +921,15 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
         ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
-        ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(
-            cache_parent_classes=False,
-            parent_classes=[""],
-            render_plugin=False,
-            ))
+        ChildPlugin = type(
+            "ChildPlugin",
+            (CMSPluginBase,),
+            dict(
+                cache_parent_classes=False,
+                parent_classes=[""],
+                render_plugin=False,
+            ),
+        )
         restriction_cache = {}  # cache is empty
 
         with register_plugins(ParentPlugin, ChildPlugin):
