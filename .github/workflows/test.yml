@@ -57,7 +57,7 @@ jobs:
         uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        uv pip install -e .
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |
@@ -115,7 +115,7 @@ jobs:
         uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        uv pip install -e .
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |
@@ -161,7 +161,7 @@ jobs:
         uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        uv pip install -e .
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: python manage.py test
@@ -192,7 +192,7 @@ jobs:
         python -m pip install --upgrade pip uv
         uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
-        uv pip install -e .
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: python manage.py test
@@ -238,7 +238,7 @@ jobs:
         uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        uv pip install -e .
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |
@@ -285,7 +285,7 @@ jobs:
         uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        uv pip install -e .
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |
