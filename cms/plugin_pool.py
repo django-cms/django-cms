@@ -134,7 +134,9 @@ class PluginPool:
             raise PluginNotRegistered("The plugin %r is not registered" % plugin)
         del self.plugins[plugin_name]
 
-    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
+    def get_all_plugins(
+        self, placeholder=None, page=None, setting_key="plugins", include_page_only=True, root_plugin=True
+    ):
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
@@ -173,7 +175,7 @@ class PluginPool:
             # Check that plugins are not in the list of the excluded ones
             plugins = (plugin for plugin in plugins if plugin.__name__ not in excluded_plugins)
 
-        if placeholder:
+        if root_plugin:
             # Filters out any plugin that requires a parent or has set parent classes
             plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
         return plugins
