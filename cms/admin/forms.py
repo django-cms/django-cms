@@ -963,6 +963,25 @@ class MovePageForm(PageTreeForm):
                 "target",
                 force_str(_("You can't move the home page inside another page")),
             )
+            return cleaned_data
+
+        target_page, position = self.get_tree_options()
+        new_parent = self._determine_new_parent(target_page, position)
+
+        language = self.page.get_content_obj().language
+        slug = self.page.get_slug(language)
+
+        if position not in ("first-child", "last-child"):
+            self._validate_slug_uniqueness(new_parent, language, slug)
+
+        if new_parent:
+            parent_path = new_parent.get_path(language)
+            new_path = f"{parent_path}/{slug}" if parent_path else slug
+        else:
+            new_path = slug
+
+        self._validate_url_uniqueness(new_path, language)
+
         return cleaned_data
 
     def get_tree_options(self):
@@ -986,6 +1005,37 @@ class MovePageForm(PageTreeForm):
 
     def move_page(self):
         self.page.move_page(*self.get_tree_options())
+
+    def _determine_new_parent(self, target_page, position):
+        if position in ("first-child", "last-child"):
+            return target_page
+        return target_page.parent
+
+    def _validate_slug_uniqueness(self, parent, language, slug):
+        target_siblings = Page.objects.filter(parent=parent).exclude(pk=self.page.pk)
+        if target_siblings.filter(urls__slug=slug, urls__language=language).exists():
+            raise ValidationError(
+                _(
+                    "You cannot have two pages with the same slug at the same page level. "
+                    "Please alter the slug of one of the pages before trying to move again."
+                )
+            )
+
+    def _validate_url_uniqueness(self, path, language):
+        try:
+            validate_url_uniqueness(
+                self._site,
+                path=path,
+                language=language,
+                exclude_page=self.page,
+            )
+        except ValidationError:
+            raise ValidationError(
+                _(
+                    "You cannot have two pages with the same slug at the same page level. "
+                    "Please alter the slug of one of the pages before trying to move again."
+                )
+            )
 
 
 class CopyPageForm(PageTreeForm):
@@ -1230,14 +1280,13 @@ class GenericCmsPermissionForm(forms.ModelForm):
 
             if data.get("can_delete_page"):
                 message = _(
-                    "Users can't delete a page without permissions " "to change the page. Edit permissions required."
+                    "Users can't delete a page without permissions to change the page. Edit permissions required."
                 )
                 raise ValidationError(message)
 
             if data.get("can_add_pagepermission"):
                 message = _(
-                    "Users can't set page permissions without permissions "
-                    "to change a page. Edit permissions required."
+                    "Users can't set page permissions without permissions to change a page. Edit permissions required."
                 )
                 raise ValidationError(message)
 

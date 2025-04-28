@@ -218,12 +218,12 @@ Example: application template
 .. code-block:: html+django
 
     {% extends CMS_TEMPLATE %}
-    {% load cms_tags %}
+    {% load cms_tags djangocms_alias_tags %}
     {% block main %}
     {% for item in object_list %}
         {{ item }}
     {% endfor %}
-    {% static_placeholder "sidebar" %}
+    {% static_alias "sidebar" %}
     {% endblock main %}
 
 ``CMS_TEMPLATE`` memorises the path of the cms template so the application
