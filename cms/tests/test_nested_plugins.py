@@ -991,3 +991,30 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         self.copy_placeholders_and_check_results([placeholder])
         self.compare_plugin_tree(expected_tree, placeholder)
+
+    def test_recalculate_plugin_positions(self):
+        """
+        Test to verify that the plugin positions are recalculated correctly
+        when a plugin is moved to another placeholder.
+        """
+        import random
+
+        placeholder = Placeholder(slot="some_slot")
+        placeholder.save()
+        # plugins in placeholder
+        order = list(random.sample(range(1, 100), 50))
+        for lang in ("en", "it"):
+            for i, pos in enumerate(order):
+                CMSPlugin.objects.create(
+                    plugin_type=str(i),
+                    placeholder=placeholder,
+                    language=lang,
+                    position=pos,
+                    parent=None,
+                )
+
+        placeholder._recalculate_plugin_positions("en")
+
+        plugins = placeholder.get_plugins("en")
+        for i, plugin in enumerate(plugins, start=1):
+            self.assertEqual(plugin.position, i)
