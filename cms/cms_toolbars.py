@@ -668,7 +668,11 @@ class PageToolbar(CMSToolbar):
 
             add_page_menu.add_modal_item(
                 _('Duplicate this Page'),
-                url=add_url_parameters(duplicate_page_url, {'language': self.toolbar.request_language}),
+                url=add_url_parameters(
+                    duplicate_page_url,
+                    {'parent_node': self.page.parent_page.node_id} if self.page.parent_page else {},
+                    language=self.toolbar.request_language,
+                ),
                 disabled=not can_add_sibling_page,
             )
 
