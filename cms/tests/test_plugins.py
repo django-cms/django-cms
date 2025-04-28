@@ -223,7 +223,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertEqual(["TextPlugin"], installed_plugins)
 
-        # try to add a new plugin to a colmn plugin - still only text
+        # try to add a new plugin to a column plugin - still only text
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
 
