@@ -1018,6 +1018,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         placeholder._recalculate_plugin_positions("en")
 
-        plugins = placeholder.get_plugins("en")
+        plugins = placeholder.get_plugins("en").order_by("position")
         for i, plugin in enumerate(plugins, start=1):
             self.assertEqual(plugin.position, i)
