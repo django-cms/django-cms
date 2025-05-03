@@ -1003,7 +1003,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         placeholder.save()
         # plugins in placeholder
         n0 = 10  # Number of plugins in the first positions
-        n = 50  # Number of plugins after the gap (of at leasat n)
+        n = 50  # Number of plugins after the gap (of at least n)
         order = list(random.sample(range(1, n0 + 1), n0))
         order += list(random.sample(range(n0 + n + 1, n0 + 3 * n + 2), n))
         for lang in ("en", "it"):
