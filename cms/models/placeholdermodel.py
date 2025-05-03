@@ -699,6 +699,11 @@ class Placeholder(models.Model):
         self.get_plugins(language).filter(position__gte=start).update(position=models.F("position") + offset)
 
     def _recalculate_plugin_positions(self, language):
+        """Closes gaps in the plugin tree by re-calculating the positions of all plugins.
+        IMPORTANT: This method requires any gap to be large enough to be able to
+        contain all missing plugin positions. Ensure to have shiftet out plugins after the
+        gaps far enough using the ``_shift_plugin_positions`` method."""
+
         from cms.models.pluginmodel import (
             CMSPlugin,
             _get_database_cursor,

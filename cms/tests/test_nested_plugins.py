@@ -1002,7 +1002,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         placeholder = Placeholder(slot="some_slot")
         placeholder.save()
         # plugins in placeholder
-        order = list(random.sample(range(1, 100), 50))
+        n0 = 10  # Number of plugins in the first positions
+        n = 50  # Number of plugins after the gap (of at leasat n)
+        order = list(random.sample(range(1, n0 + 1), n0))
+        order += list(random.sample(range(n0 + n + 1, n0 + 3 * n + 2), n))
         for lang in ("en", "it"):
             for i, pos in enumerate(order):
                 CMSPlugin.objects.create(
