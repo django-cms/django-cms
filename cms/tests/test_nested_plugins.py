@@ -1021,3 +1021,20 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugins = placeholder.get_plugins("en").order_by("position")
         for i, plugin in enumerate(plugins, start=1):
             self.assertEqual(plugin.position, i)
+
+    def test_recalculate_plugin_positions_empty_placeholder(self):
+        """
+        Test to verify that recalculating plugin positions on an empty placeholder
+        doesn't error and leaves the plugin list empty for a given language.
+        """
+        # Create an empty placeholder for language "en"
+        placeholder = Placeholder(slot="empty_slot")
+        placeholder.save()
+
+        # Invoke the recalculation function for the language "en".
+        # Adjust the call to _recalculate_plugin_positions as needed.
+        placeholder._recalculate_plugin_positions("en")
+
+        # Assert that the plugin list for the placeholder in language "en" remains empty.
+        plugins = list(placeholder.get_plugins(language="en"))
+        self.assertEqual(plugins, [])
