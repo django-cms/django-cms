@@ -15,6 +15,12 @@ $pagetree: true;
 @import "components/iconography";
 
 
+#content-main a.btn.btn, #content-main a.cms-btn.cms-btn {
+    // Necessary since django admin adds a decoration to every link except some
+    // This is needed to get a higher specificity (including the .btn.btn)
+    text-decoration: none;
+}
+
 a.btn.cms-action-btn {
     color: var(--dca-gray-darkest, var(--body-fg));
     border: 1px solid var(--dca-gray-lighter, #ddd);
