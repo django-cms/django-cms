@@ -210,6 +210,26 @@ class PluginsTestCase(PluginsTestBaseCase):
                 FilteredSelectMultiple,
             )
 
+    def test_restricted_plugin(self):
+        CMS_PLACEHOLDER_CONF = {"body": {"plugins": ["TextPlugin"]}}
+        add_page_endpoint = self.get_page_add_uri("en")
+
+        # try to add a new plugin
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            page_data = self.get_new_page_data()
+            self.client.post(add_page_endpoint, page_data)
+            page = Page.objects.first()
+            installed_plugins = plugin_pool.get_all_plugins("body", page)
+            installed_plugins = [cls.__name__ for cls in installed_plugins]
+            self.assertEqual(["TextPlugin"], installed_plugins)
+
+        # try to add a new plugin to a column plugin - still only text
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
+
+            child_plugins = ColumnPlugin.get_child_classes("body", page)
+            self.assertEqual(["TextPlugin"], child_plugins)
+
     def test_excluded_plugin(self):
         """
         Test that you can't add a text plugin
@@ -815,12 +835,13 @@ class PluginsTestCase(PluginsTestBaseCase):
             CMS_PLACEHOLDER_CONF = {
                 "body": {
                     "child_classes": {
+                        # Config includes existing LinkPlugin and non-existing PicturePlugin
                         "ChildClassesPlugin": ["LinkPlugin", "PicturePlugin"],
                     }
                 }
             }
             with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
-                self.assertEqual(["LinkPlugin", "PicturePlugin"], plugin.get_child_classes(placeholder.slot, page))
+                self.assertEqual(["LinkPlugin"], plugin.get_child_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -865,11 +886,15 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
         ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
-        ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(
-            cache_parent_classes=False,
-            parent_classes=["ParentPlugin"],
-            render_plugin=False,
-            ))
+        ChildPlugin = type(
+            "ChildPlugin",
+            (CMSPluginBase,),
+            dict(
+                cache_parent_classes=False,
+                parent_classes=["ParentPlugin"],
+                render_plugin=False,
+            ),
+        )
         restriction_cache = {}  # cache is empty
 
         with register_plugins(ParentPlugin, ChildPlugin):
@@ -896,11 +921,15 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
         ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
-        ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(
-            cache_parent_classes=False,
-            parent_classes=[""],
-            render_plugin=False,
-            ))
+        ChildPlugin = type(
+            "ChildPlugin",
+            (CMSPluginBase,),
+            dict(
+                cache_parent_classes=False,
+                parent_classes=[""],
+                render_plugin=False,
+            ),
+        )
         restriction_cache = {}  # cache is empty
 
         with register_plugins(ParentPlugin, ChildPlugin):

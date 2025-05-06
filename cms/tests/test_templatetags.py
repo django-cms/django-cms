@@ -738,9 +738,6 @@ class CmsTagTemplateTagTests(CMSTestCase):
 
         try:
             rendered = template.render(context)
-            # Print output for debugging
-            print("\nTest: Handles NoReverseMatch")
-            print(f"Rendered Output: '{rendered.strip()}'")
         except NoReverseMatch:
             self.fail("NoReverseMatch should not be raised.")
 
