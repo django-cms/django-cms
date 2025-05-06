@@ -11,9 +11,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import get_language
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import override as force_language
+from django.utils.translation import get_language, gettext_lazy as _, override as force_language
 from treebeard.mp_tree import MP_Node
 
 from cms import constants
@@ -102,7 +100,6 @@ class TreeNode(MP_Node):
 
         for field, value in data.items():
             setattr(self, field, value)
-        return
 
     def get_cached_ancestors(self):
         if self._has_cached_hierarchy():

@@ -1,5 +1,3 @@
-
-
 class CMSApp:
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
     _urls = []
@@ -22,34 +20,33 @@ class CMSApp:
         Checking for the runtime attribute should be a sane fix
         """
         if cls.app_config:
-            if getattr(cls.app_config, 'cmsapp', None) and cls.app_config.cmsapp != cls:
+            if getattr(cls.app_config, "cmsapp", None) and cls.app_config.cmsapp != cls:
                 raise RuntimeError(
-                    'Only one AppHook per AppHookConfiguration must exists.\n'
-                    'AppHook %s already defined for %s AppHookConfig' % (
-                        cls.app_config.cmsapp.__name__, cls.app_config.__name__
-                    )
+                    "Only one AppHook per AppHookConfiguration must exists.\n"
+                    "AppHook %s already defined for %s AppHookConfig"
+                    % (cls.app_config.cmsapp.__name__, cls.app_config.__name__)
                 )
             cls.app_config.cmsapp = cls
-        return super(CMSApp, cls).__new__(cls)
+        return super().__new__(cls)
 
     def get_configs(self):
         """
         Returns all the apphook configuration instances.
         """
-        raise NotImplementedError('Configurable AppHooks must implement this method')
+        raise NotImplementedError("Configurable AppHooks must implement this method")
 
     def get_config(self, namespace):
         """
         Returns the apphook configuration instance linked to the given namespace
         """
-        raise NotImplementedError('Configurable AppHooks must implement this method')
+        raise NotImplementedError("Configurable AppHooks must implement this method")
 
     def get_config_add_url(self):
         """
         Returns the url to add a new apphook configuration instance
         (usually the model admin add view)
         """
-        raise NotImplementedError('Configurable AppHooks must implement this method')
+        raise NotImplementedError("Configurable AppHooks must implement this method")
 
     def get_menus(self, page=None, language=None, **kwargs):
         """

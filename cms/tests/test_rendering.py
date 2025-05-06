@@ -52,65 +52,65 @@ class RenderingTestCase(CMSTestCase):
 
         with self.login_user_context(self.test_user):
             self.test_data = {
-                'title': u'RenderingTestCase-title',
-                'slug': u'renderingtestcase-slug',
-                'reverse_id': u'renderingtestcase-reverse-id',
-                'text_main': u'RenderingTestCase-main',
-                'text_sub': u'RenderingTestCase-sub',
+                'title': 'RenderingTestCase-title',
+                'slug': 'renderingtestcase-slug',
+                'reverse_id': 'renderingtestcase-reverse-id',
+                'text_main': 'RenderingTestCase-main',
+                'text_sub': 'RenderingTestCase-sub',
             }
             self.test_data2 = {
-                'title': u'RenderingTestCase-title2',
-                'slug': u'RenderingTestCase-slug2',
-                'reverse_id': u'renderingtestcase-reverse-id2',
+                'title': 'RenderingTestCase-title2',
+                'slug': 'RenderingTestCase-slug2',
+                'reverse_id': 'renderingtestcase-reverse-id2',
             }
             self.test_data3 = {
-                'title': u'RenderingTestCase-title3',
-                'slug': u'RenderingTestCase-slug3',
-                'reverse_id': u'renderingtestcase-reverse-id3',
-                'text_sub': u'RenderingTestCase-sub3',
+                'title': 'RenderingTestCase-title3',
+                'slug': 'RenderingTestCase-slug3',
+                'reverse_id': 'renderingtestcase-reverse-id3',
+                'text_sub': 'RenderingTestCase-sub3',
             }
             self.test_data4 = {
-                'title': u'RenderingTestCase-title3',
-                'no_extra': u'no extra var!',
+                'title': 'RenderingTestCase-title3',
+                'no_extra': 'no extra var!',
                 'placeholderconf': {'extra_context': {'extra_context': {'extra_var': 'found extra var'}}},
-                'extra': u'found extra var',
+                'extra': 'found extra var',
             }
             self.test_data5 = {
-                'title': u'RenderingTestCase-title5',
-                'slug': u'RenderingTestCase-slug5',
-                'reverse_id': u'renderingtestcase-reverse-id5',
-                'text_main': u'RenderingTestCase-main-page5',
-                'text_sub': u'RenderingTestCase-sub5',
+                'title': 'RenderingTestCase-title5',
+                'slug': 'RenderingTestCase-slug5',
+                'reverse_id': 'renderingtestcase-reverse-id5',
+                'text_main': 'RenderingTestCase-main-page5',
+                'text_sub': 'RenderingTestCase-sub5',
             }
             self.test_data6 = {
-                'title': u'RenderingTestCase-title6',
-                'slug': u'RenderingTestCase-slug6',
-                'reverse_id': u'renderingtestcase-reverse-id6',
-                'text_sub': u'RenderingTestCase-sub6',
+                'title': 'RenderingTestCase-title6',
+                'slug': 'RenderingTestCase-slug6',
+                'reverse_id': 'renderingtestcase-reverse-id6',
+                'text_sub': 'RenderingTestCase-sub6',
             }
             self.test_data7 = {
-                'title': u'RenderingTestCase-title7',
-                'slug': u'RenderingTestCase-slug7',
-                'reverse_id': u'renderingtestcase-reverse-id7',
-                'text_sub': u'RenderingTestCase-sub7',
+                'title': 'RenderingTestCase-title7',
+                'slug': 'RenderingTestCase-slug7',
+                'reverse_id': 'renderingtestcase-reverse-id7',
+                'text_sub': 'RenderingTestCase-sub7',
             }
             self.test_data8 = {
-                'title': u'RenderingTestCase-title8',
-                'slug': u'RenderingTestCase-slug8',
-                'reverse_id': u'renderingtestcase-reverse-id8',
-                'text_sub': u'RenderingTestCase-sub8',
+                'title': 'RenderingTestCase-title8',
+                'slug': 'RenderingTestCase-slug8',
+                'reverse_id': 'renderingtestcase-reverse-id8',
+                'text_sub': 'RenderingTestCase-sub8',
             }
             self.test_data9 = {
-                'title': u'RenderingTestCase-title9',
-                'slug': u'RenderingTestCase-slug9',
-                'reverse_id': u'renderingtestcase-reverse-id9',
-                'text_sub': u'RenderingTestCase-sub9',
+                'title': 'RenderingTestCase-title9',
+                'slug': 'RenderingTestCase-slug9',
+                'reverse_id': 'renderingtestcase-reverse-id9',
+                'text_sub': 'RenderingTestCase-sub9',
             }
             self.test_data10 = {
-                'title': u'RenderingTestCase-title10',
-                'slug': u'RenderingTestCase-slug10',
-                'reverse_id': u'renderingtestcase-reverse-id10',
-                'text_sub': u'RenderingTestCase-sub10',
+                'title': 'RenderingTestCase-title10',
+                'slug': 'RenderingTestCase-slug10',
+                'reverse_id': 'renderingtestcase-reverse-id10',
+                'text_sub': 'RenderingTestCase-sub10',
             }
             self.insert_test_content()
 
@@ -240,7 +240,7 @@ class RenderingTestCase(CMSTestCase):
         response = details(self.get_request(page=self.test_page), self.test_page.get_path())
         response.render()
         r = self.strip_rendered(response.content.decode('utf8'))
-        self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
+        self.assertEqual(r, '|' + self.test_data['text_main'] + '|' + self.test_data['text_sub'] + '|')
 
     @override_settings(
         CMS_PLUGIN_PROCESSORS=('cms.tests.test_rendering.sample_plugin_processor',),
@@ -265,9 +265,9 @@ class RenderingTestCase(CMSTestCase):
             name = "Test Plugin"
 
             def get_render_template(self, context, instance, placeholder):
-                t = u'{% load cms_tags %}' + \
-                    u'{{ body }}|test_passed_plugin_context_processor_ok|' \
-                    u'{{ test_plugin_context_processor }}'
+                t = '{% load cms_tags %}' + \
+                    '{{ body }}|test_passed_plugin_context_processor_ok|' \
+                    '{{ test_plugin_context_processor }}'
                 return load_from_string(t)
 
         def test_passed_plugin_context_processor(instance, placeholder, context):
@@ -300,10 +300,10 @@ class RenderingTestCase(CMSTestCase):
         Tests the {% placeholder %} templatetag.
         """
         r = self.render(self.test_page)
-        self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
+        self.assertEqual(r, '|' + self.test_data['text_main'] + '|' + self.test_data['text_sub'] + '|')
 
     def test_placeholder_extra_context(self):
-        t = u'{% load cms_tags %}{% placeholder "extra_context" %}'
+        t = '{% load cms_tags %}{% placeholder "extra_context" %}'
         r = self.render(self.test_page4, template=t)
         self.assertEqual(r, self.test_data4['no_extra'])
         cache.clear()
@@ -315,17 +315,17 @@ class RenderingTestCase(CMSTestCase):
         """
         Tests the {% placeholder %} templatetag.
         """
-        t = u'{% load cms_tags %}' + \
-            u'|{% placeholder "empty" or %}No content{% endplaceholder %}'
+        t = '{% load cms_tags %}' + \
+            '|{% placeholder "empty" or %}No content{% endplaceholder %}'
         r = self.render(self.test_page, template=t)
-        self.assertEqual(r, u'|No content')
+        self.assertEqual(r, '|No content')
 
     def test_placeholder_or_in_edit_mode(self):
         """
         Tests the {% placeholder or %} templatetag in edit mode.
         """
-        t = u'{% load cms_tags %}' + \
-            u'|{% placeholder "empty" or %}No content{% endplaceholder %}'
+        t = '{% load cms_tags %}' + \
+            '|{% placeholder "empty" or %}No content{% endplaceholder %}'
         superuser = self.get_superuser()
 
         with self.login_user_context(superuser):
@@ -345,7 +345,7 @@ class RenderingTestCase(CMSTestCase):
             page=self.test_page,
             editable=True,
         )
-        expected = u'|{}No content'.format(expected)
+        expected = '|{}No content'.format(expected)
         rendered = self.render(self.test_page, template=t, request=request)
         self.assertEqual(rendered, self.strip_rendered(expected))
 
@@ -465,20 +465,20 @@ class RenderingTestCase(CMSTestCase):
         """
         Tests the {% show_placeholder %} templatetag, using lookup by pk/dict/reverse_id and passing a Page object.
         """
-        t = u'{% load cms_tags %}' + \
-            u'|{% show_placeholder "main" ' + str(self.test_page.pk) + ' %}' + \
-            u'|{% show_placeholder "main" test_dict %}' + \
-            u'|{% show_placeholder "sub" "' + str(self.test_page.reverse_id) + '" %}' + \
-            u'|{% show_placeholder "sub" test_page %}'
+        t = '{% load cms_tags %}' + \
+            '|{% show_placeholder "main" ' + str(self.test_page.pk) + ' %}' + \
+            '|{% show_placeholder "main" test_dict %}' + \
+            '|{% show_placeholder "sub" "' + str(self.test_page.reverse_id) + '" %}' + \
+            '|{% show_placeholder "sub" test_page %}'
         r = self.render(
             self.test_page,
             template=t,
             context_vars={'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}}
         )
-        self.assertEqual(r, (u'|' + self.test_data['text_main']) * 2 + (u'|' + self.test_data['text_sub']) * 2)
+        self.assertEqual(r, ('|' + self.test_data['text_main']) * 2 + ('|' + self.test_data['text_sub']) * 2)
 
     def test_show_placeholder_extra_context(self):
-        t = u'{% load cms_tags %}{% show_uncached_placeholder "extra_context" ' + str(self.test_page4.pk) + ' %}'
+        t = '{% load cms_tags %}{% show_uncached_placeholder "extra_context" ' + str(self.test_page4.pk) + ' %}'
         r = self.render(self.test_page4, template=t)
         self.assertEqual(r, self.test_data4['no_extra'])
         cache.clear()
@@ -490,22 +490,22 @@ class RenderingTestCase(CMSTestCase):
         """
         Tests the {% show_uncached_placeholder %} templatetag, using lookup by pk.
         """
-        template = u'{%% load cms_tags %%}{%% show_uncached_placeholder "main" %s %%}' % self.test_page.pk
+        template = '{%% load cms_tags %%}{%% show_uncached_placeholder "main" %s %%}' % self.test_page.pk
         output = self.render(self.test_page, template)
         self.assertEqual(output, self.test_data['text_main'])
 
     def test_show_uncached_placeholder_by_lookup_dict(self):
-        template = u'{% load cms_tags %}{% show_uncached_placeholder "main" test_dict %}'
+        template = '{% load cms_tags %}{% show_uncached_placeholder "main" test_dict %}'
         output = self.render(self.test_page, template, {'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(output, self.test_data['text_main'])
 
     def test_show_uncached_placeholder_by_reverse_id(self):
-        template = u'{%% load cms_tags %%}{%% show_uncached_placeholder "sub" "%s" %%}' % self.test_page.reverse_id
+        template = '{%% load cms_tags %%}{%% show_uncached_placeholder "sub" "%s" %%}' % self.test_page.reverse_id
         output = self.render(self.test_page, template)
         self.assertEqual(output, self.test_data['text_sub'])
 
     def test_show_uncached_placeholder_by_page(self):
-        template = u'{% load cms_tags %}{% show_uncached_placeholder "sub" test_page %}'
+        template = '{% load cms_tags %}{% show_uncached_placeholder "sub" test_page %}'
         output = self.render(self.test_page, template, {'test_page': self.test_page})
         self.assertEqual(output, self.test_data['text_sub'])
 
@@ -525,32 +525,32 @@ class RenderingTestCase(CMSTestCase):
         self.assertIsNone(cache_value_after)
 
     def test_page_url_by_pk(self):
-        template = u'{%% load cms_tags %%}{%% page_url %s %%}' % self.test_page2.pk
+        template = '{%% load cms_tags %%}{%% page_url %s %%}' % self.test_page2.pk
         output = self.render(self.test_page, template)
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_url_by_dictionary(self):
-        template = u'{% load cms_tags %}{% page_url test_dict %}'
+        template = '{% load cms_tags %}{% page_url test_dict %}'
         output = self.render(self.test_page, template, {'test_dict': {'pk': self.test_page2.pk}})
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_url_by_reverse_id(self):
-        template = u'{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
+        template = '{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
         output = self.render(self.test_page, template)
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_url_by_reverse_id_not_on_a_page(self):
-        template = u'{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
+        template = '{%% load cms_tags %%}{%% page_url "%s" %%}' % self.test_page2.reverse_id
         output = self.render(None, template)
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_url_by_page(self):
-        template = u'{% load cms_tags %}{% page_url test_page %}'
+        template = '{% load cms_tags %}{% page_url test_page %}'
         output = self.render(self.test_page, template, {'test_page': self.test_page2})
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_url_by_page_as(self):
-        template = u'{% load cms_tags %}{% page_url test_page as test_url %}{{ test_url }}'
+        template = '{% load cms_tags %}{% page_url test_page as test_url %}{{ test_url }}'
         output = self.render(self.test_page, template, {'test_page': self.test_page2})
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
@@ -560,7 +560,7 @@ class RenderingTestCase(CMSTestCase):
     #
     @override_settings(DEBUG=False)
     def test_page_url_on_bogus_page(self):
-        template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
+        template = '{% load cms_tags %}{% page_url "bogus_page" %}'
         output = self.render(self.test_page, template, {'test_page': self.test_page2})
         self.assertEqual(output, '')
 
@@ -571,7 +571,7 @@ class RenderingTestCase(CMSTestCase):
     #
     @override_settings(DEBUG=True)
     def test_page_url_on_bogus_page_in_debug(self):
-        template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
+        template = '{% load cms_tags %}{% page_url "bogus_page" %}'
         self.assertRaises(
             Page.DoesNotExist,
             self.render,
@@ -586,7 +586,7 @@ class RenderingTestCase(CMSTestCase):
     #
     @override_settings(DEBUG=False)
     def test_page_url_as_on_bogus_page(self):
-        template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
+        template = '{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
         output = self.render(self.test_page, template, {'test_page': self.test_page2})
         self.assertEqual(output, '')
 
@@ -595,7 +595,7 @@ class RenderingTestCase(CMSTestCase):
     #
     @override_settings(DEBUG=True)
     def test_page_url_as_on_bogus_page_in_debug(self):
-        template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
+        template = '{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
         output = self.render(self.test_page, template, {'test_page': self.test_page2})
         self.assertEqual(output, '')
 
@@ -603,42 +603,42 @@ class RenderingTestCase(CMSTestCase):
         """
         Tests the {% page_attribute %} templatetag, using current page, lookup by pk/dict/reverse_id and passing a Page object.
         """
-        t = u'{% load cms_tags %}' + \
-            u'|{% page_attribute title %}' + \
-            u'{% page_attribute title as title %}' + \
-            u'|{{ title }}' + \
-            u'|{% page_attribute title ' + str(self.test_page2.pk) + ' %}' + \
-            u'{% page_attribute title ' + str(self.test_page2.pk) + ' as title %}' + \
-            u'|{{ title }}' + \
-            u'|{% page_attribute title test_dict %}' + \
-            u'{% page_attribute title test_dict as title %}' + \
-            u'|{{ title }}' + \
-            u'|{% page_attribute slug "' + str(self.test_page2.reverse_id) + '" %}' + \
-            u'{% page_attribute slug "' + str(self.test_page2.reverse_id) + '" as slug %}' + \
-            u'|{{ slug }}' + \
-            u'|{% page_attribute slug test_page %}' + \
-            u'{% page_attribute slug test_page as slug %}' + \
-            u'|{{ slug }}'
+        t = '{% load cms_tags %}' + \
+            '|{% page_attribute title %}' + \
+            '{% page_attribute title as title %}' + \
+            '|{{ title }}' + \
+            '|{% page_attribute title ' + str(self.test_page2.pk) + ' %}' + \
+            '{% page_attribute title ' + str(self.test_page2.pk) + ' as title %}' + \
+            '|{{ title }}' + \
+            '|{% page_attribute title test_dict %}' + \
+            '{% page_attribute title test_dict as title %}' + \
+            '|{{ title }}' + \
+            '|{% page_attribute slug "' + str(self.test_page2.reverse_id) + '" %}' + \
+            '{% page_attribute slug "' + str(self.test_page2.reverse_id) + '" as slug %}' + \
+            '|{{ slug }}' + \
+            '|{% page_attribute slug test_page %}' + \
+            '{% page_attribute slug test_page as slug %}' + \
+            '|{{ slug }}'
         r = self.render(
             self.test_page,
             template=t,
             context_vars={'test_page': self.test_page2, 'test_dict': {'pk': self.test_page2.pk}}
         )
-        self.assertEqual(r, (u'|' + self.test_data['title']) * 2 + (u'|' + self.test_data2['title']) * 4 + (
-            u'|' + self.test_data2['slug']) * 4)
+        self.assertEqual(r, ('|' + self.test_data['title']) * 2 + ('|' + self.test_data2['title']) * 4 + (
+            '|' + self.test_data2['slug']) * 4)
 
     def test_inherit_placeholder(self):
         # a page whose parent has no 'main' placeholder inherits from ancestors
         r = self.render(self.test_page3)
-        self.assertEqual(r, u'|' + self.test_data['text_main'] + '|' + self.test_data3['text_sub'])
+        self.assertEqual(r, '|' + self.test_data['text_main'] + '|' + self.test_data3['text_sub'])
 
         # a page whose parent has 'main' placeholder inherits from the parent, not ancestors
         r = self.render(self.test_page6)
-        self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub'])
+        self.assertEqual(r, '|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub'])
 
     def test_inherit_placeholder_with_cache(self):
-        expected_6 = u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub']
-        expected_7 = u'|' + self.test_data5['text_main'] + '|'
+        expected_6 = '|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub']
+        expected_7 = '|' + self.test_data5['text_main'] + '|'
         # Render the top-most page
         # This will cache its contents
         self.render(self.test_page)
@@ -652,16 +652,16 @@ class RenderingTestCase(CMSTestCase):
 
         self.render(self.test_page9)
         # This should use the cached parent page content
-        self.assertEqual(self.render(self.test_page10), u'|<p>Ultimate fallback</p>|')
+        self.assertEqual(self.render(self.test_page10), '|<p>Ultimate fallback</p>|')
 
     def test_inherit_placeholder_with_or(self):
         # Tests that the "or" statement used in a {% placeholder %}
         # declaration is used as the last fallback when inheritance
         # fails to find content.
-        expected_8 = u'|' + self.test_data5['text_main'] + '|'
+        expected_8 = '|' + self.test_data5['text_main'] + '|'
         self.assertEqual(self.render(self.test_page8), expected_8)
 
-        expected_10 = u'|<p>Ultimate fallback</p>|'
+        expected_10 = '|<p>Ultimate fallback</p>|'
         self.assertEqual(self.render(self.test_page10), expected_10)
 
     def test_inherit_placeholder_override(self):
@@ -669,13 +669,13 @@ class RenderingTestCase(CMSTestCase):
         # in a placeholder by adding plugins to the inherited placeholder.
         # a page whose parent has 'main' placeholder inherits from the parent, not ancestors
         r = self.render(self.test_page5)
-        self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data5['text_sub'])
+        self.assertEqual(r, '|' + self.test_data5['text_main'] + '|' + self.test_data5['text_sub'])
 
     @override_settings(CMS_PLACEHOLDER_CONF={None: {'language_fallback': False}})
     def test_inherit_placeholder_queries(self):
         with self.assertNumQueries(FuzzyInt(6,8)):
             r = self.render(self.test_page2)
-            self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|')
+            self.assertEqual(r, '|' + self.test_data['text_main'] + '|')
 
     def test_render_placeholder_toolbar(self):
         placeholder = Placeholder()

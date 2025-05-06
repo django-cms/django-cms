@@ -12,7 +12,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
-from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_placeholder_conf
 
@@ -22,7 +21,7 @@ def get_plugin_class(plugin_type):
     return plugin_pool.get_plugin(plugin_type)
 
 
-@lru_cache()
+@lru_cache
 def get_plugin_model(plugin_type):
     return get_plugin_class(plugin_type).model
 

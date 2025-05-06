@@ -7,8 +7,7 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.shortcuts import render as render_to_response
 from django.utils.encoding import force_str
 from django.utils.html import escapejs
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -22,8 +21,9 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     Ensure the CMSPlugin subclasses have sane values and set some defaults if
     they're not given.
     """
+
     def __new__(cls, name, bases, attrs):
-        super_new = super(CMSPluginBaseMetaclass, cls).__new__
+        super_new = super().__new__
         parents = [base for base in bases if isinstance(base, CMSPluginBaseMetaclass)]
         if not parents:
             # If this is CMSPluginBase itself, and not a subclass, don't do anything
@@ -37,7 +37,9 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 % (new_plugin.model, new_plugin)
             )
         # validate the template:
-        if (not hasattr(new_plugin, 'render_template') and not hasattr(new_plugin, 'get_render_template')):
+        if not hasattr(new_plugin, "render_template") and not hasattr(
+            new_plugin, "get_render_template"
+        ):
             raise ImproperlyConfigured(
                 "CMSPluginBase subclasses must have a render_template attribute"
                 " or get_render_template method"
@@ -45,38 +47,35 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         # Set the default form
         if not new_plugin.form:
             form_meta_attrs = {
-                'model': new_plugin.model,
-                'exclude': ('position', 'placeholder', 'language', 'plugin_type', 'path', 'depth')
+                "model": new_plugin.model,
+                "exclude": (
+                    "position",
+                    "placeholder",
+                    "language",
+                    "plugin_type",
+                    "path",
+                    "depth",
+                ),
             }
-            form_attrs = {
-                'Meta': type('Meta', (object,), form_meta_attrs)
-            }
-            new_plugin.form = type('%sForm' % name, (forms.ModelForm,), form_attrs)
+            form_attrs = {"Meta": type("Meta", (object,), form_meta_attrs)}
+            new_plugin.form = type("%sForm" % name, (forms.ModelForm,), form_attrs)
         # Set the default fieldsets
         if not new_plugin.fieldsets:
             basic_fields = []
             advanced_fields = []
             for f in new_plugin.model._meta.fields:
                 if not f.auto_created and f.editable:
-                    if hasattr(f, 'advanced'):
+                    if hasattr(f, "advanced"):
                         advanced_fields.append(f.name)
                     else:
                         basic_fields.append(f.name)
             if advanced_fields:
                 new_plugin.fieldsets = [
+                    (None, {"fields": basic_fields}),
                     (
-                        None,
-                        {
-                            'fields': basic_fields
-                        }
+                        _("Advanced options"),
+                        {"fields": advanced_fields, "classes": ("collapse",)},
                     ),
-                    (
-                        _('Advanced options'),
-                        {
-                            'fields': advanced_fields,
-                            'classes': ('collapse',)
-                        }
-                    )
                 ]
         # Set default name
         if not new_plugin.name:
@@ -85,10 +84,10 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         # By flagging the plugin class, we avoid having to call these class
         # methods for every plugin all the time.
         # Instead, we only call them if they are actually overridden.
-        if 'get_extra_placeholder_menu_items' in attrs:
+        if "get_extra_placeholder_menu_items" in attrs:
             new_plugin._has_extra_placeholder_menu_items = True
 
-        if 'get_extra_plugin_menu_items' in attrs:
+        if "get_extra_plugin_menu_items" in attrs:
             new_plugin._has_extra_plugin_menu_items = True
         return new_plugin
 
@@ -99,8 +98,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     module = _("Generic")  # To be overridden in child classes
 
     form = None
-    change_form_template = 'admin/cms/page/plugin/change_form.html'
-    plugin_confirm_template = 'admin/cms/page/plugin/confirm_form.html'
+    change_form_template = "admin/cms/page/plugin/change_form.html"
+    plugin_confirm_template = "admin/cms/page/plugin/confirm_form.html"
     # Should the plugin be rendered in the admin?
     admin_preview = False
 
@@ -130,7 +129,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     _has_extra_placeholder_menu_items = False
     _has_extra_plugin_menu_items = False
 
-    cache = get_cms_setting('PLUGIN_CACHE')
+    cache = get_cms_setting("PLUGIN_CACHE")
     system = False
 
     opts = {}
@@ -150,15 +149,17 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         self._operation_token = None
 
     def _get_render_template(self, context, instance, placeholder):
-        if hasattr(self, 'get_render_template'):
+        if hasattr(self, "get_render_template"):
             template = self.get_render_template(context, instance, placeholder)
-        elif getattr(self, 'render_template', False):
-            template = getattr(self, 'render_template', False)
+        elif getattr(self, "render_template", False):
+            template = getattr(self, "render_template", False)
         else:
             template = None
 
         if not template:
-            raise ImproperlyConfigured("plugin has no render_template: %s" % self.__class__)
+            raise ImproperlyConfigured(
+                "plugin has no render_template: %s" % self.__class__
+            )
         return template
 
     @classmethod
@@ -166,8 +167,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return cls.model._default_manager.all()
 
     def render(self, context, instance, placeholder):
-        context['instance'] = instance
-        context['placeholder'] = placeholder
+        context["instance"] = instance
+        context["placeholder"] = placeholder
         return context
 
     @classmethod
@@ -185,7 +186,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         template = page.get_template() if page else None
 
         # config overrides..
-        require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
+        require_parent = get_placeholder_conf(
+            "require_parent", slot, template, default=cls.require_parent
+        )
         return require_parent
 
     def get_cache_expiration(self, request, instance, placeholder):
@@ -240,16 +243,20 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         return None
 
-    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+    def render_change_form(
+        self, request, context, add=False, change=False, form_url="", obj=None
+    ):
         """
         We just need the popup interface here
         """
-        context.update({
-            'preview': "no_preview" not in request.GET,
-            'is_popup': True,
-            'plugin': obj,
-            'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-        })
+        context.update(
+            {
+                "preview": "no_preview" not in request.GET,
+                "is_popup": True,
+                "plugin": obj,
+                "CMS_MEDIA_URL": get_cms_setting("MEDIA_URL"),
+            }
+        )
 
         return super().render_change_form(request, context, add, change, form_url, obj)
 
@@ -264,7 +271,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             # which uses ghost plugins to create inline plugins on the text.
             root = obj
 
-        plugins = [root] + list(root.get_descendants().order_by('path'))
+        plugins = [root] + list(root.get_descendants().order_by("path"))
         # simulate the call to the unauthorized CMSPlugin.page property
         cms_page = obj.placeholder.page if obj.placeholder_id else None
 
@@ -285,20 +292,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             children=child_classes,
             parents=parent_classes,
         )
-        data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
+        data["plugin_desc"] = escapejs(force_str(obj.get_short_description()))
 
         context = {
-            'plugin': obj,
-            'is_popup': True,
-            'plugin_data': json.dumps(data),
-            'plugin_structure': get_plugin_tree_as_json(request, plugins),
+            "plugin": obj,
+            "is_popup": True,
+            "plugin_data": json.dumps(data),
+            "plugin_structure": get_plugin_tree_as_json(request, plugins),
         }
 
         if extra_context:
             context.update(extra_context)
-        return render_to_response(
-            request, self.plugin_confirm_template, context
-        )
+        return render_to_response(request, self.plugin_confirm_template, context)
 
     def save_model(self, request, obj, form, change):
         """
@@ -310,22 +315,24 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         if pl_admin:
             operation_kwargs = {
-                'request': request,
-                'placeholder': obj.placeholder,
+                "request": request,
+                "placeholder": obj.placeholder,
             }
 
             if change:
-                operation_kwargs['old_plugin'] = self.model.objects.get(pk=obj.pk)
-                operation_kwargs['new_plugin'] = obj
-                operation_kwargs['operation'] = operations.CHANGE_PLUGIN
+                operation_kwargs["old_plugin"] = self.model.objects.get(pk=obj.pk)
+                operation_kwargs["new_plugin"] = obj
+                operation_kwargs["operation"] = operations.CHANGE_PLUGIN
             else:
                 parent_id = obj.parent.pk if obj.parent else None
                 tree_order = obj.placeholder.get_plugin_tree_order(parent_id)
-                operation_kwargs['plugin'] = obj
-                operation_kwargs['operation'] = operations.ADD_PLUGIN
-                operation_kwargs['tree_order'] = tree_order
+                operation_kwargs["plugin"] = obj
+                operation_kwargs["operation"] = operations.ADD_PLUGIN
+                operation_kwargs["tree_order"] = tree_order
             # Remember the operation token
-            self._operation_token = pl_admin._send_pre_placeholder_operation(**operation_kwargs)
+            self._operation_token = pl_admin._send_pre_placeholder_operation(
+                **operation_kwargs
+            )
 
         # remember the saved object
         self.saved_object = obj
@@ -350,7 +357,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
+        msg_dict = {"name": force_str(opts.verbose_name), "obj": force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj)
@@ -388,14 +395,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         fieldsets = super().get_fieldsets(request, obj)
 
         for _name, data in fieldsets:
-            if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
+            if data.get(
+                "fields"
+            ):  # if fieldset with non-empty fields is found, return fieldsets
                 return fieldsets
 
         if self.inlines:
-            return []  # if plugin has inlines but no own fields return empty fieldsets to remove empty white fieldset
+            return (
+                []
+            )  # if plugin has inlines but no own fields return empty fieldsets to remove empty white fieldset
 
         try:  # if all fieldsets are empty (assuming there is only one fieldset then) add description
-            fieldsets[0][1]['description'] = self.get_empty_change_form_text(obj=obj)
+            fieldsets[0][1]["description"] = self.get_empty_change_form_text(obj=obj)
         except KeyError:
             pass
         return fieldsets
@@ -406,7 +417,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Returns the text displayed to the user when editing a plugin
         that requires no configuration.
         """
-        return gettext('There are no further settings for this plugin. Please press save.')
+        return gettext(
+            "There are no further settings for this plugin. Please press save."
+        )
 
     @classmethod
     def get_child_class_overrides(cls, slot, page):
@@ -419,7 +432,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         template = page.get_template() if page else None
 
         # config overrides..
-        ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
+        ph_conf = get_placeholder_conf("child_classes", slot, template, default={})
         return ph_conf.get(cls.__name__, cls.child_classes)
 
     @classmethod
@@ -435,6 +448,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Useful in cases like djangocms-text-ckeditor
         # where only text-enabled plugins are allowed.
         from cms.plugin_pool import plugin_pool
+
         return plugin_pool.registered_plugins
 
     @classmethod
@@ -479,7 +493,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         template = page.get_template() if page else None
 
         # config overrides..
-        ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
+        ph_conf = get_placeholder_conf("parent_classes", slot, template, default={})
         parent_classes = ph_conf.get(cls.__name__, cls.parent_classes)
         return parent_classes
 
@@ -492,6 +506,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     def plugin_urls(self):
         return self.get_plugin_urls()
+
     plugin_urls = property(plugin_urls)
 
     @classmethod
@@ -508,7 +523,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
 class PluginMenuItem:
 
-    def __init__(self, name, url, data=None, question=None, action='ajax', attributes=None):
+    def __init__(
+        self, name, url, data=None, question=None, action="ajax", attributes=None
+    ):
         """
         Creates an item in the plugin / placeholder menu
 
