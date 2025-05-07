@@ -22,6 +22,7 @@ Features:
 
 Bug Fixes:
 ----------
+* Remove more text decorations in page tree introduced by django 5.2 (#8219) (7f8a6e312) -- Fabian Braun
 * Racing condition after content update through data bridge (4b5d0f0d3) -- Fabian Braun
 * deleting users cascaded to deleting PageUser or PageUserGroup (#8167) (2403d4ea1) -- Fabian Braun
 * Add get_ancestors method to `CMSPlugin` (#8159) (502ced1ca) -- Fabian Braun
@@ -79,38 +80,13 @@ Refactoring and Cleanups:
 Statistics:
 -----------
 
-This release includes 137 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* 사재혁 (1 pull request)
-* Abdulwasiu Apalowo (2 pull requests)
-* Amanda Savluchinske (2 pull requests)
-* dependabot[bot] (0 pull request)
-* Fabian Braun (88 pull requests)
-* Filip Weidemann (3 pull requests)
-* Github Release Action (5 pull requests)
-* Halit Çelik (1 pull request)
-* Hana Belay (2 pull requests)
-* Jacob Rief (7 pull requests)
-* Jeffrey de Lange (1 pull request)
-* Jens-Erik Weber (2 pull requests)
-* jianghuyiyuan (1 pull request)
-* Mario Colombo (1 pull request)
-* Mark Walker (2 pull requests)
-* Sal (2 pull requests)
-* Stefan Heinen (1 pull request)
-* Vinit Kumar (2 pull requests)
-* Waithaka Waweru (1 pull request)
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
 
 With the review help of the following contributors:
 
-* dependabot[bot]
-* Fabian Braun
-* Github Release Action
-* Jacob Rief
-* John Bazik
-* Mario Colombo
-* sourcery-ai[bot]
-* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
