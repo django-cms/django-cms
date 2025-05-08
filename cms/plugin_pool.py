@@ -219,7 +219,7 @@ class PluginPool:
 
     @cached_property
     def registered_plugins(self) -> list[type[CMSPluginBase]]:
-        return sorted(self.get_all_plugins(), key=attrgetter("module", "name"))
+        return sorted(self.get_all_plugins(root_plugin=False), key=attrgetter("module", "name"))
 
     @cached_property
     def plugins_with_extra_menu(self) -> list[type[CMSPluginBase]]:

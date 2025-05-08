@@ -1,5 +1,5 @@
-5.0.0a1 (2025-03-02)
-====================
+5.0.0 (2025-05-12)
+==================
 
 Features:
 ---------
@@ -76,17 +76,6 @@ Bug Fixes:
 Refactoring and Cleanups:
 -------------------------
 * Replace PageAdmin.delete_view by two smaller methods (#7995) (cca00a57a) -- Jacob Rief
-
-Statistics:
------------
-
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
-
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
-
-With the review help of the following contributors:
-
 
 Thanks to all contributors for their efforts!
 
