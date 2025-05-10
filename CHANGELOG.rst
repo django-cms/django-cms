@@ -77,6 +77,92 @@ Refactoring and Cleanups:
 -------------------------
 * Replace PageAdmin.delete_view by two smaller methods (#7995) (cca00a57a) -- Jacob Rief
 
+Statistics:
+-----------
+
+This release includes 137 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* 사재혁 (1 pull request)
+* Abdulwasiu Apalowo (2 pull requests)
+* Amanda Savluchinske (2 pull requests)
+* dependabot[bot] (0 pull request)
+* Fabian Braun (88 pull requests)
+* Filip Weidemann (3 pull requests)
+* Github Release Action (5 pull requests)
+* Halit Çelik (1 pull request)
+* Hana Belay (2 pull requests)
+* Jacob Rief (7 pull requests)
+* Jeffrey de Lange (1 pull request)
+* Jens-Erik Weber (2 pull requests)
+* jianghuyiyuan (1 pull request)
+* Mario Colombo (1 pull request)
+* Mark Walker (2 pull requests)
+* Sal (2 pull requests)
+* Stefan Heinen (1 pull request)
+* Vinit Kumar (2 pull requests)
+* Waithaka Waweru (1 pull request)
+
+With the review help of the following contributors:
+
+* dependabot[bot]
+* Fabian Braun
+* Github Release Action
+* Jacob Rief
+* John Bazik
+* Mario Colombo
+* sourcery-ai[bot]
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.6 (2025-04-22)
+==================
+
+Bug Fixes:
+----------
+* Django 5.2 tried adding object tools to the page tree throwing an error  (#8200) (52af3ffc9) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.5 (2025-04-04)
+==================
+
+Bug Fixes:
+----------
+* Grouper models w/o must not assume language grouper (#8194) (#8195) (35521bc7f) -- Fabian Braun
+* Ensure correct placeholder retrieval for PageContent instances (#8088) -- Fabian Braun
+* Fallback page names were not escaped (#8113) (#8114) -- Fabian Braun
+* Use PageContent.changed_date for sitemap lastmod (#8125) -- Jacob Rief
+* Allow frontend editing of page title fields -- Fabian Braun
+* Detect page when getting toolbar for endpoint (#8137) (#8138) -- Fabian Braun
+* CMS_TOOLBAR_HIDE broke endpoints in django CMS 4+ (#8176) -- Fabian Braun
+* Preview did not show the redirect page (#8175) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull request)
+* Jacob Rief (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+* sourcery-ai[bot]
+
 Thanks to all contributors for their efforts!
 
 4.1.4 (2024-11-12)
