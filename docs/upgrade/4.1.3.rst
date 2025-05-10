@@ -1,0 +1,53 @@
+.. _upgrade-to-4.1.3:
+
+*******************
+4.1.3 release notes
+*******************
+
+*September 22, 2024*
+
+.. warning:: Upgrading from previous versions
+
+    django CMS 4.1 is the **first community release** of django CMS 4. Django CMS 4 introduces changes that **require** action if you are upgrading from a 3.x version. Please read the step-by-step guide to the
+    process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
+
+
+Welcome to django CMS 4.1.3!
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 3.2 to 5.1**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+support the latest release of each series.
+
+What's new in 4.1.3
+===================
+
+Bug Fixes:
+----------
+* Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
+* Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
+* Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
+* Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
+* Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
+* Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
+* Accept legacy action names for page permission checks (#8021) (9a1e178) -- Fabian Braun
+* Mark language and user middleware synchronous for ASGI (#7985) -- John Bazik
+
+
+Statistics:
+-----------
+
+This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull request)
+
+With the review help of the following contributors:
+
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!

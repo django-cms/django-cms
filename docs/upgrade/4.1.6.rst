@@ -1,0 +1,47 @@
+.. _upgrade-to-4.1.6:
+
+*******************
+4.1.6 release notes
+*******************
+
+*April 22, 2025*
+
+.. warning:: Upgrading from previous versions
+
+    django CMS 4.1 is the **first community release** of django CMS 4. Django CMS 4 introduces changes that **require** action if you are upgrading from a 3.x version. Please read the step-by-step guide to the
+    process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
+
+
+Welcome to django CMS 4.1.6!
+
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 3.2 to 5.2**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+support the latest release of each series.
+
+What's new in 4.1.6
+===================
+
+Bug Fixes:
+----------
+
+* Django 5.2 tried adding object tools to the page tree throwing an error (#8200) (52af3ffc9) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+

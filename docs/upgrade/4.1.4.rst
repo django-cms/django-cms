@@ -1,0 +1,82 @@
+.. _upgrade-to-4.1.4:
+
+*******************
+4.1.4 release notes
+*******************
+
+*November 12, 2024*
+
+.. warning:: Upgrading from previous versions
+
+    django CMS 4.1 is the **first community release** of django CMS 4. Django CMS 4 introduces changes that **require** action if you are upgrading from a 3.x version. Please read the step-by-step guide to the
+    process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
+
+
+Welcome to django CMS 4.1.4!
+
+Security fix
+============
+
+django CMS 4.1.4 closes a security vulnerability that could allow an attacker
+to inject malicious code into the page title allowing to load arbitrary
+javascript code when viewing the page. We recommend that you upgrade to
+this version as soon as possible.
+
+The security issue is of low severity, since an attacker needs to have access
+to the django CMS admin interface to exploit it.
+
+Thanks to `Ali İltizar (@alii76tt) <https://twitter.com/alii76tt>`_ for
+reporting the issue.
+
+.. note::
+
+   As ever, we remind our users and contributors that all security reports,
+   patches and concerns be addressed only to our security team by email, at
+   `security@django-cms.org <mailto:security@django-cms.org>`_.
+
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 3.2 to 5.1**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+support the latest release of each series.
+
+What's new in 4.1.4
+===================
+
+
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (c045a990e) -- Fabian Braun
+* Menus crashed when unexpected page content was present (#8052) -- Fabian Braun
+* Sites menu was empty in the page tree (#8064) -- Fabian Braun
+* Added redirect message when in editing a redirect toolbar object (#8056) -- Sal
+* X frame options added to page settings form (#8041) -- Sal
+* template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) -- Fabian Braun
+* Sitemap return a QuerySet in CMSSitemap.items() (#8031) -- Jens-Erik Weber
+* Improved UX when page content is missing in selected language (#8033) -- Jacob Rief
+
+Other:
+------
+* Updated welcome page (#8057) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull request)
+* Jacob Rief (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Sal (2 pull request)
+
+With the review help of the following contributors:
+
+* Jacob Rief
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!

@@ -1,0 +1,54 @@
+.. _upgrade-to-4.1.2:
+
+*******************
+4.1.2 release notes
+*******************
+
+*April 20, 2024*
+
+.. warning:: Upgrading from previous versions
+
+    django CMS 4.1 is the **first community release** of django CMS 4. Django CMS 4 introduces changes that **require** action if you are upgrading from a 3.x version. Please read the step-by-step guide to the
+    process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
+
+
+Welcome to django CMS 4.1.1!
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 3.2 to 5.0**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.8, 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+support the latest release of each series.
+
+What's new in 4.1.2
+===================
+
+Improved right-to-left support
+------------------------------
+
+* Both, the CSS assets and the JS assets have been adjusted to better support right-to-left languages (RTL).
+* Besides imrpvoed ease of use, the page tree can now be fully managed with RTL admin languages
+* Improved translations for Arabic
+
+Faster menu rendering
+---------------------
+
+* Improved efficiency building menus for the page tree dramatically reduces database hits
+* Page menus rendered by the core both for versioned and unversioned pages
+
+
+Bug Fixes
+---------
+
+* Placeholders do not block deletion of custom model instances with a ``PlaceholderRelationField``.
+* Structure view respects toolbar language
+* Fixed management command to delete orphaned plugins
+* Faster DOM update after edition plugins
+* Directly redirect to edit endpoint after creating a new page
+* Allow editing page content object for apphook without root content
+* Render fallback language in place if ``redirect_on_fallback`` is set to ``False`` in the ``CMS_LANGUAGES`` settings
+* Fail silently when rendering a placeholder on a missing toolbar object -- Fabian Braun
+* Show fallback language titles in pagetree -- Fabian Braun
