@@ -51,4 +51,4 @@ Bug Fixes
 * Allow editing page content object for apphook without root content
 * Render fallback language in place if ``redirect_on_fallback`` is set to ``False`` in the ``CMS_LANGUAGES`` settings
 * Fail silently when rendering a placeholder on a missing toolbar object -- Fabian Braun
-* Show fallback language titles in pagetree -- Fabian Braun
+* Show fallback language titles in page tree -- Fabian Braun
