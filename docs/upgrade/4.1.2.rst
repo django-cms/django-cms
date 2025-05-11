@@ -46,7 +46,7 @@ Bug Fixes
 * Placeholders do not block deletion of custom model instances with a ``PlaceholderRelationField``.
 * Structure view respects toolbar language
 * Fixed management command to delete orphaned plugins
-* Faster DOM update after edition plugins
+* Faster DOM update after editing plugins
 * Directly redirect to edit endpoint after creating a new page
 * Allow editing page content object for apphook without root content
 * Render fallback language in place if ``redirect_on_fallback`` is set to ``False`` in the ``CMS_LANGUAGES`` settings
