@@ -22,7 +22,7 @@ Features:
 
 Bug Fixes:
 ----------
-* Remove more text decorations in page tree introduced by django 5.2 (#8219) (7f8a6e312) -- Fabian Braun
+* Remove more text decorations in page tree introduced by Django 5.2 (#8219) (7f8a6e312) -- Fabian Braun
 * Racing condition after content update through data bridge (4b5d0f0d3) -- Fabian Braun
 * deleting users cascaded to deleting PageUser or PageUserGroup (#8167) (2403d4ea1) -- Fabian Braun
 * Add get_ancestors method to ``CMSPlugin`` (#8159) (502ced1ca) -- Fabian Braun
