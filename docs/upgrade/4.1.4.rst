@@ -53,7 +53,7 @@ Bug Fixes:
 * XSS vulnerability for page title (#8075) (c045a990e) -- Fabian Braun
 * Menus crashed when unexpected page content was present (#8052) -- Fabian Braun
 * Sites menu was empty in the page tree (#8064) -- Fabian Braun
-* Added redirect message when in editing a redirect toolbar object (#8056) -- Sal
+* Added redirect message when editing a redirect toolbar object (#8056) -- Sal
 * X frame options added to page settings form (#8041) -- Sal
 * template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) -- Fabian Braun
 * Sitemap return a QuerySet in CMSSitemap.items() (#8031) -- Jens-Erik Weber
