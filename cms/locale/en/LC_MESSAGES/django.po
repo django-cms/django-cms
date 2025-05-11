@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-01 20:44+0000\n"
+"POT-Creation-Date: 2025-05-07 07:36+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -92,6 +92,11 @@ msgstr "An application instance with this name already exists."
 
 msgid "You can't move the home page inside another page"
 msgstr "You can't move the home page inside another page"
+
+msgid ""
+"You cannot have two pages with the same slug at the same page level. Please "
+"alter the slug of one of the pages before trying to move again."
+msgstr ""
 
 msgid "Yes"
 msgstr "Yes"
@@ -187,6 +192,11 @@ msgstr "The page is not eligible to be home."
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s object with primary key %(key)r does not exist."
+
+#, fuzzy
+#| msgid "Error:"
+msgid "error"
+msgstr "Error:"
 
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"

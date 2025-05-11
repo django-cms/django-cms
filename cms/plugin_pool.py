@@ -38,10 +38,6 @@ class PluginPool:
     def discover_plugins(self):
         if self.discovered:
             return
-        from cms.cache import invalidate_cms_page_cache
-
-        if get_cms_setting("PAGE_CACHE"):
-            invalidate_cms_page_cache()
 
         autodiscover_modules("cms_plugins")
         self.discovered = True
@@ -219,7 +215,7 @@ class PluginPool:
 
     @cached_property
     def registered_plugins(self) -> list[type[CMSPluginBase]]:
-        return sorted(self.get_all_plugins(), key=attrgetter("module", "name"))
+        return sorted(self.get_all_plugins(root_plugin=False), key=attrgetter("module", "name"))
 
     @cached_property
     def plugins_with_extra_menu(self) -> list[type[CMSPluginBase]]:
