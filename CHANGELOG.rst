@@ -155,7 +155,7 @@ Statistics:
 
 This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (7 pull request)
+* Fabian Braun (7 pull requests)
 * Jacob Rief (1 pull request)
 
 With the review help of the following contributors:
