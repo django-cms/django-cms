@@ -1,7 +1,10 @@
+from functools import cached_property
+
 from django.db import models
 
 from cms.models import CMSPlugin
-from cms.models.fields import PlaceholderField
+from cms.models.fields import PlaceholderRelationField
+from cms.utils.placeholder import get_placeholder_from_slot
 
 
 class PlaceholderReference(CMSPlugin):
@@ -12,7 +15,11 @@ class PlaceholderReference(CMSPlugin):
         parent_link=True,
     )
     name = models.CharField(max_length=255)
-    placeholder_ref = PlaceholderField(slotname='clipboard')
+    placeholders = PlaceholderRelationField()
+
+    @cached_property
+    def placeholder_ref(self):
+        return get_placeholder_from_slot(self.placeholders, "clipboard")
 
     class Meta:
         app_label = 'cms'

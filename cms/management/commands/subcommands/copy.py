@@ -6,7 +6,7 @@ from django.db import transaction
 
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import EmptyPageContent, Page, PageContent, StaticPlaceholder
+from cms.models import EmptyPageContent, Page, PageContent
 from cms.utils import get_language_list
 from cms.utils.plugins import copy_plugins_to_placeholder
 
@@ -100,24 +100,6 @@ class CopyLangCommand(SubcommandsCommand):
                 if verbose:
                     self.stdout.write(
                         f'Skipping page {page.get_page_title(page.get_languages()[0])}, language {from_lang} not defined\n'
-                    )
-
-        if copy_content:
-            for static_placeholder in StaticPlaceholder.objects.all():
-                plugin_list = []
-                for plugin in static_placeholder.draft.get_plugins():
-                    if plugin.language == from_lang:
-                        plugin_list.append(plugin)
-
-                if plugin_list:
-                    if verbose:
-                        self.stdout.write(
-                            f'copying plugins from static_placeholder "{static_placeholder.name}" in "{from_lang}" to "{to_lang}"\n'
-                        )
-                    copy_plugins_to_placeholder(
-                        plugins=plugin_list,
-                        placeholder=static_placeholder.draft,
-                        language=to_lang,
                     )
 
         self.stdout.write('all done')

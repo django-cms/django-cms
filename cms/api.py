@@ -61,7 +61,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
-from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
@@ -383,55 +382,6 @@ def create_page_content(
     page._clear_internal_cache()
 
     return page_content
-
-
-def create_title(
-    language,
-    title,
-    page,
-    menu_title=None,
-    slug=None,
-    redirect=None,
-    meta_description=None,
-    parent=None,
-    overwrite_url=None,
-    page_title=None,
-    path=None,
-    created_by="python-api",
-    soft_root=False,
-    in_navigation=False,
-    template=TEMPLATE_INHERITANCE_MAGIC,
-    limit_visibility_in_menu=constants.VISIBILITY_ALL,
-    xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
-):
-    """
-    .. warning ::
-        ``create_title`` has been renamed to ``create_page_content`` as of django CMS version 4.
-    """
-    warnings.warn(
-        "cms.api.create_title has been renamed to cms.api.create_page_content().",
-        RemovedInDjangoCMS51Warning,
-        stacklevel=2,
-    )
-    return create_page_content(
-        language,
-        title,
-        page,
-        menu_title=menu_title,
-        slug=slug,
-        redirect=redirect,
-        meta_description=meta_description,
-        parent=parent,
-        overwrite_url=overwrite_url,
-        page_title=page_title,
-        path=path,
-        created_by=created_by,
-        soft_root=soft_root,
-        in_navigation=in_navigation,
-        template=template,
-        limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,
-    )
 
 
 @transaction.atomic

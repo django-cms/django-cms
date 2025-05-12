@@ -12,7 +12,6 @@ from sekizai.context import SekizaiContext
 from cms import constants
 from cms.api import add_plugin, create_page, create_page_content
 from cms.exceptions import DuplicatePlaceholderWarning, PlaceholderNotFound
-from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.settingmodels import UserSettings
@@ -37,8 +36,6 @@ from cms.toolbar.utils import (
     get_toolbar_from_request,
 )
 from cms.utils.placeholder import (
-    MLNGPlaceholderActions,
-    PlaceholderNoAction,
     _get_nodelist,
     _scan_placeholders,
     get_placeholder_conf,
@@ -690,9 +687,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         placeholders = _get_placeholder_slots("placeholder_tests/nested_super_level1.html")
         self.assertEqual(sorted(placeholders), sorted(["level1", "level2", "level3", "level4"]))
 
-    def test_placeholder_field_no_related_name(self):
-        self.assertRaises(ValueError, PlaceholderField, "placeholder", related_name="+")
-
     def test_placeholder_field_db_table(self):
         """
         Test for leaking Model._meta.db_table monkeypatching on SQLite (#3891).
@@ -703,9 +697,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             depth=1,
         )
         self.assertEqual(example.description._get_attached_model(), Category)
-
-    def test_placeholder_field_valid_slotname(self):
-        self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)
 
     def test_placeholder_field_dynamic_slot_generation(self):
         instance = DynamicPlaceholderSlotExample.objects.create(char_1="slot1", char_2="slot2")
@@ -1082,77 +1073,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual(poll.placeholders.all().count(), 2)  # Two should have been created
 
         self.assertEqual(slot_1, get_placeholder_from_slot(poll.placeholders, "slot_1"))  # Still the first slot
-
-
-class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
-    def test_placeholder_no_action(self):
-        actions = PlaceholderNoAction()
-        self.assertEqual(actions.get_copy_languages(), [])
-        self.assertFalse(actions.copy())
-
-    def test_mlng_placeholder_actions_get_copy_languages(self):
-        actions = MLNGPlaceholderActions()
-        fr = Translations.objects.get(language_code="fr")
-        de = Translations.objects.get(language_code="de")
-        en = Translations.objects.get(language_code="en")
-        fieldname = "placeholder"
-        fr_copy_languages = actions.get_copy_languages(fr.placeholder, Translations, fieldname)
-        de_copy_languages = actions.get_copy_languages(de.placeholder, Translations, fieldname)
-        en_copy_languages = actions.get_copy_languages(en.placeholder, Translations, fieldname)
-        EN = ("en", "English")
-        FR = ("fr", "French")
-        self.assertEqual(set(fr_copy_languages), {EN})
-        self.assertEqual(set(de_copy_languages), {EN, FR})
-        self.assertEqual(set(en_copy_languages), {FR})
-
-    def test_mlng_placeholder_actions_copy(self):
-        actions = MLNGPlaceholderActions()
-        fr = Translations.objects.get(language_code="fr")
-        de = Translations.objects.get(language_code="de")
-        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
-        self.assertEqual(de.placeholder.get_plugins().count(), 0)
-
-        new_plugins = actions.copy(de.placeholder, "fr", "placeholder", Translations, "de")
-        self.assertEqual(len(new_plugins), 1)
-
-        de = self.reload(de)
-        fr = self.reload(fr)
-
-        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
-        self.assertEqual(de.placeholder.get_plugins().count(), 1)
-
-    def test_mlng_placeholder_actions_empty_copy(self):
-        actions = MLNGPlaceholderActions()
-        fr = Translations.objects.get(language_code="fr")
-        de = Translations.objects.get(language_code="de")
-        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
-        self.assertEqual(de.placeholder.get_plugins().count(), 0)
-
-        new_plugins = actions.copy(fr.placeholder, "de", "placeholder", Translations, "fr")
-        self.assertEqual(len(new_plugins), 0)
-
-        de = self.reload(de)
-        fr = self.reload(fr)
-
-        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
-        self.assertEqual(de.placeholder.get_plugins().count(), 0)
-
-    def test_mlng_placeholder_actions_no_placeholder(self):
-        actions = MLNGPlaceholderActions()
-        Translations.objects.filter(language_code="nl").update(placeholder=None)
-        de = Translations.objects.get(language_code="de")
-        nl = Translations.objects.get(language_code="nl")
-        self.assertEqual(nl.placeholder, None)
-        self.assertEqual(de.placeholder.get_plugins().count(), 0)
-
-        okay = actions.copy(de.placeholder, "nl", "placeholder", Translations, "de")
-        self.assertEqual(okay, False)
-
-        de = self.reload(de)
-        nl = self.reload(nl)
-
-        nl = Translations.objects.get(language_code="nl")
-        de = Translations.objects.get(language_code="de")
 
 
 @override_settings(CMS_PERMISSION=False)

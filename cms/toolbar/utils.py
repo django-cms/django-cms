@@ -20,7 +20,6 @@ from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.models import CMSPlugin, PageContent, Placeholder
-from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -66,14 +65,6 @@ def get_plugin_toolbar_js(plugin: CMSPlugin, children: Optional[list[str]] = Non
         parents=parents,
     )
     return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
-
-
-def get_plugin_tree_as_json(request: HttpRequest, plugins: list[CMSPlugin]) -> str:
-    import warnings
-
-    warnings.warn("get_plugin_tree_as_json is deprecated. Use get_plugin_tree instead.",
-                  RemovedInDjangoCMS51Warning, stacklevel=2)
-    return json.dumps(get_plugin_tree(request, plugins)[0])
 
 
 def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]:
