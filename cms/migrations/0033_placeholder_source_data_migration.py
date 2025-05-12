@@ -28,7 +28,7 @@ def forwards(apps, schema_editor):
 
             # Model has related field/s with Placeholder.
             # Now get all the objects for the model and populate source field.
-            cur_ct_obj = ContentType.objects.get_for_model(model_class)
+            cur_ct_obj = ContentType.objects.using(db_alias).get_for_model(model_class)
 
             for obj in model_class.objects.using(db_alias):
                 for pl_field in pl_related_fields:

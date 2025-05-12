@@ -99,6 +99,7 @@ class MP_AddChildHandler(MP_AddHandler):
         self.model = model
 
     def process(self):
+        db_alias = self.kwargs.get('db_alias')
         newobj = self.kwargs['instance']
         newobj.depth = self.node.depth + 1
         if self.node.numchild == 0:
@@ -117,7 +118,7 @@ class MP_AddChildHandler(MP_AddHandler):
         # saving the instance before returning it
         newobj.save()
         newobj._cached_parent_obj = self.node
-        self.model.objects.filter(
+        self.model.objects.using(db_alias).filter(
             path=self.node.path).update(numchild=F('numchild') + 1)
 
         # we increase the numchild value of the object in memory
@@ -137,7 +138,7 @@ def move_to_mp(apps, schema_editor):
     last_root = None
     for page in pages:
         if not page.parent_id:
-            handler = MP_AddRootHandler(instance=page, last_root=last_root)
+            handler = MP_AddRootHandler(instance=page, last_root=last_root, db_alias=db_alias)
             handler.process()
             last_root = page
             page.last_child = None
@@ -161,7 +162,7 @@ def move_to_mp(apps, schema_editor):
             plugin.last_child = None
         else:
             parent = cache[plugin.parent_id]
-            handler = MP_AddChildHandler(parent, CMSPlugin, instance=plugin)
+            handler = MP_AddChildHandler(parent, CMSPlugin, instance=plugin, db_alias=db_alias)
             handler.process()
             parent.last_child = plugin
         cache[plugin.pk] = plugin

@@ -39,7 +39,7 @@ def set_page_nodes(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     draft_pages = Page.objects.using(db_alias).filter(publisher_is_draft=True)
     public_pages = Page.objects.using(db_alias).filter(publisher_is_draft=False)
-    nodes_by_path = {node.path: node for node in TreeNode.objects.all()}
+    nodes_by_path = {node.path: node for node in TreeNode.objects.using(db_alias).all()}
 
     for draft_page in draft_pages:
         draft_page.node = nodes_by_path[draft_page.path]
