@@ -84,13 +84,13 @@ Use `static aliases <https://github.com/django-cms/djangocms-alias>`_ instead.
 
 * The ``static_placeholder`` template tag has been removed.
 
-Placehoders
------------
+Placeholders
+------------
 
 * ``PlaceholderField`` has been removed from ``cms.fields``. Use :class:`~cms.models.fields.PlaceholderRelationField` in conjunction with
 :meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see :ref:`placeholders_outside_cms`).
 
-* ``PlaceholderAdminMixin`` has been removed from ``cms.admin``. It is not needed anymore and can be savely removed from your code.
+* ``PlaceholderAdminMixin`` has been removed from ``cms.admin``. It is not needed anymore and can be safely removed from your code.
 
 * A placeholder's ``actions`` property (deprecated in django CMS 5) has been removed. This also includes the removal of the two classes
   ``cms.utils.placeholder.PlaceholderNoAction`` and ``cms.utils.placeholder.MLNGPlaceholderActions``. If you need these classes,
