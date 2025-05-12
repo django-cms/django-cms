@@ -8,7 +8,6 @@ from django.template.defaultfilters import title
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 
 from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
@@ -533,16 +532,14 @@ class Placeholder(models.Model):
             # by shifting all right nodes further to the right, excluding the current plugin
             # but including the target plugin and its descendants.
             (target_tree.filter(position__gte=target_position).exclude(position__range=source_plugin_range)).update(
-                position=(models.F("position") + last_plugin.position),
-                changed_date=timezone.now()
+                position=(models.F("position") + last_plugin.position)
             )
 
             # Make a big hole on the left side of the current plugin's position
             # by shifting all right nodes further the right, including the current plugin
             # and its descendants.
             target_tree.filter(position__lte=source_plugin_range[1]).update(
-                position=models.F("position") - last_plugin.position,
-                changed_date=timezone.now()
+                position=models.F("position") - last_plugin.position
             )
         else:
             # Moving right
@@ -556,14 +553,13 @@ class Placeholder(models.Model):
                 target_tree.filter(position__lte=target_position + source_plugin_desc_count).exclude(
                     position__range=source_plugin_range
                 )
-            ).update(position=(models.F("position") - last_plugin.position), changed_date=timezone.now())
+            ).update(position=(models.F("position") - last_plugin.position))
 
             # Make a big hole on the right side of the current plugin's position
             # by shifting all right nodes further the right, including the current plugin
             # and its descendants.
             target_tree.filter(position__gte=plugin.position).update(
-                position=models.F("position") + last_plugin.position,
-                changed_date=timezone.now()
+                position=models.F("position") + last_plugin.position
             )
 
         if plugin.parent != target_plugin:
