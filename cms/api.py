@@ -22,6 +22,7 @@ Also, the functions defined in this module do sanity checks on arguments.
 
               def my_function():
                   from cms.api import api_function
+
                   api_function(...)
 
           instead of:
@@ -30,10 +31,12 @@ Also, the functions defined in this module do sanity checks on arguments.
 
               from cms.api import api_function
 
+
               def my_function():
                   api_function(...)
 
 """
+
 import warnings
 
 from django.contrib.auth import get_user_model
@@ -47,8 +50,7 @@ from cms import constants
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.forms.validators import validate_url_uniqueness
-from cms.models import PageContent, PageUrl
+from cms.models import PageContent
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import (
     ACCESS_PAGE_AND_DESCENDANTS,
@@ -346,6 +348,8 @@ def create_page_content(
         created_by = get_clean_username(created_by)
 
     try:
+        from cms.forms.validators import validate_url_uniqueness
+
         validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
     except ValidationError as e:
         raise IntegrityError(e)
