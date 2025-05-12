@@ -1,15 +1,3 @@
-Statistics:
------------
-
-This release includes 3 pull requests, and was created with the help of the following contributors (in alphabetical order):
-
-* Github Release Action (3 pull requests)
-
-With the review help of the following contributors:
-
-
-Thanks to all contributors for their efforts!
-
 5.0.0 (2025-05-12)
 ==================
 
