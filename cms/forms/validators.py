@@ -5,8 +5,12 @@ from django.core.validators import RegexValidator, URLValidator
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
-from cms.models.pagemodel import Page
 from cms.utils.urlutils import admin_reverse, relative_url_regex
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from cms.models.pagemodel import Page
 
 
 def validate_relative_url(value):
@@ -22,7 +26,9 @@ def validate_url(value):
         URLValidator()(value)
 
 
-def validate_url_uniqueness(site, path: str, language: str, user_language: Optional[str] = None, exclude_page: Optional[Page] = None):
+def validate_url_uniqueness(
+    site, path: str, language: str, user_language: Optional[str] = None, exclude_page: Optional["Page"] = None
+):
     """Checks for conflicting urls"""
     from cms.models.pagemodel import Page, PageUrl
 
