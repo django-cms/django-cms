@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
@@ -6,8 +6,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
 from cms.utils.urlutils import admin_reverse, relative_url_regex
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from cms.models.pagemodel import Page
