@@ -18,7 +18,7 @@ Documentation should be:
 - written using valid Sphinx_/restructuredText_ syntax (see below for specifics); the
   file extension should be ``.rst``
 - wrapped at 100 characters per line
-- written in English, using British English spelling and punctuation
+- written in English, using American English spelling and punctuation
 - accessible - you should assume the reader to be moderately familiar with Python and
   Django, but not anything else. Link to documentation of libraries you use, for
   example, even if they are "obvious" to you
@@ -135,8 +135,8 @@ You need to check your spelling before submitting documentation.
 
 .. important::
 
-    We use British English rather than US English spellings. This means that we use
-    *colour* rather than *color*, *emphasise* rather than *emphasize* and so on.
+    Prefer American English spelling, as it is the standard used in Python, Django,
+    JavaScript, CSS and Django CMS.
 
 Install the spelling software
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
