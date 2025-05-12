@@ -17,14 +17,6 @@ CREATION_METHODS = (
 )
 
 
-def static_slotname(instance):
-    """
-    Returns a string to be used as the slot
-    for the static placeholder field.
-    """
-    return instance.code
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
