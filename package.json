@@ -53,6 +53,7 @@
   "dependencies": {
     "babel-runtime": "^6.23.0",
     "diff-dom": "^5.1.4",
+    "django-cms": "file:",
     "fuzzaldrin": "^2.1.0",
     "keyboardjs": "^2.7.0",
     "local-storage": "1.4.2",

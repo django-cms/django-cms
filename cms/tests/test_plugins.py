@@ -1020,6 +1020,40 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
 
+    def test_plugin_changed_date_on_reorder(self):
+        """
+        Test that plugin changed_date is updated when reordering plugins
+        """
+        page = api.create_page("PluginOrderPage", "col_two.html", "en", slug="page1", in_navigation=True)
+        placeholder = page.get_placeholders("en").get(slot="col_left")
+
+        # Create two plugins
+        text_plugin_1 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the first")
+        text_plugin_2 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the second")
+
+        # Get initial changed_date
+        initial_changed_date_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk).changed_date
+        initial_changed_date_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk).changed_date
+
+        # Move second plugin to first position
+        data = {
+            "plugin_id": text_plugin_2.id,
+            "plugin_parent": "",
+            "target_language": "en",
+            "target_position": 1,
+        }
+
+        endpoint = self.get_move_plugin_uri(text_plugin_2)
+        self.client.post(endpoint, data)
+
+        # Get updated changed_date
+        updated_changed_date_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk).changed_date
+        updated_changed_date_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk).changed_date
+
+        # Verify changed_date was updated for both plugins
+        self.assertGreater(updated_changed_date_1, initial_changed_date_1)
+        self.assertGreater(updated_changed_date_2, initial_changed_date_2)
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):
