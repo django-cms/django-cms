@@ -33,6 +33,25 @@ class PageField(models.ForeignKey):
         return super().formfield(**defaults)
 
 
+class PlaceholderField(models.ForeignKey):
+    """
+    .. warning::
+        This field is for django CMS versions below 4 only. It may only be used inside migrations.
+
+    The ``PlaceholderField`` has been replaced by the :class:`~cms.models.fields.PlaceholderRelationField`,
+    the built-in migrations will automatically take care of the replacement.
+    See documentation of :class:`~cms.models.fields.PlaceholderRelationField` for how to replace the code.
+    """
+    def __init__(self, *args, **kwargs):
+        kwargs.update({'null': True})  # always allow Null
+        kwargs.update({'editable': False})  # never allow edits in admin
+        # We hard-code the `to` argument for ForeignKey.__init__
+        # since a PlaceholderField can only be a ForeignKey to a Placeholder
+        kwargs['to'] = 'cms.Placeholder'
+        kwargs['on_delete'] = models.CASCADE
+        super().__init__(**kwargs)
+
+
 class PlaceholderRelationField(GenericRelation):
     """:class:`~django.contrib.contenttypes.fields.GenericForeignKey` to placeholders.
 
