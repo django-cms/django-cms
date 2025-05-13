@@ -2424,42 +2424,41 @@ describe('CMS.StructureBoard', function() {
     });
 
     describe('_getPluginDataFromMarkup()', () => {
+        const wrap = markup => $(`<div>${markup}</div>`)[0];
         [
             {
-                args: ['', [1, 2, 3]],
+                args: [wrap(''), [1, 2, 3]],
                 expected: []
             },
             {
-                args: ['whatever', []],
+                args: [wrap('whatever'), []],
                 expected: []
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 3]],
+                args: [wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script>'), [1, 2, 3]],
                 expected: []
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 4]],
-                expected: [['cms-plugin-4', { plugin_id: '4' }]]
+                args: [wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script>'), [1, 2, 4]],
+                expected: [{ plugin_id: '4' }]
             },
             {
                 args: [
-                    `CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);
-                    CMS._plugins.push(["cms-plugin-10", { "plugin_id": "meh"}]);`, [1, 2, 10]],
-                expected: [['cms-plugin-10', { plugin_id: 'meh' }]]
+                    wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script><script id="cms-plugin-10">{"plugin_id":"meh"}</script>'),
+                    [1, 2, 10]],
+                expected: [{ plugin_id: 'meh' }]
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",{plugin_id:"4"}])', [4]],
+                args: [wrap('<script id="cms-plugin-4">{plugin_id:"4"}</script>'), [4]],
                 expected: []
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",not a json :(]);', [4]],
+                args: [wrap('<script id="cms-plugin-4">not a json :(]</script>'), [4]],
                 expected: []
             },
             {
-                args: [`CMS._plugins.push(["cms-plugin-4", {
-                    "something": 1
-                }])`, [4]],
-                expected: [['cms-plugin-4', { something: 1 }]]
+                args: [wrap('<script id="cms-plugin-4">{"something":1}</script>'), [4]],
+                expected: [{ something: 1 }]
             }
         ].forEach((test, i) => {
             it(`extracts plugin data from markup ${i}`, () => {
