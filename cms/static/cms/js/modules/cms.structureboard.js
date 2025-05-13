@@ -395,7 +395,8 @@ class StructureBoard {
                 CMS.settings.states = Helpers.getSettings().states;
 
                 const bodyRegex = /<body[\S\s]*?>([\S\s]*)<\/body>/gi;
-                const body = document.createElement("div");  // Switch to plain JS due to problem with $(body)
+                const body = document.createElement('div');  // Switch to plain JS due to problem with $(body)
+
                 body.innerHTML = bodyRegex.exec(contentMarkup)[1];
 
                 const structure = $(body.querySelector('.cms-structure-content'));

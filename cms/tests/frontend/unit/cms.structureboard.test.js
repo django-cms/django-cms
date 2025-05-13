@@ -2444,7 +2444,8 @@ describe('CMS.StructureBoard', function() {
             },
             {
                 args: [
-                    wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script><script id="cms-plugin-10">{"plugin_id":"meh"}</script>'),
+                    wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script>' +
+                        '<script id="cms-plugin-10">{"plugin_id":"meh"}</script>'),
                     [1, 2, 10]],
                 expected: [{ plugin_id: 'meh' }]
             },
