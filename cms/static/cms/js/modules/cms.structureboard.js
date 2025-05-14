@@ -401,7 +401,7 @@ class StructureBoard {
 
                 const structure = $(body.querySelector('.cms-structure-content'));
                 const toolbar = $(body.querySelector('.cms-toolbar'));
-                const scripts = $(body.querySelector('[type="text/cms-template"]')); // cms scripts
+                const scripts = $(body.querySelectorAll('[type="text/cms-template"]')); // cms scripts
                 const pluginIds = this.getIds($(body.querySelectorAll('.cms-draggable')));
                 const pluginData = StructureBoard._getPluginDataFromMarkup(
                     body,
