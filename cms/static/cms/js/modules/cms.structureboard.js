@@ -395,22 +395,20 @@ class StructureBoard {
                 CMS.settings.states = Helpers.getSettings().states;
 
                 const bodyRegex = /<body[\S\s]*?>([\S\s]*)<\/body>/gi;
-                const body = $(bodyRegex.exec(contentMarkup)[1]);
+                const body = document.createElement('div');  // Switch to plain JS due to problem with $(body)
 
-                const structure = body.find('.cms-structure-content');
-                const toolbar = body.find('.cms-toolbar');
-                const scripts = body.filter(function() {
-                    return $(this).is('[type="text/cms-template"]'); // cms scripts
-                });
-                const pluginIds = this.getIds(body.find('.cms-draggable'));
-                const pluginDataSource = body.filter('script[data-cms]').toArray()
-                    .map(script => script.textContent || '').join();
+                body.innerHTML = bodyRegex.exec(contentMarkup)[1];
+
+                const structure = $(body.querySelector('.cms-structure-content'));
+                const toolbar = $(body.querySelector('.cms-toolbar'));
+                const scripts = $(body.querySelector('[type="text/cms-template"]')); // cms scripts
+                const pluginIds = this.getIds($(body.querySelectorAll('.cms-draggable')));
                 const pluginData = StructureBoard._getPluginDataFromMarkup(
-                    pluginDataSource,
+                    body,
                     pluginIds
                 );
 
-                Plugin._updateRegistry(pluginData.map(([, data]) => data));
+                Plugin._updateRegistry(pluginData);
 
                 CMS.API.Toolbar._refreshMarkup(toolbar);
 
@@ -1744,21 +1742,19 @@ class StructureBoard {
      *
      * @method _getPluginDataFromMarkup
      * @private
-     * @param {String} markup
+     * @param {Node} body
      * @param {Array<Number | String>} pluginIds
      * @returns {Array<[String, Object]>}
      */
-    static _getPluginDataFromMarkup(markup, pluginIds) {
+    static _getPluginDataFromMarkup(body, pluginIds) {
         return compact(
             pluginIds.map(pluginId => {
-                // oh boy
-                const regex = new RegExp(`CMS._plugins.push\\((\\["cms\-plugin\-${pluginId}",[\\s\\S]*?\\])\\)`, 'g');
-                const matches = regex.exec(markup);
+                const pluginData = body.querySelector(`#cms-plugin-${pluginId}`);
                 let settings;
 
-                if (matches) {
+                if (pluginData) {
                     try {
-                        settings = JSON.parse(matches[1]);
+                        settings = JSON.parse(pluginData.textContent);
                     } catch (e) {
                         settings = false;
                     }
