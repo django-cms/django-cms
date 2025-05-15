@@ -6,7 +6,7 @@ from cms.models.fields import PlaceholderField
 
 
 class Category(MP_Node):
-    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
+    parent = models.ForeignKey("self", blank=True, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
     description = PlaceholderField('category_description', 600)
 
@@ -14,10 +14,10 @@ class Category(MP_Node):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('category_view', args=[self.pk])
+        return reverse("category_view", args=[self.pk])
 
     class Meta:
-        verbose_name_plural = 'categories'
+        verbose_name_plural = "categories"
 
 
 class Picture(models.Model):
@@ -39,6 +39,7 @@ class SomeEditableModel(models.Model):
 
 class GrouperModel(models.Model):
     category_name = models.CharField(max_length=200, default="")
+    some_field = models.CharField(max_length=200, default="")
 
 
 class GrouperModelContent(models.Model):
@@ -54,7 +55,7 @@ class GrouperModelContent(models.Model):
             ("en", "English"),
             ("de", "German"),
             ("it", "Italian"),
-        )
+        ),
     )
 
     region = models.TextField(
@@ -66,8 +67,8 @@ class GrouperModelContent(models.Model):
             ("europe", "Europe"),
             ("africa", "Africa"),
             ("asia", "Asia"),
-            ("australia", "Australia")
-        )
+            ("australia", "Australia"),
+        ),
     )
 
     uptodate = models.BooleanField(
@@ -97,10 +98,8 @@ class SimpleGrouperModelContent(models.Model):
             ("en", "English"),
             ("de", "German"),
             ("it", "Italian"),
-        )
+        ),
     )
-
-
 
     region = models.TextField(
         default="world",
@@ -111,8 +110,8 @@ class SimpleGrouperModelContent(models.Model):
             ("europe", "Europe"),
             ("africa", "Africa"),
             ("asia", "Asia"),
-            ("australia", "Australia")
-        )
+            ("australia", "Australia"),
+        ),
     )
 
     uptodate = models.BooleanField(
