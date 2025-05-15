@@ -19,7 +19,7 @@ from django.views.debug import ExceptionReporter
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
-from cms.models import CMSPlugin, Page, PageContent, Placeholder, StaticPlaceholder
+from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from cms.plugin_pool import PluginPool
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
@@ -100,7 +100,6 @@ class BaseRenderer:
         self._placeholders_content_cache = {}
         self._placeholders_by_page_cache = {}
         self._rendered_placeholders = OrderedDict()
-        self._rendered_static_placeholders = OrderedDict()
         self._rendered_plugins_by_placeholder = {}
 
     @cached_property
@@ -212,9 +211,6 @@ class BaseRenderer:
     def get_rendered_editable_placeholders(self) -> list[Placeholder]:
         rendered = list(self._rendered_placeholders.values())
         return [r.placeholder for r in rendered if r.editable]
-
-    def get_rendered_static_placeholders(self) -> list[StaticPlaceholder]:
-        return list(self._rendered_static_placeholders.values())
 
 
 class ContentRenderer(BaseRenderer):
@@ -485,40 +481,6 @@ class ContentRenderer(BaseRenderer):
 
         if not has_content and nodelist:
             return content + nodelist.render(context)
-        return content
-
-    def render_static_placeholder(
-        self, static_placeholder: StaticPlaceholder, context: Context, nodelist=None
-    ):
-        user = self.request.user
-
-        if self.toolbar.edit_mode_active and user.has_perm(
-            "cms.edit_static_placeholder"
-        ):
-            placeholder = static_placeholder.draft
-            editable = True
-            use_cache = False
-        else:
-            placeholder = static_placeholder.public
-            editable = False
-            use_cache = True
-
-        # I really don't like these impromptu flags...
-        placeholder.is_static = True
-
-        content = self.render_placeholder(
-            placeholder,
-            context=context,
-            editable=editable,
-            use_cache=use_cache,
-            nodelist=nodelist,
-        )
-
-        if static_placeholder.pk not in self._rendered_static_placeholders:
-            # First time this static placeholder is rendered
-            self._rendered_static_placeholders[
-                static_placeholder.pk
-            ] = static_placeholder
         return content
 
     def render_plugin(
@@ -810,27 +772,6 @@ class StructureRenderer(BaseRenderer):
 
     def render_page_placeholder(self, page, placeholder, language=None):
         return self.render_placeholder(placeholder, language=language, page=page)
-
-    def render_static_placeholder(self, static_placeholder, language=None):
-        user = self.request.user
-
-        if not user.has_perm("cms.edit_static_placeholder"):
-            return ""
-
-        language = language or self.request_language
-
-        placeholder = static_placeholder.draft
-        # I really don't like these impromptu flags...
-        placeholder.is_static = True
-
-        content = self.render_placeholder(placeholder, language=language)
-
-        if static_placeholder.pk not in self._rendered_static_placeholders:
-            # First time this static placeholder is rendered
-            self._rendered_static_placeholders[
-                static_placeholder.pk
-            ] = static_placeholder
-        return content
 
     def render_plugin(self, instance, page=None):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(

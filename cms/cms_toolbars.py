@@ -21,7 +21,6 @@ from cms.toolbar.utils import (
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
-from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
@@ -440,24 +439,6 @@ class PageToolbar(CMSToolbar):
             return reverse('pages-root')
         except NoReverseMatch:
             return admin_reverse("cms_pagecontent_changelist")
-
-    @property
-    def title(self):
-        import warnings
-
-        warnings.warn(
-            "Title property of PageToolbar will be removed. Use page_content property instead.",
-            RemovedInDjangoCMS51Warning, stacklevel=2)
-        return self.page_content
-
-    @title.setter
-    def title(self, page_content):
-        import warnings
-
-        warnings.warn(
-            "Title property of PageToolbar will be removed. Use page_content property instead.",
-            RemovedInDjangoCMS51Warning, stacklevel=2)
-        self.page_content = page_content
 
     # Populate
     def populate(self):

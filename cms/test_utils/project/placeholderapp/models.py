@@ -4,7 +4,7 @@ from django.db import models
 from django.urls import reverse
 
 from cms.models import ContentAdminManager
-from cms.models.fields import PlaceholderField, PlaceholderRelationField
+from cms.models.fields import PlaceholderRelationField
 from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_placeholder_from_slot
 from cms.utils.urlutils import admin_reverse
@@ -67,21 +67,40 @@ class TwoPlaceholderExample(models.Model):
     char_2 = models.CharField('char_2', max_length=255)
     char_3 = models.CharField('char_3', max_length=255)
     char_4 = models.CharField('char_4', max_length=255)
-    placeholder_1 = PlaceholderField('placeholder_1', related_name='p1')
-    placeholder_2 = PlaceholderField('placeholder_2', related_name='p2')
+
+    placeholders = PlaceholderRelationField()
+
+    @cached_property
+    def placeholder_1(self):
+        return get_placeholder_from_slot(self.placeholders, "placeholder_1")
+
+    @cached_property
+    def placeholder_2(self):
+        return get_placeholder_from_slot(self.placeholders, "placeholder_2")
 
 
 class DynamicPlaceholderSlotExample(models.Model):
     char_1 = models.CharField('char_1', max_length=255)
     char_2 = models.CharField('char_2', max_length=255)
-    placeholder_1 = PlaceholderField(dynamic_placeholder_1, related_name='dynamic_pl_1')
-    placeholder_2 = PlaceholderField(dynamic_placeholder_2, related_name='dynamic_pl_2')
+
+    placeholders = PlaceholderRelationField()
+
+    @cached_property
+    def placeholder_1(self):
+        return get_placeholder_from_slot(self.placeholders, dynamic_placeholder_1(self))
+
+    @cached_property
+    def placeholder_2(self):
+        return get_placeholder_from_slot(self.placeholders, dynamic_placeholder_2(self))
 
 
 class CharPksExample(models.Model):
     char_1 = models.CharField('char_1', max_length=255)
     slug = models.SlugField('char_1', max_length=255, primary_key=True)
-    placeholder_1 = PlaceholderField('placeholder_1', related_name='charpk_p1')
+
+    @cached_property
+    def placeholder_1(self):
+        return get_placeholder_from_slot(self.placeholders, "placeholder_1")
 
     def __str__(self):
         return "%s - %s" % (self.char_1, self.pk)

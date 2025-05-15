@@ -1,7 +1,7 @@
 .. _upgrade-to-enter-version-here-template:
 
 ###################
-4.X.X release notes
+5.X.X release notes
 ###################
 
 *October 31, 2022*
@@ -16,8 +16,9 @@ features.
 See the How to upgrade to 5.X.X to a newer version guide if you’re
 updating an existing project.
 
+*******************************
 Django and Python compatibility
-===============================
+*******************************
 
 django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
 support the latest release of each series.

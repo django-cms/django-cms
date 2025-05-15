@@ -213,30 +213,6 @@ def has_global_permission(user, site, action, use_cache=True):
     return action in actions
 
 
-def has_page_permission(user, page, action, use_cache=True):
-    import warnings
-
-    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
-    from cms.utils.page_permissions import has_generic_permission
-
-    warnings.warn("has_page_permission is deprecated. "
-                  "Use cms.utils.page_permissions.has_generic_permission instead.",
-                  RemovedInDjangoCMS51Warning, stacklevel=2)
-
-    action_map = {
-        "change": "change_page",
-        "add": "add_page",
-        "move": "move_page",
-        "publish": "publish_page",
-        "delete": "delete_page",
-        "view": "view_page",
-    }
-    if action in action_map:
-        action = action_map[action]
-
-    return has_generic_permission(page, user, action, site=page.site, check_global=False, use_cache=use_cache)
-
-
 def get_subordinate_users(user, site):
     """
     Returns users queryset, containing all subordinate users to given user
@@ -341,45 +317,6 @@ def get_subordinate_groups(user, site):
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )
     )
-
-
-def get_view_restrictions(pages):
-    """
-    Load all view restrictions for the pages
-    """
-
-    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
-
-    warnings.warn("get_view_restrictions will be removed",
-                  RemovedInDjangoCMS51Warning, stacklevel=2)
-
-    restricted_pages = defaultdict(list)
-
-    if not get_cms_setting('PERMISSION'):
-        # Permissions are off. There's no concept of page restrictions.
-        return restricted_pages
-
-    if not pages:
-        return restricted_pages
-
-    pages_by_id = {}
-    for page in pages:
-        if page.is_root():
-            page._set_hierarchy(pages)
-        pages_by_id[page.pk] = page
-
-    page_permissions = PagePermission.objects.filter(
-        page__in=pages_by_id,
-        can_view=True,
-    )
-
-    for perm in page_permissions:
-        # set internal fk cache to our page with loaded ancestors and descendants
-        PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
-
-        for page_id in perm._get_page_ids():
-            restricted_pages[page_id].append(perm)
-    return restricted_pages
 
 
 def has_plugin_permission(user, plugin_type, permission_type):

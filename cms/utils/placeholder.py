@@ -147,55 +147,6 @@ def validate_placeholder_name(name):
         )
 
 
-class PlaceholderNoAction:
-    can_copy = False
-
-    def copy(self, **kwargs):
-        return False
-
-    def get_copy_languages(self, **kwargs):
-        return []
-
-
-class MLNGPlaceholderActions(PlaceholderNoAction):
-    can_copy = True
-
-    def copy(
-        self,
-        target_placeholder,
-        source_language,
-        fieldname,
-        model,
-        target_language,
-        **kwargs,
-    ):
-        from cms.utils.plugins import copy_plugins_to_placeholder
-
-        trgt = model.objects.get(**{fieldname: target_placeholder})
-        src = model.objects.get(master=trgt.master, language_code=source_language)
-
-        source_placeholder = getattr(src, fieldname, None)
-        if not source_placeholder:
-            return False
-        return copy_plugins_to_placeholder(
-            source_placeholder.get_plugins_list(),
-            placeholder=target_placeholder,
-            language=target_language,
-        )
-
-    def get_copy_languages(self, placeholder, model, fieldname, **kwargs):
-        manager = model.objects
-        src = manager.get(**{fieldname: placeholder})
-        query = Q(master=src.master)
-        query &= Q(**{"%s__cmsplugin__isnull" % fieldname: False})
-        query &= ~Q(pk=src.pk)
-
-        language_codes = (
-            manager.filter(query).values_list("language_code", flat=True).distinct()
-        )
-        return [(lc, dict(settings.LANGUAGES)[lc]) for lc in language_codes]
-
-
 def restore_sekizai_context(context, changes):
     varname = get_varname()
     sekizai_container = context.get(varname)
