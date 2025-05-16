@@ -1014,7 +1014,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         for placeholder in declared_placeholders:
             self.assertContains(
                 response,
-                '<script data-cms id="cms-plugin-child-classes-%s" type="text/cms-template">'
+                '<template data-cms id="cms-plugin-child-classes-%s" type="text/cms-template">'
                 % placeholders.get(slot=placeholder.slot).pk,
             )
 
@@ -1037,7 +1037,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         for placeholder in declared_placeholders:
             self.assertContains(
                 response,
-                '<script data-cms id="cms-plugin-child-classes-%s" type="text/cms-template">'
+                '<template data-cms id="cms-plugin-child-classes-%s" type="text/cms-template">'
                 % placeholders.get(slot=placeholder.slot).pk,
             )
 
