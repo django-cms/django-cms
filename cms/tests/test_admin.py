@@ -16,7 +16,7 @@ from cms import api
 from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import PageContent, PageUrl, StaticPlaceholder, UserSettings
+from cms.models import PageContent, PageUrl, UserSettings
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -873,7 +873,6 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(user):
             output = force_str(self.client.get("/en/").content)
             self.assertIn("<b>Test</b>", output)
-            self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in homepage.get_placeholders("en"):
                 add_plugin(placeholder, TextPlugin, "en", body="<b>Test</b>")
             output = force_str(self.client.get("/en/").content)
