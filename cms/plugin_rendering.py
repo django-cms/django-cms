@@ -764,9 +764,9 @@ class ContentRenderer(BaseRenderer):
 class StructureRenderer(BaseRenderer):
     load_structure = True
     placeholder_edit_template = """
-        <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
+        <template data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
             {plugin_menu_js}
-        </script>
+        </template>
         {plugin_js}{placeholder_js}
         """
 
@@ -853,9 +853,9 @@ class LegacyRenderer(ContentRenderer):
     placeholder_edit_template = """
         {content}
         <div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>
-        <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
+        <template data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
             {plugin_menu_js}
-        </script>
+        </template>
         {plugin_js}{placeholder_js}
         """
 
