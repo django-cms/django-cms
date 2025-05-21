@@ -1,3 +1,20 @@
+Bug Fixes:
+----------
+* Adjust checks for GrouperAdmin to allow for `prepopulated_fields` (d6be4747e) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 5.0.0 (2025-05-12)
 ==================
 
