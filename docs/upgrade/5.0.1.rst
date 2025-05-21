@@ -45,9 +45,9 @@ Run migrations::
     migration in a test environment first to ensure that the migration runs
     successfully.
 
-****************
-Changes in 5.0.1
-****************
+*******************
+What's new in 5.0.1
+*******************
 
 Bug Fixes:
 ----------
