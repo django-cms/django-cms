@@ -1,3 +1,29 @@
+5.0.1 (2025-05-21)
+==================
+
+Bug Fixes:
+----------
+* Adjust checks for GrouperAdmin to allow for `prepopulated_fields` (d6be4747e) -- Fabian Braun
+* Show all text-enabled plugins inside djangocms-text (0a2ce64c4) -- Fabian Braun
+* Structure board update sometimes failed to add all interactive elements (d040cee) -- Fabian Braun
+* Remove circular import in ``cms.forms.validators`` (1548fba) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (4 pull request)
+
+With the review help of the following contributors:
+
+* Jacob Rief
+* Vinit Kumar
+
+
+Thanks to all contributors for their efforts!
+
+
 5.0.0 (2025-05-12)
 ==================
 
