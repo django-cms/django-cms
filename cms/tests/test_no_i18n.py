@@ -1,10 +1,13 @@
+from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.template import Template
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
+from django.utils.translation import trans_null
 
 from cms.api import create_page
-from cms.models import CMSPlugin, Page
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.models import CMSPlugin, Page, PageContent
 from cms.test_utils.testcases import CMSTestCase
 
 overrides = dict(
@@ -141,3 +144,12 @@ class TestNoI18N(CMSTestCase):
         Link = self.get_plugin_model('LinkPlugin')
         link = Link.objects.get(pk=created_plugin.pk)
         self.assertEqual("Hello World", link.name)
+
+
+    @patch('django.utils.translation._trans', new=trans_null)
+    def test_inherit_label(self):
+        page = create_page('test', 'nav_playground.html', 'en-us', published=True)
+        with self.login_user_context(self.get_superuser()):
+            endpoint = self.get_admin_url(PageContent, 'change', page.pk)
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<option value="%s">' % TEMPLATE_INHERITANCE_MAGIC)

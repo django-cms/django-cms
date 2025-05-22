@@ -25,7 +25,7 @@ class PageContent(models.Model):
         (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    template_choices = get_cms_setting('TEMPLATES')
 
     # These are the fields whose values are compared when saving
     # a PageContent object to know if it has changed.
