@@ -38,7 +38,6 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import create_child_plugin_references, get_plugin_content, get_plugin_tree
 from cms.utils import get_current_site
-from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
@@ -185,30 +184,6 @@ class FrontendEditableAdminMixin(BaseEditableAdminMixin):
             return manager.language(language).get(pk=object_id)
         except AttributeError:
             return manager.get(pk=object_id)
-
-
-class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
-    def __new__(cls, name, bases, attrs):
-        super_new = super().__new__
-        parents = [b for b in bases if isinstance(b, PlaceholderAdminMixinBase)]
-
-        if not parents:
-            return super_new(cls, name, bases, attrs)
-        warnings.warn(
-            "PlaceholderAdminMixin is no longer needed and thus will be removed in django CMS 5.0",
-            RemovedInDjangoCMS51Warning,
-            stacklevel=2,
-        )
-        return super_new(cls, name, bases, attrs)
-
-
-class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
-    """
-    .. warning::
-
-        PlaceholderAdminMixin is deprecated. It is no longer needed and thus will be removed
-    """
-    pass
 
 
 @admin.register(Placeholder)

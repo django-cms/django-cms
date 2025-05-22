@@ -222,7 +222,7 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         check_results = admin.check()
 
         # Assert
-        self.assertEqual(len(check_results), 4)  # No errors
+        self.assertEqual(len(check_results), 4)  # 4 errors expected (see above)
 
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
