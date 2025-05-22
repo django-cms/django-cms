@@ -286,7 +286,7 @@ latex_documents = [
 #     extensions.append("sphinxcontrib.spelling")
 
 # Spelling language.
-spelling_lang = 'en_GB'
+spelling_lang = 'en_US'
 
 # Location of word list.
 spelling_word_list_filename = 'spelling_wordlist'
