@@ -177,8 +177,8 @@ class PluginPool:
         return plugins
 
     def get_text_enabled_plugins(self, placeholder, page) -> list[type[CMSPluginBase]]:
-        plugins = set(self.get_all_plugins(placeholder, page))
-        plugins.update(self.get_all_plugins(placeholder, page, "text_only_plugins"))
+        plugins = set(self.get_all_plugins(placeholder, page, root_plugin=False))
+        plugins.update(self.get_all_plugins(placeholder, page, setting_key="text_only_plugins", root_plugin=False))
         return sorted((p for p in plugins if p.text_enabled), key=attrgetter("module", "name"))
 
     def get_plugin(self, name) -> type[CMSPluginBase]:

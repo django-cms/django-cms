@@ -1,5 +1,6 @@
 import os
 from functools import update_wrapper
+from typing import Any
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -133,7 +134,7 @@ def get_toolbar_url__enable():
     return get_cms_setting('TOOLBAR_URL__ENABLE')
 
 
-def get_templates():
+def get_templates() -> list[tuple[str, Any]]:
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
         # CMS_TEMPLATES_DIR can either be a string pointing to the templates directory

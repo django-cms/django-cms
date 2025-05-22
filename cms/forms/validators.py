@@ -8,6 +8,7 @@ from django.utils.translation import gettext
 from cms.utils.urlutils import admin_reverse, relative_url_regex
 
 if TYPE_CHECKING:
+    # Only needed for type hinting - avoid circular import
     from cms.models.pagemodel import Page
 
 
