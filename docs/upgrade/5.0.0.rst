@@ -1,16 +1,16 @@
-.. _upgrade-to-enter-version-here-template:
+.. _upgrade-to-5.0.0:
 
 ###################
 5.0.0 release notes
 ###################
 
-*March 31, 2025*
+*May 12, 2025*
 
 Welcome to django CMS 5.0.0!
 
 These release notes cover the new features, as well as some backwards
-incompatible changes you’ll want to be aware of when upgrading from
-django CMS 4.1 or earlier. We’ve begun the deprecation process for some
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
 features.
 
 *******************************
@@ -27,7 +27,7 @@ support the latest release of each series.
 How to upgrade to 5.0.0
 ***********************
 
-Update your project’s ``requirements.txt`` file to require django CMS 4.2.0 and
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.0 and
 run ``pip install -r requirements.txt``.
 
 If you are upgrading from an earlier version of django CMS, read the release

@@ -1,3 +1,5 @@
+import copy
+
 from django.contrib.admin import site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
@@ -18,10 +20,9 @@ from cms.utils.urlutils import admin_reverse, static_with_version
 
 class SetupMixin:
     """Create one grouper object and retrieve the admin instance"""
+
     def setUp(self) -> None:
-        self.grouper_instance = GrouperModel.objects.create(
-            category_name="Grouper Category"
-        )
+        self.grouper_instance = GrouperModel.objects.create(category_name="Grouper Category")
         self.add_url = admin_reverse("sampleapp_groupermodel_add")
         self.change_url = admin_reverse("sampleapp_groupermodel_change", args=(self.grouper_instance.pk,))
         self.changelist_url = admin_reverse("sampleapp_groupermodel_changelist")
@@ -48,10 +49,9 @@ class SetupMixin:
 
 class SimpleSetupMixin:
     """Create one grouper object and retrieve the admin instance"""
+
     def setUp(self) -> None:
-        self.grouper_instance = SimpleGrouperModel.objects.create(
-            category_name="Grouper Category"
-        )
+        self.grouper_instance = SimpleGrouperModel.objects.create(category_name="Grouper Category")
         self.add_url = admin_reverse("sampleapp_simplegroupermodel_add")
         self.change_url = admin_reverse("sampleapp_simplegroupermodel_change", args=(self.grouper_instance.pk,))
         self.changelist_url = admin_reverse("sampleapp_simplegroupermodel_changelist")
@@ -97,8 +97,9 @@ class SimpleChangeListActionsTestCase(SimpleSetupMixin, CMSTestCase):
             response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
             # Assert
             self.assertContains(response, 'class="cms-icon cms-icon-plus"')
-            self.assertContains(response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}'
-                                          f'/change/?')
+            self.assertContains(
+                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
             self.assertNotContains(response, 'class="cms-icon cms-icon-view"')
 
     def test_change_action(self):
@@ -110,8 +111,9 @@ class SimpleChangeListActionsTestCase(SimpleSetupMixin, CMSTestCase):
             response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
             # Assert
             self.assertContains(response, 'class="cms-icon cms-icon-view"')
-            self.assertContains(response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}'
-                                          f'/change/?')
+            self.assertContains(
+                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
             self.assertContains(response, 'class="cms-icon cms-icon-view"')
 
     def test_get_action(self):
@@ -176,7 +178,7 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
             current_content_filters = self.admin.current_content_filters
 
             self.assertEqual(admin_language, expected_language)
-            self.assertEqual(current_content_filters["language"],  expected_language)
+            self.assertEqual(current_content_filters["language"], expected_language)
 
     def test_extra_grouping_field_current(self):
         """Extra grouping fields (language) when not set return current default correctly"""
@@ -188,6 +190,39 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
 
         self.assertEqual(admin_language, expected_language)
         self.assertEqual(current_content_filters["language"], expected_language)
+
+    def test_prepopulated_fields_pass_checks(self):
+        """Prepopulated fields work for content field"""
+        # Arrange
+        admin = copy.copy(self.admin)
+        admin.prepopulated_fields = dict(
+            category_name=["category_name"],  # Both key and value from GrouperModel
+            some_field=["content__secret_greeting"],  # Value from ContentModel
+            content__secret_greeting=["category_name"],  # Key from GrouperModel
+            content__region=["content__secret_greeting"],  # Both key and value from ContentModel
+        )
+
+        # Act
+        check_results = admin.check()
+
+        # Assert
+        self.assertEqual(check_results, [])  # No errors
+
+    def test_invalid_prepopulated_content_fields_fail_checks(self):
+        """Prepopulated fields with invalid content field names fail checks"""
+        # Arrange
+        admin = copy.copy(self.admin)
+        admin.prepopulated_fields = dict(
+            some_field=["content__public_greeting"],  # Value from ContentModel: 1 error
+            content__public_greeting=["category_name"],  # Key from GrouperModel: 1 error
+            content__country=["content__public_greeting"],  # Both key and value from ContentModel: 2 errors
+        )
+
+        # Act
+        check_results = admin.check()
+
+        # Assert
+        self.assertEqual(len(check_results), 4)  # 4 errors expected (see above)
 
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
@@ -371,6 +406,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         data = {
             "content__language": "en",
             "category_name": "Changed content",
+            "some_field": "some content",
             "content__region": "world",
             "content__secret_greeting": random_content.secret_greeting,
         }
@@ -388,6 +424,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         data = {
             "content__language": "en",
             "category_name": self.grouper_instance.category_name,
+            "some_field": "some content",
             "content__region": "world",
             "content__secret_greeting": "New greeting",
         }
@@ -405,6 +442,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         data = {
             "content__language": "de",
             "category_name": "My new category",
+            "some_field": "some content",
             "content__region": "world",
             "content__secret_greeting": "Some new content",
         }
@@ -429,6 +467,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         data = {
             "content__language": "de",
             "category_name": self.grouper_instance.category_name,
+            "some_field": "some content",
             "content__region": "world",
             "content__secret_greeting": "New German content",
         }

@@ -25,40 +25,6 @@ VISIBLE_FOR_AUTHENTICATED = constants.VISIBILITY_ALL, constants.VISIBILITY_USERS
 VISIBLE_FOR_ANONYMOUS = constants.VISIBILITY_ALL, constants.VISIBILITY_ANONYMOUS
 
 
-def get_visible_nodes(request, pages, site):
-    """This function is deprecated. Use get_visible_page_contents instead."""
-
-    import warnings
-
-    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
-
-    warnings.warn(
-        "get_visible_nodes is deprecated, use get_visible_page_contents instead",
-        RemovedInDjangoCMS51Warning,
-        stacklevel=2,
-    )
-    page_contents = get_visible_page_contents(request, [page.get_content_obj() for page in pages], site)
-    return list({page_content.page for page_content in page_contents})
-
-
-def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=False):
-    """This function is deprecated. Use CMSMenu.get_menu_node_for_page_content instead."""
-    import warnings
-
-    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
-
-    warnings.warn(
-        "get_menu_node_for_page is deprecated, use CMSMenu's get_menu_node_for_page_content method instead",
-        RemovedInDjangoCMS51Warning,
-        stacklevel=2,
-    )
-    menu = CMSMenu(renderer)
-    # Overwrite languages according to parameters
-    menu.languages = [language] + fallbacks if fallbacks else [language]
-    preview_url = get_object_preview_url(PageContent(id=0)) if endpoint else None
-    return menu.get_menu_node_for_page_content(page.get_content_obj(language), preview_url=preview_url)
-
-
 def get_visible_page_contents(request, page_contents: Iterable[PageContent], site) -> Iterable[PageContent]:
     """
     This code is a many-pages-at-once version of cms.utils.page_permissions.user_can_view_page.
@@ -121,25 +87,14 @@ class CMSNavigationNode(NavigationNode):
         language: The language used for the node (optional).
     """
 
-    def __init__(self, *args, path: str = None, language: Optional[str] = None, **kwargs):
+    def __init__(self, *args, language: Optional[str] = None, **kwargs):
         """
         Initializes a CMSNavigationNode instance.
 
         :param *args: Positional arguments.
-        :param path: The path of the node.
         :param language: The language used for the node. Optional.
         :param **kwargs: Keyword arguments.
         """
-        self.path = path
-        if path is not None:
-            import warnings
-
-            from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
-
-            warnings.warn(
-                "The 'path' attribute of CMSNavigationNode is deprecated and will be removed in Django CMS 4.3.",
-                RemovedInDjangoCMS51Warning, stacklevel=2,
-            )
         # language is only used when we're dealing with a fallback
         self.language = language
         super().__init__(*args, **kwargs)

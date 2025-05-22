@@ -22,6 +22,7 @@ Also, the functions defined in this module do sanity checks on arguments.
 
               def my_function():
                   from cms.api import api_function
+
                   api_function(...)
 
           instead of:
@@ -30,16 +31,18 @@ Also, the functions defined in this module do sanity checks on arguments.
 
               from cms.api import api_function
 
+
               def my_function():
                   api_function(...)
 
 """
+
 import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError, ValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 
@@ -60,7 +63,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
-from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
@@ -84,7 +86,7 @@ def _verify_apphook(apphook, namespace):
         except AssertionError:
             raise
         apphook_name = apphook.__class__.__name__
-    elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
+    elif hasattr(apphook, "__module__") and issubclass(apphook, CMSApp):
         return apphook.__name__
     elif isinstance(apphook, str):
         try:
@@ -95,7 +97,7 @@ def _verify_apphook(apphook, namespace):
     else:
         raise TypeError("apphook must be string or CMSApp instance")
     if apphook_pool.apps[apphook_name].app_name and not namespace:
-        raise ValidationError('apphook with app_name must define a namespace')
+        raise ValidationError("apphook with app_name must define a namespace")
     return apphook_name
 
 
@@ -104,7 +106,7 @@ def _verify_plugin_type(plugin_type):
     Verifies the given plugin_type is valid and returns a tuple of
     (plugin_model, plugin_type)
     """
-    if hasattr(plugin_type, '__module__') and issubclass(plugin_type, CMSPluginBase):
+    if hasattr(plugin_type, "__module__") and issubclass(plugin_type, CMSPluginBase):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
@@ -112,11 +114,9 @@ def _verify_plugin_type(plugin_type):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
         except KeyError:
-            raise TypeError(
-                'plugin_type must be CMSPluginBase subclass or string'
-            )
+            raise TypeError("plugin_type must be CMSPluginBase subclass or string")
     else:
-        raise TypeError('plugin_type must be CMSPluginBase subclass or string')
+        raise TypeError("plugin_type must be CMSPluginBase subclass or string")
     return plugin_model, plugin_type
 
 
@@ -124,16 +124,34 @@ def _verify_plugin_type(plugin_type):
 # Public API
 # ===============================================================================
 
+
 @transaction.atomic
-def create_page(title, template, language, menu_title=None, slug=None,
-                apphook=None, apphook_namespace=None, redirect=None, meta_description=None,
-                created_by='python-api', parent=None,
-                publication_date=None, publication_end_date=None,
-                in_navigation=False, soft_root=False, reverse_id=None,
-                navigation_extenders=None, published=None, site=None,
-                login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
-                position="last-child", overwrite_url=None,
-                xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
+def create_page(
+    title,
+    template,
+    language,
+    menu_title=None,
+    slug=None,
+    apphook=None,
+    apphook_namespace=None,
+    redirect=None,
+    meta_description=None,
+    created_by="python-api",
+    parent=None,
+    publication_date=None,
+    publication_end_date=None,
+    in_navigation=False,
+    soft_root=False,
+    reverse_id=None,
+    navigation_extenders=None,
+    published=None,
+    site=None,
+    login_required=False,
+    limit_visibility_in_menu=constants.VISIBILITY_ALL,
+    position="last-child",
+    overwrite_url=None,
+    xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
+):
     """
     Creates a :class:`cms.models.Page` instance and returns it. Also
     creates a :class:`cms.models.PageContent` instance for the specified
@@ -172,12 +190,16 @@ def create_page(title, template, language, menu_title=None, slug=None,
     :param str page_title: Overridden page title for HTML title tag
     """
     if published is not None or publication_date is not None or publication_end_date is not None:
-        warnings.warn('This API function no longer accepts a "published", "publication_date", or '
-                      '"publication_end_date" argument', UserWarning, stacklevel=2)
+        warnings.warn(
+            'This API function no longer accepts a "published", "publication_date", or '
+            '"publication_end_date" argument',
+            UserWarning,
+            stacklevel=2,
+        )
 
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
-        assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+        assert template in [tpl[0] for tpl in get_cms_setting("TEMPLATES")]
         get_template(template)
 
     # validate site
@@ -187,7 +209,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         assert isinstance(site, Site)
 
     # validate language:
-    assert language in get_language_list(site), get_cms_setting('LANGUAGES').get(site.pk)
+    assert language in get_language_list(site), get_cms_setting("LANGUAGES").get(site.pk)
 
     # validate parent
     if parent:
@@ -203,7 +225,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     assert limit_visibility_in_menu in accepted_limitations
 
     # validate position
-    assert position in ('last-child', 'first-child', 'left', 'right')
+    assert position in ("last-child", "first-child", "left", "right")
 
     # validate and normalize apphook
     if apphook:
@@ -258,13 +280,25 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
 
 @transaction.atomic
-def create_page_content(language, title, page, menu_title=None, slug=None,
-                        redirect=None, meta_description=None, parent=None,
-                        overwrite_url=None, page_title=None, path=None,
-                        created_by='python-api', soft_root=False, in_navigation=False,
-                        template=TEMPLATE_INHERITANCE_MAGIC,
-                        limit_visibility_in_menu=constants.VISIBILITY_ALL,
-                        xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
+def create_page_content(
+    language,
+    title,
+    page,
+    menu_title=None,
+    slug=None,
+    redirect=None,
+    meta_description=None,
+    parent=None,
+    overwrite_url=None,
+    page_title=None,
+    path=None,
+    created_by="python-api",
+    soft_root=False,
+    in_navigation=False,
+    template=TEMPLATE_INHERITANCE_MAGIC,
+    limit_visibility_in_menu=constants.VISIBILITY_ALL,
+    xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
+):
     """
     Creates a :class:`cms.models.PageContent` instance and returns it.
 
@@ -286,7 +320,7 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
     """
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
-        assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+        assert template in [tpl[0] for tpl in get_cms_setting("TEMPLATES")]
         get_template(template)
 
     # validate page
@@ -305,7 +339,7 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
         slug = get_available_slug(page.site, base, language)
 
     if overwrite_url:
-        path = overwrite_url.strip('/')
+        path = overwrite_url.strip("/")
     elif path is None:
         path = page.get_path_for_slug(slug, language)
 
@@ -313,10 +347,21 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
         _thread_locals.user = created_by
         created_by = get_clean_username(created_by)
 
+    try:
+        from cms.forms.validators import validate_url_uniqueness
+
+        validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+    except ValidationError as e:
+        raise IntegrityError(e)
+
     page.urls.update_or_create(
         page=page,
         language=language,
-        defaults=dict(slug=slug, path=path,  managed=not bool(overwrite_url)),
+        defaults=dict(
+            slug=slug,
+            path=path,
+            managed=not bool(overwrite_url),
+        ),
     )
 
     # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
@@ -343,34 +388,8 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
     return page_content
 
 
-def create_title(language, title, page, menu_title=None, slug=None,
-                 redirect=None, meta_description=None, parent=None,
-                 overwrite_url=None, page_title=None, path=None,
-                 created_by='python-api', soft_root=False, in_navigation=False,
-                 template=TEMPLATE_INHERITANCE_MAGIC,
-                 limit_visibility_in_menu=constants.VISIBILITY_ALL,
-                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
-    """
-    .. warning ::
-        ``create_title`` has been renamed to ``create_page_content`` as of django CMS version 4.
-    """
-    warnings.warn(
-        "cms.api.create_title has been renamed to cms.api.create_page_content().",
-        RemovedInDjangoCMS51Warning,
-        stacklevel=2
-    )
-    return create_page_content(
-        language, title, page,
-        menu_title=menu_title, slug=slug, redirect=redirect, meta_description=meta_description,
-        parent=parent, overwrite_url=overwrite_url, page_title=page_title, path=path,
-        created_by=created_by, soft_root=soft_root, in_navigation=in_navigation, template=template,
-        limit_visibility_in_menu=limit_visibility_in_menu, xframe_options=xframe_options
-    )
-
-
 @transaction.atomic
-def add_plugin(placeholder, plugin_type, language, position='last-child',
-               target=None, **data):
+def add_plugin(placeholder, plugin_type, language, position="last-child", target=None, **data):
     """
     Adds a plugin to a placeholder and returns it.
 
@@ -391,24 +410,24 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
 
     if target:
-        if position == 'last-child':
-            new_pos = placeholder.get_next_plugin_position(language, parent=target, insert_order='last')
+        if position == "last-child":
+            new_pos = placeholder.get_next_plugin_position(language, parent=target, insert_order="last")
             parent_id = target.pk
-        elif position == 'first-child':
-            new_pos = placeholder.get_next_plugin_position(language, parent=target, insert_order='first')
+        elif position == "first-child":
+            new_pos = placeholder.get_next_plugin_position(language, parent=target, insert_order="first")
             parent_id = target.pk
-        elif position == 'left':
+        elif position == "left":
             new_pos = target.position
             parent_id = target.parent_id
-        elif position == 'right':
+        elif position == "right":
             new_pos = target.position + 1 + target._get_descendants_count()
             parent_id = target.parent_id
         else:
-            raise Exception('position not supported: %s' % position)
+            raise Exception("position not supported: %s" % position)
     else:
-        assert position in ('first-child', 'last-child')
-        if position == 'last-child':
-            new_pos = placeholder.get_next_plugin_position(language, insert_order='last')
+        assert position in ("first-child", "last-child")
+        if position == "last-child":
+            new_pos = placeholder.get_next_plugin_position(language, insert_order="last")
         else:
             new_pos = 1
         parent_id = None
@@ -427,14 +446,22 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     return plugin
 
 
-def create_page_user(created_by, user,
-                     can_add_page=True, can_view_page=True,
-                     can_change_page=True, can_delete_page=True,
-                     can_publish_page=True, can_add_pageuser=True,
-                     can_change_pageuser=True, can_delete_pageuser=True,
-                     can_add_pagepermission=True,
-                     can_change_pagepermission=True,
-                     can_delete_pagepermission=True, grant_all=False):
+def create_page_user(
+    created_by,
+    user,
+    can_add_page=True,
+    can_view_page=True,
+    can_change_page=True,
+    can_delete_page=True,
+    can_publish_page=True,
+    can_add_pageuser=True,
+    can_change_pageuser=True,
+    can_delete_pageuser=True,
+    can_add_pagepermission=True,
+    can_change_pagepermission=True,
+    can_delete_pagepermission=True,
+    grant_all=False,
+):
     """
     Creates a page user for the user provided and returns that page user.
 
@@ -446,26 +473,26 @@ def create_page_user(created_by, user,
     :param bool grant_all: Grant all permissions to the user
     """
     from cms.admin.forms import save_permissions
+
     if grant_all:
         # just be lazy
-        return create_page_user(created_by, user, True, True, True, True,
-                                True, True, True, True, True, True, True)
+        return create_page_user(created_by, user, True, True, True, True, True, True, True, True, True, True, True)
 
     # validate created_by
     assert isinstance(created_by, get_user_model())
 
     data = {
-        'can_add_page': can_add_page,
-        'can_view_page': can_view_page,
-        'can_change_page': can_change_page,
-        'can_delete_page': can_delete_page,
-        'can_publish_page': can_publish_page,
-        'can_add_pageuser': can_add_pageuser,
-        'can_change_pageuser': can_change_pageuser,
-        'can_delete_pageuser': can_delete_pageuser,
-        'can_add_pagepermission': can_add_pagepermission,
-        'can_change_pagepermission': can_change_pagepermission,
-        'can_delete_pagepermission': can_delete_pagepermission,
+        "can_add_page": can_add_page,
+        "can_view_page": can_view_page,
+        "can_change_page": can_change_page,
+        "can_delete_page": can_delete_page,
+        "can_publish_page": can_publish_page,
+        "can_add_pageuser": can_add_pageuser,
+        "can_change_pageuser": can_change_pageuser,
+        "can_delete_pageuser": can_delete_pageuser,
+        "can_add_pagepermission": can_add_pagepermission,
+        "can_change_pagepermission": can_change_pagepermission,
+        "can_delete_pagepermission": can_delete_pagepermission,
     }
     user.is_staff = True
     user.is_active = True
@@ -478,12 +505,22 @@ def create_page_user(created_by, user,
     return user
 
 
-def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
-                        can_add=False, can_change=False, can_delete=False,
-                        can_change_advanced_settings=False, can_publish=None,
-                        can_change_permissions=False, can_move_page=False,
-                        can_recover_page=True, can_view=False,
-                        grant_all=False, global_permission=False):
+def assign_user_to_page(
+    page,
+    user,
+    grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+    can_add=False,
+    can_change=False,
+    can_delete=False,
+    can_change_advanced_settings=False,
+    can_publish=None,
+    can_change_permissions=False,
+    can_move_page=False,
+    can_recover_page=True,
+    can_view=False,
+    grant_all=False,
+    global_permission=False,
+):
     """
     Assigns a user to a page and gives them some permissions. Returns the
     :class:`cms.models.PagePermission` object that gets
@@ -502,22 +539,20 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
 
     grant_all = grant_all and not global_permission
     data = {
-        'can_add': can_add or grant_all,
-        'can_change': can_change or grant_all,
-        'can_delete': can_delete or grant_all,
-        'can_publish': can_publish or grant_all,
-        'can_change_advanced_settings': can_change_advanced_settings or grant_all,
-        'can_change_permissions': can_change_permissions or grant_all,
-        'can_move_page': can_move_page or grant_all,
-        'can_view': can_view or grant_all,
+        "can_add": can_add or grant_all,
+        "can_change": can_change or grant_all,
+        "can_delete": can_delete or grant_all,
+        "can_publish": can_publish or grant_all,
+        "can_change_advanced_settings": can_change_advanced_settings or grant_all,
+        "can_change_permissions": can_change_permissions or grant_all,
+        "can_move_page": can_move_page or grant_all,
+        "can_view": can_view or grant_all,
     }
 
-    page_permission = PagePermission(page=page, user=user,
-                                     grant_on=grant_on, **data)
+    page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
     page_permission.save()
     if global_permission:
-        page_permission = GlobalPagePermission(
-            user=user, can_recover_page=can_recover_page, **data)
+        page_permission = GlobalPagePermission(user=user, can_recover_page=can_recover_page, **data)
         page_permission.save()
         page_permission.sites.add(get_current_site())
     return page_permission
@@ -531,9 +566,12 @@ def publish_page(page, user, language):
 
         For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
-    warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
-                  'publishing, such as: djangocms-versioning.',
-                  UserWarning, stacklevel=2)
+    warnings.warn(
+        "This API function has been removed. For publishing functionality use a package that adds "
+        "publishing, such as: djangocms-versioning.",
+        UserWarning,
+        stacklevel=2,
+    )
 
 
 def publish_pages(include_unpublished=False, language=None, site=None):
@@ -544,26 +582,31 @@ def publish_pages(include_unpublished=False, language=None, site=None):
 
         For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
-    warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
-                  'publishing, such as: djangocms-versioning.',
-                  UserWarning, stacklevel=2)
+    warnings.warn(
+        "This API function has been removed. For publishing functionality use a package that adds "
+        "publishing, such as: djangocms-versioning.",
+        UserWarning,
+        stacklevel=2,
+    )
 
 
 def get_page_draft(page):
     """
-     .. warning::
+    .. warning::
 
-        The concept of draft pages has been removed from django CMS core in version 4 onward.
+       The concept of draft pages has been removed from django CMS core in version 4 onward.
 
-        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
+       For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
-    warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
-                  'publishing, such as: djangocms-versioning.',
-                  UserWarning, stacklevel=2)
+    warnings.warn(
+        "This API function has been removed. For publishing functionality use a package that adds "
+        "publishing, such as: djangocms-versioning.",
+        UserWarning,
+        stacklevel=2,
+    )
 
 
-def copy_plugins_to_language(page, source_language, target_language,
-                             only_empty=True):
+def copy_plugins_to_language(page, source_language, target_language, only_empty=True):
     """
     Copy the plugins to another language in the same page for all the page
     placeholders.

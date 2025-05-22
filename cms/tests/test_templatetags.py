@@ -725,10 +725,6 @@ class CmsTagTemplateTagTests(CMSTestCase):
         context = Context({})
         rendered = template.render(context)
 
-        # Print output for debugging
-        print("\nTest: Non-Existing Page URL")
-        print(f"Rendered Output: '{rendered.strip()}'")
-
         self.assertEqual(rendered.strip(), "")
 
     def test_page_url_tag_handles_noreversematch(self):
@@ -738,9 +734,6 @@ class CmsTagTemplateTagTests(CMSTestCase):
 
         try:
             rendered = template.render(context)
-            # Print output for debugging
-            print("\nTest: Handles NoReverseMatch")
-            print(f"Rendered Output: '{rendered.strip()}'")
         except NoReverseMatch:
             self.fail("NoReverseMatch should not be raised.")
 

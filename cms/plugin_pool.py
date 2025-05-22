@@ -38,10 +38,6 @@ class PluginPool:
     def discover_plugins(self):
         if self.discovered:
             return
-        from cms.cache import invalidate_cms_page_cache
-
-        if get_cms_setting("PAGE_CACHE"):
-            invalidate_cms_page_cache()
 
         autodiscover_modules("cms_plugins")
         self.discovered = True
@@ -134,7 +130,9 @@ class PluginPool:
             raise PluginNotRegistered("The plugin %r is not registered" % plugin)
         del self.plugins[plugin_name]
 
-    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
+    def get_all_plugins(
+        self, placeholder=None, page=None, setting_key="plugins", include_page_only=True, root_plugin=True
+    ):
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
@@ -173,7 +171,7 @@ class PluginPool:
             # Check that plugins are not in the list of the excluded ones
             plugins = (plugin for plugin in plugins if plugin.__name__ not in excluded_plugins)
 
-        if placeholder:
+        if root_plugin:
             # Filters out any plugin that requires a parent or has set parent classes
             plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
         return plugins
@@ -217,7 +215,7 @@ class PluginPool:
 
     @cached_property
     def registered_plugins(self) -> list[type[CMSPluginBase]]:
-        return sorted(self.get_all_plugins(), key=attrgetter("module", "name"))
+        return sorted(self.get_all_plugins(root_plugin=False), key=attrgetter("module", "name"))
 
     @cached_property
     def plugins_with_extra_menu(self) -> list[type[CMSPluginBase]]:
