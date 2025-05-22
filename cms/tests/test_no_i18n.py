@@ -1,4 +1,5 @@
 from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.template import Template
 from django.test.utils import override_settings
