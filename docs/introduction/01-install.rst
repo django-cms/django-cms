@@ -466,7 +466,7 @@ Also add:
 
 .. code-block::
 
-    "django:django.middleware.locale.LocaleMiddleware",  # not installed by default
+    "django.middleware.locale.LocaleMiddleware",  # not installed by default
 
     "cms.middleware.user.CurrentUserMiddleware",
     "cms.middleware.page.CurrentPageMiddleware",
@@ -503,7 +503,7 @@ URLs
 ~~~~
 
 In the project's ``urls.py``, add ``path("", include("cms.urls"))`` to the
-``urlpatterns`` list, preferably as ``i18patterns``. It should come after other
+``urlpatterns`` list, preferably as ``i18n_patterns``. It should come after other
 patterns, so that specific URLs for other applications can be detected first.
 
 You'll also need to have an import for ``django.urls.include``. For example:
@@ -514,7 +514,7 @@ You'll also need to have an import for ``django.urls.include``. For example:
     from django.conf.urls.i18n import i18n_patterns
     from django.urls import include, path
 
-    urlpatterns = i18patterns(
+    urlpatterns = i18n_patterns(
         path("admin/", admin.site.urls),
         path("", include("cms.urls")),
     )
@@ -783,8 +783,9 @@ Install: ``pip install djangocms-frontend`` and it and its subpackages to
 
     INSTALLED_APPS = [
         ...,
-        "easy_thumbnails',
-        "djangocms_frontend',
+        "easy_thumbnails",
+        "djangocms_frontend",
+        "djangocms_link",
         "djangocms_frontend.contrib.accordion",
         "djangocms_frontend.contrib.alert",
         "djangocms_frontend.contrib.badge",

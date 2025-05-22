@@ -155,6 +155,12 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
         mid(request)
         self.assertTrue(hasattr(request, 'toolbar'))
 
+        # edit-field endpoint
+        request = self.get_request(admin_reverse('cms_placeholder_edit_field', args=(content.pk, 'en')))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_provide_toolbar_obj_to_edit_actions(self):
         from cms.middleware.toolbar import ToolbarMiddleware
@@ -1253,7 +1259,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             f'<h1><template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}" '
-            f'data-cms-placeholder="{plugin.placeholder_id}" data-cms-position="{plugin.position}"></template>'
+            f'data-cms-placeholder="{plugin.placeholder_id}"></template>'
             f'{render_placeholder_body}'
             f'<template class="cms-plugin cms-plugin-end cms-plugin-{plugin.pk}"></template>'
         )

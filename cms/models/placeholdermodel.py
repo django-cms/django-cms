@@ -15,7 +15,6 @@ from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
 from cms.utils import get_language_from_request, permissions
-from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
 
@@ -260,19 +259,6 @@ class Placeholder(models.Model):
 
     def get_cached_plugins(self):
         return getattr(self, "_plugins_cache", [])
-
-    @property
-    def actions(self):
-        import warnings
-
-        from cms.utils.placeholder import PlaceholderNoAction
-
-        warnings.warn(
-            "The actions property is deprecated. Use placeholder admin instead.",
-            RemovedInDjangoCMS51Warning,
-            stacklevel=2,
-        )
-        return PlaceholderNoAction()
 
     def get_cache_expiration(self, request, response_timestamp):
         """
@@ -699,6 +685,11 @@ class Placeholder(models.Model):
         self.get_plugins(language).filter(position__gte=start).update(position=models.F("position") + offset)
 
     def _recalculate_plugin_positions(self, language):
+        """Closes gaps in the plugin tree by re-calculating the positions of all plugins.
+        IMPORTANT: This method requires any gap to be large enough to be able to
+        contain all missing plugin positions. Ensure to have shifted out plugins after the
+        gaps far enough using the ``_shift_plugin_positions`` method."""
+
         from cms.models.pluginmodel import (
             CMSPlugin,
             _get_database_cursor,

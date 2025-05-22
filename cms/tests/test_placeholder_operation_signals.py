@@ -598,7 +598,7 @@ class PagePlaceholderTestCase(CMSTestCase):
         with signal_tester(pre_placeholder_operation) as env:
             with self.login_user_context(self._admin_user):
                 response = self.client.post(endpoint, {'test': 0})
-                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.status_code, 200)
 
             self.assertEqual(env.call_count, 1)
 
@@ -620,7 +620,7 @@ class PagePlaceholderTestCase(CMSTestCase):
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
             with self.login_user_context(self._admin_user):
                 response = self.client.post(endpoint, {'test': 0})
-                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.status_code, 200)
 
             self.assertEqual(env.call_count, 2)
 

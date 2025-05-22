@@ -19,7 +19,7 @@ from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
-from django.utils.translation import activate, get_language_from_request
+from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
@@ -297,7 +297,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
             content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
             request.current_page = content_type_obj.page
             if (
-                content_type_obj.page.application_urls and  # noqa: W504
+                content_type_obj.page.application_urls and
                 content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
             ):
                 try:

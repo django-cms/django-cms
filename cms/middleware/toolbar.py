@@ -22,9 +22,11 @@ cms_endpoints = (
     'cms_placeholder_edit_plugin',
     'cms_placeholder_copy_plugins',
     'cms_placeholder_move_plugin',
+    'cms_placeholder_delete_plugin',
     'cms_placeholder_render_object_edit',
     'cms_placeholder_render_object_preview',
     'cms_placeholder_render_object_structure',
+    'cms_placeholder_edit_field',
 )
 
 

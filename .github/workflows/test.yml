@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
@@ -53,11 +53,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install pytest uv
+        python -m pip install --upgrade pip uv
+        uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        python setup.py install
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |
@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
@@ -91,7 +91,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:9.0.1
+        image: mysql:8.4
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -111,12 +111,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install pytest uv
+        python -m pip install --upgrade pip uv
+        uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        python setup.py install
-
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |
@@ -129,7 +128,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
@@ -158,10 +157,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install pytest uv
+        python -m pip install --upgrade pip uv
+        uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
-        python setup.py install
+        uv pip install --system -r test_requirements/databases.txt
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: python manage.py test
@@ -189,11 +189,10 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        python -m pip install --upgrade pip uv
         uv pip install --system pytest
-        python setup.py install
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: python manage.py test
@@ -235,12 +234,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        python -m pip install --upgrade pip uv
         uv pip install --system pytest
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        python setup.py install
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |
@@ -263,7 +261,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:8.4
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -283,12 +281,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        python -m pip install --upgrade pip uv
         uv pip install --system pytest
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
-        python setup.py install
+        uv pip install --system -e .
 
     - name: Test with django test runner
       run: |

@@ -1,0 +1,138 @@
+.. _upgrade-to-5.1.0:
+
+###################
+5.1.0 release notes
+###################
+
+*Month day, year*
+
+Welcome to django CMS 5.1.0!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.0 or earlier. We've begun the deprecation process for some
+features.
+
+See the How to upgrade to 5.1.0 to a newer version guide if you’re
+updating an existing project.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.11, 3.12, 3.13, and 3.14**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.1.0
+***********************
+
+*******************
+What's new in 5.1.0
+*******************
+
+Feature 1
+=========
+
+Feature 2
+=========
+
+Feature 3
+=========
+
+Minor features
+==============
+
+Bug Fixes
+=========
+
+**************************************
+Backward incompatible changes in 5.X.X
+**************************************
+
+TitleExtension
+==============
+
+
+Miscellaneous
+=============
+
+Features deprecated in 5.1.0
+============================
+
+Empty sections are to be removed before release.
+
+Removal of deprecated functionality
+===================================
+
+API
+---
+
+``cms.api.create_title`` has been removed. Use :meth:`cms.api.create_page_content` instead.
+
+
+``StaticPlaceholder``
+---------------------
+
+* ``StaticPlaceholder`` has been removed from ``cms.models`` and ``cms.admin``.
+Use `static aliases <https://github.com/django-cms/djangocms-alias>`_ instead.
+
+* This implies that ``cms.plugin_rendering`` does not accept static placeholders any more.
+
+* The ``static_placeholder`` template tag has been removed.
+
+Placeholders
+------------
+
+* ``PlaceholderField`` has been removed from ``cms.fields``. Use :class:`~cms.models.fields.PlaceholderRelationField` in conjunction with
+:meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see :ref:`placeholders_outside_cms`).
+
+* ``PlaceholderAdminMixin`` has been removed from ``cms.admin``. It is not needed anymore and can be safely removed from your code.
+
+* A placeholder's ``actions`` property (deprecated in django CMS 5) has been removed. This also includes the removal of the two classes
+  ``cms.utils.placeholder.PlaceholderNoAction`` and ``cms.utils.placeholder.MLNGPlaceholderActions``. If you need these classes,
+  move them to your own codebase.
+
+Permissions
+-----------
+
+``cms.utils.permissions.has_page_permission()`` has been removed. Use
+:meth:`cms.utils.page_permissions.has_generic_permission()` instead.
+
+As part of performance improvements, the following methods have been removed from
+``cms.utils.page_permissions``. They were deprecated in django CMS 4.1:
+
+* ``cms.utils.page_permissions.get_add_ids()``
+* ``cms.utils.page_permissions.get_change_ids()``
+* ``cms.utils.page_permissions.get_change_advanced_settings_ids()``
+* ``cms.utils.page_permissions.get_change_permissions_ids()``
+* ``cms.utils.page_permissions.get_get_delete_ids()``
+* ``cms.utils.page_permissions.get_move_page_ids()``
+* ``cms.utils.page_permissions.get_publish_ids()``
+* ``cms.utils.page_permissions.get_view_ids()``
+* ``cms.utils.permissions.get_view_restrictions()``
+
+
+Menus
+-----
+
+* ``cms.cms_menus.get_visible_nodes`` has been removed. Use ``cms.cms_menus.get_visible_page_contents`` instead.
+
+* ``cms.cms_menus.get_menu_node_for_page`` has been removed. Use ``cms.cms_menus.get_menu_node_for_page_content`` instead.
+
+Miscellaneous
+-------------
+
+* The ``title`` property has been removed from ``cms.cms_toolbars.PageToolbar``.
+  Use ``cms.cms_toolbars.PageTooolbar.page_content`` instead.
+
+* ``cms.forms.get_root_nodes`` has been removed. Use ``cms.cms_menus.get_root_pages`` instead.
+
+* ``cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin`` has been removed.
+  Use ``cms.extensions.toolbar.ExtensionToolbar.get_page_content_extension_admin`` instead.
+
+* ``cms.toolbar.utils.get_plugin_tree_as_json`` has been removed. Use ``cms.toolbar.utils.get_plugin_tree`` and convert the result
+  to JSON instead.

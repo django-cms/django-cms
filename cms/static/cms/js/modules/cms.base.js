@@ -117,24 +117,45 @@ export const Helpers = {
      * @public
      */
     onPluginSave: function() {
-        var data = this.dataBridge;
-        var editedPlugin =
-            data &&
-            data.plugin_id &&
-            window.CMS._instances.some(function(plugin) {
-                return Number(plugin.options.plugin_id) === Number(data.plugin_id) && plugin.options.type === 'plugin';
-            });
-        var addedPlugin = !editedPlugin && data && data.plugin_id;
+        const data = this.dataBridge || {};
+        const action = data.action ? data.action.toUpperCase() : null;
 
-        if (editedPlugin || addedPlugin) {
-            CMS.API.StructureBoard.invalidateState(addedPlugin ? 'ADD' : 'EDIT', data);
-            return;
+        switch (action) {
+            case 'CHANGE':
+            case 'EDIT':
+                if (this._pluginExists(data.plugin_id)) {
+                    CMS.API.StructureBoard.invalidateState('EDIT', data);
+                } else {
+                    CMS.API.StructureBoard.invalidateState('ADD', data);
+                }
+                return;
+            case 'ADD':
+            case 'DELETE':
+            case 'CLEAR_PLACEHOLDER':
+                CMS.API.StructureBoard.invalidateState(action, data);
+                return;
+            default:
+                break;
         }
 
         // istanbul ignore else
         if (!this._isReloading) {
             this.reloadBrowser(null, 300); // eslint-disable-line
         }
+    },
+
+    /*
+     * Check if a plugin object existst for the given plugin id
+     *
+     * @method _pluginExists
+     * @private
+     * @param {String} pluginId
+     * @returns {Boolean}
+     */
+    _pluginExists: function(pluginId) {
+        return window.CMS._instances.some(function(plugin) {
+            return Number(plugin.options.plugin_id) === Number(pluginId) && plugin.options.type === 'plugin';
+        });
     },
 
     /**

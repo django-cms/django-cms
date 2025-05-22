@@ -525,10 +525,8 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(0):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
-            old_plugins = plugin_pool.plugins
-            plugin_pool.clear()
-            plugin_pool.discover_plugins()
-            plugin_pool.plugins = old_plugins
+
+            invalidate_cms_page_cache()
             with self.assertNumQueries(FuzzyInt(1, 20)):
                 response = self.client.get(page1_url)
                 self.assertEqual(response.status_code, 200)

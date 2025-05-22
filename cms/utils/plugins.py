@@ -55,11 +55,11 @@ def get_plugins(request, placeholder, template, lang=None):
         plugins = get_plugins(request, placeholder, template)
 
         # Get plugins for a placeholder in a template with specific language
-        plugins = get_plugins(request, placeholder, template, lang='en')
+        plugins = get_plugins(request, placeholder, template, lang="en")
     """
     if not placeholder:
         return []
-    if not hasattr(placeholder, '_plugins_cache'):
+    if not hasattr(placeholder, "_plugins_cache"):
         assign_plugins(request, [placeholder], template, lang)
     return placeholder._plugins_cache
 
@@ -91,11 +91,7 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         return
     placeholders = tuple(placeholders)  # Trigger db hit
     lang = lang or get_language_from_request(request)
-    plugins = list(
-        CMSPlugin
-        .objects
-        .filter(placeholder__in=placeholders, language=lang)
-    )
+    plugins = list(CMSPlugin.objects.filter(placeholder__in=placeholders, language=lang))
     if not plugins:
         # Create default plugins if enabled
         plugins = create_default_plugins(request, placeholders, template, lang)
@@ -136,14 +132,11 @@ def create_default_plugins(request, placeholders, template, lang):
         Returns the plugins at the current level along with all descendants.
         """
         plugins, descendants = [], []
-        addable_confs = (conf for conf in confs
-                         if has_plugin_permission(request.user,
-                                                  conf['plugin_type'], 'add'))
+        addable_confs = (conf for conf in confs if has_plugin_permission(request.user, conf["plugin_type"], "add"))
         for conf in addable_confs:
-            plugin = add_plugin(placeholder, conf['plugin_type'], lang,
-                                target=parent, **conf['values'])
-            if 'children' in conf:
-                args = placeholder, conf['children'], plugin
+            plugin = add_plugin(placeholder, conf["plugin_type"], lang, target=parent, **conf["values"])
+            if "children" in conf:
+                args = placeholder, conf["children"], plugin
                 descendants += _create_default_plugins(*args)
             plugin.notify_on_autoadd(request, conf)
             plugins.append(plugin)
@@ -151,14 +144,13 @@ def create_default_plugins(request, placeholders, template, lang):
             parent.notify_on_autoadd_children(request, conf, plugins)
         return plugins + descendants
 
-    unfiltered_confs = ((ph, get_placeholder_conf('default_plugins',
-                                                  ph.slot, template))
-                        for ph in placeholders)
+    unfiltered_confs = ((ph, get_placeholder_conf("default_plugins", ph.slot, template)) for ph in placeholders)
     # Empty confs must be filtered before filtering on add permission
-    mutable_confs = ((ph, default_plugin_confs)
-                     for ph, default_plugin_confs
-                     in filter(itemgetter(1), unfiltered_confs)
-                     if ph.has_change_permission(request.user))
+    mutable_confs = (
+        (ph, default_plugin_confs)
+        for ph, default_plugin_confs in filter(itemgetter(1), unfiltered_confs)
+        if ph.has_change_permission(request.user)
+    )
     return sum(starmap(_create_default_plugins, mutable_confs), [])
 
 
@@ -188,8 +180,8 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
-    parents_cache = cache.setdefault('plugin_parents', {})
-    children_cache = cache.setdefault('plugin_children', {})
+    parents_cache = cache.setdefault("plugin_parents", {})
+    children_cache = cache.setdefault("plugin_children", {})
 
     try:
         parent_classes = parents_cache[plugin_type]
@@ -203,17 +195,34 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     if plugin_class.cache_parent_classes:
         parents_cache[plugin_type] = parent_classes or []
 
-    try:
-        child_classes = children_cache[plugin_type]
-    except KeyError:
-        child_classes = plugin_class.get_child_classes(
-            slot=plugin.placeholder.slot,
-            page=page,
-            instance=plugin,
-        )
+    child_classes = []
+    if plugin_class.allow_children:
+        # Only check for children if children are allowed
+        try:
+            child_classes = children_cache[plugin_type]
+            # Still check child classes that did not cache their parent classes
+            uncached_child_classes = plugin_class.get_child_classes(
+                slot=plugin.placeholder.slot,
+                page=page,
+                instance=plugin,
+                only_uncached=True,
+            )
+            child_classes = child_classes + uncached_child_classes  # Creates a new list to not change the cache
 
-    if plugin_class.cache_child_classes:
-        children_cache[plugin_type] = child_classes or []
+        except KeyError:
+            child_classes = plugin_class.get_child_classes(
+                slot=plugin.placeholder.slot,
+                page=page,
+                instance=plugin,
+            )
+            if plugin_class.cache_child_classes:  # Check if child classes should be cached
+                # Only add plugins to the cache that have the cache_parent_class attribute set
+                children_cache[plugin_type] = [plugin for plugin in (child_classes or [])
+                                            if plugin_pool.get_plugin(plugin).cache_parent_classes]
+                if not children_cache[plugin_type] and child_classes:
+                    # Edge case:
+                    children_cache[plugin_type] = [""]
+
     return child_classes, parent_classes
 
 
@@ -234,8 +243,7 @@ def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_l
             new_plugin.save()
 
 
-def copy_plugins_to_placeholder(plugins, placeholder, language=None,
-                                root_plugin=None, start_positions=None):
+def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin=None, start_positions=None):
     """Copies an iterable of plugins to a placeholder
 
     :param iterable plugins: Plugins to be copied
@@ -298,7 +306,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
             position = placeholder.get_next_plugin_position(
                 language=new_plugin.language,
                 parent=new_plugin.parent,
-                insert_order='last',
+                insert_order="last",
             )
             # Because it is the first time this language is processed,
             # shift all plugins to the right of the next position.
@@ -319,9 +327,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
 
         # Rescue any orphaned plugins
         if not parent and source_plugin.parent_id:
-            orphaned_plugin_list.append(
-                (source_plugin.parent_id, new_plugin)
-            )
+            orphaned_plugin_list.append((source_plugin.parent_id, new_plugin))
 
     # Reunite any orphaned plugins with the parent
     if orphaned_plugin_list:
@@ -384,9 +390,9 @@ def get_bound_plugins(plugins):
             plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
-        parent_not_available = (not plugin.parent_id or plugin.parent_id not in plugin_ids)
+        parent_not_available = not plugin.parent_id or plugin.parent_id not in plugin_ids
         # The plugin either has no parent or needs to have a non-ghost parent
-        valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
+        valid_parent = parent_not_available or plugin.parent_id in plugin_lookup
 
         if valid_parent and plugin.pk in plugin_lookup:
             plugin._inst = plugin_lookup[plugin.pk]  # Populate bound plugin cache for plugin
@@ -397,7 +403,7 @@ def downcast_plugins(
     plugins: Iterable[CMSPlugin],
     placeholders: Optional[list] = None,
     select_placeholder: bool = False,
-    request: Optional[HttpRequest] = None
+    request: Optional[HttpRequest] = None,
 ) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins
@@ -425,9 +431,7 @@ def downcast_plugins(
             base_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
         except KeyError:
             # Plugin not available
-            logger.error(
-                f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info()
-            )
+            logger.error(f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info())
             continue
         plugin_ids.append(plugin.pk)
         if base_model is CMSPlugin:
@@ -443,7 +447,7 @@ def downcast_plugins(
         plugin_qs = plugin_model.objects.filter(pk__in=pks)
 
         if select_placeholder:
-            plugin_qs = plugin_qs.select_related('placeholder')
+            plugin_qs = plugin_qs.select_related("placeholder")
 
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
@@ -453,9 +457,9 @@ def downcast_plugins(
             plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
-        parent_not_available = (not plugin.parent_id or plugin.parent_id not in plugin_ids)
+        parent_not_available = not plugin.parent_id or plugin.parent_id not in plugin_ids
         # The plugin either has no parent or needs to have a non-ghost parent
-        valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
+        valid_parent = parent_not_available or plugin.parent_id in plugin_lookup
 
         if valid_parent and plugin.pk in plugin_lookup:
             instance = plugin_lookup[plugin.pk]
@@ -500,15 +504,13 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
             raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s)." % count))
         elif type_limit:
             # total plugin type count
-            type_count = (
-                placeholder
-                .get_plugins(language=language)
-                .filter(plugin_type=plugin_type)
-                .count()
-            )
+            type_count = placeholder.get_plugins(language=language).filter(plugin_type=plugin_type).count()
             if type_count >= type_limit:
                 plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
-                raise PluginLimitReached(_(
-                    "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
-                ) % {'limit': type_limit, 'plugin_name': plugin_name})
+                raise PluginLimitReached(
+                    _(
+                        "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
+                    )
+                    % {"limit": type_limit, "plugin_name": plugin_name}
+                )
     return False

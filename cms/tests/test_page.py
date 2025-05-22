@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.timezone import now as tz_now
@@ -204,59 +205,28 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_path_collisions_api_1(self):
         """Checks for slug collisions on sibling pages - uses API to create pages"""
-        site = get_current_site()
         page1 = create_page("test page 1", "nav_playground.html", "en")
-        page1_1 = create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
-        page1_2 = create_page("test page 1_2", "nav_playground.html", "en", parent=page1, slug="foo")
-        # both sibling pages has same slug, so both pages have an invalid slug
-        self.assertRaises(
-            ValidationError,
-            validate_url_uniqueness,
-            site=site,
-            path=page1_1.get_path("en"),
-            language="en",
-            exclude_page=page1_1,
-        )
-        self.assertRaises(
-            ValidationError,
-            validate_url_uniqueness,
-            site=site,
-            path=page1_2.get_path("en"),
-            language="en",
-            exclude_page=page1_2,
-        )
+        create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
+
+        # Try to create a sibling page with the same slug - should fail with IntegrityError
+        with self.assertRaises(IntegrityError):
+            create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
 
     def test_path_collisions_api_2(self):
         """Checks for slug collisions on root (not home) page and a home page child - uses API to create pages"""
-        site = get_current_site()
         page1 = self.create_homepage("test page 1", "nav_playground.html", "en")
-        page1_1 = create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
-        page2 = create_page("test page 1_1", "nav_playground.html", "en", slug="foo")
-        # Root (non home) page and child page has the same slug, both are invalid
-        self.assertRaises(
-            ValidationError,
-            validate_url_uniqueness,
-            site=site,
-            path=page1_1.get_path("en"),
-            language="en",
-            exclude_page=page1_1,
-        )
-        self.assertRaises(
-            ValidationError,
-            validate_url_uniqueness,
-            site=site,
-            path=page2.get_path("en"),
-            language="en",
-            exclude_page=page2,
-        )
+        create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
+
+        # Try to create a root page with the same slug - should fail with IntegrityError
+        with self.assertRaises(IntegrityError):
+            create_page("test page 1_1", "nav_playground.html", "en", slug="foo")
 
     def test_path_collisions_api_3(self):
         """Checks for slug collisions on children of a non root page - uses API to create pages"""
         site = get_current_site()
         page1 = create_page("test page 1", "nav_playground.html", "en")
         page1_1 = create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
-        page1_1_1 = create_page("test page 1_1_1", "nav_playground.html", "en", parent=page1_1, slug="bar")
-        page1_1_2 = create_page("test page 1_1_1", "nav_playground.html", "en", parent=page1_1, slug="bar")
+        create_page("test page 1_1_1", "nav_playground.html", "en", parent=page1_1, slug="bar")
         page1_2 = create_page("test page 1_2", "nav_playground.html", "en", parent=page1, slug="bar")
         # Direct children of home has different slug so it's ok.
         self.assertTrue(
@@ -275,23 +245,25 @@ class PagesTestCase(TransactionCMSTestCase):
                 exclude_page=page1_2,
             )
         )
-        # children of page1_1 has the same slug -> you lose!
-        self.assertRaises(
-            ValidationError,
-            validate_url_uniqueness,
-            site=site,
-            path=page1_1_1.get_path("en"),
-            language="en",
-            exclude_page=page1_1_1,
-        )
-        self.assertRaises(
-            ValidationError,
-            validate_url_uniqueness,
-            site=site,
-            path=page1_1_2.get_path("en"),
-            language="en",
-            exclude_page=page1_1_2,
-        )
+        with self.assertRaises(IntegrityError):
+            create_page("test page 1_1_1", "nav_playground.html", "en", parent=page1_1, slug="bar")
+
+    def test_parent_child_same_slug(self):
+        """Test that a parent page and its child can have the same slug."""
+        parent = create_page("parent", "nav_playground.html", "en", slug="foo")
+        child = create_page("child", "nav_playground.html", "en", parent=parent, slug="foo")
+
+        # Verify the paths are correctly formed and different
+        self.assertEqual(parent.get_path("en"), "foo")
+        self.assertEqual(child.get_path("en"), "foo/foo")
+        self.assertEqual(parent.get_absolute_url("en"), "/en/foo/")
+        self.assertEqual(child.get_absolute_url("en"), "/en/foo/foo/")
+
+        # Verify we can access both pages
+        response = self.client.get(parent.get_absolute_url("en"))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(child.get_absolute_url("en"))
+        self.assertEqual(response.status_code, 200)
 
     def test_details_view(self):
         """
@@ -659,16 +631,8 @@ class PagesTestCase(TransactionCMSTestCase):
                 )
             )
 
-            foo.update_urls("en", managed=False, path="bar")
-
-            self.assertRaises(
-                ValidationError,
-                validate_url_uniqueness,
-                site,
-                path=bar.get_path("en"),
-                language="en",
-                exclude_page=bar,
-            )
+            with self.assertRaises(IntegrityError):
+                foo.update_urls("en", managed=False, path="bar")
 
     def test_valid_url_multisite(self):
         site1 = Site.objects.get_current()
