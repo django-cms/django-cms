@@ -26,7 +26,7 @@ def set_page_url(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     create_url = PageUrl.objects.using(db_alias).create
 
-    for cms_page in Page.objects.all():
+    for cms_page in Page.objects.using(db_alias).all():
         for translation in cms_page.title_set.all():
             create_url(
                 page=cms_page,
