@@ -226,7 +226,7 @@ class PageContent(models.Model):
                     self
                     .get_ancestor_titles()
                     .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-                    .order_by('-page__node__path')
+                    .order_by('-page__path')
                     .values_list('template', flat=True)
                 )
                 if templates:
