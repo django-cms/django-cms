@@ -63,7 +63,7 @@ def _handle_no_page(request):
     try:
         match = resolve(request.path)
     except Resolver404 as e:
-        raise Http404(dict(path=request.path, tried=e.args[0]['tried']))
+        raise Http404(dict(path=request.path, tried=e.args[0]['tried'])) from e
 
     # redirect to PageContent's changelist if the root page is detected
     if match.url_name == 'pages-root':
