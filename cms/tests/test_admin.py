@@ -436,6 +436,18 @@ class AdminTestCase(AdminTestsBase):
             child_page_content = PageContent.objects.get(page=child_page, language="en")
             self.assertEqual(child_page_content.get_template(), "nav_playground.html")
 
+    @override_settings(CMS_TEMPLATES=[])
+    def test_placeholder_slot_inheritance_magic_with_two_levels_of_inheritance_without_configured_templates(self):
+        admin_user = self.get_superuser()
+        parent_page = create_page("grandparent-page", TEMPLATE_INHERITANCE_MAGIC, "en", created_by=admin_user)
+        child_page = create_page(
+            "parent-page", TEMPLATE_INHERITANCE_MAGIC, "en", created_by=admin_user, parent=parent_page
+        )
+
+        child_slots = child_page.get_content_obj("en").get_placeholder_slots()
+
+        self.assertEqual(child_slots, ("content",))
+
 
 class AdminTests(AdminTestsBase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
