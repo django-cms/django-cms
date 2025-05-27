@@ -61,17 +61,15 @@ def render_page(request, page, current_language, slug=None):
 
 def _handle_no_page(request):
     try:
-        # redirect to PageContent's changelist if the root page is detected
-        resolved_path = resolve(request.path)
-        if resolved_path.url_name == 'pages-root':
-            redirect_url = admin_reverse('cms_pagecontent_changelist')
-            return HttpResponseRedirect(redirect_url)
-
-        # add a $ to the end of the url (does not match on the cms anymore)
-        return resolve('%s$' % request.path).func(request)
+        match = resolve(request.path)
     except Resolver404 as e:
-        # raise a django http 404 page
-        raise Http404(dict(path=request.path, tried=e.args[0]['tried']))
+        raise Http404(dict(path=request.path, tried=e.args[0]['tried'])) from e
+
+    # redirect to PageContent's changelist if the root page is detected
+    if match.url_name == 'pages-root':
+        redirect_url = admin_reverse('cms_pagecontent_changelist')
+        return HttpResponseRedirect(redirect_url)
+    raise Http404(dict(path=request.path, tried=match.tried))
 
 
 def _handle_no_apphook(request):
