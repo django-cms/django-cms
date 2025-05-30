@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpResponseNotFound
