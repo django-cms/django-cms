@@ -4,7 +4,7 @@ CONTRIBUTING
 
 First, thank you very much, that you would like to contribute to django CMS.
 We always welcome contributions, like many other open-source projects. We are
-very thankful to the many `present, past and future contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_, to our `community heroes <https://github.com/django-cms/django-cms-mgmt/blob/master/community%20heros/list%20of%20community%20heros.md>`_ and to the `members of the django CMS Association <https://github.com/django-cms/django-cms-mgmt/blob/master/association/members.md>`_.
+very thankful to the many `present, past and future contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_, to our `community champions <https://www.django-cms.org/en/community/django-cms-supporters/#champions>`_ and to the `members of the django CMS Association <https://www.django-cms.org/en/about-us/#django-cms-team>`_.
 
 
 Code of Conduct
@@ -79,17 +79,11 @@ You can join us online:
 
 You can join a work group and work collaboratively on django CMS
 
-* `work groups <https://www.django-cms.org/en/join-work-group/>`_
+* `work groups <https://www.django-cms.org/en/roadmap/>`_
 
 You can become a member of the django CMS Association and receive benefits
 
 * `Membership <https://www.django-cms.org/en/memberships/>`_
-
-
-Receive rewards for submitting pull requests
---------------------------------------------
-
-Sign up for our `Bounty program <https://www.django-cms.org/en/bounty-program/>`_.
 
 
 Join a work group
