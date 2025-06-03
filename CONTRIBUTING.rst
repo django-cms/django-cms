@@ -77,10 +77,6 @@ You can join us online:
 
 * at our `django CMS Discord Server <https://discord-main-channel.django-cms.org>`_
 
-You can join a work group and work collaboratively on django CMS
-
-* `work groups <https://www.django-cms.org/en/roadmap/>`_
-
 You can become a member of the django CMS Association and receive benefits
 
 * `Membership <https://www.django-cms.org/en/memberships/>`_
