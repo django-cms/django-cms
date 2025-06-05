@@ -47,9 +47,15 @@ class PlaceholderField(models.ForeignKey):
         kwargs.update({'editable': False})  # never allow edits in admin
         # We hard-code the `to` argument for ForeignKey.__init__
         # since a PlaceholderField can only be a ForeignKey to a Placeholder
+        self.slotname = slotname
         kwargs['to'] = 'cms.Placeholder'
         kwargs['on_delete'] = models.CASCADE
         super().__init__(**kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs['slotname'] = self.slotname
+        return name, path, args, kwargs
 
 
 class PlaceholderRelationField(GenericRelation):
