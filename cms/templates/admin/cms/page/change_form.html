@@ -43,7 +43,7 @@
 {% if show_language_tabs and not show_permissions %}
 <div id="page_form_lang_tabs">
     {% for lang_code, lang_name in language_tabs %}
-        <input type="button" onclick="CMS.API.changeLanguage('{% get_admin_url_for_language cms_page lang_code %}');"
+        <input type="button" data-admin-url="{% get_admin_url_for_language cms_page lang_code %}"
             class="language_button {% if lang_code == language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endif %}"
             id="{{lang_code}}button" name="{{lang_code}}" value="{{lang_name}}" />
     {% endfor %}

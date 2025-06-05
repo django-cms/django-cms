@@ -232,12 +232,7 @@ class FormsTestCase(CMSTestCase):
         app_config_select = ApplicationConfigSelect(app_configs=app_configs)
         output = app_config_select.render("application_configurations", 1)
         self.assertFalse('<script>alert("bad-stuff");</script>' in output)
-        self.assertTrue(
-            "\\u0026lt\\u003Bscript\\u0026gt\\u003Balert("
-            "\\u0026quot\\u003Bbad\\u002Dstuff\\u0026quot"
-            "\\u003B)\\u003B\\u0026lt\\u003B/script\\u0026gt"
-            "\\u003B" in output
-        )
+        self.assertTrue('\\u003Cscript\\u003Ealert(\\"bad-stuff\\");\\u003C/script\\u003E' in output)
 
     def test_move_page_form(self):
         """Test the MovePageForm validation and behavior"""

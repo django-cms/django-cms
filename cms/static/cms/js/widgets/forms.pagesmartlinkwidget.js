@@ -95,10 +95,10 @@ require.ensure([], function (require) {
     window.CMS.PageSmartLinkWidget = PageSmartLinkWidget;
 
     $(function () {
-        if (window.CMS.Widgets !== undefined && window.CMS.Widgets._pageSmartLinkWidgets !== undefined) {
-            window.CMS.Widgets._pageSmartLinkWidgets.forEach(function (widget) {
-                new PageSmartLinkWidget(widget);
-            });
-        }
+        document.querySelectorAll('[data-cms-widget-pagesmartlinkwidget]').forEach(function (el) {
+            var widget = JSON.parse(el.querySelector('script').textContent);
+
+            new PageSmartLinkWidget(widget);
+        });
     });
 }, 'admin.widget');
