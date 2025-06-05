@@ -95,6 +95,7 @@ def forwards(apps, schema_editor):
         .using(db_alias)
         .filter(pk__in=old_placeholder_ids)
         .annotate(plugin_count=models.Count('cmsplugin'))
+        .only("pk")
     )
 
     if old_placeholders.filter(plugin_count__gt=0).exists():
