@@ -1,3 +1,22 @@
+Bug Fixes:
+----------
+* 404 no raised in CMS view when no URLs match (#8240) (3d069cbe5) -- Stefan Wehrmeyer
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Github Release Action (3 pull requests)
+* Stefan Wehrmeyer (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* sourcery-ai[bot]
+
+Thanks to all contributors for their efforts!
+
 5.0.1 (2025-05-21)
 ==================
 
