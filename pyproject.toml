@@ -1,3 +1,74 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+
+requires = [ "setuptools", "setuptools-scm" ]
+
+[project]
+name = "django-cms"
+description = "Lean enterprise content management powered by Django."
+readme = "README.rst"
+license = { text = "BSD-3-Clause" }
+maintainers = [
+  { name = "Django CMS Association and contributors", email = "info@django-cms.org" },
+]
+authors = [
+  { name = "Django CMS Association and contributors", email = "info@django-cms.org" },
+]
+requires-python = ">=3.9"
+
+classifiers = [
+  "Environment :: Web Environment",
+  "Framework :: Django",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Framework :: Django",
+  "Framework :: Django :: 4.2",
+  "Framework :: Django :: 5.0",
+  "Framework :: Django :: 5.1",
+  "Framework :: Django :: 5.2",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+dynamic = [ "version" ]
+dependencies = [
+  "Django >= 4.2",
+  "django-classy-tags >=0.7.2",
+  "django-formtools >=2.1",
+  "django-treebeard >=4.3",
+  "django-sekizai >=0.7",
+]
+
+[project.optional-dependencies]
+admin-style = ["djangocms-admin-style>=1.2"]
+
+[project.urls]
+"Homepage" = "https://www.django-cms.org/"
+"Documentation" = "https://docs.django-cms.org/"
+"Release notes" = "https://docs.django-cms.org/en/latest/upgrade/index.html"
+"Community" = "https://discord-support-channel.django-cms.org"
+"Source" = "https://github.com/django-cms/django-cms"
+
+[project.scripts]
+djangocms = "cms.management.djangocms:execute_from_command_line"
+
+[tool.setuptools]
+packages = [ "cms", "menus" ]
+
+[tool.setuptools.dynamic]
+version = { attr = "cms.__version__" }
+
+
 [tool.flake8]
 max-line-length = 119
 exclude = [
