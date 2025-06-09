@@ -68,7 +68,6 @@ packages = [ "cms", "menus" ]
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }
 
-
 [tool.flake8]
 max-line-length = 119
 exclude = [
@@ -163,3 +162,7 @@ quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
 docstring-code-line-length = 80
+
+[tool.codespell]
+ignore-words-list = "cant,statics,groupe,manuel,uptodate,assertIn"
+skip = "package-lock.json,*.js,*.js.html,*.po,./node_modules/*,./.idea/*,./docs/env/*,./docs/build/*,./.env/*,./.venv/*,./build/*,./django_cms.egg-info/*,./.git,./cms/test_utils/project/sampleapp/models.py,./venv/*,./docs/spelling_wordlist"
