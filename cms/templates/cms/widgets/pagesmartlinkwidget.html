@@ -1,2 +1,4 @@
 {% include 'django/forms/widgets/text.html' %}
-{{ widget.script_init|safe }}
+<div data-cms-widget-pagesmartlinkwidget="true" hidden>
+    {{ widget.script_data|json_script }}
+</div>

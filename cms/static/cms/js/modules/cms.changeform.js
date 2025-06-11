@@ -19,6 +19,10 @@ $(function() {
         $(this).parent('.form-row').hide();
     });
 
+    $('#page_form_lang_tabs .language_button').on('click', function() {
+        CMS.API.changeLanguage(this.dataset.adminUrl);
+    });
+
     // public api for changing the language tabs
     // used in admin/cms/page/change_form.html
     window.CMS.API.changeLanguage = function(url) {
