@@ -5,17 +5,17 @@ from django.utils.translation import gettext_lazy as _
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('cms', '0042_remove_placeholderreference_placeholder_ref_and_more'),
+        ("cms", "0042_remove_placeholderreference_placeholder_ref_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='pagepermission',
-            name='can_view',
+            model_name="pagepermission",
+            name="can_view",
             field=models.BooleanField(
-                _('can view restricted pages'),
+                _("can view restricted pages"),
                 default=False,
-                help_text=_('Grants access to published pages with view restrictions. Does not allow viewing unpublished pages.'),
+                help_text=_("Grants access to published pages with view restrictions. Does not allow viewing unpublished pages."),
             ),
         ),
     ]
