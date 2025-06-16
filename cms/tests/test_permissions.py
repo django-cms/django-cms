@@ -98,3 +98,19 @@ class PermissionCacheTests(CMSTestCase):
 
         self.assertTrue(has_generic_permission(page_b, self.user_normal, "change_page"))
         self.assertFalse(has_generic_permission(page_b, self.user_normal, "publish_page"))
+
+    def test_view_permission_behavior(self):
+        """
+        Test that can_view permission:
+        1. Allows access to published pages with view restrictions
+        2. Does not allow viewing unpublished pages
+        """
+        page = create_page("test", "nav_playground.html", "en",
+                          created_by=self.user_super, published=True)
+        assign_user_to_page(page, self.user_normal, can_view=True)
+
+        # Should be able to view published restricted page
+        self.assertTrue(has_generic_permission(page.node, self.user_normal, "view"))
+        page.unpublish("en")
+        # Should not be able to view unpublished page
+        self.assertFalse(has_generic_permission(page.node, self.user_normal, "view"))
