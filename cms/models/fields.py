@@ -42,14 +42,28 @@ class PlaceholderField(models.ForeignKey):
     the built-in migrations will automatically take care of the replacement.
     See documentation of :class:`~cms.models.fields.PlaceholderRelationField` for how to replace the code.
     """
+    system_check_removed_details = {
+        "msg": (
+            "PlaceholderField is for django CMS versions below 4 only. It may only be used inside migrations."
+        ),
+        "hint": "Use PlaceholderRelationField instead.",
+        "id": "cms.E001",
+    }
+
     def __init__(self, slotname, *args, **kwargs):
         kwargs.update({'null': True})  # always allow Null
         kwargs.update({'editable': False})  # never allow edits in admin
         # We hard-code the `to` argument for ForeignKey.__init__
         # since a PlaceholderField can only be a ForeignKey to a Placeholder
+        self.slotname = slotname
         kwargs['to'] = 'cms.Placeholder'
         kwargs['on_delete'] = models.CASCADE
         super().__init__(**kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs['slotname'] = self.slotname
+        return name, path, args, kwargs
 
 
 class PlaceholderRelationField(GenericRelation):
