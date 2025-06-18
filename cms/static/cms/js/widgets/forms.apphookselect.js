@@ -11,7 +11,18 @@ __webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.apph
 // APP HOOK SELECT
 require.ensure([], function (require) {
     var $ = require('jquery');
-    var apphooks_configuration = window.apphooks_configuration || {};
+    var apphookData = {
+        apphooks_configuration: {},
+        apphooks_configuration_value: undefined,
+        apphooks_configuration_url: {}
+    };
+    var dataElement = document.querySelector('script[data-cms-widget-applicationconfigselect]');
+
+    if (dataElement) {
+        apphookData = JSON.parse(dataElement.querySelector('script').textContent);
+    }
+
+    var apphooks_configuration = apphookData.apphooks_configuration || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
@@ -33,7 +44,7 @@ require.ensure([], function (require) {
                 for (var i = 0; i < apphooks_configuration[opt.val()].length; i++) {
                     var selectedCfgs = '';
 
-                    if (apphooks_configuration[opt.val()][i][0] === window.apphooks_configuration_value) {
+                    if (apphooks_configuration[opt.val()][i][0] === apphookData.apphooks_configuration_value) {
                         selectedCfgs = 'selected="selected"';
                     }
                     appCfgs.append(
@@ -42,11 +53,14 @@ require.ensure([], function (require) {
                         '</option>'
                     );
                 }
-                appCfgsAdd.attr('href', window.apphooks_configuration_url[opt.val()] +
+                appCfgsAdd.attr('href', apphookData.apphooks_configuration_url[opt.val()] +
                     // Here we check if we are on django>=1.8 by checking if the method introduced in that version
                     // exists, and if it does - we add `_popup` ourselves, because otherwise the popup with
                     // apphook creation form will not be dismissed correctly
                     (window.showRelatedObjectPopup ? '?_popup=1' : ''));
+                appCfgsAdd.on('click', function () {
+                    window.showAddAnotherPopup(this);
+                });
                 appCfgsRow.removeClass('hidden');
                 appNsRow.addClass('hidden');
             } else {
