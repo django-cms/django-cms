@@ -90,7 +90,11 @@ class AbstractPagePermission(models.Model):
         _("can change permissions"), default=False, help_text=_("on page level")
     )
     can_move_page = models.BooleanField(_("can move"), default=True)
-    can_view = models.BooleanField(_("view restricted"), default=False, help_text=_("frontend view restriction"))
+    can_view = models.BooleanField(
+        _("can view restricted pages"),
+        default=False,
+        help_text=_("Grants access to published pages with view restrictions. Does not allow viewing unpublished pages."),
+    )
 
     class Meta:
         abstract = True
