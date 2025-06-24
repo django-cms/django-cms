@@ -16,7 +16,7 @@ require.ensure([], function (require) {
         apphooks_configuration_value: undefined,
         apphooks_configuration_url: {}
     };
-    var dataElement = document.querySelector('script[data-cms-widget-applicationconfigselect]');
+    var dataElement = document.querySelector('div[data-cms-widget-applicationconfigselect] script');
 
     if (dataElement) {
         apphookData = JSON.parse(dataElement.querySelector('script').textContent);
