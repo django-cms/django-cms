@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from functools import cached_property
 from logging import getLogger
 
 from django.core.exceptions import ImproperlyConfigured
@@ -19,9 +20,8 @@ class CMSCoreConfig(CMSAppConfig):
 
 
 class CMSCoreExtensions(CMSAppExtension):
-
     def __init__(self):
-        self.wizards = {}
+        self.lazy_wizards = []
         self.toolbar_enabled_models = {}
         self.model_groupers = {}
         self.toolbar_mixins = []
@@ -33,17 +33,30 @@ class CMSCoreExtensions(CMSAppExtension):
         """
         if not isinstance(cms_config.cms_wizards, Iterable):
             raise ImproperlyConfigured("cms_wizards must be iterable")
-        for wizard in cms_config.cms_wizards:
-            if not isinstance(wizard, Wizard):
+
+        self.lazy_wizards.append(cms_config.cms_wizards)
+
+    @cached_property
+    def wizards(self) -> dict[str, Wizard]:
+        """
+        Returns a dictionary of wizard instances keyed by their unique IDs.
+        Iterates over all iterables in `self.lazy_wizards`, filters out objects that are instances
+        of the `Wizard` class, and constructs a dictionary where each key is the wizard's `id`
+        and the value is the corresponding `Wizard` instance.
+        Returns:
+            dict: A dictionary mapping wizard IDs to `Wizard` instances.
+        """
+
+        wizards = {}
+        for iterable in self.lazy_wizards:
+            new_wizards = {wizard.id: wizard for wizard in iterable}
+            if wizard := next((wizard for wizard in new_wizards.values() if not isinstance(wizard, Wizard)), None):
+                # If any wizard in the iterable is not an instance of Wizard, raise an exception
                 raise ImproperlyConfigured(
-                    "All wizards defined in cms_wizards must inherit "
-                    "from cms.wizards.wizard_base.Wizard"
+                    f"cms_wizards must be iterable of Wizard instances, got {type(wizard)}"
                 )
-            elif wizard.id in self.wizards:
-                msg = f"Wizard for model {wizard.get_model()} has already been registered"
-                logger.warning(msg)
-            else:
-                self.wizards[wizard.id] = wizard
+            wizards.update(new_wizards)
+        return wizards
 
     def configure_toolbar_enabled_models(self, cms_config):
         if not isinstance(cms_config.cms_toolbar_enabled_models, Iterable):
