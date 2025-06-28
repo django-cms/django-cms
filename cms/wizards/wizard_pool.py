@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.utils.translation import gettext as _
 
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
 from cms.wizards.helpers import get_entries, get_entry  # noqa: F401
 from cms.wizards.wizard_base import Wizard, entry_choices  # noqa: F401
 
@@ -44,7 +44,7 @@ class WizardPool:
 
         warnings.warn(
             "Using wizard_pool is deprecated. Use the cms_config instead.",
-            RemovedInDjangoCMS60Warning,
+            RemovedInDjangoCMS50Warning,
             stacklevel=2,
         )
         assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
