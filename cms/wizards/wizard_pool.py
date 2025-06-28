@@ -1,22 +1,13 @@
 from django.apps import apps
 from django.utils.translation import gettext as _
 
-from cms.wizards.helpers import get_entries, get_entry
-from cms.wizards.wizard_base import Wizard
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
+from cms.wizards.helpers import get_entries, get_entry  # noqa: F401
+from cms.wizards.wizard_base import Wizard, entry_choices  # noqa: F401
 
 
 class AlreadyRegisteredException(Exception):
     pass
-
-
-def entry_choices(user, page):
-    """
-    Yields a list of wizard entries that the current user can use based on their
-    permission to add instances of the underlying model objects.
-    """
-    for entry in get_entries():
-        if entry.user_has_add_permission(user, page=page):
-            yield (entry.id, entry.title)
 
 
 class WizardPool:
@@ -49,7 +40,13 @@ class WizardPool:
         name. In this case, the register method will raise a
         ``cms.wizards.wizard_pool.AlreadyRegisteredException``.
         """
-        # TODO: Add deprecation warning
+        import warnings
+
+        warnings.warn(
+            "Using wizard_pool is deprecated. Use the cms_config instead.",
+            RemovedInDjangoCMS51Warning,
+            stacklevel=2,
+        )
         assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
         if self.is_registered(entry, passive=True):
             model = entry.get_model()

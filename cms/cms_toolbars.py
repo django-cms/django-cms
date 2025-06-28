@@ -86,13 +86,9 @@ class PlaceholderToolbar(CMSToolbar):
         from cms.wizards.wizard_pool import entry_choices
         title = _("Create")
 
-        if self.page:
-            user = self.request.user
-            page_pk = self.page.pk
-            disabled = len(list(entry_choices(user, self.page))) == 0
-        else:
-            page_pk = ''
-            disabled = True
+        user = self.request.user
+        page_pk = self.page.pk if self.page else ""
+        disabled = not list(entry_choices(user, self.page))
 
         url = '{url}?page={page}&language={lang}&edit'.format(
             url=admin_reverse("cms_wizard_create"),
