@@ -13,7 +13,7 @@ from cms.test_utils.project.sampleapp.models import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.grouper import wo_content_permission
-from cms.utils.i18n import get_language_list
+from cms.utils.i18n import force_language, get_language_list
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 

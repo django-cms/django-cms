@@ -13,7 +13,7 @@ from cms.utils import get_current_site
 from cms.utils.i18n import get_site_language_from_request
 
 from .forms import WizardStep1Form, WizardStep2BaseForm, step2_form_factory
-from .wizard_pool import wizard_pool
+from .wizard_base import get_entry
 
 
 class WizardCreateView(SessionWizardView):
@@ -149,7 +149,7 @@ class WizardCreateView(SessionWizardView):
 
     def get_selected_entry(self):
         data = self.get_cleaned_data_for_step('0')
-        return wizard_pool.get_entry(data['entry'])
+        return get_entry(data['entry'])
 
     def get_origin_page(self):
         data = self.get_cleaned_data_for_step('0')
