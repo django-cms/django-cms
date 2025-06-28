@@ -21,7 +21,7 @@ from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
-from cms.models import Placeholder
+from cms.models import EmptyPageContent, Placeholder
 from cms.utils.conf import get_cms_setting
 
 RANGE_START = 128

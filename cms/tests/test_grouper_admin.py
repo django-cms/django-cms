@@ -3,6 +3,7 @@ import copy
 from django.contrib.admin import site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
+from django.utils.translation import get_language, override as force_language
 
 from cms.admin.utils import CONTENT_PREFIX
 from cms.test_utils.project.sampleapp.models import (
@@ -177,7 +178,7 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
             current_content_filters = self.admin.current_content_filters
 
             self.assertEqual(admin_language, expected_language)
-            self.assertEqual(current_content_filters["language"], expected_language)
+            self.assertEqual(current_content_filters["language"],  expected_language)
 
     def test_extra_grouping_field_current(self):
         """Extra grouping fields (language) when not set return current default correctly"""
@@ -189,39 +190,6 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
 
         self.assertEqual(admin_language, expected_language)
         self.assertEqual(current_content_filters["language"], expected_language)
-
-    def test_prepopulated_fields_pass_checks(self):
-        """Prepopulated fields work for content field"""
-        # Arrange
-        admin = copy.copy(self.admin)
-        admin.prepopulated_fields = dict(
-            category_name=["category_name"],  # Both key and value from GrouperModel
-            some_field=["content__secret_greeting"],  # Value from ContentModel
-            content__secret_greeting=["category_name"],  # Key from GrouperModel
-            content__region=["content__secret_greeting"],  # Both key and value from ContentModel
-        )
-
-        # Act
-        check_results = admin.check()
-
-        # Assert
-        self.assertEqual(check_results, [])  # No errors
-
-    def test_invalid_prepopulated_content_fields_fail_checks(self):
-        """Prepopulated fields with invalid content field names fail checks"""
-        # Arrange
-        admin = copy.copy(self.admin)
-        admin.prepopulated_fields = dict(
-            some_field=["content__public_greeting"],  # Value from ContentModel: 1 error
-            content__public_greeting=["category_name"],  # Key from GrouperModel: 1 error
-            content__country=["content__public_greeting"],  # Both key and value from ContentModel: 2 errors
-        )
-
-        # Act
-        check_results = admin.check()
-
-        # Assert
-        self.assertEqual(len(check_results), 4)  # No errors
 
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):

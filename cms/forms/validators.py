@@ -57,5 +57,9 @@ def validate_url_uniqueness(site, path, language, user_language=None, exclude_pa
         message = gettext('Page %(conflict_page)s has the same url \'%(url)s\' as current page "%(instance)s".')
     else:
         message = gettext('Page %(conflict_page)s has the same url \'%(url)s\' as current page.')
-    message = message % {'conflict_page': conflict_url, 'url': path, 'instance': exclude_page}
+    message = message % {
+        'conflict_page': conflict_url,
+        'url': path,
+        'instance': exclude_page.get_title(language) if exclude_page else ''
+    }
     raise ValidationError(mark_safe(message))
