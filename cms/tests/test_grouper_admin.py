@@ -3,6 +3,7 @@ import copy
 from django.contrib.admin import site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
+from django.utils.translation import get_language, override as force_language
 
 from cms.admin.utils import CONTENT_PREFIX
 from cms.test_utils.project.sampleapp.models import (
@@ -13,7 +14,7 @@ from cms.test_utils.project.sampleapp.models import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.grouper import wo_content_permission
-from cms.utils.i18n import force_language, get_language_list
+from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 
