@@ -1,0 +1,43 @@
+========================== ============================================================ =========== ==================
+Package                    Description                                                  Status      Supported Versions
+========================== ============================================================ =========== ==================
+djangocms-alias            Universial alias plugin for all contents that needs to be    production    4.1, 5.0
+                           repeated within a project.                                  
+djangocms-attribute-fields An opinionated implementation of JSONField for arbitrary     production    3.11, 4.1, 5.0
+                           HTML element attributes.                                    
+djangocms-audio            django CMS Audio is a set of plugins for django CMS. That    production    3.11, 4.1, 5.0
+                           allow you to publish audio files on your site.              
+djangocms-blog             django CMS blog application - Support for multilingual       beta          4.1, 5.0
+                           posts, placeholders, social network meta tags and           
+                           configurable apphooks                                       
+djangocms-form-builder     Flexible HTML forms for your django CMS projects             alpha         3.11, 4.1, 5.0
+djangocms-frontend         django CMS Frontend facilitates the easy creation of         production    3.11, 4.1, 5.0
+                           reusable frontend components. It supports any CSS framework.
+                           For immediate use, it includes a comprehensive set of       
+                           Bootstrap 5 components and templates.                       
+djangocms-link             Universal link plugin - allows intuitive in-text linking to  production    3.11, 4.1, 5.0
+                           all known linkable objects (starting with CMS pages).       
+                           Provides a django CMS link field and widget for developers  
+                           to use in custom content elements. Compatible with (and     
+                           enabled in) djangocms-text.                                 
+djangocms-maps             A universal maps plugin for django CMS, supporting all major production    3.11
+                           map providers.                                              
+djangocms-moderation       Moderation workflows for django CMS and django CMS           production    4.1, 5.0
+                           versioning.                                                 
+djangocms-modules          Reusable user-configured components (made of existing        production    3.1
+                           plugins)                                                    
+djangocms-picture          django CMS Picture is a plugin for django CMS that allows    production    3.11, 4.2
+                           you to add images on your site.                             
+djangocms-rest             djangocms-rest enables frontend projects to consume django   beta          4.1, 5.0
+                           CMS content through a browseable read-only, REST/JSON API.  
+                           It is based on the django rest framework (DRF).             
+djangocms-snippet          django CMS Snippet provides a plugin for django CMS to       production    3.11, 4.1, 5.0
+                           inject HTML, CSS or JavaScript snippets into your website.  
+djangocms-text             Text Plugin for django CMS using Tiptap (or any other text   beta          3.11, 4.1, 5.0
+                           editor of your choice)                                      
+djangocms-transfer         Import/Export (JSON) for page contents                       beta          3.11, 4.1, 5.0
+djangocms-versioning       Adds version management for django CMS pages and other       production    4.1, 5.0
+                           packages supporting versioning.                             
+djangocms-video            django CMS Video is a set of plugins for django CMS that     production    3.11, 4.1, 5.0
+                           allow you to publish video content on your site.            
+========================== ============================================================ =========== ==================
