@@ -12,3 +12,6 @@ class FuzzyInt(int):
 
     def __repr__(self):
         return "[%d..%d]" % (self.lowest, self.highest)
+
+    def __hash__(self):
+        return hash((self.lowest, self.highest))
