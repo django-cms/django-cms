@@ -202,12 +202,12 @@ def has_global_permission(user, site, action, use_cache=True):
 def has_page_permission(user, page, action, use_cache=True):
     import warnings
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
     from cms.utils.page_permissions import has_generic_permission
 
     warnings.warn("has_page_permission is deprecated and will be removed in django CMS 4.3. "
                   "Use cms.utils.page_permissions.has_generic_permission instead.",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
+                  RemovedInDjangoCMS50Warning, stacklevel=2)
 
     action_map = {
         "change": "change_page",
@@ -334,10 +334,10 @@ def get_view_restrictions(pages):
     Load all view restrictions for the pages
     """
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
 
     warnings.warn("get_view_restrictions will be removed in django CMS 4.3",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
+                  RemovedInDjangoCMS50Warning, stacklevel=2)
 
     restricted_pages = defaultdict(list)
 

@@ -11,13 +11,13 @@ from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
 from cms.utils.compat import DJANGO_4_2
-from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
 
 
 class SuperLazyIterator:
     def __init__(self, func):
         warnings.warn("SuperLazyIterator is deprecated.",
-                      RemovedInDjangoCMS42Warning, stacklevel=2)
+                      RemovedInDjangoCMS50Warning, stacklevel=2)
         self.func = func
 
     def __iter__(self):
@@ -28,7 +28,7 @@ class LazyChoiceField(forms.ChoiceField):
 
     def __init__(self, *args, **kwargs):
         warnings.warn("LazyChoiceField is deprecated. Use Django's ChoiceField instead.",
-                      RemovedInDjangoCMS42Warning, stacklevel=2)
+                      RemovedInDjangoCMS50Warning, stacklevel=2)
         super().__init__(*args, **kwargs)
 
     @property

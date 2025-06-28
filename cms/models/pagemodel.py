@@ -19,7 +19,7 @@ from cms import constants
 from cms.exceptions import LanguageError
 from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
 from cms.utils import i18n
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
 from cms.utils.page import get_clean_username
@@ -737,7 +737,7 @@ class Page(models.Model):
         warnings.warn(
             "Method `set_translations_cache` is deprecated. Use `get_content_obj` instead. "
             "For admin views use `set_admin_content_cache` instead.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS50Warning,
             stacklevel=2,
         )
         for translation in self.pagecontent_set.all():
