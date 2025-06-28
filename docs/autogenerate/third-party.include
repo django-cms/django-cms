@@ -1,7 +1,0 @@
-========================== ============================================================ =========== ==================
-Package                    Description                                                  Status      Supported Versions
-========================== ============================================================ =========== ==================
-djangocms-blog             django CMS blog application - Support for multilingual       production    3.11
-                           posts, placeholders, social network meta tags and           
-                           configurable apphooks                                       
-========================== ============================================================ =========== ==================

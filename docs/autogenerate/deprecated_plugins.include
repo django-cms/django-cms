@@ -1,8 +1,0 @@
-========================== ============================================================ =========== ==================
-Package                    Description                                                  Status      Supported Versions
-========================== ============================================================ =========== ==================
-djangocms-bootstrap4       django CMS Bootstrap 4 is a plugin bundle for django CMS     production    3.11, 4.1, 5.0
-                           providing several components from the popular Bootstrap 4   
-                           framework. djangocms-frontend offers an automatic migration.
-djangocms-text-ckeditor    Text Plugin for django CMS using CKEditor 4 (now sunset)     production    3.11, 4.1, 5.0
-========================== ============================================================ =========== ==================
