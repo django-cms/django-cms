@@ -47,6 +47,15 @@ def entry_choices(user, page):
             yield (entry.id, entry.title)
 
 
+def clear_wizard_cache():
+    """
+    Clears the wizard cache. This is useful if you have added or removed wizards
+    and want to ensure that the changes are reflected immediately.
+    """
+    del apps.get_app_config('cms').cms_extension.wizards
+
+
+
 class WizardBase:
     """
 
