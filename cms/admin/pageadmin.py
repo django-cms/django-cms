@@ -103,6 +103,7 @@ class PageAdmin(admin.ModelAdmin):
     copy_form = CopyPageForm
     move_form = MovePageForm
     inlines = PERMISSION_ADMIN_INLINES
+    title_frontend_editable_fields =  ['title', 'menu_title', 'page_title']
     search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
 
     def has_add_permission(self, request):
