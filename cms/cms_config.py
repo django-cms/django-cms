@@ -55,7 +55,7 @@ class CMSCoreExtensions(CMSAppExtension):
                 raise ImproperlyConfigured(
                     f"cms_wizards must be iterable of Wizard instances, got {type(wizard)}"
                 )
-            wizards.update(new_wizards)
+            wizards |= new_wizards
         return wizards
 
     def configure_toolbar_enabled_models(self, cms_config):
