@@ -4,7 +4,6 @@ from django.contrib.admin import site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
-from django.utils.translation import get_language, override as force_language
 
 from cms.admin.utils import CONTENT_PREFIX
 from cms.test_utils.project.sampleapp.models import (
