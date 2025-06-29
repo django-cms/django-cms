@@ -38,8 +38,8 @@ def get_entry(entry_key):
 
 def entry_choices(user, page):
     """
-    Yields a list of wizard entry tuples of the form (wizard.id, wizard.title) that 
-    the current user can use based on their permission to add instances of the 
+    Yields a list of wizard entry tuples of the form (wizard.id, wizard.title) that
+    the current user can use based on their permission to add instances of the
     underlying model objects.
     """
     for entry in get_entries():
