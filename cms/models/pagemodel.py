@@ -876,7 +876,8 @@ class Page(MP_Node):
         from cms.models import PageContent, Placeholder
 
         if admin_manager:
-            page_content = PageContent.admin_manager.latest_content().get(language=language, page=self)
+            # Use the admin manager to get the current content (i.e. potentially not yet published content)
+            page_content = PageContent.admin_manager.current_content().get(language=language, page=self)
         else:
             page_content = PageContent.objects.get(language=language, page=self)
         return Placeholder.objects.get_for_obj(page_content)
