@@ -5,13 +5,6 @@ from cms.models import Page, PageContent
 
 
 class BaseExtension(models.Model):
-    public_extension = models.OneToOneField(
-        'self',
-        on_delete=models.CASCADE,
-        null=True,
-        editable=False,
-        related_name='draft_extension',
-    )
     extended_object = None
 
     class Meta:
@@ -44,7 +37,6 @@ class BaseExtension(models.Model):
         """
         clone = self.__class__.objects.get(pk=self.pk)  # get a copy of this instance
         clone.pk = None
-        clone.public_extension = None
         clone.extended_object = target  # set the new public object
 
         # Nullify all concrete parent primary keys. See issue #5494
@@ -55,20 +47,6 @@ class BaseExtension(models.Model):
         clone.save()
         clone.copy_relations(self, language)
         return clone
-
-    def copy_to_public(self, public_object, language):
-        """
-        .. warning::
-
-            This method used to "publish" this extension as part of the a larger operation on the target.
-            Publishing pages has been removed from django CMS core in version 4 onward.
-
-            For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
-        """
-        import warnings
-        warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
-                      'publishing, such as: djangocms-versioning.',
-                      UserWarning, stacklevel=2)
 
 
 class PageExtension(BaseExtension):
