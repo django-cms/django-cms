@@ -1,17 +1,28 @@
+4.1.7 (2025-06-30)
+==================
+
 Bug Fixes:
 ----------
 * show_placeholder did not respect edit/preview mode and failed loudly (#8273) (c062968b7) -- Fabian Braun
+* Updated deprecation warning to current version scheme (#8269) (ce2dba0) -- Fabian Braun
+* Allow lazy wizard initialization (#8268) (04003bb) -- Fabian Braun
+* Migration failed in rare cases (#8249) (b5b7f30) -- Fabian Braun
+* Added default_auto_field to cms/apps.py (#8254) (14425d) -- Fabian Braun
+* Adjusted checks for GrouperAdmin to allow for `prepopulated_fields` (#8255) (7f08375) -- Fabian Braun
+* Remove text decorations in page tree introduced by django 5.2 (#8214) (56b75e1) -- Fabian Braun
+
 
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 10 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
+* Fabian Braun (7 pull request)
 * Github Release Action (3 pull requests)
 
 With the review help of the following contributors:
 
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
