@@ -285,6 +285,22 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         request = self.get_request("/")
         self.assertRaises(TypeError, _get_page_by_untyped_arg, [], request, 1)
 
+    def test_show_placeholder_for_page_content_does_not_exist(self):
+        """
+        Verify ``show_placeholder`` correctly handles being given an
+        invalid page content (language).
+        """
+
+        with self.settings(DEBUG=True):
+            context = self.get_context("/")
+
+            self.assertRaises(
+                PageContent.DoesNotExist, _show_placeholder_by_id, context, "content", "myreverseid", lang="does_not_exist"
+            )
+        with self.settings(DEBUG=False):
+            content = _show_placeholder_by_id(context, "content", "myreverseid", lang="does_not_exist")
+            self.assertEqual(content, "")
+
     def test_show_placeholder_for_page_placeholder_does_not_exist(self):
         """
         Verify ``show_placeholder`` correctly handles being given an
