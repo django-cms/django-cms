@@ -9,7 +9,6 @@ pyenchant>3
 sphinx-autobuild
 datetime
 coverage
-django~=3.2
 git+https://github.com/django-cms/django-cms@release/4.1.x
 codespell
 pip-tools
