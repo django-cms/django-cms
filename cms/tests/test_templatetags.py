@@ -295,6 +295,22 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             context = self.get_context("/")
 
             self.assertRaises(
+                PageContent.DoesNotExist, _show_placeholder_by_id, context, "does_not_exist", "myreverseid", lang="go-lang"
+            )
+        with self.settings(DEBUG=False):
+            content = _show_placeholder_by_id(context, "does_not_exist", "myreverseid", lang="go-lang")
+            self.assertEqual(content, "")
+
+    def test_show_placeholder_for_page_content_does_not_exist(self):
+        """
+        Verify ``show_placeholder`` correctly handles being given an
+        invalid identifier.
+        """
+
+        with self.settings(DEBUG=True):
+            context = self.get_context("/")
+
+            self.assertRaises(
                 Placeholder.DoesNotExist, _show_placeholder_by_id, context, "does_not_exist", "myreverseid"
             )
         with self.settings(DEBUG=False):
