@@ -295,10 +295,10 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             context = self.get_context("/")
 
             self.assertRaises(
-                PageContent.DoesNotExist, _show_placeholder_by_id, context, "does_not_exist", "myreverseid", lang="go-lang"
+                PageContent.DoesNotExist, _show_placeholder_by_id, context, "content", "myreverseid", lang="does_not_exist"
             )
         with self.settings(DEBUG=False):
-            content = _show_placeholder_by_id(context, "does_not_exist", "myreverseid", lang="go-lang")
+            content = _show_placeholder_by_id(context, "content", "myreverseid", lang="does_not_exist")
             self.assertEqual(content, "")
 
     def test_show_placeholder_for_page_placeholder_does_not_exist(self):
