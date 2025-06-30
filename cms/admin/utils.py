@@ -737,11 +737,6 @@ class _GrouperAdminFormMixin:
         # Will be set on admin model save
         self.fields[CONTENT_PREFIX + self._admin.grouper_field_name].required = False
         self.update_labels(self._content_fields)
-        if hasattr(self._admin, "can_change_content") and False:
-            if not self._admin.can_change_content(self._request, self._content_instance):
-                # Only allow content object fields to be edited if user can change them
-                for field in self._additional_content_fields:
-                    self.fields[field].disabled = True
 
     def update_labels(self, fields: list[str]) -> None:
         """Adds a language indicator to field labels"""

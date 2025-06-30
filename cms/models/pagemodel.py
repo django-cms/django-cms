@@ -872,10 +872,13 @@ class Page(MP_Node):
             return self.get_title(language, True, force_reload)
         return menu_title
 
-    def get_placeholders(self, language):
+    def get_placeholders(self, language: str, admin_manager: bool = False) -> models.QuerySet:
         from cms.models import PageContent, Placeholder
 
-        page_content = PageContent.objects.get(language=language, page=self)
+        if admin_manager:
+            page_content = PageContent.admin_manager.latest_content().get(language=language, page=self)
+        else:
+            page_content = PageContent.objects.get(language=language, page=self)
         return Placeholder.objects.get_for_obj(page_content)
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
