@@ -1,3 +1,20 @@
+Bug Fixes:
+----------
+* show_placeholder did not respect edit/preview mode and failed loudly (#8273) (c062968b7) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 4.1.6 (2025-04-22)
 ==================
 
