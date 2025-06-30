@@ -285,10 +285,10 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         request = self.get_request("/")
         self.assertRaises(TypeError, _get_page_by_untyped_arg, [], request, 1)
 
-    def test_show_placeholder_for_page_placeholder_does_not_exist(self):
+    def test_show_placeholder_for_page_content_does_not_exist(self):
         """
         Verify ``show_placeholder`` correctly handles being given an
-        invalid identifier.
+        invalid page content (language).
         """
 
         with self.settings(DEBUG=True):
@@ -301,7 +301,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             content = _show_placeholder_by_id(context, "does_not_exist", "myreverseid", lang="go-lang")
             self.assertEqual(content, "")
 
-    def test_show_placeholder_for_page_content_does_not_exist(self):
+    def test_show_placeholder_for_page_placeholder_does_not_exist(self):
         """
         Verify ``show_placeholder`` correctly handles being given an
         invalid identifier.
