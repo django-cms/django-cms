@@ -146,7 +146,7 @@ class Page(MP_Node):
         #: Might be larger than the page_content_cache
 
     def __str__(self):
-        page_content = self.get_content_obj(get_language(), fallback=True)
+        page_content = self.get_admin_content(get_language(), fallback=True)
         if page_content:
             title = page_content.menu_title or page_content.title
         else:
