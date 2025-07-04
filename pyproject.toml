@@ -64,6 +64,7 @@ djangocms = "cms.management.djangocms:execute_from_command_line"
 
 [tool.setuptools]
 packages = [ "cms", "menus" ]
+include-package-data = true
 
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }
