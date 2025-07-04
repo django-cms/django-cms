@@ -39,7 +39,7 @@ When instantiating a Wizard object, use the keywords:
               CMS will create one from the pattern:
               "Create a new «model.verbose_name» instance."
 :edit_mode_on_success: Whether the user will get redirected to object edit url after a
-                       successful creation or not. This only works if the object is registered 
+                       successful creation or not. This only works if the object is registered
                        for toolbar enabled models.
 
 
@@ -78,16 +78,12 @@ Wizard class
     :members:
     :inherited-members:
 
-
-*******
-Helpers
-*******
-
-..  module:: cms.wizards.helpers
-
 ..  autofunction:: get_entry
 
 ..  autofunction:: get_entries
+
+..  autofunction:: entry_choices
+
 
 
 ***********

@@ -13,6 +13,49 @@ from cms.toolbar.utils import (
 )
 
 
+def get_entries():
+    """
+    Returns a list of Wizard objects (for all registered wizards) ordered by weight
+
+    ``get_entries()`` is useful if it is required to have a list of all registered
+    wizards. Typically, this is used to iterate over them all. Note that they will
+    be returned in the order of their ``weight``: smallest numbers for weight are
+    returned first.::
+
+        for wizard in get_entries():
+            # do something with a wizard...
+    """
+    wizards = apps.get_app_config('cms').cms_extension.wizards
+    return sorted(wizards.values(), key=lambda e: e.weight)
+
+
+def get_entry(entry_key):
+    """
+    Returns a wizard object based on its :attr:`~.cms.wizards.wizard_base.Wizard.id`.
+    """
+    return apps.get_app_config('cms').cms_extension.wizards[entry_key]
+
+
+def entry_choices(user, page):
+    """
+    Yields a list of wizard entry tuples of the form (wizard.id, wizard.title) that
+    the current user can use based on their permission to add instances of the
+    underlying model objects.
+    """
+    for entry in get_entries():
+        if entry.user_has_add_permission(user, page=page):
+            yield (entry.id, entry.title)
+
+
+def clear_wizard_cache():
+    """
+    Clears the wizard cache. This is useful if you have added or removed wizards
+    and want to ensure that the changes are reflected immediately.
+    """
+    del apps.get_app_config('cms').cms_extension.wizards
+
+
+
 class WizardBase:
     """
 

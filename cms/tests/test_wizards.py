@@ -219,7 +219,9 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # Clean up in case anything has been removed or added to the
         # registered wizards, so other tests don't have problems
         extension = apps.get_app_config('cms').cms_extension
-        extension.wizards = {}
+        # Reset the cached property 'wizards'
+        if hasattr(extension, 'wizards'):
+            del extension.wizards
         configs_with_wizards = [
             app.cms_config for app in app_registration.get_cms_config_apps()
             if hasattr(app.cms_config, 'cms_wizards')
@@ -235,6 +237,9 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         Test for backwards compatibility of is_registered when checking
         a registered wizard.
         """
+        from django.apps import apps
+
+        self.assertTrue(apps.get_app_config("cms").cms_extension.wizards)
         is_registered = wizard_pool.is_registered(cms_page_wizard)
         self.assertTrue(is_registered)
 
