@@ -21,6 +21,7 @@ from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
 from cms.test_utils.project.placeholder_relation_field_app.models import (
     FancyPoll,
+    FancyPollWithoutGetTemplate,
 )
 from cms.test_utils.project.placeholderapp.models import (
     DynamicPlaceholderSlotExample,
@@ -1063,6 +1064,21 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertQuerySetEqual(
             poll.placeholders.all(), Placeholder.objects.get_for_obj(poll), transform=lambda x: x, ordered=False
         )
+
+    def xtest_placeholder_relation_field_no_template(self):
+        """
+        This tests the PlaceholderRelationField where it returns (does a reverse relation)
+        the placeholders for the attached object, even if no template is set.
+        """
+        poll = FancyPollWithoutGetTemplate.objects.create(name="poll 1", template="test")
+
+        with self.login_user_context(self.get_superuser()):
+            self.client.get(get_object_edit_url(poll))
+
+        self.assertQuerySetEqual(
+            poll.placeholders.all(), Placeholder.objects.get_for_obj(poll), transform=lambda x: x, ordered=False
+        )
+        poll.placeholders.all().delete()  # Clean up
 
     def test_placeholder_relation_field_get_slot(self):
         """

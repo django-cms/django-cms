@@ -5,6 +5,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from sekizai.helpers import get_varname
 
+from cms.models.contentmodels import PageContent
 from cms.utils.encoder import SafeJSONEncoder
 from cms.utils.placeholder import (
     get_declared_placeholders_for_obj,
@@ -42,9 +43,9 @@ def render_cms_structure_js(context, renderer, obj):
 
     for placeholder_node in declared_placeholders:
         obj_placeholder = obj_placeholders_by_slot.get(placeholder_node.slot)
-
         if obj_placeholder:
-            placeholder_js = renderer.render_placeholder(obj_placeholder, language=lang, page=obj)
+            page = obj.page if isinstance(obj, PageContent) else None
+            placeholder_js = renderer.render_placeholder(obj_placeholder, language=lang, page=page)
             markup_bits.append(placeholder_js)
 
     return mark_safe('\n'.join(markup_bits))
