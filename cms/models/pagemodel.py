@@ -151,7 +151,6 @@ class Page(MP_Node):
             title = page_content.menu_title or page_content.title
         else:
             title = _("No available title")
-        path = self.get_path(get_language(), fallback=True)
         return force_str(title)
 
     def __repr__(self):
