@@ -63,8 +63,7 @@ admin-style = ["djangocms-admin-style>=1.2"]
 djangocms = "cms.management.djangocms:execute_from_command_line"
 
 [tool.setuptools]
-packages = [ "cms", "menus" ]
-include-package-data = true
+packages = { find = {} }
 
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }
