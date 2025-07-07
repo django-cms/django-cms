@@ -1,4 +1,4 @@
-4.1.7 (2025-06-30)
+4.1.7 (2025-07-08)
 ==================
 
 Bug Fixes:
@@ -10,14 +10,14 @@ Bug Fixes:
 * Added default_auto_field to cms/apps.py (#8254) (14425d) -- Fabian Braun
 * Adjusted checks for GrouperAdmin to allow for `prepopulated_fields` (#8255) (7f08375) -- Fabian Braun
 * Remove text decorations in page tree introduced by django 5.2 (#8214) (56b75e1) -- Fabian Braun
-
+* Allow lazy wizard initialization (#8283) (e1e8f32) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 10 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 11 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (7 pull request)
+* Fabian Braun (8 pull request)
 * Github Release Action (3 pull requests)
 
 With the review help of the following contributors:
