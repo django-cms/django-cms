@@ -146,13 +146,12 @@ class Page(MP_Node):
         #: Might be larger than the page_content_cache
 
     def __str__(self):
-        page_content = self.get_content_obj(get_language(), fallback=True)
+        page_content = self.get_admin_content(get_language(), fallback=True)
         if page_content:
             title = page_content.menu_title or page_content.title
         else:
             title = _("No available title")
-        path = self.get_path(get_language(), fallback=True)
-        return force_str(title) + ("" if path is None else f" (/{path})")
+        return force_str(title)
 
     def __repr__(self):
         display = f"<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>"
@@ -872,10 +871,14 @@ class Page(MP_Node):
             return self.get_title(language, True, force_reload)
         return menu_title
 
-    def get_placeholders(self, language):
+    def get_placeholders(self, language: str, admin_manager: bool = False) -> models.QuerySet:
         from cms.models import PageContent, Placeholder
 
-        page_content = PageContent.objects.get(language=language, page=self)
+        if admin_manager:
+            # Use the admin manager to get the current content (i.e. potentially not yet published content)
+            page_content = PageContent.admin_manager.current_content().get(language=language, page=self)
+        else:
+            page_content = PageContent.objects.get(language=language, page=self)
         return Placeholder.objects.get_for_obj(page_content)
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
