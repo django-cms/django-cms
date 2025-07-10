@@ -2,7 +2,7 @@
 django CMS
 ##########
 
-|PyPiVersion| |PyVersion| |DjVersion| |License|
+|PyPiVersion| |PyVersion| |DjVersion| |License| |Coverage|
 
 Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_).
 
@@ -134,3 +134,5 @@ Credits
 .. |License| image:: https://img.shields.io/github/license/django-cms/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
     :alt: License
+.. |Coverage| image:: https://codecov.io/gh/django-cms/django-cms/graph/badge.svg?token=Jyx7Ilpibf 
+ :target: https://codecov.io/gh/django-cms/django-cms
