@@ -6,12 +6,14 @@ from urllib.parse import parse_qsl
 from django import forms
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.checks import ModelAdminChecks
-from django.contrib.admin.utils import label_for_field
+from django.contrib.admin.utils import label_for_field, lookup_spawns_duplicates
 from django.contrib.admin.views.main import ChangeList
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models import DateField, OuterRef, Subquery, functions
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.functions import Cast
+from django.db.models.query_utils import Q
 from django.forms import modelform_factory
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -20,6 +22,7 @@ from django.urls import NoReverseMatch
 from django.utils.html import format_html_join
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
+from django.utils.text import smart_split, unescape_string_literal
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models.managers import ContentAdminManager
@@ -695,6 +698,111 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             # Finally force grouper field to point to grouper
             setattr(form._content_instance, self.grouper_field_name, obj)
             form._content_instance.save()
+
+    def _search_content_model(self, search_term, search_fields):
+        """
+        Search in the related content model with admin_manager.
+        """
+        if not search_fields:
+            return []
+
+        queryset = self.content_model.admin_manager.all()
+        search_results, __ = self._get_search_result(queryset, search_term, search_fields=search_fields)
+
+        matching_grouper_ids = search_results.values_list(f"{self.grouper_field_name}_id", flat=True)
+        return matching_grouper_ids
+
+    def construct_search(self, queryset, field_name):
+        """Construct search query from fields in search fields"""
+        if field_name.startswith("^"):
+            return "%s__istartswith" % field_name.removeprefix("^"), None
+        elif field_name.startswith("="):
+            return "%s__iexact" % field_name.removeprefix("="), None
+        elif field_name.startswith("@"):
+            return "%s__search" % field_name.removeprefix("@"), None
+        # Use field_name if it includes a lookup.
+        opts = queryset.model._meta
+        lookup_fields = field_name.split(LOOKUP_SEP)
+        # Go through the fields, following all relations.
+        prev_field = None
+        for i, path_part in enumerate(lookup_fields):
+            if path_part == "pk":
+                path_part = opts.pk.name
+            try:
+                field = opts.get_field(path_part)
+            except FieldDoesNotExist:
+                # Use valid query lookups.
+                if prev_field and prev_field.get_lookup(path_part):
+                    if path_part == "exact" and not isinstance(prev_field, (models.CharField, models.TextField)):
+                        field_name_without_exact = "__".join(lookup_fields[:i])
+                        alias = Cast(
+                            field_name_without_exact,
+                            output_field=models.CharField(),
+                        )
+                        alias_name = "_".join(lookup_fields[:i])
+                        return f"{alias_name}_str", alias
+                    else:
+                        return field_name, None
+            else:
+                prev_field = field
+                if hasattr(field, "path_infos"):
+                    # Update opts to follow the relation.
+                    opts = field.path_infos[-1].to_opts
+        # Otherwise, use the field with icontains.
+        return "%s__icontains" % field_name, None
+
+    def get_search_results(self, request, queryset, search_term):
+        """
+        Get search results from a queryset.
+        """
+        content_results = None
+        search_fields = self.get_search_fields(request)
+        # Get content model search fields from search fields list
+        content_search_fields = [
+            field.replace(f"{self.content_related_field}__", "")
+            for field in search_fields
+            if field.startswith(f"{self.content_related_field}__")
+        ]
+        # Get grouper model search fields from search fields list
+        grouper_search_fields = [
+            field for field in search_fields if not field.startswith(f"{self.content_related_field}__")
+        ]
+        if search_term:
+            content_results = self._search_content_model(search_term, content_search_fields)
+
+        queryset, may_have_duplicates = self._get_search_result(
+            queryset, search_term, search_fields=grouper_search_fields, included_pks=content_results
+        )
+        return queryset, may_have_duplicates
+
+    def _get_search_result(self, queryset, search_term, search_fields, included_pks=None):
+        """Get search results from a queryset. using search fields"""
+        may_have_duplicates = False
+        if search_fields and search_term:
+            str_aliases = {}
+            orm_lookups = []
+            for field in search_fields:
+                lookup, str_alias = self.construct_search(queryset, str(field))
+                orm_lookups.append(lookup)
+                if str_alias:
+                    str_aliases[lookup] = str_alias
+            if str_aliases:
+                queryset = queryset.alias(**str_aliases)
+
+            term_queries = []
+            for bit in smart_split(search_term):
+                if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
+                    bit = unescape_string_literal(bit)
+                or_queries = models.Q.create(
+                    [(orm_lookup, bit) for orm_lookup in orm_lookups],
+                    connector=models.Q.OR,
+                )
+                if included_pks:
+                    or_queries = Q(or_queries) | Q(id__in=included_pks)
+                term_queries.append(or_queries)
+            queryset = queryset.filter(models.Q.create(term_queries))
+            may_have_duplicates |= any(lookup_spawns_duplicates(self.opts, search_spec) for search_spec in orm_lookups)
+        return queryset, may_have_duplicates
 
 
 class _GrouperAdminFormMixin:

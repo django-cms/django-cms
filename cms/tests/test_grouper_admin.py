@@ -558,3 +558,38 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
         self.assertEqual(response.status_code, 302)  # Expecting redirect
         self.assertIsNotNone(content_instance)
         self.assertEqual(content_instance.secret_greeting, data["content__secret_greeting"])  # Has new content
+
+
+class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
+    def test_search_grouper_with_grouper_query(self):
+        self.createContentInstance("en")
+        search_token = self.grouper_instance.category_name[:5]
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
+            # Assert
+            self.assertContains(response, self.grouper_instance.category_name)
+            self.assertContains(
+                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
+
+    def test_search_grouper_with_content_model_query(self):
+        instance = self.createContentInstance("en")
+        search_token = instance.secret_greeting[:5]
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
+            # Assert
+            self.assertContains(response, self.grouper_instance.category_name)
+            self.assertContains(
+                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
+
+    def test_search_grouper_with_no_search_result(self):
+        self.createContentInstance("en")
+        search_token = get_random_string(10)
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
+            # Assert
+            self.assertNotContains(response, self.grouper_instance.category_name)
+            self.assertNotContains(
+                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
