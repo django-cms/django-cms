@@ -1,3 +1,6 @@
+import os
+import subprocess
+import tempfile
 import uuid
 from io import StringIO
 
@@ -647,3 +650,30 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             str(command_error.exception),
             'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES'
         )
+
+class DjangoCmsCommandTestCase(CMSTestCase):
+    """
+    Test that the django-cms command can be run without any subcommand
+    """
+    def test_djangocms_command_returns_version(self):
+        from cms import __version__
+
+        result = subprocess.run(['djangocms', '--version'], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout.strip(), __version__)
+
+    def test_djangocms_command_creates_project(self):
+        from cms import __version__
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            old_cwd = os.getcwd()
+            os.chdir(tmpdir)
+            project_name = f'test_project_{uuid.uuid4().hex}'
+            try:
+                result = subprocess.run(['djangocms', project_name, "--noinput"], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result)
+                self.assertIn(f'django CMS {__version__} installed successfully', result.stdout)
+                # Clean up the created project directory
+            finally:
+                subprocess.run(['rm', '-rf', project_name])
+                os.chdir(old_cwd)
