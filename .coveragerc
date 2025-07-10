@@ -2,14 +2,13 @@
 source =
     cms
     menus
+parallel = True
 branch = False
 omit =
     cms/migrations/*
-    cms/south_migrations/*
     cms/tests/*
     cms/test_utils/*
     menus/migrations/*
-    menus/south_migrations/*
     docs/*
     env/*
     env*

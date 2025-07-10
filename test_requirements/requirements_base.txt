@@ -1,6 +1,6 @@
 -e .
 argparse
-coverage<5
+coverage
 dj-database-url
 django-app-helper  # required to run the server for integration tests
 django-classy-tags>=0.7.2
