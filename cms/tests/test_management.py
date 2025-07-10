@@ -658,7 +658,7 @@ class DjangoCmsCommandTestCase(CMSTestCase):
     def test_djangocms_command_returns_version(self):
         from cms import __version__
 
-        result = subprocess.run(['djangocms', '--version'], capture_output=True, text=True)
+        result = subprocess.run(['djangocms', '--version'], check=False, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout.strip(), __version__)
 
@@ -670,10 +670,10 @@ class DjangoCmsCommandTestCase(CMSTestCase):
             os.chdir(tmpdir)
             project_name = f'test_project_{uuid.uuid4().hex}'
             try:
-                result = subprocess.run(['djangocms', project_name, "--noinput"], capture_output=True, text=True)
+                result = subprocess.run(['djangocms', project_name, "--noinput"], check=False, capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result)
                 self.assertIn(f'django CMS {__version__} installed successfully', result.stdout)
                 # Clean up the created project directory
             finally:
-                subprocess.run(['rm', '-rf', project_name])
+                subprocess.run(['rm', '-rf', project_name], check=False)
                 os.chdir(old_cwd)
