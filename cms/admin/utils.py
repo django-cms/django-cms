@@ -709,17 +709,22 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         queryset = self.content_model.admin_manager.all()
         search_results, __ = self._get_search_result(queryset, search_term, search_fields=search_fields)
 
-        matching_grouper_ids = search_results.values_list(f"{self.grouper_field_name}_id", flat=True)
-        return matching_grouper_ids
+        return search_results.values_list(f"{self.grouper_field_name}_id", flat=True)
+
+    def _handle_prefix_operators(self, field_name):
+        """Handle special prefix operators (^, =, @)"""
+        if field_name.startswith("^"):
+            return f'{field_name.removeprefix("^")}__istartswith', None
+        elif field_name.startswith("="):
+            return f'{field_name.removeprefix("=")}__iexact', None
+        elif field_name.startswith("@"):
+            return f'{field_name.removeprefix("@")}__search', None
 
     def construct_search(self, queryset, field_name):
         """Construct search query from fields in search fields"""
-        if field_name.startswith("^"):
-            return "%s__istartswith" % field_name.removeprefix("^"), None
-        elif field_name.startswith("="):
-            return "%s__iexact" % field_name.removeprefix("="), None
-        elif field_name.startswith("@"):
-            return "%s__search" % field_name.removeprefix("@"), None
+        prefix_result = self._handle_prefix_operators(field_name)
+        if prefix_result:
+            return prefix_result
         # Use field_name if it includes a lookup.
         opts = queryset.model._meta
         lookup_fields = field_name.split(LOOKUP_SEP)
@@ -749,7 +754,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     # Update opts to follow the relation.
                     opts = field.path_infos[-1].to_opts
         # Otherwise, use the field with icontains.
-        return "%s__icontains" % field_name, None
+        return f"{field_name}__icontains", None
 
     def get_search_results(self, request, queryset, search_term):
         """
@@ -786,23 +791,33 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 orm_lookups.append(lookup)
                 if str_alias:
                     str_aliases[lookup] = str_alias
-            if str_aliases:
-                queryset = queryset.alias(**str_aliases)
+            queryset = self._resolve_aliases(queryset, str_aliases)
 
-            term_queries = []
-            for bit in smart_split(search_term):
-                if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
-                    bit = unescape_string_literal(bit)
-                or_queries = models.Q.create(
-                    [(orm_lookup, bit) for orm_lookup in orm_lookups],
-                    connector=models.Q.OR,
-                )
-                if included_pks:
-                    or_queries = Q(or_queries) | Q(id__in=included_pks)
-                term_queries.append(or_queries)
-            queryset = queryset.filter(models.Q.create(term_queries))
+            queryset = queryset.filter(self._build_search_query(search_term, included_pks, orm_lookups))
             may_have_duplicates |= any(lookup_spawns_duplicates(self.opts, search_spec) for search_spec in orm_lookups)
         return queryset, may_have_duplicates
+
+    def _resolve_aliases(self, queryset, str_aliases):
+        """Resolve aliases"""
+        if str_aliases:
+            return queryset.alias(**str_aliases)
+        return queryset
+
+    def _build_search_query(self, search_term, included_pks, orm_lookups):
+        """Build search query"""
+        term_queries = []
+        for bit in smart_split(search_term):
+            if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
+                bit = unescape_string_literal(bit)
+            or_queries = models.Q.create(
+                [(orm_lookup, bit) for orm_lookup in orm_lookups],
+                connector=models.Q.OR,
+            )
+            term_queries.append(or_queries)
+        search_query = models.Q.create(term_queries)
+        if included_pks:
+            search_query = Q(search_query) | Q(id__in=included_pks)
+        return search_query
 
 
 class _GrouperAdminFormMixin:

@@ -64,14 +64,16 @@ class SimpleSetupMixin:
         self.grouper_instance.delete()
         self.admin.clear_content_cache()  # The admin does this automatically for each new request.
 
-    def createContentInstance(self, language="en"):
+    def createContentInstance(self, language="en", grouper_instance=None, secret_greeting=None):
         """Creates a content instance with a random content for a language. The random content is returned
         to be able to check if it appears in forms etc."""
 
         assert language == "en", "Only English is supported for SimpleGrouperModelContent"
+        grouper_instance = grouper_instance or self.grouper_instance
+        secret_greeting = secret_greeting or get_random_string(16)
         instance = SimpleGrouperModelContent.objects.create(
-            simple_grouper_model=self.grouper_instance,
-            secret_greeting=get_random_string(16),
+            simple_grouper_model=grouper_instance,
+            secret_greeting=secret_greeting,
         )
         self.admin.clear_content_cache()  # The admin does this automatically for each new request.
         return instance
@@ -561,9 +563,38 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
 
 
 class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.another_grouper_instance = SimpleGrouperModel.objects.create(category_name="Another Category")
+        self.another_change_url = admin_reverse(
+            "sampleapp_simplegroupermodel_change", args=(self.another_grouper_instance.pk,)
+        )
+        self.grouper_content_objects = {}
+        for grouper in [self.grouper_instance, self.another_grouper_instance]:
+            self.grouper_content_objects[grouper.id] = self.createContentInstance(
+                language="en", grouper_instance=grouper, secret_greeting=f"{grouper.category_name} Greeting"
+            )
+
+    def tearDown(self) -> None:
+        self.another_grouper_instance.delete()
+        super().tearDown()
+
+    def test_search_grouper_with_empty_search_query(self):
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.changelist_url}?q=", follow=True)
+            # Assert
+            self.assertContains(response, self.grouper_instance.category_name)
+            self.assertContains(response, self.another_grouper_instance.category_name)
+            self.assertContains(
+                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
+            self.assertContains(
+                response,
+                f'href="/en/admin/sampleapp/{self.groupermodel}/' f"{self.another_grouper_instance.pk}/change/?",
+            )
+
     def test_search_grouper_with_grouper_query(self):
-        self.createContentInstance("en")
-        search_token = self.grouper_instance.category_name[:5]
+        search_token = self.grouper_instance.category_name
         with self.login_user_context(self.admin_user):
             response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
             # Assert
@@ -573,8 +604,7 @@ class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
             )
 
     def test_search_grouper_with_content_model_query(self):
-        instance = self.createContentInstance("en")
-        search_token = instance.secret_greeting[:5]
+        search_token = self.grouper_content_objects[self.grouper_instance.id].secret_greeting[:5]
         with self.login_user_context(self.admin_user):
             response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
             # Assert
@@ -584,7 +614,6 @@ class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
             )
 
     def test_search_grouper_with_no_search_result(self):
-        self.createContentInstance("en")
         search_token = get_random_string(10)
         with self.login_user_context(self.admin_user):
             response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
@@ -592,4 +621,19 @@ class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
             self.assertNotContains(response, self.grouper_instance.category_name)
             self.assertNotContains(
                 response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
+
+    def test_search_grouper_with_multiple_result_with_grouper_query(self):
+        search_token = "Greeting"
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
+            # Assert
+            self.assertContains(response, self.grouper_instance.category_name)
+            self.assertContains(response, self.another_grouper_instance.category_name)
+            self.assertContains(
+                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
+            )
+            self.assertContains(
+                response,
+                f'href="/en/admin/sampleapp/{self.groupermodel}/' f"{self.another_grouper_instance.pk}/change/?",
             )
