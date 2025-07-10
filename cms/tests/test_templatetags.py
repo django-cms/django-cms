@@ -16,7 +16,7 @@ from django.utils.encoding import force_str
 from django.utils.html import escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text.cms_plugins import TextPlugin
 from sekizai.context import SekizaiContext
 
 import cms
@@ -716,9 +716,9 @@ class EditablePluginsTemplateTags(CMSTestCase):
         template = """{% load cms_tags %}{% render_model plugin "body" "body" %}"""
         # The template html tags will render the object editable in the frontend
         expectation = (
-            f'<template class="cms-plugin cms-plugin-start cms-plugin-djangocms_text_ckeditor-text-body-{self.plugin.pk} cms-render-model"></template>'
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-djangocms_text-text-body-{self.plugin.pk} cms-render-model"></template>'
             "&lt;b&gt;Test&lt;/b&gt;"
-            f'<template class="cms-plugin cms-plugin-end cms-plugin-djangocms_text_ckeditor-text-body-{self.plugin.pk} cms-render-model"></template>'
+            f'<template class="cms-plugin cms-plugin-end cms-plugin-djangocms_text-text-body-{self.plugin.pk} cms-render-model"></template>'
         )
 
         endpoint = get_object_edit_url(self.page.get_content_obj("en"))  # view in edit mode

@@ -1,6 +1,5 @@
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 import uuid
@@ -12,7 +11,7 @@ from django.core import management
 from django.core.management import CommandError
 from django.db import models
 from django.test.utils import override_settings
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.management.commands.subcommands.list import plugin_report
@@ -687,16 +686,6 @@ class DjangoCmsCommandTestCase(CMSTestCase):
             sys.stdout = out
             sys.stderr = StringIO()
             try:
-                subprocess.run(
-                    [sys.executable, '-m', 'venv', 'venv'],
-                    check=True,
-                )
-                if sys.platform == "win32":
-                    venv_python = os.path.join(tmpdir, "venv", "Scripts", "python.exe")
-                else:
-                    venv_python = os.path.join(tmpdir, "venv", "bin", "python")
-                os.environ["VIRTUAL_ENV"] = os.path.join(tmpdir, "venv")
-                os.environ["PATH"] = os.path.dirname(venv_python) + os.pathsep + os.environ.get("PATH", "")
                 djangocms.execute_from_command_line(['djangocms', project_name, "--noinput"])
                 # Clean up the created project directory
             finally:
