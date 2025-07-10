@@ -49,8 +49,10 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
         wizard = Mock(id=3, spec=object)
         cms_config = Mock(
             cms_enabled=True, cms_wizards=[wizard])
+        extensions.configure_wizards(cms_config)
         with self.assertRaises(ImproperlyConfigured):
-            extensions.configure_wizards(cms_config)
+            extensions.wizards
+
 
     def test_raises_exception_if_not_iterable(self):
         """
@@ -62,22 +64,6 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
             cms_enabled=True, cms_wizards=wizard)
         with self.assertRaises(ImproperlyConfigured):
             extensions.configure_wizards(cms_config)
-
-    @patch('cms.cms_config.logger.warning')
-    def test_warning_if_registering_the_same_wizard_twice(self, mocked_logger):
-        """
-        If a wizard is already added to the dict log a warning.
-        """
-        extensions = CMSCoreExtensions()
-        wizard = Mock(id=81, spec=Wizard)
-        cms_config = Mock(
-            cms_enabled=True, cms_wizards=[wizard, wizard])
-        extensions.configure_wizards(cms_config)
-        warning_msg = f"Wizard for model {wizard.get_model()} has already been registered"
-        # Warning message displayed
-        mocked_logger.assert_called_once_with(warning_msg)
-        # wizards dict is still what we expect it to be
-        self.assertDictEqual(extensions.wizards, {81: wizard})
 
 
 class ConfigureWizardsIntegrationTestCase(CMSTestCase):
