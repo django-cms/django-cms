@@ -1,6 +1,6 @@
 import os
 import shutil
-import subprocess
+import sys
 import tempfile
 import uuid
 from io import StringIO
@@ -658,25 +658,40 @@ class DjangoCmsCommandTestCase(CMSTestCase):
     """
     def test_djangocms_command_returns_version(self):
         from cms import __version__
+        from cms.management import djangocms
 
-        result = subprocess.run(['djangocms', '--version'], check=False, capture_output=True, text=True)
-        self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout.strip(), __version__)
+        out = StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = out
+        try:
+            djangocms.execute_from_command_line(['djangocms', '--version'])
+        finally:
+            sys.stdout = old_stdout
+        result = out.getvalue()
+        self.assertEqual(result, __version__ + "\n")
 
     def test_djangocms_command_creates_project(self):
         from cms import __version__
+        from cms.management import djangocms
 
         os.environ["DJANGOCMS_ALLOW_PIP_INSTALL"] = "True"
         with tempfile.TemporaryDirectory() as tmpdir:
             old_cwd = os.getcwd()
             os.chdir(tmpdir)
             project_name = f'test_project_{uuid.uuid4().hex}'
+
+            out = StringIO()
+            old_stdout = sys.stdout
+            sys.stdout = out
+
             try:
-                result = subprocess.run(['djangocms', project_name, "--noinput"], check=False, capture_output=True, text=True)
-                self.assertEqual(result.returncode, 0, result)
-                self.assertIn(f'django CMS {__version__} installed successfully', result.stdout)
+                djangocms.execute_from_command_line(['djangocms', project_name, "--noinput"])
                 # Clean up the created project directory
             finally:
+                sys.stdout = old_stdout
                 shutil.rmtree(project_name)
                 os.chdir(old_cwd)
                 os.environ.pop("DJANGOCMS_ALLOW_PIP_INSTALL", None)
+
+        result = out.getvalue()
+        self.assertIn(f'django CMS {__version__} installed successfully', result)
