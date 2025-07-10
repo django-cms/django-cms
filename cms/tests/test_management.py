@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import uuid
@@ -682,13 +683,26 @@ class DjangoCmsCommandTestCase(CMSTestCase):
 
             out = StringIO()
             old_stdout = sys.stdout
+            old_stderr = sys.stderr
             sys.stdout = out
-
+            sys.stderr = StringIO()
             try:
+                subprocess.run(
+                    [sys.executable, '-m', 'venv', 'venv'],
+                    check=True,
+                )
+                if sys.platform == "win32":
+                    venv_python = os.path.join(tmpdir, "venv", "Scripts", "python.exe")
+                else:
+                    venv_python = os.path.join(tmpdir, "venv", "bin", "python")
+                os.environ["VIRTUAL_ENV"] = os.path.join(tmpdir, "venv")
+                os.environ["PATH"] = os.path.dirname(venv_python) + os.pathsep + os.environ.get("PATH", "")
                 djangocms.execute_from_command_line(['djangocms', project_name, "--noinput"])
                 # Clean up the created project directory
             finally:
                 sys.stdout = old_stdout
+                sys.stderr = old_stderr
+                # Remove the created project directory
                 shutil.rmtree(project_name)
                 os.chdir(old_cwd)
                 os.environ.pop("DJANGOCMS_ALLOW_PIP_INSTALL", None)
