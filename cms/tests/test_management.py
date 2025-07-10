@@ -700,4 +700,16 @@ class DjangoCmsCommandTestCase(CMSTestCase):
         self.assertIn(f'django CMS {__version__} installed successfully', result)
 
     def test_check(self):
-        execute_from_command_line(["cms", "check"])
+        out = StringIO()
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = out
+        sys.stderr = StringIO()
+        try:
+            execute_from_command_line(["manage.py", "cms", "check"])
+            # Clean up the created project directory
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+        result = out.getvalue()
+        self.assertIn("Installation okay", result)
