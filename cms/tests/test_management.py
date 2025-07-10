@@ -8,7 +8,7 @@ from io import StringIO
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
-from django.core.management import CommandError
+from django.core.management import CommandError, execute_from_command_line
 from django.db import models
 from django.test.utils import override_settings
 from djangocms_text.cms_plugins import TextPlugin
@@ -698,3 +698,6 @@ class DjangoCmsCommandTestCase(CMSTestCase):
 
         result = out.getvalue()
         self.assertIn(f'django CMS {__version__} installed successfully', result)
+
+    def test_check(self):
+        execute_from_command_line(["cms", "check"])
