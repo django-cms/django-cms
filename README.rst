@@ -134,5 +134,5 @@ Credits
 .. |License| image:: https://img.shields.io/github/license/django-cms/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
     :alt: License
-.. |Coverage| image:: https://codecov.io/gh/django-cms/django-cms/graph/badge.svg?token=Jyx7Ilpibf 
- :target: https://codecov.io/gh/django-cms/django-cms
+.. image:: https://codecov.io/gh/django-cms/django-cms/branch/main/graph/badge.svg?token=Jyx7Ilpibf
+:target: https://codecov.io/gh/django-cms/django-cms
