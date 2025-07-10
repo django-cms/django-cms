@@ -666,6 +666,7 @@ class DjangoCmsCommandTestCase(CMSTestCase):
     def test_djangocms_command_creates_project(self):
         from cms import __version__
 
+        os.environ["DJANGOCMS_ALLOW_PIP_INSTALL"] = "True"
         with tempfile.TemporaryDirectory() as tmpdir:
             old_cwd = os.getcwd()
             os.chdir(tmpdir)
@@ -678,3 +679,4 @@ class DjangoCmsCommandTestCase(CMSTestCase):
             finally:
                 shutil.rmtree(project_name)
                 os.chdir(old_cwd)
+                os.environ.pop("DJANGOCMS_ALLOW_PIP_INSTALL", None)
