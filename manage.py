@@ -379,5 +379,6 @@ if __name__ == "__main__":
             MIGRATION_MODULES=MIGRATION_MODULES,
             X_FRAME_OPTIONS="SAMEORIGIN",
             CMS_CONFIRM_VERSION4=True,
+            TEXT_INLINE_EDITING=False,
             **dynamic_configs,
         )

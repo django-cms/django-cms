@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
@@ -493,7 +494,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self._create_user("admin", True, True)
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = SessionBase()
         request.toolbar = CMSToolbar(request)
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {"plugin": plugin}, request)
@@ -512,7 +513,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self._create_user("admin", True, True)
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = SessionBase()
         request.toolbar = CMSToolbar(request)
         request.toolbar.show_toolbar = True
         output = self.render_template_obj(template, {"plugin": plugin}, request)
@@ -535,7 +536,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self._create_user("admin", True, True)
         request.user = user
         request.current_page = page
-        request.session = {"cms_edit": False}
+        request.session = SessionBase()
+        request.session["cms_edit"] = False
         request.toolbar = CMSToolbar(request)
         request.toolbar.show_toolbar = True
         output = self.render_template_obj(template, {"plugin": plugin}, request)
@@ -550,7 +552,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get(get_object_edit_url(page_content))
         request.current_page = None
         request.user = superuser
-        request.session = {}
+        request.session = SessionBase()
         request.toolbar = CMSToolbar(request)
         context = SekizaiContext(
             {
@@ -573,7 +575,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self.get_superuser()
         request.user = user
         request.current_page = page
-        request.session = {"cms_edit": True}
+        request.session = SessionBase()
+        request.session["cms_edit"] = True
         request.toolbar = CMSToolbar(request)
         request.toolbar.is_staff = True
         with self.assertNumQueries(2):
@@ -609,7 +612,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get(get_object_edit_url(page_content))
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = SessionBase()
         request.toolbar = CMSToolbar(request)
         request.toolbar.is_staff = True
         category = Category.objects.only("name").get()
@@ -621,7 +624,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get("/")
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = SessionBase()
         request.toolbar = CMSToolbar(request)
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {"category": category}, request)
@@ -661,7 +664,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = SessionBase()
         request.toolbar = CMSToolbar(request)
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {"category": Category()}, request)
@@ -681,7 +684,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get(get_object_edit_url(page_content))
         request.user = user
         request.current_page = page
-        request.session = {"cms_edit": True}
+        request.session = SessionBase()
+        request.session["cms_edit"] = True
         request.toolbar = CMSToolbar(request)
         request.toolbar.is_staff = True
         with self.assertNumQueries(1):
@@ -697,7 +701,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = SessionBase()
         request.toolbar = CMSToolbar(request)
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {"category": Category()}, request)
