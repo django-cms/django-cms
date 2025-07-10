@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import tempfile
 import uuid
@@ -675,5 +676,5 @@ class DjangoCmsCommandTestCase(CMSTestCase):
                 self.assertIn(f'django CMS {__version__} installed successfully', result.stdout)
                 # Clean up the created project directory
             finally:
-                subprocess.run(['rm', '-rf', project_name], check=False)
+                shutil.rmtree(project_name)
                 os.chdir(old_cwd)
