@@ -756,22 +756,25 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         # Otherwise, use the field with icontains.
         return f"{field_name}__icontains", None
 
+    def _get_search_fields(self, request):
+        search_fields = self.get_search_fields(request)
+        content_search_fields = []
+        grouper_search_fields = []
+        for field_name in search_fields:
+            if field_name.startswith(f"{self.content_related_field}__") or field_name.startswith("content__"):
+                content_search_fields.append(re.sub(r"^([@^=]?)[^_]+__", r"\1", field_name))
+
+            else:
+                grouper_search_fields.append(field_name)
+
+        return grouper_search_fields, content_search_fields
+
     def get_search_results(self, request, queryset, search_term):
         """
         Get search results from a queryset.
         """
         content_results = None
-        search_fields = self.get_search_fields(request)
-        # Get content model search fields from search fields list
-        content_search_fields = [
-            field.replace(f"{self.content_related_field}__", "")
-            for field in search_fields
-            if field.startswith(f"{self.content_related_field}__")
-        ]
-        # Get grouper model search fields from search fields list
-        grouper_search_fields = [
-            field for field in search_fields if not field.startswith(f"{self.content_related_field}__")
-        ]
+        grouper_search_fields, content_search_fields = self._get_search_fields(request)
         if search_term:
             content_results = self._search_content_model(search_term, content_search_fields)
 

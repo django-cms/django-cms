@@ -563,77 +563,168 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
 
 
 class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
+    """Test suite for Grouper model search functionality in Django admin."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.SEARCH_FIELDS_DEFAULT = ("category_name", "content__secret_greeting")
+        cls.SEARCH_FIELDS_GROUPER_ONLY = ("category_name",)
+        cls.SEARCH_FIELDS_STARTSWITH = ("^category_name", "^content__secret_greeting")
+        cls.SEARCH_FIELDS_EXACT = ("=category_name", "=content__secret_greeting")
+
     def setUp(self) -> None:
         super().setUp()
-        self.another_grouper_instance = SimpleGrouperModel.objects.create(category_name="Another Category")
-        self.another_change_url = admin_reverse(
-            "sampleapp_simplegroupermodel_change", args=(self.another_grouper_instance.pk,)
-        )
+        self._setup_test_data()
+        self._setup_admin_config()
+
+    def _setup_test_data(self):
+        """Create test instances and content objects."""
+        self.another_grouper_instance = SimpleGrouperModel.objects.create(category_name="Another_Category")
         self.grouper_content_objects = {}
+
         for grouper in [self.grouper_instance, self.another_grouper_instance]:
             self.grouper_content_objects[grouper.id] = self.createContentInstance(
-                language="en", grouper_instance=grouper, secret_greeting=f"{grouper.category_name} Greeting"
+                language="en", grouper_instance=grouper, secret_greeting=f"{grouper.category_name}_Greeting"
             )
+
+    def _setup_admin_config(self):
+        """Configure admin search fields."""
+        self.admin.search_fields = self.SEARCH_FIELDS_DEFAULT
 
     def tearDown(self) -> None:
         self.another_grouper_instance.delete()
         super().tearDown()
 
-    def test_search_grouper_with_empty_search_query(self):
-        with self.login_user_context(self.admin_user):
-            response = self.client.get(f"{self.changelist_url}?q=", follow=True)
-            # Assert
-            self.assertContains(response, self.grouper_instance.category_name)
-            self.assertContains(response, self.another_grouper_instance.category_name)
-            self.assertContains(
-                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
-            )
-            self.assertContains(
-                response,
-                f'href="/en/admin/sampleapp/{self.groupermodel}/' f"{self.another_grouper_instance.pk}/change/?",
-            )
+    def _get_search_url(self, query=""):
+        """Helper to construct search URL."""
+        return f"{self.changelist_url}?q={query}"
 
-    def test_search_grouper_with_grouper_query(self):
+    def _get_admin_change_url(self, instance):
+        """Helper to construct admin change URL."""
+        return f'href="/en/admin/sampleapp/{self.groupermodel}/{instance.pk}/change/?'
+
+    def _assert_instance_in_response(self, response, instance, should_contain=True):
+        """Helper to assert instance presence in response."""
+        assertion_method = self.assertContains if should_contain else self.assertNotContains
+        assertion_method(response, instance.category_name)
+        assertion_method(response, self._get_admin_change_url(instance))
+
+    def _assert_search_results(self, response, expected_instances):
+        """Helper to assert multiple search results."""
+        all_instances = [self.grouper_instance, self.another_grouper_instance]
+
+        for instance in all_instances:
+            should_contain = instance in expected_instances
+            self._assert_instance_in_response(response, instance, should_contain)
+
+    def _perform_search(self, query, expected_instances):
+        """Helper to perform search and assert results."""
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self._get_search_url(query), follow=True)
+            self._assert_search_results(response, expected_instances)
+            return response
+
+    def test_search_with_empty_query_returns_all_results(self):
+        """Empty search query should return all grouper instances."""
+        expected_instances = [self.grouper_instance, self.another_grouper_instance]
+        self._perform_search("", expected_instances)
+
+    def test_search_by_grouper_category_name(self):
+        """Search by grouper's category name should return matching instance."""
         search_token = self.grouper_instance.category_name
-        with self.login_user_context(self.admin_user):
-            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
-            # Assert
-            self.assertContains(response, self.grouper_instance.category_name)
-            self.assertContains(
-                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
-            )
+        expected_instances = [self.grouper_instance]
+        self._perform_search(search_token, expected_instances)
 
-    def test_search_grouper_with_content_model_query(self):
-        search_token = self.grouper_content_objects[self.grouper_instance.id].secret_greeting[:5]
-        with self.login_user_context(self.admin_user):
-            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
-            # Assert
-            self.assertContains(response, self.grouper_instance.category_name)
-            self.assertContains(
-                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
-            )
+    def test_search_by_content_field(self):
+        """Search by content field should return matching instance."""
+        content_obj = self.grouper_content_objects[self.grouper_instance.id]
+        search_token = content_obj.secret_greeting[:5]
+        expected_instances = [self.grouper_instance]
+        self._perform_search(search_token, expected_instances)
 
-    def test_search_grouper_with_no_search_result(self):
+    def test_search_with_no_matching_results(self):
+        """Search with non-existent term should return no results."""
         search_token = get_random_string(10)
-        with self.login_user_context(self.admin_user):
-            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
-            # Assert
-            self.assertNotContains(response, self.grouper_instance.category_name)
-            self.assertNotContains(
-                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
-            )
+        expected_instances = []
+        self._perform_search(search_token, expected_instances)
 
-    def test_search_grouper_with_multiple_result_with_grouper_query(self):
+    def test_search_returns_multiple_results_by_category(self):
+        """Search by common category term should return multiple instances."""
+        search_token = "Category"
+        expected_instances = [self.grouper_instance, self.another_grouper_instance]
+        self._perform_search(search_token, expected_instances)
+
+    def test_search_returns_multiple_results_by_content(self):
+        """Search by common content term should return multiple instances."""
         search_token = "Greeting"
-        with self.login_user_context(self.admin_user):
-            response = self.client.get(f"{self.changelist_url}?q={search_token}", follow=True)
-            # Assert
-            self.assertContains(response, self.grouper_instance.category_name)
-            self.assertContains(response, self.another_grouper_instance.category_name)
-            self.assertContains(
-                response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
-            )
-            self.assertContains(
-                response,
-                f'href="/en/admin/sampleapp/{self.groupermodel}/' f"{self.another_grouper_instance.pk}/change/?",
-            )
+        expected_instances = [self.grouper_instance, self.another_grouper_instance]
+        self._perform_search(search_token, expected_instances)
+
+    def test_search_without_content_fields_by_category(self):
+        """Search should work when content fields are excluded from search_fields."""
+        self.admin.search_fields = self.SEARCH_FIELDS_GROUPER_ONLY
+        search_token = "Category"
+        expected_instances = [self.grouper_instance, self.another_grouper_instance]
+        self._perform_search(search_token, expected_instances)
+
+    def test_search_without_content_fields_by_content_returns_nothing(self):
+        """Search by content should return nothing when content fields excluded."""
+        self.admin.search_fields = self.SEARCH_FIELDS_GROUPER_ONLY
+        search_token = "Greeting"
+        expected_instances = []
+        self._perform_search(search_token, expected_instances)
+
+    def test_startswith_search_by_category(self):
+        """Test startswith (^) search modifier on category field."""
+        self.admin.search_fields = ("^category_name",)
+        search_token = "Grouper"  # Matches "Grouper_Category" but not "Another_Category"
+        expected_instances = [self.grouper_instance]
+        self._perform_search(search_token, expected_instances)
+
+    def test_exact_search_by_category(self):
+        """Test exact match (=) search modifier on category field."""
+        self.admin.search_fields = ("=category_name",)
+        search_token = "Another_Category"
+        expected_instances = [self.another_grouper_instance]
+        self._perform_search(search_token, expected_instances)
+
+    def test_startswith_search_by_content(self):
+        """Test startswith (^) search modifier on content field."""
+        self.admin.search_fields = ("category_name", "^content__secret_greeting")
+        content_obj = self.grouper_content_objects[self.another_grouper_instance.id]
+        search_token = content_obj.secret_greeting[:-5]  # Partial match from start
+        expected_instances = [self.another_grouper_instance]
+        self._perform_search(search_token, expected_instances)
+
+    def test_exact_search_by_content(self):
+        """Test exact match (=) search modifier on content field."""
+        self.admin.search_fields = ("category_name", "=content__secret_greeting")
+        content_obj = self.grouper_content_objects[self.another_grouper_instance.id]
+        search_token = content_obj.secret_greeting  # Exact match
+        expected_instances = [self.another_grouper_instance]
+        self._perform_search(search_token, expected_instances)
+
+    def test_search_configurations_basic(self):
+        """Test basic search configurations."""
+        test_cases = [
+            (("category_name",), "Category", 2),
+            (("^category_name",), "Grouper", 1),
+            (("=category_name",), "Another_Category", 1),
+            (("content__secret_greeting",), "Greeting", 2),
+        ]
+
+        for search_fields, query, expected_count in test_cases:
+            with self.subTest(search_fields=search_fields, query=query):
+                self.admin.search_fields = search_fields
+                with self.login_user_context(self.admin_user):
+                    response = self.client.get(self._get_search_url(query), follow=True)
+                    # Count occurrences of the change URL pattern to determine result count
+                    content = response.content.decode()
+                    actual_count = content.count('class="action-checkbox"')
+                    self.assertEqual(
+                        actual_count,
+                        expected_count,
+                        f"Expected {expected_count} results for query '{query}' "
+                        f"with search_fields {search_fields}, got {actual_count}",
+                    )
