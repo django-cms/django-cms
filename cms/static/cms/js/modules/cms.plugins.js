@@ -2235,8 +2235,6 @@ Plugin._clickToHighlightHandler = function _clickToHighlightHandler(e) {
     if (CMS.settings.mode !== 'structure') {
         return;
     }
-    e.preventDefault();
-    e.stopPropagation();
     // FIXME refactor into an object
     CMS.API.StructureBoard._showAndHighlightPlugin(200, true); // eslint-disable-line no-magic-numbers
 };
