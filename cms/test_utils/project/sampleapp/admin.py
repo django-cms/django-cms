@@ -27,6 +27,7 @@ class SomeEditableAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
 class GrouperAdmin(GrouperModelAdmin):
     extra_grouping_fields = ("language",)
     list_display = ("category_name", "content__secret_greeting", "admin_list_actions")
+    search_fields = ("category_name", "some_field", "content__secret_greeting")
 
     def can_change_content(self, request, content_obj):
         return getattr(self, "change_content", True)
@@ -34,6 +35,7 @@ class GrouperAdmin(GrouperModelAdmin):
 
 class SimpleGrouperAdmin(GrouperModelAdmin):
     list_display = ("category_name", "content__secret_greeting", "admin_list_actions")
+    search_fields = ("category_name", "content__secret_greeting")
 
     def can_change_content(self, request, content_obj):
         return getattr(self, "change_content", True)
