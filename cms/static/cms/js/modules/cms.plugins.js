@@ -2231,7 +2231,7 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
     }
 };
 
-Plugin._clickToHighlightHandler = function _clickToHighlightHandler(e) {
+Plugin._clickToHighlightHandler = function _clickToHighlightHandler() {
     if (CMS.settings.mode !== 'structure') {
         return;
     }
