@@ -8,7 +8,7 @@ django-formtools
 django-sekizai>=0.7
 django-treebeard>=4.3
 djangocms-admin-style>=1.5
-djangocms-text-ckeditor
+djangocms-text
 iptools
 mock>=2.0.0
 Pillow
