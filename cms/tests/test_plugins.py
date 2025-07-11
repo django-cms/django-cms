@@ -15,7 +15,7 @@ from django.urls import re_path, reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.translation import override as force_language
-from djangocms_text_ckeditor.models import Text
+from djangocms_text.models import Text
 
 from cms import api
 from cms.api import create_page

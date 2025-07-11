@@ -6,6 +6,7 @@ from urllib.parse import unquote, urljoin
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
@@ -440,7 +441,7 @@ class BaseCMSTestCase:
         path = path or page and page.get_absolute_url()
 
         request = RequestFactory().get(path)
-        request.session = {}
+        request.session = SessionBase()
         request.user = user
         request.LANGUAGE_CODE = lang_code
         request.GET = request.GET.copy()

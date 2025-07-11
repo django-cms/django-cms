@@ -1,4 +1,4 @@
-from djangocms_text_ckeditor.models import Text
+from djangocms_text.models import Text
 
 from cms.api import add_plugin, create_page
 from cms.models import Page

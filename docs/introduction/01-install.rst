@@ -210,7 +210,7 @@ template. It performs the following five steps in one simple go:
 2. It installs additional *optional packages* which are used in the template project.
    Those are
 
-   - `djangocms-text-ckeditor <https://github.com/django-cms/djangocms-text-ckeditor>`_
+   - `djangocms-text <https://github.com/django-cms/djangocms-text>`_
      for rich text input.
    - `djangocms-frontend <https://github.com/django-cms/djangocms-frontend>`_ for
      `Bootstrap5 <https://getbootstrap.com>`_ support.
@@ -761,17 +761,17 @@ Django CMS CKEditor
 
 `Django CMS CKEditor`_ is the default rich text editor for django CMS.
 
-.. _django cms ckeditor: https://github.com/django-cms/djangocms-text-ckeditor
+.. _django cms ckeditor: https://github.com/django-cms/djangocms-text
 
-Install: ``pip install djangocms-text-ckeditor``.
+Install: ``pip install djangocms-text``.
 
-Add ``djangocms_text_ckeditor`` to your ``INSTALLED_APPS``.
+Add ``djangocms_text`` to your ``INSTALLED_APPS``.
 
 Run migrations:
 
 .. code-block::
 
-    python manage.py migrate djangocms_text_ckeditor
+    python manage.py migrate djangocms_text
 
 Django CMS Frontend
 +++++++++++++++++++
