@@ -313,7 +313,7 @@ class RenderingTestCase(CMSTestCase):
         in settings and are working and that extra plugin context processors can be
         passed to PluginContext.
         """
-        from djangocms_text_ckeditor.cms_plugins import TextPlugin
+        from djangocms_text.cms_plugins import TextPlugin
 
         from cms.plugin_pool import plugin_pool
 

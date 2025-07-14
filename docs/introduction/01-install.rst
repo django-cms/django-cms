@@ -201,16 +201,16 @@ template. It performs the following five steps in one simple go:
 
    .. code-block::
 
-       django-admin startproject myproject --template https://github.com/django-cms/cms-template/archive/4.1.tar.gz
+       django-admin startproject myproject --template https://github.com/django-cms/cms-template/archive/5.1.tar.gz
 
    If ``django-admin startproject`` is new to you, you ought to read the `official
    Django tutorial <https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_, which
    covers starting a new project.
 
-2. It installs additional optional packages which are used in the template project.
+2. It installs additional *optional packages* which are used in the template project.
    Those are
 
-   - `djangocms-text-ckeditor <https://github.com/django-cms/djangocms-text-ckeditor>`_
+   - `djangocms-text <https://github.com/django-cms/djangocms-text>`_
      for rich text input.
    - `djangocms-frontend <https://github.com/django-cms/djangocms-frontend>`_ for
      `Bootstrap5 <https://getbootstrap.com>`_ support.
@@ -220,7 +220,7 @@ template. It performs the following five steps in one simple go:
      publishing and version management,
    - `djangocms-alias <https://github.com/django-cms/djangocms-alias>`_ for managing
      common content parts such as footers.
-   - `djangocms_admin_style <https://github.com/django-cms/djangocms-admin-style>`_ for
+   - `djangocms-simple-admin-style <https://github.com/fsbraun/djangocms-simple-admin-style>`_ for
      a consistent user experience with django CMS and Django admin.
 
 3. It changes into the project directory and runs the ``migrate`` command to create the
@@ -318,13 +318,19 @@ You will need to add the following to its list of ``INSTALLED_APPS``:
 - `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django
   CMS's page tree structures.
 
-django CMS also installs `django CMS admin style
-<https://github.com/django-cms/djangocms-admin-style>`_. This provides some styling that
+django CMS optionally provides `django CMS admin style
+<https://github.com/django-cms/djangocms-admin-style>`_. This contains some styling that
 helps make django CMS administration components easier to work with. Technically it's an
-optional component and does not need to be enabled in your project, but it's strongly
+optional component and does not need to be enabled in your project, but it's
 recommended for a more consistent user experience.
 
-In the ``INSTALLED_APPS``, **before** ``django.contrib.admin``, add:
+If you want to use it, add ``djangocms-admin-style`` to your project requirements, and
+install it using pip:
+.. code-block::
+
+    pip install djangocms-admin-style
+
+Then, in the ``INSTALLED_APPS``, **before** ``django.contrib.admin``, add:
 
 .. code-block::
 
@@ -755,17 +761,17 @@ Django CMS CKEditor
 
 `Django CMS CKEditor`_ is the default rich text editor for django CMS.
 
-.. _django cms ckeditor: https://github.com/django-cms/djangocms-text-ckeditor
+.. _django cms ckeditor: https://github.com/django-cms/djangocms-text
 
-Install: ``pip install djangocms-text-ckeditor``.
+Install: ``pip install djangocms-text``.
 
-Add ``djangocms_text_ckeditor`` to your ``INSTALLED_APPS``.
+Add ``djangocms_text`` to your ``INSTALLED_APPS``.
 
 Run migrations:
 
 .. code-block::
 
-    python manage.py migrate djangocms_text_ckeditor
+    python manage.py migrate djangocms_text
 
 Django CMS Frontend
 +++++++++++++++++++

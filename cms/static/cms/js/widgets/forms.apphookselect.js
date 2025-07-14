@@ -10,30 +10,42 @@ __webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.apph
 // #############################################################################
 // APP HOOK SELECT
 require.ensure([], function (require) {
-    var $ = require('jquery');
-    var apphooks_configuration = window.apphooks_configuration || {};
+    const $ = require('jquery');
+    let apphookData = {
+        apphooks_configuration: {},
+        apphooks_configuration_value: undefined,
+        apphooks_configuration_url: {}
+    };
 
     // shorthand for jQuery(document).ready();
     $(function () {
-        var appHooks = $('#application_urls, #id_application_urls');
-        var selected = appHooks.find('option:selected');
-        var appNsRow = $('.form-row.application_namespace, .form-row.field-application_namespace');
-        var appNs = appNsRow.find('#application_namespace, #id_application_namespace');
-        var appCfgsRow = $('.form-row.application_configs, .form-row.field-application_configs');
-        var appCfgs = appCfgsRow.find('#application_configs, #id_application_configs');
-        var appCfgsAdd = appCfgsRow.find('#add_application_configs');
-        var original_ns = appNs.val();
+        const dataElement = document.querySelector('div[data-cms-widget-applicationconfigselect]');
+
+        if (dataElement) {
+            apphookData = JSON.parse(dataElement.querySelector('script').textContent);
+        }
+
+        const apphooks_configuration = apphookData.apphooks_configuration || {};
+
+        const appHooks = $('#application_urls, #id_application_urls');
+        const selected = appHooks.find('option:selected');
+        const appNsRow = $('.form-row.application_namespace, .form-row.field-application_namespace');
+        const appNs = appNsRow.find('#application_namespace, #id_application_namespace');
+        const appCfgsRow = $('.form-row.application_configs, .form-row.field-application_configs');
+        const appCfgs = appCfgsRow.find('#application_configs, #id_application_configs');
+        const appCfgsAdd = appCfgsRow.find('#add_application_configs');
+        const original_ns = appNs.val();
 
         // Shows / hides namespace / config selection widgets depending on the user input
         appHooks.setupNamespaces = function () {
-            var opt = $(this).find('option:selected');
+            const opt = $(this).find('option:selected');
 
             if ($(appCfgs).length > 0 && apphooks_configuration[opt.val()]) {
                 appCfgs.html('');
-                for (var i = 0; i < apphooks_configuration[opt.val()].length; i++) {
-                    var selectedCfgs = '';
+                for (let i = 0; i < apphooks_configuration[opt.val()].length; i++) {
+                    let selectedCfgs = '';
 
-                    if (apphooks_configuration[opt.val()][i][0] === window.apphooks_configuration_value) {
+                    if (apphooks_configuration[opt.val()][i][0] === apphookData.apphooks_configuration_value) {
                         selectedCfgs = 'selected="selected"';
                     }
                     appCfgs.append(
@@ -42,11 +54,15 @@ require.ensure([], function (require) {
                         '</option>'
                     );
                 }
-                appCfgsAdd.attr('href', window.apphooks_configuration_url[opt.val()] +
+                appCfgsAdd.attr('href', apphookData.apphooks_configuration_url[opt.val()] +
                     // Here we check if we are on django>=1.8 by checking if the method introduced in that version
                     // exists, and if it does - we add `_popup` ourselves, because otherwise the popup with
                     // apphook creation form will not be dismissed correctly
                     (window.showRelatedObjectPopup ? '?_popup=1' : ''));
+                appCfgsAdd.on('click', function (ev) {
+                    ev.preventDefault();
+                    window.showAddAnotherPopup(this);
+                });
                 appCfgsRow.removeClass('hidden');
                 appNsRow.addClass('hidden');
             } else {

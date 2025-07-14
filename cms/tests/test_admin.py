@@ -9,8 +9,8 @@ from django.contrib.sites.models import Site
 from django.http import Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.test.utils import override_settings
 from django.utils.encoding import force_str, smart_str
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
+from djangocms_text.cms_plugins import TextPlugin
+from djangocms_text.models import Text
 
 from cms import api
 from cms.admin.forms import ChangePageForm
