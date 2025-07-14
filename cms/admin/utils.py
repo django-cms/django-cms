@@ -699,128 +699,50 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             setattr(form._content_instance, self.grouper_field_name, obj)
             form._content_instance.save()
 
-    def _search_content_model(self, search_term, search_fields):
-        """
-        Search in the related content model with admin_manager.
-        """
-        if not search_fields:
-            return []
-
-        queryset = self.content_model.admin_manager.all()
-        search_results, __ = self._get_search_result(queryset, search_term, search_fields=search_fields)
-
-        return search_results.values_list(f"{self.grouper_field_name}_id", flat=True)
-
-    def _handle_prefix_operators(self, field_name):
-        """Handle special prefix operators (^, =, @)"""
-        if field_name.startswith("^"):
-            return f'{field_name.removeprefix("^")}__istartswith', None
-        elif field_name.startswith("="):
-            return f'{field_name.removeprefix("=")}__iexact', None
-        elif field_name.startswith("@"):
-            return f'{field_name.removeprefix("@")}__search', None
-
-    def construct_search(self, queryset, field_name):
-        """Construct search query from fields in search fields"""
-        prefix_result = self._handle_prefix_operators(field_name)
-        if prefix_result:
-            return prefix_result
-        # Use field_name if it includes a lookup.
-        opts = queryset.model._meta
-        lookup_fields = field_name.split(LOOKUP_SEP)
-        # Go through the fields, following all relations.
-        prev_field = None
-        for i, path_part in enumerate(lookup_fields):
-            if path_part == "pk":
-                path_part = opts.pk.name
-            try:
-                field = opts.get_field(path_part)
-            except FieldDoesNotExist:
-                # Use valid query lookups.
-                if prev_field and prev_field.get_lookup(path_part):
-                    if path_part == "exact" and not isinstance(prev_field, (models.CharField, models.TextField)):
-                        field_name_without_exact = "__".join(lookup_fields[:i])
-                        alias = Cast(
-                            field_name_without_exact,
-                            output_field=models.CharField(),
-                        )
-                        alias_name = "_".join(lookup_fields[:i])
-                        return f"{alias_name}_str", alias
-                    else:
-                        return field_name, None
-            else:
-                prev_field = field
-                if hasattr(field, "path_infos"):
-                    # Update opts to follow the relation.
-                    opts = field.path_infos[-1].to_opts
-        # Otherwise, use the field with icontains.
-        return f"{field_name}__icontains", None
-
-    def _get_search_fields(self, request):
-        search_fields = self.get_search_fields(request)
+    def get_search_fields(self, request):
+        """Return search fields for either grouper model or content model"""
         content_search_fields = []
         grouper_search_fields = []
-        for field_name in search_fields:
+        for field_name in self.search_fields:
             if field_name.startswith(f"{self.content_related_field}__") or field_name.startswith("content__"):
                 content_search_fields.append(re.sub(r"^([@^=]?)[^_]+__", r"\1", field_name))
 
             else:
                 grouper_search_fields.append(field_name)
 
-        return grouper_search_fields, content_search_fields
+        if getattr(self, "_content_fields", False):
+            return content_search_fields
+
+        return grouper_search_fields
 
     def get_search_results(self, request, queryset, search_term):
-        """
-        Get search results from a queryset.
-        """
-        content_results = None
-        grouper_search_fields, content_search_fields = self._get_search_fields(request)
-        if search_term:
-            content_results = self._search_content_model(search_term, content_search_fields)
+        # Reset _content_fields flag
+        self._content_fields = False
+        grouper_search_result, may_have_duplicate_grouper = super().get_search_results(request, queryset, search_term)
 
-        queryset, may_have_duplicates = self._get_search_result(
-            queryset, search_term, search_fields=grouper_search_fields, included_pks=content_results
+        # Set _content_fields for get_search_fields to return content model search fields
+        self._content_fields = True
+        search_result_from_content, may_have_duplicate_content = self._get_content_search_result(
+            request, queryset, search_term
         )
-        return queryset, may_have_duplicates
 
-    def _get_search_result(self, queryset, search_term, search_fields, included_pks=None):
-        """Get search results from a queryset. using search fields"""
-        may_have_duplicates = False
-        if search_fields and search_term:
-            str_aliases = {}
-            orm_lookups = []
-            for field in search_fields:
-                lookup, str_alias = self.construct_search(queryset, str(field))
-                orm_lookups.append(lookup)
-                if str_alias:
-                    str_aliases[lookup] = str_alias
-            queryset = self._resolve_aliases(queryset, str_aliases)
+        return grouper_search_result | search_result_from_content, (
+            may_have_duplicate_grouper & may_have_duplicate_content
+        )
 
-            queryset = queryset.filter(self._build_search_query(search_term, included_pks, orm_lookups))
-            may_have_duplicates |= any(lookup_spawns_duplicates(self.opts, search_spec) for search_spec in orm_lookups)
-        return queryset, may_have_duplicates
-
-    def _resolve_aliases(self, queryset, str_aliases):
-        """Resolve aliases"""
-        if str_aliases:
-            return queryset.alias(**str_aliases)
-        return queryset
-
-    def _build_search_query(self, search_term, included_pks, orm_lookups):
-        """Build search query"""
-        term_queries = []
-        for bit in smart_split(search_term):
-            if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
-                bit = unescape_string_literal(bit)
-            or_queries = models.Q.create(
-                [(orm_lookup, bit) for orm_lookup in orm_lookups],
-                connector=models.Q.OR,
+    def _get_content_search_result(self, request, queryset, search_term):
+        """Get search results from content model"""
+        content_queryset = self.content_model.admin_manager.all()
+        content_search_fields = self.get_search_fields(request)
+        content_search_result, may_have_duplicate_content = self.content_model.admin_manager.none(), False
+        if content_search_fields:
+            content_search_result, may_have_duplicate_content = super().get_search_results(
+                request, content_queryset, search_term
             )
-            term_queries.append(or_queries)
-        search_query = models.Q.create(term_queries)
-        if included_pks:
-            search_query = Q(search_query) | Q(id__in=included_pks)
-        return search_query
+        search_result_from_content = queryset.filter(
+            id__in=content_search_result.values_list(f"{self.grouper_field_name}_id", flat=True)
+        )
+        return search_result_from_content, may_have_duplicate_content
 
 
 class _GrouperAdminFormMixin:
