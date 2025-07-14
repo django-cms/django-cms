@@ -6,14 +6,12 @@ from urllib.parse import parse_qsl
 from django import forms
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.checks import ModelAdminChecks
-from django.contrib.admin.utils import label_for_field, lookup_spawns_duplicates
+from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
-from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models import DateField, OuterRef, Subquery, functions
-from django.db.models.constants import LOOKUP_SEP
 from django.db.models.functions import Cast
-from django.db.models.query_utils import Q
 from django.forms import modelform_factory
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -22,7 +20,6 @@ from django.urls import NoReverseMatch
 from django.utils.html import format_html_join
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.utils.text import smart_split, unescape_string_literal
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models.managers import ContentAdminManager
@@ -704,24 +701,23 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         content_search_fields = []
         grouper_search_fields = []
         for field_name in self.search_fields:
-            if field_name.startswith(f"{self.content_related_field}__") or field_name.startswith("content__"):
-                content_search_fields.append(re.sub(r"^([@^=]?)[^_]+__", r"\1", field_name))
-
+            if field_name.startswith(CONTENT_PREFIX):
+                content_search_fields.append(field_name.replace(CONTENT_PREFIX, ""))
             else:
                 grouper_search_fields.append(field_name)
 
-        if getattr(self, "_content_fields", False):
+        if getattr(request, "_content_fields", False):
             return content_search_fields
 
         return grouper_search_fields
 
     def get_search_results(self, request, queryset, search_term):
         # Reset _content_fields flag
-        self._content_fields = False
+        request._content_fields = False
         grouper_search_result, may_have_duplicate_grouper = super().get_search_results(request, queryset, search_term)
 
         # Set _content_fields for get_search_fields to return content model search fields
-        self._content_fields = True
+        request._content_fields = True
         search_result_from_content, may_have_duplicate_content = self._get_content_search_result(
             request, queryset, search_term
         )
@@ -734,15 +730,14 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         """Get search results from content model"""
         content_queryset = self.content_model.admin_manager.all()
         content_search_fields = self.get_search_fields(request)
-        content_search_result, may_have_duplicate_content = self.content_model.admin_manager.none(), False
         if content_search_fields:
-            content_search_result, may_have_duplicate_content = super().get_search_results(
-                request, content_queryset, search_term
-            )
+            content_search_result, __ = super().get_search_results(request, content_queryset, search_term)
+        else:
+            content_search_result = self.content_model.admin_manager.none()
         search_result_from_content = queryset.filter(
             id__in=content_search_result.values_list(f"{self.grouper_field_name}_id", flat=True)
         )
-        return search_result_from_content, may_have_duplicate_content
+        return search_result_from_content, False
 
 
 class _GrouperAdminFormMixin:

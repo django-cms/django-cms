@@ -1,8 +1,6 @@
 import copy
 
 from django.contrib.admin import site
-from django.db.models import CharField
-from django.db.models.functions import Cast
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
@@ -701,7 +699,7 @@ class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
 
     def test_exact_search_by_content(self):
         """Test exact match (=) search modifier on content field."""
-        self.admin.search_fields = ("id__exact", "category_name", "=content__secret_greeting")
+        self.admin.search_fields = ("category_name", "=content__secret_greeting")
         content_obj = self.grouper_content_objects[self.another_grouper_instance.id]
         search_token = content_obj.secret_greeting  # Exact match
         expected_instances = [self.another_grouper_instance]
