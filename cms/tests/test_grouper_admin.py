@@ -625,6 +625,18 @@ class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
             self._assert_search_results(response, expected_instances)
             return response
 
+    def _test_expected_result_count(self, query, expected_count):
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self._get_search_url(query), follow=True)
+            content = response.content.decode()
+            actual_count = content.count('class="action-checkbox"')
+            self.assertEqual(
+                actual_count,
+                expected_count,
+                f"Expected {expected_count} results for query '{query}' "
+                f"with search_fields {self.admin.search_fields}, got {actual_count}",
+            )
+
     def test_search_with_empty_query_returns_all_results(self):
         """Empty search query should return all grouper instances."""
         expected_instances = [self.grouper_instance, self.another_grouper_instance]
@@ -705,26 +717,26 @@ class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
         expected_instances = [self.another_grouper_instance]
         self._perform_search(search_token, expected_instances)
 
-    def test_search_configurations_basic(self):
-        """Test basic search configurations."""
-        test_cases = [
-            (("category_name",), "Category", 2),
-            (("^category_name",), "Grouper", 1),
-            (("=category_name",), "Another_Category", 1),
-            (("content__secret_greeting",), "Greeting", 2),
-        ]
+    def test_search_with_multiple_results_and_grouper_query(self):
+        """Test search configuration with category_name contains search."""
+        query = "Category"
+        self.admin.search_fields = ("category_name",)
+        self._test_expected_result_count(query, 2)
 
-        for search_fields, query, expected_count in test_cases:
-            with self.subTest(search_fields=search_fields, query=query):
-                self.admin.search_fields = search_fields
-                with self.login_user_context(self.admin_user):
-                    response = self.client.get(self._get_search_url(query), follow=True)
-                    # Count occurrences of the change URL pattern to determine result count
-                    content = response.content.decode()
-                    actual_count = content.count('class="action-checkbox"')
-                    self.assertEqual(
-                        actual_count,
-                        expected_count,
-                        f"Expected {expected_count} results for query '{query}' "
-                        f"with search_fields {search_fields}, got {actual_count}",
-                    )
+    def test_search_with_startswith_grouper_query(self):
+        """Test search configuration with category_name starts with search."""
+        query = "Grouper"
+        self.admin.search_fields = ("^category_name",)
+        self._test_expected_result_count(query, 1)
+
+    def test_search_configurations_category_name_exact(self):
+        """Test search configuration with category_name exact match search."""
+        query = "Another_Category"
+        self.admin.search_fields = ("=category_name",)
+        self._test_expected_result_count(query, 1)
+
+    def test_search_content_secret_greeting_with_multiple_results(self):
+        """Test search configuration with content__secret_greeting field search."""
+        query = "Greeting"
+        self.admin.search_fields = ("content__secret_greeting",)
+        self._test_expected_result_count(query, 2)

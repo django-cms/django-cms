@@ -729,8 +729,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def _get_content_search_result(self, request, queryset, search_term):
         """Get search results from content model"""
         content_queryset = self.content_model.admin_manager.all()
-        content_search_fields = self.get_search_fields(request)
-        if content_search_fields:
+        if self.get_search_fields(request):
             content_search_result, __ = super().get_search_results(request, content_queryset, search_term)
         else:
             content_search_result = self.content_model.admin_manager.none()
