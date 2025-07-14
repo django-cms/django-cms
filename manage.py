@@ -67,7 +67,7 @@ if __name__ == "__main__":
     )
 
     PLUGIN_APPS = [
-        "djangocms_text_ckeditor",
+        "djangocms_text",
         "cms.test_utils.project.sampleapp",
         "cms.test_utils.project.placeholderapp",
         "cms.test_utils.project.pluginapp.plugins.link",
@@ -112,7 +112,7 @@ if __name__ == "__main__":
         "sites": None,
         "cms": None,
         "menus": None,
-        "djangocms_text_ckeditor": None,
+        "djangocms_text": None,
     }
 
     dynamic_configs = {
@@ -379,5 +379,6 @@ if __name__ == "__main__":
             MIGRATION_MODULES=MIGRATION_MODULES,
             X_FRAME_OPTIONS="SAMEORIGIN",
             CMS_CONFIRM_VERSION4=True,
+            TEXT_INLINE_EDITING=False,  # Do not pollute toolbar for tests
             **dynamic_configs,
         )
