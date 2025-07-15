@@ -702,7 +702,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         grouper_search_fields = []
         for field_name in self.search_fields:
             if field_name.startswith(CONTENT_PREFIX):
-                content_search_fields.append(field_name.replace(CONTENT_PREFIX, ""))
+                content_search_fields.append(field_name[len(CONTENT_PREFIX) :])
             else:
                 grouper_search_fields.append(field_name)
 
@@ -712,12 +712,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return grouper_search_fields
 
     def get_search_results(self, request, queryset, search_term):
-        # Reset _content_fields flag
-        request._content_fields = False
         grouper_search_result, may_have_duplicate_grouper = super().get_search_results(request, queryset, search_term)
 
-        # Set _content_fields for get_search_fields to return content model search fields
-        request._content_fields = True
         search_result_from_content, may_have_duplicate_content = self._get_content_search_result(
             request, queryset, search_term
         )
@@ -728,14 +724,20 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def _get_content_search_result(self, request, queryset, search_term):
         """Get search results from content model"""
-        content_queryset = self.content_model.admin_manager.all()
-        if self.get_search_fields(request):
-            content_search_result, __ = super().get_search_results(request, content_queryset, search_term)
-        else:
-            content_search_result = self.content_model.admin_manager.none()
-        search_result_from_content = queryset.filter(
-            id__in=content_search_result.values_list(f"{self.grouper_field_name}_id", flat=True)
-        )
+        try:
+            # Set flag on request object to get the content search fields. `get_search_results` will call
+            # `get_search_fields` to get the content search fields.
+            request._content_fields = True
+            content_queryset = self.content_model.admin_manager.all()
+            if self.get_search_fields(request):
+                content_search_result, __ = super().get_search_results(request, content_queryset, search_term)
+            else:
+                content_search_result = self.content_model.admin_manager.none()
+            search_result_from_content = queryset.filter(
+                id__in=content_search_result.values_list(f"{self.grouper_field_name}_id", flat=True)
+            )
+        finally:
+            request._content_fields = False
         return search_result_from_content, False
 
 
