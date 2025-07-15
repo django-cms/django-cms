@@ -1,3 +1,5 @@
+@import "settings/all";
+
 html.cms-structure-mode-structure section {
     margin-inline-end: 436px;
 }
@@ -6,7 +8,7 @@ html.cms-structure-mode-structure section {
     font: normal 18px/24px Helvetica,Arial,sans-serif;
     margin: 20px;
     padding: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid $gray-light;
 }
 
 .cms-placeholder-view h1 {
@@ -14,10 +16,10 @@ html.cms-structure-mode-structure section {
     padding: 0;
     padding-bottom: 10px;
     font-size: 1.5em;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid $gray-light;
     small {
         font-size: 0.5em;
-        color: #999;
+        color: $gray;
     }
 }
 
@@ -25,5 +27,5 @@ html.cms-structure-mode-structure section {
     max-width: 100%;
     padding: 3px;
     margin: -5px;
-    border: 1px solid #ccc;
+    border: 1px solid $gray-light;
 }
