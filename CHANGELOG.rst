@@ -1,3 +1,20 @@
+Bug Fixes:
+----------
+* The headless template included inline CSS (#8291) (#8292) (14dd89faf) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 5.0.1 (2025-05-21)
 ==================
 
