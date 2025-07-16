@@ -1,17 +1,36 @@
+5.0.2 (2025-07-17)
+==================
+
 Bug Fixes:
 ----------
 * The headless template included inline CSS (#8291) (#8292) (14dd89faf) -- Fabian Braun
+* GrouperAdmin Search in content model (#8284) (#8290) (46f0e0775) -- Muhammad Hassan Siddiqi
+* Allow clicks to propagate to plugins (#8288) (#8289) (2c1ab2d7d) -- Fabian Braun
+* show_placeholder did not respect edit/preview mode and failed loudly (#8272) (#8274) (e7be7bc9b) -- Fabian Braun
+* Allow lazy wizard initialization (#8265) (365185848) -- Fabian Braun
+* Apphook widgets were not always detected correctly (#8263) (ec2f4e815) -- Fabian Braun
+* Migrating from django CMS 3.x failed in some rare cases (#8249) (bcf7f895a) -- jmit-modern
+* Added default_auto_field to cms/apps.py (#8254) (4a12dd38a) -- Fabian Braun
+* 404 not raised in CMS view when no URLs matched (#8240) (3d069cbe5) -- Stefan Wehrmeyer
+* Replaced outdated usage of page__node__path with page__path (#8238) (a9105a738) -- Stefan Wehrmeyer
+
+
 
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 13 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
+* Fabian Braun (6 pull request)
 * Github Release Action (3 pull requests)
+* jmit-modern (1 pull request)
+* Muhammad Hassan Siddiqi (1 pull request)
+* Stefan Wehrmeyer (2 pull requests)
 
 With the review help of the following contributors:
 
+* Fabian Braun
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
@@ -20,6 +39,7 @@ Thanks to all contributors for their efforts!
 
 Bug Fixes:
 ----------
+
 * Adjust checks for GrouperAdmin to allow for `prepopulated_fields` (d6be4747e) -- Fabian Braun
 * Show all text-enabled plugins inside djangocms-text (0a2ce64c4) -- Fabian Braun
 * Structure board update sometimes failed to add all interactive elements (d040cee) -- Fabian Braun
