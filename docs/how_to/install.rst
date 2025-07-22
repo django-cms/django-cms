@@ -93,7 +93,7 @@ Your new project will look like this::
 
 The ``LICENSE`` and ``README.md`` files are not needed and can be deleted or replaced by appropriate files for your project.
 
-``requirements.in`` contains dependencies for the project. Add your dependencies here. We suggest to use `pip-compile <https://github.com/jazzband/pip-tools>`_  to freeze your requirements as, for example, discussed in `this blog post <https://blog.typodrive.com/2020/02/04/always-freeze-requirements-with-pip-compile-to-avoid-unpleasant-surprises/>`_.
+``requirements.in`` contains dependencies for the project. Add your dependencies here. We suggest to use `pip-compile <https://github.com/jazzband/pip-tools>`_  to freeze your requirements as, for example, discussed in `this blog post <https://www.linkedin.com/pulse/freeze-requirements-pip-compile-best-practise-mario-colombo-7rgse/>`_.
 
 Now, enter the project directory and create the database::
 
