@@ -268,7 +268,7 @@ appropriate files for your project.
 ``requirements.in`` contains dependencies for the project. Add your dependencies here.
 We suggest to use pip-compile to freeze your requirements as, for example, discussed in
 `this blog post
-<https://blog.typodrive.com/2020/02/04/always-freeze-requirements-with-pip-compile-to-avoid-unpleasant-surprises/>`_.
+<https://www.linkedin.com/pulse/freeze-requirements-pip-compile-best-practise-mario-colombo-7rgse/>`_.
 
 Spin up your Django development server (Step 3)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
