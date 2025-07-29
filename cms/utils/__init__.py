@@ -1,5 +1,6 @@
 # TODO: this is just stuff from utils.py - should be split / moved
 from typing import Optional
+
 from django.http import HttpRequest
 
 from cms.utils.i18n import (
@@ -10,7 +11,7 @@ from cms.utils.i18n import (
 )
 
 
-def get_current_site(request: Optional[HttpRequest]) -> 'Site':
+def get_current_site(request: Optional[HttpRequest] = None):
     from django.contrib.sites.models import Site
 
     if request is None:
