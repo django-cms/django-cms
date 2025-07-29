@@ -51,10 +51,10 @@ def get_clean_username(user):
 
 
 def get_page_queryset(site, draft=True, published=False):
+    from warnings import warn
+
     from cms.models import Page
     from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
-
-    from warnings import warn
 
     warn(
         "cms.utils.page.get_page_queryset is deprecated. "
