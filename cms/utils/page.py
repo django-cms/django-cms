@@ -50,7 +50,7 @@ def get_clean_username(user):
     return username
 
 
-def get_page_queryset(site, draft=True, published=False):
+def get_page_queryset(site, draft=True, published=False):  # pragma: no cover
     from warnings import warn
 
     from cms.models import Page
