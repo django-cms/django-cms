@@ -212,7 +212,7 @@ class DefaultLanguageChanger:
         if url:
             return url
 
-        site = get_current_site()
+        site = get_current_site(self.request)
 
         if is_valid_site_language(lang, site_id=site.pk):
             _valid_language = True

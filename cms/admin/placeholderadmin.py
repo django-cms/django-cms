@@ -254,7 +254,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         # has a special meaning on the CMS.
         # It allows users to see another language while maintaining
         # the same url. This complicates language detection.
-        site = get_current_site()
+        site = get_current_site(request)
         parsed_url = urlparse(request.GET['cms_path'])
         queries = dict(parse_qsl(parsed_url.query))
         language = queries.get('language')

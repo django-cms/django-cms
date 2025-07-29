@@ -1,4 +1,5 @@
 # TODO: this is just stuff from utils.py - should be split / moved
+from typing import Optional
 from django.http import HttpRequest
 
 from cms.utils.i18n import (
@@ -9,13 +10,20 @@ from cms.utils.i18n import (
 )
 
 
-def get_current_site():
+def get_current_site(request: Optional[HttpRequest]) -> 'Site':
     from django.contrib.sites.models import Site
 
-    return Site.objects.get_current()
+    if request is None:
+        import warnings
+        warnings.warn(
+            "get_current_site() called without request. This may lead to unexpected behavior.",
+            DeprecationWarning,
+        )
+
+    return Site.objects.get_current(request)
 
 
-def get_language_from_request(request: HttpRequest, current_page=None):
+def get_language_from_request(request: HttpRequest, current_page=None) -> str:
     """
     Return the most obvious language according the request
     """

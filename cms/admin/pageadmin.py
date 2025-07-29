@@ -90,12 +90,12 @@ def get_site(request):
     site_id = request.session.get("cms_admin_site")
 
     if not site_id:
-        return get_current_site()
+        return get_current_site(request)
 
     try:
         site = Site.objects._get_site_by_id(site_id)
     except Site.DoesNotExist:
-        site = get_current_site()
+        site = get_current_site(request)
     return site
 
 

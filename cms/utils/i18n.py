@@ -36,7 +36,7 @@ def get_site_language_from_request(request, site_id=None):
     from cms.utils import get_current_site
 
     if site_id is None:
-        site_id = get_current_site().pk
+        site_id = get_current_site(request).pk
 
     # Level 1: language get parameter
     language = request.GET.get('language', None)

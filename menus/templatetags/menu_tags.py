@@ -385,8 +385,8 @@ class LanguageChooser(InclusionTag):
             return {'template': 'cms/content.html'}
         marker = MARKERS[i18n_mode]
         current_lang = get_language()
-        site = Site.objects.get_current()
         request = context['request']
+        site = Site.objects.get_current(request)
 
         if request.user.is_staff:
             languages = get_language_list(site_id=site.pk)
