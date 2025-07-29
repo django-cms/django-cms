@@ -4,8 +4,6 @@ from functools import update_wrapper
 from urllib.parse import urlparse
 
 from django.contrib import admin
-from django.contrib.admin import ModelAdmin
-from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
 from django.http import (
     HttpResponse,
@@ -14,8 +12,10 @@ from django.http import (
 )
 from django.http.request import QueryDict
 from django.urls import Resolver404, path, re_path, resolve
+from django.utils.decorators import method_decorator
 from django.utils.html import conditional_escape
 from django.utils.translation import override
+from django.views.decorators.csrf import csrf_protect
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
@@ -25,7 +25,7 @@ from cms.utils.urlutils import admin_reverse
 
 
 @admin.register(UserSettings)
-class SettingsAdmin(ModelAdmin):
+class SettingsAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         def wrap(view):
@@ -43,7 +43,7 @@ class SettingsAdmin(ModelAdmin):
             re_path(r'^(.+)/$', wrap(self.change_view), name='%s_%s_change' % info),
         ]
 
-    @csrf_protect_m
+    @method_decorator(csrf_protect)
     @transaction.atomic
     def change_view(self, request, id=None):
         model = self.model
