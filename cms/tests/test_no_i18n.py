@@ -149,7 +149,7 @@ class TestNoI18N(CMSTestCase):
 
     @patch("django.utils.translation._trans", new=trans_null)
     def test_inherit_label(self):
-        page = create_page("test", "nav_playground.html", "en-us", published=True)
+        page = create_page("test", "nav_playground.html", "en-us")
         with self.login_user_context(self.get_superuser()):
             endpoint = self.get_admin_url(PageContent, "change", page.get_content_obj("en-us").pk)
             response = self.client.get(endpoint)
