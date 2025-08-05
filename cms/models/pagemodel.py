@@ -362,6 +362,12 @@ class Page(MP_Node):
             except NoReverseMatch:
                 return None
 
+    def get_full_url(self, language=None, fallback=True):
+        path = self.get_absolute_url(language, fallback)
+        if path is None:
+            return None
+        return f"//{self.site.domain}{path}"
+
     def set_tree_node(self, site, target=None, position="first-child"):
         warnings.warn(
             "Method `set_tree_node` is deprecated. Use `add_to_tree` instead.",

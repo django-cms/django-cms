@@ -328,6 +328,9 @@ class PageContent(models.Model):
         the absolute url of the corresponding "sister" content."""
         return self.page.get_absolute_url(language=language or self.language)
 
+    def get_full_url(self, language=None, fallback=True):
+        return self.page.get_full_url(language=language or self.language, fallback=fallback)
+
 
 class EmptyPageContent:
     """
