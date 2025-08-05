@@ -107,7 +107,12 @@ class MenuRenderer:
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.site = Site.objects.get_current(request)
+        page = getattr(self.request, 'current_page', None)
+        if page:
+            # Avoid resolving site
+            self.site = Site(id=page.site_id)
+        else:
+            self.site = Site.objects.get_current(request)
         self.request_language = None
         if hasattr(request, "LANGUAGE_CODE"):
             # use language from middleware - usually django.middleware.locale.LocaleMiddleware
