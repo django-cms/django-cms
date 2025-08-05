@@ -457,15 +457,9 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         target_id = data.get("target")
 
-        try:
-            source_site_id = data["source_site"]
-            source_site = Site.objects.get(pk=source_site_id)
-        except (KeyError, ObjectDoesNotExist):
-            return HttpResponseBadRequest("source_site is required")
-
         site = get_site(request)
         user = request.user
-        can_view_page = page_permissions.user_can_view_page(user, page, source_site)
+        can_view_page = page_permissions.user_can_view_page(user, page, page.site)
 
         if not can_view_page:
             raise PermissionDenied
@@ -475,8 +469,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 target = Page.objects.get(pk=target_id)
             except Page.DoesNotExist:
                 raise Http404
-
-            if not page_permissions.user_can_add_subpage(user, target, site):
+            if not page_permissions.user_can_add_subpage(user, target, target.site):
                 raise PermissionDenied
         elif not page_permissions.user_can_add_page(user, site):
             raise PermissionDenied
@@ -504,8 +497,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     def has_change_permissions_permission(self, request, obj=None):
         if not obj:
             return False
-        site = get_site(request)
-        return page_permissions.user_can_change_page_permissions(request.user, page=obj, site=site)
+        return page_permissions.user_can_change_page_permissions(request.user, page=obj, site=obj.site)
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -513,14 +505,12 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         """
         if not obj:
             return False
-        site = get_site(request)
-        return page_permissions.user_can_delete_page(request.user, page=obj, site=site)
+        return page_permissions.user_can_delete_page(request.user, page=obj, site=obj.site)
 
     def has_move_page_permission(self, request, obj=None):
         if not obj:
             return False
-        site = get_site(request)
-        return page_permissions.user_can_move_page(user=request.user, page=obj, site=site)
+        return page_permissions.user_can_move_page(user=request.user, page=obj, site=obj.site)
 
     @require_POST
     @transaction.atomic
@@ -545,14 +535,13 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             target=4, position=0 => target=4, position="first-child"
 
         """
-        site = get_site(request)
         page = self.get_object(request, object_id=page_id)
 
         if page is None:
             return jsonify_request(HttpResponseBadRequest("error"))
 
         user = request.user
-        form = self.move_form(request.POST or None, page=page, site=site)
+        form = self.move_form(request.POST or None, page=page, site=page.site)
 
         if not form.is_valid():
             return jsonify_request(HttpResponseBadRequest(str(form.errors.get("__all__", _("error")))))
@@ -591,7 +580,10 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(page_id)
 
-        site = get_site(request)
+        if not self.has_view_permission(request, obj=page):
+            raise PermissionDenied("No permission for page permissions view")
+
+        site = get_site_from_request(request)
         PermissionRow = namedtuple("Permission", ["is_global", "can_change", "permission"])
 
         global_permissions = GlobalPagePermission.objects.filter(sites__in=[site.pk])
@@ -651,10 +643,9 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             return jsonify_request(HttpResponseBadRequest("error"))
 
         target = form.cleaned_data["target"]
-        source_site = form.cleaned_data["source_site"]
 
         # User can only copy pages he can see
-        can_copy_page = page_permissions.user_can_view_page(user, page, source_site)
+        can_copy_page = page_permissions.user_can_view_page(user, page, page.site)
 
         if can_copy_page and target:
             # User can only copy a page into another one if he has permission

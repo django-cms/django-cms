@@ -1030,7 +1030,6 @@ class MovePageForm(PageTreeForm):
 
 
 class CopyPageForm(PageTreeForm):
-    source_site = forms.ModelChoiceField(queryset=Site.objects.all(), required=True)
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
     def copy_page(self, user):

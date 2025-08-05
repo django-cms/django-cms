@@ -621,7 +621,6 @@ class PageTest(PageTestBase):
         """
         data = {
             'position': 2,
-            'source_site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -695,7 +694,6 @@ class PageTest(PageTestBase):
     def test_copy_page_to_different_site_fails_with_untranslated_page(self):
         data = {
             'position': 0,
-            'source_site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -712,7 +710,6 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -730,7 +727,6 @@ class PageTest(PageTestBase):
     def test_copy_page_to_different_site_with_no_pages(self):
         data = {
             'position': 0,
-            'source_site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -742,7 +738,6 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -2781,7 +2776,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             endpoint = self.get_admin_url(Page, 'get_copy_dialog', page.pk)
-            endpoint += '?source_site=%s' % page.site_id
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 

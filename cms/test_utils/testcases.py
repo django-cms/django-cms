@@ -337,7 +337,6 @@ class BaseCMSTestCase:
         data = {
             'position': position,
             'target': target_page.pk,
-            'source_site': page.site_id,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
