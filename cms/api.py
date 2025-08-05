@@ -202,18 +202,23 @@ def create_page(
         assert template in [tpl[0] for tpl in get_cms_setting("TEMPLATES")]
         get_template(template)
 
-    # validate site
-    if not site:
-        site = get_current_site()
-    else:
-        assert isinstance(site, Site)
-
-    # validate language:
-    assert language in get_language_list(site), get_cms_setting("LANGUAGES").get(site.pk)
-
     # validate parent
     if parent:
         assert isinstance(parent, Page)
+
+    # validate site
+    if not site:
+        if parent:
+            site = parent.site
+        else:
+            site = get_current_site()
+    else:
+        assert isinstance(site, Site)
+        if parent:
+            assert parent.site == site, "Parent page must be on the same site as the new page"
+
+    # validate language:
+    assert language in get_language_list(site), get_cms_setting("LANGUAGES").get(site.pk)
 
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
