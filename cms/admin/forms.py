@@ -905,7 +905,7 @@ class PageTreeForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.page = kwargs.pop("page")
-        self._site = kwargs.pop("site", Site.objects.get_current())
+        self._site = kwargs.pop("site", self.page.site)
         super().__init__(*args, **kwargs)
         self.fields["target"].queryset = Page.objects.filter(
             site=self._site,

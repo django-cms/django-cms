@@ -165,6 +165,19 @@ class PageTest(PageTestBase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<title>Add a page</title>', html=True)
 
+    def test_add_page_different_site(self):
+        """
+        Test that the add admin page could be displayed via the admin
+        """
+        superuser = self.get_superuser()
+        Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+
+        with self.login_user_context(superuser):
+            response = self.client.get(self.get_page_add_uri('en', site_id=2))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<title>Add a page</title>', html=True)
+            self.assertContains(response, '&amp;site=2')
+
     def test_create_page_admin(self):
         """
         Test that a page can be created via the admin
@@ -183,6 +196,28 @@ class PageTest(PageTestBase):
             self.assertEqual(page_url.page.get_title(), page_data['title'])
             self.assertEqual(page_url.page.get_slug('en'), page_data['slug'])
             self.assertEqual(page_url.page.get_placeholders('en').count(), 2)
+
+    def test_create_page_admin_different_site(self):
+        """
+        Test that a page can be created via the admin
+        """
+        Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+        with self.settings(CMS_LANGUAGES={2: [{'code': 'en', 'name': 'English'}]}):
+            page_data = self.get_new_page_data()
+
+            superuser = self.get_superuser()
+            with self.login_user_context(superuser):
+                self.assertEqual(PageContent.objects.all().count(), 0)
+                self.assertEqual(Page.objects.all().count(), 0)
+                # create home
+                response = self.client.post(self.get_page_add_uri('en', site_id=2), page_data)
+                self.assertRedirects(response, self.get_pages_admin_list_uri('en', site_id=2))
+
+                page_url = PageUrl.objects.get(slug=page_data['slug'])
+                self.assertEqual(page_url.page.site_id, 2)
+                self.assertEqual(page_url.page.get_title(), page_data['title'])
+                self.assertEqual(page_url.page.get_slug('en'), page_data['slug'])
+                self.assertEqual(page_url.page.get_placeholders('en').count(), 2)
 
     def test_create_page_with_unconfigured_language(self):
         """
@@ -212,15 +247,12 @@ class PageTest(PageTestBase):
             self.assertEqual(Page.objects.filter(site=2).count(), 1)
             self.assertEqual(PageContent.objects.filter(language='de').count(), 1)
 
-        # The user is on site #1 but switches sites using the site switcher
-        # on the page changelist.
-        client.post(self.get_pages_admin_list_uri(), {'site': 2})
-
+        # The user is on site #1 but switches to using site #2.
         # url uses "en" as the request language
         # but the site is configured to use "de" and "fr"
-        endpoint = self.get_page_add_uri('en')
+        endpoint = self.get_page_add_uri('en', site_id=2)
         response = client.post(endpoint, self.get_new_page_data())
-        self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
+        self.assertRedirects(response, self.get_pages_admin_list_uri('de', site_id=2))
         self.assertEqual(Page.objects.filter(site=2).count(), 2)
         self.assertEqual(PageContent.objects.filter(language='de').count(), 2)
 
@@ -1432,6 +1464,37 @@ class PageTest(PageTestBase):
             self.assertIn(tree, content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
 
+    def test_page_get_tree_different_site(self):
+        superuser = self.get_superuser()
+        site = Site.objects.create(id=2, domain='example-2.com', name='example-2.com')
+
+        with self.settings(CMS_LANGUAGES={2: [{'code': 'en', 'name': 'English'}]}):
+            create_page('Home', 'nav_playground.html', 'en', site=site)
+            alpha = create_page('Alpha', 'nav_playground.html', 'en', site=site)
+            create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
+            create_page('Gamma', 'nav_playground.html', 'en', site=site)
+
+            tree = (
+                '<li>\nHome\n</li>'
+                '<li>\nAlpha\n</li>'
+                '<li>\nGamma\n</li>'
+            )
+            endpoint_default = self.get_admin_url(PageContent, 'get_tree')
+            endpoint_site = self.get_admin_url(PageContent, 'get_tree') + '?site=2'
+
+            with self.login_user_context(superuser):
+                response = self.client.get(endpoint_default)
+                self.assertEqual(response.status_code, 200)
+                parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
+                content = force_str(parsed)
+                self.assertNotIn(tree, content)
+
+                response = self.client.get(endpoint_site)
+                self.assertEqual(response.status_code, 200)
+                parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
+                content = force_str(parsed)
+                self.assertIn(tree, content)
+
     def test_page_get_tree_endpoint_nested(self):
         superuser = self.get_superuser()
         endpoint = self.get_admin_url(PageContent, 'get_tree')
@@ -2191,6 +2254,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         endpoint = self.get_admin_url(Page, 'get_permissions', page.pk)
         staff_user = self.get_staff_user_with_no_permissions()
 
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+
         with self.login_user_context(staff_user):
             data = {'post': 'true'}
 
@@ -2198,7 +2264,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(
                 response,
-                "<p>Page doesn't inherit any permissions.</p>",
+                '<td class="user">staff</td>',
                 html=True,
             )
 

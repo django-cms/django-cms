@@ -1300,7 +1300,7 @@ class AdminPageTreeTests(AdminTestsBase):
             for language in languages:  # Now check all language with the languages selector defined
                 request = self.get_request(path=f"{url}?language={language}")  # Language of the page tree
                 response = pagecontent_admin.changelist_view(request)
-                self.assertContains(response, f'href="{add_url}?language={language}"')
+                self.assertContains(response, f'href="{add_url}?language={language}&amp;site=1"')
 
             # Create pages in all languages
             page = {}

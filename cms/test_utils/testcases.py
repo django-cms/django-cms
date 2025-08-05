@@ -520,17 +520,21 @@ class BaseCMSTestCase:
 
         return plugin_pool.get_plugin(plugin_type).model
 
-    def get_pages_admin_list_uri(self, language=None):
+    def get_pages_admin_list_uri(self, language=None, site_id=None):
         endpoint = admin_reverse('cms_pagecontent_changelist')
         data = {'language': language or get_language()}
+        if site_id:
+            data['site'] = site_id
         return endpoint + '?' + urlencode(data)
 
-    def get_page_add_uri(self, language, page=None):
+    def get_page_add_uri(self, language, page=None, site_id=None):
         endpoint = admin_reverse('cms_pagecontent_add')
         data = {'language': language}
 
         if page:
             data['cms_page'] = page.pk
+        if site_id:
+            data['site'] = site_id
         return endpoint + '?' + urlencode(data)
 
     def get_page_change_uri(self, language, page):
