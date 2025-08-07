@@ -622,7 +622,8 @@ class GlobalPermissionTests(CMSTestCase):
         with self.settings(CMS_PERMISSION=True):
             # for all users, they should have access to site 1
             request = RequestFactory().get(path='/')
-            request.session = {'cms_admin_site': site_1.pk}
+            # Fake session
+            request.session = {}
             request.current_page = None
             for user in USERS:
                 request.user = user
@@ -639,9 +640,9 @@ class GlobalPermissionTests(CMSTestCase):
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
             # to site 1
-            request = RequestFactory().get(path='/')
-            request.session = {'cms_admin_site': site_2.pk}
+            request = RequestFactory().get(path=f'/?site={site_2.pk}')
             request.current_page = None
+            request.session = {}
 
             # Refresh internal user cache
             USERS[0] = self.reload(USERS[0])
