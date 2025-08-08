@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
@@ -750,7 +751,7 @@ class ToolbarTests(ToolbarTestBase):
         """
         user = self.get_staff()
         page = create_page('test', 'nav_playground.html', 'en')
-        for code, verbose in get_language_tuple():
+        for code, verbose in get_language_tuple(Site.objects.get_current().pk):
             if code != "en":
                 create_page_content(code, f"test {code}", page)
         page_content = self.get_pagecontent_obj(page)
@@ -775,7 +776,7 @@ class ToolbarTests(ToolbarTestBase):
         )
         self.assertEqual(
             [item.name for item in lang_menu.get_items()],
-            [language_name for _, language_name in get_language_tuple(1)],
+            [language_name for _, language_name in get_language_tuple(Site.objects.get_current().pk)],
         )
         self.assertIn(edit_url, [item.url for item in lang_menu.get_items()])  # Edit urls returned
 
@@ -2251,13 +2252,13 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
     def test_get_object_for_language_multiple_languages(self):
         page = create_page('Test', 'col_two.html', 'en')
         # Additional pages to ensure not a page content of another page is returned
-        for code, verbose in get_language_tuple():
+        for code, verbose in get_language_tuple(Site.objects.get_current().pk):
             create_page(f"Not this page ({verbose})", "col_two.html", code)
 
         page_content = {
             "en": self.get_pagecontent_obj(page, "en")
         }
-        for code, verbose in get_language_tuple():
+        for code, verbose in get_language_tuple(Site.objects.get_current().pk):
             if code != "en":
                 page_content[code] = create_page_content(code, verbose, page)
 

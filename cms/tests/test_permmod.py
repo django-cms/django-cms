@@ -19,7 +19,6 @@ from cms.models.permissionmodels import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils import get_current_site
 from cms.utils.page_permissions import user_can_view_page
 
 
@@ -312,7 +311,7 @@ class ViewPermissionBaseTests(CMSTestCase):
     def setUp(self):
         self.page = create_page('testpage', 'nav_playground.html', 'en')
         self.page_content = self.page.get_content_obj("en")
-        self.site = get_current_site()
+        self.site = Site.objects.get_current()
 
     def get_request(self, user=None):
         attrs = {

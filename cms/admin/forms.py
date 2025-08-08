@@ -46,6 +46,7 @@ from cms.operations.helpers import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
+from cms.utils import get_current_site
 from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
@@ -1432,8 +1433,8 @@ class PluginAddValidationForm(forms.Form):
         position = data["plugin_position"]
         placeholder = data["placeholder_id"]
         parent_plugin = data.get("plugin_parent")
-
-        if language not in get_language_list():
+        site = get_current_site(getattr(self, "_request", None))
+        if language not in get_language_list(site_id=site.pk):
             message = gettext("Language must be set to a supported language!")
             self.add_error("plugin_language", message)
             return self.cleaned_data

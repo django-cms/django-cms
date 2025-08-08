@@ -1226,7 +1226,7 @@ class PageTest(PageTestBase):
         superuser = self.get_superuser()
         cms_page = create_page('app', 'nav_playground.html', 'en')
         cms_pages = Page.objects.filter(pk=cms_page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=cms_page.site_id)
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
         page_data = {
             "reverse_id": "",
@@ -1281,7 +1281,7 @@ class PageTest(PageTestBase):
         app_config = SampleAppConfig.objects.create(namespace='sample')
         cms_page = create_page('app', 'nav_playground.html', 'en')
         cms_pages = Page.objects.filter(pk=cms_page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=cms_page.site_id)
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
         page_data = {
             "reverse_id": "",
@@ -1933,7 +1933,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'advanced', page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=page.site_id)
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(reverse_id='permissions-2')
@@ -3411,7 +3411,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         endpoint = self.get_admin_url(Page, 'advanced', page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=page.site_id)
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(reverse_id='permissions-2')

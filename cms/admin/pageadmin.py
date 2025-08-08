@@ -10,9 +10,7 @@ from django.contrib import admin, messages
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
 from django.core.exceptions import (
-    ObjectDoesNotExist,
     PermissionDenied,
     ValidationError,
 )
@@ -52,7 +50,6 @@ from cms.admin.forms import (
     MovePageForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
-from cms.admin.site_utils import get_site, get_site_from_request, get_sites_for_user, needs_site_redirect
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import (
@@ -72,7 +69,7 @@ from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, page_permissions, permissions
-from cms.utils.admin import jsonify_request
+from cms.utils.admin import get_site_from_request, jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_language_list,
@@ -189,7 +186,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         This override is in place to preserve the "language" get parameter in
         the "Save" page redirect
         """
-        site = get_site(request)
+        site = get_site_from_request(request)
         preserved_filters_encoded = super().get_preserved_filters(request)
         preserved_filters = QueryDict(preserved_filters_encoded).copy()
         lang = get_site_language_from_request(request, site_id=site.pk)
@@ -249,7 +246,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if not self.has_view_permission(request, obj=page):
             raise PermissionDenied("No permission for actions menu")
 
-        site = get_site(request)
+        site = get_site_from_request(request)
         paste_enabled = request.GET.get("has_copy") or request.GET.get("has_cut")
         context = {
             "page": page,
@@ -294,13 +291,13 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         """
         can_change_any_page = page_permissions.user_can_change_at_least_one_page(
             user=request.user,
-            site=get_site(request),
+            site=obj.site,
             use_cache=False,
         )
 
         if can_change_any_page:
             query = self.get_preserved_filters(request)
-            post_url = admin_reverse("cms_pagecontent_changelist") + "?" + query
+            post_url = admin_reverse("cms_pagecontent_changelist") + "?" + query + "&site=" + str(obj.site_id)
         else:
             post_url = admin_reverse("index")
         return HttpResponseRedirect(post_url)
@@ -433,7 +430,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         target_id = data.get("target")
 
-        site = get_site(request)
+        site = get_site_from_request(request)
         user = request.user
         can_view_page = page_permissions.user_can_view_page(user, page, page.site)
 
@@ -612,7 +609,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             return jsonify_request(HttpResponseBadRequest("error"))
 
         user = request.user
-        site = get_site(request)
+        site = get_site_from_request(request)
         form = self.copy_form(request.POST or None, page=page, site=site)
 
         if not form.is_valid():
@@ -769,7 +766,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         if lang:
             preserved_filters["language"] = lang
-        if site and site.pk != settings.SITE_ID:
+        if site and site.pk != get_current_site(request).pk:
             preserved_filters["site"] = site.pk
         return preserved_filters.urlencode()
 
@@ -815,7 +812,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         the request.
         """
         form = super().get_form(request, obj, form=self.get_form_class(request, obj), **kwargs)
-        form._site = get_site(request)
+        form._site = get_site_from_request(request)
         form._request = request
         return form
 
@@ -856,9 +853,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return self.add_view(request)
 
     def add_view(self, request, form_url="", extra_context=None):
-        if request.method == "GET" and (redirect_response := needs_site_redirect(request)):
-            return redirect_response
-        site = get_site(request)
+        site = get_site_from_request(request)
         language = get_site_language_from_request(request, site_id=site.pk)
 
         if extra_context is None:
@@ -1041,20 +1036,43 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         )
         return has_perm
 
+    def get_sites_for_user(self, user):
+        from django.contrib.sites.models import Site
+
+        if hasattr(user, "_cms_user_sites"):
+            return user._cms_user_sites
+
+        sites = Site.objects.order_by("name")
+        if not get_cms_setting("PERMISSION") or user.is_superuser:
+            user._cms_user_sites = sites
+            return sites
+
+        _has_perm = page_permissions.user_can_change_at_least_one_page
+        user_sites = [site for site in sites if _has_perm(user, site)]
+        user._cms_user_sites = user_sites
+        return user_sites
+
+    def user_can_access_site(self, request):
+        site = get_site_from_request(request)
+        user_sites = self.get_sites_for_user(request.user)
+        return site in user_sites
+
+    def raise_site_permission_denied(self):
+        raise PermissionDenied(
+             _("You do not have permission to access this site. Please contact your administrator.")
+        )
+
     def changelist_view(self, request, extra_context=None):
         from django.contrib.admin.views.main import ERROR_FLAG
-
-        if redirect_response := needs_site_redirect(request):
-            return redirect_response
 
         if not self.has_change_permission(request, obj=None):
             raise PermissionDenied
 
-        site = get_site(request)
+        site = get_site_from_request(request)
         language = get_site_language_from_request(request, site_id=site.pk)
         query = request.GET.get("q", "")
         page_contents = self.get_queryset(request)
-        page_contents, _ = self.get_search_results(request, page_contents, query)
+        page_contents = self.get_search_results(request, page_contents, query)[0]
         changelist_form = self.changelist_form(request.GET)
 
         try:
@@ -1107,7 +1125,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 "admin": self,
                 "tree": {
                     "site": site,
-                    "sites": get_sites_for_user(request.user),
+                    "sites": self.get_sites_for_user(request.user),
                     "query": query,
                     "is_filtered": changelist_form.is_filtered(),
                     "items": pages,
@@ -1209,7 +1227,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         )
 
         message = _("Title and plugins with language %(language)s was deleted") % {
-            "language": force_str(get_language_object(obj.language)["name"])
+            "language": force_str(get_language_object(obj.language, site_id=obj.page.site_id)["name"])
         }
         messages.success(request, message)
         if obj.language in obj.page.admin_content_cache:
@@ -1260,7 +1278,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         Used for lazy loading pages in cms.pagetree.js
         """
-        site = get_site(request)
+        if not self.has_change_permission(request, obj=None):
+            raise PermissionDenied
+        site = get_site_from_request(request)
         pages = Page.objects.on_site(site).order_by("path")
         node_id = re.sub(r"[^\d]", "", request.GET.get("nodeId", "")) or None
         open_page_ids = [int(id) for id in request.GET.getlist("openNodes[]") if id.isdigit()]
@@ -1294,8 +1314,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         Used for rendering the page tree, inserts into context everything what
         we need for single item
         """
-        user = request.user
-        site = get_site(request)
+        if not self.has_change_permission(request, obj=None):
+            raise PermissionDenied
+        site = get_site_from_request(request)
         permissions_on = get_cms_setting("PERMISSION")
         template = get_template(self.page_tree_row_template)
         is_popup = IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET
@@ -1330,7 +1351,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 "follow_descendants": follow_descendants,
                 "site_languages": languages,
                 "is_popup": is_popup,
-                "has_add_page_permission": user_can_add(user, target=page),
+                "has_add_page_permission": user_can_add(request.user, target=page),
                 "has_change_permission": user_can_change(request.user, page, site),
                 "has_change_advanced_settings_permission": user_can_change_advanced(request.user, page, site),
                 "has_move_page_permission": has_move_page_permission,

@@ -62,7 +62,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
@@ -211,7 +210,7 @@ def create_page(
         if parent:
             site = parent.site
         else:
-            site = get_current_site()
+            site = Site.objects.get_current()  # Get the current site from settings
     else:
         assert isinstance(site, Site)
         if parent:
@@ -559,7 +558,7 @@ def assign_user_to_page(
     if global_permission:
         page_permission = GlobalPagePermission(user=user, can_recover_page=can_recover_page, **data)
         page_permission.save()
-        page_permission.sites.add(get_current_site())
+        page_permission.sites.add(page.site)
     return page_permission
 
 
