@@ -1,5 +1,6 @@
 // #############################################################################
 // SETTINGS
+@use "sass:list";
 
 $pagetree-mobile: $screen-mobile + 200px;
 $pagetree-box-shadow: 0 0 5px 0 rgba(var(--dca-shadow), 0.2);
@@ -43,8 +44,8 @@ $pagetree-anchor-padding: 12px 25px;
 $pagetree-anchor-padding-block: 12px 12px;
 $pagetree-anchor-padding-inline: 25px 25px;
 $pagetree-anchor-padding-with-icon: 12px 25px 12px 45px;
-$pagetree-anchor-padding-block-with-icon: 12px 12px; 
-$pagetree-anchor-padding-inline-with-icon: 45px 25px; 
+$pagetree-anchor-padding-block-with-icon: 12px 12px;
+$pagetree-anchor-padding-inline-with-icon: 45px 25px;
 $pagetree-nesting-padding: 20px;
 $pagetree-cell-padding: 7px 8px;
 $pagetree-cell-padding-block: 7px 7px;
@@ -69,4 +70,4 @@ $pagetree-search-width: 175px;
 // used for copy and paste
 $pagetree-dimmer: $sideframe-dimmer;
 
-$pagetree-cell-inner-height: $pagetree-cell-height - 2 * nth($pagetree-cell-padding, 1);
+$pagetree-cell-inner-height: $pagetree-cell-height - 2 * list.nth($pagetree-cell-padding, 1);

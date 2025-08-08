@@ -62,7 +62,7 @@
     top: $sideframe-buttons-position-top + $sideframe-buttons-offset;
     inset-inline-end: $sideframe-buttons-position-right;
     z-index: z(sideframe, buttons);
-    box-shadow: $toolbar-shadow;
+    box-shadow: none; // $toolbar-shadow;
     background-color: $white;
     border-radius: $border-radius-base;
     border: 1px solid $gray-lighter;

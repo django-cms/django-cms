@@ -1,32 +1,32 @@
 // #############################################################################
 // SETTINGS
 @use "sass:math";
+@use "sass:list";
+@use "sass:color";
 
 $speed-base: 200ms;
 
 // COLORS
-$white: var(--dca-white);
-$black: var(--dca-black);
-:root, :root[data-theme="light"], :root[data-theme="auto"] {
-    --dca-light-mode: 1;
-    --dca-dark-mode: 0;
-    --dca-white: #FFFFFF;
-    --dca-black: #000000;
-    --dca-shadow: 0, 0, 0;
-    --dca-primary: #00bbff;
-    --dca-gray: #666;
+:root {
+    color-scheme: dark light;
+    --dca-light-mode: light-dark(1, 0);
+    --dca-dark-mode: light-dark(0, 1);
+    --dca-white: light-dark(#FFF, #2A2C2E);
+    --dca-black: light-dark(#2A2C2E, #FFFFFF);
+    --dca-primary: light-dark(#2d4c4d, color-mix(in srgb, #2d4c4d, #fff 80%));
+    --dca-secondary: light-dark(#defcb9, color-mix(in srgb, #defcb9, #2A2C2E 80%));
+    --dca-red: #d44848;
+    --dca-gray: light-dark(#7c7c7c, #999);
+    --dca-gray-super-lightest: light-dark(#f7f7f7, #303030);
     --dca-gray-lightest: #f2f2f2;
-    --dca-gray-lighter: #ddd;
-    --dca-gray-light: #999;
-    --dca-gray-darker: #454545;
-    --dca-gray-darkest: #333;
-    --dca-gray-super-lightest: #f7f7f7;
-
-    --active-brightness: 0.9;
-    --focus-brightness: 0.95;
+    --dca-gray-lighter: light-dark(#ddd, #666);
+    --dca-gray-light: light-dark(#999, #888);
+    --dca-gray-darker: light-dark(#454545, #ddd);
+    --dca-gray-darkest: light-dark(#333, #eee);
+    --dca-border-radius: 40px;
 }
 
-:root, :root[data-theme="auto"] {
+:root[data-theme="auto"] {
     color-scheme: dark light;
 }
 
@@ -36,48 +36,15 @@ $black: var(--dca-black);
 
 :root[data-theme="dark"] {
     color-scheme: dark;
-    --dca-light-mode: 0;
-    --dca-dark-mode: 1;
-    --dca-white: #2A2C2E;
-    --dca-black: #FFF;
-    --dca-primary: #58D1FC;
-    --dca-gray: #ccc;
-    --dca-gray-lightest: #444;
-    --dca-gray-lighter: #666;
-    --dca-gray-light: #888;
-    --dca-gray-darker: #ddd;
-    --dca-gray-darkest: #eee;
-    --dca-gray-super-lightest: #333;
-
-    --active-brightness: 2;
-    --focus-brightness: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme]), :root[data-theme="auto"] {
-        --dca-light-mode: 0;
-        --dca-dark-mode: 1;
-        --dca-white: #2A2C2E;
-        --dca-black: #FFF;
-        --dca-primary: #58D1FC;
-        --dca-gray: #ccc;
-        --dca-gray-lightest: #444;
-        --dca-gray-lighter: #666;
-        --dca-gray-light: #888;
-        --dca-gray-darker: #ddd;
-        --dca-gray-darkest: #eee;
-        --dca-gray-super-lightest: #333;
-
-        --active-brightness: 2;
-        --focus-brightness: 1.5;
-    }
-}
-
+$white: var(--dca-white);
+$black: var(--dca-black);
 
 $color-primary: var(--dca-primary);
-$color-primary-fallback: #00bbff;
-$color-success: #693;
-$color-danger: #f00;
+$color-secondary: var(--dca-secondary);
+$color-success: var(--dca-green, #693);
+$color-danger: var(--dca-red, #f00);
 $color-warning: #c93;
 
 // COLORS gray
@@ -110,6 +77,8 @@ $line-height-normal: 20px;
 
 $border-radius-base: 3px;
 $border-radius-normal: 5px;
+$border-radius-buttons: var(--dca-border-radius);
+$border-radius-modal: calc(var(--dca-border-radius) / 2);
 
 $padding-base: 3px;
 $padding-normal: 10px;
@@ -195,8 +164,8 @@ $z-layers: (
 
 //##############################################################################
 // BUTTONS
-$btn-border-radius-base: $border-radius-base;
-$btn-active-shadow: inset 0 3px 5px rgba(var(--dca-shadow), 0.125);
+$btn-border-radius-base: $border-radius-buttons;
+$btn-active-shadow: inset 0 3px 5px color-mix(in srgb, $black, transparent 12.5%);
 
 $btn-default-color: $gray;
 $btn-default-bgcolor: $white;
@@ -207,8 +176,8 @@ $btn-action-bgcolor: $color-primary;
 $btn-action-border: $color-primary;
 
 $btn-caution-color: $white;
-$btn-caution-bgcolor: adjust-hue($color-danger, 15deg);
-$btn-caution-border: adjust-hue($color-danger, 15deg);
+$btn-caution-bgcolor: $color-danger;
+$btn-caution-border: hsl(from $color-danger calc(h + 15) s l);
 
 $btn-active-color: $white;
 $btn-active-bgcolor: $gray-darker;
@@ -218,7 +187,7 @@ $btn-active-border: $gray-darkest;
 //##############################################################################
 // Structureboard
 $structure-max-width: 980px;
-$structure-bgcolor: $gray-super-lightest;
+$structure-bgcolor: $color-secondary;
 
 $structure-dragbar-height: 44px;
 $structure-dragbar-color: $black;
@@ -268,7 +237,7 @@ $submenu-quicksearch-input-line-height: $submenu-quicksearch-input-font-size;
 // Tooltip
 $tooltip-font-size: $font-size-normal - 2px;
 $tooltip-padding: 5px 7px;
-$tooltip-line-height: $tooltip-font-size + 2 * nth($tooltip-padding, 1);
+$tooltip-line-height: $tooltip-font-size + 2 * list.nth($tooltip-padding, 1);
 $tooltip-icon-area-size: 22px;
 $tooltip-icon-size: 14px;
 $tooltip-first-line-color: $gray-lighter;
@@ -278,7 +247,7 @@ $tooltip-second-line-color: $white;
 //##############################################################################
 // Toolbar
 $toolbar-height: 46px; // has to be even number
-$toolbar-shadow: 0 0 5px rgba(var(--dca-shadow), 0.2);
+$toolbar-shadow: 0 0 5px color-mix(in srgb, $black 20%, transparent);
 $toolbar-left-space: 15px;
 $toolbar-border: $gray-lighter;
 
@@ -295,7 +264,7 @@ $toolbar-menu-item-hover-color: $white;
 $toolbar-menu-item-hover-bgcolor: $color-primary;
 
 $toolbar-dropdown-padding: 4px 0 3px;
-$toolbar-dropdown-shadow: 0 1.5px 1.5px rgba(var(--dca-shadow), 0.4);
+$toolbar-dropdown-shadow: 0 1.5px 1.5px color-mix(in srgb, $black 40%, transparent);
 $toolbar-dropdown-bgcolor: $white;
 $toolbar-dropdown-border-radius: $border-radius-base + 1px;
 
@@ -307,15 +276,15 @@ $toolbar-dropdown-item-icon-size: 10px;
 $toolbar-button-height: 30px;
 $toolbar-button-font-size: 12px;
 $toolbar-button-padding-horizontal: 12px;
-$toolbar-button-border-radius: $border-radius-base;
+$toolbar-button-border-radius: $border-radius-buttons;
 
 
 //##############################################################################
 // Modal
 $modal-header-title-font-size: $font-size-large;
-$modal-shadow: 0 0 20px rgba(var(--dca-shadow), .5);
+$modal-shadow: 0 0 10px 2px color-mix(in srgb, $black 25%, transparent);
 $modal-bgcolor: $white;
-$modal-border-radius: $border-radius-normal;
+$modal-border-radius: $border-radius-modal;
 
 $modal-header-height: $toolbar-height;
 $modal-breadcrumb-height: $toolbar-height - 6px;
@@ -346,13 +315,13 @@ $messages-color: white;
 $messages-font-size: 12px;
 $messages-line-height: 16px;
 $messages-border-radius: $border-radius-base;
-$messages-bgcolor: rgba(var(--dca-shadow), 0.74);
+$messages-bgcolor: color-mix(in srgb, $black 75%, transparent);
 $messages-font-weight: 200;
 $messages-close-area-size: 20px;
 $messages-close-icon-size: 10px;
 
 $screenblock-color: $white;
-$screenblock-bgcolor: rgba(var(--dca-shadow), 0.9);
+$screenblock-bgcolor: color-mix(in srgb, $color-primary 90%, transparent);
 $screenblock-inner-position: 300px;
 
 $login-form-input-font-size: $font-size-normal;
@@ -376,8 +345,8 @@ $sideframe-button-area-size: 32px;
 $sideframe-button-icon-size: 12px;
 $sideframe-button-space: 2px;
 $sideframe-resize-width: 15px;
-$sideframe-box-shadow: 10px 0 5px -5px rgba(var(--dca-shadow), 0.2);
-$sideframe-dimmer: rgba(var(--dca-shadow), 0.6);
+$sideframe-box-shadow: 10px 0 5px -5px color-mix(in srgb, $black 20%, transparent);
+$sideframe-dimmer: color-mix(in srgb, $black 60%, transparent);
 
 
 //##############################################################################
@@ -391,7 +360,7 @@ $hover-tooltip-padding: 6px 8px;
 //##############################################################################
 // Dropdown
 $dropdown-width: 180px;
-$dropdown-shadow: 0 0 10px rgba(var(--dca-shadow), 0.25);
+$dropdown-shadow: 0 0 10px color-mix(in srgb, $black 25%, transparent);
 $dropdown-item-height: 46px;
 $dropdown-item-icon-space: 40px;
 $dropdown-item-icon-position: 14px;

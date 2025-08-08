@@ -46,8 +46,8 @@
     }
     &-dirty {
         animation: pulsate 2.5s ease-out infinite;
-        border-color: $color-primary;
-        background-color: $color-primary;
+        border-color: $color-warning; // color-mix(in srgb, $color-secondary,  $color-primary 60%);
+        background-color: $color-warning; // color-mix(in srgb, $color-secondary,  $color-primary 60%);
     }
     &-deletion {
         border-color: $color-danger;

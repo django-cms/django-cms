@@ -1,6 +1,7 @@
 //##############################################################################
 // PAGETREE
 @use "sass:math";
+@use "sass:color";
 
 // INFO: please note that all related styles to the pagetree itself are
 // handled through theming after the "PAGETREE THEME" section in this file.
@@ -222,12 +223,12 @@
         border-radius: $border-radius-base;
 
         &:hover {
-            background: darken($color-primary-fallback, 5%) !important;
+            background: hsl(from $color-primary h s calc(l - 5)) !important;
         }
         &:active,
         &:focus {
             color: $white !important;
-            background: darken($color-primary-fallback, 15%) !important;
+            background: hsl(from $color-primary h s calc(l - 15)) !important;
         }
     }
     .cms-pagetree-header-filter {

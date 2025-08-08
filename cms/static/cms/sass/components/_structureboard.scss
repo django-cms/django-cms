@@ -267,15 +267,15 @@
             margin: 0;
             border: 2px solid $color-primary;
             border-radius: $border-radius-base;
-            background-color: rgba($color-primary-fallback, 20%);
+            background-color: color-mix(in srgb, $color-primary 20%, transparent);
             box-shadow: none;
             transform: translateY(0) !important;
             &:before {
                 display: none;
             }
             &.cms-draggable-disallowed {
-                border: 2px solid saturate($color-danger, 80%);
-                background: rgba($color-danger, 0.1);
+                border: 2px solid hsl(from $color-danger h calc(s + 80%) l);
+                background: color-mix(in srgb, $color-danger 10%, transparent);
             }
         }
         .cms-draggables-empty {
@@ -394,7 +394,7 @@
 
     .cms-draggable-selected .cms-dragitem,
     .cms-draggable-selected .cms-dragitem strong {
-        color: adjust-hue($color-primary-fallback, 15deg);
+        color: hsl(from color-primary calc(h + 15) s l);
     }
     .cms-draggable-selected .cms-draggable .cms-dragitem,
     .cms-draggable-selected .cms-draggable .cms-dragitem strong {
@@ -404,8 +404,8 @@
     .cms-draggable-allowed,
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: lighten($color-primary-fallback, 40%);
-        border-color: lighten($color-primary-fallback, 40%);
+        color: color-mix(rgba $color-primary, $white 40%);
+        border-color: color-mix(rgba $color-primary, $white 40%);
     }
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
@@ -415,9 +415,9 @@
 
     .cms-draggable-disallowed,
     .cms-draggable-hover-disallowed {
-        color: saturate($color-danger, 80%);
-        background: rgba($color-danger, 0.1);
-        box-shadow: 0 0 0 2px saturate($color-danger, 80%);
+        color: hsl(from $color-danger h calc(s + 80%) l);
+        background: color-mix(in srgb, $color-danger 10%, transparent);
+        box-shadow: 0 0 0 2px hsl(from $color-danger h calc(s + 80%) l);
         &:before {
             display: none;
         }
@@ -554,7 +554,7 @@
     left: -2px;
     z-index: z(structure, content, droppable);
     border: 1px solid $color-primary !important;
-    background: rgba($color-primary-fallback, 20%) !important;
+    background: color-mix(in srgb, $color-primary 20%, transparent) !important;
     border-radius: $border-radius-base;
     opacity: 0.6;
 

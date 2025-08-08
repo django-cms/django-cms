@@ -74,7 +74,7 @@ $wizard-input-size: 16px;
 
         &.active {
             border-color: $btn-action-border;
-            background: rgba($color-primary-fallback, 45%);
+            background: color-mix(in srgb, $color-primary 45%, transparent);
         }
     }
 }
