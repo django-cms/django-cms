@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Pro v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M560 64C551.2 64 544 71.2 544 80L544 183.8L507 144.7C458.4 93.2 390.8 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576C418.3 576 503.6 520.6 546.5 439.5C550.6 431.7 547.6 422 539.8 417.9C532 413.8 522.3 416.8 518.2 424.6C480.6 495.6 405.9 544 320 544C196.3 544 96 443.7 96 320C96 196.3 196.3 96 320 96C382 96 441.2 121.5 483.8 166.6L522.9 208L416 208C407.2 208 400 215.2 400 224C400 232.8 407.2 240 416 240L560 240C568.8 240 576 232.8 576 224L576 80C576 71.2 568.8 64 560 64z"/></svg>
