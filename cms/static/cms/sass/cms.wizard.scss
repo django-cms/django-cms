@@ -34,6 +34,7 @@ $wizard-input-size: 16px;
     }
     .choice {
         @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, false);
+        border-radius: $border-radius-modal;
         box-sizing: border-box;
         position: relative;
 
@@ -74,7 +75,7 @@ $wizard-input-size: 16px;
 
         &.active {
             border-color: $btn-action-border;
-            background: color-mix(in srgb, $color-primary 45%, transparent);
+            background: $color-secondary;
         }
     }
 }
