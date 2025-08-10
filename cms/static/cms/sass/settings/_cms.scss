@@ -9,13 +9,15 @@ $speed-base: 200ms;
 // COLORS
 :root {
     color-scheme: dark light;
-    --dca-light-mode: light-dark(1, 0);
-    --dca-dark-mode: light-dark(0, 1);
+    --dca-dark: #2d4c4d;
+    --dca-light: #defcb9;
     --dca-white: light-dark(#FFF, #2A2C2E);
     --dca-black: light-dark(#2A2C2E, #FFFFFF);
-    --dca-primary: light-dark(#2d4c4d, #defcb9);
-    --dca-secondary: light-dark(#defcb9, #2d4c4d);
+    --dca-primary: light-dark(var(--dca-dark), color-mix(in srgb, var(--dca-light), black 10%));
+    --dca-secondary: light-dark(var(--dca-light), var(--dca-dark));
     --dca-red: #d44848;
+    --dca-action-bg: var(--dca-secondary);
+    --dca-action-text: var(--dca-black);
     --dca-gray: light-dark(#7c7c7c, #aaa);
     --dca-gray-super-lightest: light-dark(#f7f7f7, #303030);
     --dca-gray-lightest: light-dark(#f7f7f7, #303030);
@@ -23,7 +25,31 @@ $speed-base: 200ms;
     --dca-gray-light: light-dark(#999, #888);
     --dca-gray-darker: light-dark(#454545, #ddd);
     --dca-gray-darkest: light-dark(#333, #eee);
-    --dca-border-radius: 40px;
+    --dca-border-radius: 20px;
+    --dca-btn-radius: 40px;
+    --dca-default-spacing: 2px;
+}
+
+:root[data-cms-theme="4"], :root[data-cms-theme="3"] {
+    --dca-dark: #00bbff;
+    --dca-light: color-mix(in srgb, var(--dca-dark), var(--dca-white) 55%);
+    --dca-white: light-dark(#FFF, #000);
+    --dca-black: light-dark(#000, #FFF);
+    --dca-primary: light-dark(var(--dca-dark), color-mix(in srgb, var(--dca-light), black 10%));
+    --dca-secondary: var(--dca-gray-lightest);
+    --dca-red: #d44848;
+    --dca-action-bg: var(--dca-primary);
+    --dca-action-text: var(--dca-white);
+    --dca-gray: light-dark(#7c7c7c, #aaa);
+    --dca-gray-super-lightest: light-dark(#f7f7f7, #303030);
+    --dca-gray-lightest: light-dark(#f7f7f7, #303030);
+    --dca-gray-lighter: light-dark(#ddd, #666);
+    --dca-gray-light: light-dark(#999, #888);
+    --dca-gray-darker: light-dark(#454545, #ddd);
+    --dca-gray-darkest: light-dark(#333, #eee);
+    --dca-border-radius: 5px;
+    --dca-btn-radius: 3px;
+    --dca-default-spacing: 0px;
 }
 
 :root[data-theme="auto"] {
@@ -46,7 +72,7 @@ $color-secondary: var(--dca-secondary);
 $color-success: var(--dca-green, #693);
 $color-danger: var(--dca-red, #f00);
 $color-warning: #c93;
-
+$color-cms3: light-dark(#00bbff, color-mix(in srgb,#00bbff, black 10%));
 // COLORS gray
 $gray:            var(--dca-gray); // lighten(#000, 40%); // #666;
 $gray-lightest:   var(--dca-gray-lightest); //lighten($gray, 55%); // #f2f2f2
@@ -77,8 +103,8 @@ $line-height-normal: 20px;
 
 $border-radius-base: 3px;
 $border-radius-normal: 5px;
-$border-radius-buttons: var(--dca-border-radius);
-$border-radius-modal: calc(var(--dca-border-radius) / 2);
+$border-radius-buttons: var(--dca-btn-radius);
+$border-radius-modal: var(--dca-border-radius);
 
 $padding-base: 3px;
 $padding-normal: 10px;
@@ -165,23 +191,23 @@ $z-layers: (
 //##############################################################################
 // BUTTONS
 $btn-border-radius-base: $border-radius-buttons;
-$btn-active-shadow: inset 0 3px 5px color-mix(in srgb, $black, transparent 12.5%);
+$btn-active-shadow: none ; // inset 0 3px 5px color-mix(in srgb, $black, transparent 12.5%);
 
 $btn-default-color: $gray;
 $btn-default-bgcolor: $white;
-$btn-default-border: $gray-lighter;
+$btn-default-border: $gray;
 
-$btn-action-color: $white;
-$btn-action-bgcolor: $color-primary;
-$btn-action-border: $color-primary;
+$btn-action-color: var(--dca-action-text);
+$btn-action-bgcolor: var(--dca-action-bg);
+$btn-action-border: $gray;
 
 $btn-caution-color: $white;
 $btn-caution-bgcolor: $color-danger;
-$btn-caution-border: hsl(from $color-danger calc(h + 15) s l);
+$btn-caution-border: $gray; // hsl(from $color-danger calc(h + 15) s l);
 
 $btn-active-color: $white;
 $btn-active-bgcolor: $gray-darker;
-$btn-active-border: $gray-darkest;
+$btn-active-border: $gray;
 
 
 //##############################################################################
@@ -283,7 +309,7 @@ $toolbar-button-border-radius: $border-radius-buttons;
 // Modal
 $modal-header-title-font-size: $font-size-large;
 $modal-shadow: 0 0 10px 2px color-mix(in srgb, $black 25%, transparent);
-$modal-bgcolor: $white;
+$modal-bgcolor: $color-secondary;
 $modal-border-radius: $border-radius-modal;
 
 $modal-header-height: $toolbar-height;

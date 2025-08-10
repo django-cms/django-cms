@@ -87,6 +87,7 @@
 
 .cms-modal-foot {
     position: absolute;
+    background-color: $white;
     overflow: hidden;
     clear: both;
     height: $modal-footer-height;
@@ -267,8 +268,9 @@
     .cancel-link {
         display: none;
     }
+    float: inline-end;
     &:has(.deletelink) {
-        float: inline-end;
+        float: inline-start;
     }
 }
 .cms-modal-item-buttons-left {

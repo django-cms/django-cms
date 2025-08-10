@@ -104,12 +104,12 @@
         position: relative;
         left: 0;
         top: 0;
-        padding: 8px 4px 8px 12px;
+        padding: 8px 4px 8px 10px;
         margin: 0;
     }
     .cms-icon-arrow-forward {
         @include icon(arrow-right);
-        padding: 8px 12px 8px 4px;
+        padding: 8px 10px 8px 4px;
     }
     // disabled state if there is no history
     .cms-icon-disabled {

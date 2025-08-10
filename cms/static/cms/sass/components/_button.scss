@@ -9,7 +9,7 @@ $pagetree: false !default;
 .cms-btn-action {
     @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, $pagetree);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: var(--dca-default-spacing);
 }
 .cms-btn-caution {
     @include button-variant($btn-caution-color, $btn-caution-bgcolor, $btn-caution-border, $pagetree);
