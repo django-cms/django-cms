@@ -5,7 +5,7 @@
     height: $pagetree-lang-size;
     border-radius: 100%;
     // will change according to states
-    border: 2px solid $white;
+    border: 1px solid $white;
     background: $white;
     vertical-align: top;
 }
@@ -46,8 +46,8 @@
     }
     &-dirty {
         animation: pulsate 2.5s ease-out infinite;
-        border-color: $color-warning; // color-mix(in srgb, $color-secondary,  $color-primary 60%);
-        background-color: $color-warning; // color-mix(in srgb, $color-secondary,  $color-primary 60%);
+        border-color: $color-cms3;
+        background-color: $color-cms3;
     }
     &-deletion {
         border-color: $color-danger;

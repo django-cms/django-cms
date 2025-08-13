@@ -126,7 +126,7 @@
         .cms-dragbar-toggler {
             position: absolute;
             inset-inline-end: 0;
-            background-image: linear-gradient(to right, rgba($structure-bgcolor, 0) 0, $structure-bgcolor 40px);
+            background-image: linear-gradient(to right, $structure-bgcolor 0, $structure-bgcolor 40px);
             padding-inline-start: 50px;
             font-weight: normal;
             text-transform: uppercase;

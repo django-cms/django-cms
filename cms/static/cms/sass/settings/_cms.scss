@@ -329,7 +329,8 @@ $loader-bgcolor: $white;
 //##############################################################################
 // Dialog
 $dialog-width: 500px;
-$dialog-border-radius: $border-radius-normal;
+$dialog-border-radius: $border-radius-modal;
+$dialog-bgcolor: $color-secondary;
 $dialog-shadow: $modal-shadow;
 
 
