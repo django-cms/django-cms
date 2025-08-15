@@ -599,7 +599,7 @@
 
     .cms-tree-item-inner > a {
         display: block;
-        height: $pagetree-icon-size + 4;
+        height: $pagetree-icon-size;
     }
 
     .cms-icon {
@@ -608,7 +608,7 @@
 
     .cms-icon:before {
         display: block;
-        font-size: $pagetree-icon-size + 4;
+        font-size: $pagetree-icon-size;
         color: $gray-darker;
     }
     .cms-icon-check-square:before {
