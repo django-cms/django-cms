@@ -72,7 +72,7 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             request = self.get_request()
 
-        site = get_current_site()
+        site = get_current_site(request)
         data = {
             'title': 'page 1',
             'slug': 'page_1',
