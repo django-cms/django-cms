@@ -25,7 +25,7 @@ $pagetree: true;
 
 a.btn.cms-action-btn {
     @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, $pagetree);
-color: $black;
+    color: $black;
     position: relative;
     display: inline-flex;
     padding: 0 !important;
