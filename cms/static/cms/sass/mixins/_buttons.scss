@@ -14,6 +14,7 @@
         @return string.unquote('');
     }
 }
+
 @mixin button-variant($color, $background, $border, $important: false) {
     background-image: none important($important);
     margin-bottom: 0; // For input.btn
@@ -32,22 +33,43 @@
     }
     &:hover {
         color: $color important($important);
-        background-color: color-mix(in srgb, $background, $black 10%) important($important);
+        @if($background == $white) {
+            background-color: color-mix(in srgb, $background, $color-secondary 40%) important($important);
+        } @else {
+            background-color: color-mix(in srgb, $background, $black 10%) important($important);
+        }
         border-color: color-mix(in srgb, $border, $black 10%) important($important);
         text-decoration: none important($important);
     }
     &:active,
     &.cms-btn-active {
         color: $color important($important);
-        background-color: color-mix(in srgb, $background, $black 15%) important($important);
+        @if($background == $white) {
+            background-color: $color-secondary important($important);
+        } @else {
+            background-color: color-mix(in srgb, $background, $black 15%) important($important);
+        }
         border-color: color-mix(in srgb, $border, $black 15%) important($important);
         box-shadow: $btn-active-shadow important($important);
 
-        &:hover,
+        &:hover {
+            color: $color important($important);
+            @if($background == $white) {
+                background-color: color-mix(in srgb, $color-secondary, $black 10%) important($important);
+            } @else {
+                background-color: color-mix(in srgb, $background, $black 10%) important($important);
+            }
+            border-color: color-mix(in srgb, $border, $black 10%) important($important);
+            text-decoration: none important($important);
+        }
         &:focus,
         &.focus {
             color: $color important($important);
-            background-color: color-mix(in srgb, $background, $black 20%) important($important);
+            @if($background == $white) {
+                background-color: $color-secondary important($important);
+            } @else {
+                background-color: color-mix(in srgb, $background, $black 20%) important($important);
+            }
             border-color: color-mix(in srgb, $border, $black 25%) important($important);
         }
     }

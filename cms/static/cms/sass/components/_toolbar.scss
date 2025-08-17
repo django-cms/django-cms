@@ -91,7 +91,7 @@
     }
     .cms-toolbar .cms-btn-action {
         background-color: $toolbar-debug-bgcolor;
-        border-color: $toolbar-debug-bgcolor;
+        border-color: $toolbar-debug-border;
         color: black;
         &:active,
         &:focus {
