@@ -34,7 +34,7 @@
     &:hover {
         color: $color important($important);
         @if($background == $white) {
-            background-color: color-mix(in srgb, $background, $color-secondary 40%) important($important);
+            background-color: color-mix(in srgb, $background, $color-secondary 50%) important($important);
         } @else {
             background-color: color-mix(in srgb, $background, $black 10%) important($important);
         }
