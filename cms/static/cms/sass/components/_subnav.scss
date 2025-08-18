@@ -89,6 +89,7 @@
     z-index: z(structure, content, dropdown);
     min-width: $dropdown-width;
     background: $submenu-dropdown-bgcolor;
+    border: $submenu-dropdown-border;
     border-radius: $border-radius-normal;
     box-shadow: $dropdown-shadow;
     inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
@@ -159,7 +160,7 @@
             &:hover,
             &:focus {
                 cursor: default !important;
-                opacity: 0.2;
+                opacity: 0.33;
                 color: $submenu-item-color !important;
                 background: none !important;
                 box-shadow: none;
@@ -184,6 +185,7 @@
         margin-inline-start: math.div(-$dropdown-arrow-side, 2);
         transform: rotate(45deg);
         background-color: $submenu-dropdown-bgcolor;
+        border: $submenu-dropdown-border;
         box-shadow: $dropdown-shadow;
     }
 
