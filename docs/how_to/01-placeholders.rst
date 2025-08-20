@@ -128,6 +128,30 @@ The view in which you render your placeholder field must return the :class:`requ
 endpoints require a view to render an object. This method takes the request and the
 object as parameter (see example below: ``render_my_model``).
 
+Setting and getting the placeholder-enabled object from the toolbar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The toolbar provides two important methods for managing the object associated with placeholder editing.
+These methods are essential for enabling the toolbar's Edit and Preview buttons when working 
+with models that contain placeholders.
+
+**set_object(obj)**
+    Associates a Django model instance with the toolbar. This method only sets the object if 
+    one hasn't already been set. The object is typically a model instance that contains 
+    placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any 
+    other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
+    
+    The associated object is used by other toolbar methods to generate appropriate URLs for 
+    editing, preview, and structure modes.
+
+**get_object()**
+    Returns the object currently associated with the toolbar, or ``None`` if no object has 
+    been set. This method can be used to retrieve the object that was previously set using 
+    ``set_object()``.
+
+Usage in Views
+^^^^^^^^^^^^^^
+
 If the object has a user-facing view it typically is identical to the preview and
 editing endpoints, but has to get the object from the URL (e.g., by its primary key).
 **It also needs to set the toolbar object, so that the toolbar will have Edit and
@@ -153,6 +177,16 @@ Preview buttons:**
         request.toolbar.set_object(obj)  # Announce the object to the toolbar
         return render_my_model(request, obj)  # Same as preview rendering
 
+You can also retrieve the object from the toolbar in your views using the ``get_object()`` method:
+
+.. code-block:: python
+
+    def my_view(request):
+        my_content = request.toolbar.get_object()  # Can be anything: PageContent, PostContent, AliasContent, etc.
+        if my_content:
+            my_post = my_content.post  # only works for PostContent, of course
+        # ... rest of your view logic
+
 .. note::
 
     If using class based views, you can set the toolbar object in the ``get_context_data``
@@ -174,28 +208,23 @@ Preview buttons:**
         def my_model_endpoint_view(request, my_model):
             return MyModelDetailView.as_view()(request, pk=my_model.pk)
 
-Toolbar Object Management
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage in Templates
+^^^^^^^^^^^^^^^^^^
 
-The toolbar provides two important methods for managing the object associated with placeholder editing:
+You can also access the toolbar object directly in templates:
 
-**set_object(obj)**
-    Associates a Django model instance with the toolbar. This method only sets the object if 
-    one hasn't already been set. The object is typically a model instance that contains 
-    placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any 
-    other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
-    
-    The associated object is used by other toolbar methods to generate appropriate URLs for 
-    editing, preview, and structure modes.
+.. code-block:: html+django
 
-**get_object()**
-    Returns the object currently associated with the toolbar, or ``None`` if no object has 
-    been set. This method can be used to retrieve the object that was previously set using 
-    ``set_object()``.
+    {# Access the object directly #}
+    {{ request.toolbar.get_object.title }}
 
-These methods are essential for enabling the toolbar's Edit and Preview buttons when working 
-with models that contain placeholders. As shown in the examples above, you typically call 
-``request.toolbar.set_object(obj)`` in your view to announce the object to the toolbar.
+    {# Use with template tag for more complex operations #}
+    {% with my_obj=request.toolbar.get_object %}
+        {% if my_obj %}
+            <h2>{{ my_obj.title }}</h2>
+            <p><strong>{{ my_obj.description }}</strong></p>
+        {% endif %}
+    {% endwith %}
 
 .. note::
 
