@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.db import models
 from django.http import HttpRequest
 from django.urls import NoReverseMatch
@@ -282,6 +283,35 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
 
     with force_language(language):
         return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+
+
+def get_object_live_url(obj: models.Model, language: str = None, site: Optional[Site] = None) -> str:
+    """
+    Returns the live url of the given object. The object must be frontend-editable
+    and registered as such with cms.
+
+    If the object has a language property, the language parameter is ignored.
+    If the object - or its grouper - has no site property, the site argument is ignored.
+    """
+
+    language = getattr(obj, "language", language)  # Object trumps parameter
+    if language is None:
+        language = get_language()
+
+    with force_language(language):
+        absolute_url = obj.get_absolute_url() = ContentType.objects.get_for_model(obj)
+
+    obj_site = getattr(obj, 'site', None)
+    if obj_site is None:
+        try:
+            grouper_field = apps.get_app_config('cms').cms_extension[obj.__class__][0]
+            obj_site = getattr(obj, grouper_field, None)
+        except KeyError:
+            pass
+    if obj_site != site:
+        absolute_url = f"//{obj_site.domain}{absolute_url}" if obj_site else absolute_url
+
+    return absolute_url
 
 
 def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> Optional[models.Model]:
