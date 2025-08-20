@@ -174,6 +174,29 @@ Preview buttons:**
         def my_model_endpoint_view(request, my_model):
             return MyModelDetailView.as_view()(request, pk=my_model.pk)
 
+Toolbar Object Management
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The toolbar provides two important methods for managing the object associated with placeholder editing:
+
+**set_object(obj)**
+    Associates a Django model instance with the toolbar. This method only sets the object if 
+    one hasn't already been set. The object is typically a model instance that contains 
+    placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any 
+    other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
+    
+    The associated object is used by other toolbar methods to generate appropriate URLs for 
+    editing, preview, and structure modes.
+
+**get_object()**
+    Returns the object currently associated with the toolbar, or ``None`` if no object has 
+    been set. This method can be used to retrieve the object that was previously set using 
+    ``set_object()``.
+
+These methods are essential for enabling the toolbar's Edit and Preview buttons when working 
+with models that contain placeholders. As shown in the examples above, you typically call 
+``request.toolbar.set_object(obj)`` in your view to announce the object to the toolbar.
+
 .. note::
 
     If you want to render plugins from a specific language, you can use the tag like
