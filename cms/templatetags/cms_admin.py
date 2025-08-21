@@ -11,8 +11,7 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
-from cms.models import Page
-from cms.models.contentmodels import PageContent
+from cms.models import Page, PageContent, Placeholder
 from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
@@ -277,3 +276,9 @@ def submit_row_plugin(context):
     if context.get('original') is not None:
         ctx['original'] = context['original']
     return ctx
+
+@register.filter
+def placeholder_is_editable(placeholder, user):
+    if isinstance(placeholder, Placeholder):
+        return placeholder.check_source(user)
+    return False

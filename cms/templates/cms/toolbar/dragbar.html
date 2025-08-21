@@ -1,6 +1,6 @@
-{% load i18n l10n cms_tags %}
+{% load i18n l10n cms_tags cms_admin %}
 <div class="cms-dragbar cms-dragbar-{{ placeholder.pk|unlocalize }}">
-    {% if object_is_immutable %}
+    {% if object_is_immutable or not placeholder|placeholder_is_editable:request.user %}
         <div class="cms-submenu-btn cms-submenu-add cms-btn cms-btn-disabled">
             <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "You do not have permission to edit this item" %}"></span>
         </div>
@@ -16,7 +16,7 @@
             {% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
                 <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
             {% endif %}{% endfor %}
-            {% if object_is_immutable %}
+            {% if object_is_immutable or not placeholder|placeholder_is_editable:request.user %}
                 <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="paste" href="#">{% trans "Paste" %}</a></div>
                 <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="bin" href="#">{% trans "Empty all" %}</a></div>
             {% else %}
