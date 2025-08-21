@@ -6,7 +6,7 @@ from django.db import transaction
 
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import EmptyPageContent, Page, PageContent, PageUrl, StaticPlaceholder
+from cms.models import EmptyPageContent, Page, PageContent, PageUrl
 from cms.utils import get_language_list
 from cms.utils.page import get_available_slug
 from cms.utils.plugins import copy_plugins_to_placeholder
