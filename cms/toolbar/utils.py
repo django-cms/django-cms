@@ -142,7 +142,6 @@ def get_plugin_tree(
             collect_plugin_data(root_plugin)
             context = {
                 'plugin': root_plugin,
-                'placeholder': root_plugin.placeholder,
                 'request': request,
                 'clipboard': copy_to_clipboard,
                 'cms_toolbar': toolbar,

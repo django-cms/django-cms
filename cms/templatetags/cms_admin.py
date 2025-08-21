@@ -278,7 +278,7 @@ def submit_row_plugin(context):
     return ctx
 
 @register.filter
-def placeholder_is_editable(placeholder, user):
+def placeholder_is_immutable(placeholder, user):
     if isinstance(placeholder, Placeholder):
-        return placeholder.check_source(user)
-    return False
+        return not placeholder.check_source(user)
+    return True

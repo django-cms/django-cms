@@ -546,7 +546,6 @@ class CMSToolbarBase(BaseToolbar):
 
         context = {
             'cms_toolbar': self,
-            'object_is_immutable': not self.object_is_editable(),
             'cms_renderer': renderer,
             'cms_edit_url': self.get_object_edit_url(),
             'cms_preview_url': self.get_object_preview_url(),

@@ -1,15 +1,15 @@
-{% load i18n l10n cms_tags cms_admin %}
+{% load i18n l10n cms_tags %}
 
 {% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins %}
 <div  class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
-    {% if object_is_immutable or not placeholder|placeholder_is_editable:request.user%}cms-drag-disabled{% endif %}
+    {% if object_is_immutable %}cms-drag-disabled{% endif %}
     {% if not allow_children %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
 
     <div class="cms-dragitem cms-dragitem-handler
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% if not disabled_child %}
-            {% if object_is_immutable or not placeholder|placeholder_is_editable:request.user %}
+            {% if object_is_immutable %}
                 <div class="cms-submenu-btn cms-submenu-edit cms-btn cms-btn-disabled">
                     <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You do not have permission to edit this item" %}"></span>
                 </div>
@@ -19,8 +19,8 @@
                 </div>
             {% endif %}
             <div class="cms-submenu-btn cms-submenu-add cms-btn
-                {% if not allow_children or object_is_immutable or not placeholder|placeholder_is_editable:request.user %} cms-btn-disabled{% endif %}">
-                {% if not allow_children or object_is_immutable or not placeholder|placeholder_is_editable:request.user %}
+                {% if not allow_children or object_is_immutable %} cms-btn-disabled{% endif %}">
+                {% if not allow_children or object_is_immutable %}
                 <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You cannot add plugins to this plugin." %}"></span>
                 {% else %}
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Add plugin" %}"></span>
@@ -35,9 +35,9 @@
         {% endif %}
         <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
             <div class="cms-dropdown-inner">
-                <div class="cms-submenu-item{% if object_is_immutable or not placeholder|placeholder_is_editable:request.user %} cms-submenu-item-disabled{% endif %}"><a data-cms-icon="cut" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
+                <div class="cms-submenu-item{% if object_is_immutable %} cms-submenu-item-disabled{% endif %}"><a data-cms-icon="cut" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
                 <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy" href="#">{% trans "Copy" %}</a></div>
-                {% if object_is_immutable or not placeholder|placeholder_is_editable:request.user %}
+                {% if object_is_immutable %}
                     <div class="cms-submenu-item cms-submenu-item-disabled">
                         <a data-cms-icon="paste" href="#">{% trans "Paste" %}</a>
                     </div>

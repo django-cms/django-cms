@@ -63,19 +63,21 @@
         <div class="cms-structure-content" data-touch-action="pan-y">
         {% if cms_renderer.load_structure %}
             {% for placeholder in cms_renderer.get_rendered_editable_placeholders %}
-            <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
-                {% include cms_toolbar.templates.dragbar_template with placeholder=placeholder %}
-                {% if object_is_immutable or not placeholder|placeholder_is_editable:request.user %}
-                <div class="cms-draggables cms-draggables-root cms-drag-disabled">
-                {% else %}
-                <div class="cms-draggables cms-draggables-root">
-                {% endif %}
-                    <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
-                    {% for plugin in placeholder.get_cached_plugins %}
-                        {% include cms_toolbar.templates.drag_item_template with plugin=plugin placeholder=placeholder %}
-                    {% endfor %}
-                </div>
-            </div>
+               {% with object_is_immutable=placeholder|placeholder_is_immutable:request.user %}
+                    <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
+                        {% include cms_toolbar.templates.dragbar_template with placeholder=placeholder object_is_immutable=object_is_immutable %}
+                        {% if object_is_immutable %}
+                        <div class="cms-draggables cms-draggables-root cms-drag-disabled">
+                        {% else %}
+                        <div class="cms-draggables cms-draggables-root">
+                        {% endif %}
+                            <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
+                            {% for plugin in placeholder.get_cached_plugins %}
+                                {% include cms_toolbar.templates.drag_item_template with plugin=plugin object_is_immutable=object_is_immutable %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endwith %}
             {% endfor %}
         {% endif %}
         </div>
