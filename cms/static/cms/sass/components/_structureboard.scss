@@ -450,7 +450,7 @@
             display: none !important;
         }
     }
-    .cms-drag-disabled.cms-draggable .cms-dragitem {
+    .cms-drag-disabled.cms-draggable > .cms-dragitem {
         // Remove drag handle from read-only dragables
         background-image: none;
     }
