@@ -1,7 +1,7 @@
 import operator
 import warnings
 from collections import OrderedDict
-from typing import Union
+from typing import Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -21,7 +21,7 @@ from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
-from cms.models import Placeholder
+from cms.models import EmptyPageContent, Placeholder
 from cms.utils.conf import get_cms_setting
 
 RANGE_START = 128
@@ -43,7 +43,7 @@ def get_context():
         return {}
 
 
-def get_placeholder_conf(setting, placeholder, template=None, default=None):
+def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str] = None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
@@ -52,21 +52,24 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
 
     CMS_PLACEHOLDER_CONF[None] (global)
     CMS_PLACEHOLDER_CONF['template'] (if template is given)
-    CMS_PLACEHOLDER_CONF['placeholder']
+    CMS_PLACEHOLDER_CONF['placeholder'] (where placeholder denotes a slot)
     CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
+
+    Template is only evaluated if the placeholder configuration contains key with ".html" or ".htm"
     """
 
     if placeholder:
         keys = []
         placeholder_conf = get_cms_setting("PLACEHOLDER_CONF")
+        template_in_conf = any(".htm" in (key or "") for key in placeholder_conf) and template
         # 1st level
-        if template:
+        if template_in_conf:
             keys.append(f"{template} {placeholder}")
         # 2nd level
         keys.append(placeholder)
         # 3rd level
-        if template:
-            keys.append(template)
+        if template_in_conf:
+            keys.append(str(template))
         # 4th level
         keys.append(None)
         for key in keys:
@@ -122,6 +125,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
                 "value": plugin.value,
                 "name": names.get(plugin.value, plugin.name),
                 "module": modules.get(plugin.value, plugin.module),
+                "add_form": plugin.show_add_form and not plugin.disable_edit,
             }
         )
     return sorted(main_list, key=operator.itemgetter("module"))
@@ -141,55 +145,6 @@ def validate_placeholder_name(name):
             "users, please use the CMS_PLACEHOLDER_CONF setting with the 'name' "
             "key to specify a verbose name."
         )
-
-
-class PlaceholderNoAction:
-    can_copy = False
-
-    def copy(self, **kwargs):
-        return False
-
-    def get_copy_languages(self, **kwargs):
-        return []
-
-
-class MLNGPlaceholderActions(PlaceholderNoAction):
-    can_copy = True
-
-    def copy(
-        self,
-        target_placeholder,
-        source_language,
-        fieldname,
-        model,
-        target_language,
-        **kwargs,
-    ):
-        from cms.utils.plugins import copy_plugins_to_placeholder
-
-        trgt = model.objects.get(**{fieldname: target_placeholder})
-        src = model.objects.get(master=trgt.master, language_code=source_language)
-
-        source_placeholder = getattr(src, fieldname, None)
-        if not source_placeholder:
-            return False
-        return copy_plugins_to_placeholder(
-            source_placeholder.get_plugins_list(),
-            placeholder=target_placeholder,
-            language=target_language,
-        )
-
-    def get_copy_languages(self, placeholder, model, fieldname, **kwargs):
-        manager = model.objects
-        src = manager.get(**{fieldname: placeholder})
-        query = Q(master=src.master)
-        query &= Q(**{"%s__cmsplugin__isnull" % fieldname: False})
-        query &= ~Q(pk=src.pk)
-
-        language_codes = (
-            manager.filter(query).values_list("language_code", flat=True).distinct()
-        )
-        return [(lc, dict(settings.LANGUAGES)[lc]) for lc in language_codes]
 
 
 def restore_sekizai_context(context, changes):
@@ -407,7 +362,7 @@ def rescan_placeholders_for_obj(obj):
     return existing
 
 
-def get_declared_placeholders_for_obj(obj: Union[models.Model, None]) -> list[Placeholder]:
+def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent, None]) -> list[Placeholder]:
     """Returns declared placeholders for an object. The object is supposed to either have a method
     ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
@@ -430,7 +385,7 @@ def get_declared_placeholders_for_obj(obj: Union[models.Model, None]) -> list[Pl
 
 
 def get_placeholder_from_slot(
-    placeholder_relation: models.Manager, slot: str, template_obj=None
+    placeholder_relation: models.Manager, slot: str, template_obj=None, default_width: Optional[int] = None
 ) -> Placeholder:
     """Retrieves the placeholder instance for a PlaceholderRelationField either by scanning the template
     of the template_obj (if given) or by creating or getting a Placeholder in the database
@@ -442,9 +397,8 @@ def get_placeholder_from_slot(
         try:
             return placeholder_relation.get(slot=slot)
         except Placeholder.DoesNotExist:
-            rescan_placeholders_for_obj(template_obj)
-            return placeholder_relation.placeholders.get(slot=slot)
+            return rescan_placeholders_for_obj(template_obj).get(slot)
     else:
         # Gets or creates the placeholder in any model. Placeholder is
         # rendered by {% render_placeholder %}
-        return placeholder_relation.get_or_create(slot=slot)[0]
+        return placeholder_relation.get_or_create(slot=slot, default_width=default_width)[0]

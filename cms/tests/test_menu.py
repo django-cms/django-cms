@@ -10,7 +10,7 @@ from django.utils.translation import activate, override as force_language
 
 from cms.api import create_page, create_page_content
 from cms.apphook_pool import apphook_pool
-from cms.cms_menus import get_visible_nodes, get_visible_page_contents
+from cms.cms_menus import get_visible_page_contents
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, PageContent
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (
@@ -34,7 +34,7 @@ from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_languages
+from cms.utils.i18n import get_default_language_for_site
 from menus.base import NavigationNode
 from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
 from menus.models import CacheKey
@@ -1173,6 +1173,30 @@ class MenuTests(BaseMenuTest):
             tpl.render(context)
             nodes = context["children"]
             self.assertEqual(len(nodes), 0)
+
+    def test_menu_renderer_language_code_handling(self):
+        """
+        Tests that MenuRenderer correctly handles language code determination:
+        1. Uses request.LANGUAGE_CODE if available
+        2. Falls back to site's default language if LANGUAGE_CODE not set
+        """
+        site = Site.objects.get_current()
+
+        # Test with LANGUAGE_CODE set in request
+        request = self.get_request("/")
+        request.LANGUAGE_CODE = "fr"  # Set a specific language code
+        renderer = menu_pool.get_renderer(request)
+        self.assertEqual(renderer.request_language, "fr")
+
+        # Test fallback when LANGUAGE_CODE not set
+        request = self.get_request("/")
+        # Ensure request has no LANGUAGE_CODE
+        if hasattr(request, "LANGUAGE_CODE"):
+            delattr(request, "LANGUAGE_CODE")
+        renderer = menu_pool.get_renderer(request)
+        # Should fall back to site's default language
+        expected_language = get_default_language_for_site(site.pk)
+        self.assertEqual(renderer.request_language, expected_language)
 
 
 @override_settings(CMS_PERMISSION=False)

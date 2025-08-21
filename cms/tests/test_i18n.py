@@ -1,4 +1,3 @@
-from collections import deque
 from importlib import import_module
 from unittest.mock import patch
 
@@ -7,11 +6,6 @@ from django.template.context import Context
 from django.test.utils import override_settings
 
 from cms import api
-from cms.plugin_rendering import (
-    ContentRenderer,
-    LegacyRenderer,
-    StructureRenderer,
-)
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
 from cms.views import details
@@ -454,14 +448,13 @@ class TestLanguageFallbacks(CMSTestCase):
         with patch("cms.views.render_pagecontent") as mock_render:
             # normal page
             path = page.get_absolute_url(language="en")
-            request = self.get_request(path)
+            request = self.get_request(path, "en")
             details(request, slug=page.get_path("en"))
             mock_render.assert_called_once_with(
                 request,
                 page.get_content_obj()
             )
-            # check that the french plugins will render
-            context = Context({'request': request})
+            context = Context({'request': self.get_request(path, "fr")})
             rendered_placeholder = self._render_placeholder(page_ph_fr, context)
             self.assertEqual(rendered_placeholder, "Hello, world!")
 
@@ -506,6 +499,7 @@ class TestLanguageFallbacks(CMSTestCase):
         self.assertEqual(response_fr.status_code, 200)
         response_en = self.client.get(page.get_absolute_url(language="en"))
         self.assertRedirects(response_en, page.get_absolute_url(language="fr"))
+
 
 @override_settings(
     LANGUAGE_CODE='en',

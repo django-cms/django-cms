@@ -1,15 +1,8 @@
 ##########
 django CMS
 ##########
-.. image:: https://img.shields.io/pypi/v/django-cms.svg
-    :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://img.shields.io/badge/wheel-yes-green.svg
-    :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://img.shields.io/pypi/l/django-cms.svg
-    :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://codeclimate.com/github/divio/django-cms/badges/gpa.svg
-   :target: https://codeclimate.com/github/divio/django-cms
-   :alt: Code Climate
+
+|PyPiVersion| |PyVersion| |DjVersion| |License| |Coverage|
 
 Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_).
 
@@ -22,7 +15,7 @@ Because django CMS is a community-driven project, we welcome everyone to `get in
 
 .. ATTENTION::
 
-    Please use the ``develop-4`` branch as the target for pull requests for on-going development.
+    Please use the ``main`` branch as the target for pull requests for on-going development.
 
     Security fixes will be backported to older branches by the core team as appropriate.
 
@@ -72,7 +65,7 @@ Documentation
 Our documentation working group maintains documentation for several versions of the project. Key versions are:
 
 * `stable <http://docs.django-cms.org>`_ (default), for the **current release** version
-* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **develop-4 branch**
+* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **main branch**
 
 For more information about our branch policy, see `Branches
 <http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
@@ -130,3 +123,16 @@ Credits
 * Many thanks to
   `all the contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_
   to django CMS!
+
+.. |PyPiVersion| image:: https://img.shields.io/pypi/v/django-cms.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+.. |PyVersion| image:: https://img.shields.io/pypi/pyversions/django-cms
+    :target: https://pypi.python.org/pypi/django-cms/
+    :alt: PyPI - Python Version
+.. |DjVersion| image:: https://img.shields.io/pypi/frameworkversions/django/django-cms
+    :alt: PyPI - Versions from Framework Classifiers
+.. |License| image:: https://img.shields.io/github/license/django-cms/django-cms.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+    :alt: License
+.. |Coverage| image:: https://codecov.io/gh/django-cms/django-cms/graph/badge.svg?token=Jyx7Ilpibf 
+ :target: https://codecov.io/gh/django-cms/django-cms

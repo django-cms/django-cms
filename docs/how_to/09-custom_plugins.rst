@@ -272,6 +272,117 @@ another.
 See the GitHub issue `copy_relations() does not work for relations between cmsplugins
 #4143 <https://github.com/django-cms/django-cms/issues/4143>`_ for more details.
 
+
+Adding a model to an existing custom plugin
+-------------------------------------------
+
+When enhancing an existing django CMS plugin with additional functionality, you might need to
+associate a database model with the plugin. This allows the plugin to store and manage data
+persistently. However, introducing a model to an existing plugin requires careful handling to
+prevent the disappearance of existing plugin instances, as discussed in `Issue #7476`_.
+
+1. **Define the Model**:
+
+   In your application's `models.py`, define a model that inherits from `CMSPlugin`. This model
+   will store the plugin's data. To allow for automatic migration later, make sure that all model
+   fields have meaningful defaults.
+
+   .. code-block:: python
+
+       from django.db import models
+       from cms.models.pluginmodel import CMSPlugin
+
+       class MyPluginModel(CMSPlugin):
+           title = models.CharField(max_length=100, default='Default Title')  # Add defaults
+           # Add other fields as needed
+
+           def __str__(self):
+               return self.title
+
+2. **Update the Plugin Class**:
+
+   In your `cms_plugins.py`, associate the plugin with the newly created model by setting the `model` attribute.
+
+   .. code-block:: python
+
+       from cms.plugin_base import CMSPluginBase
+       from cms.plugin_pool import plugin_pool
+       from django.utils.translation import gettext_lazy as _
+       from .models import MyPluginModel
+
+       @plugin_pool.register_plugin
+       class MyPlugin(CMSPluginBase):
+           model = MyPluginModel
+           name = _("My Plugin")
+           render_template = "my_app/my_plugin_template.html"
+           # Configure other attributes as needed
+
+3. **Create Migrations**:
+
+   Generate the necessary database migrations to reflect the new model. Do not apply them yet, since
+   the migrations will need an additional script to run.
+
+   .. code-block:: bash
+
+       python manage.py makemigrations
+
+4. **Handle Existing Plugin Instances**:
+
+   After adding a model to an existing plugin, existing instances will not automatically
+   associate with the new model, leading to their disappearance in the CMS interface. To address
+   this, use a migration script to convert existing plugin instances to the new model.
+
+   This script can be added to the migration just created in step 3.
+
+    .. code-block:: python
+
+       def add_model_to_plugin(apps, schema_editor):
+           """ Adds instances for the new model.
+           ATTENTION: All fields of the model must have a valid default value!"""
+
+           # Adjust the following two lines
+           model = app.get_model("my_app", "MyGreatPluginModel")  # Name of the plugin's new model class
+           plugin_type = "MyGreatPlugin"  # Name of the plugin class
+
+           CMSPlugin = apps.get_model("cms", "CMSPlugin")
+
+           plugin_instances = CMSPlugin.objects.filter(plugin_type=plugin_type)
+           for plugin_instance in plugin_instances:
+               logger.info('Creating new model instance for plugin instance %s', plugin_instance.pk)
+               obj = model()
+               obj.pk = plugin_instance.pk
+               obj.cmsplugin_ptr = plugin_instance
+               obj.plugin_type = plugin_type
+               obj.placeholder = plugin_instance.placeholder
+               obj.parent = plugin_instance.parent
+               obj.language = plugin_instance.language
+               obj.position = plugin_instance.position
+               obj.creation_date = plugin_instance.creation_date
+               obj.save()
+
+       class Migration(migrations.Migration):
+           ...
+
+           operations = [
+               ...,
+               migrations.RunPython(add_model_to_plugin),  # Add at the end of migration operations
+           ]
+
+   This script migrates existing plugin instances to the new model structure, preserving data integrity.
+
+5. **Run the migrations**:
+
+   Apply the modified migration.
+
+   .. code-block:: bash
+
+       python manage.py makemigrations
+
+   After applying migrations, thoroughly test the plugin to ensure that existing instances appear correctly
+   and that the new model functionalities work as intended.
+
+.. _Issue #7476: https://github.com/django-cms/django-cms/issues/7476
+
 Advanced
 --------
 
@@ -342,6 +453,17 @@ django-sekizai, please refer to the `django-sekizai documentation`_.
 Note that sekizai **can't** help you with the **admin-side** plugin templates - what
 follows is for your plugins' **output templates**.
 
+Inline JavaScrip code
++++++++++++++++++++++
+
+django CMS does not enforce a specific way to include JavaScript code in your plugins.
+Inline JavaScript code is a potential security risk, so it is recommended to avoid it
+where possible. Since version 4.2 django CMS itself has removed any inline JavaScript
+from its code base to allow for meaningful Content Security Policy (CSP) headers to be
+set. **It is good practice to avoid inline JavaScript in your plugins as well.**
+If your project's CSP policy does not allow inline JavaScript, inline JavaScript
+provided through Sekizai also will not be executed.
+
 Sekizai style
 +++++++++++++
 
@@ -390,45 +512,34 @@ A **bad** example:
         });
     </script>{% endaddtoblock %}
 
-.. note::
-
-    If the Plugin requires javascript code to be rendered properly, the class
-    ``'cms-execute-js-to-render'`` can be added to the script tag. This will download
-    and execute all scripts with this class, which weren't present before, when the
-    plugin is first added to the page. If the javascript code is protected from
-    prematurely executing by the EventListener for the event ``'load'`` and/or
-    ``'DOMContentLoaded'``, the following classes can be added to the script tag:
-
-    =========================================== =============================
-    Classname                                   Corresponding javascript code
-    =========================================== =============================
-    cms-trigger-event-document-DOMContentLoaded ``document.dispatchEvent(new
-                                                Event('DOMContentLoaded')``
-    cms-trigger-event-window-DOMContentLoaded   ``window.dispatchEvent(new
-                                                Event('DOMContentLoaded')``
-    cms-trigger-event-window-load               ``window.dispatchEvent(new
-                                                Event('load')``
-    =========================================== =============================
-
-    The events will be triggered once after all scripts are successfully injected into
-    the DOM.
 
 .. note::
+
+    Due to the faster way of updating content in edit mode, ``<script>`` tags do
+    not need to be marked with classes like ``cms-trigger-event-document-DOMContentLoaded``,
+    ``cms-trigger-event-window-DOMContentLoaded``, or ``cms-trigger-event-window-load`` as  in
+    earlier versions of django CMS. Each script in the Sekizai ``js`` block is now executed in
+    the order they are defined in the template. After all scripts have been loaded and executed, the
+    document's ``DOMContentLoaded``, the window's ``load`` events are triggered. The
+    ``cms-content-refresh`` jQuery event on the window is also triggered for backwards
+    compatibility.
 
     Some plugins might need to run a certain bit of javascript after a content refresh.
-    In such a case, you can use the ``cms-content-refresh`` event to take care of that,
-    by adding something like:
+    This is why after a content refresh in edit mode, the ``document.DOMContentLoaded``,
+    ``window.load`` events and -- for backward compatibility -- the ``cms-content-refresh``
+    jQuery event are triggered. We encourage to use the ``window.load`` event for your
+    plugin's javascript code that needs to be run after a content refresh. Since this events
+    is triggered both on initial load and on updates (of potentially different plugins), you
+    should make sure that running the event listener multiple times on one plugin should
+    not cause any issues.
 
-    .. code-block:: html+django
+    .. code-block:: javascript
 
-        {% if request.toolbar and request.toolbar.edit_mode_active %}
-            <script>
-            CMS.$(window).on('cms-content-refresh', function () {
-                // Here comes your code of the plugin's javascript which
-                // needs to be run after a content refresh
-            });
-            </script>
-        {% endif %}
+        window.on('load', function () {
+            // Here comes your code of the plugin's javascript which
+            // needs to be run after a content refresh
+        });
+
 
 .. _plugin-context-processors:
 

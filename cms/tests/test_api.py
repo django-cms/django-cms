@@ -5,8 +5,8 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
+from djangocms_text.cms_plugins import TextPlugin
+from djangocms_text.models import Text
 
 from cms.api import (
     _verify_plugin_type,

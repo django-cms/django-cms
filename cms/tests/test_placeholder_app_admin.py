@@ -131,7 +131,7 @@ class AppAdminTest(AppAdminTestCase):
     def test_no_global_limit_check_same_placeholder_move(self):
         """
         Ensures no global limit exception is raised
-        when moving plugins inside of a placeholder.
+        when moving plugins inside a placeholder.
         """
         superuser = self.get_superuser()
         source_placeholder = self._obj.placeholder
@@ -347,7 +347,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
             data = {'post': True}
 
             response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 302)
+            self.assertContains(response, '<div class="success"></div>')
             self.assertFalse(CMSPlugin.objects.filter(pk=plugin.pk).exists())
 
     def test_user_cant_delete_plugin(self):
@@ -536,7 +536,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, {'test': 0})
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
 
     def test_user_cant_clear_empty_placeholder(self):
         """
@@ -572,7 +572,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, {'test': 0})
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
             self.assertEqual(placeholder.get_plugins('en').count(), 0)
 
     def test_user_cant_clear_non_empty_placeholder(self):

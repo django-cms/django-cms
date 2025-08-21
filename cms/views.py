@@ -19,7 +19,7 @@ from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
-from django.utils.translation import activate, get_language_from_request
+from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
@@ -33,7 +33,7 @@ from cms.page_rendering import (
     _render_welcome_page,
     render_pagecontent,
 )
-from cms.toolbar.utils import get_object_preview_url, get_object_structure_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import is_editable_model
@@ -116,10 +116,11 @@ def details(request, slug):
         user_languages = get_public_languages(site_id=site.pk)
 
     request_language = None
-    if is_language_prefix_patterns_used():
-        request_language = get_language_from_request(request, check_path=True)
+    if hasattr(request, "LANGUAGE_CODE"):
+        # use language from middleware - usually django.middleware.locale.LocaleMiddleware
+        request_language = request.LANGUAGE_CODE
     if not request_language:
-        request_language = get_default_language_for_site(get_current_site().pk)
+        request_language = get_default_language_for_site(site.pk)
 
     if not page.is_home and request_language not in user_languages:
         # The homepage is treated differently because
@@ -250,7 +251,11 @@ def render_object_structure(request, content_type_id, object_id):
         raise Http404 from err
 
     try:
-        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+        if issubclass(content_type.model_class(), PageContent):
+            content_type_obj = PageContent._base_manager.select_related("page").get(pk=object_id)
+            request.current_page = content_type_obj.page
+        else:
+            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist as err:
         raise Http404 from err
 
@@ -258,8 +263,6 @@ def render_object_structure(request, content_type_id, object_id):
         'object': content_type_obj,
         'cms_toolbar': request.toolbar,
     }
-    if isinstance(content_type_obj, PageContent):
-        request.current_page = content_type_obj.page
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
@@ -294,7 +297,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
             content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
             request.current_page = content_type_obj.page
             if (
-                content_type_obj.page.application_urls and  # noqa: W504
+                content_type_obj.page.application_urls and
                 content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
             ):
                 try:
@@ -323,10 +326,9 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
 
-    if request.user.is_staff and toolbar.edit_mode_active:
-        redirect = getattr(content_type_obj, "redirect", None)
-        if isinstance(redirect, str):
-            toolbar.redirect_url = redirect
+    redirect = getattr(content_type_obj, "redirect", None)
+    if isinstance(redirect, str):
+        toolbar.redirect_url = redirect
 
     if require_editable and not toolbar.object_is_editable():
         # If not editable, switch from edit to preview endpoint

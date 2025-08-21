@@ -16,7 +16,6 @@ from cms.test_utils.project.extensionapp.models import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.urlutils import admin_reverse
 
 
@@ -419,29 +418,6 @@ class ExtensionAdminTestCase(CMSTestCase):
         with self.login_user_context(self.admin):
             response = self.client.get(f'{self.page.get_absolute_url()}?edit')
             self.assertIn("TestItem", response.rendered_content)
-        toolbar_pool.toolbars = old_toolbars
-
-    def test_deprecated_title_extension(self):
-        urls = []
-        old_toolbars = deepcopy(toolbar_pool.toolbars)
-
-        class SampleExtensionToolbar2(ExtensionToolbar):
-            model = MyPageContentExtension
-            def populate(self):
-                nonlocal urls
-                urls = self.get_title_extension_admin()
-
-        toolbar_pool.register(SampleExtensionToolbar2)
-
-        message = "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin"
-        with self.login_user_context(self.admin):
-            self.failUnlessWarns(
-                RemovedInDjangoCMS43Warning,
-                message,
-                lambda: self.client.get(self.page.get_absolute_url()),
-            )
-
-        self.assertEqual(len(urls), 2)
         toolbar_pool.toolbars = old_toolbars
 
     def test_admin_title_extension(self):

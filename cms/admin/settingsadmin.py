@@ -4,8 +4,6 @@ from functools import update_wrapper
 from urllib.parse import urlparse
 
 from django.contrib import admin
-from django.contrib.admin import ModelAdmin
-from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
 from django.http import (
     HttpResponse,
@@ -14,17 +12,20 @@ from django.http import (
 )
 from django.http.request import QueryDict
 from django.urls import Resolver404, path, re_path, resolve
+from django.utils.decorators import method_decorator
 from django.utils.html import conditional_escape
 from django.utils.translation import override
+from django.views.decorators.csrf import csrf_protect
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
+from cms.models.contentmodels import PageContent
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
 
 @admin.register(UserSettings)
-class SettingsAdmin(ModelAdmin):
+class SettingsAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         def wrap(view):
@@ -42,7 +43,7 @@ class SettingsAdmin(ModelAdmin):
             re_path(r'^(.+)/$', wrap(self.change_view), name='%s_%s_change' % info),
         ]
 
-    @csrf_protect_m
+    @method_decorator(csrf_protect)
     @transaction.atomic
     def change_view(self, request, id=None):
         model = self.model
@@ -80,10 +81,10 @@ class SettingsAdmin(ModelAdmin):
         cms_path = form_data.get('cms_path') or request.path_info
         origin_url = urlparse(cms_path)
         attached_obj = form_data.get('attached_obj')
-        current_page = get_page_from_request(request, use_path=origin_url.path, clean_path=True)
-
-        if attached_obj and current_page and not (attached_obj == current_page):
-            return HttpResponseBadRequest('Generic object does not match current page')
+        if isinstance(attached_obj, PageContent):
+            current_page = attached_obj.page
+        else:
+            current_page = get_page_from_request(request, use_path=origin_url.path, clean_path=True)
 
         data = QueryDict(query_string=origin_url.query, mutable=True)
         placeholders = request.GET.getlist("placeholders[]")
@@ -136,5 +137,3 @@ class SettingsAdmin(ModelAdmin):
         Return empty perms dict thus hiding the model from admin index.
         """
         return {}
-
-

@@ -23,6 +23,9 @@ sys.path.append(os.path.abspath('./'))
 
 import django
 
+from djangocms_ecosystem import write_LTS_table, write_current_LTS, write_plugin_table
+
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
 django.setup()
 
@@ -283,7 +286,7 @@ latex_documents = [
 #     extensions.append("sphinxcontrib.spelling")
 
 # Spelling language.
-spelling_lang = 'en_GB'
+spelling_lang = 'en_US'
 
 # Location of word list.
 spelling_word_list_filename = 'spelling_wordlist'
@@ -294,3 +297,23 @@ spelling_ignore_pypi_package_names = True
 #https://github.com/sphinx-contrib/spelling/blob/master/sphinxcontrib/spelling/filters.py
 #See https://sphinxcontrib-spelling.readthedocs.io/en/latest/customize.html#word-filters
 spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]
+
+os.makedirs("autogenerate", exist_ok=True)
+
+with open("autogenerate/compatibility.include", "w") as f:
+    write_LTS_table(f)
+
+with open("autogenerate/lts.include", "w") as f:
+    write_current_LTS(f, current=True)
+
+with open("autogenerate/past_lts.include", "w") as f:
+    write_current_LTS(f, current=False)
+
+with open("autogenerate/plugins.include", "w") as f:
+    write_plugin_table(f, deprecated=False)
+
+with open("autogenerate/deprecated_plugins.include", "w") as f:
+    write_plugin_table(f, deprecated=True)
+
+with open("autogenerate/third-party.include", "w") as f:
+    write_plugin_table(f, chapter="Third-party packages", deprecated=False)

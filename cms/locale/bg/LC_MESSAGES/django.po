@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Fabian Braun <fsbraun@gmx.de>, 2023
+# Ivaylo Nakov, 2025
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -11,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
+"Last-Translator: Ivaylo Nakov, 2025\n"
 "Language-Team: Bulgarian (https://app.transifex.com/divio/teams/58664/bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,7 +84,7 @@ msgid "Redirects to this URL."
 msgstr "Пренасочва към този URL адрес"
 
 msgid "Start typing..."
-msgstr ""
+msgstr "Започни да пишеш..."
 
 msgid "menu visibility"
 msgstr "видимост на менюто"
@@ -110,7 +111,7 @@ msgid "A page with this reverse URL id exists already."
 msgstr "Страница с този обратен URL адрес вече съществува."
 
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Невалидна стойност за конфигурацията на приложението"
 
 msgid "An application instance using this configuration already exists."
 msgstr ""
@@ -120,13 +121,13 @@ msgid "An application instance with this name already exists."
 msgstr "Друга инстанция на това приложение с това има вече съществува."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Не можете да преместите началната страница в друга страница"
 
 msgid "Yes"
-msgstr ""
+msgstr "Да"
 
 msgid "No"
-msgstr ""
+msgstr "Не"
 
 msgid "user"
 msgstr "потребител"
@@ -147,26 +148,36 @@ msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
+"Потребителите не могат да създадат страница без права за промяна на "
+"създадената страница. Нужни са права за \"Промяна\"."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"Потребителите не могат да изтрият страница без права за промяна на "
+"страницата. Нужни са права за \"Промяна\"."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
+"Потребителите не могат да приложат права за страницата без права за промяна "
+"на страницата. Нужни са права за \"Промяна\"."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
+"Потребителите не могат да премахнат правата за страницата без права за "
+"промяна на страница. Нужни са права за \"Промяна\"."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
+"Потребителите не могат да създадат правата за страница без права за промяна "
+"на създадените права. Нужни са права за \"Промяна\"."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
@@ -175,26 +186,26 @@ msgstr ""
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Невалиден тип плъгин '%s'"
 
 msgid "Language must be set to a supported language!"
 msgstr "Избрания език трябва да бъде един от поддържаните!"
 
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "Езикът на родителския плъгин трябва да бъде същия като език!"
 
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "Позицията на плъгинът трябва да е по-голяма от %(position)d"
 
 msgid "Advanced Settings"
 msgstr "Разширени настройки"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "Тази страница не може да бъде начална."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
@@ -202,7 +213,7 @@ msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Не може да изтрие%(name)s"
 
 msgid "Are you sure?"
 msgstr "Сигурни ли сте?"
@@ -218,24 +229,26 @@ msgstr ""
 "страницата."
 
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Грешка! Нямате права да копирате тази страница."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
+"Грешка! Страницата, която поставяте, не е преведена на никой от езиците, "
+"конфигурирани в сайтът."
 
 msgid "You do not have permission to edit this page"
 msgstr "Вие нямате право да редактирате тази страница"
 
 msgid "Add Page Copy"
-msgstr ""
+msgstr "Добави копие на страница"
 
 msgid "New sub page"
-msgstr ""
+msgstr "Нова подстраница"
 
 msgid "New page"
-msgstr ""
+msgstr "Нова страница"
 
 msgid "Database error"
 msgstr "Грешка в базата данни"
@@ -250,26 +263,26 @@ msgid "You do not have permission to copy these plugins."
 msgstr "Нямате право да копирате тези плъгини."
 
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "Нямате права да изтриете тази страница"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Заглавието и добавките на %(language)s език бяха изтрити"
 
 msgid "You do not have permission to change a page's navigation status"
-msgstr ""
+msgstr "Нямате права да промените статусът на навигацията на страницата"
 
 msgid "You cannot change this page's navigation status"
-msgstr ""
+msgstr "Не можете да промените статуса на навигацията на страницата"
 
 msgid "Public content"
-msgstr ""
+msgstr "Публично съдържание"
 
 msgid "Empty"
 msgstr "Празно"
 
 msgid "Create Content"
-msgstr ""
+msgstr "Създай съдържание"
 
 msgid "View restriction"
 msgstr "Вижте забраната"
@@ -279,7 +292,7 @@ msgstr "Вижте забраните"
 
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "Поле %sне е намерено"
 
 msgid "You do not have permission to edit this item"
 msgstr "Нямате право да редактирате този елемент"
@@ -288,7 +301,7 @@ msgid "You do not have permission to add a plugin"
 msgstr "Нямате право да слагате добавки."
 
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "Нямате права да копирате този плейсхолдър."
 
 msgid "Plugin not found"
 msgstr "Плъгинът не е намерен"
@@ -297,33 +310,33 @@ msgid "You do not have permission to edit this plugin"
 msgstr "Нямате право да редактирате този плъгин"
 
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "Нямате права да поставите този плъгин"
 
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "Нямате права да поставите този плейсхолдър"
 
 msgid "You have no permission to move this plugin"
 msgstr "Нямате право да местите тази добавка."
 
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "Нямате права да изрежете този плъгин"
 
 msgid "You do not have permission to delete this plugin"
 msgstr "Нямате право да триете тази добавка."
 
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "%(name)sплъгинът \"%(obj)s\" беше изтрит успешно."
 
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "Нямате права да изчистите този плейсхолдър"
 
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "Плейсхолдърът \"%(obj)s\" беше изчистен успешно."
 
 msgid "placeholder"
-msgstr ""
+msgstr "плейсхолдър"
 
 msgid "Page permissions"
 msgstr "Права за страницата"
@@ -335,45 +348,50 @@ msgid "Page permissions management"
 msgstr "Управление на правата за страницата"
 
 msgid "Actions"
-msgstr ""
+msgstr "Действия"
 
 msgid "Empty content"
-msgstr ""
+msgstr "Празно съдържание"
 
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "%(object_name)sСвойства"
 
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "Добави нов %(object_name)s"
 
 msgid "Add content"
-msgstr ""
+msgstr "Добави съдържание"
 
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"Съдържанието за текущия език беше променено. Натиснете \"Отмяна\", за да се "
+"върнете към формата и да запазите промените. Натиснете \"ОК\", за да "
+"отмените промените."
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "Добави %(language)sсъдържание"
 
 msgid "Preview"
 msgstr "Преглед"
 
 msgid "Settings"
-msgstr ""
+msgstr "Настройки"
 
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
+"Невалиден език %(value)s. Тази форма не може да бъде обработена. Опитайте да"
+" промените езиците."
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<unspecified>"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
@@ -383,7 +401,7 @@ msgid "django CMS"
 msgstr "Django CMS"
 
 msgid "Placeholder"
-msgstr ""
+msgstr "Плейсхолдър"
 
 msgid "Alias"
 msgstr ""
@@ -398,7 +416,7 @@ msgid ""
 msgstr ""
 
 msgid "Create"
-msgstr ""
+msgstr "Създай"
 
 msgid "Edit"
 msgstr "редактирай"
@@ -413,7 +431,7 @@ msgid "Sites"
 msgstr "сайтове"
 
 msgid "Admin Sites"
-msgstr ""
+msgstr "Админски сайтове"
 
 msgid "Administration"
 msgstr "Администрация на сайта"
@@ -428,17 +446,17 @@ msgid "Clear clipboard"
 msgstr ""
 
 msgid "Disable toolbar"
-msgstr ""
+msgstr "Деактивирайте лентата с инструменти"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Преки пътища..."
 
 msgid "Users"
 msgstr "Потребители"
 
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "Излез %s"
 
 msgid "Logout"
 msgstr "Изход"
@@ -447,21 +465,21 @@ msgid "Language"
 msgstr "Език"
 
 msgid "Add Translation"
-msgstr ""
+msgstr "Добави превод"
 
 msgid "Delete Translation"
-msgstr ""
+msgstr "Изтрий превод"
 
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Копирай всички плъгини"
 
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "от %s"
 
 #, python-format
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Сигурни ли сте, че искате да копирате всички плъгини от %s?"
 
 msgid "Pages"
 msgstr "страници"
@@ -470,7 +488,7 @@ msgid "Page"
 msgstr "Страница"
 
 msgid "Create Page"
-msgstr ""
+msgstr "Създай страница"
 
 msgid "New Page"
 msgstr "Нова страница"
@@ -503,10 +521,10 @@ msgid "Delete page"
 msgstr "искане за изтриване"
 
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "Създай нова страница до текущата."
 
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "Създай страница под текущата."
 
 msgid "Select a valid site"
 msgstr "Изберете валиден сайт"
@@ -519,17 +537,22 @@ msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
+"Страница %(conflict_page)sима същия url '%(url)s' като текущата страница "
+"\"%(instance)s\"."
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
+"Страница %(conflict_page)sима същия url '%(url)s' като текущата страница."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
+"Незадължително. Ако бъде добавено, ще бъде автоматично добавено към нов "
+"текстови плъгин."
 
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "Задайте заглавие на новата страница."
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr ""
@@ -541,10 +564,10 @@ msgid "Please provide a valid slug."
 msgstr ""
 
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Нямате нужните права за добавяне на страница."
 
 msgid "ID"
-msgstr ""
+msgstr "Идентификатор"
 
 msgid "position"
 msgstr "позиция"
@@ -670,7 +693,7 @@ msgid "description"
 msgstr "описание"
 
 msgid "The text displayed in search engines."
-msgstr ""
+msgstr "Показаният текст в търсачките."
 
 msgid "redirect"
 msgstr "пренасочване"
@@ -679,10 +702,10 @@ msgid "The template used to render the content."
 msgstr "Шаблон използван за показването на съдържанието."
 
 msgid "page content"
-msgstr ""
+msgstr "съдържание на страница"
 
 msgid "page contents"
-msgstr ""
+msgstr "съдържания на страница"
 
 msgid "default"
 msgstr "по подразбиране"
@@ -725,7 +748,7 @@ msgid "frontend view restriction"
 msgstr "ограничение при разглеждане през публичния интерфейс"
 
 msgid "Please select user or group."
-msgstr ""
+msgstr "Моля, изберете потребител или група."
 
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
@@ -848,43 +871,43 @@ msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
 msgid "Moved"
-msgstr ""
+msgstr "Преместено"
 
 msgid "Changed"
-msgstr ""
+msgstr "Променено"
 
 msgid "Deleted"
-msgstr ""
+msgstr "Изтрито"
 
 msgid "Added Page Translation"
-msgstr ""
+msgstr "Добавен Превод на Страница"
 
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "Променен Превод на Страница"
 
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "Изтрит Превод на Страница"
 
 msgid "Added Plugin"
-msgstr ""
+msgstr "Добавен плъгин"
 
 msgid "Changed Plugin"
-msgstr ""
+msgstr "Променен плъгин"
 
 msgid "Moved Plugin"
-msgstr ""
+msgstr "Преместен плъгин"
 
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "Изтрит плъгин"
 
 msgid "Cut Plugin"
-msgstr ""
+msgstr "Изрежи плъгин"
 
 msgid "Paste Plugin"
-msgstr ""
+msgstr "Постави плъгин"
 
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "Постави в Плейсхолдър"
 
 msgid "Added plugins to placeholder from clipboard"
 msgstr ""
@@ -897,6 +920,8 @@ msgstr "Запази"
 
 msgid "Some fields cannot be changed since they are read-only content."
 msgstr ""
+"Някои от полетата не могат да бъдат променени, защото са с непроменливо "
+"съдържание."
 
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
@@ -913,7 +938,7 @@ msgid "Password:"
 msgstr "Парола:"
 
 msgid "Add a page"
-msgstr ""
+msgstr "Добави страница"
 
 msgid "Change a page"
 msgstr "Редактиране на страница"
@@ -975,7 +1000,7 @@ msgid "Page doesn't inherit any permissions."
 msgstr "Страницата не наследява права."
 
 msgid "Edit model"
-msgstr ""
+msgstr "Редактирай модел"
 
 msgid "Save as new"
 msgstr "Запази като нов"
@@ -990,22 +1015,22 @@ msgid "Cut"
 msgstr "Отрежи"
 
 msgid "Paste"
-msgstr ""
+msgstr "Постави"
 
 msgid "Set as home"
-msgstr ""
+msgstr "Задай като начало"
 
 msgid "Permissions"
 msgstr "Права"
 
 msgid "is restricted"
-msgstr ""
+msgstr "е ограничен"
 
 msgid "last change by"
-msgstr ""
+msgstr "последна промяна от"
 
 msgid "last change on"
-msgstr ""
+msgstr "последна промяна на"
 
 msgid "meta"
 msgstr ""
@@ -1014,10 +1039,10 @@ msgid "List of pages"
 msgstr "Списък със страниците"
 
 msgid "Search"
-msgstr ""
+msgstr "Търси"
 
 msgid "Page Tree"
-msgstr ""
+msgstr "Дърво на страница"
 
 msgid "Reset filter"
 msgstr ""
@@ -1030,30 +1055,32 @@ msgid ""
 msgstr ""
 
 msgid "Main Navigation"
-msgstr ""
+msgstr "Главна Навигация"
 
 msgid "Options"
-msgstr ""
+msgstr "Опции"
 
 msgid "Successfully moved"
 msgstr "Успешно преместено"
 
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "Промяна в дървото може да изисква обновяване."
 
 msgid "Error:"
-msgstr ""
+msgstr "Грешка:"
 
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
 msgstr ""
+"Тази страница не може да бъде копирана, защото апликацията е закачена към "
+"нея. Виж допълнителните настройки на страницата, за да менажираш apphooks."
 
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "Сигурни ли сте, че искате да § тази страница?"
 
 msgid "Reload"
-msgstr ""
+msgstr "Презареди"
 
 msgid "New node"
 msgstr ""
@@ -1062,10 +1089,10 @@ msgid "nodes"
 msgstr ""
 
 msgid "View"
-msgstr ""
+msgstr "Преглед"
 
 msgid "Menu"
-msgstr ""
+msgstr "Меню"
 
 #, python-format
 msgid ""
@@ -1086,16 +1113,16 @@ msgid "Close"
 msgstr "Затвори"
 
 msgid "Legend"
-msgstr ""
+msgstr "Легенда"
 
 msgid "In menu"
-msgstr ""
+msgstr "В меню"
 
 msgid "Not in menu"
-msgstr ""
+msgstr "Не е в меню"
 
 msgid "View page"
-msgstr ""
+msgstr "Покажи страница"
 
 msgid "Softroot"
 msgstr ""
@@ -1108,13 +1135,13 @@ msgid "Application: %(apphook)s"
 msgstr "Приложение: %(apphook)s"
 
 msgid "in menu"
-msgstr ""
+msgstr "в меню"
 
 msgid "not in menu"
-msgstr ""
+msgstr "не е в меню"
 
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "Настройки на страницата (SHIFT клик за разширени настройки)"
 
 msgid "This page has no preview!"
 msgstr ""
@@ -1124,40 +1151,41 @@ msgid ""
 msgstr ""
 
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "Пренасочва към:"
 
 msgid "Clipboard"
 msgstr ""
 
 msgid "Add plugin"
-msgstr ""
+msgstr "Добави плъгин"
 
 msgid "Copy all"
-msgstr ""
+msgstr "Копирай всички"
 
 msgid "Copy from"
-msgstr ""
+msgstr "Копирай от"
 
 msgid "Empty all"
-msgstr ""
+msgstr "Премахни всички"
 
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Филтрирай плъгини..."
 
 msgid "This is a static placeholder"
-msgstr ""
+msgstr "Това е статичен плейсхолдър"
 
 msgid "Expand all"
-msgstr ""
+msgstr "Разпъни всички"
 
 msgid "Collapse all"
-msgstr ""
+msgstr "Свий всички"
 
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "Не можете да добавите плъгини към този плъгин."
 
 msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr ""
+"Този плъгин не може да бъде преместен или редактиран извън родителя си"
 
 msgid "Clipboard is empty."
 msgstr ""
@@ -1181,66 +1209,70 @@ msgid "Login"
 msgstr "Вписване"
 
 msgid "Add plugin to"
-msgstr ""
+msgstr "Добави плъгин към"
 
 msgid "More"
-msgstr ""
+msgstr "Повече"
 
 #, python-format
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
 msgstr ""
+"Програмна версия използващо Django CMS %(cms_version)s, "
+"Django%(django_version)s, Python%(python_version)s"
 
 msgid "Cancel"
 msgstr "Отказ"
 
 msgid "The following error occured:"
-msgstr ""
+msgstr "Грешка:"
 
 msgid "Action successful."
-msgstr ""
+msgstr "Успех."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Наистина ли искате да изтриете тази добавка?"
 
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "Сигурен ли сте, че искате да публикувате тази страница?"
 
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Плъгинът ще бъде добавен тук"
 
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Имате незапазени промени."
 
 msgid "Loading"
-msgstr ""
+msgstr "Зареждане"
 
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Сигурен ли сте, че искате да премахнете тези промени?"
 
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
 msgstr ""
+"Тази форма не може да бъде заредена. Моля, проверете дали сървърът работи "
+"правилно."
 
 msgid "Most used"
-msgstr ""
+msgstr "Най-използван"
 
 msgid "Shortcuts"
-msgstr ""
+msgstr "Преки пътища"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "Тази страница беше променена, презареждане..."
 
 msgid "CMS-wide Shortcuts"
 msgstr ""
 
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Покажи помощния диалогов прозорец"
 
 msgid "Close/cancel"
-msgstr ""
+msgstr "Затвори"
 
 msgid "Toggle structure mode"
 msgstr ""
@@ -1252,59 +1284,61 @@ msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Фокусирай лентата с инструменти"
 
 msgid "Focus on placeholders"
 msgstr ""
 
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Навигирай към следващия/предишния елемент"
 
 msgid "Focus on plugins of placeholder"
 msgstr ""
 
 msgid "Edit plugin"
-msgstr ""
+msgstr "Редактирай плъгин"
 
 msgid "Open actions menu"
-msgstr ""
+msgstr "Отворете меню с действия"
 
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Разпъни/свий"
 
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
+"<strong>Неуспешен опит за влизане в системата.</strong> Моля, проверете "
+"вашите имейл и парола и опитайте отново."
 
 msgid "Double-click to edit"
-msgstr ""
+msgstr "Двоен клик за редакция"
 
 msgid "Tap to edit"
-msgstr ""
+msgstr "Цъки за редакция"
 
 msgid "Click to go back"
-msgstr ""
+msgstr "Клик за навигиране назад"
 
 msgid "Click to go forward"
-msgstr ""
+msgstr "Клик за навигиране напред"
 
 msgid "Minimize"
-msgstr ""
+msgstr "Минимизирай"
 
 msgid "Maximize"
-msgstr ""
+msgstr "Максимизирай"
 
 msgid "Drop a plugin here"
 msgstr ""
 
 msgid "Installation successful!"
-msgstr ""
+msgstr "Инсталацията успешна!"
 
 msgid "Add your first page"
-msgstr ""
+msgstr "Добави своята първа страница"
 
 msgid "Please log in"
-msgstr ""
+msgstr "Моля, влезте в профила си"
 
 #, python-format
 msgid ""
@@ -1312,6 +1346,9 @@ msgid ""
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
 msgstr ""
+"\n"
+"                    Добре дошли в django CMS версия<strong>%(cms_version)s</strong>.\n"
+"                "
 
 #, python-format
 msgid ""
@@ -1319,6 +1356,9 @@ msgid ""
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
 "                    "
 msgstr ""
+"\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Добавете първата страница</a> към системата, за да продължите.\n"
+"                    "
 
 #, python-format
 msgid ""
@@ -1327,15 +1367,19 @@ msgid ""
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
 msgstr ""
+"\n"
+"                        Изглежда JavaScript е деактивиран, затова \n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">добавете страница</a> ръчно.\n"
+"                    "
 
 msgid "Installation Notes"
-msgstr ""
+msgstr "Инсталационни бележки"
 
 msgid "Support"
-msgstr ""
+msgstr "Помощ"
 
 msgid "Documentation"
-msgstr ""
+msgstr "Документация"
 
 msgid ""
 "\n"
@@ -1344,6 +1388,11 @@ msgid ""
 "                    static files.</p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">Ако не виждате django CMS логото отгоре, уверете се, че\n"
+"                    сте свързали <code>static/cms</code> папката към вашите\n"
+"                    статични файлове.</p>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1353,21 +1402,29 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">Виждате това съобщение, защото\n"
+"                        <code>DEBUG = True</code> във файлът с конфигурации на django и\n"
+"                        все още не сте добавили страници.\n"
+"                    </p>\n"
+"                "
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Добре дошли в Django CMS"
 
 msgid "Add Another"
 msgstr "Добави друг"
 
 msgid "Back"
-msgstr ""
+msgstr "Назад"
 
 msgid "Please choose an option from below to proceed to the next step."
 msgstr ""
+"Моля изберете опция от долу-изброените за да продължите към следващата "
+"стъпка."
 
 msgid "Next"
-msgstr ""
+msgstr "Напред"
 
 msgid "Unknown"
 msgstr ""
@@ -1385,17 +1442,18 @@ msgstr ""
 "адресът на заявката е бил: http://%(host)s%(path)s"
 
 msgid "Two columns"
-msgstr ""
+msgstr "Две колони"
 
 msgid "Three columns"
-msgstr ""
+msgstr "Три колони"
 
 msgid "username"
-msgstr ""
+msgstr "потребителско име"
 
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
+"Задължително. 300 символа или по-малко. Букви, цифри и @/./+/-/_ символи"
 
 msgid "Enter a valid username."
 msgstr "Въведи валидно потребителско име"
@@ -1410,7 +1468,7 @@ msgid "Designates whether the user can log into this admin site."
 msgstr ""
 
 msgid "active"
-msgstr ""
+msgstr "активен"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
@@ -1421,25 +1479,25 @@ msgid "users"
 msgstr "потребители"
 
 msgid "Title Extension"
-msgstr ""
+msgstr "Заглавие на разширението"
 
 msgid "Page Extension"
 msgstr "Разширение на страница"
 
 msgid "object ID"
-msgstr ""
+msgstr "Идентификатор на обект"
 
 msgid "Example1 App"
-msgstr ""
+msgstr "Примерно1 Приложение"
 
 msgid "MultilingualExample1 App"
 msgstr ""
 
 msgid "Example1"
-msgstr ""
+msgstr "Пример1"
 
 msgid "Examples"
-msgstr ""
+msgstr "Примери"
 
 msgid "Extra Context"
 msgstr "Допълнителен контекст"
@@ -1448,28 +1506,28 @@ msgid "Articles"
 msgstr "статии"
 
 msgid "Sample App"
-msgstr ""
+msgstr "Просто Приложение"
 
 msgid "Sample App with config"
-msgstr ""
+msgstr "Просто Приложение с настройки"
 
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "Просто Приложение с премахни права"
 
 msgid "Sample App 2"
-msgstr ""
+msgstr "Просто Приложение 2"
 
 msgid "Sample App 3"
-msgstr ""
+msgstr "Просто Приложение 2"
 
 msgid "Namespaced App"
 msgstr ""
 
 msgid "Parent app"
-msgstr ""
+msgstr "Родителско приложение"
 
 msgid "Child app"
-msgstr ""
+msgstr "Дъщерно приложение"
 
 msgid "Variable urls-menus App"
 msgstr ""
@@ -1478,28 +1536,28 @@ msgid "sample root page"
 msgstr ""
 
 msgid "sample settings page"
-msgstr ""
+msgstr "проста страница с настройки"
 
 msgid "sample account page"
-msgstr ""
+msgstr "проста страница с профил"
 
 msgid "sample my profile page"
-msgstr ""
+msgstr "проста страница моят профил"
 
 msgid "Static Menu"
-msgstr ""
+msgstr "Статично Меню"
 
 msgid "Static Menu2"
-msgstr ""
+msgstr "Статично Меню2"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "Статично Меню3"
 
 msgid "Static Menu4"
-msgstr ""
+msgstr "Статично Меню"
 
 msgid "Category"
-msgstr ""
+msgstr "Категория"
 
 msgid "Categories"
 msgstr "Категории"
@@ -1514,13 +1572,13 @@ msgid "Change Category"
 msgstr "Промени категория"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "Благодаря, че днес си прекарахте хубаво с Уеб-сайтът."
 
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Наследи шаблона от най-близката главна страница"
 
 msgid "UserSettings"
-msgstr ""
+msgstr "ПотребителскиНастройки"
 
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
@@ -1528,7 +1586,7 @@ msgstr ""
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "Добави плъгин към %(plugin_name)s"
 
 msgid "CMS - your user account was created."
 msgstr "CMS — Вашият потребителски профил беше създаден."
@@ -1560,7 +1618,7 @@ msgstr ""
 
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "Създайте нова %sинстанция."
 
 #, python-format
 msgid "A wizard has already been registered for model: %s"

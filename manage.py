@@ -8,6 +8,7 @@ import warnings
 import dj_database_url
 
 from cms.exceptions import DontUsePageAttributeWarning
+from cms.utils.conf import default
 from docs.django_settings import SECRET_KEY
 
 gettext = lambda s: s
@@ -50,9 +51,8 @@ def main(argv: list[str], **full_settings):
     ]
 
     if (
-        len(argv) >= 2
+        len(argv) - sum((arg.startswith("-") for arg in argv[2:]), start=0) < 3
         and argv[1] in local_commands
-        and all(not arg.startswith("-") for arg in argv[2:])
     ):
         argv.append("cms")
         argv.append("menus")
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     )
 
     PLUGIN_APPS = [
-        "djangocms_text_ckeditor",
+        "djangocms_text",
         "cms.test_utils.project.sampleapp",
         "cms.test_utils.project.placeholderapp",
         "cms.test_utils.project.pluginapp.plugins.link",
@@ -112,7 +112,7 @@ if __name__ == "__main__":
         "sites": None,
         "cms": None,
         "menus": None,
-        "djangocms_text_ckeditor": None,
+        "djangocms_text": None,
     }
 
     dynamic_configs = {
@@ -379,5 +379,6 @@ if __name__ == "__main__":
             MIGRATION_MODULES=MIGRATION_MODULES,
             X_FRAME_OPTIONS="SAMEORIGIN",
             CMS_CONFIRM_VERSION4=True,
+            TEXT_INLINE_EDITING=False,  # Do not pollute toolbar for tests
             **dynamic_configs,
         )

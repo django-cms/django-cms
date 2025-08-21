@@ -257,6 +257,15 @@ Configuration is retrieved in the following order:
 The first ``CMS_PLACEHOLDER_CONF`` key that matches for the required configuration attribute
 is used.
 
+``template`` denotes a page's template setting, e.g. ``pages/with_sidebar.html``.
+The template name must end in ``.htm`` or ``.html``. ``placeholder`` is a placeholder
+slot name.
+
+.. versionchanged:: 4.2
+
+    The template selector is available on django CMS pages. Since django CMS 4.2 it also
+    is available for other models, provided they provide a ``get_template()`` method.
+
 E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
 placeholder in a page using the ``base.html`` template, the value
 ``['TextPlugin', 'PicturePlugin', 'TeaserPlugin']`` will be returned as ``'base.html content'``
@@ -708,6 +717,17 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
 More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.io/>`_.
 
 
+.. setting:: CMS_DEFAULT_IN_NAVIGATION
+
+CMS_DEFAULT_IN_NAVIGATION
+=========================
+
+default
+    ``True``
+
+Decides if a newly added page content is automatically added to the navigation.
+
+
 **************
 Media Settings
 **************
@@ -1013,6 +1033,30 @@ Example::
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
 
 
+CMS_ENABLE_HELP
+===============
+
+default
+    ``True``
+
+This setting controls if the help menu appears in the toolbar.
+
+
+CMS_EXTRA_HELP_MENU_ITEMS
+=========================
+
+Example::
+
+    CMS_EXTRA_HELP_MENU_ITEMS = (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
+
+This setting adds to the default links of the support menu allowing project or company support links.
+
+
 CMS_TOOLBAR_ANONYMOUS_ON
 ========================
 
@@ -1120,7 +1164,7 @@ default
 
 This is the name of the plugin created in the Page Wizard when the "Content"
 field is filled in. There should be no need to change it, unless you
-**don't** use ``djangocms-text-ckeditor`` in your project.
+**don't** use `djangocms-text`` in your project.
 
 ..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
@@ -1132,9 +1176,10 @@ default
 
 This is the name of the body field in the plugin created in the Page Wizard
 when the "Content" field is filled in. There should be no need to change it,
-unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
-your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
-body field **different** than ``body``.
+unless you **don't** use `djangocms-text`` in
+your project **and** your custom plugin defined in
+:setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a body field **different** than
+``body``.
 
 .. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED
 
@@ -1152,7 +1197,7 @@ default
 .. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
 
 CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
-===============================================
+=======================================
 
 default
     ``live-url``
@@ -1184,6 +1229,39 @@ default
 
 This indicates to the CMS that it should redirect requests with an non-lowercase
 slug to its lowercase version if no page with that slug is found.
+
+.. setting:: CMS_CATCH_PLUGIN_500_EXCEPTION
+
+CMS_CATCH_PLUGIN_500_EXCEPTION
+==============================
+
+default
+    ``True``
+
+Should rendering plugins cause an exception, they are caught by default.
+In edit mode the exception is shown in the placeholder, in preview mode and
+on public content the placeholder remains empty.
+
+If ``CMS_CATCH_PLUGIN_500_EXCEPTION`` is set to ``False``, viewing public
+content will cause a server error (http error code 500). This can, for example,
+be used for regular health checking.
+
+.. setting:: CMS_ALWAYS_REFRESH_CONTENT
+
+CMS_ALWAYS_REFRESH_CONTENT
+==========================
+
+default
+    ``False``
+
+.. versionadded:: 4.2
+
+If set to ``True``, the CMS will always refresh the content of the page after
+edit action, just as in django CMS 4.1 and before.
+
+Only use this setting of your custom plugins have issues with the new partial
+content refresh when editing. **If you need to set this, make sure to report an
+issue on GitHub.**
 
 
 CMS_CONFIRM_VERSION4

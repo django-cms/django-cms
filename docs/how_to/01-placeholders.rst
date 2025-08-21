@@ -41,6 +41,7 @@ you would like to use:
 .. code-block::
 
     from django.db import models
+    from django.utils.functional import cached_property
     from cms.models.fields import PlaceholderRelationField
     from cms.utils.placeholder import get_placeholder_from_slot
 
@@ -127,6 +128,30 @@ The view in which you render your placeholder field must return the :class:`requ
 endpoints require a view to render an object. This method takes the request and the
 object as parameter (see example below: ``render_my_model``).
 
+Setting and getting the placeholder-enabled object from the toolbar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The toolbar provides two important methods for managing the object associated with placeholder editing.
+These methods are essential for enabling the toolbar's Edit and Preview buttons when working 
+with models that contain placeholders.
+
+**set_object(obj)**
+    Associates a Django model instance with the toolbar. This method only sets the object if 
+    one hasn't already been set. The object is typically a model instance that contains 
+    placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any 
+    other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
+    
+    The associated object is used by other toolbar methods to generate appropriate URLs for 
+    editing, preview, and structure modes.
+
+**get_object()**
+    Returns the object currently associated with the toolbar, or ``None`` if no object has 
+    been set. This method can be used to retrieve the object that was previously set using 
+    ``set_object()``.
+
+Usage in Views
+^^^^^^^^^^^^^^
+
 If the object has a user-facing view it typically is identical to the preview and
 editing endpoints, but has to get the object from the URL (e.g., by its primary key).
 **It also needs to set the toolbar object, so that the toolbar will have Edit and
@@ -151,6 +176,55 @@ Preview buttons:**
         obj = get_object_or_404(MyModel, id=id)  # Get the object (here by id)
         request.toolbar.set_object(obj)  # Announce the object to the toolbar
         return render_my_model(request, obj)  # Same as preview rendering
+
+You can also retrieve the object from the toolbar in your views using the ``get_object()`` method:
+
+.. code-block:: python
+
+    def my_view(request):
+        my_content = request.toolbar.get_object()  # Can be anything: PageContent, PostContent, AliasContent, etc.
+        if my_content:
+            my_post = my_content.post  # only works for PostContent, of course
+        # ... rest of your view logic
+
+.. note::
+
+    If using class based views, you can set the toolbar object in the ``get_context_data``
+    method of your view and add a stub view usable when you
+    :ref:`register the model for frontend editing <register_model_frontend_editing>`.
+
+    .. code-block:: python
+
+        from django.views.generic.detail import DetailView
+
+        class MyModelDetailView(DetailView):
+            # your detail view attributes
+
+            def get_context_data(self, **kwargs):
+                context = super().get_context_data(**kwargs)
+                self.request.toolbar.set_object(self.object)
+                return context
+
+        def my_model_endpoint_view(request, my_model):
+            return MyModelDetailView.as_view()(request, pk=my_model.pk)
+
+Usage in Templates
+^^^^^^^^^^^^^^^^^^
+
+You can also access the toolbar object directly in templates:
+
+.. code-block:: html+django
+
+    {# Access the object directly #}
+    {{ request.toolbar.get_object.title }}
+
+    {# Use with template tag for more complex operations #}
+    {% with my_obj=request.toolbar.get_object %}
+        {% if my_obj %}
+            <h2>{{ my_obj.title }}</h2>
+            <p><strong>{{ my_obj.description }}</strong></p>
+        {% endif %}
+    {% endwith %}
 
 .. note::
 
@@ -193,6 +267,8 @@ Let the model know about this template by declaring the ``get_template()`` metho
 
         ...
 
+.. _register_model_frontend_editing:
+
 Registering the model for frontend editing
 ------------------------------------------
 
@@ -202,7 +278,7 @@ The final step is to register the model for frontend editing. Since django CMS 4
 done by adding a :class:`~cms.app_base.CMSAppConfig` class to the app's `cms_config.py`
 file:
 
-.. code-block::
+.. code-block:: python
 
     from cms.app_base import CMSAppConfig
     from . import models, views
@@ -211,6 +287,15 @@ file:
     class MyAppConfig(CMSAppConfig):
         cms_enabled = True
         cms_toolbar_enabled_models = [(models.MyModel, views.render_my_model)]
+
+.. note::
+
+    If using class based views, use the stub view in ``cms_toolbar_enabled_models`` attribute.
+
+    .. code-block:: python
+
+        cms_toolbar_enabled_models = [(models.MyModel, views.my_model_endpoint_view)]
+
 
 Adding content to a placeholder
 -------------------------------

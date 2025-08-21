@@ -13,16 +13,16 @@ jobs:
       fail-fast: false
       matrix:
         django-version: [
-          '4.2', '5.0', '5.1'
+          '4.2', '5.0', '5.1', '5.2',
         ]
-        python-version: ['3.11']
+        python-version: ['3.13']
         requirements-file: ['requirements_base.txt']
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v5

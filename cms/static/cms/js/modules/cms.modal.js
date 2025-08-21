@@ -169,7 +169,7 @@ class Modal {
         this.ui.minimizeButton.toggle(this.options.minimizable);
         this.ui.maximizeButton.toggle(this.options.maximizable);
 
-        var position = this._calculateNewPosition(opts);
+        const position = this._calculateNewPosition(opts);
 
         this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
         this.maximized = false;
@@ -772,48 +772,33 @@ class Modal {
                         that.ui.modal.find('.cms-modal-frame iframe').hide();
                         // page has been saved or deleted, run checkup
                         that.saved = true;
-                        if (item.hasClass('deletelink')) {
-                            that.justDeleted = true;
-
-                            var action = item.closest('form').prop('action');
-
-                            // in case action is an input (see https://github.com/jquery/jquery/issues/3691)
-                            // it's definitely not a plugin/placeholder deletion
-                            if (typeof action === 'string' && action.match(/delete-plugin/)) {
-                                that.justDeletedPlugin = /delete-plugin\/(\d+)\//gi.exec(action)[1];
-                            }
-                            if (typeof action === 'string' && action.match(/clear-placeholder/)) {
-                                that.justDeletedPlaceholder = /clear-placeholder\/(\d+)\//gi.exec(action)[1];
-                            }
-                        }
                     }
                 }
 
                 if (item.is('input') || item.is('button')) {
                     that.ui.modalBody.addClass('cms-loader');
-                    var frm = item.closest('form');
+                    var frm = item[0].form;
 
                     // In Firefox with 1Password extension installed (FF 45 1password 4.5.6 at least)
                     // the item[0].click() doesn't work, which notably breaks
                     // deletion of the plugin. Workaround is that if the clicked button
                     // is the only button in the form - submit a form, otherwise
                     // click on the button
-                    if (frm.find('button, input[type="button"], input[type="submit"]').length > 1) {
+                    if (frm.querySelectorAll('button, input[type="button"], input[type="submit"]').length > 1) {
                         // we need to use native `.click()` event specifically
                         // as we are inside an iframe and magic is happening
                         item[0].click();
                     } else {
                         // have to dispatch native submit event so all the submit handlers
                         // can be fired, see #5590
-                        var evt = document.createEvent('HTMLEvents');
+                        var evt = new CustomEvent('submit', { bubbles: false, cancelable: true });
 
-                        evt.initEvent('submit', false, true);
-                        if (frm[0].dispatchEvent(evt)) {
+                        if (frm.dispatchEvent(evt)) {
                             // triggering submit event in webkit based browsers won't
                             // actually submit the form, while in Gecko-based ones it
                             // will and calling frm.submit() would throw NS_ERROR_UNEXPECTED
                             try {
-                                frm[0].submit();
+                                frm.submit();
                             } catch (err) {}
                         }
                     }
@@ -912,12 +897,16 @@ class Modal {
             }
 
             // check if we are redirected - should only happen after successful form submission
-            var redirect = body.find('a.cms-view-new-object').attr('href');
+            const redirect = body.find('a.cms-view-new-object').attr('href');
 
             if (redirect) {
                 Helpers.reloadBrowser(redirect, false);
                 return true;
             }
+
+            // If the response contains the close-frame (and potentially the data bridge),
+            // the form was saved successfully
+            that.saved = that.saved || body.hasClass('cms-close-frame');
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
@@ -1016,24 +1005,31 @@ class Modal {
                         true
                     );
                 } else {
-                    setTimeout(function() {
-                        if (that.justDeleted && (that.justDeletedPlugin || that.justDeletedPlaceholder)) {
-                            CMS.API.StructureBoard.invalidateState(
-                                that.justDeletedPlaceholder ? 'CLEAR_PLACEHOLDER' : 'DELETE',
-                                {
-                                    plugin_id: that.justDeletedPlugin,
-                                    placeholder_id: that.justDeletedPlaceholder,
-                                    deleted: true
-                                }
-                            );
-                        }
+                    // Serve the data bridge:
+                    // We have a special case here cause the CMS namespace
+                    // can be either inside the current window or the parent
+                    const dataBridge = body[0].querySelector('script#data-bridge');
+
+                    if (dataBridge) {
                         // hello ckeditor
                         Helpers.removeEventListener('modal-close.text-plugin');
                         that.close();
-                    // must be more than 100ms
-                    }, 150); // eslint-disable-line
+                        // the dataBridge is used to access plugin information from different resources
+                        // Do NOT move this!!!
+                        try {
+                            CMS.API.Helpers.dataBridge = JSON.parse(dataBridge.textContent);
+                            CMS.API.Helpers.onPluginSave();
+                        } catch (e) {
+                            // istanbul ignore next
+                            Helpers.reloadBrowser();
+                        }
+                    }
                 }
             } else {
+                if (that.ui.modal.hasClass('cms-modal-open')) {
+                    // show modal if hidden
+                    that.ui.modal.show();
+                }
                 iframe.show();
                 // set title of not provided
                 innerTitle = contents.find('#content h1:eq(0)');

@@ -2424,42 +2424,42 @@ describe('CMS.StructureBoard', function() {
     });
 
     describe('_getPluginDataFromMarkup()', () => {
+        const wrap = markup => $(`<div>${markup}</div>`)[0];
         [
             {
-                args: ['', [1, 2, 3]],
+                args: [wrap(''), [1, 2, 3]],
                 expected: []
             },
             {
-                args: ['whatever', []],
+                args: [wrap('whatever'), []],
                 expected: []
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 3]],
+                args: [wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script>'), [1, 2, 3]],
                 expected: []
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 4]],
-                expected: [['cms-plugin-4', { plugin_id: '4' }]]
+                args: [wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script>'), [1, 2, 4]],
+                expected: [{ plugin_id: '4' }]
             },
             {
                 args: [
-                    `CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);
-                    CMS._plugins.push(["cms-plugin-10", { "plugin_id": "meh"}]);`, [1, 2, 10]],
-                expected: [['cms-plugin-10', { plugin_id: 'meh' }]]
+                    wrap('<script id="cms-plugin-4">{"plugin_id":"4"}</script>' +
+                        '<script id="cms-plugin-10">{"plugin_id":"meh"}</script>'),
+                    [1, 2, 10]],
+                expected: [{ plugin_id: 'meh' }]
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",{plugin_id:"4"}])', [4]],
+                args: [wrap('<script id="cms-plugin-4">{plugin_id:"4"}</script>'), [4]],
                 expected: []
             },
             {
-                args: ['CMS._plugins.push(["cms-plugin-4",not a json :(]);', [4]],
+                args: [wrap('<script id="cms-plugin-4">not a json :(]</script>'), [4]],
                 expected: []
             },
             {
-                args: [`CMS._plugins.push(["cms-plugin-4", {
-                    "something": 1
-                }])`, [4]],
-                expected: [['cms-plugin-4', { something: 1 }]]
+                args: [wrap('<script id="cms-plugin-4">{"something":1}</script>'), [4]],
+                expected: [{ something: 1 }]
             }
         ].forEach((test, i) => {
             it(`extracts plugin data from markup ${i}`, () => {
@@ -2572,7 +2572,7 @@ describe('CMS.StructureBoard', function() {
 
             board = new StructureBoard();
 
-            spyOn(StructureBoard, '_replaceBodyWithHTML');
+            spyOn(board, '_replaceBodyWithHTML');
 
             CMS.API.Messages = {
                 open: jasmine.createSpy()
@@ -2619,6 +2619,86 @@ describe('CMS.StructureBoard', function() {
             expect(FakePlugin.prototype._ensureData).toHaveBeenCalledTimes(2);
             expect(FakePlugin.prototype._setPlaceholder).toHaveBeenCalledTimes(1);
             expect(FakePlugin.prototype._setPluginContentEvents).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('_updateContentFromDataBridge', () => {
+        beforeEach(() => {
+            CMS.API.StructureBoard = new StructureBoard();
+        });
+
+        it('should return true if data is missing or incomplete', () => {
+            const incompleteData = {};
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(incompleteData)).toBe(true);
+
+            const missingContent = { content: [] };
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(missingContent)).toBe(true);
+
+            const missingPluginIds = { content: [{ html: '<div></div>' }] };
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(missingPluginIds)).toBe(true);
+        });
+
+        it('should return true if source placeholder is not found', () => {
+            const data = {
+                source_placeholder_id: 1,
+                content: {
+                    pluginIds: [1],
+                    html: '<div></div>'
+                }
+            };
+            spyOn(CMS._instances, 'some').and.returnValue(false);
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(true);
+        });
+
+        it('should update content and return false if data is valid', () => {
+            const data = {
+                content: [{
+                    pluginIds: [1],
+                    html: '<template class="cms-plugin cms-plugin-1 cms-plugin-start"></template>' +
+                          '<div>My new plugin</div>' +
+                          '<template class="cms-plugin cms-plugin-1 cms-plugin-end"></template>',
+                    placeholder_id: 1,
+                    position: 0
+                }]
+            };
+            spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
+            spyOn(CMS.API.StructureBoard, '_updateSekizai');
+            spyOn(CMS.API.StructureBoard, '_contentChanged');
+
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(false);
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'css');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'js');
+            expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
+        });
+
+        it('should remove previous content and update Sekizai blocks', () => {
+            const data = {
+                content: [{
+                    pluginIds: [1, 2],
+                    html: '<div class="cms-plugin cms-plugin-1 cms-plugin-start"></div>',
+                    placeholder_id: 1,
+                    position: 0,
+                    css: '<link rel="stylesheet" href="style.css">',
+                    js: '<script src="script.js"></script>'
+                }]
+            };
+            spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
+            spyOn(CMS.API.StructureBoard, '_updateSekizai');
+            spyOn(CMS.API.StructureBoard, '_contentChanged');
+
+            $('body').append('<div class="cms-plugin cms-plugin-1"></div>');
+            $('body').append('<div class="cms-plugin cms-plugin-2"></div>');
+            $('body').append('<script data-cms-plugin id="cms-plugin-1"></script>');
+            $('body').append('<script data-cms-plugin id="cms-plugin-2"></script>');
+
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(false);
+            expect($('.cms-plugin.cms-plugin-1').length).toBe(0);
+            expect($('.cms-plugin.cms-plugin-2').length).toBe(0);
+            expect($('script[data-cms-plugin]#cms-plugin-1').length).toBe(0);
+            expect($('script[data-cms-plugin]#cms-plugin-2').length).toBe(0);
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'css');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'js');
+            expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
         });
     });
 

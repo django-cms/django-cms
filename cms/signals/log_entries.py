@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
@@ -81,7 +83,18 @@ _placeholder_operations_map = {
 }
 
 
-create_log_entry = LogEntry.objects.log_action
+def create_log_entry(user_id, content_type_id, object_id, object_repr, action_flag, change_message):
+    if isinstance(change_message, list):
+        change_message = json.dumps(change_message)
+
+    LogEntry.objects.create(
+            user_id=user_id,
+            content_type_id=content_type_id,
+            object_id=str(object_id),
+            object_repr=object_repr[:200],
+            action_flag=action_flag,
+            change_message=change_message,
+        )
 
 
 def _is_valid_page_instance(page):

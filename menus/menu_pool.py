@@ -107,12 +107,13 @@ class MenuRenderer:
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.request_language = None
-        if is_language_prefix_patterns_used():
-            self.request_language = get_language_from_request(request, check_path=True)
-        if not self.request_language:
-            self.request_language = get_default_language_for_site(get_current_site().pk)
         self.site = Site.objects.get_current(request)
+        self.request_language = None
+        if hasattr(request, "LANGUAGE_CODE"):
+            # use language from middleware - usually django.middleware.locale.LocaleMiddleware
+            self.request_language = request.LANGUAGE_CODE
+        if not self.request_language:
+            self.request_language = get_default_language_for_site(self.site.pk)
         toolbar = getattr(request, "toolbar", None)
         self.edit_or_preview = toolbar.edit_mode_active or toolbar.preview_mode_active if toolbar else False
 

@@ -5,7 +5,6 @@ from django.urls import NoReverseMatch
 from cms.models import PageContent
 from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
 
@@ -69,40 +68,6 @@ class ExtensionToolbar(CMSToolbar):
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
         return page_extension, admin_url
-
-    def get_title_extension_admin(self, language=None):
-        """
-        Deprecated.
-
-        Reflects now obsolete behavior in django CMS 3.x:
-
-        Get the admin urls for the page content extensions menu items, depending on whether a
-        :class:`~cms.extensions.models.PageContentExtension` instance exists for each
-        :class:`~cms.models.contentmodels.PageContent` in the current page.
-        A single language can be passed to only work on a single page content object.
-
-        Return a list of tuples of the page content extension and the url; the extension is None
-        if no instance exists, the url is None is no admin is registered for the extension.
-        """
-        warnings.warn(
-            "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin",
-            RemovedInDjangoCMS43Warning,
-            stacklevel=2,
-        )
-        urls = []
-        page = self._get_page()
-        if page:
-            page_contents = (
-                page.pagecontent_set(manager="admin_manager")
-                .latest_content()
-                .filter(language__in=get_language_list(page.site_id))
-            )
-
-            for page_content in page_contents:
-                admin_url = self.get_page_content_extension_admin(page_content)
-                if admin_url:
-                    urls.append(admin_url)
-        return urls
 
     def get_page_content_extension_admin(self, page_content_obj=None):
         """

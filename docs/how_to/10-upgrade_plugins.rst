@@ -134,11 +134,11 @@ Creating "universal" plugins
 ----------------------------
 
 Some packages introduce universal plugins which can be used both on django CMS 3 and
-django CMS 4 alike. Examples include `djangocms-text-ckeditor
-<https://github.com/django-cms/djangocms-text-ckeditor>`_ or `djangocms-frontend
+django CMS 4 alike. Examples include `djangocms-text
+<https://github.com/django-cms/djangocms-text>`_ or `djangocms-frontend
 <https://github.com/django-cms/djangocms-frontend>`_.
 
-Here is an excerpt from djangocms-text-ckeditor which needs to be able to create and
+Here is an excerpt from djangocms-text which needs to be able to create and
 delete child plugins for text fields. It adds private static methods to
 
 .. code-block::

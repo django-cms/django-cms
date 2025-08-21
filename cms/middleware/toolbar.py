@@ -5,7 +5,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.urls import resolve
 from django.urls.exceptions import Resolver404
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 from cms.toolbar.toolbar import CMSToolbar
@@ -15,11 +14,29 @@ from cms.utils.request_ip_resolvers import get_request_ip_resolver
 
 get_request_ip = get_request_ip_resolver()
 
+cms_endpoints = (
+    'pages-root',
+    'pages-details-by-slug',
+    'cms_placeholder_clear_placeholder',
+    'cms_placeholder_add_plugin',
+    'cms_placeholder_edit_plugin',
+    'cms_placeholder_copy_plugins',
+    'cms_placeholder_move_plugin',
+    'cms_placeholder_delete_plugin',
+    'cms_placeholder_render_object_edit',
+    'cms_placeholder_render_object_preview',
+    'cms_placeholder_render_object_structure',
+    'cms_placeholder_edit_field',
+)
 
-class ToolbarMiddleware(MiddlewareMixin):
+
+class ToolbarMiddleware:
     """
     Middleware to set up CMS Toolbar.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+        super().__init__()
 
     def is_edit_mode(self, request):
         try:
@@ -50,8 +67,7 @@ class ToolbarMiddleware(MiddlewareMixin):
             match = resolve(request.path_info)
         except Resolver404:
             return False
-
-        return match.url_name in ('pages-root', 'pages-details-by-slug')
+        return match.url_name in cms_endpoints
 
     def process_request(self, request):
         """
@@ -77,13 +93,19 @@ class ToolbarMiddleware(MiddlewareMixin):
         request.toolbar = SimpleLazyObject(lambda: CMSToolbar(request))
 
     def process_response(self, request, response):
-        if not self.is_cms_request(request):
-            return response
+        if toolbar := get_toolbar_from_request(request):
+            from django.utils.cache import add_never_cache_headers
 
-        from django.utils.cache import add_never_cache_headers
-
-        toolbar = get_toolbar_from_request(request)
-
-        if toolbar._cache_disabled:
-            add_never_cache_headers(response)
+            if toolbar._cache_disabled:
+                add_never_cache_headers(response)
         return response
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        return self.process_response(request, response)
+
+    async def __acall__(self, request):
+        self.process_request(request)
+        response = await self.get_response(request)
+        return self.process_response(request, response)

@@ -151,6 +151,7 @@ class DefaultLanguageChanger:
             None.
         """
         self.request = request
+        self.request_language = get_language_from_request(request)
         self._app_path = None
 
     @property
@@ -176,7 +177,7 @@ class DefaultLanguageChanger:
         """
         if self._app_path is None:
             if settings.USE_I18N:
-                page_path = self.get_page_path(get_language_from_request(self.request))
+                page_path = self.get_page_path(self.request_language)
             else:
                 page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
@@ -207,10 +208,9 @@ class DefaultLanguageChanger:
         if not page:
             return '/%s/' % lang if settings.USE_I18N else '/'
 
-        page_languages = page.get_languages()
-
-        if lang in page_languages:
-            return page.get_absolute_url(lang, fallback=False)
+        url = page.get_absolute_url(lang, fallback=False)
+        if url:
+            return url
 
         site = get_current_site()
 
@@ -226,14 +226,16 @@ class DefaultLanguageChanger:
 
         default_language = get_default_language_for_site(site.pk)
 
-        if not _valid_language and default_language in page_languages:
+        if not _valid_language:
             # The request language is not configured for the current site.
             # Fallback to the default language configured for the current site.
-            return page.get_absolute_url(default_language, fallback=False)
+            url = page.get_absolute_url(default_language, fallback=False)
+            if url:
+                return url
 
         if _valid_language:
             fallbacks = get_fallback_languages(lang, site_id=site.pk) or []
-            fallbacks = [_lang for _lang in fallbacks if _lang in page_languages]
+            fallbacks = [_lang for _lang in fallbacks if _lang in page.get_languages()]
         else:
             fallbacks = []
 
@@ -258,8 +260,7 @@ class DefaultLanguageChanger:
             NoReverseMatch: If there is no matching URL for the given language.
             TypeError: If there is a type error when trying to get the absolute URL.
         """
-        page_language = get_language_from_request(self.request)
-        with force_language(page_language):
+        with force_language(self.request_language):
             try:
                 view = resolve(self.request.path_info)
             except (NoReverseMatch, Resolver404):  # NOQA

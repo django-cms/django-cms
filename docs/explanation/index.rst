@@ -15,6 +15,7 @@ with explaining *how to do things* than with helping you understand *how it work
     multiple_languages
     i18n
     permissions
+    searchdocs
     touch
     colorscheme
     menu_system

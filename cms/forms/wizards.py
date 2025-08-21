@@ -1,5 +1,3 @@
-import warnings
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -14,8 +12,8 @@ from cms.utils.page import get_available_slug
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 
 try:
-    # djangocms_text_ckeditor is not guaranteed to be available
-    from djangocms_text_ckeditor.widgets import TextEditorWidget
+    # djangocms_text is not guaranteed to be available
+    from djangocms_text.widgets import TextEditorWidget
     text_widget = TextEditorWidget
 except ImportError:
     text_widget = forms.Textarea

@@ -1,17 +1,21 @@
+import os
+import shutil
+import sys
+import tempfile
 import uuid
 from io import StringIO
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
-from django.core.management import CommandError
+from django.core.management import CommandError, execute_from_command_line
 from django.db import models
 from django.test.utils import override_settings
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models import Page, StaticPlaceholder
+from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
@@ -73,7 +77,7 @@ class ManagementTestCase(CMSTestCase):
         page1.save()
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
-        self.assertEqual(out.getvalue(), 'fixing page tree\nall done\n')
+        self.assertEqual(out.getvalue(), 'fixing page tree\nfixing page URLs\nall done\n')
         page1 = page1.reload()
         self.assertEqual(page1.path, "0002")
         self.assertEqual(page1.depth, 1)
@@ -285,9 +289,8 @@ class ManagementTestCase(CMSTestCase):
             0)
 
         # No gaps in plugin tree
-        max_positon = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
-        self.assertEqual(max_positon, 3)
-
+        max_position = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
+        self.assertEqual(max_position, 3)
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
@@ -309,10 +312,12 @@ class ManagementTestCase(CMSTestCase):
             management.call_command('cms')
         self.assertEqual(str(e.exception), 'Error: one of the available sub commands must be provided')
 
+
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
     def _fill_page_body(self, page, lang):
-        ph_en = page.get_placeholders(lang).get(slot="body")
+        placeholders = page.get_placeholders(lang)
+        ph_en = placeholders.get(slot="body")
         # add misc plugins
         mcol1 = add_plugin(ph_en, "MultiColumnPlugin", lang, position="first-child")
         add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)
@@ -322,9 +327,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         col4 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         # add a *nested* link plugin
         add_plugin(ph_en, "LinkPlugin", lang, target=col4, name="A Link", external_link="https://www.django-cms.org")
-        static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()), site_id=1)
-        static_placeholder.save()
-        add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
+        placeholder = placeholders.get(slot="right-column")
+        placeholder.save()
+        add_plugin(placeholder, "TextPlugin", lang, body="example content")
 
     def setUp(self):
         pages = Page.objects.all()
@@ -369,7 +374,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(link_en.external_link, link_de.external_link)
         self.assertEqual(link_en.position, link_de.position)
 
-        stack_plugins = CMSPlugin.objects.filter(placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
+        stack_plugins = CMSPlugin.objects.filter(placeholder=root_page.get_placeholders('en').get(slot="right-column"))
 
         stack_text_en, _ = stack_plugins.get(language='en', plugin_type='TextPlugin').get_plugin_instance()
         stack_text_de, _ = stack_plugins.get(language='de', plugin_type='TextPlugin').get_plugin_instance()
@@ -413,7 +418,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertIsNone(first_plugin_de)
 
         stack_plugins = CMSPlugin.objects.filter(
-            placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
+                placeholder=root_page.get_placeholders('en').get(slot="right-column")
+            )
 
         stack_text_en, _ = stack_plugins.get(language='en',
                                              plugin_type='TextPlugin').get_plugin_instance()
@@ -458,7 +464,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         for page in Page.objects.on_site(site_2_pk):
             phs_2.extend(page.get_placeholders('en').values_list('pk', flat=True))
 
-        # These asserts that no orphaned plugin exists
+        # These assert that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
 
@@ -645,3 +651,21 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             str(command_error.exception),
             'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES'
         )
+
+class DjangoCmsCommandTestCase(CMSTestCase):
+    """
+    Test that the django-cms command can be run without any subcommand
+    """
+    def test_djangocms_command_returns_version(self):
+        from cms import __version__
+        from cms.management import djangocms
+
+        out = StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = out
+        try:
+            djangocms.execute_from_command_line(['djangocms', '--version'])
+        finally:
+            sys.stdout = old_stdout
+        result = out.getvalue()
+        self.assertEqual(result, __version__ + "\n")

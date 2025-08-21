@@ -15,6 +15,11 @@ const CMS = {
     KEYS
 };
 
-// in case some data is already attached to the CMS global
-// we shoud not override it
+// in case some data is already attached to the global CMS
+// we must not override it
 window.CMS = CMS.$.extend(window.CMS || {}, CMS);
+
+// make sure that jQuery is available as $ and jQuery
+if (!window.jQuery) {
+    window.$ = window.jQuery = CMS.$;
+}

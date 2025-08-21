@@ -117,72 +117,29 @@ var Plugin = new Class({
      * @param {String} container `cms-plugin-${id}`
      */
     _setupUI: function setupUI(container) {
-        var wrapper = $(`.${container}`);
-        var contents;
+        const wrapper = $(`.${container}`);
+        let contents;
 
         // have to check for cms-plugin, there can be a case when there are multiple
         // static placeholders or plugins rendered twice, there could be multiple wrappers on same page
         if (wrapper.length > 1 && container.match(/cms-plugin/)) {
-            // so it's possible that multiple plugins (more often generics) are rendered
-            // in different places. e.g. page menu in the header and in the footer
-            // so first, we find all the template tags, then put them in a structure like this:
-            // [[start, end], [start, end]...]
-            //
-            // in case of plugins it means that it's aliased plugin or a plugin in a duplicated
-            // static placeholder (for whatever reason)
-            var contentWrappers = wrapper.toArray().reduce((wrappers, elem, index) => {
-                if (index === 0) {
-                    wrappers[0].push(elem);
-                    return wrappers;
+            // Get array [[start, end], [start, end], ...]
+            const contentWrappers = this._extractContentWrappers(wrapper);
+
+            if (contentWrappers[0][0].tagName === 'TEMPLATE') {
+                // then - if the content is bracketed by two template tages - we map that structure into an array of
+                // jquery collections from which we filter out empty ones
+                contents = contentWrappers
+                    .map(items => this._processTemplateGroup(items, container))
+                    .filter(v => v.length);
+
+                wrapper.filter('template').remove();
+                if (contents.length) {
+                    // and then reduce it to one big collection
+                    contents = contents.reduce((collection, items) => collection.add(items), $());
                 }
-
-                var lastWrapper = wrappers[wrappers.length - 1];
-                var lastItemInWrapper = lastWrapper[lastWrapper.length - 1];
-
-                if ($(lastItemInWrapper).is('.cms-plugin-end')) {
-                    wrappers.push([elem]);
-                } else {
-                    lastWrapper.push(elem);
-                }
-
-                return wrappers;
-            }, [[]]);
-
-            // then we map that structure into an array of jquery collections
-            // from which we filter out empty ones
-            contents = contentWrappers
-                .map(items => {
-                    var templateStart = $(items[0]);
-                    var className = templateStart.attr('class').replace('cms-plugin-start', '');
-
-                    var itemContents = $(nextUntil(templateStart[0], container));
-
-                    $(items).filter('template').remove();
-
-                    itemContents.each((index, el) => {
-                        // if it's a non-space top-level text node - wrap it in `cms-plugin`
-                        if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
-                            var element = $(el);
-
-                            element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
-                            itemContents[index] = element.parent()[0];
-                        }
-                    });
-
-                    // otherwise we don't really need text nodes or comment nodes or empty text nodes
-                    itemContents = itemContents.filter(function() {
-                        return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
-                    });
-
-                    itemContents.addClass(`cms-plugin ${className}`);
-
-                    return itemContents;
-                })
-                .filter(v => v.length);
-
-            if (contents.length) {
-                // and then reduce it to one big collection
-                contents = contents.reduce((collection, items) => collection.add(items), $());
+            } else {
+                contents = wrapper;
             }
         } else {
             contents = wrapper;
@@ -195,6 +152,73 @@ var Plugin = new Class({
 
         this.ui = this.ui || {};
         this.ui.container = contents;
+    },
+
+    /**
+     * Extracts the content wrappers from the given wrapper:
+     * It is possible that multiple plugins (more often generics) are rendered
+     * in different places. e.g. page menu in the header and in the footer
+     * so first, we find all the template tags, then put them in a structure like this:
+     * [[start, end], [start, end], ...]
+     *
+     * @method _extractContentWrappers
+     * @private
+     * @param {jQuery} wrapper
+     * @returns {Array<Array<HTMLElement>>}
+     */
+    _extractContentWrappers: function (wrapper) {
+        return wrapper.toArray().reduce((wrappers, elem) => {
+            if (elem.classList.contains('cms-plugin-start') || wrappers.length === 0) {
+                wrappers.push([elem]);
+            } else {
+                wrappers.at(-1).push(elem);
+            }
+            return wrappers;
+        }, []);
+    },
+
+    /**
+     * Processes the template group and returns a jQuery collection
+     * of the content bracketed by ``cms-plugin-start`` and ``cms-plugin-end``.
+     * It also wraps any top-level text nodes in ``cms-plugin`` elements.
+     *
+     * @method _processTemplateGroup
+     * @private
+     * @param {Array<HTMLElement>} items
+     * @param {HTMLElement} container
+     * @returns {jQuery}
+     * @example
+     * // Given the following HTML:
+     * <template class="cms-plugin cms-plugin-4711 cms-plugin-start"></template>
+     * <p>Some text</p>
+     * <template class="cms-plugin cms-plugin-4711 cms-plugin-end"></template>
+     *
+     * // The following jQuery collection will be returned:
+     * $('<p class="cms-plugin cms-plugin-4711 cms-plugin-start cms-plugin-end">Some text</p>')
+     */
+    _processTemplateGroup: function (items, container) {
+        const templateStart = $(items[0]);
+        const className = templateStart.attr('class').replace('cms-plugin-start', '');
+        let itemContents = $(nextUntil(templateStart[0], container));
+
+        itemContents.each((index, el) => {
+            if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
+                const element = $(el);
+
+                element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
+                itemContents[index] = element.parent()[0];
+            }
+        });
+
+        itemContents = itemContents.filter(function() {
+            return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
+        });
+
+        itemContents.addClass(`cms-plugin ${className}`);
+        itemContents.first().addClass('cms-plugin-start');
+        itemContents.last().addClass('cms-plugin-end');
+
+        return itemContents;
     },
 
     /**
@@ -490,30 +514,51 @@ var Plugin = new Class({
      * @param {String} type type of the plugin, e.g "Bootstrap3ColumnCMSPlugin"
      * @param {String} name name of the plugin, e.g. "Column"
      * @param {String} parent id of a parent plugin
+     * @param {Boolean} showAddForm if false, will NOT show the add form
+     * @param {Number} position (optional) position of the plugin
      */
-    addPlugin: function(type, name, parent) {
+    // eslint-disable-next-line max-params
+    addPlugin: function(type, name, parent, showAddForm = true, position) {
         var params = {
             placeholder_id: this.options.placeholder_id,
             plugin_type: type,
             cms_path: path,
             plugin_language: CMS.config.request.language,
-            plugin_position: this._getPluginAddPosition()
+            plugin_position: position || this._getPluginAddPosition()
         };
 
         if (parent) {
             params.plugin_parent = parent;
         }
         var url = this.options.urls.add_plugin + '?' + $.param(params);
-        var modal = new Modal({
+
+        const modal = new Modal({
             onClose: this.options.onClose || false,
             redirectOnClose: this.options.redirectOnClose || false
         });
 
-        modal.open({
-            url: url,
-            title: name
-        });
+        if (showAddForm) {
+            modal.open({
+                url: url,
+                title: name
+            });
+        } else {
+            // Also open the modal but without the content. Instead create a form and immediately submit it.
+            modal.open({
+                url: '#',
+                title: name
+            });
+            if (modal.ui) {
+                // Hide the plugin type selector modal if it's open
+                modal.ui.modal.hide();
+            }
+            const contents = modal.ui.frame.find('iframe').contents();
+            const body = contents.find('body');
 
+            body.append(`<form method="post" action="${url}" style="display: none;">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${CMS.config.csrf}"></form>`);
+            body.find('form').submit();
+        }
         this.modal = modal;
 
         Helpers.removeEventListener('modal-closed.add-plugin');
@@ -745,22 +790,22 @@ var Plugin = new Class({
         CMS.API.locked = true;
 
         // set correct options
-        var options = opts || this.options;
+        const options = opts || this.options;
 
-        var dragitem = $(`.cms-draggable-${options.plugin_id}:last`);
+        const dragitem = $(`.cms-draggable-${options.plugin_id}:last`);
 
         // SAVING POSITION
-        var placeholder_id = this._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
+        const placeholder_id = this._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
 
         // cancel here if we have no placeholder id
         if (placeholder_id === false) {
             return false;
         }
-        var pluginParentElement = dragitem.parent().closest('.cms-draggable');
-        var plugin_parent = this._getId(pluginParentElement);
+        const pluginParentElement = dragitem.parent().closest('.cms-draggable');
+        const plugin_parent = this._getId(pluginParentElement);
 
         // gather the data for ajax request
-        var data = {
+        const data = {
             plugin_id: options.plugin_id,
             plugin_parent: plugin_parent || '',
             target_language: CMS.config.request.language,
@@ -777,7 +822,7 @@ var Plugin = new Class({
             Plugin._updatePluginPositions(options.placeholder_id);
         }
 
-        var position = this.options.position;
+        const position = this.options.position;
 
         data.target_position = position;
 
@@ -787,7 +832,7 @@ var Plugin = new Class({
             type: 'POST',
             url: Helpers.updateUrlWithPath(options.urls.move_plugin),
             data: data,
-            success: function(response) {
+            success: response => {
                 CMS.API.StructureBoard.invalidateState(
                     data.move_a_copy ? 'PASTE' : 'MOVE',
                     $.extend({}, data, { placeholder_id: placeholder_id }, response)
@@ -797,9 +842,9 @@ var Plugin = new Class({
                 CMS.API.locked = false;
                 hideLoader();
             },
-            error: function(jqXHR) {
+            error: jqXHR => {
                 CMS.API.locked = false;
-                var msg = CMS.config.lang.error;
+                const msg = CMS.config.lang.error;
 
                 // trigger error
                 CMS.API.Messages.open({
@@ -811,7 +856,7 @@ var Plugin = new Class({
         });
     },
 
-    /**
+     /**
      * Changes the settings attributes on an initialised plugin.
      *
      * @method _setSettings
@@ -1032,6 +1077,7 @@ var Plugin = new Class({
         }
         var that = this;
         var modal;
+        var possibleChildClasses;
         var isTouching;
         var plugins;
 
@@ -1108,23 +1154,37 @@ var Plugin = new Class({
 
                 Plugin._hideSettingsMenu();
 
-                initModal();
+                possibleChildClasses = that._getPossibleChildClasses();
+                var selectionNeeded = possibleChildClasses.filter(':not(.cms-submenu-item-title)').length !== 1;
 
-                // since we don't know exact plugin parent (because dragndrop)
-                // we need to know the parent id by the time we open "add plugin" dialog
-                var pluginsCopy = that._updateWithMostUsedPlugins(
-                    plugins
-                        .clone(true, true)
-                        .data('parentId', that._getId(nav.closest('.cms-draggable')))
-                        .append(that._getPossibleChildClasses())
-                );
+                if (selectionNeeded) {
+                    initModal();
 
-                modal.open({
-                    title: that.options.addPluginHelpTitle,
-                    html: pluginsCopy,
-                    width: 530,
-                    height: 400
-                });
+                    // since we don't know exact plugin parent (because dragndrop)
+                    // we need to know the parent id by the time we open "add plugin" dialog
+                    var pluginsCopy = that._updateWithMostUsedPlugins(
+                        plugins
+                            .clone(true, true)
+                            .data('parentId', that._getId(nav.closest('.cms-draggable')))
+                            .append(possibleChildClasses)
+                    );
+
+                    modal.open({
+                        title: that.options.addPluginHelpTitle,
+                        html: pluginsCopy,
+                        width: 530,
+                        height: 400
+                    });
+                } else {
+                    // only one plugin available, no need to show the modal
+                    // instead directly add the single plugin
+                    const el = possibleChildClasses.find('a');  // only one result
+                    const pluginType = el.attr('href').replace('#', '');
+                    const showAddForm = el.data('addForm');
+                    const parentId = that._getId(nav.closest('.cms-draggable'));
+
+                    that.addPlugin(pluginType, el.text(), parentId, showAddForm);
+                }
             });
 
         // prevent propagation
@@ -1336,9 +1396,10 @@ var Plugin = new Class({
             // eslint-disable-next-line no-case-declarations
             case 'add':
                 const pluginType = el.attr('href').replace('#', '');
+                const showAddForm = el.data('addForm');
 
                 Plugin._updateUsageCount(pluginType);
-                that.addPlugin(pluginType, el.text(), el.closest('.cms-plugin-picker').data('parentId'));
+                that.addPlugin(pluginType, el.text(), el.closest('.cms-plugin-picker').data('parentId'), showAddForm);
                 break;
             case 'ajax_add':
                 CMS.API.Toolbar.openAjax({
@@ -2170,12 +2231,10 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
     }
 };
 
-Plugin._clickToHighlightHandler = function _clickToHighlightHandler(e) {
+Plugin._clickToHighlightHandler = function _clickToHighlightHandler() {
     if (CMS.settings.mode !== 'structure') {
         return;
     }
-    e.preventDefault();
-    e.stopPropagation();
     // FIXME refactor into an object
     CMS.API.StructureBoard._showAndHighlightPlugin(200, true); // eslint-disable-line no-magic-numbers
 };
@@ -2189,7 +2248,17 @@ Plugin.staticPlaceholderDuplicatesMap = {};
 
 // istanbul ignore next
 Plugin._initializeTree = function _initializeTree() {
-    CMS._plugins = uniqWith(CMS._plugins, ([x], [y]) => x === y);
+    const plugins = {};
+
+    document.body.querySelectorAll(
+        'script[data-cms-plugin], ' +
+        'script[data-cms-placeholder], ' +
+        'script[data-cms-general]'
+    ).forEach(script => {
+        plugins[script.id] = JSON.parse(script.textContent || '{}');
+    });
+
+    CMS._plugins = Object.entries(plugins);
     CMS._instances = CMS._plugins.map(function(args) {
         return new CMS.Plugin(args[0], args[1]);
     });
@@ -2220,6 +2289,12 @@ Plugin._removeAddPluginPlaceholder = function removeAddPluginPlaceholder() {
 Plugin._refreshPlugins = function refreshPlugins() {
     Plugin.aliasPluginDuplicatesMap = {};
     Plugin.staticPlaceholderDuplicatesMap = {};
+
+    // Re-read front-end editable fields ("general" plugins) from DOM
+    document.body.querySelectorAll('script[data-cms-general]').forEach(script => {
+        CMS._plugins.push([script.id, JSON.parse(script.textContent)]);
+    });
+    // Remove duplicates
     CMS._plugins = uniqWith(CMS._plugins, isEqual);
 
     CMS._instances.forEach(instance => {

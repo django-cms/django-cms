@@ -1,18 +1,30 @@
+from contextlib import contextmanager
 from copy import deepcopy
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text.cms_plugins import TextPlugin
 
 from cms.api import add_plugin
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_base import CMSPluginBase
+from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.extensionapp.models import MyPageExtension
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    ArticlePluginModel,
-)
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.utils.check import FileOutputWrapper, FileSectionWrapper, check
+
+
+@contextmanager
+def register_plugins(*plugins):
+    for plugin in plugins:
+        plugin_pool.register_plugin(plugin)
+    try:
+        yield
+    finally:
+        for plugin in plugins:
+            plugin_pool.unregister_plugin(plugin)
 
 
 class TestOutput(FileOutputWrapper):
@@ -45,9 +57,7 @@ class CheckAssertMixin:
         check(output)
         self.assertEqual(output.successful, successful)
         for key, value in assertions.items():
-            self.assertEqual(
-                getattr(output, key), value, f"{value} {key} expected, got {getattr(output, key)}"
-            )
+            self.assertEqual(getattr(output, key), value, f"{value} {key} expected, got {getattr(output, key)}")
 
 
 class CheckTests(CheckAssertMixin, TestCase):
@@ -56,55 +66,55 @@ class CheckTests(CheckAssertMixin, TestCase):
 
     def test_no_sekizai(self):
         apps = list(settings.INSTALLED_APPS)
-        apps.remove('sekizai')
+        apps.remove("sekizai")
 
         with self.settings(INSTALLED_APPS=apps):
             self.assertCheck(False, errors=1)
 
     def test_no_django_i18n_context_processor(self):
-        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
-            'sekizai.context_processors.sekizai',
-            'cms.context_processors.cms_settings'
+        override = {"TEMPLATES": deepcopy(settings.TEMPLATES)}
+        override["TEMPLATES"][0]["OPTIONS"]["context_processors"] = [
+            "sekizai.context_processors.sekizai",
+            "cms.context_processors.cms_settings",
         ]
         with self.settings(**override):
             self.assertCheck(False, errors=1)
 
     def test_no_cms_settings_context_processor(self):
-        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
-            'sekizai.context_processors.sekizai',
-            'django.template.context_processors.i18n',
+        override = {"TEMPLATES": deepcopy(settings.TEMPLATES)}
+        override["TEMPLATES"][0]["OPTIONS"]["context_processors"] = [
+            "sekizai.context_processors.sekizai",
+            "django.template.context_processors.i18n",
         ]
         with self.settings(**override):
             self.assertCheck(False, errors=1)
 
     def test_no_sekizai_template_context_processor(self):
-        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
-            'cms.context_processors.cms_settings',
-            'django.template.context_processors.i18n',
+        override = {"TEMPLATES": deepcopy(settings.TEMPLATES)}
+        override["TEMPLATES"][0]["OPTIONS"]["context_processors"] = [
+            "cms.context_processors.cms_settings",
+            "django.template.context_processors.i18n",
         ]
         with self.settings(**override):
             self.assertCheck(False, errors=2)
 
     def test_old_style_i18n_settings(self):
-        with self.settings(CMS_LANGUAGES=[('en', 'English')]):
+        with self.settings(CMS_LANGUAGES=[("en", "English")]):
             self.assertRaises(ImproperlyConfigured, self.assertCheck, True, warnings=1, errors=0)
 
     def test_middlewares(self):
         MIDDLEWARE = [
-            'django.middleware.cache.UpdateCacheMiddleware',
-            'django.middleware.http.ConditionalGetMiddleware',
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
-            'django.middleware.cache.FetchFromCacheMiddleware',
+            "django.middleware.cache.UpdateCacheMiddleware",
+            "django.middleware.http.ConditionalGetMiddleware",
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.contrib.messages.middleware.MessageMiddleware",
+            "django.middleware.csrf.CsrfViewMiddleware",
+            "django.middleware.locale.LocaleMiddleware",
+            "django.middleware.common.CommonMiddleware",
+            "cms.middleware.page.CurrentPageMiddleware",
+            "cms.middleware.toolbar.ToolbarMiddleware",
+            "django.middleware.cache.FetchFromCacheMiddleware",
         ]
         self.assertCheck(True, warnings=0, errors=0)
         with self.settings(MIDDLEWARE=MIDDLEWARE):
@@ -132,12 +142,13 @@ class CheckTests(CheckAssertMixin, TestCase):
 
     def test_non_numeric_site_id(self):
         self.assertCheck(True, warnings=0, errors=0)
-        with self.settings(SITE_ID='broken'):
+        with self.settings(SITE_ID="broken"):
             self.assertCheck(False, warnings=0, errors=1)
 
     def test_cmsapps_check(self):
         from cms.app_base import CMSApp
         from cms.apphook_pool import apphook_pool
+
         class AppWithoutName(CMSApp):
             def get_urls(self, page=None, language=None, **kwargs):
                 return ["sampleapp.urls"]
@@ -147,16 +158,61 @@ class CheckTests(CheckAssertMixin, TestCase):
         self.assertCheck(True, warnings=1, errors=0)
         apphook_pool.apps.pop(app.__name__)
 
-class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
+    def test_validate_template_invalid_parent_class(self):
+        class ParentPlugin(CMSPluginBase):
+            render_template = "base.html"
+            allow_children = True
 
+        class ChildPlugin(CMSPluginBase):
+            render_template = "base.html"
+            parent_classes = ("NonExistentPlugin",)
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            self.assertCheck(True, warnings=1)
+
+    def test_validate_template_invalid_child_class(self):
+        class ParentPlugin(CMSPluginBase):
+            render_template = "base.html"
+            allow_children = True
+            child_classes = ("NonExistentPlugin",)
+
+        class ChildPlugin(CMSPluginBase):
+            render_template = "base.html"
+            parent_classes = ("ParentPlugin",)
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            self.assertCheck(True, warnings=1)
+
+    def test_validate_template_valid_parent_child_classes(self):
+        class ParentPlugin(CMSPluginBase):
+            render_template = "base.html"
+            allow_children = True
+            child_classes = ("ChildPlugin",)
+
+        class ChildPlugin(CMSPluginBase):
+            render_template = "base.html"
+            parent_classes = ("ParentPlugin",)
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            self.assertCheck(True, warnings=0)
+
+    def test_plugin_parent_child_relations_empty_string(self):
+        class ChildPlugin(CMSPluginBase):
+            render_template = "base.html"
+            parent_classes = ("",)
+
+        with register_plugins(ChildPlugin):
+            self.assertCheck(True, warnings=0)
+
+
+class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
     def test_check_plugin_instances(self):
         self.assertCheck(True, warnings=0, errors=0)
 
         placeholder = Placeholder.objects.create(slot="test")
         add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, TextPlugin, "en", body="en body")
-        add_plugin(placeholder, "LinkPlugin", "en",
-                   name="A Link", external_link="https://www.django-cms.org")
+        add_plugin(placeholder, "LinkPlugin", "en", name="A Link", external_link="https://www.django-cms.org")
 
         # create a CMSPlugin with an unsaved instance
         instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")

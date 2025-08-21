@@ -1,5 +1,6 @@
 import os
 from functools import update_wrapper
+from typing import Any
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -14,7 +15,8 @@ __all__ = [
 ]
 
 
-class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
+class VERIFIED:
+    pass  # need a unique identifier for CMS_LANGUAGES
 
 
 def _load_from_file(module_path):
@@ -90,6 +92,17 @@ DEFAULTS = {
     'HIDE_LEGACY_FEATURES': True,
     'COLOR_SCHEME': 'auto',
     'COLOR_SCHEME_TOGGLE': True,
+    'CATCH_PLUGIN_500_EXCEPTION': True,
+    'DEFAULT_IN_NAVIGATION': True,
+    'ALWAYS_REFRESH_CONTENT': False,
+    'ENABLE_HELP': True,  # Adds help menu toolbar
+    'EXTRA_HELP_MENU_ITEMS': (),
+    'HELP_MENU_ITEMS': (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
 }
 
 
@@ -129,7 +142,7 @@ def get_toolbar_url__enable():
     return get_cms_setting('TOOLBAR_URL__ENABLE')
 
 
-def get_templates():
+def get_templates() -> list[tuple[str, Any]]:
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
         # CMS_TEMPLATES_DIR can either be a string pointing to the templates directory
@@ -290,7 +303,7 @@ COMPLEX = {
 }
 
 
-def get_cms_setting(name):
+def get_cms_setting(name) -> Any:
     if name in COMPLEX:
         return COMPLEX[name]()
     return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])

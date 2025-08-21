@@ -169,7 +169,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(4):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
                 with self.assertNumQueries(FuzzyInt(8, 16)):
@@ -525,10 +525,8 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(0):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
-            old_plugins = plugin_pool.plugins
-            plugin_pool.clear()
-            plugin_pool.discover_plugins()
-            plugin_pool.plugins = old_plugins
+
+            invalidate_cms_page_cache()
             with self.assertNumQueries(FuzzyInt(1, 20)):
                 response = self.client.get(page1_url)
                 self.assertEqual(response.status_code, 200)

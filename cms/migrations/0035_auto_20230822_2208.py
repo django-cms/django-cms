@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name='page',
             options={'default_permissions': ('add', 'change', 'delete'), 'permissions': (
-            ('view_page', 'Can view page'), ('edit_static_placeholder', 'Can edit static placeholders')),
+                ('view_page', 'Can view page'), ('edit_static_placeholder', 'Can edit static placeholders')),
                      'verbose_name': 'page', 'verbose_name_plural': 'pages'},
         ),
         migrations.AlterModelOptions(

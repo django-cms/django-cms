@@ -4,7 +4,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
-from cms.utils import get_current_site
+from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_cms_setting
 
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
@@ -50,9 +50,18 @@ def get_clean_username(user):
     return username
 
 
-def get_page_queryset(site, draft=True, published=False):
-    from cms.models import Page
+def get_page_queryset(site, draft=True, published=False):  # pragma: no cover
+    from warnings import warn
 
+    from cms.models import Page
+    from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+
+    warn(
+        "cms.utils.page.get_page_queryset is deprecated. "
+        "Use Page.objects.on_site(site) instead.",
+        RemovedInDjangoCMS60Warning,
+        stacklevel=2,
+    )
     return Page.objects.on_site(site)
 
 
@@ -105,10 +114,10 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     page_urls = list(page_urls)  # force queryset evaluation to save 1 query
     try:
         page = page_urls[0].page
+        if page_urls[0].language == get_language_from_request(request):
+            page.urls_cache = {url.language: url for url in page_urls}
     except IndexError:
         page = None
-    else:
-        page.urls_cache = {url.language: url for url in page_urls}
     return page
 
 

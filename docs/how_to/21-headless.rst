@@ -1,3 +1,5 @@
+.. _headless_mode:
+
 ########################################
  How to run django CMS in headless mode
 ########################################

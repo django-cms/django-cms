@@ -277,6 +277,10 @@ class CMSToolbarBase(BaseToolbar):
         if self.is_staff:
             try:
                 user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
+                if user_settings.clipboard and not user_settings.clipboard.object_id:
+                    # Add source field to existing clipboard objects
+                    user_settings.clipboard.source = user_settings
+                    user_settings.clipboard.save()
             except UserSettings.DoesNotExist:
                 placeholder = Placeholder.objects.create(slot="clipboard")
                 user_settings = UserSettings.objects.create(
@@ -284,6 +288,8 @@ class CMSToolbarBase(BaseToolbar):
                     language=self.request_language,
                     user=self.request.user,
                 )
+                placeholder.source = user_settings  # Populate source
+                placeholder.save()
         return user_settings
 
     def _reorder_toolbars(self):
@@ -370,10 +376,33 @@ class CMSToolbarBase(BaseToolbar):
         return item
 
     def set_object(self, obj):
+        """
+        Associates an object with the toolbar.
+
+        Sets the toolbar's object if one has not already been set. This object is typically
+        a Django model instance that the toolbar should operate on, such as a :class:`~cms.models.contentmodels.PageContent` object or any
+        other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
+
+        The object is used by other toolbar methods like :meth:`get_object_edit_url`,
+        :meth:`get_object_preview_url`, and :meth:`get_object_structure_url` to generate
+        appropriate URLs for the object.
+
+        :param obj: The object to associate with the toolbar
+        :type obj: django.db.models.Model
+        """
         if not self.obj:
             self.obj = obj
 
     def get_object(self):
+        """
+        Returns the object currently associated with the toolbar.
+
+        This returns the object that was previously set using :meth:`set_object`,
+        or ``None`` if no object has been associated with the toolbar.
+
+        :returns: The object associated with the toolbar, or None
+        :rtype: django.db.models.Model or None
+        """
         return self.obj
 
     def get_object_model(self):
@@ -559,7 +588,7 @@ class CMSToolbarBase(BaseToolbar):
         return f'{toolbar}\n{rendered_contents}'
 
 
-# Add toolbar mixins from extensions to toolbar
+#: :class:`CMSToolbarBase` including toolbar mixins from extensions to toolbar
 CMSToolbar = type("CMSToolbar", tuple(cms_toolbar_extensions + [CMSToolbarBase]), dict())
 
 

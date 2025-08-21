@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -26,7 +25,7 @@ class PageContent(models.Model):
         (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    template_choices = get_cms_setting('TEMPLATES')
 
     # These are the fields whose values are compared when saving
     # a PageContent object to know if it has changed.
@@ -227,7 +226,7 @@ class PageContent(models.Model):
                     self
                     .get_ancestor_titles()
                     .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-                    .order_by('-page__node__path')
+                    .order_by('-page__path')
                     .values_list('template', flat=True)
                 )
                 if templates:
@@ -237,7 +236,7 @@ class PageContent(models.Model):
             else:
                 placeholder_set = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
 
-            for key, value, _ in get_cms_setting("PLACEHOLDERS"):
+            for key, value, __ in get_cms_setting("PLACEHOLDERS"):
                 if key == placeholder_set or key == "":  # NOQA: PLR1714 - Empty string matches always
                     self._placeholder_slot_cache = value
                     break

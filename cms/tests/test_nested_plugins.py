@@ -1,4 +1,4 @@
-from djangocms_text_ckeditor.models import Text
+from djangocms_text.models import Text
 
 from cms.api import add_plugin, create_page
 from cms.models import Page
@@ -991,3 +991,50 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         self.copy_placeholders_and_check_results([placeholder])
         self.compare_plugin_tree(expected_tree, placeholder)
+
+    def test_recalculate_plugin_positions(self):
+        """
+        Test to verify that the plugin positions are recalculated correctly
+        when a plugin is moved to another placeholder.
+        """
+        import random
+
+        placeholder = Placeholder(slot="some_slot")
+        placeholder.save()
+        # plugins in placeholder
+        n0 = 10  # Number of plugins in the first positions
+        n = 50  # Number of plugins after the gap (of at least n)
+        order = list(random.sample(range(1, n0 + 1), n0))
+        order += list(random.sample(range(n0 + n + 1, n0 + 3 * n + 2), n))
+        for lang in ("en", "it"):
+            for i, pos in enumerate(order):
+                CMSPlugin.objects.create(
+                    plugin_type=str(i),
+                    placeholder=placeholder,
+                    language=lang,
+                    position=pos,
+                    parent=None,
+                )
+
+        placeholder._recalculate_plugin_positions("en")
+
+        plugins = placeholder.get_plugins("en").order_by("position")
+        for i, plugin in enumerate(plugins, start=1):
+            self.assertEqual(plugin.position, i)
+
+    def test_recalculate_plugin_positions_empty_placeholder(self):
+        """
+        Test to verify that recalculating plugin positions on an empty placeholder
+        doesn't error and leaves the plugin list empty for a given language.
+        """
+        # Create an empty placeholder for language "en"
+        placeholder = Placeholder(slot="empty_slot")
+        placeholder.save()
+
+        # Invoke the recalculation function for the language "en".
+        # Adjust the call to _recalculate_plugin_positions as needed.
+        placeholder._recalculate_plugin_positions("en")
+
+        # Assert that the plugin list for the placeholder in language "en" remains empty.
+        plugins = list(placeholder.get_plugins(language="en"))
+        self.assertEqual(plugins, [])
