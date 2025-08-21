@@ -14,7 +14,7 @@
         <div class="cms-dropdown-inner">
             {% if placeholder.is_static %}
                 <div class="cms-submenu-item">
-                    <a data-cms-icon="view" href="{% get_preview_url placeholder.source %}">{% translate "Edit" %}</a>
+                    <a data-cms-icon="edit" href="{% get_edit_url placeholder.source %}">{% translate "Edit" %}</a>
                 </div>
             {% endif %}
             <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy" href="#">{% trans "Copy all" %}</a></div>

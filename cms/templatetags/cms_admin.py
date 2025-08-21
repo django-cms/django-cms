@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models import Page, PageContent, Placeholder
-from cms.toolbar.utils import get_object_preview_url
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -64,10 +64,22 @@ class GetPreviewUrl(AsTag):
             )
         if not page_content:
             return ""
-        return get_object_preview_url(page_content, language=page_content.language)
+        return self.get_url(page_content, language=page_content.language)
+
+    def get_url(self, object, language):
+        return get_object_preview_url(object, language=language)
+
+
+class GetEditUrl(GetPreviewUrl):
+    """Classy tag that returns the url for editing PageContent in the admin."""
+    name = "get_edit_url"
+
+    def get_url(self, object, language):
+        return get_object_edit_url(object, language=language)
 
 
 register.tag(GetPreviewUrl.name, GetPreviewUrl)
+register.tag(GetEditUrl.name, GetEditUrl)
 
 
 @register.simple_tag(takes_context=True)
