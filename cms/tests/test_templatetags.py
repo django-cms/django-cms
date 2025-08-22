@@ -108,6 +108,25 @@ class TemplatetagTests(CMSTestCase):
         self.assertIn(expected_for_page, output)
         self.assertIn(expected_for_german_content, output)
 
+    def test_placeholder_is_immutable_filter(self):
+        template = """
+            {% load cms_admin %}
+            non-placeholder={{ True|placeholder_is_immutable:request.user }}
+            placeholder={{ placeholder|placeholder_is_immutable:request.user }}
+        """
+        from cms.models import Placeholder
+        from unittest.mock import patch
+
+        page = create_page("page_a", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").first()
+        request = self.get_request()
+
+        with patch.object(Placeholder, "check_source", wraps=placeholder.check_source) as mock_check_source:
+            output = self.render_template_obj(template, {"placeholder": placeholder}, request=request)
+            self.assertIn("non-placeholder=True", output)
+            self.assertIn("placeholder=False", output)
+            self.assertEqual(mock_check_source.call_count, 1)
+
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en", slug="slug-test2")
         self.assertEqual(get_page_display_name(page), "page_a")
