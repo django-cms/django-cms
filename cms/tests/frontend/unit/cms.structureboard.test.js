@@ -872,7 +872,7 @@ describe('CMS.StructureBoard', function() {
             options = board.ui.sortables.nestedSortable('option');
             expect(options).toEqual(
                 jasmine.objectContaining({
-                    items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
+                    items: '> .cms-draggable:not(.cms-drag-disabled):not(.cms-draggable-disabled .cms-draggable)',
                     placeholder: 'cms-droppable',
                     connectWith: '.cms-draggables:not(.cms-hidden)',
                     appendTo: '.cms-structure-content',
