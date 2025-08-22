@@ -1,7 +1,8 @@
 import operator
 import warnings
 from collections import OrderedDict
-from typing import Optional, Union
+from functools import lru_cache
+from typing import TYPE_CHECKING, Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -23,6 +24,10 @@ from sekizai.helpers import get_varname
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import EmptyPageContent, Placeholder
 from cms.utils.conf import get_cms_setting
+
+if TYPE_CHECKING:
+    from cms.templatetags.cms_tags import DeclaredPlaceholder
+
 
 RANGE_START = 128
 
@@ -239,7 +244,8 @@ def _scan_static_placeholders(nodelist):
     return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
 
 
-def get_placeholders(template):
+@lru_cache
+def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
     compiled_template = get_template(template)
 
     placeholders = []
@@ -260,24 +266,6 @@ def get_placeholders(template):
             placeholders.append(placeholder)
             clean_placeholders.append(slot)
     return placeholders
-
-
-def get_static_placeholders(template, context):
-    compiled_template = get_template(template)
-    nodes = _scan_static_placeholders(_get_nodelist(compiled_template))
-    placeholders = [node.get_declaration(context) for node in nodes]
-    placeholders_with_code = []
-
-    for placeholder in placeholders:
-        if placeholder.slot:
-            placeholders_with_code.append(placeholder)
-        else:
-            warnings.warn(
-                "Unable to resolve static placeholder "
-                f'name in template "{template}"',
-                Warning,
-            )
-    return placeholders_with_code
 
 
 def _get_block_nodes(extend_node):
