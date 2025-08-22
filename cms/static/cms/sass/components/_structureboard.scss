@@ -438,7 +438,6 @@
 
         .cms-draggable {
             margin-inline-start: $structure-draggable-inner-padding !important;
-            margin-inline-start: 15px;
             .cms-dragitem {
                 background-image: none;
                 &:hover {
@@ -446,12 +445,16 @@
                 }
             }
         }
-
         .cms-draggables,
         .cms-droppable {
             display: none !important;
         }
     }
+    .cms-drag-disabled.cms-draggable > .cms-dragitem {
+        // Remove drag handle from read-only dragables
+        background-image: none;
+    }
+
     .cms-plugin-disabled {
         position: absolute;
         top: 50%;
@@ -484,12 +487,12 @@
             padding-inline: 15px;
             overflow-x: hidden;
         }
-        .cms-draggables .cms-draggables {
-            padding-inline-start: 15px;
+        .cms-collapsable-container {
+            padding-inline-start: math.div($structure-draggable-inner-padding, 2);
         }
         .cms-draggable-disabled {
             .cms-draggable {
-                margin-inline-start: 15px !important;
+                margin-inline-start: math.div($structure-draggable-inner-padding, 2) !important;
             }
         }
 
