@@ -114,8 +114,9 @@ class TemplatetagTests(CMSTestCase):
             non-placeholder={{ True|placeholder_is_immutable:request.user }}
             placeholder={{ placeholder|placeholder_is_immutable:request.user }}
         """
-        from cms.models import Placeholder
         from unittest.mock import patch
+
+        from cms.models import Placeholder
 
         page = create_page("page_a", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").first()
