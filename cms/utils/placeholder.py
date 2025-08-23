@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import connection, models
 from django.db.models.query_utils import Q
 from django.template import (
     Context,
@@ -341,10 +341,15 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
 
     if new_placeholders:
-        new_placeholders = Placeholder.objects.bulk_create(new_placeholders)
-        for placeholder in new_placeholders:
-            placeholders[placeholder.slot] = placeholder
-            assert placeholder.pk is not None
+        if connection.features.can_return_rows_from_bulk_insert:
+            Placeholder.objects.bulk_create(new_placeholders)
+            for placeholder in new_placeholders:
+                placeholders[placeholder.slot] = placeholder
+        else:
+            # Some MySql versions do not support returning IDs from bulk_create
+            for placeholder in new_placeholders:
+                placeholder.save()
+                placeholders[placeholder.slot] = placeholder
 
     return placeholders
 
