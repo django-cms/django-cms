@@ -341,7 +341,7 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
 
     if new_placeholders:
-        Placeholder.objects.bulk_create(new_placeholders)
+        new_placeholders = Placeholder.objects.bulk_create(new_placeholders)
         for placeholder in new_placeholders:
             placeholders[placeholder.slot] = placeholder
 
