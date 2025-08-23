@@ -96,7 +96,7 @@ class CopyLangCommand(SubcommandsCommand):
 
                     # copy PageUrls - inspired from pagemodels.Page.copy() - possibly refactorable
                     page_url = page.urls.get(language=from_lang)
-                    parent_page = page.parent.cms_pages.first()
+                    parent_page = page.parent
 
                     new_url = model_to_dict(page_url)
                     new_url.pop("id", None)  # No PK
