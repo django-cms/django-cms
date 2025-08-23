@@ -1,7 +1,7 @@
 import operator
 import warnings
 from collections import OrderedDict
-from functools import lru_cache
+from functools import cache
 from typing import TYPE_CHECKING, Optional, Union
 
 from django.conf import settings
@@ -246,7 +246,7 @@ def _scan_static_placeholders(nodelist):
     return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
 
 
-@lru_cache
+@cache
 def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
     compiled_template = get_template(template)
 
