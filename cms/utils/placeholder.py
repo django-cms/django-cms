@@ -1,4 +1,5 @@
 import operator
+import os
 import warnings
 from collections import OrderedDict
 from functools import cache
@@ -246,7 +247,6 @@ def _scan_static_placeholders(nodelist):
     return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
 
 
-@cache
 def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
     compiled_template = get_template(template)
 
@@ -268,6 +268,11 @@ def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
             placeholders.append(placeholder)
             clean_placeholders.append(slot)
     return placeholders
+
+if settings.DEBUG is False or os.environ.get("DJANGO_TESTS"):
+    # Cache in production only, so template changes in development
+    # are always reflected without needing a server restart
+    get_placeholders = cache(get_placeholders)
 
 
 def _get_block_nodes(extend_node):
