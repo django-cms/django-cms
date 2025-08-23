@@ -1,13 +1,15 @@
 import logging
+import os
 import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache
+from functools import cache, lru_cache
 from itertools import starmap
 from operator import itemgetter
 from typing import Optional
 
+from django.db import models
 from django.http import HttpRequest
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
@@ -495,22 +497,28 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
 
     """
     limits = get_placeholder_conf("limits", placeholder.slot, template)
-    if limits:
-        global_limit = limits.get("global")
-        type_limit = limits.get(plugin_type)
-        # total plugin count
-        count = placeholder.get_plugins(language=language).count()
-        if global_limit and count >= global_limit:
-            raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s)." % count))
-        elif type_limit:
-            # total plugin type count
-            type_count = placeholder.get_plugins(language=language).filter(plugin_type=plugin_type).count()
-            if type_count >= type_limit:
-                plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
-                raise PluginLimitReached(
-                    _(
-                        "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
-                    )
-                    % {"limit": type_limit, "plugin_name": plugin_name}
-                )
-    return False
+    if not limits:
+        return False
+
+    global_limit = limits.get("global")
+    type_limit = limits.get(plugin_type)
+    # total plugin counts
+    counts = placeholder.get_plugins(language=language).aggregate(
+        total_count=models.Count('pk'),
+        type_count=models.Count('pk', filter=models.Q(plugin_type=plugin_type))
+    )
+    global_limit = limits.get("global")
+    type_limit = limits.get(plugin_type)
+
+    if global_limit and counts['total_count'] >= global_limit:
+        raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s).") % counts['total_count'])
+
+    if type_limit and counts['type_count'] >= type_limit:
+        plugin_name = get_plugin_class(plugin_type).name
+        raise PluginLimitReached(
+            _(
+                "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
+            )
+            % {"limit": type_limit, "plugin_name": plugin_name}
+        )
+

@@ -142,7 +142,9 @@ def validate_placeholder_name(name):
             "Placeholder identifier names need to be of type string. "
         )
 
-    if not all(ord(char) < RANGE_START for char in name):
+    try:
+        name.encode("ascii")
+    except UnicodeEncodeError:
         raise ImproperlyConfigured(
             "Placeholder identifiers names may not "
             "contain non-ascii characters. If you wish your placeholder "
@@ -334,6 +336,7 @@ def rescan_placeholders_for_obj(obj):
     from cms.models import Placeholder
 
     existing = OrderedDict()
+    new_placeholders = []
     declared_placeholders = get_declared_placeholders_for_obj(obj)
     placeholders = [pl.slot for pl in declared_placeholders]
 
@@ -343,10 +346,13 @@ def rescan_placeholders_for_obj(obj):
 
     for placeholder in placeholders:
         if placeholder not in existing:
-            existing[placeholder] = Placeholder.objects.create(
-                slot=placeholder,
-                source=obj,
-            )
+            new_placeholders.append(Placeholder(slot=placeholder, source=obj))
+
+    if new_placeholders:
+        Placeholder.objects.bulk_create(new_placeholders)
+        for placeholder in new_placeholders:
+            existing[placeholder.slot] = placeholder
+
     return existing
 
 
