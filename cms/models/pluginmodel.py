@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
+import re
 import warnings
 from datetime import date
-from functools import cache
+from functools import cache, cached_property
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
@@ -202,9 +203,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return display
 
     def get_plugin_name(self):
-        from cms.plugin_pool import plugin_pool
-
-        return plugin_pool.get_plugin(self.plugin_type).name
+        return self.plugin_class.name
 
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
@@ -212,10 +211,14 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             return force_str(instance)
         return _("<Empty>")
 
-    def get_plugin_class(self):
+    @cached_property
+    def plugin_class(self):
         from cms.plugin_pool import plugin_pool
 
         return plugin_pool.get_plugin(self.plugin_type)
+
+    def get_plugin_class(self):
+        return self.plugin_class
 
     def get_plugin_class_instance(self, admin=None):
         plugin_class = self.get_plugin_class()
@@ -264,7 +267,15 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return self._inst
 
     def get_plugin_info(self, children=None, parents=None):
-        plugin_class = self.get_plugin_class()
+        plugin_class = self.plugin_class
+
+        if not hasattr(CMSPlugin, '_edit_url'):
+            CMSPlugin._edit_url = admin_reverse('cms_placeholder_edit_plugin', args=(0,))
+            CMSPlugin._add_url = admin_reverse('cms_placeholder_add_plugin')
+            CMSPlugin._delete_url = admin_reverse('cms_placeholder_delete_plugin', args=(0,))
+            CMSPlugin._move_url = admin_reverse('cms_placeholder_move_plugin')
+            CMSPlugin._copy_url = admin_reverse('cms_placeholder_copy_plugins')
+
         return {
             'type': 'plugin',
             'position': self.position,
@@ -278,7 +289,13 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             'plugin_parent_restriction': parents or [],
             'disable_edit': plugin_class.disable_edit,
             'disable_child_plugins': plugin_class.disable_child_plugins,
-            'urls': self.get_action_urls(),
+            'urls': {
+                'edit_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._edit_url),
+                'add_plugin': CMSPlugin._add_url,
+                'delete_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._delete_url),
+                'move_plugin': CMSPlugin._move_url,
+                'copy_plugin': CMSPlugin._copy_url,
+            }
         }
 
     def refresh_from_db(self, *args, **kwargs):
@@ -449,7 +466,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             # TODO: Remove this condition
             # once the javascript files have been refactored
             # to use the new naming schema (ending in _url).
-            data = {
+            return {
                 'edit_plugin': admin_reverse('cms_placeholder_edit_plugin', args=(self.pk,)),
                 'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
                 'delete_plugin': admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,)),
@@ -457,14 +474,13 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
                 'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
             }
         else:
-            data = {
+            return {
                 'edit_url': admin_reverse('cms_placeholder_edit_plugin', args=(self.pk,)),
                 'add_url': admin_reverse('cms_placeholder_add_plugin'),
                 'delete_url': admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,)),
                 'move_url': admin_reverse('cms_placeholder_move_plugin'),
                 'copy_url': admin_reverse('cms_placeholder_copy_plugins'),
             }
-        return data
 
 
 def get_plugin_media_path(instance, filename):

@@ -1209,7 +1209,7 @@ class PlaceholderPluginTestsBase(CMSTestCase):
             position=position,
             placeholder=placeholder,
         )
-        plugin_model = base.get_plugin_class().model
+        plugin_model = base.plugin_class.model
         plugin = plugin_model()
         base.set_base_attr(plugin)
         plugin.save()

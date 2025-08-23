@@ -95,12 +95,12 @@ class BaseRenderer:
 
     def __init__(self, request: HttpRequest):
         self.request = request
-        self._cached_templates = {}
         self._cached_plugin_classes = {}
         self._placeholders_content_cache = {}
         self._placeholders_by_page_cache = {}
         self._rendered_placeholders = OrderedDict()
         self._rendered_plugins_by_placeholder = {}
+        self._cached_add_perms = {}
 
     @cached_property
     def current_page(self) -> Page:
@@ -128,17 +128,23 @@ class BaseRenderer:
     def request_language(self) -> str:
         return get_language_from_request(self.request)
 
+    def _can_add_plugin(self, plugin_type: str) -> bool:
+        can_add = self._cached_add_perms.get(plugin_type)
+        if can_add is None:
+            can_add = has_plugin_permission(
+                user=self.request.user, plugin_type=plugin_type, permission_type="add"
+            )
+            self._cached_add_perms[plugin_type] = can_add
+        return can_add
+
     def get_placeholder_plugin_menu(
         self, placeholder: Placeholder, page: Optional[Page] = None
     ):
         registered_plugins = self.plugin_pool.registered_plugins
-        can_add_plugin = partial(
-            has_plugin_permission, user=self.request.user, permission_type="add"
-        )
         plugins = [
             plugin
             for plugin in registered_plugins
-            if can_add_plugin(plugin_type=plugin.value)
+            if self._can_add_plugin(plugin_type=plugin.value)
         ]
         plugin_menu = get_toolbar_plugin_struct(
             plugins=plugins,

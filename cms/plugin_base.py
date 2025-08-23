@@ -85,10 +85,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-T = TypeVar("T", bound=Callable)
-
-
-def template_slot_caching(method: T) -> T:
+def template_slot_caching(method: Callable) -> Callable:
     """
     Decorator that enables global caching for methods based on placeholder slots and templates.
 
@@ -109,12 +106,8 @@ def template_slot_caching(method: T) -> T:
             pass
     """
 
-    @wraps(method)
-    def wrapper(*args, **kwargs):
-        return method(*args, **kwargs)
-
-    wrapper._template_slot_caching = True
-    return cast(T, wrapper)
+    method._template_slot_caching = True
+    return method
 
 
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
@@ -736,7 +729,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
 
-        return sorted(plugin_pool.get_all_plugins(slot, page, root_plugin=False), key=attrgetter("module", "name"))
+        return sorted(list(plugin_pool.get_all_plugins(slot, page, root_plugin=False)), key=attrgetter("module", "name"))
 
     @classmethod
     @template_slot_caching

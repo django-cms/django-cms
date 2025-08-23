@@ -1,7 +1,7 @@
 import operator
 import os
 import warnings
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from functools import cache
 from typing import TYPE_CHECKING, Optional, Union
 
@@ -49,6 +49,37 @@ def get_context():
         return {}
 
 
+_placeholder_settings = {}
+
+def _get_placeholder_settings():
+    conf = get_cms_setting("PLACEHOLDER_CONF")
+    template_in_conf = any(".htm" in key for key in conf if key)
+    if id(conf) in _placeholder_settings:
+        return _placeholder_settings[id(conf)], template_in_conf
+
+    def resolve_inheritance(key):
+        return resolve_inheritance(conf[key]['inherit']) if "inherit" in conf[key] else conf[key]
+
+    new_conf = {}
+    for key, value in conf.items():
+        if "inherit" in value:
+            new_conf[key] = resolve_inheritance(value['inherit'])
+            new_conf[key].update({k: v for k, v in value.items() if k != "inherit"})
+        else:
+            new_conf[key] = value
+
+
+    settings = defaultdict(dict)
+    for key, value in new_conf.items():
+        for setting, setting_value in value.items():
+            settings[setting][key] = setting_value
+
+    _placeholder_settings[id(conf)] = settings
+    return settings, template_in_conf
+
+_fix_settings = _get_placeholder_settings()
+
+
 def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str] = None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
@@ -64,39 +95,19 @@ def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str]
     Template is only evaluated if the placeholder configuration contains key with ".html" or ".htm"
     """
 
-    if placeholder:
-        keys = []
-        placeholder_conf = get_cms_setting("PLACEHOLDER_CONF")
-        template_in_conf = any(".htm" in (key or "") for key in placeholder_conf) and template
-        # 1st level
-        if template_in_conf:
-            keys.append(f"{template} {placeholder}")
-        # 2nd level
-        keys.append(placeholder)
-        # 3rd level
-        if template_in_conf:
-            keys.append(str(template))
-        # 4th level
-        keys.append(None)
-        for key in keys:
-            try:
-                conf = placeholder_conf[key]
-                value = conf.get(setting, None)
-                if value is not None:
-                    return value
-                inherit = conf.get("inherit")
-                if inherit:
-                    if " " in inherit:
-                        inherit = inherit.split(" ")
-                    else:
-                        inherit = (None, inherit)
-                    value = get_placeholder_conf(
-                        setting, inherit[1], inherit[0], default
-                    )
-                    if value is not None:
-                        return value
-            except KeyError:
-                continue
+    _placeholder_settings, template_in_conf = _fix_settings
+    if setting not in _placeholder_settings:
+        return default
+
+    if template_in_conf and template is not None:
+        keys = [f"{template} {placeholder}", placeholder, str(template), None]
+    else:
+        keys = [placeholder, None]
+
+    conf = _placeholder_settings[setting]
+    for key in keys:
+        if (value := conf.get(key, None)) is not None:
+            return value
     return default
 
 
