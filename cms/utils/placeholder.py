@@ -241,12 +241,6 @@ def _scan_placeholders(
     return nodes
 
 
-def _scan_static_placeholders(nodelist):
-    from cms.templatetags.cms_tags import StaticPlaceholderNode
-
-    return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
-
-
 def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
     compiled_template = get_template(template)
 
@@ -337,31 +331,24 @@ def _find_topmost_template(extend_node):
     return extend_node.get_parent(get_context())
 
 
-def rescan_placeholders_for_obj(obj):
+def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     from cms.models import Placeholder
 
-    existing = OrderedDict()
-    new_placeholders = []
     declared_placeholders = get_declared_placeholders_for_obj(obj)
-    placeholders = [pl.slot for pl in declared_placeholders]
+    placeholders = {pl.slot: None for pl in declared_placeholders}
 
-    for placeholder in Placeholder.objects.get_for_obj(obj):
-        if placeholder.slot in placeholders:
-            existing[placeholder.slot] = placeholder
-
-    for placeholder in placeholders:
-        if placeholder not in existing:
-            new_placeholders.append(Placeholder(slot=placeholder, source=obj))
+    placeholders.update({placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj) if placeholder.slot in placeholders})
+    new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
 
     if new_placeholders:
         Placeholder.objects.bulk_create(new_placeholders)
         for placeholder in new_placeholders:
-            existing[placeholder.slot] = placeholder
+            placeholders[placeholder.slot] = placeholder
 
-    return existing
+    return placeholders
 
 
-def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent, None]) -> list[Placeholder]:
+def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent, None]) -> list['DeclaredPlaceholder']:
     """Returns declared placeholders for an object. The object is supposed to either have a method
     ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
