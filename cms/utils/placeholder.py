@@ -344,6 +344,7 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
         new_placeholders = Placeholder.objects.bulk_create(new_placeholders)
         for placeholder in new_placeholders:
             placeholders[placeholder.slot] = placeholder
+            assert placeholder.pk is not None
 
     return placeholders
 
