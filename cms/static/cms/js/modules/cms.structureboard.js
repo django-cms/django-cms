@@ -726,7 +726,7 @@ class StructureBoard {
 
         elem
             .nestedSortable({
-                items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
+                items: '> .cms-draggable:not(.cms-drag-disabled):not(.cms-draggable-disabled .cms-draggable)',
                 placeholder: 'cms-droppable',
                 connectWith: '.cms-draggables:not(.cms-hidden)',
                 tolerance: 'intersect',
@@ -862,6 +862,11 @@ class StructureBoard {
                     let immediateParentType;
 
                     if (placeholder && placeholder.closest('.cms-clipboard-containers').length) {
+                        return false;
+                    }
+
+                    // if parent has class disabled, dissalow drop
+                    if (placeholder && placeholder.parent().hasClass('cms-drag-disabled')) {
                         return false;
                     }
 

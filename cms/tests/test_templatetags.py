@@ -29,7 +29,7 @@ from cms.models import (
     PageContent,
     Placeholder,
 )
-from cms.templatetags.cms_admin import GetPreviewUrl, get_page_display_name
+from cms.templatetags.cms_admin import get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
@@ -39,7 +39,7 @@ from cms.templatetags.cms_tags import (
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
 
@@ -75,11 +75,58 @@ class TemplatetagTests(CMSTestCase):
         page = create_page("page_a", "nav_playground.html", "en")
         german_content = create_page_content("de", "Seite_a", page)
 
-        page_preview_url = GetPreviewUrl.get_value(None, context={"request": self.get_request()}, page_content=page)
-        german_content_preview_url = GetPreviewUrl.get_value(None, context={}, page_content=german_content)
+        expected_for_page = f'en={get_object_preview_url(page.get_admin_content("en"), language="en")}'
+        expected_for_german_content = f'de={get_object_preview_url(german_content, language="de")}'
 
-        self.assertIn("/en", page_preview_url)
-        self.assertIn("/de/", german_content_preview_url)
+        template = """
+            {% load cms_admin %}
+            en={% get_preview_url page_obj %}
+            de={% get_preview_url german_content %}
+        """
+        output = self.render_template_obj(template, {"page_obj": page, "german_content": german_content}, self.get_request())
+
+        self.assertIn(expected_for_page, output)
+        self.assertIn(expected_for_german_content, output)
+
+    def test_get_edit_url(self):
+        """The get_edit_url template tag returns the content edit url for its language:
+        If a page is given, take the current language (en), if a page_content is given,
+        take its language (de for this test)"""
+        page = create_page("page_a", "nav_playground.html", "en")
+        german_content = create_page_content("de", "Seite_a", page)
+
+        expected_for_page = f'en={get_object_edit_url(page.get_admin_content("en"), language="en")}'
+        expected_for_german_content = f'de={get_object_edit_url(german_content, language="de")}'
+
+        template = """
+            {% load cms_admin %}
+            en={% get_edit_url page_obj %}
+            de={% get_edit_url german_content %}
+        """
+        output = self.render_template_obj(template, {"page_obj": page, "german_content": german_content}, self.get_request())
+
+        self.assertIn(expected_for_page, output)
+        self.assertIn(expected_for_german_content, output)
+
+    def test_placeholder_is_immutable_filter(self):
+        template = """
+            {% load cms_admin %}
+            non-placeholder={{ True|placeholder_is_immutable:request.user }}
+            placeholder={{ placeholder|placeholder_is_immutable:request.user }}
+        """
+        from unittest.mock import patch
+
+        from cms.models import Placeholder
+
+        page = create_page("page_a", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").first()
+        request = self.get_request()
+
+        with patch.object(Placeholder, "check_source", wraps=placeholder.check_source) as mock_check_source:
+            output = self.render_template_obj(template, {"placeholder": placeholder}, request=request)
+            self.assertIn("non-placeholder=True", output)
+            self.assertIn("placeholder=False", output)
+            self.assertEqual(mock_check_source.call_count, 1)
 
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en", slug="slug-test2")
