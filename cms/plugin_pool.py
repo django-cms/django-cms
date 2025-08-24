@@ -240,7 +240,7 @@ class PluginPool:
         be recalculated for each request.
 
         Args:
-            request_cache (dict): The current request cache (only filled is non globally cachable).
+            request_cache (dict): The current request cache (only filled is non globally cacheable).
             instance (CMSPluginBase): The plugin instance for which to retrieve the restrictions cache.
             page (Optional[Page]): The page associated with the plugin instance, if any.
 
