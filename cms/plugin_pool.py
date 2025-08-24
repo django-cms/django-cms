@@ -138,7 +138,6 @@ class PluginPool:
     ):
         from cms.utils.placeholder import get_placeholder_conf
 
-        self.discover_plugins()
         plugins = self.plugins.values()
         template = (
             lazy(page.get_template, str)() if page else None
@@ -188,7 +187,7 @@ class PluginPool:
         """
         Retrieve a plugin from the cache.
         """
-        self.discover_plugins()
+        # self.discover_plugins()
         return self.plugins[name]
 
     def get_patterns(self) -> list[URLResolver]:
@@ -213,7 +212,7 @@ class PluginPool:
         return url_patterns
 
     def get_system_plugins(self) -> list[str]:
-        self.discover_plugins()
+        # self.discover_plugins()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
 
     @cached_property

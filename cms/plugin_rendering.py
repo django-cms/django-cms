@@ -165,6 +165,7 @@ class BaseRenderer:
         )
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
+            page=page,
             restrictions_cache=placeholder_cache,  # Store non-global plugin-restriction in placeholder_cache
         )
         content = get_plugin_toolbar_js(

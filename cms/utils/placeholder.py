@@ -49,16 +49,25 @@ def get_context():
         return {}
 
 
-_placeholder_settings = {}
-
 def _get_placeholder_settings():
+    """Convert CMS_PLACEHOLDER_CONF into a faster to access format since it is accessed many times
+    in each request response cycle:
+    * setting key on the first level dict, scope on the second level
+    * resolve inheritance
+    * Check of template-specific configs exist (expensive to access)
+    """
     conf = get_cms_setting("PLACEHOLDER_CONF")
     template_in_conf = any(".htm" in key for key in conf if key)
-    if id(conf) in _placeholder_settings:
-        return _placeholder_settings[id(conf)], template_in_conf
 
-    def resolve_inheritance(key):
-        return resolve_inheritance(conf[key]['inherit']) if "inherit" in conf[key] else conf[key]
+    def resolve_inheritance(key, visited=None):
+        if visited is None:
+            visited = set()
+        if key in visited:
+            raise ImproperlyConfigured(f"Circular inheritance detected in CMS_PLACEHOLDER_CONF at key '{key}'")
+        visited.add(key)
+        if "inherit" in conf[key]:
+            return resolve_inheritance(conf[key]['inherit'], visited)
+        return conf[key]
 
     new_conf = {}
     for key, value in conf.items():
@@ -74,10 +83,16 @@ def _get_placeholder_settings():
         for setting, setting_value in value.items():
             settings[setting][key] = setting_value
 
-    _placeholder_settings[id(conf)] = settings
     return settings, template_in_conf
 
-_fix_settings = _get_placeholder_settings()
+
+_placeholder_settings, _template_in_conf = _get_placeholder_settings()
+
+
+def _clear_placeholder_conf_cache():
+    # Needed by the override_placeholder_conf context manager for tests
+    global _placeholder_settings, _template_in_conf
+    _placeholder_settings, _template_in_conf = _get_placeholder_settings()
 
 
 def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str] = None, default=None):
@@ -95,11 +110,10 @@ def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str]
     Template is only evaluated if the placeholder configuration contains key with ".html" or ".htm"
     """
 
-    _placeholder_settings, template_in_conf = _fix_settings
     if setting not in _placeholder_settings:
         return default
 
-    if template_in_conf and template is not None:
+    if _template_in_conf and template is not None:
         keys = [f"{template} {placeholder}", placeholder, str(template), None]
     else:
         keys = [placeholder, None]
@@ -343,7 +357,7 @@ def _find_topmost_template(extend_node):
 
 
 def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
-    from cms.models import Placeholder
+    from cms.models import CMSPlugin, Placeholder
 
     declared_placeholders = get_declared_placeholders_for_obj(obj)
     placeholders = {pl.slot: None for pl in declared_placeholders}  # Fix order of placeholders in dict
@@ -357,13 +371,15 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
         if connection.features.can_return_rows_from_bulk_insert:
             Placeholder.objects.bulk_create(new_placeholders)
             for placeholder in new_placeholders:
-                placeholder._prefetched_objects_cache = {"cmsplugin_set": []}  # No plugins in newly created placeholder yet
+                # No plugins in newly created placeholder yet
+                placeholder._prefetched_objects_cache = {"cmsplugin_set": CMSPlugin.objects.none()}
                 placeholders[placeholder.slot] = placeholder
         else:
             # Some MySql versions do not support returning IDs from bulk_create
             for placeholder in new_placeholders:
                 placeholder.save()
-                placeholder._prefetched_objects_cache = {"cmsplugin_set": []}  # No plugins in newly created placeholder yet
+                # No plugins in newly created placeholder yet
+                placeholder._prefetched_objects_cache = {"cmsplugin_set": CMSPlugin.objects.none()}
                 placeholders[placeholder.slot] = placeholder
 
     return placeholders

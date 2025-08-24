@@ -729,7 +729,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
 
-        return sorted(list(plugin_pool.get_all_plugins(slot, page, root_plugin=False)), key=attrgetter("module", "name"))
+        return plugin_pool.get_all_plugins(slot, page, root_plugin=False)
 
     @classmethod
     @template_slot_caching

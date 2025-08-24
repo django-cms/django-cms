@@ -32,7 +32,7 @@ from cms.models import PagePermission, UserSettings
 from cms.test_utils.project.placeholderapp.models import CharPksExample, Example1
 from cms.test_utils.project.placeholderapp.views import ClassDetail, detail_view
 from cms.test_utils.testcases import URL_CMS_USERSETTINGS, CMSTestCase
-from cms.test_utils.util.context_managers import UserLoginContext
+from cms.test_utils.util.context_managers import UserLoginContext, override_placeholder_conf
 from cms.toolbar import utils
 from cms.toolbar.items import (
     AjaxItem,
@@ -779,7 +779,7 @@ class ToolbarTests(ToolbarTestBase):
         )
         self.assertIn(edit_url, [item.url for item in lang_menu.get_items()])  # Edit urls returned
 
-    @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
+    @override_placeholder_conf(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'Charles Babbage'}})
     def test_placeholder_name(self):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en")
@@ -789,7 +789,7 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'PPPP')
+        self.assertContains(response, 'Charles Babbage')
 
     def test_user_settings(self):
         superuser = self.get_superuser()

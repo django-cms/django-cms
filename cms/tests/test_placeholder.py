@@ -28,6 +28,7 @@ from cms.test_utils.project.placeholderapp.models import (
 )
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.utils import (
@@ -629,7 +630,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             },
         }
 
-        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
             # test no inheritance
             returned = get_placeholder_conf("plugins", "main")
             self.assertEqual(returned, TEST_CONF["main"]["plugins"])
@@ -667,14 +668,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             },
         }
 
-        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
             self.assertEqual(force_str(placeholder_1.get_label()), "left column")
             self.assertEqual(force_str(placeholder_2.get_label()), "renamed left column")
             self.assertEqual(force_str(placeholder_3.get_label()), "fallback")
 
         del TEST_CONF[None]
 
-        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
             self.assertEqual(force_str(placeholder_1.get_label()), "left column")
             self.assertEqual(force_str(placeholder_2.get_label()), "renamed left column")
             self.assertEqual(force_str(placeholder_3.get_label()), "No_Name")
@@ -750,7 +751,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
                 ]
             },
         }
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             page = create_page("page_en", "col_two.html", "en")
             placeholder = page.get_placeholders("en").get(slot="col_left")
             context = SekizaiContext()
@@ -785,7 +786,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             },
         }
 
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             page = create_page("page_en", "col_two.html", "en")
             placeholder = page.get_placeholders("en").get(slot="col_left")
             context = SekizaiContext()
@@ -1173,7 +1174,7 @@ class PlaceholderConfTests(TestCase):
             },
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             plugins = list(plugin_pool.get_all_plugins(placeholder, page))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1191,7 +1192,7 @@ class PlaceholderConfTests(TestCase):
             },
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             plugins = list(plugin_pool.get_all_plugins(placeholder, page))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
