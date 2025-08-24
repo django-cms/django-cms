@@ -346,20 +346,24 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     from cms.models import Placeholder
 
     declared_placeholders = get_declared_placeholders_for_obj(obj)
-    placeholders = {pl.slot: None for pl in declared_placeholders}
+    placeholders = {pl.slot: None for pl in declared_placeholders}  # Fix order of placeholders in dict
 
+    # Fill in existing placeholders
     placeholders.update({placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj) if placeholder.slot in placeholders})
-    new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
 
+    # Create missing placeholders
+    new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
     if new_placeholders:
         if connection.features.can_return_rows_from_bulk_insert:
             Placeholder.objects.bulk_create(new_placeholders)
             for placeholder in new_placeholders:
+                placeholder._prefetched_objects_cache = {"cmsplugin_set": []}  # No plugins in newly created placeholder yet
                 placeholders[placeholder.slot] = placeholder
         else:
             # Some MySql versions do not support returning IDs from bulk_create
             for placeholder in new_placeholders:
                 placeholder.save()
+                placeholder._prefetched_objects_cache = {"cmsplugin_set": []}  # No plugins in newly created placeholder yet
                 placeholders[placeholder.slot] = placeholder
 
     return placeholders

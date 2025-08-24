@@ -746,7 +746,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         installed_plugins = cls.get_child_plugin_candidates(slot, page)
 
         if child_classes:
+            # Override skips check if current class is valid parent of child classes
             return [plugin.__name__ for plugin in installed_plugins if plugin.__name__ in child_classes]
+
+        if only_uncached:
+            installed_plugins = [plugin for plugin in installed_plugins if not plugin.cache_parent_classes]
 
         child_classes = []
         plugin_type = cls.__name__
@@ -760,12 +764,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # If there are no restrictions then the plugin
         # is a valid child class.
         for plugin_class in installed_plugins:
-            if not only_uncached or not plugin_class.cache_parent_classes:
-                allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
-                if not allowed_parents or plugin_type in allowed_parents:
-                    # Plugin has no parent restrictions or
-                    # Current plugin (self) is a configured parent
-                    child_classes.append(plugin_class.__name__)
+            allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
+            if not allowed_parents or plugin_type in allowed_parents:
+                # Plugin has no parent restrictions or
+                # Current plugin (self) is a configured parent
+                child_classes.append(plugin_class.__name__)
 
         return child_classes
 

@@ -179,9 +179,9 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     if restrictions_cache is None:
         restrictions_cache = {}
 
-    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
+    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
     parents_cache = cache.setdefault("plugin_parents", {})
     children_cache = cache.setdefault("plugin_children", {})
 
@@ -216,13 +216,15 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 slot=plugin.placeholder.slot,
                 page=page,
                 instance=plugin,
+                only_uncached=False,
             )
             if plugin_class.cache_child_classes:  # Check if child classes should be cached
                 # Only add plugins to the cache that have the cache_parent_class attribute set
-                children_cache[plugin_type] = [plugin for plugin in (child_classes or [])
-                                            if plugin_pool.get_plugin(plugin).cache_parent_classes]
+                children_cache[plugin_type] = [
+                    plugin for plugin in (child_classes or []) if plugin_pool.get_plugin(plugin).cache_parent_classes
+                ]
                 if not children_cache[plugin_type] and child_classes:
-                    # Edge case:
+                    # Edge case: NO child classes available
                     children_cache[plugin_type] = [""]
 
     return child_classes, parent_classes

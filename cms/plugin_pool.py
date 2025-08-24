@@ -22,8 +22,11 @@ class PluginPool:
         self.plugins = {}
         self.discovered = False
         self.global_restrictions_cache = {
+            # Initialize the global restrictions cache for each CMS_PLACEHOLDER_CONF
+            # granularity that contains "parent_classes" or "child_classes" overwrites
             None: {},
-            **{key: {} for key in get_cms_setting("PLACEHOLDER_CONF").keys()},
+            **{key: {} for key, value in get_cms_setting("PLACEHOLDER_CONF").items()
+               if "parent_classes" in value or "child_classes" in value},
         }
         self.global_template_restrictions = any(".htm" in (key or "") for key in self.global_restrictions_cache)
 
@@ -240,7 +243,7 @@ class PluginPool:
         be recalculated for each request.
 
         Args:
-            request_cache (dict): The current request cache.
+            request_cache (dict): The current request cache (only filled is non globally cachable).
             instance (CMSPluginBase): The plugin instance for which to retrieve the restrictions cache.
             page (Optional[Page]): The page associated with the plugin instance, if any.
 
@@ -256,11 +259,11 @@ class PluginPool:
         else:
             template = ""
 
-        if f"{template} {slot}" in self.global_restrictions_cache:
+        if template and f"{template} {slot}" in self.global_restrictions_cache:
             return self.global_restrictions_cache[f"{template} {slot}"]
         if template and template in self.global_restrictions_cache:
             return self.global_restrictions_cache[template]
-        if slot in self.global_restrictions_cache:
+        if slot and slot in self.global_restrictions_cache:
             return self.global_restrictions_cache[slot]
         return self.global_restrictions_cache[None]
 
