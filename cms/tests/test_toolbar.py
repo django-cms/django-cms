@@ -565,7 +565,8 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.status_code, 200)
         response_text = response.render().rendered_content
         self.assertTrue(
-            re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text)
+            re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text),
+            "/en/admin/cms/placeholder/edit-plugin/%s not found in %s" % (plugin_1.pk, response_text)
         )
         self.assertTrue(re.search('move_plugin.+/en/admin/cms/placeholder/move-plugin/', response_text))
         self.assertTrue(
@@ -789,7 +790,8 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Charles Babbage')
+        self.assertContains(response, 'Charles Babbage')  # Configured placeholder name
+        self.assertContains(response, 'Col_Sidebar')  # Fall back placeholder name
 
     def test_user_settings(self):
         superuser = self.get_superuser()

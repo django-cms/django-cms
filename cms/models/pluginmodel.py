@@ -269,13 +269,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     def get_plugin_info(self, children=None, parents=None):
         plugin_class = self.plugin_class
 
-        if not hasattr(CMSPlugin, '_edit_url'):
-            CMSPlugin._edit_url = admin_reverse('cms_placeholder_edit_plugin', args=(0,))
-            CMSPlugin._add_url = admin_reverse('cms_placeholder_add_plugin')
-            CMSPlugin._delete_url = admin_reverse('cms_placeholder_delete_plugin', args=(0,))
-            CMSPlugin._move_url = admin_reverse('cms_placeholder_move_plugin')
-            CMSPlugin._copy_url = admin_reverse('cms_placeholder_copy_plugins')
-
         return {
             'type': 'plugin',
             'position': self.position,
@@ -289,13 +282,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             'plugin_parent_restriction': parents or [],
             'disable_edit': plugin_class.disable_edit,
             'disable_child_plugins': plugin_class.disable_child_plugins,
-            'urls': {
-                'edit_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._edit_url),
-                'add_plugin': CMSPlugin._add_url,
-                'delete_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._delete_url),
-                'move_plugin': CMSPlugin._move_url,
-                'copy_plugin': CMSPlugin._copy_url,
-            }
+            'urls': self.get_action_urls(),
         }
 
     def refresh_from_db(self, *args, **kwargs):
@@ -462,24 +449,31 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         This method replaces the set of legacy methods `get_add_url`, ``get_edit_url`, `get_move_url`,
         `get_delete_url`, `get_copy_url`.
         """
+        if not hasattr(CMSPlugin, '_edit_url'):
+            CMSPlugin._edit_url = admin_reverse('cms_placeholder_edit_plugin', args=(0,))
+            CMSPlugin._add_url = admin_reverse('cms_placeholder_add_plugin')
+            CMSPlugin._delete_url = admin_reverse('cms_placeholder_delete_plugin', args=(0,))
+            CMSPlugin._move_url = admin_reverse('cms_placeholder_move_plugin')
+            CMSPlugin._copy_url = admin_reverse('cms_placeholder_copy_plugins')
+
         if js_compat:
             # TODO: Remove this condition
             # once the javascript files have been refactored
             # to use the new naming schema (ending in _url).
             return {
-                'edit_plugin': admin_reverse('cms_placeholder_edit_plugin', args=(self.pk,)),
-                'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
-                'delete_plugin': admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,)),
-                'move_plugin': admin_reverse('cms_placeholder_move_plugin'),
-                'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
+                'edit_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._edit_url),
+                'add_plugin': CMSPlugin._add_url,
+                'delete_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._delete_url),
+                'move_plugin': CMSPlugin._move_url,
+                'copy_plugin': CMSPlugin._copy_url,
             }
         else:
             return {
-                'edit_url': admin_reverse('cms_placeholder_edit_plugin', args=(self.pk,)),
-                'add_url': admin_reverse('cms_placeholder_add_plugin'),
-                'delete_url': admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,)),
-                'move_url': admin_reverse('cms_placeholder_move_plugin'),
-                'copy_url': admin_reverse('cms_placeholder_copy_plugins'),
+                'edit_url': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._edit_url),
+                'add_url': CMSPlugin._add_url,
+                'delete_url': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._delete_url),
+                'move_url': CMSPlugin._move_url,
+                'copy_url': CMSPlugin._copy_url,
             }
 
 

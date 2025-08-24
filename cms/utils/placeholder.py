@@ -66,7 +66,7 @@ def _get_placeholder_settings():
             raise ImproperlyConfigured(f"Circular inheritance detected in CMS_PLACEHOLDER_CONF at key '{key}'")
         visited.add(key)
         if "inherit" in conf[key]:
-            return resolve_inheritance(conf[key]['inherit'], visited)
+            return resolve_inheritance(conf[key]['inherit'], visited) | {k: v for k, v in conf.items() if k != "inherit"}
         return conf[key]
 
     new_conf = {}

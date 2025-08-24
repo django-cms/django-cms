@@ -509,13 +509,17 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
         total_count=models.Count('pk'),
         type_count=models.Count('pk', filter=models.Q(plugin_type=plugin_type))
     )
+    # Ensure counts default to integers if None
+    total_count = counts.get('total_count') or 0
+    type_count = counts.get('type_count') or 0
+
     global_limit = limits.get("global")
     type_limit = limits.get(plugin_type)
 
-    if global_limit and counts['total_count'] >= global_limit:
-        raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s).") % counts['total_count'])
+    if global_limit and total_count >= global_limit:
+        raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s).") % global_limit)
 
-    if type_limit and counts['type_count'] >= type_limit:
+    if type_limit and type_count >= type_limit:
         plugin_name = get_plugin_class(plugin_type).name
         raise PluginLimitReached(
             _(

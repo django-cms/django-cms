@@ -649,6 +649,9 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             # test generic configuration
             returned = get_placeholder_conf("plugins", "something")
             self.assertEqual(returned, TEST_CONF[None]["plugins"])
+            # test doubly-inherited
+            returned = get_placeholder_conf("default_plugins", "layout/other.html main")
+            self.assertEqual(returned, TEST_CONF["main"]["default_plugins"])
 
     def test_placeholder_name_conf(self):
         page_en = create_page("page_en", "col_two.html", "en")
@@ -759,6 +762,20 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             # Our page should have "en default body 1" AND "en default body 2"
             content = _render_placeholder(placeholder, context)
             self.assertRegex(content, r"^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+
+    def test_circular_inheritance_in_placeholder_conf_raises(self):
+        circular_conf = {
+            "slot_a": {"inherit": "slot_b"},
+            "slot_b": {"inherit": "slot_c"},
+            "slot_c": {"inherit": "slot_a"},
+        }
+        with self.assertRaises(ImproperlyConfigured):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=circular_conf):
+                # Attempt to access any slot to trigger the config resolution
+                page = create_page("circular_page", "col_two.html", "en")
+                placeholder = page.get_placeholders("en").get(slot="slot_a")
+                # Accessing the label should trigger the circular inheritance detection
+                force_str(placeholder.get_label())
 
     def test_plugins_children_prepopulate(self):
         """
