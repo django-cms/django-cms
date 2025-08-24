@@ -61,7 +61,7 @@ class BaseMenuTest(CMSTestCase):
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {"CMSMenu": self.old_menu["CMSMenu"]}
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         activate("en")
 
     def tearDown(self):
@@ -542,7 +542,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(len(node.children), 0)
 
     def test_only_level_one(self):
-        site = get_current_site()
+        site = Site.objects.get_current()
         context = self.get_context()
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
@@ -811,7 +811,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page4 = self.get_page(4)
         page4.update_translations(in_navigation=True)
         page4.save()
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
@@ -1640,7 +1640,7 @@ class ViewPermissionMenuTests(CMSTestCase):
         self.page = create_page("page", "nav_playground.html", "en")
         self.pages = [self.page]
         self.user = self.get_standard_user()
-        self.site = get_current_site()
+        self.site = Site.objects.get_current()
 
     def get_request(self, user=None):
         attrs = {
@@ -1804,7 +1804,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         c3 = create_page("c3", template, "en", parent=b2, **kw)
         c4 = create_page("c4", template, "en", parent=b2, **kw)
         self.pages = [a, b1, c1, c2, b2, c3, c4]  # tree order
-        self.site = get_current_site()
+        self.site = Site.objects.get_current()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
         self.other = self._create_user("other", is_staff=False, is_superuser=False)

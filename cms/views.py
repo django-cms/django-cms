@@ -83,7 +83,7 @@ def details(request, slug):
             return response
 
     # Get a Page model object from the request
-    site = get_current_site()
+    site = get_current_site(request)
     page = get_page_from_request(request, use_path=slug)
 
     if not page and not slug and not Page.objects.on_site(site).exists():

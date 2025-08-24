@@ -8,7 +8,6 @@ from django.utils.translation import override as force_language
 from cms.admin import forms
 from cms.admin.forms import (
     GlobalPagePermissionAdminForm,
-    MovePageForm,
     PagePermissionInlineAdminForm,
     PageUserGroupForm,
     ViewRestrictionInlineAdminForm,
@@ -27,7 +26,6 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PERMISSIONS,
     CMSTestCase,
 )
-from cms.utils import get_current_site
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
@@ -42,6 +40,7 @@ class Mock_PageSelectFormField(PageSelectFormField):
 class FormsTestCase(CMSTestCase):
     def setUp(self):
         cache.clear()
+        self.site = Site.objects.get_current()
 
     def test_get_site_choices(self):
         result = get_site_choices()
@@ -55,7 +54,6 @@ class FormsTestCase(CMSTestCase):
         """
         The page choices should always use draft ids
         """
-        site = get_current_site()
         pages = [
             create_page("0001", "nav_playground.html", "en"),
             create_page("0002", "nav_playground.html", "en"),
@@ -63,11 +61,10 @@ class FormsTestCase(CMSTestCase):
             create_page("0004", "nav_playground.html", "en"),
         ]
 
-        expected = [("", "----"), (site.name, [(page.pk, page.get_title("en", fallback=False)) for page in pages])]
+        expected = [("", "----"), (self.site.name, [(page.pk, page.get_title("en", fallback=False)) for page in pages])]
         self.assertSequenceEqual(get_page_choices("en"), expected)
 
     def test_get_page_choices_with_multiple_translations(self):
-        site = get_current_site()
         pages = [
             create_page("0001", "nav_playground.html", "en"),
             create_page("0002", "nav_playground.html", "en"),
@@ -84,7 +81,7 @@ class FormsTestCase(CMSTestCase):
         for language in ["en"] + languages:
             expected = [
                 ("", "----"),
-                (site.name, [(page.pk, page.get_title(language, fallback=False)) for page in pages]),
+                (self.site.name, [(page.pk, page.get_title(language, fallback=False)) for page in pages]),
             ]
 
             with force_language(language):
@@ -236,8 +233,6 @@ class FormsTestCase(CMSTestCase):
 
     def test_move_page_form(self):
         """Test the MovePageForm validation and behavior"""
-        site = get_current_site()
-
         # Create a basic page structure
         parent1 = create_page("Parent 1", "nav_playground.html", "en")
         parent2 = create_page("Parent 2", "nav_playground.html", "en")
@@ -247,9 +242,9 @@ class FormsTestCase(CMSTestCase):
         data = {
             "target": parent2.pk,
             "position": "0",  # first-child
-            "site": site.pk,
+            "site": self.site.pk,
         }
-        form = forms.MovePageForm(data=data, page=child1, site=site)
+        form = forms.MovePageForm(data=data, page=child1, site=self.site)
         self.assertTrue(form.is_valid(), form.errors)
 
         # Test moving page with same slug under different parents
@@ -257,9 +252,9 @@ class FormsTestCase(CMSTestCase):
         data = {
             "target": parent1.pk,
             "position": "0",  # first-child
-            "site": site.pk,
+            "site": self.site.pk,
         }
-        form = forms.MovePageForm(data=data, page=child2, site=site)
+        form = forms.MovePageForm(data=data, page=child2, site=self.site)
         self.assertTrue(form.is_valid(), form.errors)
 
         # Test moving page to a position that would create duplicate slug
@@ -267,9 +262,9 @@ class FormsTestCase(CMSTestCase):
         data = {
             "target": parent1.pk,
             "position": "0",  # first-child
-            "site": site.pk,
+            "site": self.site.pk,
         }
-        form = forms.MovePageForm(data=data, page=child3, site=site)
+        form = forms.MovePageForm(data=data, page=child3, site=self.site)
         self.assertFalse(form.is_valid())
         self.assertIn("You cannot have two pages with the same slug", str(form.errors["__all__"]))
 
@@ -279,15 +274,14 @@ class FormsTestCase(CMSTestCase):
         data = {
             "target": parent1.pk,
             "position": "0",  # first-child
-            "site": site.pk,
+            "site": self.site.pk,
         }
-        form = forms.MovePageForm(data=data, page=homepage, site=site)
+        form = forms.MovePageForm(data=data, page=homepage, site=self.site)
         self.assertFalse(form.is_valid())
         self.assertIn("You can&#x27;t move the home page inside another page", str(form.errors["target"]))
 
     def test_move_page_form_positions(self):
         """Test different position options in MovePageForm"""
-        site = get_current_site()
         parent = create_page("Parent", "nav_playground.html", "en")
         child1 = create_page("Child 1", "nav_playground.html", "en", parent=parent)
         child2 = create_page("Child 2", "nav_playground.html", "en", parent=parent)
@@ -303,17 +297,15 @@ class FormsTestCase(CMSTestCase):
             data = {
                 "target": child2.pk,
                 "position": position_id,  # Use the numeric position ID
-                "site": site.pk,
+                "site": self.site.pk,
             }
-            form = forms.MovePageForm(data=data, page=child1, site=site)
+            form = forms.MovePageForm(data=data, page=child1, site=self.site)
             self.assertTrue(
                 form.is_valid(), f"Form should be valid for position {position_name}, errors: {form.errors}"
             )
 
     def test_move_page_form_sibling_slug_collision(self):
         """Test that pages cannot be moved to create duplicate slugs at the same level"""
-        site = get_current_site()
-
         # Create two separate parent pages
         parent1 = create_page("Parent 1", "nav_playground.html", "en", slug="parent-1")
         parent2 = create_page("Parent 2", "nav_playground.html", "en", slug="parent-2")
@@ -328,10 +320,10 @@ class FormsTestCase(CMSTestCase):
         data = {
             "target": parent1.pk,
             "position": 2,  # 2 = first-child position
-            "site": site.pk,
+            "site": self.site.pk,
         }
 
-        form = forms.MovePageForm(data=data, page=child2, site=site)
+        form = forms.MovePageForm(data=data, page=child2, site=self.site)
         is_valid = form.is_valid()
 
         self.assertFalse(is_valid, "Form should be invalid due to slug collision")
@@ -343,8 +335,6 @@ class FormsTestCase(CMSTestCase):
 
     def test_move_page_form_child_parent_slug_collision(self):
         """Test that pages cannot be moved to create duplicate slugs at the same level"""
-        site = get_current_site()
-
         # Create grandparent page
         grandparent = create_page("Grandparent", "nav_playground.html", "en", slug="grandparent")
 
@@ -358,10 +348,10 @@ class FormsTestCase(CMSTestCase):
         data = {
             "target": grandparent.pk,
             "position": 2,  # 2 = first-child position
-            "site": site.pk,
+            "site": self.site.pk,
         }
 
-        form = forms.MovePageForm(data=data, page=child, site=site)
+        form = forms.MovePageForm(data=data, page=child, site=self.site)
         is_valid = form.is_valid()
 
         self.assertFalse(is_valid, "Form should be invalid due to slug collision")

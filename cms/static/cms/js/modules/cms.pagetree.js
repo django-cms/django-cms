@@ -440,17 +440,6 @@ var PageTree = new Class({
             that._reloadHelper();
         });
 
-        // propagate the sites dropdown "li > a" entries to the hidden sites form
-        this.ui.container.find('.js-cms-pagetree-site-trigger').on(this.click, function(e) {
-            e.preventDefault();
-            var el = $(this);
-
-            // prevent if parent is active
-            if (el.parent().hasClass('active')) {
-                return false;
-            }
-            that.ui.siteForm.find('select').val(el.data().id).end().submit();
-        });
 
         // additional event handlers
         this._setupDropdowns();
