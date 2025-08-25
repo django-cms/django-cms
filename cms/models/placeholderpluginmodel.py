@@ -19,7 +19,9 @@ class PlaceholderReference(CMSPlugin):
 
     @cached_property
     def placeholder_ref(self):
-        return get_placeholder_from_slot(self.placeholders, "clipboard")
+        placeholder = get_placeholder_from_slot(self.placeholders, "clipboard")
+        placeholder.source = self
+        return placeholder
 
     class Meta:
         app_label = 'cms'
