@@ -227,6 +227,16 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
             self.assertRaises(TemplateSyntaxError, tpl.render, context)
 
+    def test_show_menu_cut_inactive(self):
+        root = self.get_page(2)
+        context = self.get_context(page=root)
+        tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(len(nodes[0].children), 1)
+        self.assertEqual(len(nodes[1].children), 0)
+
     def test_show_submenu_nephews(self):
         page_2 = self.get_page(2)
         context = self.get_context(path=page_2.get_absolute_url(), page=page_2)
