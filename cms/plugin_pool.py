@@ -44,6 +44,8 @@ class PluginPool:
 
         autodiscover_modules("cms_plugins")
         self.discovered = True
+        # Sort plugins by their module and name
+        self.plugins = dict(sorted(self.plugins.items(), key=lambda key: (key[1].module, key[1].name)))
 
     def clear(self):
         self.discovered = False
