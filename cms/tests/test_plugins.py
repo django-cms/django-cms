@@ -161,6 +161,25 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin = self.__edit_link_plugin(created_plugin, "Hello World")
         self.assertEqual("Hello World", plugin.name)
 
+    def test_add_empty_plugin(self):
+        """
+        Adding a plugin without form works.
+        """
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        self.client.post(self.get_page_add_uri("en"), page_data)
+        page = Page.objects.first()
+        endpoint = self.get_add_plugin_uri(
+            page.get_placeholders("en").first(),
+            "SolarSystemPlugin"
+        )
+        with self.login_user_context(self.super_user):
+            response = self.client.get(endpoint)
+            self.assertContains(
+                response,
+                '<div class="description">There are no further settings for this plugin. Please press save.</div>'
+            )
+
     def test_plugin_add_form_integrity(self):
         admin.autodiscover()
         admin_instance = admin.site._registry[ArticlePluginModel]
