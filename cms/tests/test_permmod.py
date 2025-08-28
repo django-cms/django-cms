@@ -20,7 +20,6 @@ from cms.models.permissionmodels import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils import get_current_site
 from cms.utils.page_permissions import user_can_view_page
 
 
@@ -313,7 +312,7 @@ class ViewPermissionBaseTests(CMSTestCase):
     def setUp(self):
         self.page = create_page('testpage', 'nav_playground.html', 'en')
         self.page_content = self.page.get_content_obj("en")
-        self.site = get_current_site()
+        self.site = Site.objects.get_current()
 
     def get_request(self, user=None):
         attrs = {
@@ -623,7 +622,8 @@ class GlobalPermissionTests(CMSTestCase):
         with self.settings(CMS_PERMISSION=True):
             # for all users, they should have access to site 1
             request = RequestFactory().get(path='/')
-            request.session = {'cms_admin_site': site_1.pk}
+            # Fake session
+            request.session = {}
             request.current_page = None
             for user in USERS:
                 request.user = user
@@ -640,9 +640,9 @@ class GlobalPermissionTests(CMSTestCase):
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
             # to site 1
-            request = RequestFactory().get(path='/')
-            request.session = {'cms_admin_site': site_2.pk}
+            request = RequestFactory().get(path=f'/?site={site_2.pk}')
             request.current_page = None
+            request.session = {}
 
             # Refresh internal user cache
             USERS[0] = self.reload(USERS[0])

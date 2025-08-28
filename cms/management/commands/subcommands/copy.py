@@ -63,7 +63,7 @@ class CopyLangCommand(SubcommandsCommand):
         try:
             site = int(options.get('site', None))
         except Exception:
-            site = settings.SITE_ID
+            site = Site.objects.get_current().pk
 
         try:
             assert from_lang in get_language_list(site)
@@ -122,11 +122,11 @@ class CopySiteCommand(SubcommandsCommand):
         try:
             from_site = int(options.get('from_site', None))
         except Exception:
-            from_site = settings.SITE_ID
+            from_site = Site.objects.get_current().pk
         try:
             to_site = int(options.get('to_site', None))
         except Exception:
-            to_site = settings.SITE_ID
+            to_site = Site.objects.get_current().pk
         try:
             assert from_site != to_site
         except AssertionError:

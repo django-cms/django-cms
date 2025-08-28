@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 
 from cms.toolbar.utils import get_object_edit_url, get_object_for_language, get_object_preview_url
-from cms.utils import get_current_site, get_language_from_request
+from cms.utils import get_language_from_request
 from cms.utils.i18n import (
     force_language,
     get_default_language_for_site,
@@ -212,11 +212,11 @@ class DefaultLanguageChanger:
         if url:
             return url
 
-        site = get_current_site()
+        site_id = page.site_id
 
-        if is_valid_site_language(lang, site_id=site.pk):
+        if is_valid_site_language(lang, site_id=site_id):
             _valid_language = True
-            _hide_untranslated = hide_untranslated(lang, site.pk)
+            _hide_untranslated = hide_untranslated(lang, site_id)
         else:
             _valid_language = False
             _hide_untranslated = False
@@ -224,7 +224,7 @@ class DefaultLanguageChanger:
         if _hide_untranslated and settings.USE_I18N:
             return '/%s/' % lang
 
-        default_language = get_default_language_for_site(site.pk)
+        default_language = get_default_language_for_site(site_id)
 
         if not _valid_language:
             # The request language is not configured for the current site.
@@ -234,7 +234,7 @@ class DefaultLanguageChanger:
                 return url
 
         if _valid_language:
-            fallbacks = get_fallback_languages(lang, site_id=site.pk) or []
+            fallbacks = get_fallback_languages(lang, site_id=site_id) or []
             fallbacks = [_lang for _lang in fallbacks if _lang in page.get_languages()]
         else:
             fallbacks = []

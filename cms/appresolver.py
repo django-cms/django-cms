@@ -32,7 +32,8 @@ def applications_page_check(request):
         path = request.path_info
 
     # check if application resolver can resolve this
-    for lang in get_language_list():
+    site = get_current_site(request)
+    for lang in get_language_list(site_id=site.pk):
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
 
@@ -187,9 +188,9 @@ def get_patterns_for_page_url(page_url):
 
 def get_app_patterns():
     try:
-        site = get_current_site()
+        site = get_current_site()  # get_current_site(request) is not available here
         return _get_app_patterns(site)
-    except (OperationalError, ProgrammingError):
+    except (OperationalError, ProgrammingError,):
         # ignore if DB is not ready
         # Starting with Django 1.9 this code gets called even when creating
         # or running migrations. So in many cases the DB will not be ready yet.

@@ -362,6 +362,12 @@ class Page(MP_Node):
             except NoReverseMatch:
                 return None
 
+    def get_full_url(self, language=None, fallback=True):
+        path = self.get_absolute_url(language, fallback)
+        if path is None:
+            return None
+        return f"//{self.site.domain}{path}"
+
     def set_tree_node(self, site, target=None, position="first-child"):
         warnings.warn(
             "Method `set_tree_node` is deprecated. Use `add_to_tree` instead.",
@@ -740,7 +746,7 @@ class Page(MP_Node):
             self.set_admin_content_cache()
         page_content = self.admin_content_cache.get(language, EmptyPageContent(language=language, page=self))
         if not page_content and fallback:
-            for lang in i18n.get_fallback_languages(language):
+            for lang in i18n.get_fallback_languages(language, site_id=self.site_id):
                 page_content = self.admin_content_cache.get(lang)
                 if page_content:
                     return page_content
@@ -928,7 +934,7 @@ class Page(MP_Node):
         """
 
         def get_fallback_language(page, language):
-            fallback_langs = i18n.get_fallback_languages(language)
+            fallback_langs = i18n.get_fallback_languages(language, site_id=page.site_id)
             for lang in fallback_langs:
                 if page.page_content_cache.get(lang):
                     return lang
