@@ -811,6 +811,28 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         queryset = queryset.filter(language__in=languages, page__site=site)
         return queryset
 
+    def get_object(self, request, object_id, from_field=None):
+        """
+        Return an instance matching the field and value provided, the primary
+        key is used if no field is provided. Return ``None`` if no match is
+        found or the object_id fails validation.
+        
+        Override to bypass site filtering when directly accessing objects by ID,
+        which prevents 404 errors when editing pages from sites other than the
+        currently selected one in the page tree.
+        """
+        # Use unfiltered queryset for direct object access
+        queryset = super().get_queryset(request).select_related("page")
+        model = queryset.model
+        field = (
+            model._meta.pk if from_field is None else model._meta.get_field(from_field)
+        )
+        try:
+            object_id = field.to_python(object_id)
+            return queryset.get(**{field.name: object_id})
+        except (model.DoesNotExist, ValidationError, ValueError):
+            return None
+
     def get_urls(self):
         """Get the admin urls"""
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
