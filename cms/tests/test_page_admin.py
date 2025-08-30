@@ -3216,6 +3216,52 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertEqual(placeholder.get_plugins('en').count(), 2)
 
+    def test_change_template_with_different_site_in_session(self):
+        """
+        Test that changing a page template works even when the CMS admin site
+        in the session is different from the page's site.
+        
+        This reproduces the issue where switching the page tree to a different site
+        in one tab causes template changes on pages from other sites to fail with 404.
+        """
+        # Create pages on two different sites
+        site1 = Site.objects.get(pk=1)
+        site2 = Site.objects.create(name='Test Site 2', domain='test2.example.com')
+        
+        page_on_site1 = create_page(
+            title='Page on Site 1',
+            template='nav_playground.html',
+            language='en',
+            site=site1
+        )
+        page_on_site2 = create_page(
+            title='Page on Site 2', 
+            template='nav_playground.html',
+            language='en',
+            site=site2
+        )
+        
+        staff_user = self.get_staff_user_with_no_permissions()
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=True)
+        
+        with self.login_user_context(staff_user):
+            # Simulate the session state where user switched the page tree to site2
+            session = self.client.session
+            session['cms_admin_site'] = site2.pk
+            session.save()
+            
+            # Try to change template on a page from site1
+            # This should work despite the session having site2 selected
+            endpoint = self.get_page_change_template_uri('en', page_on_site1)
+            data = {'template': 'simple.html'}
+            response = self.client.post(endpoint, data)
+            
+            # Should succeed and change the template
+            self.assertContains(response, 'The template was successfully changed')
+            page_on_site1.refresh_from_db()
+            self.assertEqual(page_on_site1.get_template(), 'simple.html')
+
 
 @override_settings(CMS_PERMISSION=True)
 class PermissionsOnPageTest(PermissionsTestCase):
