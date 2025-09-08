@@ -1,0 +1,29 @@
+@import "settings/all";
+
+html.cms-structure-mode-structure section {
+    margin-inline-end: 436px;
+}
+
+.cms-placeholder-view section {
+    font: normal 18px/24px Helvetica,Arial,sans-serif;
+    padding: 20px;
+}
+
+.cms-placeholder-view h1 {
+    margin: 0 0 20px;
+    padding: 0;
+    padding-bottom: 10px;
+    font-size: 1.5em;
+    border-bottom: 1px solid $gray-light;
+    small {
+        font-size: 0.5em;
+        color: $gray;
+    }
+}
+
+.cms-placeholder-view section img {
+    max-width: 100%;
+    padding: 3px;
+    margin: -5px;
+    border: 1px solid $gray-light;
+}

@@ -1,15 +1,8 @@
 ##########
 django CMS
 ##########
-.. image:: https://img.shields.io/pypi/v/django-cms.svg
-    :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://img.shields.io/badge/wheel-yes-green.svg
-    :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://img.shields.io/pypi/l/django-cms.svg
-    :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://codeclimate.com/github/divio/django-cms/badges/gpa.svg
-   :target: https://codeclimate.com/github/divio/django-cms
-   :alt: Code Climate
+
+|PyPiVersion| |PyVersion| |DjVersion| |License| |Coverage|
 
 Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_).
 
@@ -130,3 +123,16 @@ Credits
 * Many thanks to
   `all the contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_
   to django CMS!
+
+.. |PyPiVersion| image:: https://img.shields.io/pypi/v/django-cms.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+.. |PyVersion| image:: https://img.shields.io/pypi/pyversions/django-cms
+    :target: https://pypi.python.org/pypi/django-cms/
+    :alt: PyPI - Python Version
+.. |DjVersion| image:: https://img.shields.io/pypi/frameworkversions/django/django-cms
+    :alt: PyPI - Versions from Framework Classifiers
+.. |License| image:: https://img.shields.io/github/license/django-cms/django-cms.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+    :alt: License
+.. |Coverage| image:: https://codecov.io/gh/django-cms/django-cms/graph/badge.svg?token=Jyx7Ilpibf 
+ :target: https://codecov.io/gh/django-cms/django-cms

@@ -95,6 +95,14 @@ DEFAULTS = {
     'CATCH_PLUGIN_500_EXCEPTION': True,
     'DEFAULT_IN_NAVIGATION': True,
     'ALWAYS_REFRESH_CONTENT': False,
+    'ENABLE_HELP': True,  # Adds help menu toolbar
+    'EXTRA_HELP_MENU_ITEMS': (),
+    'HELP_MENU_ITEMS': (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
 }
 
 
@@ -295,7 +303,7 @@ COMPLEX = {
 }
 
 
-def get_cms_setting(name):
+def get_cms_setting(name) -> Any:
     if name in COMPLEX:
         return COMPLEX[name]()
     return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])

@@ -1033,6 +1033,30 @@ Example::
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
 
 
+CMS_ENABLE_HELP
+===============
+
+default
+    ``True``
+
+This setting controls if the help menu appears in the toolbar.
+
+
+CMS_EXTRA_HELP_MENU_ITEMS
+=========================
+
+Example::
+
+    CMS_EXTRA_HELP_MENU_ITEMS = (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
+
+This setting adds to the default links of the support menu allowing project or company support links.
+
+
 CMS_TOOLBAR_ANONYMOUS_ON
 ========================
 
@@ -1140,7 +1164,7 @@ default
 
 This is the name of the plugin created in the Page Wizard when the "Content"
 field is filled in. There should be no need to change it, unless you
-**don't** use `djangocms-text`` or ```djangocms-text-ckeditor`` in your project.
+**don't** use `djangocms-text`` in your project.
 
 ..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
@@ -1152,7 +1176,7 @@ default
 
 This is the name of the body field in the plugin created in the Page Wizard
 when the "Content" field is filled in. There should be no need to change it,
-unless you **don't** use `djangocms-text`` or ``djangocms-text-ckeditor`` in
+unless you **don't** use `djangocms-text`` in
 your project **and** your custom plugin defined in
 :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a body field **different** than
 ``body``.

@@ -38,13 +38,13 @@ from cms.exceptions import PlaceholderNotFound
 from cms.models import (
     CMSPlugin,
     Page,
+    PageContent,
     Placeholder as PlaceholderModel,
 )
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils import get_current_site, get_language_from_request
+from cms.utils import get_language_from_request
 from cms.utils.conf import get_site_id
-from cms.utils.page import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
 
@@ -82,8 +82,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if "pk" in page_lookup:
             return Page.objects.get(**page_lookup)
         else:
-            pages = get_page_queryset(site)
-            return pages.get(**page_lookup)
+            return Page.objects.on_site(site).get(**page_lookup)
     except Page.DoesNotExist:
         subject = _("Page not found on %(domain)s") % {"domain": site.domain}
         body = _(
@@ -121,8 +120,10 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, si
         lang = renderer.request_language
 
     try:
-        placeholder = page.get_placeholders(lang).get(slot=placeholder_name)
-    except PlaceholderModel.DoesNotExist:
+        toolbar = get_toolbar_from_request(request)
+        admin_manager = toolbar.edit_mode_active or toolbar.preview_mode_active
+        placeholder = page.get_placeholders(lang, admin_manager=admin_manager).get(slot=placeholder_name)
+    except (PlaceholderModel.DoesNotExist, PageContent.DoesNotExist):
         if settings.DEBUG:
             raise
         return ""

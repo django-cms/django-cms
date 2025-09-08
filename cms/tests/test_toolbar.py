@@ -23,20 +23,16 @@ from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_toolbars import (
     ADMIN_MENU_IDENTIFIER,
     ADMINISTRATION_BREAK,
+    DEFAULT_HELP_MENU_ITEMS,
+    HELP_MENU_IDENTIFIER,
     LANGUAGE_MENU_IDENTIFIER,
     get_user_model,
 )
 from cms.models import PagePermission, UserSettings
-from cms.test_utils.project.placeholderapp.models import (
-    CharPksExample,
-    Example1,
-)
-from cms.test_utils.project.placeholderapp.views import (
-    ClassDetail,
-    detail_view,
-)
+from cms.test_utils.project.placeholderapp.models import CharPksExample, Example1
+from cms.test_utils.project.placeholderapp.views import ClassDetail, detail_view
 from cms.test_utils.testcases import URL_CMS_USERSETTINGS, CMSTestCase
-from cms.test_utils.util.context_managers import UserLoginContext
+from cms.test_utils.util.context_managers import UserLoginContext, override_placeholder_conf
 from cms.toolbar import utils
 from cms.toolbar.items import (
     AjaxItem,
@@ -374,8 +370,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populate()
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + admin-menu + color scheme + logout
-        self.assertEqual(len(items), 4, items)
+        self.assertEqual(len(items), 5, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 12, admin_items)
 
@@ -385,8 +380,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populate()
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + edit-mode + admin-menu + color scheme + logout
-        self.assertEqual(len(items), 4)
+        self.assertEqual(len(items), 5)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 13, admin_items)
 
@@ -403,7 +397,6 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, self.get_nonstaff())
         toolbar = CMSToolbar(request)
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + edit-mode + logout
         self.assertEqual(len(items), 0)
 
     @override_settings(CMS_PERMISSION=True)
@@ -572,7 +565,8 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.status_code, 200)
         response_text = response.render().rendered_content
         self.assertTrue(
-            re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text)
+            re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text),
+            "/en/admin/cms/placeholder/edit-plugin/%s not found in %s" % (plugin_1.pk, response_text)
         )
         self.assertTrue(re.search('move_plugin.+/en/admin/cms/placeholder/move-plugin/', response_text))
         self.assertTrue(
@@ -718,8 +712,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(page.has_change_permission(request.user))
 
         items = request.toolbar.get_left_items() + request.toolbar.get_right_items()
-        # Logo + page-menu + admin-menu + color scheme + logout
-        self.assertEqual(len(items), 5, items)
+        self.assertEqual(len(items), 6, items)
         page_items = items[1].get_items()
         # The page menu should only have the "Create page" item enabled.
         self.assertFalse(page_items[0].disabled)
@@ -743,15 +736,14 @@ class ToolbarTests(ToolbarTestBase):
         en_toolbar.set_object(page_content_en)
         en_toolbar.populate()
         en_toolbar.post_template_populate()
-        # Logo + templates + page-menu + admin-menu + color scheme + logout
-        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 7)
+
         de_request = self.get_page_request(cms_page, user, edit_url_de, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         de_toolbar.set_object(page_content_de)
         de_toolbar.populate()
         de_toolbar.post_template_populate()
-        # Logo + templates + page-menu + admin-menu + color scheme + logout
-        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 7)
 
     def test_double_menus(self):
         """
@@ -774,13 +766,21 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populated = False
         toolbar.post_template_populate()
         get_object_for_language(page_content, "de")
-        admin = toolbar.get_left_items()[0]
-        lang = toolbar.get_left_items()[1]
-        self.assertEqual(len(admin.get_items()), 15)
-        self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
-        self.assertIn(edit_url, [item.url for item in lang.get_items()])  # Edit urls returned
+        admin_menu = toolbar.get_left_items()[0]
+        help_menu = toolbar.get_left_items()[1]
+        lang_menu = toolbar.get_left_items()[2]
+        self.assertEqual(len(admin_menu.get_items()), 15)
+        self.assertEqual(
+            list(DEFAULT_HELP_MENU_ITEMS),
+            [(item.name, item.url) for item in help_menu.get_items()],
+        )
+        self.assertEqual(
+            [item.name for item in lang_menu.get_items()],
+            [language_name for _, language_name in get_language_tuple(1)],
+        )
+        self.assertIn(edit_url, [item.url for item in lang_menu.get_items()])  # Edit urls returned
 
-    @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
+    @override_placeholder_conf(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'Charles Babbage'}})
     def test_placeholder_name(self):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en")
@@ -790,7 +790,8 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'PPPP')
+        self.assertContains(response, 'Charles Babbage')  # Configured placeholder name
+        self.assertContains(response, 'Col_Sidebar')  # Fall back placeholder name
 
     def test_user_settings(self):
         superuser = self.get_superuser()
@@ -980,10 +981,10 @@ class ToolbarTests(ToolbarTestBase):
             return default
 
     def test_toolbar_logout(self):
-        '''
+        """
         Tests that the Logout menu item includes the user's full name, if the
         relevant fields were populated in auth.User, else the user's username.
-        '''
+        """
         superuser = self.get_superuser()
 
         # Ensure that some other test hasn't set the name fields
@@ -1115,6 +1116,28 @@ class ToolbarModeTests(ToolbarTestBase):
         self.assertTrue(toolbar.edit_mode_active)
         self.assertTrue(toolbar.structure_mode_active)
         self.assertFalse(toolbar.preview_mode_active)
+
+    @override_settings(CMS_EXTRA_HELP_MENU_ITEMS=(('google', 'www.google.com'),))
+    def test_help_menu(self):
+        page = create_page("help-page", "nav_playground.html", "en")
+        staff = self.get_staff()
+        assert staff.user_permissions.get().name == 'Can change page'
+        request = self.get_page_request(page, staff, '/')
+        toolbar = CMSToolbar(request)
+        help_menu = toolbar.get_menu(HELP_MENU_IDENTIFIER)
+        custom_link = help_menu.get_items()[-1]
+        self.assertEqual(custom_link.name, 'google')
+        self.assertEqual(custom_link.url, 'www.google.com')
+
+    @override_settings(CMS_ENABLE_HELP=False)
+    def test_help_menu_disabled(self):
+        page = create_page("help-page", "nav_playground.html", "en")
+        staff = self.get_staff()
+        assert staff.user_permissions.get().name == 'Can change page'
+        request = self.get_page_request(page, staff, '/')
+        toolbar = CMSToolbar(request)
+        help_menu = toolbar.get_menu(HELP_MENU_IDENTIFIER)
+        self.assertIsNone(help_menu)
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')

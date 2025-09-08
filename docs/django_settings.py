@@ -8,7 +8,6 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'djangocms_admin_style',
     'django.contrib.admin',
     'django.contrib.sites',
     'django.contrib.staticfiles',

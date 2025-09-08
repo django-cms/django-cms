@@ -11,6 +11,7 @@ from cms.plugin_rendering import (
     StructureRenderer,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
 
@@ -66,7 +67,7 @@ class TestStructureRenderer(CMSTestCase):
 
         conf = {placeholder.slot: {'name': 'Content-with-dash'}}
 
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
 
         expected_bits = [
@@ -209,7 +210,8 @@ class TestExceptionCatchers(CMSTestCase):
             plugin_context = Context()
             self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en")
             self.assertEqual(len(logs.output), 1)
-            self.assertIn("TemplateSyntaxError: Invalid block tag on line 1", logs.output[0])
+            self.assertIn("TemplateSyntaxError", logs.output[0])
+            self.assertIn("Invalid block tag on line 1", logs.output[0])
         LinkPlugin.render_template = link_template
 
     def test_exception_in_plugin_render_shows_error_in_edit_mode(self):
@@ -218,7 +220,8 @@ class TestExceptionCatchers(CMSTestCase):
             markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=True)
         self.assertTrue(self.renderer.toolbar.edit_mode_active)
         self.assertIn('<div class="cms-rendering-exception">', markup)
-        self.assertIn("ZeroDivisionError: division by zero", markup)
+        self.assertIn("ZeroDivisionError", markup)
+        self.assertIn("division by zero", markup)
 
     def test_exception_in_plugin_render_is_silent_in_preview_mode(self):
         plugin_context = Context()

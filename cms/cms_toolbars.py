@@ -12,7 +12,7 @@ from django.utils.translation import (
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Page, PageContent, PageType, Placeholder
-from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
+from cms.toolbar.items import REFRESH_PAGE, ButtonList, SubMenu, TemplateItem
 from cms.toolbar.utils import (
     get_object_edit_url,
     get_object_preview_url,
@@ -42,6 +42,12 @@ LANGUAGE_MENU_IDENTIFIER = 'language-menu'
 The *Language* menu. ``LANGUAGE_MENU_IDENTIFIER`` allows you to get hold of this object
 easily using :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
 """
+HELP_MENU_IDENTIFIER = 'help-menu'
+"""
+The *Help* menu. ``HELP_MENU_IDENTIFIER`` allows you to get hold of this object easily
+using :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
+"""
+HELP_MENU_BREAK = 'Help Menu Break'
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_IDENTIFIER = 'page'
 """
@@ -66,6 +72,14 @@ COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 SHORTCUTS_BREAK = 'Shortcuts Break'
 
+DEFAULT_HELP_MENU_ITEMS = (
+    (_("Getting started developer guide"), 'https://docs.django-cms.org/en/stable/introduction/index.html'),
+    (_("Documentation"), 'https://docs.django-cms.org/en/stable/'),
+    (_("User guide"), 'https://user-guide.django-cms.org'),
+    (_("Discord community"), 'https://www.django-cms.org/discord'),
+    (_("What's new"), 'https://www.django-cms.org/en/blog/'),
+)
+
 
 @toolbar_pool.register
 class PlaceholderToolbar(CMSToolbar):
@@ -85,13 +99,9 @@ class PlaceholderToolbar(CMSToolbar):
         from cms.wizards.wizard_pool import entry_choices
         title = _("Create")
 
-        if self.page:
-            user = self.request.user
-            page_pk = self.page.pk
-            disabled = len(list(entry_choices(user, self.page))) == 0
-        else:
-            page_pk = ''
-            disabled = True
+        user = self.request.user
+        page_pk = self.page.pk if self.page else ""
+        disabled = not list(entry_choices(user, self.page))
 
         url = '{url}?page={page}&language={lang}&edit'.format(
             url=admin_reverse("cms_wizard_create"),
@@ -236,6 +246,35 @@ class AppearanceToolbar(CMSToolbar):
 
 
 @toolbar_pool.register
+class HelpToolbar(CMSToolbar):
+    """
+    Adds a help menu to the toolbar
+    """
+
+    def populate(self):
+        if not get_cms_setting('ENABLE_HELP'):
+            return
+        help_menu = self._get_or_create_help_menu()
+        self._add_default_menu_items(help_menu)
+        self._add_extra_menu_items(help_menu)
+
+    def _get_or_create_help_menu(self) -> SubMenu:
+        help_menu = self.toolbar.get_or_create_menu(HELP_MENU_IDENTIFIER, _('Help'), position=-1)
+        help_menu.items = []  # reset the items so we don't duplicate
+        return help_menu
+
+    def _add_default_menu_items(self, help_menu: SubMenu):
+        for label, url in DEFAULT_HELP_MENU_ITEMS:
+            help_menu.add_link_item(label, url=url)
+
+    def _add_extra_menu_items(self, help_menu: SubMenu):
+        if extra_menu_items := get_cms_setting('EXTRA_HELP_MENU_ITEMS'):
+            help_menu.add_break(HELP_MENU_BREAK)
+            for label, url in extra_menu_items:
+                help_menu.add_link_item(label, url=url)
+
+
+@toolbar_pool.register
 class BasicToolbar(CMSToolbar):
     """
     Basic Toolbar for site and languages menu
@@ -268,7 +307,7 @@ class BasicToolbar(CMSToolbar):
                 sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
                 sites_menu.add_break(ADMIN_SITES_BREAK)
                 for site in sites_queryset:
-                    sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
+                    sites_menu.add_link_item(site.name, url='//%s' % site.domain,
                                              active=site.pk == self.current_site.pk)
 
             # admin

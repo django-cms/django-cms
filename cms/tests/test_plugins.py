@@ -15,7 +15,7 @@ from django.urls import re_path, reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.translation import override as force_language
-from djangocms_text_ckeditor.models import Text
+from djangocms_text.models import Text
 
 from cms import api
 from cms.api import create_page
@@ -40,6 +40,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
     NoRenderButChildren,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat import DJANGO_5_1
@@ -215,7 +216,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         add_page_endpoint = self.get_page_add_uri("en")
 
         # try to add a new plugin
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
@@ -224,7 +225,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(["TextPlugin"], installed_plugins)
 
         # try to add a new plugin to a column plugin - still only text
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
 
             child_plugins = ColumnPlugin.get_child_classes("body", page)
@@ -239,7 +240,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         add_page_endpoint = self.get_page_add_uri("en")
 
         # try to add a new text plugin
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
@@ -250,7 +251,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         CMS_PLACEHOLDER_CONF = {"body": {"plugins": ["TextPlugin"], "excluded_plugins": ["TextPlugin"]}}
 
         # try to add a new text plugin
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
@@ -840,7 +841,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                     }
                 }
             }
-            with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
                 self.assertEqual(["LinkPlugin"], plugin.get_child_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_settings(self):
@@ -863,7 +864,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                     }
                 }
             }
-            with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
                 self.assertEqual(["TestPlugin"], plugin.get_parent_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_object(self):

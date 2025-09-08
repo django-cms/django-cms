@@ -8,10 +8,10 @@ import warnings
 import dj_database_url
 
 from cms.exceptions import DontUsePageAttributeWarning
-from cms.utils.conf import default
-from docs.django_settings import SECRET_KEY
 
-gettext = lambda s: s
+
+def gettext(s):
+    return s
 warnings.filterwarnings("ignore", category=DontUsePageAttributeWarning)
 
 
@@ -41,8 +41,8 @@ class TempDirs:
 
 
 def main(argv: list[str], **full_settings):
-    from django.core.management import execute_from_command_line
     from django.conf import settings
+    from django.core.management import execute_from_command_line
 
     local_commands = [
         "test",
@@ -62,12 +62,13 @@ def main(argv: list[str], **full_settings):
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_LIVE_TEST_SERVER_ADDRESS", "localhost:8000-9000")
+    os.environ.setdefault("DJANGO_TESTS", "1")
     PROJECT_PATH = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "cms", "test_utils")
     )
 
     PLUGIN_APPS = [
-        "djangocms_text_ckeditor",
+        "djangocms_text",
         "cms.test_utils.project.sampleapp",
         "cms.test_utils.project.placeholderapp",
         "cms.test_utils.project.pluginapp.plugins.link",
@@ -112,7 +113,7 @@ if __name__ == "__main__":
         "sites": None,
         "cms": None,
         "menus": None,
-        "djangocms_text_ckeditor": None,
+        "djangocms_text": None,
     }
 
     dynamic_configs = {
@@ -379,5 +380,6 @@ if __name__ == "__main__":
             MIGRATION_MODULES=MIGRATION_MODULES,
             X_FRAME_OPTIONS="SAMEORIGIN",
             CMS_CONFIRM_VERSION4=True,
+            TEXT_INLINE_EDITING=False,  # Do not pollute toolbar for tests
             **dynamic_configs,
         )
