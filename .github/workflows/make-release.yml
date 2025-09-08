@@ -19,7 +19,7 @@ jobs:
       - name: Check out
         uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
       - name: Start building version ${{ inputs.version }}
         env:
           BUILD_BRANCH: release/build
