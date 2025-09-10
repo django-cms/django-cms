@@ -1,6 +1,6 @@
-import uuid
 import os
 import sys
+import uuid
 from io import StringIO
 
 from django.conf import settings

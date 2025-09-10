@@ -73,7 +73,7 @@ class CopyLangCommand(SubcommandsCommand):
             raise CommandError('Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES')
 
         # obey node path (tree order) to make sure parent records are created before children (for slug generation)
-        for page in Page.objects.on_site(site).order_by('path'):
+        for page in Page.objects.on_site(site).order_by('node__path'):
             # copy title
             if from_lang in page.get_languages():
 
@@ -96,7 +96,7 @@ class CopyLangCommand(SubcommandsCommand):
 
                     # copy PageUrls - inspired from pagemodels.Page.copy() - possibly refactorable
                     page_url = page.urls.get(language=from_lang)
-                    parent_page = page.parent
+                    parent_page = page.node.parent.cms_pages.first() if page.node.parent else None
 
                     new_url = model_to_dict(page_url)
                     new_url.pop("id", None)  # No PK
