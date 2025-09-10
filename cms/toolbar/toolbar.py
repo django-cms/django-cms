@@ -376,10 +376,33 @@ class CMSToolbarBase(BaseToolbar):
         return item
 
     def set_object(self, obj):
+        """
+        Associates an object with the toolbar.
+
+        Sets the toolbar's object if one has not already been set. This object is typically
+        a Django model instance that the toolbar should operate on, such as a :class:`~cms.models.contentmodels.PageContent` object or any
+        other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
+
+        The object is used by other toolbar methods like :meth:`get_object_edit_url`,
+        :meth:`get_object_preview_url`, and :meth:`get_object_structure_url` to generate
+        appropriate URLs for the object.
+
+        :param obj: The object to associate with the toolbar
+        :type obj: django.db.models.Model
+        """
         if not self.obj:
             self.obj = obj
 
     def get_object(self):
+        """
+        Returns the object currently associated with the toolbar.
+
+        This returns the object that was previously set using :meth:`set_object`,
+        or ``None`` if no object has been associated with the toolbar.
+
+        :returns: The object associated with the toolbar, or None
+        :rtype: django.db.models.Model or None
+        """
         return self.obj
 
     def get_object_model(self):
@@ -523,7 +546,6 @@ class CMSToolbarBase(BaseToolbar):
 
         context = {
             'cms_toolbar': self,
-            'object_is_immutable': not self.object_is_editable(),
             'cms_renderer': renderer,
             'cms_edit_url': self.get_object_edit_url(),
             'cms_preview_url': self.get_object_preview_url(),

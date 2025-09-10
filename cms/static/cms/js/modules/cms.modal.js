@@ -1005,15 +1005,15 @@ class Modal {
                         true
                     );
                 } else {
+                    // hello ckeditor
+                    Helpers.removeEventListener('modal-close.text-plugin');
+                    that.close();
                     // Serve the data bridge:
                     // We have a special case here cause the CMS namespace
                     // can be either inside the current window or the parent
                     const dataBridge = body[0].querySelector('script#data-bridge');
 
                     if (dataBridge) {
-                        // hello ckeditor
-                        Helpers.removeEventListener('modal-close.text-plugin');
-                        that.close();
                         // the dataBridge is used to access plugin information from different resources
                         // Do NOT move this!!!
                         try {

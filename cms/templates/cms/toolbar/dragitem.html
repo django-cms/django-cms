@@ -20,7 +20,9 @@
             {% endif %}
             <div class="cms-submenu-btn cms-submenu-add cms-btn
                 {% if not allow_children or object_is_immutable %} cms-btn-disabled{% endif %}">
-                {% if not allow_children or object_is_immutable %}
+                {% if object_is_immutable %}
+                <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You do not have permission to edit this item" %}"></span>
+                {% elif not allow_children %}
                 <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You cannot add plugins to this plugin." %}"></span>
                 {% else %}
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Add plugin" %}"></span>
@@ -42,7 +44,7 @@
                         <a data-cms-icon="paste" href="#">{% trans "Paste" %}</a>
                     </div>
                     <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="bin" href="#">{% trans "Delete" %}</a></div>
-            {% else %}
+                {% else %}
                     <div class="cms-submenu-item">
                         <a data-cms-icon="paste" data-rel="paste" href="#">{% trans "Paste" %}</a>
                         <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-empty cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Clipboard is empty." %}"></span>

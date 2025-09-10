@@ -122,6 +122,9 @@
                     line-height: $dropdown-item-height
                 }
             }
+            &[data-cms-icon=edit] {
+                @include icon(edit);
+            }
             &[data-cms-icon=copy] {
                 @include icon(copy);
             }

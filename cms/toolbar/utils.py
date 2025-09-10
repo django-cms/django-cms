@@ -151,7 +151,7 @@ def get_plugin_tree(
 
     content = {}
     # Render the target plugin if given and all plugins are local
-    if target_plugin and all(plugin.get_plugin_class().is_local for plugin in plugins):
+    if target_plugin and all(plugin.plugin_class.is_local for plugin in plugins):
         # Also provide the parent plugin to the context (if available)
         downcasted = next(
             (plugin for plugin in plugins if plugin.pk == target_plugin.pk), None
