@@ -1,3 +1,5 @@
+import os
+import sys
 import uuid
 from io import StringIO
 
@@ -11,7 +13,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models import Page, StaticPlaceholder
+from cms.models import Page, PageUrl, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
@@ -341,6 +343,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         """
         site = 1
         number_start_plugins = CMSPlugin.objects.all().count()
+        number_urls = PageUrl.objects.filter(language='en').count()
 
         out = StringIO()
         management.call_command(
@@ -376,6 +379,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         self.assertEqual(stack_text_en.plugin_type, stack_text_de.plugin_type)
         self.assertEqual(stack_text_en.body, stack_text_de.body)
+
+        self.assertEqual(PageUrl.objects.filter(language='de').count(), number_urls)
 
     def test_copy_langs_no_content(self):
         """
