@@ -1,4 +1,5 @@
 from django.contrib.sitemaps import Sitemap
+from django.contrib.sites.models import Site
 from django.db.models import OuterRef, Q, QuerySet, Subquery
 
 from cms.models import PageContent, PageUrl
@@ -46,7 +47,7 @@ class CMSSitemap(Sitemap):
         # Even though items() can also return a sequence, we should return a
         # QuerySet in this case in order to be compatible with
         # djangocms-page-sitemap.
-        site = get_current_site()
+        site = Site.objects.get_current()
         languages = get_public_languages(site_id=site.pk)
 
         return (
