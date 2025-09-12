@@ -458,7 +458,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
                 'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
                 'delete_plugin': admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,)),
                 'move_plugin': admin_reverse('cms_placeholder_move_plugin'),
-                'copy_plugin':admin_reverse('cms_placeholder_copy_plugins'),
+                'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
             }
         else:
             return {
