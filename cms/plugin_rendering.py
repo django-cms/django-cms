@@ -39,15 +39,10 @@ from cms.utils.plugins import get_plugin_restrictions
 logger = logging.getLogger(__name__)
 
 
-def _unpack_plugins(parent_plugin: CMSPlugin) -> list[CMSPlugin]:
-    found_plugins = []
-
+def _unpack_plugins(parent_plugin: CMSPlugin) -> Generator[CMSPlugin, None, None]:
+    yield parent_plugin
     for plugin in parent_plugin.child_plugin_instances or []:
-        found_plugins.append(plugin)
-
-        if plugin.child_plugin_instances:
-            found_plugins.extend(_unpack_plugins(plugin))
-    return found_plugins
+        yield from _unpack_plugins(plugin)
 
 
 class RenderedPlaceholder:
@@ -95,13 +90,13 @@ class BaseRenderer:
 
     def __init__(self, request: HttpRequest):
         self.request = request
-        self._cached_templates = {}
         self._cached_plugin_classes = {}
         self._placeholders_content_cache = {}
         self._placeholders_by_page_cache = {}
         self._rendered_placeholders = OrderedDict()
         self._rendered_static_placeholders = OrderedDict()
         self._rendered_plugins_by_placeholder = {}
+        self._plugins_with_perms = None
 
     @cached_property
     def current_page(self) -> Page:
@@ -129,20 +124,25 @@ class BaseRenderer:
     def request_language(self) -> str:
         return get_language_from_request(self.request)
 
+    def get_plugins_with_perms(self) -> list[CMSPlugin]:
+        if self._plugins_with_perms is None:
+            registered_plugins = self.plugin_pool.registered_plugins
+            can_add_plugin = partial(
+                has_plugin_permission, user=self.request.user, permission_type="add"
+            )
+            self._plugins_with_perms = [
+                plugin
+                for plugin in registered_plugins
+                if can_add_plugin(plugin_type=plugin.value)
+            ]
+
+        return self._plugins_with_perms
+
     def get_placeholder_plugin_menu(
         self, placeholder: Placeholder, page: Optional[Page] = None
     ):
-        registered_plugins = self.plugin_pool.registered_plugins
-        can_add_plugin = partial(
-            has_plugin_permission, user=self.request.user, permission_type="add"
-        )
-        plugins = [
-            plugin
-            for plugin in registered_plugins
-            if can_add_plugin(plugin_type=plugin.value)
-        ]
         plugin_menu = get_toolbar_plugin_struct(
-            plugins=plugins,
+            plugins=self.get_plugins_with_perms(),
             slot=placeholder.slot,
             page=page,
         )
@@ -166,7 +166,8 @@ class BaseRenderer:
         )
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
-            restrictions_cache=placeholder_cache,
+            page=page,
+            restrictions_cache=placeholder_cache,  # Store non-global plugin-restriction in placeholder_cache
         )
         content = get_plugin_toolbar_js(
             plugin,
@@ -774,13 +775,7 @@ class StructureRenderer(BaseRenderer):
         plugins = super().get_plugins_to_render(*args, **kwargs)
 
         for plugin in plugins:
-            yield plugin
-
-            if not plugin.child_plugin_instances:
-                continue
-
-            for plugin in _unpack_plugins(plugin):
-                yield plugin
+            yield from _unpack_plugins(plugin)
 
     def render_placeholder(self, placeholder, language, page=None):
         rendered_plugins = self.render_plugins(

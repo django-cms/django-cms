@@ -5,6 +5,7 @@ from shutil import rmtree as _rmtree
 from tempfile import _exists, mkdtemp, template
 
 from django.contrib.auth import get_user_model
+from django.test.utils import override_settings
 from django.utils.translation import activate, get_language
 
 from cms.apphook_pool import apphook_pool
@@ -173,3 +174,15 @@ class SignalTester:
     def __call__(self, *args, **kwargs):
         self.call_count += 1
         self.calls.append((args, kwargs))
+
+
+@contextmanager
+def override_placeholder_conf(CMS_PLACEHOLDER_CONF):
+    from cms.utils.placeholder import _clear_placeholder_conf_cache
+
+    # Call _get_placeholder_settings after changing the setting
+    with override_settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        _clear_placeholder_conf_cache()  # Clear cache if needed
+        yield
+    # Call _get_placeholder_settings after resetting the setting
+    _clear_placeholder_conf_cache()  # Clear cache if needed

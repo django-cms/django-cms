@@ -31,6 +31,7 @@ from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
 from cms.test_utils.util.context_managers import (
     LanguageOverride,
     UserLoginContext,
+    override_placeholder_conf,
 )
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
@@ -1501,7 +1502,7 @@ class PageTest(PageTestBase):
         plugin_2 = add_plugin(**data)
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
@@ -1529,7 +1530,7 @@ class PageTest(PageTestBase):
         plugin_1 = add_plugin(**data)
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first

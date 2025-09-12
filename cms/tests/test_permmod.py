@@ -18,6 +18,7 @@ from cms.models.permissionmodels import (
     PagePermission,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site
 from cms.utils.page_permissions import user_can_view_page
@@ -144,8 +145,8 @@ class PermissionModeratorTests(CMSTestCase):
             response = self.client.get(self.get_page_add_uri('en'))
             self.assertEqual(response.status_code, 403)
 
-    @override_settings(
-        CMS_PLACEHOLDER_CONF={
+    @override_placeholder_conf(
+        {
             'col_left': {
                 'default_plugins': [
                     {

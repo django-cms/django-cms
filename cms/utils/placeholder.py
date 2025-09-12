@@ -1,11 +1,13 @@
 import operator
+import os
 import warnings
-from collections import OrderedDict
-from typing import Optional, Union
+from collections import OrderedDict, defaultdict
+from functools import cache
+from typing import TYPE_CHECKING, Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import connection, models
 from django.db.models.query_utils import Q
 from django.template import (
     Context,
@@ -23,6 +25,10 @@ from sekizai.helpers import get_varname
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import EmptyPageContent, Placeholder
 from cms.utils.conf import get_cms_setting
+
+if TYPE_CHECKING:
+    from cms.templatetags.cms_tags import DeclaredPlaceholder
+
 
 RANGE_START = 128
 
@@ -43,6 +49,52 @@ def get_context():
         return {}
 
 
+def _get_placeholder_settings():
+    """Convert CMS_PLACEHOLDER_CONF into a faster to access format since it is accessed many times
+    in each request response cycle:
+    * setting key on the first level dict, scope on the second level
+    * resolve inheritance
+    * Check of template-specific configs exist (expensive to access)
+    """
+    conf = get_cms_setting("PLACEHOLDER_CONF")
+    template_in_conf = any(".htm" in key for key in conf if key)
+
+    def resolve_inheritance(key, visited=None):
+        if visited is None:
+            visited = set()
+        if key in visited:
+            raise ImproperlyConfigured(f"Circular inheritance detected in CMS_PLACEHOLDER_CONF at key '{key}'")
+        visited.add(key)
+        if "inherit" in conf[key]:
+            return resolve_inheritance(conf[key]['inherit'], visited) | {k: v for k, v in conf.items() if k != "inherit"}
+        return conf[key]
+
+    new_conf = {}
+    for key, value in conf.items():
+        if "inherit" in value:
+            new_conf[key] = resolve_inheritance(value['inherit'])
+            new_conf[key].update({k: v for k, v in value.items() if k != "inherit"})
+        else:
+            new_conf[key] = value
+
+
+    settings = defaultdict(dict)
+    for key, value in new_conf.items():
+        for setting, setting_value in value.items():
+            settings[setting][key] = setting_value
+
+    return settings, template_in_conf
+
+
+_placeholder_settings, _template_in_conf = _get_placeholder_settings()
+
+
+def _clear_placeholder_conf_cache():
+    # Needed by the override_placeholder_conf context manager for tests
+    global _placeholder_settings, _template_in_conf
+    _placeholder_settings, _template_in_conf = _get_placeholder_settings()
+
+
 def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str] = None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
@@ -58,39 +110,18 @@ def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str]
     Template is only evaluated if the placeholder configuration contains key with ".html" or ".htm"
     """
 
-    if placeholder:
-        keys = []
-        placeholder_conf = get_cms_setting("PLACEHOLDER_CONF")
-        template_in_conf = any(".htm" in (key or "") for key in placeholder_conf) and template
-        # 1st level
-        if template_in_conf:
-            keys.append(f"{template} {placeholder}")
-        # 2nd level
-        keys.append(placeholder)
-        # 3rd level
-        if template_in_conf:
-            keys.append(str(template))
-        # 4th level
-        keys.append(None)
-        for key in keys:
-            try:
-                conf = placeholder_conf[key]
-                value = conf.get(setting, None)
-                if value is not None:
-                    return value
-                inherit = conf.get("inherit")
-                if inherit:
-                    if " " in inherit:
-                        inherit = inherit.split(" ")
-                    else:
-                        inherit = (None, inherit)
-                    value = get_placeholder_conf(
-                        setting, inherit[1], inherit[0], default
-                    )
-                    if value is not None:
-                        return value
-            except KeyError:
-                continue
+    if setting not in _placeholder_settings:
+        return default
+
+    if _template_in_conf and template is not None:
+        keys = [f"{template} {placeholder}", placeholder, str(template), None]
+    else:
+        keys = [placeholder, None]
+
+    conf = _placeholder_settings[setting]
+    for key in keys:
+        if (value := conf.get(key, None)) is not None:
+            return value
     return default
 
 
@@ -137,7 +168,9 @@ def validate_placeholder_name(name):
             "Placeholder identifier names need to be of type string. "
         )
 
-    if not all(ord(char) < RANGE_START for char in name):
+    try:
+        name.encode("ascii")
+    except UnicodeEncodeError:
         raise ImproperlyConfigured(
             "Placeholder identifiers names may not "
             "contain non-ascii characters. If you wish your placeholder "
@@ -282,13 +315,7 @@ def _scan_placeholders(
     return nodes
 
 
-def _scan_static_placeholders(nodelist):
-    from cms.templatetags.cms_tags import StaticPlaceholderNode
-
-    return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
-
-
-def get_placeholders(template):
+def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
     compiled_template = get_template(template)
 
     placeholders = []
@@ -310,23 +337,10 @@ def get_placeholders(template):
             clean_placeholders.append(slot)
     return placeholders
 
-
-def get_static_placeholders(template, context):
-    compiled_template = get_template(template)
-    nodes = _scan_static_placeholders(_get_nodelist(compiled_template))
-    placeholders = [node.get_declaration(context) for node in nodes]
-    placeholders_with_code = []
-
-    for placeholder in placeholders:
-        if placeholder.slot:
-            placeholders_with_code.append(placeholder)
-        else:
-            warnings.warn(
-                "Unable to resolve static placeholder "
-                f'name in template "{template}"',
-                Warning,
-            )
-    return placeholders_with_code
+if settings.DEBUG is False or os.environ.get("DJANGO_TESTS"):
+    # Cache in production only, so template changes in development
+    # are always reflected without needing a server restart
+    get_placeholders = cache(get_placeholders)
 
 
 def _get_block_nodes(extend_node):
@@ -391,27 +405,36 @@ def _find_topmost_template(extend_node):
     return extend_node.get_parent(get_context())
 
 
-def rescan_placeholders_for_obj(obj):
-    from cms.models import Placeholder
+def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
+    from cms.models import CMSPlugin, Placeholder
 
-    existing = OrderedDict()
     declared_placeholders = get_declared_placeholders_for_obj(obj)
-    placeholders = [pl.slot for pl in declared_placeholders]
+    placeholders = {pl.slot: None for pl in declared_placeholders}  # Fix order of placeholders in dict
 
-    for placeholder in Placeholder.objects.get_for_obj(obj):
-        if placeholder.slot in placeholders:
-            existing[placeholder.slot] = placeholder
+    # Fill in existing placeholders
+    placeholders.update({placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj) if placeholder.slot in placeholders})
 
-    for placeholder in placeholders:
-        if placeholder not in existing:
-            existing[placeholder] = Placeholder.objects.create(
-                slot=placeholder,
-                source=obj,
-            )
-    return existing
+    # Create missing placeholders
+    new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
+    if new_placeholders:
+        if connection.features.can_return_rows_from_bulk_insert:
+            Placeholder.objects.bulk_create(new_placeholders)
+            for placeholder in new_placeholders:
+                # No plugins in newly created placeholder yet
+                placeholder._prefetched_objects_cache = {"cmsplugin_set": CMSPlugin.objects.none()}
+                placeholders[placeholder.slot] = placeholder
+        else:
+            # Some MySql versions do not support returning IDs from bulk_create
+            for placeholder in new_placeholders:
+                placeholder.save()
+                # No plugins in newly created placeholder yet
+                placeholder._prefetched_objects_cache = {"cmsplugin_set": CMSPlugin.objects.none()}
+                placeholders[placeholder.slot] = placeholder
+
+    return placeholders
 
 
-def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent, None]) -> list[Placeholder]:
+def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent, None]) -> list['DeclaredPlaceholder']:
     """Returns declared placeholders for an object. The object is supposed to either have a method
     ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns

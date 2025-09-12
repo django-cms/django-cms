@@ -11,6 +11,7 @@ from cms.plugin_rendering import (
     StructureRenderer,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
 
@@ -66,7 +67,7 @@ class TestStructureRenderer(CMSTestCase):
 
         conf = {placeholder.slot: {'name': 'Content-with-dash'}}
 
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
 
         expected_bits = [
