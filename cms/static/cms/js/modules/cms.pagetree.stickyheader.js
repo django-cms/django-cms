@@ -59,7 +59,7 @@ var PageTreeStickyHeader = new Class({
         if (this._isInSideframe()) {
             this.toolbarHeight = CMS.API.Helpers._getWindow().parent.CMS.$('.cms-toolbar').height();
         } else {
-            this.toolbarHeight = $('#branding').height();
+            this.toolbarHeight = $('.djangocms-admin-style #branding').height() || 0;
         }
     },
 
