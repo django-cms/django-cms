@@ -1,13 +1,24 @@
+5.0.3 (2025-09-13)
+==================
+
+Bug Fixes:
+----------
+* Django 6 compatibility (July 2025) by @fsbraun in https://github.com/django-cms/django-cms/pull/8302
+* Respect individual placeholder checks if they can be changed (#8317) by @fsbraun in https://github.com/django-cms/django-cms/pull/8318
+* Cut children from inactive nodes when level is less or equal to 0 (#8322) by @fsbraun in https://github.com/django-cms/django-cms/pull/8324
+* Copy lang management command - include PageUrl (#7548) by @fsbraun in https://github.com/django-cms/django-cms/pull/8335
+
+
 Statistics:
 -----------
 
 This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
+* Fabian Braun (4 pull request)
 
 With the review help of the following contributors:
 
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
