@@ -39,7 +39,7 @@ def forwards(apps, schema_editor):
                             content_type_id=cur_ct_obj.pk,
                             object_id=obj.pk,
                         )
-                    else:
+                    elif obj_placeholder_field:
                         obj_placeholder_field.content_type_id = cur_ct_obj.pk
                         obj_placeholder_field.object_id = obj.pk
                         obj_placeholder_field.save()
