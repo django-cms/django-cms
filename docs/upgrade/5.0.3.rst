@@ -4,9 +4,9 @@
 5.0.3 release notes
 ###################
 
-*July 27, 2025*
+*September 17, 2025*
 
-Welcome to django CMS 5.0.2!
+Welcome to django CMS 5.0.3!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you'll want to be aware of when upgrading from
@@ -27,7 +27,7 @@ support the latest release of each series.
 How to upgrade to 5.0.3
 ***********************
 
-Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.1 and
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.3 and
 run ``pip install -r requirements.txt``.
 
 If you are upgrading from an earlier version of django CMS, read the release
@@ -52,33 +52,29 @@ What's new in 5.0.3
 
 Bug Fixes:
 ----------
-* The headless template included inline CSS (#8291) (#8292) (14dd89faf) -- Fabian Braun
-* GrouperAdmin Search in content model (#8284) (#8290) (46f0e0775) -- Muhammad Hassan Siddiqi
-* Allow clicks to propagate to plugins (#8288) (#8289) (2c1ab2d7d) -- Fabian Braun
-* show_placeholder did not respect edit/preview mode and failed loudly (#8272) (#8274) (e7be7bc9b) -- Fabian Braun
-* Allow lazy wizard initialization (#8265) (365185848) -- Fabian Braun
-* Apphook widgets were not always detected correctly (#8263) (ec2f4e815) -- Fabian Braun
-* Migrating from django CMS 3.x failed in some rare cases (#8249) (bcf7f895a) -- jmit-modern
-* Added default_auto_field to cms/apps.py (#8254) (4a12dd38a) -- Fabian Braun
-* 404 not raised in CMS view when no URLs matched (#8240) (3d069cbe5) -- Stefan Wehrmeyer
-* Replaced outdated usage of page__node__path with page__path (#8238) (a9105a738) -- Stefan Wehrmeyer
 
+* Django 6 compatibility (July 2025) (8302) -- Fabian Braun
+* Respect individual placeholder checks if they can be changed (#8318) -- Fabian Braun
+* Cut children from inactive menu nodes when level is less or equal to 0 (#8324) -- Stefan Wehrmeyer
+* Copy lang management command - include PageUrl (#8335) -- Vašek Chalupníček
+* Optimize placeholder and plugin utilities (#8337) -- Fabian Braun
+* Migration 0033 failed when empty placeholder objects were not present in the db (#8339) -- Fabian Braun
 
 
 Statistics:
 -----------
 
-This release includes 13 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (6 pull request)
+* Fabian Braun (5 pull requests)
+* Stefan Wehrmeyer (1 pull request)
+* Vašek Chalupníček (1 pull request)
 * Github Release Action (3 pull requests)
-* jmit-modern (1 pull request)
-* Muhammad Hassan Siddiqi (1 pull request)
-* Stefan Wehrmeyer (2 pull requests)
 
 With the review help of the following contributors:
 
 * Fabian Braun
 * Vinit Kumar
+
 
 Thanks to all contributors for their efforts!

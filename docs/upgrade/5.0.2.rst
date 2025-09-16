@@ -27,7 +27,7 @@ support the latest release of each series.
 How to upgrade to 5.0.2
 ***********************
 
-Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.1 and
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.2 and
 run ``pip install -r requirements.txt``.
 
 If you are upgrading from an earlier version of django CMS, read the release
