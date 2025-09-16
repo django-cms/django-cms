@@ -1,3 +1,20 @@
+Bug Fixes:
+----------
+* Migration 0033 failed when empty placeholder objects were not present in the db (#8339) (7ec333dc8) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 5.0.2 (2025-07-17)
 ==================
 
