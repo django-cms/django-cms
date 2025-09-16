@@ -1,3 +1,36 @@
+5.0.3 (2025-09-17)
+==================
+
+
+Bug Fixes:
+----------
+
+* Django 6 compatibility (July 2025) (8302) -- Fabian Braun
+* Respect individual placeholder checks if they can be changed (#8318) -- Fabian Braun
+* Cut children from inactive menu nodes when level is less or equal to 0 (#8324) -- Stefan Wehrmeyer
+* Copy lang management command - include PageUrl (#8335) -- Vašek Chalupníček
+* Optimize placeholder and plugin utilities (#8337) -- Fabian Braun
+* Migration 0033 failed when empty placeholder objects were not present in the db (#8339) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+* Stefan Wehrmeyer (1 pull request)
+* Vašek Chalupníček (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+
+Thanks to all contributors for their efforts!
+
 5.0.2 (2025-07-17)
 ==================
 
