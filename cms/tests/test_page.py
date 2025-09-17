@@ -26,9 +26,12 @@ from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
     get_available_slug,
-    get_current_site,
     get_page_from_request,
 )
+
+
+def _get_current_site():
+    return Site.objects.get_current()
 
 
 class PageMigrationTestCase(CMSTestCase):
@@ -196,7 +199,7 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_get_available_slug_recursion(self):
         """Checks cms.utils.page.get_available_slug for infinite recursion"""
-        site = get_current_site()
+        site = _get_current_site()
         for x in range(0, 12):
             create_page("test-page", "nav_playground.html", "en")
         new_slug = get_available_slug(site, "test-page", "en")
@@ -222,7 +225,7 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_path_collisions_api_3(self):
         """Checks for slug collisions on children of a non root page - uses API to create pages"""
-        site = get_current_site()
+        site = _get_current_site()
         page1 = create_page("test page 1", "nav_playground.html", "en")
         page1_1 = create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
         create_page("test page 1_1_1", "nav_playground.html", "en", parent=page1_1, slug="bar")
@@ -607,7 +610,7 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_slug_url_overwrite_clash(self):
         """Tests if a URL-Override clashes with a normal page url"""
-        site = get_current_site()
+        site = _get_current_site()
         with self.settings(CMS_PERMISSION=False):
             create_page("home", "nav_playground.html", "en")
             bar = create_page("bar", "nav_playground.html", "en")

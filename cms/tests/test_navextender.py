@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.contrib.sites.models import Site
 from django.template import Template
 
 from cms.models import Page, PageContent
@@ -44,7 +44,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
 
     def test_extenders_on_root(self):
         self._update_page(1, navigation_extenders="TestMenu")
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         context = self.get_context()
 
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -54,7 +54,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(len(nodes[0].children[3].children), 1)
         PageContent.objects.filter(title='page1').update(in_navigation=False)
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
         nodes = context['children']
@@ -62,7 +62,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
 
     def test_extenders_on_root_child(self):
         self._update_page(4, navigation_extenders="TestMenu")
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
@@ -76,8 +76,8 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         """
         PageContent.objects.filter(title='page1').update(in_navigation=False)
         self._update_page(2, navigation_extenders="TestMenu")
-        menu_pool.clear(settings.SITE_ID)
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
+        menu_pool.clear(Site.objects.get_current().pk)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
@@ -88,7 +88,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
 
     def test_incorrect_nav_extender_in_db(self):
         self._update_page(2, navigation_extenders="SomethingWrong")
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)

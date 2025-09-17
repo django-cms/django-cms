@@ -82,7 +82,7 @@ class PageUrlManager(WithUserMixin, models.Manager):
 
 
 class PageContentManager(WithUserMixin, models.Manager):
-    def get_title(self, page, language, language_fallback=False):
+    def get_title(self, page, language, language_fallback=False, site=None):
         """
         Gets the latest content for a particular page and language. Falls back
         to another language if wanted.
@@ -94,7 +94,7 @@ class PageContentManager(WithUserMixin, models.Manager):
             if language_fallback:
                 try:
                     titles = self.filter(page=page)
-                    fallbacks = get_fallback_languages(language)
+                    fallbacks = get_fallback_languages(language, site_id=site.pk if site else None)
                     for lang in fallbacks:
                         for title in titles:
                             if lang == title.language:
