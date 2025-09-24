@@ -12,7 +12,7 @@
     process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
 
 
-Welcome to django CMS 4.1.6!
+Welcome to django CMS 4.1.7!
 
 
 Django and Python compatibility
