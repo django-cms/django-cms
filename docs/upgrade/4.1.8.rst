@@ -30,7 +30,7 @@ What's new in 4.1.8
 Bug Fixes:
 ----------
 
-* Wrong placholders rendered when using apphooks with own placeholder (4f68ba794) -- Fabian Braun
+* Wrong placeholders rendered when using apphooks with own placeholder (4f68ba794) -- Fabian Braun
 * copy lang management command - include PageUrl (#7548) -- Fabian Braun
 * Migration 0033 failed when empty placeholder objects were not present in the db (#8340) (c7c0b7a35) -- Fabian Braun
 * Allow lazy wizard initialization (#8266) (#8283) -- Fabian Braun
