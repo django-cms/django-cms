@@ -83,7 +83,8 @@ describe('CMS.PageTreeStickyHeader', function() {
 
         it('saves toolbar height if in admin', function() {
             spyOn(sticky, '_isInSideframe').and.returnValue(false);
-            $('<div class="djangocms-admin-style"><div id="branding" style="height: 200px"></div></div>').prependTo(sticky.ui.container);
+            $('<div class="djangocms-admin-style"><div id="branding" style="height: 200px"></div></div>')
+                .prependTo(sticky.ui.container);
             expect(sticky.toolbarHeight).toEqual(0);
             sticky._saveSizes();
             expect(sticky.toolbarHeight).toEqual(200);
