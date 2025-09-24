@@ -4,7 +4,7 @@
 4.1.8 release notes
 *******************
 
-*April 22, 2025*
+*September 25, 2025*
 
 .. warning:: Upgrading from previous versions
 
@@ -12,7 +12,7 @@
     process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
 
 
-Welcome to django CMS 4.1.6!
+Welcome to django CMS 4.1.8!
 
 
 Django and Python compatibility
@@ -29,22 +29,18 @@ What's new in 4.1.8
 
 Bug Fixes:
 ----------
-* show_placeholder did not respect edit/preview mode and failed loudly (#8273) (c062968b7) -- Fabian Braun
-* Updated deprecation warning to current version scheme (#8269) (ce2dba0) -- Fabian Braun
-* Allow lazy wizard initialization (#8268) (04003bb) -- Fabian Braun
-* Migration failed in rare cases (#8249) (b5b7f30) -- Fabian Braun
-* Added default_auto_field to cms/apps.py (#8254) (14425d) -- Fabian Braun
-* Adjusted checks for GrouperAdmin to allow for `prepopulated_fields` (#8255) (7f08375) -- Fabian Braun
-* Remove text decorations in page tree introduced by django 5.2 (#8214) (56b75e1) -- Fabian Braun
-* Allow lazy wizard initialization (#8283) (e1e8f32) -- Fabian Braun
 
+* Wrong placholders rendered when using apphooks with own placeholder (4f68ba794) -- Fabian Braun
+* copy lang management command - include PageUrl (#7548) -- Fabian Braun
+* Migration 0033 failed when empty placeholder objects were not present in the db (#8340) (c7c0b7a35) -- Fabian Braun
+* Allow lazy wizard initialization (#8266) (#8283) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 11 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (8 pull request)
+* Fabian Braun (3 pull request)
 * Github Release Action (3 pull requests)
 
 With the review help of the following contributors:
