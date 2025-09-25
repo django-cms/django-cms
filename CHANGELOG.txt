@@ -5,6 +5,7 @@
 * Fix: CSS bundle versioned path (#7872)
 * Fix: update util function add_builtin_arguments (#7858)
 * Fix: Empty all placeholder menu
+* Removed support for python 3.8
 
 === 4.0.0 (unreleased) ===
 * feat: Added live-url querystring parameter option for PageContent edit and preview endpoints
