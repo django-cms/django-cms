@@ -387,8 +387,10 @@ class ContentRenderer(BaseRenderer):
         nodelist=None,
         editable: bool = True,
     ):
+        # Get current object from toolbar
+        current_obj = self.toolbar.get_object()
         # Check if page, if so delegate to render_page_placeholder
-        if self.current_page:
+        if self.current_page and (isinstance(current_obj, (PageContent, type(None)))):
             return self.render_page_placeholder(
                 slot,
                 context,
@@ -396,10 +398,8 @@ class ContentRenderer(BaseRenderer):
                 nodelist=nodelist,
                 editable=editable,
             )
-
         # Not page, therefore we will use toolbar object as
         # the current object and render the placeholder
-        current_obj = self.toolbar.get_object()
         if current_obj is None:
             raise PlaceholderNotFound(f"No object found for placeholder '{slot}'")
         placeholder = rescan_placeholders_for_obj(current_obj).get(slot)
