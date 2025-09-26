@@ -103,7 +103,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         except NoReverseMatch:
             pass
 
-    site = get_current_site()
+    site = get_current_site(request)
     page_urls = (
         PageUrl
         .objects
