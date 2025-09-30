@@ -698,6 +698,9 @@
     .addlink {
         padding-inline-start: 16px;
     }
+    background: $pagetree-bg;
+    border-bottom-left-radius: $border-radius-modal;
+    border-bottom-right-radius: $border-radius-modal;
 }
 
 //##############################################################################
