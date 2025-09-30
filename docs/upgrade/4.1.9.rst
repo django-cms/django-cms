@@ -1,10 +1,10 @@
-.. _upgrade-to-4.1.9:
+.. _upgrade-to-4.1.8:
 
 *******************
 4.1.9 release notes
 *******************
 
-*September 25, 2025*
+*September 30, 2025*
 
 .. warning:: Upgrading from previous versions
 
@@ -12,7 +12,7 @@
     process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
 
 
-Welcome to django CMS 4.1.8!
+Welcome to django CMS 4.1.9!
 
 
 Django and Python compatibility
@@ -24,7 +24,7 @@ support the latest release of each series.
 It supports **Python 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
 support the latest release of each series.
 
-What's new in 4.1.9
+What's new in 4.1.8
 ===================
 
 Bug Fixes:

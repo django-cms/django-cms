@@ -1,25 +1,27 @@
+4.1.9 (2025-09-30)
+==================
+
+Bug Fixes:
+----------
+
+* Wrong placeholders rendered when using apphooks with own placeholder (4f68ba794) -- Fabian Braun
+
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 1 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
 
 With the review help of the following contributors:
 
-* Github Release Action
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
 4.1.8 (2025-09-26)
 ==================
 
-
-Bug Fixes:
-----------
-
-* Wrong placeholders rendered when using apphooks with own placeholder (4f68ba794) -- Fabian Braun
 * copy lang management command - include PageUrl (#7548) -- Fabian Braun
 * Migration 0033 failed when empty placeholder objects were not present in the db (#8340) (c7c0b7a35) -- Fabian Braun
 * Allow lazy wizard initialization (#8266) (#8283) -- Fabian Braun
@@ -29,7 +31,7 @@ Statistics:
 
 This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (3 pull request)
+* Fabian Braun (3 pull requests)
 * Github Release Action (3 pull requests)
 
 With the review help of the following contributors:
