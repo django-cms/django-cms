@@ -3,9 +3,6 @@
 
 @use "sass:string";
 
-// #############################################################################
-// BUTTONS
-
 // taken from bootstrap with adaptations
 @function important($important) {
     @if($important == true) {
