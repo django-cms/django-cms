@@ -1,3 +1,6 @@
+5.0.4 (2025-10-03)
+==================
+
 Bug Fixes:
 ----------
 * Wrong placeholders rendered when using apphooks with own placeholders (#8343) (#8348) (775392390) -- Fabian Braun
@@ -5,10 +8,9 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 1 pull request, and was created with the help of the following contributors (in alphabetical order):
 
 * Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
 
 With the review help of the following contributors:
 
@@ -18,7 +20,6 @@ Thanks to all contributors for their efforts!
 
 5.0.3 (2025-09-17)
 ==================
-
 
 Bug Fixes:
 ----------
