@@ -31,6 +31,7 @@ jobs:
     - name: Create project from template
       run: |
         sudo apt install gettext gcc -y
+        sudo apt install libcairo2-dev pkg-config python3-dev
         python -m venv .venv
         source ./.venv/bin/activate
         python -m pip install --upgrade pip
