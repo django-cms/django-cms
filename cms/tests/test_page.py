@@ -924,8 +924,17 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].pk, page1.pk)
 
+        # Search by content and language
+        results = Page.objects.search("more random", language="fr")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].pk, page1.pk)
+
         # Search with no results
         results = Page.objects.search("nonexistent")
+        self.assertEqual(len(results), 0)
+
+        # Search with language that has no content
+        results = Page.objects.search("more random", language="en")
         self.assertEqual(len(results), 0)
 
 
