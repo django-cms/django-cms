@@ -586,7 +586,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.registered_plugins)
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
 
-    def test_search_pages(self):
+    def test_search_pages_for_plugin_content(self):
         """
         Test search for pages
         To be fully useful, this testcase needs to have the following different
@@ -606,6 +606,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         text.save()
         self.assertEqual(Page.objects.search("hi").count(), 0)
         self.assertEqual(Page.objects.search("hello").count(), 1)
+        self.assertEqual(Page.objects.search("hi", language="en").count(), 0)
+        self.assertEqual(Page.objects.search("hello", language="fr").count(), 0)
+
 
     def test_empty_plugin_is_ignored(self):
         page = api.create_page("page", "nav_playground.html", "en")
