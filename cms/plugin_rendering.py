@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import contextlib
 import logging
 import sys
 from collections import OrderedDict
 from collections.abc import Generator
 from functools import partial
-from typing import Any, Optional, Union
+from typing import Any
 
 from classytags.utils import flatten_context
 from django.conf import settings
@@ -139,7 +141,7 @@ class BaseRenderer:
         return self._plugins_with_perms
 
     def get_placeholder_plugin_menu(
-        self, placeholder: Placeholder, page: Optional[Page] = None
+        self, placeholder: Placeholder, page: Page | None = None
     ):
         plugin_menu = get_toolbar_plugin_struct(
             plugins=self.get_plugins_with_perms(),
@@ -160,7 +162,7 @@ class BaseRenderer:
         )
         return placeholder_toolbar_js
 
-    def get_plugin_toolbar_js(self, plugin: CMSPlugin, page: Optional[Page] = None):
+    def get_plugin_toolbar_js(self, plugin: CMSPlugin, page: Page | None = None):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
             plugin.placeholder_id, {}
         )
@@ -186,7 +188,7 @@ class BaseRenderer:
         return self._cached_plugin_classes[plugin_type]
 
     def get_plugins_to_render(
-        self, placeholder: Placeholder, language: str, template: Optional[str]
+        self, placeholder: Placeholder, language: str, template: str | None
     ):
         from cms.utils.plugins import get_plugins
 
@@ -244,12 +246,12 @@ class ContentRenderer(BaseRenderer):
         self,
         placeholder: Placeholder,
         context: Context,
-        language: Optional[str] = None,
-        page: Optional[Page] = None,
+        language: str | None = None,
+        page: Page | None = None,
         editable: bool = False,
         use_cache: bool = False,
-        nodelist: Optional[Any] = None,
-        width: Optional[int] = None,
+        nodelist: Any | None = None,
+        width: int | None = None,
     ):
         from sekizai.helpers import Watcher
 
@@ -364,7 +366,7 @@ class ContentRenderer(BaseRenderer):
         return mark_safe(placeholder_content)
 
     def get_editable_placeholder_context(
-        self, placeholder: Placeholder, page: Optional[Page] = None
+        self, placeholder: Placeholder, page: Page | None = None
     ) -> dict:
         placeholder_cache = self.get_rendered_plugins_cache(placeholder)
         placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
@@ -418,7 +420,7 @@ class ContentRenderer(BaseRenderer):
         slot: str,
         context: Context,
         inherit: bool,
-        page: Optional[Page] = None,
+        page: Page | None = None,
         nodelist=None,
         editable: bool = True,
     ):
@@ -526,7 +528,7 @@ class ContentRenderer(BaseRenderer):
         self,
         instance: CMSPlugin,
         context: Context,
-        placeholder: Optional[Placeholder] = None,
+        placeholder: Placeholder | None = None,
         editable: bool = False,
     ):
         context["_last_plugin"] = instance  # Used if an exception is rendered
@@ -618,8 +620,8 @@ class ContentRenderer(BaseRenderer):
         language: str,
         context,
         editable: bool = False,
-        template: Optional[str] = None,
-    ) -> Generator[Union[SafeText, str], None, None]:
+        template: str | None = None,
+    ) -> Generator[SafeText | str, None, None]:
         plugins = self.get_plugins_to_render(
             placeholder=placeholder,
             template=template,

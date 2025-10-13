@@ -70,7 +70,7 @@ class WizardTestMixin:
     def assertSequencesEqual(self, seq_a, seq_b):
         seq_a = list(seq_a)
         seq_b = list(seq_b)
-        zipped = list(zip(seq_a, seq_b))
+        zipped = list(zip(seq_a, seq_b, strict=False))
         if len(zipped) < len(seq_a) or len(zipped) < len(seq_b):
             self.fail("Sequence lengths are not the same.")
         for idx, (a, b) in enumerate(zipped):

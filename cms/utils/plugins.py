@@ -1,13 +1,13 @@
+from __future__ import annotations
+
 import logging
-import os
 import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache, lru_cache
+from functools import cache
 from itertools import starmap
 from operator import itemgetter
-from typing import Optional
 
 from django.db import models
 from django.http import HttpRequest
@@ -405,9 +405,9 @@ def get_bound_plugins(plugins):
 
 def downcast_plugins(
     plugins: Iterable[CMSPlugin],
-    placeholders: Optional[list] = None,
+    placeholders: list | None = None,
     select_placeholder: bool = False,
-    request: Optional[HttpRequest] = None,
+    request: HttpRequest | None = None,
 ) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins
