@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import re
 from collections.abc import Sequence
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -97,11 +99,11 @@ admin_namespace = get_cms_setting('ADMIN_NAMESPACE')
 
 def admin_reverse(
     viewname: str,
-    urlconf: Optional[str] = None,
-    args: Optional[Sequence] = None,
-    kwargs: Optional[dict[str, Any]] = None,
+    urlconf: str | None = None,
+    args: Sequence | None = None,
+    kwargs: dict[str, Any] | None = None,
     prefix=None,
-    current_app: Optional[str] = None
+    current_app: str | None = None
 ):
     return reverse(
         f"{admin_namespace}:{viewname}",

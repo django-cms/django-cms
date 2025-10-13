@@ -32,6 +32,7 @@ select = [
 ]
 
 extend-ignore = [
+  "B905",     # zip w/o strict parameter -- remove once py 3.9 is no longer supported
   "C901",     # Too complex
   "PLR0911",  # Too many return statements
   "PLR0912",  # Too many branches

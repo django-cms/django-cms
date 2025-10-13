@@ -1,4 +1,6 @@
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import Any
 
 from django.utils.encoding import smart_str
 
@@ -19,7 +21,7 @@ class Menu:
         if not self.namespace:
             self.namespace = self.__class__.__name__
 
-    def get_nodes(self, request) -> list['NavigationNode']:
+    def get_nodes(self, request) -> list[NavigationNode]:
         """
         Get a list of NavigationNode instances for the menu.
 
@@ -77,16 +79,16 @@ class NavigationNode:
     ancestor: bool = False
     descendant: bool = False
     sibling: bool = False
-    level: Optional[int] = None
+    level: int | None = None
 
     def __init__(
         self,
         title: str,
         url: str,
         id: Any,
-        parent_id: Optional[Any] = None,
-        parent_namespace: Optional[str] = None,
-        attr: Optional[dict[str, Any]] = None,
+        parent_id: Any | None = None,
+        parent_namespace: str | None = None,
+        attr: dict[str, Any] | None = None,
         visible: bool = True,
     ):
         """
@@ -102,8 +104,8 @@ class NavigationNode:
             visible: Indicates whether this item is visible (default is True).
         """
         self.children: list[NavigationNode] = []  # Do not modify
-        self.parent: Optional[NavigationNode] = None  # Do not modify, code depends on this
-        self.namespace: Optional[str] = None  # TODO: Clarify the necessity of this and the line above
+        self.parent: NavigationNode | None = None  # Do not modify, code depends on this
+        self.namespace: str | None = None  # TODO: Clarify the necessity of this and the line above
         self.title = title
         self.url = url
         self.id = id
@@ -147,13 +149,13 @@ class NavigationNode:
         """
         return self.attr.get(name, None)
 
-    def get_descendants(self) -> list['NavigationNode']:
+    def get_descendants(self) -> list[NavigationNode]:
         """
         Returns a list of all children beneath the current menu item.
         """
         return sum(([node] + node.get_descendants() for node in self.children), [])
 
-    def get_ancestors(self) -> list['NavigationNode']:
+    def get_ancestors(self) -> list[NavigationNode]:
         """
         Returns a list of all parent items, excluding the current menu item.
         """

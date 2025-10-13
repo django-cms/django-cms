@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import re
 from collections import defaultdict
 from collections.abc import Generator, Iterable
-from typing import Optional
 
 from django.utils.functional import SimpleLazyObject
 
@@ -121,7 +122,7 @@ class CMSNavigationNode(NavigationNode):
         language: The language used for the node (optional).
     """
 
-    def __init__(self, *args, path: str = None, language: Optional[str] = None, **kwargs):
+    def __init__(self, *args, path: str = None, language: str | None = None, **kwargs):
         """
         Initializes a CMSNavigationNode instance.
 
@@ -209,7 +210,7 @@ class CMSMenu(Menu):
     def get_menu_node_for_page_content(
         self,
         page_content: PageContent,
-        preview_url: Optional[str] = None,
+        preview_url: str | None = None,
         cut: bool = False,
     ) -> CMSNavigationNode:
         """

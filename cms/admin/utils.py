@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import typing
 from copy import copy
@@ -99,7 +101,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
 
     def get_list_display(
         self, request: HttpRequest
-    ) -> tuple[typing.Union[str, typing.Callable[[models.Model], str]], ...]:
+    ) -> tuple[str | typing.Callable[[models.Model], str], ...]:
         list_display = super().get_list_display(request)
         return tuple(
             self.get_admin_list_actions(request) if item == "admin_list_actions" else item for item in list_display
@@ -165,7 +167,7 @@ class GrouperChangeListBase(ChangeList):
 
     _extra_grouping_fields = []
 
-    def get_filters_params(self, params: typing.Optional[dict] = None):
+    def get_filters_params(self, params: dict | None = None):
         lookup_params = super().get_filters_params(params)
         for field in self._extra_grouping_fields:
             if field in lookup_params:
@@ -229,7 +231,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     #: The name of the ``ForeignKey`` in the content model that points to the grouper instance. If not given
     #: it is assumed to be the snake case name of the grouper model class, e.g. ``"blog_post"`` for the
     #: ``"BlogPost"`` model.
-    grouper_field_name: typing.Optional[str] = None
+    grouper_field_name: str | None = None
     #: Indicates additional grouping fields such as ``"language"`` for example. Additional grouping fields create
     #: tabs in the change form and a dropdown menu in the change list view.
     #:
@@ -242,12 +244,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     #: The content model class to be used. Defaults to the model class named like the grouper model class
     #: plus ``"Content"`` at the end from the same app as the grouper model class, e.g., ``BlogPostContent`` if
     #: the grouper is ``BlogPost``.
-    content_model: typing.Optional[models.Model] = None
+    content_model: models.Model | None = None
     #: Name of the inverse relation field giving the set of content models belonging to a grouper model. Defaults to
     #: the first field found as an inverse relation. If you have more than one inverse relation please make sure
     #: to specify this field. An example would be if the blog post content model contained a many-to-many
     #: relationship to the grouper model for, say, related blog posts.
-    content_related_field: typing.Optional[str] = None
+    content_related_field: str | None = None
 
     change_list_template = "admin/cms/grouper/change_list.html"
     change_form_template = "admin/cms/grouper/change_form.html"
@@ -345,7 +347,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         self,
         obj: models.Model,
         field_name: str,
-        request: typing.Optional[HttpRequest] = None,
+        request: HttpRequest | None = None,
     ) -> typing.Any:
         """Retrieves the content of a field stored in the content model. If request is given extra
         grouping fields are processed before."""
@@ -441,7 +443,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def changeform_view(
         self,
         request: HttpRequest,
-        object_id: typing.Optional[str] = None,
+        object_id: str | None = None,
         form_url: str = "",
         extra_context: dict = None,
     ) -> HttpResponse:
@@ -461,7 +463,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         self,
         request: HttpRequest,
         object_id: str,
-        extra_context: typing.Optional[dict] = None,
+        extra_context: dict | None = None,
     ) -> HttpResponse:
         """Update grouping field properties for delete view"""
         self.get_grouping_from_request(request)
@@ -471,7 +473,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         self,
         request: HttpRequest,
         object_id: str,
-        extra_context: typing.Optional[dict] = None,
+        extra_context: dict | None = None,
     ) -> HttpResponse:
         """Update grouping field properties for history view"""
         self.get_grouping_from_request(request)
@@ -494,7 +496,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             preserved_filters["_changelist_filters"] = urlencode(grouping_filters)
         return urlencode(preserved_filters)
 
-    def get_extra_context(self, request: HttpRequest, object_id: typing.Optional[str] = None) -> dict[str, typing.Any]:
+    def get_extra_context(self, request: HttpRequest, object_id: str | None = None) -> dict[str, typing.Any]:
         """Provide the grouping fields to the change view."""
         if object_id:
             # Instance provided? Get corresponding postconent
@@ -539,7 +541,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         # TODO: Add context for other grouping fields to be shown as a dropdown
         return extra_context
 
-    def get_form(self, request: HttpRequest, obj: typing.Optional[models.Model] = None, **kwargs) -> type:
+    def get_form(self, request: HttpRequest, obj: models.Model | None = None, **kwargs) -> type:
         """Adds the language from the request to the form class"""
         form_class = super().get_form(request, obj, **kwargs)
         form_class._admin = self
@@ -616,7 +618,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             ).latest_content()
         return self._content_qs_cache[obj]
 
-    def get_content_obj(self, obj: typing.Optional[models.Model]) -> typing.Optional[models.Model]:
+    def get_content_obj(self, obj: models.Model | None) -> models.Model | None:
         if obj is None or self._is_content_obj(obj):
             return obj
         else:
@@ -626,7 +628,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 )
             return self._content_obj_cache[obj]
 
-    def get_content_objects(self, obj: typing.Optional[models.Model]) -> models.QuerySet:
+    def get_content_objects(self, obj: models.Model | None) -> models.QuerySet:
         if obj is None:
             return None
         if self._is_content_obj(obj):
@@ -648,7 +650,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             return getattr(obj, field_name)
         return obj
 
-    def view_on_site(self, obj: models.Model) -> typing.Optional[str]:
+    def view_on_site(self, obj: models.Model) -> str | None:
         # Adds the View on Site button to the admin
         content_obj = self.get_content_obj(obj)
         if content_obj:
@@ -656,7 +658,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             return get_object_preview_url(content_obj, language=getattr(content_obj, "language", None))
         return None
 
-    def get_readonly_fields(self, request: HttpRequest, obj: typing.Optional[models.Model] = None):
+    def get_readonly_fields(self, request: HttpRequest, obj: models.Model | None = None):
         """Allow access to content fields to be controlled by a method "can_change_content":
         This allows versioned content to be protected if needed"""
         # First, get read-only fields for grouper

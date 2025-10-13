@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from operator import attrgetter
-from typing import Optional
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
@@ -229,7 +230,7 @@ class PluginPool:
         plugin_classes = [cls for cls in self.registered_plugins if cls._has_extra_placeholder_menu_items]
         return plugin_classes
 
-    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Optional[Page] = None):
+    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Page | None = None):
         """
         Retrieve the restrictions cache for a given plugin instance.
 
