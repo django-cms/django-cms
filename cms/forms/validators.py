@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
@@ -26,7 +28,7 @@ def validate_url(value):
 
 
 def validate_url_uniqueness(
-    site, path: str, language: str, user_language: str | None = None, exclude_page: Optional["Page"] = None
+    site, path: str, language: str, user_language: str | None = None, exclude_page: Page | None = None
 ):
     """Checks for conflicting urls"""
     from cms.models.pagemodel import Page, PageUrl
