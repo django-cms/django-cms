@@ -317,7 +317,7 @@ def _scan_placeholders(
     return nodes
 
 
-def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
+def get_placeholders(template: str) -> list[DeclaredPlaceholder]:
     compiled_template = get_template(template)
 
     placeholders = []
@@ -436,7 +436,7 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     return placeholders
 
 
-def get_declared_placeholders_for_obj(obj: models.Model | EmptyPageContent | None) -> list['DeclaredPlaceholder']:
+def get_declared_placeholders_for_obj(obj: models.Model | EmptyPageContent | None) -> list[DeclaredPlaceholder]:
     """Returns declared placeholders for an object. The object is supposed to either have a method
     ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
