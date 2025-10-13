@@ -1,4 +1,6 @@
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import Any
 
 from django.utils.encoding import smart_str
 
@@ -77,16 +79,16 @@ class NavigationNode:
     ancestor: bool = False
     descendant: bool = False
     sibling: bool = False
-    level: Optional[int] = None
+    level: int | None = None
 
     def __init__(
         self,
         title: str,
         url: str,
         id: Any,
-        parent_id: Optional[Any] = None,
-        parent_namespace: Optional[str] = None,
-        attr: Optional[dict[str, Any]] = None,
+        parent_id: Any | None = None,
+        parent_namespace: str | None = None,
+        attr: dict[str, Any] | None = None,
         visible: bool = True,
     ):
         """
@@ -102,8 +104,8 @@ class NavigationNode:
             visible: Indicates whether this item is visible (default is True).
         """
         self.children: list[NavigationNode] = []  # Do not modify
-        self.parent: Optional[NavigationNode] = None  # Do not modify, code depends on this
-        self.namespace: Optional[str] = None  # TODO: Clarify the necessity of this and the line above
+        self.parent: NavigationNode | None = None  # Do not modify, code depends on this
+        self.namespace: str | None = None  # TODO: Clarify the necessity of this and the line above
         self.title = title
         self.url = url
         self.id = id
