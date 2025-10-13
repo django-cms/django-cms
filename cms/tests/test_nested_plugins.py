@@ -14,7 +14,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         counter = 1
         plugins = placeholder.get_plugins()
 
-        for plugin, data in zip(plugins, tree, strict=False):
+        for plugin, data in zip(plugins, tree):
             msg = 'Expected %s %s. Got %s instead.'
             self.assertEqual(plugin.pk, data[0], msg % ('id', data[0], plugin.pk))
             self.assertEqual(plugin.position, counter, msg % ('position', counter, plugin.position))
@@ -51,7 +51,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             )
 
             # quick check: make sure the two querysets match:
-            for original, copy in zip(original_plugins, copied_plugins, strict=False):
+            for original, copy in zip(original_plugins, copied_plugins):
                 self.assertEqual(
                     Text.objects.get(id=original.id).body,
                     Text.objects.get(id=copy.id).body
