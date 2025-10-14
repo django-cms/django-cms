@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import json
 from collections import defaultdict, deque
-from typing import Optional
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -207,7 +208,7 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
         return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
 
 
-def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> Optional[models.Model]:
+def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> models.Model | None:
     """
     Retrieves the correct content object for the target language. The object must be frontend-editable
     and registered as such with cms.

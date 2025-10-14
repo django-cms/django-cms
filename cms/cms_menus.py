@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.utils.functional import SimpleLazyObject
@@ -173,7 +173,7 @@ class CMSNavigationNode(NavigationNode):
         language: The language used for the node (optional).
     """
 
-    def __init__(self, *args, path: str, language: Optional[str] = None, **kwargs):
+    def __init__(self, *args, path: str, language: str | None = None, **kwargs):
         """
         Initializes a CMSNavigationNode instance.
 
