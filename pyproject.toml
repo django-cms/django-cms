@@ -24,6 +24,7 @@ select = [
 ]
 
 extend-ignore = [
+  "B905",     # strict parameter for zip
   "C901",     # Too complex
   "PLR0911",  # Too many return statements
   "PLR0912",  # Too many branches
