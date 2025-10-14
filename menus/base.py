@@ -21,7 +21,7 @@ class Menu:
         if not self.namespace:
             self.namespace = self.__class__.__name__
 
-    def get_nodes(self, request) -> List['NavigationNode']:
+    def get_nodes(self, request) -> List[NavigationNode]:
         """
         Get a list of NavigationNode instances for the menu.
 
@@ -148,13 +148,13 @@ class NavigationNode:
         """
         return self.attr.get(name, None)
 
-    def get_descendants(self) -> List['NavigationNode']:
+    def get_descendants(self) -> List[NavigationNode]:
         """
         Returns a list of all children beneath the current menu item.
         """
         return sum(([node] + node.get_descendants() for node in self.children), [])
 
-    def get_ancestors(self) -> List['NavigationNode']:
+    def get_ancestors(self) -> List[NavigationNode]:
         """
         Returns a list of all parent items, excluding the current menu item.
         """
