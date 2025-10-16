@@ -423,7 +423,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 2)
 
         # Assert that copied plugins have distinct, sequential positions
-        plugins = list(ph_de.cmsplugin_set.filter(parent=None).order_by('position'))
+        plugins = list(ph_de.cmsplugin_set.filter(language="de").order_by('position'))
         positions = [plugin.position for plugin in plugins]
         self.assertEqual(len(positions), len(set(positions)), "Plugin positions should be unique")
         self.assertEqual(positions, list(range(positions[0], positions[0] + len(positions))), "Plugin positions should be sequential")
