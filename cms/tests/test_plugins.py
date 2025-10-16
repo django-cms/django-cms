@@ -420,6 +420,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # test subplugin copy
         copy_plugins_to_placeholder([link_plugin_en], ph_de, language="de")
+        self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 2)
 
     def test_deep_copy_plugins(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
