@@ -422,6 +422,21 @@ class PluginsTestCase(PluginsTestBaseCase):
         copy_plugins_to_placeholder([link_plugin_en], ph_de, language="de")
         self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 2)
 
+        # Assert that copied plugins have distinct, sequential positions
+        plugins = list(ph_de.cmsplugin_set.filter(parent=None).order_by('position'))
+        positions = [plugin.position for plugin in plugins]
+        self.assertEqual(len(positions), len(set(positions)), "Plugin positions should be unique")
+        self.assertEqual(positions, list(range(positions[0], positions[0] + len(positions))), "Plugin positions should be sequential")
+
+        # Assert that no integrity errors are raised (uniqueness constraints maintained)
+        from django.db import IntegrityError
+        try:
+            for plugin in plugins:
+                # Try to save plugin again to check for uniqueness constraint
+                plugin.save()
+        except IntegrityError:
+            self.fail("IntegrityError raised: uniqueness constraint violated when saving copied plugins")
+
     def test_deep_copy_plugins(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
         ph_en = page_en.get_placeholders("en").get(slot="body")
