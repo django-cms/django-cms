@@ -31,6 +31,7 @@
         border-bottom: 1px solid transparent;
         &:hover {
             color: $color-primary;
+            background-color: $color-secondary;
             border-top: 1px solid $color-primary;
             border-bottom: 1px solid $color-primary;
         }
@@ -99,6 +100,6 @@
         bottom: 0;
         left: 0;
         right:0 ;
-        background-color: rgba($color-primary-fallback, 40%);
+        background-color: color-mix(in srgb, $color-primary 40%, transparent);
     }
 }
