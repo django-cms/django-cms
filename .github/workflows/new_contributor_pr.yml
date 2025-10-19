@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: actions/first-interaction@v3
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-message: |
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_message: |
             Hello! Thank you for your contribution! 🎉
 
             As it's your first contribution, be sure to check out the [contribution docs](https://docs.django-cms.org/en/latest/contributing/index.html).
