@@ -410,7 +410,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         plugin = add_plugin(
             user_settings.clipboard,
             "LinkPlugin",
-            language="en",
+            language="de",  # Test x-language
             name="A Link",
             external_link="https://www.django-cms.org",
         )
