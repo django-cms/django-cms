@@ -1,6 +1,6 @@
 name: django CMS test.yml
 
-on: 
+on:
   pull_request:
   push:
     branches:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
@@ -26,13 +26,6 @@ jobs:
         os: [
           ubuntu-latest,
         ]
-        exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
-          - requirements-file: django-5.1.txt
-            python-version: 3.9
-          - requirements-file: django-5.2.txt
-            python-version: 3.9
 
     services:
       postgres:
@@ -81,7 +74,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
@@ -91,13 +84,6 @@ jobs:
         os: [
           ubuntu-latest,
         ]
-        exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
-          - requirements-file: django-5.1.txt
-            python-version: 3.9
-          - requirements-file: django-5.2.txt
-            python-version: 3.9
 
     services:
       mysql:
@@ -145,7 +131,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
@@ -155,13 +141,6 @@ jobs:
         os: [
           ubuntu-latest,
         ]
-        exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
-          - requirements-file: django-5.1.txt
-            python-version: 3.9
-          - requirements-file: django-5.2.txt
-            python-version: 3.9
 
     steps:
     - uses: actions/checkout@v5
