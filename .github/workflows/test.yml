@@ -23,6 +23,7 @@ jobs:
           django-5.1.txt,
           django-5.2.txt,
         ]
+        postgres-version: ['16', '17', '18']
         os: [
           ubuntu-latest,
         ]
@@ -37,7 +38,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:latest
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -73,7 +74,7 @@ jobs:
     - name: Upload coverage data
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-postgres${{ matrix.postgres-version }}
         include-hidden-files: true
         path: '.coverage*'
 
@@ -89,6 +90,7 @@ jobs:
           django-5.1.txt,
           django-5.2.txt,
         ]
+        mysql-version: ['8.4', '9.5']
         os: [
           ubuntu-latest,
         ]
@@ -103,7 +105,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.4
+        image: mysql:${{ matrix.mysql-version }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -138,7 +140,7 @@ jobs:
     - name: Upload coverage data
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-mysql${{ matrix.mysql-version }}
         include-hidden-files: true
         path: '.coverage*'
 
@@ -241,13 +243,14 @@ jobs:
       matrix:
         python-version: ['3.12', '3.13', '3.14']
         requirements-file: ['requirement_base_django_main.txt']
+        postgres-version: ['16', '17', '18']
         os: [
           ubuntu-latest,
         ]
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -285,7 +288,7 @@ jobs:
     - name: Upload coverage data
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-postgres${{ matrix.postgres-version }}
         include-hidden-files: true
         path: '.coverage*'
 
@@ -296,13 +299,14 @@ jobs:
       matrix:
         python-version: ['3.12', '3.13', '3.14']
         requirements-file: ['requirement_base_django_main.txt']
+        mysql-version: ['8.4', '9.5']
         os: [
           ubuntu-latest,
         ]
 
     services:
       mysql:
-        image: mysql:8.4
+        image: mysql:${{ matrix.mysql-version }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -338,7 +342,7 @@ jobs:
     - name: Upload coverage data
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-mysql${{ matrix.mysql-version }}
         include-hidden-files: true
         path: '.coverage*'
 
