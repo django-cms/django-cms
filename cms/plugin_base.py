@@ -260,6 +260,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
     """
 
+    #: This flag is used to determine whether a plugin is considered a “system” (internal) plugin — meaning,
+    #: it is used by the cms itself to structure content or placeholders,
+    #: not meant to be added, edited, or deleted directly by end users in the admin or frontend editor.
+    #: When set to ``True``, the cms treats that plugin as infrastructure, not user content (e.g djangocms-transfer).
     system = False
 
     opts = {}
