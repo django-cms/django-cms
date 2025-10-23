@@ -105,7 +105,7 @@ class CopyLangCommand(SubcommandsCommand):
 
                     if parent_page:
                         base = parent_page.get_path(to_lang)
-                        path = '{}/{}'.format(base, page_url.slug) if base else page_url.slug
+                        path = f'{base}/{page_url.slug}' if base else page_url.slug
                     else:
                         base = ''
                         path = page_url.slug

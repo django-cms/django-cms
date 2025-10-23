@@ -49,7 +49,7 @@ class SampleAppWithConfig(CMSApp):
             return None
 
     def get_config_add_url(self):
-        return reverse('admin:{}_{}_add'.format(self.app_config._meta.app_label, self.app_config._meta.model_name))
+        return reverse(f'admin:{self.app_config._meta.app_label}_{self.app_config._meta.model_name}_add')
 
 
 class SampleAppWithExcludedPermissions(CMSApp):
