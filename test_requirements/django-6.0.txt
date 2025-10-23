@@ -1,2 +1,2 @@
 -r requirements_base.txt
-Django>=6.0,<6.1
+Django==6.0b1
