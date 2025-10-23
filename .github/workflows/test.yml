@@ -22,6 +22,7 @@ jobs:
           django-5.0.txt,
           django-5.1.txt,
           django-5.2.txt,
+          django-6.0.txt,
         ]
         postgres-version: ['16', '17', '18']
         os: [
@@ -35,6 +36,11 @@ jobs:
             requirements-file: django-5.0.txt
           - python-version: '3.14'
             requirements-file: django-5.1.txt
+          # Python 3.10 and 3.11 only supported until Django 5.2
+          - python-version: '3.10'
+            requirements-file: django-6.0.txt
+          - python-version: '3.11'
+            requirements-file: django-6.0.txt
 
     services:
       postgres:
@@ -89,6 +95,7 @@ jobs:
           django-5.0.txt,
           django-5.1.txt,
           django-5.2.txt,
+          django-6.0.txt,
         ]
         mysql-version: ['8.4', '9.5']
         os: [
@@ -102,6 +109,11 @@ jobs:
             requirements-file: django-5.0.txt
           - python-version: '3.14'
             requirements-file: django-5.1.txt
+          # Python 3.10 and 3.11 only supported until Django 5.2
+          - python-version: '3.10'
+            requirements-file: django-6.0.txt
+          - python-version: '3.11'
+            requirements-file: django-6.0.txt
 
     services:
       mysql:
@@ -155,6 +167,7 @@ jobs:
           django-5.0.txt,
           django-5.1.txt,
           django-5.2.txt,
+          django-6.0.txt,
         ]
         os: [
           ubuntu-latest,
@@ -167,6 +180,11 @@ jobs:
             requirements-file: django-5.0.txt
           - python-version: '3.14'
             requirements-file: django-5.1.txt
+          # Python 3.10 and 3.11 only supported until Django 5.2
+          - python-version: '3.10'
+            requirements-file: django-6.0.txt
+          - python-version: '3.11'
+            requirements-file: django-6.0.txt
 
     steps:
     - uses: actions/checkout@v5
