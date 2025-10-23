@@ -97,11 +97,11 @@ admin_namespace = get_cms_setting('ADMIN_NAMESPACE')
 
 def admin_reverse(
     viewname: str,
-    urlconf: Optional[str] = None,
-    args: Optional[Sequence] = None,
-    kwargs: Optional[dict[str, Any]] = None,
+    urlconf: str | None = None,
+    args: Sequence | None = None,
+    kwargs: dict[str, Any] | None = None,
     prefix=None,
-    current_app: Optional[str] = None
+    current_app: str | None = None
 ):
     return reverse(
         f"{admin_namespace}:{viewname}",

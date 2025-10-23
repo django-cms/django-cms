@@ -95,7 +95,7 @@ def _clear_placeholder_conf_cache():
     _placeholder_settings, _template_in_conf = _get_placeholder_settings()
 
 
-def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str] = None, default=None):
+def get_placeholder_conf(setting: str, placeholder: str, template: str | None = None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
@@ -385,7 +385,7 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     return placeholders
 
 
-def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent, None]) -> list['DeclaredPlaceholder']:
+def get_declared_placeholders_for_obj(obj: models.Model | EmptyPageContent | None) -> list['DeclaredPlaceholder']:
     """Returns declared placeholders for an object. The object is supposed to either have a method
     ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
@@ -408,7 +408,7 @@ def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent,
 
 
 def get_placeholder_from_slot(
-    placeholder_relation: models.Manager, slot: str, template_obj=None, default_width: Optional[int] = None
+    placeholder_relation: models.Manager, slot: str, template_obj=None, default_width: int | None = None
 ) -> Placeholder:
     """Retrieves the placeholder instance for a PlaceholderRelationField either by scanning the template
     of the template_obj (if given) or by creating or getting a Placeholder in the database
