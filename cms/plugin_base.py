@@ -1,8 +1,9 @@
 import json
 import re
+from collections.abc import Callable
 from functools import lru_cache, wraps
 from operator import attrgetter
-from typing import Callable, Optional, TypeVar, cast
+from typing import Optional, TypeVar, cast
 
 from django import forms
 from django.contrib import admin, messages
@@ -344,7 +345,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @lru_cache
-    def _get_template_for_conf(cls, page: Optional[Page], instance: Optional[CMSPlugin] = None):
+    def _get_template_for_conf(cls, page: Page | None, instance: CMSPlugin | None = None):
         """Cache page template because page.get_template() might have to fetch the page content object from the db
         since django CMS 4"""
         if page:
@@ -361,7 +362,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None) -> bool:
+    def get_require_parent(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)
@@ -463,10 +464,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def render_close_frame(
         self,
         request: HttpRequest,
-        obj: Optional[CMSPlugin],
-        action: Optional[str] = "edit",
-        extra_data: Optional[Context] = None,
-        extra_context: Optional[Context] = None,
+        obj: CMSPlugin | None,
+        action: str | None = "edit",
+        extra_data: Context | None = None,
+        extra_context: Context | None = None,
     ) -> HttpResponse:
         """
         Renders the close frame for a CMS plugin in the Django admin interface.
@@ -702,7 +703,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+    def get_child_class_overrides(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None):
         """
         Returns a list of plugin types that are allowed
         as children of this plugin.
@@ -716,7 +717,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return ph_conf.get(cls.__name__, cls.child_classes)
 
     @classmethod
-    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None) -> list:
+    def get_child_plugin_candidates(cls, slot: str, page: Page | None = None) -> list:
         """
         Returns a list of all plugin classes
         that will be considered when fetching
@@ -734,7 +735,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     @classmethod
     @template_slot_caching
     def get_child_classes(
-        cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, only_uncached: bool = False
+        cls, slot, page: Page | None = None, instance: CMSPlugin | None = None, only_uncached: bool = False
     ) -> list:
         """
         Returns a list of plugin types that can be added
@@ -774,7 +775,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+    def get_parent_classes(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None):
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)
