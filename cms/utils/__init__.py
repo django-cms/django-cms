@@ -1,6 +1,9 @@
 # TODO: this is just stuff from utils.py - should be split / moved
+from typing import TYPE_CHECKING
+
 from django.http import HttpRequest
 
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.i18n import (
     get_current_language,
     get_default_language,
@@ -8,14 +11,30 @@ from cms.utils.i18n import (
     get_language_list,
 )
 
-
-def get_current_site():
+if TYPE_CHECKING:
     from django.contrib.sites.models import Site
 
-    return Site.objects.get_current()
+
+def get_current_site(request: HttpRequest = None) -> "Site":
+    """
+    Returns the current Site instance associated with the given request.
+    """
+    from django.contrib.sites.models import Site
+
+    if request is None:
+        import warnings
+
+        warnings.warn(
+            "get_current_site() called without request. This may lead to unexpected behavior. "
+            "Use get_current_site(request) instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
+
+    return Site.objects.get_current(request=request)
 
 
-def get_language_from_request(request: HttpRequest, current_page=None):
+def get_language_from_request(request: HttpRequest, current_page=None) -> str:
     """
     Return the most obvious language according the request
     """
@@ -27,9 +46,9 @@ def get_language_from_request(request: HttpRequest, current_page=None):
         language = request.POST.get('language', None)
     if hasattr(request, 'GET') and not language:
         language = request.GET.get('language', None)
-    site_id = current_page.site_id if current_page else None
+    site_id = current_page.site_id if current_page else get_current_site(request).pk
     if language:
-        language = get_language_code(language)
+        language = get_language_code(language, site_id=site_id)
         if language not in get_language_list(site_id):
             language = None
     if not language and request:

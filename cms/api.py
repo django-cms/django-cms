@@ -62,7 +62,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
@@ -202,18 +201,23 @@ def create_page(
         assert template in [tpl[0] for tpl in get_cms_setting("TEMPLATES")]
         get_template(template)
 
-    # validate site
-    if not site:
-        site = get_current_site()
-    else:
-        assert isinstance(site, Site)
-
-    # validate language:
-    assert language in get_language_list(site), get_cms_setting("LANGUAGES").get(site.pk)
-
     # validate parent
     if parent:
         assert isinstance(parent, Page)
+
+    # validate site
+    if not site:
+        if parent:
+            site = parent.site
+        else:
+            site = Site.objects.get_current()  # Get the current site from settings
+    else:
+        assert isinstance(site, Site)
+        if parent:
+            assert parent.site == site, "Parent page must be on the same site as the new page"
+
+    # validate language:
+    assert language in get_language_list(site), get_cms_setting("LANGUAGES").get(site.pk)
 
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
@@ -554,7 +558,7 @@ def assign_user_to_page(
     if global_permission:
         page_permission = GlobalPagePermission(user=user, can_recover_page=can_recover_page, **data)
         page_permission.save()
-        page_permission.sites.add(get_current_site())
+        page_permission.sites.add(page.site)
     return page_permission
 
 
