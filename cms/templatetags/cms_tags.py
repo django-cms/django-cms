@@ -442,7 +442,7 @@ class PageAttribute(AsTag):
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)
-            if not isinstance(ret_val, datetime):
+            if not isinstance(ret_val, datetime) and ret_val is not None:
                 ret_val = escape(ret_val)
             return ret_val
         return ""
