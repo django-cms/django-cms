@@ -405,9 +405,9 @@ def get_bound_plugins(plugins):
 
 def downcast_plugins(
     plugins: Iterable[CMSPlugin],
-    placeholders: Optional[list] = None,
+    placeholders: list | None = None,
     select_placeholder: bool = False,
-    request: Optional[HttpRequest] = None,
+    request: HttpRequest | None = None,
 ) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins
