@@ -28,7 +28,7 @@ jobs:
           django-6.0.txt,
         ]
         # On nightly runs, test all postgres versions. On push/PR, only test latest.
-        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["18"]') }}
+        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["16"]') }}
         os: [
           ubuntu-latest,
         ]
