@@ -769,7 +769,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             target_parent_id=target_parent_id,
         )
 
-        target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
+        target_last_plugin = target_placeholder.get_last_plugin(target_language)
 
         if target_last_plugin:
             target_offset = target_last_plugin.position + len(plugins)
