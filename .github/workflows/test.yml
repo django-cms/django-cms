@@ -102,7 +102,7 @@ jobs:
           django-6.0.txt,
         ]
         # On nightly runs, test all mysql versions. On push/PR, only test latest.
-        mysql-version: ${{ github.event_name == 'schedule' && fromJSON('["8.4", "9.5"]') || fromJSON('["9.5"]') }}
+        mysql-version: ${{ github.event_name == 'schedule' && fromJSON('["8.4", "9.5"]') || fromJSON('["8.4"]') }}
         os: [
           ubuntu-latest,
         ]
