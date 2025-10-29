@@ -2,6 +2,84 @@
 Changelog
 =========
 
+3.11.10 (2025-04-05)
+====================
+
+Bug Fixes:
+----------
+* Remove deprecated get_storage_class import from cms.utils (#8102) -- Fabian Braun
+* Add missing compiled French messages (#8126) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (2 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+3.11.9 (2024-11-13)
+===================
+
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (699f04e9b) -- Fabian Braun
+* fix: Accept legacy action names for page permission check (#8022) (fc4838f99) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (2 pull requests)
+
+With the review help of the following contributors:
+
+* Mark Walker
+
+Thanks to all contributors for their efforts!
+
+3.11.8 (2024-09-10)
+===================
+
+Features:
+---------
+* Improved permission performance for Django CMS 3 by @fsbraun in https://github.com/django-cms/django-cms/pull/7987
+
+
+Bug Fixes:
+----------
+* Backport of #7868 and #7920 by @fsbraun in https://github.com/django-cms/django-cms/pull/7926
+* Mark language and user middleware synchronous for ASGI (#7985) by @jbazik in https://github.com/django-cms/django-cms/pull/7986
+* Also clear menu cache if page permissions are changed (#7988) (#7990) (7a2632277) -- Fabian Braun
+* Import error from backporting v4 deprecation (#7993) (4492f479c) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (3 pull request)
+* John Bazik (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+3.11.7 (2024-09-09)
+===================
+
+**Retracted**
+
 3.11.6 (2024-05-17)
 ===================
 

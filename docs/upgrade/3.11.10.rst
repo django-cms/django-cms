@@ -1,0 +1,55 @@
+.. _upgrade-to-3.11.10:
+
+#####################
+Release notes 3.11.10
+#####################
+
+
+*********************
+What's new in 3.11.10
+*********************
+
+Bug Fixes:
+----------
+* Remove deprecated get_storage_class import from cms.utils (#8102) -- Fabian Braun
+* Add missing compiled French messages (#8126) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (2 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+
+*************************
+How to upgrade to 3.11.10
+*************************
+
+We assume you are upgrading from django CMS 3.11.9.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.

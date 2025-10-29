@@ -7,6 +7,8 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 class CurrentUserMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def __init__(self, get_response=None):
         self.get_response = get_response
         # One-time configuration and initialization.

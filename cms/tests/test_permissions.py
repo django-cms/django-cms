@@ -3,12 +3,17 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import assign_user_to_page, create_page
-from cms.cache.permissions import clear_user_permission_cache, get_permission_cache, set_permission_cache
+from cms.cache.permissions import (
+    clear_user_permission_cache,
+    get_permission_cache,
+    set_permission_cache,
+)
 from cms.models import Page
 from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, CMSTestCase
 from cms.utils.page_permissions import (
-    get_change_id_list,
+    get_change_perm_tuples,
+    has_generic_permission,
     user_can_add_subpage,
     user_can_publish_page,
     user_can_view_page,
@@ -59,10 +64,10 @@ class PermissionCacheTests(CMSTestCase):
         cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-        live_permissions = get_change_id_list(self.user_normal, Site.objects.get_current())
+        live_permissions = get_change_perm_tuples(self.user_normal, Site.objects.get_current())
         cached_permissions_permissions = get_permission_cache(self.user_normal,
                                                               "change_page")
-        self.assertEqual(live_permissions, [page_b.id])
+        self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
     def test_cached_permission_precedence(self):
@@ -141,3 +146,18 @@ class PermissionCacheTests(CMSTestCase):
         User = get_user_model()
         user1 = User.objects.get(pk=user1.pk)
         self.assertTrue(user_can_add_subpage(user1, child))
+
+    def test_has_generic_permissions_compatibiltiy(self):
+        from cms.utils.permissions import has_page_permission
+
+        page_b = create_page("page_b", "nav_playground.html", "en",
+                             created_by=self.user_super)
+        assign_user_to_page(page_b, self.user_normal, can_view=True,
+                            can_change=True)
+
+        self.assertTrue(has_generic_permission(page_b, self.user_normal, "change_page"))
+        self.assertFalse(has_generic_permission(page_b, self.user_normal, "publish_page"))
+
+        # Backwards compatibility: check if the old permission names work
+        self.assertTrue(has_page_permission(self.user_normal, page_b, "change"))
+        self.assertFalse(has_page_permission(self.user_normal, page_b, "publish"))

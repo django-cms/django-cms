@@ -16,7 +16,7 @@ from django.db.models import Model
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import smart_str
-from django.utils.html import escape
+from django.utils.html import escape, strip_tags
 from django.utils.http import urlencode
 from django.utils.translation import get_language, override
 from django.utils.translation import gettext_lazy as _

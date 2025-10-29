@@ -360,7 +360,7 @@ class Page(models.Model):
             base = self.get_path(language, fallback=True)
 
         if base:
-            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
+            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'), output_field=models.CharField())
         else:
             # User is moving the homepage
             new_path = models.F('slug')
@@ -386,7 +386,7 @@ class Page(models.Model):
             # to include this page's slug as its path prefix
             (translations
              .filter(language=language)
-             .update(path=Concat(models.Value(slug), models.Value('/'), 'path')))
+             .update(path=Concat(models.Value(slug), models.Value('/'), 'path', output_field=models.CharField())))
 
             # Explicitly update this page's path to match its slug
             # Doing this is cheaper than a TRIM call to remove the "/" characters
@@ -1190,7 +1190,7 @@ class Page(models.Model):
         )
 
         if base:
-            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
+            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'), output_field=models.CharField())
         else:
             # User is moving the homepage
             new_path = models.F('slug')

@@ -445,7 +445,7 @@ class BaseCMSTestCase:
             # this specific warning is present due to the way Django
             # handle asyncio
             # https://stackoverflow.com/questions/70303895/python-3-10-asyncio-gather-shows-deprecationwarning-there-is-no-current-event
-            if (warning.category != DeprecationWarning and warning.message != 'There is no current event loop'):
+            if (warning.category is not DeprecationWarning and warning.message != 'There is no current event loop'):
                 cleanwarningsShown.append(warning)
 
         first = cleanwarningsShown[0]
