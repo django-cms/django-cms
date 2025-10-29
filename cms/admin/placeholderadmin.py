@@ -93,7 +93,7 @@ class BaseEditableAdminMixin:
         opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
-        raw_fields = request.GET.get("edit_fields")
+        raw_fields = request.GET.get("edit_fields", "")
         admin_obj = self._get_model_admin(obj)
         allowed_fields = getattr(admin_obj, "frontend_editable_fields", [])
         fields = [field for field in raw_fields.split(",") if field in allowed_fields]
