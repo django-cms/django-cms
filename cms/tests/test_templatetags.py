@@ -196,6 +196,14 @@ class TemplatetagTests(CMSTestCase):
         output_script = self.render_template_obj(template, {}, request_script)
         output_ampersand = self.render_template_obj(template, {}, request_ampersand)
         output_partial = self.render_template_obj(template, {}, FakeRequest(FakePage(partial)))
+        output_none = self.render_template_obj(
+            (
+                "{% load cms_tags %}{% page_attribute page_title as somevar %}"
+                "{% if somevar %}WRONG VALUE!{% else %}YAY{% endif %}"
+            ),
+            {},
+            FakeRequest(FakePage(None)),
+        )
 
         self.assertNotEqual(script, output_script)
         self.assertNotEqual(ampersand, output_ampersand)
@@ -203,6 +211,7 @@ class TemplatetagTests(CMSTestCase):
         self.assertEqual(escape(script), output_script)
         self.assertEqual(escape(ampersand), output_ampersand)
         self.assertEqual(escape(partial), output_partial)
+        self.assertEqual("YAY", output_none)
 
     def test_json_encoder(self):
         self.assertEqual(json_filter(True), "true")
