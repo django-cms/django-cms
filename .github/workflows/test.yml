@@ -78,7 +78,7 @@ jobs:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-postgres${{ matrix.postgres-version }}
         include-hidden-files: true
@@ -150,7 +150,7 @@ jobs:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-mysql${{ matrix.mysql-version }}
         include-hidden-files: true
@@ -209,7 +209,7 @@ jobs:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
         include-hidden-files: true
@@ -248,7 +248,7 @@ jobs:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
         include-hidden-files: true
@@ -304,7 +304,7 @@ jobs:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-postgres${{ matrix.postgres-version }}
         include-hidden-files: true
@@ -358,7 +358,7 @@ jobs:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-mysql${{ matrix.mysql-version }}
         include-hidden-files: true
@@ -389,7 +389,7 @@ jobs:
         run: python -m pip install --upgrade coverage[toml]
 
       - name: Download data
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: coverage-data-*
           merge-multiple: true
@@ -405,7 +405,7 @@ jobs:
 
       - name: Upload HTML report (for debugging)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: html-report
           path: htmlcov
