@@ -103,4 +103,4 @@ class CharPksExample(models.Model):
         return get_placeholder_from_slot(self.placeholders, "placeholder_1")
 
     def __str__(self):
-        return "%s - %s" % (self.char_1, self.pk)
+        return f"{self.char_1} - {self.pk}"

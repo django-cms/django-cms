@@ -567,7 +567,7 @@ class ToolbarTests(ToolbarTestBase):
         response_text = response.render().rendered_content
         self.assertTrue(
             re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text),
-            "/en/admin/cms/placeholder/edit-plugin/%s not found in %s" % (plugin_1.pk, response_text)
+            f"/en/admin/cms/placeholder/edit-plugin/{plugin_1.pk} not found in {response_text}"
         )
         self.assertTrue(re.search('move_plugin.+/en/admin/cms/placeholder/move-plugin/', response_text))
         self.assertTrue(

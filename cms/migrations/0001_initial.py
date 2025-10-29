@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from cms.models import ACCESS_CHOICES, PageContent
 from cms.utils.conf import get_cms_setting
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
