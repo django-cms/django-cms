@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,7 +27,8 @@ jobs:
           django-5.2.txt,
           django-6.0.txt,
         ]
-        postgres-version: ['16', '17', '18']
+        # On nightly runs, test all postgres versions. On push/PR, only test latest.
+        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["18"]') }}
         os: [
           ubuntu-latest,
         ]
@@ -97,7 +101,8 @@ jobs:
           django-5.2.txt,
           django-6.0.txt,
         ]
-        mysql-version: ['8.4', '9.5']
+        # On nightly runs, test all mysql versions. On push/PR, only test latest.
+        mysql-version: ${{ github.event_name == 'schedule' && fromJSON('["8.4", "9.5"]') || fromJSON('["9.5"]') }}
         os: [
           ubuntu-latest,
         ]
@@ -261,7 +266,8 @@ jobs:
       matrix:
         python-version: ['3.12', '3.13', '3.14']
         requirements-file: ['requirement_base_django_main.txt']
-        postgres-version: ['16', '17', '18']
+        # On nightly runs, test all postgres versions. On push/PR, only test latest.
+        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["18"]') }}
         os: [
           ubuntu-latest,
         ]
@@ -317,7 +323,8 @@ jobs:
       matrix:
         python-version: ['3.12', '3.13', '3.14']
         requirements-file: ['requirement_base_django_main.txt']
-        mysql-version: ['8.4', '9.5']
+        # On nightly runs, test all mysql versions. On push/PR, only test latest.
+        mysql-version: ${{ github.event_name == 'schedule' && fromJSON('["8.4", "9.5"]') || fromJSON('["9.5"]') }}
         os: [
           ubuntu-latest,
         ]
