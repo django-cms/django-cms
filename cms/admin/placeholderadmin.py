@@ -99,7 +99,7 @@ class FrontendEditableAdminMixin:
         opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
-        raw_fields = request.GET.get("edit_fields")
+        raw_fields = request.GET.get("edit_fields", "")
         fields = [field for field in raw_fields.split(",") if field in self.frontend_editable_fields]
         if not fields:
             context = {
