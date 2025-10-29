@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Callable
 from functools import lru_cache
-from typing import Callable
 
 from django import forms
 from django.contrib import admin, messages
