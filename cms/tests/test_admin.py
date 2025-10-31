@@ -913,10 +913,19 @@ class AdminFormsTests(AdminTestsBase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(path)
-            self.assertEqual(response.status_code, 200)
             # Check that advanced settings fields are present
             self.assertContains(response, 'name="reverse_id"')
             self.assertContains(response, 'name="application_urls"')
+
+        # Test with permissions change permission only
+        gpp.can_change_advanced_settings = False
+        gpp.can_change_permissions = True
+        gpp.save()
+        # Ensure no advanced settings fields are shown without proper permissions
+        with self.login_user_context(staff_user):
+            response = self.client.get(path)
+            self.assertNotContains(response, 'name="reverse_id"')
+            self.assertNotContains(response, 'name="application_urls"')
 
     def test_advanced_settings_toolbar_entry(self):
         """
@@ -962,12 +971,6 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(staff_user):
             response = self.client.get(page_url)
             self.assertContains(response, enabled_snippet, html=True)
-
-        # Ensure no advanced settings fields are shown without proper permissions
-        with self.login_user_context(staff_user):
-            response = self.client.get(advanced_settings_url)
-            self.assertNotContains(response, 'name="reverse_id"')
-            self.assertNotContains(response, 'name="application_urls"')
 
         # Test with permissions change permissions only
         gpp.can_change_permissions = False
