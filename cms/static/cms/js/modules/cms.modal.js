@@ -906,7 +906,7 @@ class Modal {
 
             // If the response contains the close-frame (and potentially the data bridge),
             // the form was saved successfully
-            that.saved = that.saved || body.hasClass('cms-close-frame');
+            that.saved = that.saved || body.hasClass('cms-close-frame') || body.find('script#django-admin-popup-response-constants').length > 0;
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
@@ -940,7 +940,8 @@ class Modal {
                 });
             }
 
-            var saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length);
+            var saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length) ||
+                body.find('script#django-admin-popup-response-constants').length > 0;
 
             // in case message didn't appear, assume that admin page is actually a success
             // istanbul ignore if
