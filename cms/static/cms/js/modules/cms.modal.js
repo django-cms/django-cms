@@ -875,12 +875,12 @@ class Modal {
         // eslint-disable-next-line complexity
         iframe.on('load', function() {
             clearTimeout(loaderTimeout);
-            var messages;
-            var messageList;
-            var contents;
-            var body;
-            var innerTitle;
-            var bc;
+            let messages;
+            let messageList;
+            let contents;
+            let body;
+            let innerTitle;
+            let bc;
 
             // check if iframe can be accessed
             try {
@@ -941,7 +941,7 @@ class Modal {
                 });
             }
 
-            var saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length) ||
+            let saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length) ||
                 body.find('script#django-admin-popup-response-constants').length > 0;
 
             // in case message didn't appear, assume that admin page is actually a success

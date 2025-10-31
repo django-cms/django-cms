@@ -963,7 +963,13 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.get(page_url)
             self.assertContains(response, enabled_snippet, html=True)
 
-        # Test with both permissions
+        # Ensure no advanced settings fields are shown without proper permissions
+        with self.login_user_context(staff_user):
+            response = self.client.get(advanced_settings_url)
+            self.assertNotContains(response, 'name="reverse_id"')
+            self.assertNotContains(response, 'name="application_urls"')
+
+        # Test with permissions change permissions only
         gpp.can_change_permissions = False
         gpp.can_change_advanced_settings = True
         gpp.save()
