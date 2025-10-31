@@ -2123,14 +2123,15 @@ describe('CMS.StructureBoard', function() {
             CMS.config.request = {
                 toolbar: 'TOOLBAR_URL',
                 pk: 100,
-                model: 'cms.page'
+                model: 'cms.page',
+                language: 'en'
             };
 
             board._loadToolbar();
 
             expect($.ajax).toHaveBeenCalledWith({
                 url: jasmine.stringMatching(
-                    /TOOLBAR_URL\?obj_id=100&obj_type=cms.page&cms_path=%2Fstructure*/
+                    /TOOLBAR_URL\?obj_id=100&obj_type=cms.page&language=en&cms_path=%2Fstructure*/
                 )
             });
         });
