@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models, transaction
 from django.template.defaultfilters import title
+from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
@@ -698,11 +699,12 @@ class Placeholder(models.Model):
 
         cursor = _get_database_cursor("write")
         db_vendor = _get_database_vendor("write")
+        now = timezone.now()
 
         if db_vendor in ("sqlite", "postgresql"):
             sql = (
                 "UPDATE {0} "
-                "SET position = subquery.new_pos "
+                "SET position = subquery.new_pos, changed_date = %s "
                 "FROM ("
                 "  SELECT  ID, ROW_NUMBER() OVER (ORDER BY position, id) AS new_pos "
                 "  FROM {0} WHERE placeholder_id=%s AND language=%s "
@@ -710,7 +712,7 @@ class Placeholder(models.Model):
                 "WHERE {0}.id=subquery.id"
             )
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
+            cursor.execute(sql, [now, self.pk, language])
         elif db_vendor == "mysql":
             sql = (
                 "UPDATE {0} "
@@ -718,10 +720,10 @@ class Placeholder(models.Model):
                 "SELECT COUNT(*)+1 FROM (SELECT * FROM {0}) t "
                 "WHERE placeholder_id={0}.placeholder_id AND language={0}.language "
                 "AND {0}.position > t.position"
-                ") WHERE placeholder_id=%s AND language=%s"
+                "), changed_date = %s WHERE placeholder_id=%s AND language=%s"
             )
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
+            cursor.execute(sql, [now, self.pk, language])
         elif db_vendor == "oracle":
             sql = (
                 "UPDATE {0} "
@@ -729,9 +731,9 @@ class Placeholder(models.Model):
                 "SELECT COUNT(*)+1 FROM (SELECT * FROM {0}) t "
                 "WHERE placeholder_id={0}.placeholder_id AND language={0}.language "
                 "AND {0}.position > t.position"
-                ") WHERE placeholder_id=%s AND language=%s"
+                "), changed_date = %s WHERE placeholder_id=%s AND language=%s"
             )
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
+            cursor.execute(sql, [now, self.pk, language])
         else:
             raise RuntimeError(f"{connection.vendor} is not supported by django-cms")
