@@ -1,3 +1,5 @@
+import time
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
@@ -5,6 +7,7 @@ from django.template import Template, TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
@@ -1483,10 +1486,6 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
         """
         Tests that the changed_date field is updated when a plugin's order is changed.
         """
-        import time
-
-        from django.utils import timezone
-
         # Get two plugins to move
         plugin = self.get_last_root_plugin()
         initial_changed_date = plugin.changed_date

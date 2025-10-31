@@ -329,7 +329,8 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return force_str(plugin.icon_alt(instance)) if instance else ''
 
     def update(self, refresh=False, **fields):
-        # Always update changed_date when plugin is updated
+        # The changed_date field has auto_now=True, but that only works with .save()
+        # When using .update() queries, we need to manually set changed_date
         if 'changed_date' not in fields:
             fields['changed_date'] = timezone.now()
         CMSPlugin.objects.filter(pk=self.pk).update(**fields)
