@@ -954,16 +954,17 @@ class AdminFormsTests(AdminTestsBase):
         # Test with change permission but no advanced settings permission
         gpp = GlobalPagePermission.objects.create(
             user=staff_user,
-            can_change=True,
+            can_change_permissions=True,
             can_change_advanced_settings=False,
         )
         gpp.sites.set(Site.objects.all())
 
         with self.login_user_context(staff_user):
             response = self.client.get(page_url)
-            self.assertContains(response, disabled_snippet, html=True)
+            self.assertContains(response, enabled_snippet, html=True)
 
         # Test with both permissions
+        gpp.can_change_permissions = False
         gpp.can_change_advanced_settings = True
         gpp.save()
 
