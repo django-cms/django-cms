@@ -620,7 +620,7 @@ describe('CMS.Toolbar', function () {
             toolbar._delegate($('<div href="href" data-name="modal" data-rel="modal" data-on-close="test"></div>'));
 
             expect(modalOpen).toHaveBeenCalledWith({
-                url: 'href?cms_path=%2Fcontext.html',
+                url: 'href?cms_path=%2Fcontext.html&_popup=1',
                 title: 'modal'
             });
         });

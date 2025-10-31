@@ -562,7 +562,7 @@ var Toolbar = new Class({
                 });
 
                 modal.open({
-                    url: Helpers.updateUrlWithPath(el.attr('href')),
+                    url: Helpers.updateUrlWithPath(el.attr('href')) + '&_popup=1',
                     title: el.data('name')
                 });
                 break;
