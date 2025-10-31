@@ -1479,6 +1479,27 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
             self.assertPluginTreeEquals(source_plugin_tree_all)
             self.assertPluginTreeEquals(target_plugin_tree_all, placeholder=target)
 
+    def test_move_plugin_updates_changed_date(self):
+        """
+        Tests that the changed_date field is updated when a plugin's order is changed.
+        """
+        import time
+        from django.utils import timezone
+
+        # Get two plugins to move
+        plugin = self.get_last_root_plugin()
+        initial_changed_date = plugin.changed_date
+        
+        # Wait a small amount to ensure timestamp difference
+        time.sleep(0.01)
+        
+        # Move the plugin to the first position
+        self.placeholder.move_plugin(plugin, 1)
+        plugin.refresh_from_db()
+        
+        # Check that changed_date was updated
+        self.assertGreater(plugin.changed_date, initial_changed_date)
+
 
 class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
     """
