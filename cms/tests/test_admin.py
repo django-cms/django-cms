@@ -971,6 +971,14 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.get(page_url)
             self.assertContains(response, enabled_snippet, html=True)
 
+    def test_advanced_settings_returns_404(self):
+        invalid_page_pk = 0
+        path = admin_reverse("cms_page_advanced", args=(invalid_page_pk,))
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 404)
+
     def test_render_edit_mode(self):
         from django.core.cache import cache
 

@@ -304,6 +304,9 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     def advanced(self, request, object_id):
         page = self.get_object(request, object_id=object_id)
 
+        if page is None:
+            raise self._get_404_exception(object_id)
+
         if get_cms_setting("PERMISSION"):
             show_permissions = self.has_change_permissions_permission(request, obj=page)
         else:
@@ -314,8 +317,6 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if not show_permissions and not show_advanced_settings:
             raise PermissionDenied("No permission for editing advanced settings")
 
-        if page is None:
-            raise self._get_404_exception(object_id)
         context = {
             "title": _("Advanced Settings") if show_advanced_settings else _("Change Permissions"),
             "show_permissions": show_permissions,
