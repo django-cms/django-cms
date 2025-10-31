@@ -1486,19 +1486,24 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
         """
         Tests that the changed_date field is updated when a plugin's order is changed.
         """
-        # Get two plugins to move
+        # Get a plugin to move
         plugin = self.get_last_root_plugin()
         initial_changed_date = plugin.changed_date
 
-        # Wait a small amount to ensure timestamp difference
-        time.sleep(0.01)
+        # Small sleep to ensure timestamp difference (OS time resolution may vary)
+        time.sleep(0.001)
 
         # Move the plugin to the first position
         self.placeholder.move_plugin(plugin, 1)
         plugin.refresh_from_db()
 
         # Check that changed_date was updated
-        self.assertGreater(plugin.changed_date, initial_changed_date)
+        # Using assertGreater ensures the timestamp has changed
+        self.assertGreater(
+            plugin.changed_date,
+            initial_changed_date,
+            "changed_date should be updated when plugin position changes"
+        )
 
 
 class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
