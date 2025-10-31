@@ -906,7 +906,8 @@ class Modal {
 
             // If the response contains the close-frame (and potentially the data bridge),
             // the form was saved successfully
-            that.saved = that.saved || body.hasClass('cms-close-frame') || body.find('script#django-admin-popup-response-constants').length > 0;
+            that.saved = that.saved || body.hasClass('cms-close-frame')
+                || body.find('script#django-admin-popup-response-constants').length > 0;
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
