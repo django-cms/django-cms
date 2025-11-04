@@ -48,6 +48,7 @@ from cms.toolbar.utils import (
     add_live_url_querystring_param,
     get_object_edit_url,
     get_object_for_language,
+    get_object_live_url,
     get_object_preview_url,
     get_object_structure_url,
 )
@@ -2266,6 +2267,56 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
 
         self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
         self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
+
+
+class GetObjectLiveUrlTests(CMSTestCase):
+    """
+    Tests for get_object_live_url:
+    - no prefix if no target site is given
+    - no prefix if target site equals object's site
+    - protocol-relative domain prefix if target site differs from object's site
+    - no prefix if the object has no site information
+    """
+
+    class _Dummy:
+        def __init__(self, url='/en/dummy/', language='en', site=None):
+            self.language = language
+            if site is not None:
+                self.site = site  # optional site attribute
+            self._url = url
+
+        def get_absolute_url(self):
+            return self._url
+
+    def setUp(self):
+        # create two sites with distinct domains
+        Site.objects.all().delete()
+        self.site1 = Site.objects.create(domain='site1.test', name='Site 1')
+        self.site2 = Site.objects.create(domain='site2.test', name='Site 2')
+
+    def test_no_prefix_when_site_argument_is_none(self):
+        obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)
+        url = get_object_live_url(obj, language='en', site=None)
+        self.assertEqual(url, '/en/dummy/')
+
+    def test_no_prefix_when_target_site_equals_object_site(self):
+        obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)
+        url = get_object_live_url(obj, language='en', site=self.site1)
+        self.assertEqual(url, '/en/dummy/')
+
+    def test_prefix_added_when_target_site_differs_from_object_site(self):
+        obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)
+        url = get_object_live_url(obj, language='en', site=self.site2)
+        self.assertEqual(url, f'//{self.site1.domain}/en/dummy/')
+
+    def test_no_prefix_when_object_has_no_site_info(self):
+        # No .site attribute and no cms_extension mapping -> site param ignored
+        obj = self._Dummy(url='/en/dummy/', language='en', site=None)
+        # Remove site attribute if present
+        if hasattr(obj, 'site'):
+            delattr(obj, 'site')
+        url = get_object_live_url(obj, language='en', site=self.site2)
+        self.assertEqual(url, '/en/dummy/')
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):

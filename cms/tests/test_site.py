@@ -157,3 +157,4 @@ class GetSiteFromRequestWithMiddlewareTests(CMSTestCase):
             req.site = self.site_default
             site = get_site_from_request(req)
             self.assertEqual(site.pk, self.site_other.pk)
+

@@ -304,13 +304,13 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Optional[
     obj_site = getattr(obj, 'site', None)
     if obj_site is None:
         try:
-            grouper_field = apps.get_app_config('cms').cms_extension[obj.__class__][0]
+            grouper_field = apps.get_app_config('cms').cms_extension.toolbar_enabled_models[obj.__class__][0]
             obj_site = getattr(obj, grouper_field, None)
         except KeyError:
             pass
     if obj_site and site and obj_site != site:
         # Add domain if current and target sites are defined and different
-        absolute_url = f"//{obj_site.domain}{absolute_url}" if obj_site else absolute_url
+        absolute_url = f"//{obj_site.domain}{absolute_url}"
 
     return absolute_url
 
