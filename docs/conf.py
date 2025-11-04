@@ -12,19 +12,18 @@
 # to show the default.
 
 
-import cms
 import datetime
 import os
 import sys
+
+import cms
 
 # Initialize Django for autodoc
 
 sys.path.append(os.path.abspath('./'))
 
 import django
-
-from djangocms_ecosystem import write_LTS_table, write_current_LTS, write_plugin_table
-
+from djangocms_ecosystem import write_current_LTS, write_LTS_table, write_plugin_table
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
 django.setup()
@@ -82,7 +81,7 @@ master_doc = 'index'
 current_year = datetime.datetime.now().year
 # General information about the project.
 project = 'django cms'
-copyright = '2009-{}, django CMS Association and contributors'.format(current_year)
+copyright = f'2009-{current_year}, django CMS Association and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -254,8 +253,8 @@ latex_paper_size = 'a4'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'djangocms.tex', u'django cms Documentation',
-     u'django CMS Association and contributors', 'manual'),
+    ('index', 'djangocms.tex', 'django cms Documentation',
+     'django CMS Association and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top

@@ -31,6 +31,12 @@ def get_current_site(request: HttpRequest = None) -> "Site":
             stacklevel=2,
         )
 
+    # Allow middleware to identify the site
+    request_site = getattr(request, "site", None) if request else None
+    if request_site:
+        return request_site
+
+    # Fallback to the default site configuration by SITE_ID or through request
     return Site.objects.get_current(request=request)
 
 

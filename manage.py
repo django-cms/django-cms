@@ -11,7 +11,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.utils.conf import default
 from docs.django_settings import SECRET_KEY
 
-gettext = lambda s: s
+gettext = lambda s: s  # noqa: E731
 warnings.filterwarnings("ignore", category=DontUsePageAttributeWarning)
 
 
@@ -41,8 +41,8 @@ class TempDirs:
 
 
 def main(argv: list[str], **full_settings):
-    from django.core.management import execute_from_command_line
     from django.conf import settings
+    from django.core.management import execute_from_command_line
 
     local_commands = [
         "test",

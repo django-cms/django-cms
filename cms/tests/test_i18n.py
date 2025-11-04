@@ -536,3 +536,33 @@ class TestGetLanguageFromRequest(CMSTestCase):
     def test_get_language_from_request_does_not_return_empty_string_from_get(self):
         request = self.get_request('/en/?language=', language='en')
         self.assertEqual(get_language_from_request(request), 'en')
+
+
+@override_settings(
+    LANGUAGE_CODE='es',
+    LANGUAGES=(('fr', 'French'),
+               ('en', 'English'),
+               ('de', 'German'),
+               ('es', 'Spanish')),
+     SITE_ID=None,
+)
+class TestLanguagesWithoutSiteID(CMSTestCase):
+    """
+    Test language handling when SITE_ID is not set in settings.
+    """
+
+    def test_get_languages_without_site_id_uses_all_languages(self):
+        """Test that get_languages uses all LANGUAGES when SITE_ID is not set."""
+
+        result = i18n.get_languages()
+        self.assertEqual(result, [{'code': 'fr', 'name': 'French'}, {'code': 'en', 'name': 'English'}, {'code': 'de', 'name': 'German'}, {'code': 'es', 'name': 'Spanish'}])
+
+    @override_settings(USE_I18N=False)
+    def test_get_language_code_without_site_id_and_use_i18n_false_returns_site_language(self):
+        """Verify that when SITE_ID is not set and USE_I18N is False, i18n.get_languages()
+        returns only the current site's default language (a single-item list) rather than
+        using the full global LANGUAGES setting."""
+        """Test that get_languages uses all LANGUAGES when SITE_ID is not set."""
+
+        result = i18n.get_languages()
+        self.assertEqual(result, [{'code': 'es', 'name': 'es'}])

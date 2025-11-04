@@ -988,11 +988,10 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         if obj:
             return page_permissions.user_can_change_page(request.user, page=obj.page, site=obj.page.site)
-        can_change_page = page_permissions.user_can_change_at_least_one_page(
+        return page_permissions.user_can_change_at_least_one_page(
             user=request.user,
             site=get_site_from_request(request),
         )
-        return can_change_page
 
     def has_view_permission(self, request, obj=None):
         """
@@ -1004,12 +1003,11 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         if obj:
             return page_permissions.user_can_change_page(request.user, page=obj.page, site=obj.page.site)
-        can_view_page = page_permissions.user_can_change_at_least_one_page(
+        return page_permissions.user_can_change_at_least_one_page(
             user=request.user,
             site=get_site_from_request(request),
             use_cache=False,
         )
-        return can_view_page
 
     def has_delete_permission(self, request, obj=None):
         """

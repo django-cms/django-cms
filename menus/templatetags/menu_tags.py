@@ -9,6 +9,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.translation import get_language, gettext
 
+from cms.utils import get_current_site
 from cms.utils.i18n import (
     force_language,
     get_language_list,
@@ -390,7 +391,7 @@ class LanguageChooser(InclusionTag):
         if page:
             site_id = page.site_id
         else:
-            site_id = Site.objects.get_current().pk
+            site_id = get_current_site(request).pk
 
         if request.user.is_staff:
             languages = get_language_list(site_id=site_id)

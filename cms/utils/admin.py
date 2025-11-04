@@ -1,10 +1,10 @@
-from django.core.exceptions import PermissionDenied
+from django.contrib.sites.models import Site
+from django.forms import IntegerField, ValidationError
 from django.http import Http404, JsonResponse
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
 
-from cms.utils import page_permissions
-from cms.utils.conf import get_cms_setting
+from cms.utils import get_current_site
 
 NOT_FOUND_RESPONSE = "NotFound"
 
@@ -19,26 +19,12 @@ def jsonify_request(response):
     return JsonResponse(content)
 
 
-def _get_site_id_from_request(request):
-    site_id = request.GET.get("site", request.session.get("cms_admin_site"))
-    if site_id is None:
-        return None
-
-    try:
-        return int(site_id)
-    except ValueError:
-        raise Http404(_("Invalid site ID."))
-
-
 def get_site_from_request(request):
-    site_id = _get_site_id_from_request(request)
-    if site_id is None:
-        from cms.utils import get_current_site
-
-        return get_current_site(request)
     try:
-        from django.contrib.sites.models import Site
+        site_id = request.GET.get("site") or request.POST.get("site")
+        site_id = IntegerField().clean(site_id)
+        site = Site.objects.get(pk=site_id)
+    except (ValidationError, Site.DoesNotExist):
+        site = get_current_site(request)
 
-        return Site.objects._get_site_by_id(site_id)
-    except Site.DoesNotExist:
-        raise Http404(_("Site does not exist."))
+    return site

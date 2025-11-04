@@ -1099,15 +1099,16 @@ class PageTest(PageTestBase):
         site = Site.objects.create(domain='otherlang', name='otherlang', pk=2)
         # Change site for this session
         page_data = self.get_new_page_data()
-        page_data['site'] = site.pk
         page_data['title'] = 'changed title'
         self.assertEqual(site.pk, 2)
         TESTLANG = get_cms_setting('LANGUAGES')[site.pk][0]['code']
+        TESTSITE = site.pk
         page_data['language'] = TESTLANG
+        page_data['site'] = TESTSITE
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.post(self.get_page_add_uri('en'), page_data)
-            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
+            self.assertRedirects(response, self.get_pages_admin_list_uri(TESTLANG, site_id=TESTSITE))
             page = Page.objects.get(urls__slug=page_data['slug'])
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')

@@ -12,6 +12,7 @@ from django.utils.translation import (
     gettext_lazy as _,
 )
 
+from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_default_language_for_site,
@@ -109,7 +110,7 @@ class MenuRenderer:
             # Avoid resolving site
             self.site = Site(id=page.site_id)
         else:
-            self.site = Site.objects.get_current(request)
+            self.site = get_current_site(request)
         self.request_language = None
         if hasattr(request, "LANGUAGE_CODE"):
             # use language from middleware - usually django.middleware.locale.LocaleMiddleware

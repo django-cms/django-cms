@@ -299,7 +299,7 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Optional[
         language = get_language()
 
     with force_language(language):
-        absolute_url = obj.get_absolute_url() = ContentType.objects.get_for_model(obj)
+        absolute_url = obj.get_absolute_url()
 
     obj_site = getattr(obj, 'site', None)
     if obj_site is None:
@@ -308,7 +308,8 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Optional[
             obj_site = getattr(obj, grouper_field, None)
         except KeyError:
             pass
-    if obj_site != site:
+    if obj_site and site and obj_site != site:
+        # Add domain if current and target sites are defined and different
         absolute_url = f"//{obj_site.domain}{absolute_url}" if obj_site else absolute_url
 
     return absolute_url

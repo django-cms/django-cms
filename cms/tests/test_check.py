@@ -96,7 +96,7 @@ class CheckTests(CheckAssertMixin, TestCase):
             "django.template.context_processors.i18n",
         ]
         with self.settings(**override):
-            self.assertCheck(False, errors=2)
+            self.assertCheck(False, errors=1)
 
     def test_old_style_i18n_settings(self):
         with self.settings(CMS_LANGUAGES=[("en", "English")]):
