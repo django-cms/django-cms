@@ -2325,7 +2325,7 @@ class GetObjectLiveUrlTests(CMSTestCase):
         url = get_object_live_url(obj, language='de', site=self.site2)
         self.assertEqual(url, f'//{self.site1.domain}/de/test-page/')
         url = get_object_live_url(obj, language='de', site=self.site1)
-        self.assertEqual(url, f'/de/test-page/')
+        self.assertEqual(url, '/de/test-page/')
 
     def test_get_object_live_url_works_with_grouper(self):
         page = create_page('test page', 'nav_playground.html', 'de', site=self.site1)
@@ -2333,7 +2333,7 @@ class GetObjectLiveUrlTests(CMSTestCase):
         url = get_object_live_url(page, language='de', site=self.site2)
         self.assertEqual(url, f'//{self.site1.domain}/de/test-page/')
         url = get_object_live_url(page, language='de', site=self.site1)
-        self.assertEqual(url, f'/de/test-page/')
+        self.assertEqual(url, '/de/test-page/')
 
 
 
