@@ -554,7 +554,7 @@ class TestLanguagesWithoutSiteID(CMSTestCase):
     def test_get_languages_without_site_id_uses_all_languages(self):
         """Test that get_languages uses all LANGUAGES when SITE_ID is not set."""
 
-        result = i18n.get_languages()
+        result = i18n.get_languages(site_id=1)
         self.assertEqual(result, [{'code': 'fr', 'name': 'French'}, {'code': 'en', 'name': 'English'}, {'code': 'de', 'name': 'German'}, {'code': 'es', 'name': 'Spanish'}])
 
     @override_settings(USE_I18N=False)
@@ -564,5 +564,5 @@ class TestLanguagesWithoutSiteID(CMSTestCase):
         using the full global LANGUAGES setting."""
         """Test that get_languages uses all LANGUAGES when SITE_ID is not set."""
 
-        result = i18n.get_languages()
+        result = i18n.get_languages(site_id=1)
         self.assertEqual(result, [{'code': 'es', 'name': 'es'}])

@@ -2318,6 +2318,24 @@ class GetObjectLiveUrlTests(CMSTestCase):
         url = get_object_live_url(obj, language='en', site=self.site2)
         self.assertEqual(url, '/en/dummy/')
 
+    def test_grouper_site_is_respected(self):
+        page = create_page('test page', 'nav_playground.html', 'de', site=self.site1)
+        obj = page.get_content_obj('de')
+
+        url = get_object_live_url(obj, language='de', site=self.site2)
+        self.assertEqual(url, f'//{self.site1.domain}/de/test-page/')
+        url = get_object_live_url(obj, language='de', site=self.site1)
+        self.assertEqual(url, f'/de/test-page/')
+
+    def test_get_object_live_url_works_with_grouper(self):
+        page = create_page('test page', 'nav_playground.html', 'de', site=self.site1)
+
+        url = get_object_live_url(page, language='de', site=self.site2)
+        self.assertEqual(url, f'//{self.site1.domain}/de/test-page/')
+        url = get_object_live_url(page, language='de', site=self.site1)
+        self.assertEqual(url, f'/de/test-page/')
+
+
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
 

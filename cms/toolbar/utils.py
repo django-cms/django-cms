@@ -304,8 +304,8 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Optional[
     obj_site = getattr(obj, 'site', None)
     if obj_site is None:
         try:
-            grouper_field = apps.get_app_config('cms').cms_extension.toolbar_enabled_models[obj.__class__][0]
-            obj_site = getattr(obj, grouper_field, None)
+            grouper_field = apps.get_app_config('cms').cms_extension.model_groupers[obj.__class__]
+            obj_site = getattr(getattr(obj, grouper_field, None), 'site', None)
         except KeyError:
             pass
     if obj_site and site and obj_site != site:

@@ -1149,3 +1149,20 @@ class ApphooksSiteTestCase(BaseApphooksTestCase):
 
         response = self.get_for_site(self.site2, '/de/page-1/')
         self.assertEqual(response.status_code, 404)  # Sollte nicht erreichbar sein
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_site_filter_preserves_view_name(self):
+        self.create_pages()
+
+        view_names = (
+            ('sample-settings', 'sample_view'),
+            ('sample-class-view', 'ClassView'),
+            ('sample-class-based-view', 'view'),
+        )
+
+        with force_language("de"):
+            for url_name, view_name in view_names:
+                path = reverse(url_name)
+                match = resolve(path)
+                self.assertEqual(match.func.__name__, view_name)
+
