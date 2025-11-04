@@ -22,8 +22,11 @@ class PluginPool:
         self.plugins = {}
         self.discovered = False
         self.global_restrictions_cache = {
+            # Initialize the global restrictions cache for each CMS_PLACEHOLDER_CONF
+            # granularity that contains "parent_classes" or "child_classes" overwrites
             None: {},
-            **{key: {} for key in get_cms_setting("PLACEHOLDER_CONF").keys()},
+            **{key: {} for key, value in get_cms_setting("PLACEHOLDER_CONF").items()
+               if "parent_classes" in value or "child_classes" in value},
         }
         self.global_template_restrictions = any(".htm" in (key or "") for key in self.global_restrictions_cache)
 
@@ -41,6 +44,8 @@ class PluginPool:
 
         autodiscover_modules("cms_plugins")
         self.discovered = True
+        # Sort plugins by their module and name
+        self.plugins = dict(sorted(self.plugins.items(), key=lambda key: (key[1].module, key[1].name)))
 
     def clear(self):
         self.discovered = False
@@ -135,7 +140,6 @@ class PluginPool:
     ):
         from cms.utils.placeholder import get_placeholder_conf
 
-        self.discover_plugins()
         plugins = self.plugins.values()
         template = (
             lazy(page.get_template, str)() if page else None
@@ -185,7 +189,6 @@ class PluginPool:
         """
         Retrieve a plugin from the cache.
         """
-        self.discover_plugins()
         return self.plugins[name]
 
     def get_patterns(self) -> list[URLResolver]:
@@ -210,7 +213,6 @@ class PluginPool:
         return url_patterns
 
     def get_system_plugins(self) -> list[str]:
-        self.discover_plugins()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
 
     @cached_property
@@ -227,7 +229,7 @@ class PluginPool:
         plugin_classes = [cls for cls in self.registered_plugins if cls._has_extra_placeholder_menu_items]
         return plugin_classes
 
-    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Optional[Page] = None):
+    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Page | None = None):
         """
         Retrieve the restrictions cache for a given plugin instance.
 
@@ -240,7 +242,7 @@ class PluginPool:
         be recalculated for each request.
 
         Args:
-            request_cache (dict): The current request cache.
+            request_cache (dict): The current request cache (only filled is non globally cacheable).
             instance (CMSPluginBase): The plugin instance for which to retrieve the restrictions cache.
             page (Optional[Page]): The page associated with the plugin instance, if any.
 
@@ -256,11 +258,11 @@ class PluginPool:
         else:
             template = ""
 
-        if f"{template} {slot}" in self.global_restrictions_cache:
+        if template and f"{template} {slot}" in self.global_restrictions_cache:
             return self.global_restrictions_cache[f"{template} {slot}"]
         if template and template in self.global_restrictions_cache:
             return self.global_restrictions_cache[template]
-        if slot in self.global_restrictions_cache:
+        if slot and slot in self.global_restrictions_cache:
             return self.global_restrictions_cache[slot]
         return self.global_restrictions_cache[None]
 

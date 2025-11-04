@@ -40,6 +40,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
     NoRenderButChildren,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat import DJANGO_5_1
@@ -215,7 +216,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         add_page_endpoint = self.get_page_add_uri("en")
 
         # try to add a new plugin
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
@@ -224,7 +225,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(["TextPlugin"], installed_plugins)
 
         # try to add a new plugin to a column plugin - still only text
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
 
             child_plugins = ColumnPlugin.get_child_classes("body", page)
@@ -239,7 +240,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         add_page_endpoint = self.get_page_add_uri("en")
 
         # try to add a new text plugin
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
@@ -250,7 +251,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         CMS_PLACEHOLDER_CONF = {"body": {"plugins": ["TextPlugin"], "excluded_plugins": ["TextPlugin"]}}
 
         # try to add a new text plugin
-        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
@@ -419,6 +420,22 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # test subplugin copy
         copy_plugins_to_placeholder([link_plugin_en], ph_de, language="de")
+        self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 2)
+
+        # Assert that copied plugins have distinct, sequential positions
+        plugins = list(ph_de.cmsplugin_set.filter(language="de").order_by('position'))
+        positions = [plugin.position for plugin in plugins]
+        self.assertEqual(len(positions), len(set(positions)), "Plugin positions should be unique")
+        self.assertEqual(positions, list(range(positions[0], positions[0] + len(positions))), "Plugin positions should be sequential")
+
+        # Assert that no integrity errors are raised (uniqueness constraints maintained)
+        from django.db import IntegrityError
+        try:
+            for plugin in plugins:
+                # Try to save plugin again to check for uniqueness constraint
+                plugin.save()
+        except IntegrityError:
+            self.fail("IntegrityError raised: uniqueness constraint violated when saving copied plugins")
 
     def test_deep_copy_plugins(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
@@ -585,7 +602,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.registered_plugins)
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
 
-    def test_search_pages(self):
+    def test_search_pages_for_plugin_content(self):
         """
         Test search for pages
         To be fully useful, this testcase needs to have the following different
@@ -605,6 +622,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         text.save()
         self.assertEqual(Page.objects.search("hi").count(), 0)
         self.assertEqual(Page.objects.search("hello").count(), 1)
+        self.assertEqual(Page.objects.search("hi", language="en").count(), 0)
+        self.assertEqual(Page.objects.search("hello", language="fr").count(), 0)
+
 
     def test_empty_plugin_is_ignored(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -840,7 +860,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                     }
                 }
             }
-            with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
                 self.assertEqual(["LinkPlugin"], plugin.get_child_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_settings(self):
@@ -863,7 +883,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                     }
                 }
             }
-            with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
                 self.assertEqual(["TestPlugin"], plugin.get_parent_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_object(self):

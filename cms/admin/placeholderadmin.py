@@ -92,7 +92,7 @@ class BaseEditableAdminMixin:
         opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
-        raw_fields = request.GET.get("edit_fields")
+        raw_fields = request.GET.get("edit_fields", "")
         admin_obj = self._get_model_admin(obj)
         allowed_fields = getattr(admin_obj, "frontend_editable_fields", [])
         fields = [field for field in raw_fields.split(",") if field in allowed_fields]
@@ -816,7 +816,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             target_parent_id=target_parent_id,
         )
 
-        target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
+        target_last_plugin = target_placeholder.get_last_plugin(target_language)
 
         if target_last_plugin:
             target_offset = target_last_plugin.position + len(plugins)

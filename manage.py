@@ -8,10 +8,11 @@ import warnings
 import dj_database_url
 
 from cms.exceptions import DontUsePageAttributeWarning
-from cms.utils.conf import default
-from docs.django_settings import SECRET_KEY
 
-gettext = lambda s: s  # noqa: E731
+
+def gettext(s):
+    return s
+
 warnings.filterwarnings("ignore", category=DontUsePageAttributeWarning)
 
 
@@ -62,6 +63,7 @@ def main(argv: list[str], **full_settings):
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_LIVE_TEST_SERVER_ADDRESS", "localhost:8000-9000")
+    os.environ.setdefault("DJANGO_TESTS", "1")
     PROJECT_PATH = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "cms", "test_utils")
     )

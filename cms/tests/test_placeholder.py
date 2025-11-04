@@ -26,6 +26,7 @@ from cms.test_utils.project.placeholderapp.models import (
 )
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.utils import (
@@ -407,7 +408,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         plugin = add_plugin(
             user_settings.clipboard,
             "LinkPlugin",
-            language="en",
+            language="de",  # Test x-language
             name="A Link",
             external_link="https://www.django-cms.org",
         )
@@ -627,7 +628,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             },
         }
 
-        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
             # test no inheritance
             returned = get_placeholder_conf("plugins", "main")
             self.assertEqual(returned, TEST_CONF["main"]["plugins"])
@@ -646,6 +647,9 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             # test generic configuration
             returned = get_placeholder_conf("plugins", "something")
             self.assertEqual(returned, TEST_CONF[None]["plugins"])
+            # test doubly-inherited
+            returned = get_placeholder_conf("default_plugins", "layout/other.html main")
+            self.assertEqual(returned, TEST_CONF["main"]["default_plugins"])
 
     def test_placeholder_name_conf(self):
         page_en = create_page("page_en", "col_two.html", "en")
@@ -665,14 +669,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             },
         }
 
-        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
             self.assertEqual(force_str(placeholder_1.get_label()), "left column")
             self.assertEqual(force_str(placeholder_2.get_label()), "renamed left column")
             self.assertEqual(force_str(placeholder_3.get_label()), "fallback")
 
         del TEST_CONF[None]
 
-        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
             self.assertEqual(force_str(placeholder_1.get_label()), "left column")
             self.assertEqual(force_str(placeholder_2.get_label()), "renamed left column")
             self.assertEqual(force_str(placeholder_3.get_label()), "No_Name")
@@ -748,7 +752,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
                 ]
             },
         }
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             page = create_page("page_en", "col_two.html", "en")
             placeholder = page.get_placeholders("en").get(slot="col_left")
             context = SekizaiContext()
@@ -756,6 +760,20 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             # Our page should have "en default body 1" AND "en default body 2"
             content = _render_placeholder(placeholder, context)
             self.assertRegex(content, r"^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+
+    def test_circular_inheritance_in_placeholder_conf_raises(self):
+        circular_conf = {
+            "slot_a": {"inherit": "slot_b"},
+            "slot_b": {"inherit": "slot_c"},
+            "slot_c": {"inherit": "slot_a"},
+        }
+        with self.assertRaises(ImproperlyConfigured):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=circular_conf):
+                # Attempt to access any slot to trigger the config resolution
+                page = create_page("circular_page", "col_two.html", "en")
+                placeholder = page.get_placeholders("en").get(slot="slot_a")
+                # Accessing the label should trigger the circular inheritance detection
+                force_str(placeholder.get_label())
 
     def test_plugins_children_prepopulate(self):
         """
@@ -783,7 +801,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             },
         }
 
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             page = create_page("page_en", "col_two.html", "en")
             placeholder = page.get_placeholders("en").get(slot="col_left")
             context = SekizaiContext()
@@ -1171,7 +1189,7 @@ class PlaceholderConfTests(TestCase):
             },
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             plugins = list(plugin_pool.get_all_plugins(placeholder, page))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1189,7 +1207,7 @@ class PlaceholderConfTests(TestCase):
             },
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
             plugins = list(plugin_pool.get_all_plugins(placeholder, page))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1207,7 +1225,7 @@ class PlaceholderPluginTestsBase(CMSTestCase):
             position=position,
             placeholder=placeholder,
         )
-        plugin_model = base.get_plugin_class().model
+        plugin_model = base.plugin_class.model
         plugin = plugin_model()
         base.set_base_attr(plugin)
         plugin.save()

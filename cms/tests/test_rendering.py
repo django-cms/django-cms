@@ -11,6 +11,7 @@ from cms.models import EmptyPageContent, Page, Placeholder
 from cms.plugin_rendering import PluginContext
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
@@ -366,7 +367,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(self.test_page4, template=t)
         self.assertEqual(r, self.test_data4['no_extra'])
         cache.clear()
-        with self.settings(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
             r = self.render(self.test_page4, template=t)
         self.assertEqual(r, self.test_data4['extra'])
 
@@ -541,7 +542,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(self.test_page4, template=t)
         self.assertEqual(r, self.test_data4['no_extra'])
         cache.clear()
-        with self.settings(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
             r = self.render(self.test_page4, template=t)
             self.assertEqual(r, self.test_data4['extra'])
 

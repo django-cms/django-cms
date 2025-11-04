@@ -62,7 +62,7 @@ class PageManager(MP_NodeManager):
                         f'pagecontent_set__placeholders__cmsplugin__{related_query_name}__{field}__icontains': q})
         if language:
             qt &= Q(pagecontent_set__language=language)
-            qp &= Q(cmsplugin__language=language)
+            qp &= Q(pagecontent_set__placeholders__cmsplugin__language=language)
 
         qs = qs.filter(qt | qp)
 

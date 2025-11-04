@@ -25,12 +25,13 @@ jobs:
     - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Create project from template
       run: |
         sudo apt install gettext gcc -y
+        sudo apt install libcairo2-dev pkg-config python3-dev
         python -m venv .venv
         source ./.venv/bin/activate
         python -m pip install --upgrade pip

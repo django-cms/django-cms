@@ -1,13 +1,15 @@
 import logging
+import os
 import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache
+from functools import cache, lru_cache
 from itertools import starmap
 from operator import itemgetter
 from typing import Optional
 
+from django.db import models
 from django.http import HttpRequest
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
@@ -177,9 +179,9 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     if restrictions_cache is None:
         restrictions_cache = {}
 
-    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
+    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
     parents_cache = cache.setdefault("plugin_parents", {})
     children_cache = cache.setdefault("plugin_children", {})
 
@@ -214,13 +216,15 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 slot=plugin.placeholder.slot,
                 page=page,
                 instance=plugin,
+                only_uncached=False,
             )
             if plugin_class.cache_child_classes:  # Check if child classes should be cached
                 # Only add plugins to the cache that have the cache_parent_class attribute set
-                children_cache[plugin_type] = [plugin for plugin in (child_classes or [])
-                                            if plugin_pool.get_plugin(plugin).cache_parent_classes]
+                children_cache[plugin_type] = [
+                    plugin for plugin in (child_classes or []) if plugin_pool.get_plugin(plugin).cache_parent_classes
+                ]
                 if not children_cache[plugin_type] and child_classes:
-                    # Edge case:
+                    # Edge case: NO child classes available
                     children_cache[plugin_type] = [""]
 
     return child_classes, parent_classes
@@ -301,7 +305,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
         try:
             position = positions_by_language[new_plugin.language]
         except KeyError:
-            offset = placeholder.get_last_plugin_position(language) or 0
+            offset = placeholder.get_last_plugin_position(new_plugin.language) or 0
             # The position is relative to language.
             position = placeholder.get_next_plugin_position(
                 language=new_plugin.language,
@@ -311,7 +315,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
             # Because it is the first time this language is processed,
             # shift all plugins to the right of the next position.
             placeholder._shift_plugin_positions(
-                language,
+                new_plugin.language,
                 start=position,
                 offset=offset,
             )
@@ -401,9 +405,9 @@ def get_bound_plugins(plugins):
 
 def downcast_plugins(
     plugins: Iterable[CMSPlugin],
-    placeholders: Optional[list] = None,
+    placeholders: list | None = None,
     select_placeholder: bool = False,
-    request: Optional[HttpRequest] = None,
+    request: HttpRequest | None = None,
 ) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins
@@ -495,22 +499,32 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
 
     """
     limits = get_placeholder_conf("limits", placeholder.slot, template)
-    if limits:
-        global_limit = limits.get("global")
-        type_limit = limits.get(plugin_type)
-        # total plugin count
-        count = placeholder.get_plugins(language=language).count()
-        if global_limit and count >= global_limit:
-            raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s)." % count))
-        elif type_limit:
-            # total plugin type count
-            type_count = placeholder.get_plugins(language=language).filter(plugin_type=plugin_type).count()
-            if type_count >= type_limit:
-                plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
-                raise PluginLimitReached(
-                    _(
-                        "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
-                    )
-                    % {"limit": type_limit, "plugin_name": plugin_name}
-                )
-    return False
+    if not limits:
+        return False
+
+    global_limit = limits.get("global")
+    type_limit = limits.get(plugin_type)
+    # total plugin counts
+    counts = placeholder.get_plugins(language=language).aggregate(
+        total_count=models.Count('pk'),
+        type_count=models.Count('pk', filter=models.Q(plugin_type=plugin_type))
+    )
+    # Ensure counts default to integers if None
+    total_count = counts.get('total_count') or 0
+    type_count = counts.get('type_count') or 0
+
+    global_limit = limits.get("global")
+    type_limit = limits.get(plugin_type)
+
+    if global_limit and total_count >= global_limit:
+        raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s).") % global_limit)
+
+    if type_limit and type_count >= type_limit:
+        plugin_name = get_plugin_class(plugin_type).name
+        raise PluginLimitReached(
+            _(
+                "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
+            )
+            % {"limit": type_limit, "plugin_name": plugin_name}
+        )
+

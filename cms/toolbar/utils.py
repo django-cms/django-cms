@@ -25,7 +25,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: Optional[list[str]] = None) -> str:
+def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[str] | None = None) -> str:
     label = placeholder.get_label() or ''
     help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -45,7 +45,7 @@ def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: Option
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> dict[str, Any]:
+def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> dict[str, Any]:
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
@@ -59,7 +59,7 @@ def get_plugin_toolbar_info(plugin: CMSPlugin, children: Optional[list[str]] = N
     return data
 
 
-def get_plugin_toolbar_js(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> str:
+def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> str:
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
@@ -88,8 +88,8 @@ def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]
 def get_plugin_tree(
     request: HttpRequest,
     plugins: list[CMSPlugin],
-    restrictions: Optional[dict] = None,
-    target_plugin: Optional[CMSPlugin] = None,
+    restrictions: dict | None = None,
+    target_plugin: CMSPlugin | None = None,
 ) -> dict[str, Any]:
     """
     Constructs a tree structure of CMS plugins for the toolbar.
@@ -152,7 +152,7 @@ def get_plugin_tree(
 
     content = {}
     # Render the target plugin if given and all plugins are local
-    if target_plugin and all(plugin.get_plugin_class().is_local for plugin in plugins):
+    if target_plugin and all(plugin.plugin_class.is_local for plugin in plugins):
         # Also provide the parent plugin to the context (if available)
         downcasted = next(
             (plugin for plugin in plugins if plugin.pk == target_plugin.pk), None
@@ -202,7 +202,7 @@ def get_toolbar_from_request(request: HttpRequest):
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
-def add_live_url_querystring_param(obj: models.Model, url: str, language: Optional[str] = None) -> str:
+def add_live_url_querystring_param(obj: models.Model, url: str, language: str | None = None) -> str:
     """
     Append a live url to a given object url using a supplied url parameter configured
     by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
@@ -315,7 +315,7 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Optional[
     return absolute_url
 
 
-def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> Optional[models.Model]:
+def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> models.Model | None:
     """
     Retrieves the correct content object for the target language. The object must be frontend-editable
     and registered as such with cms.

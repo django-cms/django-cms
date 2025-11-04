@@ -33,7 +33,7 @@ def cut_after(node, levels, removed=None):
     if removed is not None:
         raise TypeError("menus.template_tags.cut_after() does not accept 'removed' list argument")
 
-    if levels == 0:
+    if levels <= 0:
         node.children = []
     else:
         for child in node.children:
