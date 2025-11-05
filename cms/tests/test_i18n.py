@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.template.context import Context
+from django.utils import translation
 from django.test.utils import override_settings
 
 from cms import api
@@ -279,6 +280,71 @@ class TestLanguageCodesEnGB(CMSTestCase):
         for lang in result:
             self.assertEqual(lang['public'], True)
             self.assertEqual(lang['hide_untranslated'], False)
+
+
+@override_settings(
+    LANGUAGE_CODE='en',
+    LANGUAGES=(('fr', 'French'),
+               ('en', 'English'),
+               ('de', 'German'),
+               ('es', 'Spanish')),
+    CMS_LANGUAGES={
+        1: [
+            {'code': 'en',
+             'name': 'English',
+             'public': True},
+            {'code': 'fr',
+             'name': 'French',
+             'public': False},
+        ],
+        2: [
+            {'code': 'de',
+             'name': 'German',
+             'public': True},
+            {'code': 'es',
+             'name': 'Spanish',
+             'public': True},
+        ],
+        'default': {
+            'public': True,
+            'hide_untranslated': False,
+        },
+    },
+)
+class TestGetCurrentLanguageWithoutSiteID(CMSTestCase):
+    """
+    Test get_current_language when SITE_ID is not set in settings.
+    """
+
+    @override_settings(SITE_ID=None)
+    def test_get_current_language_returns_valid_language_code(self):
+        """Test that get_current_language returns a valid language from settings.LANGUAGES."""
+        with translation.override('en'):
+            result = i18n.get_current_language()
+            self.assertEqual(result, 'en')
+
+    @override_settings(SITE_ID=None)
+    def test_get_current_language_with_base_language_match(self):
+        """Test that get_current_language matches base language when exact match not found."""
+        with translation.override('en-us'):
+            result = i18n.get_current_language()
+            # Should match 'en' from settings.LANGUAGES
+            self.assertEqual(result, 'en')
+
+    @override_settings(SITE_ID=None)
+    def test_get_current_language_with_no_match_returns_active_language(self):
+        """Test that get_current_language returns active language when no match found."""
+        with translation.override('it'):  # Italian not in settings.LANGUAGES
+            result = i18n.get_current_language()
+            self.assertEqual(result, 'it')
+
+    @override_settings(SITE_ID=None)
+    def test_get_current_language_with_region_variant(self):
+        """Test that get_current_language handles region variants correctly."""
+        with translation.override('de-at'):  # Austrian German
+            result = i18n.get_current_language()
+            # Should match 'de' from settings.LANGUAGES
+            self.assertEqual(result, 'de')
 
 
 @override_settings(

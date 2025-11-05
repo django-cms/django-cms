@@ -99,9 +99,23 @@ def get_current_language():
     LANGUAGE_CODE will be found in LANGUAGES.
     Overcomes this issue: https://code.djangoproject.com/ticket/9340
     """
+    site_id = getattr(settings, 'SITE_ID', None)
     language_code = translation.get_language()
-    return get_language_code(language_code, site_id=settings.SITE_ID)
+    if site_id:
+        return get_language_code(language_code, site_id=site_id)
 
+    # We do not know the site, return an entry from settings.LANGUAGES
+    languages = dict(getattr(settings, 'LANGUAGES', ((language_code, language_code), ))).keys()
+
+    if language_code in languages:
+        return language_code  # direct hit
+
+    for lang in languages:
+        if language_code.split('-')[0] == lang:  # base language hit
+            return lang
+        if lang.split('-')[0] == language_code:  # base language hit
+            return lang
+    return language_code
 
 def get_language_list(site_id=None):
     """
