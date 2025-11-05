@@ -2294,10 +2294,10 @@ class GetObjectLiveUrlTests(CMSTestCase):
         self.site1 = Site.objects.create(domain='site1.test', name='Site 1')
         self.site2 = Site.objects.create(domain='site2.test', name='Site 2')
 
-    def test_no_prefix_when_site_argument_is_none(self):
+    def test_always_prefix_when_site_argument_is_none(self):
         obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)
         url = get_object_live_url(obj, language='en', site=None)
-        self.assertEqual(url, '/en/dummy/')
+        self.assertEqual(url, f'//{self.site1.domain}/en/dummy/')
 
     def test_no_prefix_when_target_site_equals_object_site(self):
         obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)

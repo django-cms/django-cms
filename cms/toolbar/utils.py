@@ -308,7 +308,7 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Optional[
             obj_site = getattr(getattr(obj, grouper_field, None), 'site', None)
         except KeyError:
             pass
-    if obj_site and site and obj_site != site:
+    if obj_site and obj_site != site:
         # Add domain if current and target sites are defined and different
         absolute_url = f"//{obj_site.domain}{absolute_url}"
 
