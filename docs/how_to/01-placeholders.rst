@@ -70,14 +70,6 @@ which determines which plugins may be inserted into this placeholder.
     If you add a PlaceholderRelationField to an existing model, you'll be able to see
     the placeholder in the frontend editor only after saving the relevant instance.
 
-Admin Integration
-~~~~~~~~~~~~~~~~~
-
-.. versionchanged:: 4.0
-
-Since django CMS version 4 :class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` is
-not required any more. For now, it still exists as an empty mixin but will be removed in
-a future version.
 
 I18N Placeholders
 ~~~~~~~~~~~~~~~~~
@@ -132,21 +124,21 @@ Setting and getting the placeholder-enabled object from the toolbar
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The toolbar provides two important methods for managing the object associated with placeholder editing.
-These methods are essential for enabling the toolbar's Edit and Preview buttons when working 
+These methods are essential for enabling the toolbar's Edit and Preview buttons when working
 with models that contain placeholders.
 
 **set_object(obj)**
-    Associates a Django model instance with the toolbar. This method only sets the object if 
-    one hasn't already been set. The object is typically a model instance that contains 
-    placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any 
+    Associates a Django model instance with the toolbar. This method only sets the object if
+    one hasn't already been set. The object is typically a model instance that contains
+    placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any
     other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
-    
-    The associated object is used by other toolbar methods to generate appropriate URLs for 
+
+    The associated object is used by other toolbar methods to generate appropriate URLs for
     editing, preview, and structure modes.
 
 **get_object()**
-    Returns the object currently associated with the toolbar, or ``None`` if no object has 
-    been set. This method can be used to retrieve the object that was previously set using 
+    Returns the object currently associated with the toolbar, or ``None`` if no object has
+    been set. This method can be used to retrieve the object that was previously set using
     ``set_object()``.
 
 Usage in Views
