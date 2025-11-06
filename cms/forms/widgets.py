@@ -38,7 +38,7 @@ class PageSelectWidget(MultiWidget):
         if value:
             page = Page.objects.get(pk=value)
             return [page.site_id, page.pk, page.pk]
-        site = Site.objects.get_current()
+        site = Site.objects.first()
         return [site.pk, None, None]
 
     def _has_changed(self, initial, data):

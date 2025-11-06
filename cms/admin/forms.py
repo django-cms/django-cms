@@ -1111,6 +1111,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
     level or under him in chosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
+    _page = None
 
     page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
@@ -1122,7 +1123,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         user = get_current_user()  # current user from threadlocals
-        site = Site.objects.get_current()
+        site = getattr(self._page, "site", None)
         sub_users = get_subordinate_users(user, site)
 
         limit_choices = True

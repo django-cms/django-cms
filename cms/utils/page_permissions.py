@@ -5,6 +5,7 @@ from cms.constants import GRANT_ALL_PERMISSIONS
 from cms.models import Page, PermissionTuple
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import _ensure_site_id
 from cms.utils.permissions import (
     cached_func,
     get_model_permission_codename,
@@ -123,8 +124,16 @@ def skip_if_permissions_disabled(func):
 @auth_permission_required('add_page')
 def user_can_add_page(user, site=None):
     if site is None:
+        import warnings
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
         from django.contrib.sites.models import Site
 
+        warnings.warn(
+            "user_can_add_page() called without site. This may lead to unexpected behavior. "
+            "Use user_can_add_page(user, site) instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         site = Site.objects.get_current()
     return has_global_permission(user, site, action='add_page')
 
@@ -259,7 +268,7 @@ def user_can_view_page(user, page, site=None):
     if site is None:
         from django.contrib.sites.models import Site
 
-        site = Site.objects.get_current()
+        site = page.site
 
     if user.is_superuser:
         return True
@@ -469,9 +478,17 @@ def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
 
 
 def has_generic_permission(page, user, action, site=None, check_global=True, use_cache=True):
-    if site is None:
+    if page is None and site is None:
+        import warnings
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
         from django.contrib.sites.models import Site
 
+        warnings.warn(
+            "has_generic_permission() called without site. This may lead to unexpected behavior. "
+            "Use has_generic_permission(page, user, action, site) instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         site = Site.objects.get_current()
 
     page_path = page.path

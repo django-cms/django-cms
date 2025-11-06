@@ -30,7 +30,7 @@ class PageManager(MP_NodeManager):
     def get_home(self, site=None):
         return self.get_queryset().get_home(site)
 
-    def search(self, q, language=None, current_site_only=True):
+    def search(self, q, language=None, current_site_only=True, site=None):
         """Simple search function
 
         Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
@@ -39,8 +39,7 @@ class PageManager(MP_NodeManager):
 
         qs = self.get_queryset()
 
-        if current_site_only:
-            site = Site.objects.get_current()
+        if site or current_site_only:
             qs = qs.on_site(site)
 
         qt = Q(pagecontent_set__title__icontains=q)
