@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # Sovichet Tep, 2011
 # Sovichet Tep, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Sovichet Tep, 2011\n"
 "Language-Team: Khmer (http://app.transifex.com/divio/django-cms/language/km/)\n"
@@ -18,12 +19,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: km\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-msgid "/"
-msgstr ""
-
-msgid ":"
-msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "តើ​ប្រាកដ​ថា​ចង់​ប្ដូរ ផ្ទាំង ដោយ​មិន​មាន​ការ​រក្សា​ទុក​ទំព័រ​ជា​មុន​ឬ?"
