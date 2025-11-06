@@ -1,3 +1,20 @@
+Bug Fixes:
+----------
+* Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367) (#8390) (9e00f694e) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 5.0.4 (2025-10-03)
 ==================
 
