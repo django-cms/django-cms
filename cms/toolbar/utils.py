@@ -13,6 +13,7 @@ from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
     get_language,
+    get_language_from_path,
     gettext,
     override as force_language,
 )
@@ -242,6 +243,8 @@ def get_object_edit_url(obj: models.Model, language: str = None) -> str:
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+        if not get_language_from_path(url):
+            url += f'?language={language}'
     if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
         url = add_live_url_querystring_param(obj, url, language)
     return url
@@ -262,6 +265,8 @@ def get_object_preview_url(obj: models.Model, language: str = None) -> str:
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+        if not get_language_from_path(url):
+            url += f'?language={language}'
     if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
         url = add_live_url_querystring_param(obj, url, language)
     return url
@@ -282,8 +287,10 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
-
+        url = admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+        if not get_language_from_path(url):
+            url += f'?language={language}'
+    return url
 
 def get_object_live_url(obj: models.Model, language: str = None, site: Optional[Site] = None) -> str:
     """

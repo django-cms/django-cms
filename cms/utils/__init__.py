@@ -60,7 +60,6 @@ def get_language_from_request(request: HttpRequest, current_page=None) -> str:
     if not language and request:
         # get the active language
         language = get_current_language()
-        request._cms_language = language
     if language:
         if language not in get_language_list(site_id):
             language = None
@@ -78,4 +77,5 @@ def get_language_from_request(request: HttpRequest, current_page=None) -> str:
         # best match
         language = get_default_language(site_id=site_id)
 
+    request._cms_language = language
     return language

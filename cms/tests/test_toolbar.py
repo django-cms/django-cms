@@ -1,5 +1,6 @@
 import datetime
 import re
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import iptools
@@ -2267,6 +2268,55 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
 
         self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
         self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
+
+    @patch('cms.toolbar.utils.get_cms_setting')
+    @patch('cms.toolbar.utils.get_language_from_path')
+    @patch('cms.toolbar.utils.admin_reverse')
+    @patch('cms.toolbar.utils.ContentType')
+    def test_get_object_edit_url_appends_language_if_no_i18n_prefix(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = '/admin/cms/placeholder/render/object/edit/1/'
+
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=42)
+
+        obj = SimpleNamespace(pk=1)
+        url = get_object_edit_url(obj, language='de')
+        self.assertIn('?language=de', url)
+
+    @patch('cms.toolbar.utils.get_cms_setting')
+    @patch('cms.toolbar.utils.get_language_from_path')
+    @patch('cms.toolbar.utils.admin_reverse')
+    @patch('cms.toolbar.utils.ContentType')
+    def test_get_object_preview_url_appends_language_if_no_i18n_prefix(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = '/admin/cms/placeholder/render/object/preview/1/'
+
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=99)
+
+        obj = SimpleNamespace(pk=2)
+        url = get_object_preview_url(obj, language='fr')
+        self.assertIn('?language=fr', url)
+
+    @patch('cms.toolbar.utils.get_language_from_path')
+    @patch('cms.toolbar.utils.admin_reverse')
+    @patch('cms.toolbar.utils.ContentType')
+    def test_get_object_structure_url_appends_language_if_no_i18n_prefix(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path
+    ):
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = '/admin/cms/placeholder/render/object/structure/1/'
+
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=7)
+
+        obj = SimpleNamespace(pk=3)
+        url = get_object_structure_url(obj, language='es')
+        self.assertIn('?language=es', url)
 
 
 class GetObjectLiveUrlTests(CMSTestCase):
