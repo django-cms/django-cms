@@ -125,8 +125,10 @@ def skip_if_permissions_disabled(func):
 def user_can_add_page(user, site=None):
     if site is None:
         import warnings
-        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+
         from django.contrib.sites.models import Site
+
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
         warnings.warn(
             "user_can_add_page() called without site. This may lead to unexpected behavior. "
@@ -480,8 +482,10 @@ def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
 def has_generic_permission(page, user, action, site=None, check_global=True, use_cache=True):
     if page is None and site is None:
         import warnings
-        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+
         from django.contrib.sites.models import Site
+
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
         warnings.warn(
             "has_generic_permission() called without site. This may lead to unexpected behavior. "

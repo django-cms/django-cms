@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.template.context import Context
-from django.utils import translation
 from django.test.utils import override_settings
+from django.utils import translation
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
