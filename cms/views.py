@@ -252,7 +252,7 @@ def render_object_structure(request, content_type_id, object_id):
 
     try:
         if issubclass(content_type.model_class(), PageContent):
-            content_type_obj = PageContent._base_manager.select_related("page").get(pk=object_id)
+            content_type_obj = PageContent._base_manager.select_related("page", "page__site").get(pk=object_id)
             request.current_page = content_type_obj.page
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -294,7 +294,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     try:
         if issubclass(model, PageContent):
             # An apphook might be attached to a PageContent object
-            content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
+            content_type_obj = model.admin_manager.select_related("page", "page__site").get(pk=object_id)
             request.current_page = content_type_obj.page
             if (
                 content_type_obj.page.application_urls and

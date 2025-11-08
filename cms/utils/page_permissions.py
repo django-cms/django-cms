@@ -270,7 +270,7 @@ def user_can_view_page(user, page, site=None):
     if site is None:
         from django.contrib.sites.models import Site
 
-        site = page.site
+        site = Site.objects._get_site_by_id(page.site_id)
 
     if user.is_superuser:
         return True
@@ -480,10 +480,9 @@ def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
 
 
 def has_generic_permission(page, user, action, site=None, check_global=True, use_cache=True):
+    from django.contrib.sites.models import Site
     if page is None and site is None:
         import warnings
-
-        from django.contrib.sites.models import Site
 
         from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
@@ -494,6 +493,8 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
             stacklevel=2,
         )
         site = Site.objects.get_current()
+    elif site is None:
+        site = Site.objects._get_site_by_id(page.site_id)
 
     page_path = page.path
     actions_map = {

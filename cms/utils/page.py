@@ -109,7 +109,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         .objects
         .get_for_site(site)
         .filter(path=path)
-        .select_related('page')
+        .select_related("page", "page__site")
     )
     page_urls = list(page_urls)  # force queryset evaluation to save 1 query
     try:
