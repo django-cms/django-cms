@@ -8,7 +8,6 @@ from sekizai.helpers import get_varname
 from cms.utils.encoder import SafeJSONEncoder
 from cms.utils.placeholder import rescan_placeholders_for_obj
 
-
 register = template.Library()
 
 
