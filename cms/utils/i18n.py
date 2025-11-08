@@ -117,6 +117,7 @@ def get_current_language():
             return lang
     return language_code
 
+
 def get_language_list(site_id=None):
     """
     :return: returns a list of iso2codes for this site

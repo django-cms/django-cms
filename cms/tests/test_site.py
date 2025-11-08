@@ -54,6 +54,7 @@ class SiteTestCase(CMSTestCase):
             # without param
             self.assertEqual(Page.objects.on_site().count(), 1)
 
+
 class GetCurrentSiteTests(CMSTestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -157,4 +158,3 @@ class GetSiteFromRequestWithMiddlewareTests(CMSTestCase):
             req.site = self.site_default
             site = get_site_from_request(req)
             self.assertEqual(site.pk, self.site_other.pk)
-

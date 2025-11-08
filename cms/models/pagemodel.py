@@ -5,7 +5,7 @@ from os.path import join
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.db import IntegrityError, models
-from django.db.models import F, Prefetch, Q
+from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import Concat
@@ -667,7 +667,7 @@ class Page(MP_Node):
         return self.get_descendants().order_by("path")
 
     def get_root(self):
-        return self.__class__.objects.get(path=self.path[0 : self.steplen])
+        return self.__class__.objects.get(path=self.path[0: self.steplen])
 
     def get_parent_page(self):
         warnings.warn(

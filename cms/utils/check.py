@@ -277,7 +277,6 @@ def check_context_processors(output):
                 section.success("%s context processor found" % processor)
 
 
-
 @define_check
 def check_plugin_instances(output):
     from cms.management.commands.subcommands.list import plugin_report

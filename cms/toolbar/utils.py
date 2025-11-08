@@ -189,7 +189,6 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin]
         return []  # do not deliver content if rendering fails
 
 
-
 def get_plugin_tree_ids(plugin: CMSPlugin) -> list[int]:
     plugin_ids = [plugin.pk]
     for child in plugin.child_plugin_instances or []:
@@ -291,6 +290,7 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
         if not get_language_from_path(url):
             url += f'?language={language}'
     return url
+
 
 def get_object_live_url(obj: models.Model, language: str = None, site: Optional[Site] = None) -> str:
     """

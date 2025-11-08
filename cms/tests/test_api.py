@@ -206,6 +206,7 @@ class PythonAPITests(CMSTestCase):
             new_page = create_page('child', 'nav_playground.html', 'en', parent=home_2)
             self.assertEqual(new_page.site_id, 2)
 
+
 class PythonAPIPluginTests(CMSTestCase):
 
     def setUp(self):

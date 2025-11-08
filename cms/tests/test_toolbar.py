@@ -2386,7 +2386,6 @@ class GetObjectLiveUrlTests(CMSTestCase):
         self.assertEqual(url, '/de/test-page/')
 
 
-
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
 
     def get_admin(self):

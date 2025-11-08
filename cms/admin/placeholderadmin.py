@@ -3,7 +3,6 @@ import uuid
 import warnings
 from urllib.parse import parse_qsl, urlparse
 
-from django import forms
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects

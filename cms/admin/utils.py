@@ -168,7 +168,6 @@ class GrouperChangeListBase(ChangeList):
     available_languages: tuple[tuple[str, str], ...] = ()
     _extra_grouping_fields: list[str] = []
 
-
     def get_filters_params(self, params: dict | None = None):
         lookup_params = super().get_filters_params(params)
         for field in self._extra_grouping_fields:
@@ -183,7 +182,7 @@ class GrouperModelAdminChecks(ModelAdminChecks):
         `field_name` is "content__title"."""
 
         if field_name.startswith(CONTENT_PREFIX) and obj.content_model:
-            field_name = field_name[len(CONTENT_PREFIX) :]
+            field_name = field_name[len(CONTENT_PREFIX):]
             obj = copy(obj)
             obj.model = obj.content_model
         return super()._check_prepopulated_fields_value_item(obj, field_name, label)
@@ -194,7 +193,7 @@ class GrouperModelAdminChecks(ModelAdminChecks):
         """
 
         if field_name.startswith(CONTENT_PREFIX) and obj.content_model:
-            field_name = field_name[len(CONTENT_PREFIX) :]
+            field_name = field_name[len(CONTENT_PREFIX):]
             obj = copy(obj)
             obj.model = obj.content_model
         return super()._check_prepopulated_fields_key(obj, field_name, label)
@@ -710,7 +709,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         grouper_search_fields = []
         for field_name in self.search_fields:
             if field_name.startswith(CONTENT_PREFIX):
-                content_search_fields.append(field_name[len(CONTENT_PREFIX) :])
+                content_search_fields.append(field_name[len(CONTENT_PREFIX):])
             else:
                 grouper_search_fields.append(field_name)
 

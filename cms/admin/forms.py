@@ -1,5 +1,3 @@
-import warnings
-
 from django import forms
 from django.apps import apps
 from django.contrib.auth import get_permission_codename, get_user_model

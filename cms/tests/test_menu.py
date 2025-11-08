@@ -1,6 +1,5 @@
 import copy
 
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
@@ -32,7 +31,6 @@ from cms.test_utils.project.sampleapp.cms_menus import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_default_language_for_site
 from menus.base import NavigationNode

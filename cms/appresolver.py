@@ -154,6 +154,7 @@ def _set_permissions(patterns, exclude_permissions):
             from cms.utils.decorators import cms_perms
             pattern.callback = cms_perms(pattern.callback)
 
+
 def _set_site_filter(patterns, site_id):
     for pattern in patterns:
         if isinstance(pattern, URLResolver):

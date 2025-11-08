@@ -1165,4 +1165,3 @@ class ApphooksSiteTestCase(BaseApphooksTestCase):
                 path = reverse(url_name)
                 match = resolve(path)
                 self.assertEqual(match.func.__name__, view_name)
-

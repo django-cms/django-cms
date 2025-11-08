@@ -6,10 +6,8 @@ from django.utils.safestring import mark_safe
 from sekizai.helpers import get_varname
 
 from cms.utils.encoder import SafeJSONEncoder
-from cms.utils.placeholder import (
-    get_declared_placeholders_for_obj,
-    rescan_placeholders_for_obj,
-)
+from cms.utils.placeholder import rescan_placeholders_for_obj
+
 
 register = template.Library()
 

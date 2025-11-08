@@ -123,7 +123,6 @@ class WizardTestMixin:
         self.site = Site.objects.get_current()
 
 
-
 class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
 
     def test_user_has_add_permission(self):

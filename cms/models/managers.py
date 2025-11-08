@@ -3,7 +3,6 @@ import functools
 import operator
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
 from treebeard.mp_tree import MP_NodeManager

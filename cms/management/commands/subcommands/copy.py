@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.management import CommandError
@@ -9,7 +8,6 @@ from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import EmptyPageContent, Page, PageContent, PageUrl
 from cms.utils import get_language_list
 from cms.utils.page import get_available_slug
-from cms.utils.plugins import copy_plugins_to_placeholder
 
 User = get_user_model()
 

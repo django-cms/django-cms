@@ -1,8 +1,7 @@
 from django.contrib.sites.models import Site
 from django.forms import IntegerField, ValidationError
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.utils.encoding import smart_str
-from django.utils.translation import gettext as _
 
 from cms.utils import get_current_site
 

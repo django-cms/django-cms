@@ -5,7 +5,6 @@ from cms.constants import GRANT_ALL_PERMISSIONS
 from cms.models import Page, PermissionTuple
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import _ensure_site_id
 from cms.utils.permissions import (
     cached_func,
     get_model_permission_codename,

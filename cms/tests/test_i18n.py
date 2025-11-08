@@ -610,7 +610,7 @@ class TestGetLanguageFromRequest(CMSTestCase):
                ('en', 'English'),
                ('de', 'German'),
                ('es', 'Spanish')),
-     SITE_ID=None,
+    SITE_ID=None,
 )
 class TestLanguagesWithoutSiteID(CMSTestCase):
     """
