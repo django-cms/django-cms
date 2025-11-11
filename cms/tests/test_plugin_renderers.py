@@ -279,9 +279,9 @@ class TestValidModelsFiltering(CMSTestCase):
     """
 
     def setUp(self):
-        from cms.test_utils.project.placeholderapp.models import Example1
         from cms.plugin_base import CMSPluginBase
         from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
 
         self.example = Example1.objects.create(
             char_1="ex1", char_2="ex2", char_3="ex3", char_4="ex4", publish=True
@@ -325,10 +325,10 @@ class TestValidModelsFiltering(CMSTestCase):
         self.assertIn(f'"placeholder_id": "{self.placeholder.pk}"', js)
 
     def test_get_placeholder_toolbar_js_pagecontent_valid_models(self):
+        from cms.api import create_page
         from cms.plugin_base import CMSPluginBase
         from cms.plugin_pool import plugin_pool
         from cms.plugin_rendering import ContentRenderer
-        from cms.api import create_page
 
         # Create a CMS page placeholder as source model cms.pagecontent
         cms_page = create_page("page", 'nav_playground.html', "en")
