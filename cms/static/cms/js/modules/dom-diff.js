@@ -1,3 +1,4 @@
+/* eslint-env browser */
 /*
  * Copyright https://github.com/django-cms/django-cms
  * Simple DOM diffing replacement using native browser APIs
@@ -50,7 +51,8 @@ export function nodeToObj(node) {
  */
 export class DiffDOM {
     constructor() {
-        this.parser = new DOMParser();
+        // Use window.DOMParser when available (avoids no-undef in lint) and allow fallback
+        this.parser = (typeof window !== 'undefined' && window.DOMParser) ? new window.DOMParser() : null;
     }
 
     /**
@@ -66,9 +68,17 @@ export class DiffDOM {
         let newNode;
 
         if (typeof newContent === 'string') {
-            // Parse HTML string
-            const doc = this.parser.parseFromString(newContent, 'text/html');
-            newNode = doc.body.firstChild || doc.head.firstChild;
+            // Parse HTML string (fallback if DOMParser unavailable)
+            if (this.parser) {
+                const doc = this.parser.parseFromString(newContent, 'text/html');
+
+                newNode = doc.body.firstChild || doc.head.firstChild;
+            } else if (typeof document !== 'undefined') {
+                const temp = document.createElement('div');
+
+                temp.innerHTML = newContent.trim();
+                newNode = temp.firstChild;
+            }
         } else if (typeof newContent === 'object' && newContent.nodeName) {
             // Convert object to DOM node
             newNode = this._objToNode(newContent);
@@ -141,6 +151,7 @@ export class DiffDOM {
         if (obj.childNodes) {
             for (const child of obj.childNodes) {
                 const childNode = this._objToNode(child);
+
                 if (childNode) {
                     node.appendChild(childNode);
                 }

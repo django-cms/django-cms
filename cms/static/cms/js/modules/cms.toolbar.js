@@ -16,7 +16,19 @@ var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
 
 export const getPlaceholderIds = pluginRegistry =>
-    Array.from(new Set((pluginRegistry || []).filter(([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id)));
+    Array.from(
+        new Set(
+            (pluginRegistry || [])
+                .map(entry => (Array.isArray(entry) ? entry[1] : null))
+                .filter(opts => (
+                    opts &&
+                    opts.type === 'placeholder' &&
+                    typeof opts.placeholder_id !== 'undefined' &&
+                    opts.placeholder_id !== null
+                ))
+                .map(opts => opts.placeholder_id)
+        )
+    );
 
 /**
  * @function hideDropdownIfRequired

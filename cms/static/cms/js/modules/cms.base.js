@@ -318,12 +318,12 @@ export const Helpers = {
 
         try {
             // Try to parse as absolute URL
-            // eslint-disable-next-line compat/compat, no-undef
+            // eslint-disable-next-line no-undef
             newUrl = new URL(decodedUrl);
             isAbsolute = true;
         } catch {
             // If relative, use window.location.origin as base
-            // eslint-disable-next-line compat/compat, no-undef
+            // eslint-disable-next-line no-undef
             newUrl = new URL(decodedUrl, window.location.origin);
         }
 

@@ -52,6 +52,7 @@
     "uuid": "^8.3.2",
     "watchpack": "^2.4.2",
     "webpack": "^5.102.1",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {

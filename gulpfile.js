@@ -344,17 +344,8 @@ const webpackBundleStats = function(opts) {
             if (err) {
                 throw new Error('webpack: ' + err);
             }
-            const statsJson = stats.toJson({
-                all: false,
-                assets: true,
-                chunks: true,
-                chunkRelations: true,
-                modules: true,
-                moduleAssets: true,
-                reasons: false,
-                source: false,
-                usedExports: true
-            });
+            // Generate a full stats JSON for maximum compatibility with analyzers
+            const statsJson = stats.toJson({ all: true });
             try {
                 fs.writeFileSync('webpack-stats.json', JSON.stringify(statsJson, null, 2));
                 log.success('Wrote webpack-stats.json');
@@ -366,6 +357,100 @@ const webpackBundleStats = function(opts) {
             }
         });
     };
+};
+
+// Analyze webpack-stats.json visually in the browser using webpack-bundle-analyzer
+const analyzeWebpackStatsServer = (done) => {
+    const statsFile = 'webpack-stats.json';
+    const { spawn } = require('child_process');
+
+    if (!fs.existsSync(statsFile)) {
+        log.error('webpack-stats.json not found. Run `gulp bundle:stats` or use the combined task `gulp bundle:analyze`.');
+        return done(new Error('webpack-stats.json not found'));
+    }
+
+    let analyzerCmd = 'webpack-bundle-analyzer';
+    try {
+        // Try to resolve to hint if package is missing
+        require.resolve('webpack-bundle-analyzer');
+    } catch (e) {
+        log.error('webpack-bundle-analyzer is not installed. Install it with:');
+        log.plain('  npm i -D webpack-bundle-analyzer');
+        return done(new Error('webpack-bundle-analyzer missing'));
+    }
+
+    const port = argv.port || '8888';
+    const host = argv.host || '127.0.0.1';
+    // webpack-bundle-analyzer uses --no-open (there is no --open flag)
+    const noOpenFlag = (argv.open === false || argv.noOpen) ? '--no-open' : '';
+    const defaultSizes = argv.sizes || 'parsed'; // stat | parsed | gzip
+
+    log.info(`Starting webpack-bundle-analyzer on http://${host}:${port} ...`);
+    const bundleDir = PROJECT_PATH.js + '/dist/' + CMS_VERSION + '/';
+    const proc = spawn('npx', [
+        analyzerCmd,
+        statsFile,
+        bundleDir,
+        '--mode', 'server',
+        '--host', host,
+        '--port', String(port),
+        '--default-sizes', String(defaultSizes),
+        noOpenFlag
+    ].filter(Boolean), {
+        stdio: 'inherit',
+        shell: true
+    });
+
+    proc.on('exit', (code) => {
+        if (code !== 0) {
+            done(new Error(`webpack-bundle-analyzer exited with code ${code}`));
+        } else {
+            done();
+        }
+    });
+};
+
+// Generate a static HTML report for the current webpack-stats.json
+const analyzeWebpackStatsStatic = (done) => {
+    const statsFile = 'webpack-stats.json';
+    const { spawn } = require('child_process');
+
+    if (!fs.existsSync(statsFile)) {
+        log.error('webpack-stats.json not found. Run `gulp bundle:stats` or use the combined task `gulp bundle:analyze:static`.');
+        return done(new Error('webpack-stats.json not found'));
+    }
+
+    try {
+        require.resolve('webpack-bundle-analyzer');
+    } catch (e) {
+        log.error('webpack-bundle-analyzer is not installed. Install it with:');
+        log.plain('  npm i -D webpack-bundle-analyzer');
+        return done(new Error('webpack-bundle-analyzer missing'));
+    }
+
+    const reportFile = argv.report || 'webpack-report.html';
+    const defaultSizes = argv.sizes || 'parsed';
+
+    log.info(`Generating static bundle analysis to ${reportFile} ...`);
+    const staticBundleDir = PROJECT_PATH.js + '/dist/' + CMS_VERSION + '/';
+    const proc = require('child_process').spawn('npx', [
+        'webpack-bundle-analyzer',
+        statsFile,
+        staticBundleDir,
+        '--mode', 'static',
+        '--report', reportFile,
+        '--default-sizes', String(defaultSizes),
+        '--no-open'
+    ], { stdio: 'inherit', shell: true });
+
+    proc.on('exit', (code) => {
+        if (code !== 0) {
+            done(new Error(`webpack-bundle-analyzer (static) exited with code ${code}`));
+        } else {
+            log.success(`✓ Wrote ${reportFile}`);
+            done();
+        }
+    });
 };
 
 const watchFiles = () => {
@@ -380,6 +465,10 @@ gulp.task("lint", lint);
 gulp.task('watch', gulp.parallel(watchFiles));
 gulp.task('bundle', webpackBundle());
 gulp.task('bundle:stats', webpackBundleStats());
+// Build + open interactive analyzer (server mode)
+gulp.task('bundle:analyze', gulp.series(webpackBundleStats(), analyzeWebpackStatsServer));
+// Build + generate a static HTML report (no server needed)
+gulp.task('bundle:analyze:static', gulp.series(webpackBundleStats(), analyzeWebpackStatsStatic));
 gulp.task('unitTest', unitTest);
 gulp.task('testsIntegration',testsIntegration);
 gulp.task('tests', gulp.series(unitTest, testsIntegration));

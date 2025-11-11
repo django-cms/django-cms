@@ -1953,8 +1953,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         var html = '';
 
         if (clipboardDraggable.length) {
-            pluginData = find(
-                CMS._plugins,
+            pluginData = CMS._plugins.find(
                 ([desc]) => desc === `cms-plugin-${CMS.API.StructureBoard.getId(clipboardDraggable)}`
             )[1];
             html = clipboardDraggable.parent().html();
