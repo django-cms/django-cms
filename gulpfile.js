@@ -472,5 +472,5 @@ gulp.task('bundle:analyze', gulp.series(webpackBundleStats(), analyzeWebpackStat
 // Build + generate a static HTML report (no server needed)
 gulp.task('bundle:analyze:static', gulp.series(webpackBundleStats(), analyzeWebpackStatsStatic));
 gulp.task('unitTest', unitTest);
-gulp.task('testsIntegration',testsIntegration);
+gulp.task('testsIntegration', testsIntegration);
 gulp.task('tests', gulp.series(unitTest, testsIntegration));

@@ -22,10 +22,13 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   // Reporter to use
   reporter: 'html',
-  // Shared settings for all the projects below
+    /* Use maxFailures if you want the run to stop after the first test failure */
+  // maxFailures: process.env.CI ? 1 : undefined,
+
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    // Base URL to use in actions like `await page.goto('/')`
-    baseURL: process.env.BASE_URL || 'http://localhost:8000',
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    baseURL: process.env.BASE_URL || 'http://localhost:9009',
     // Collect trace when retrying the failed test
     trace: 'on-first-retry',
     // Screenshot on failure
@@ -53,14 +56,16 @@ module.exports = defineConfig({
     //   name: 'webkit',
     //   use: { ...devices['Desktop Safari'] },
     // },
-  ],
+  ]
 
-  // Run your local dev server before starting the tests
-  // Uncomment if you want Playwright to start the Django server automatically
+  /* Run your local dev server before starting the tests */
+  /* NOTE: Disabled - use `gulp testsIntegration` instead which manages the testserver */
   // webServer: {
-  //   command: 'python manage.py runserver',
+  //   command: 'python testserver.py --port=8000',
   //   url: 'http://localhost:8000',
   //   reuseExistingServer: !process.env.CI,
   //   timeout: 120 * 1000,
+  //   stdout: 'pipe',
+  //   stderr: 'pipe',
   // },
 });
