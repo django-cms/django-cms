@@ -278,7 +278,7 @@ var Sideframe = new Class({
                     window.CMS.settings = Helpers.setSettings(window.CMS.settings);
                     iframeUrl = currentUrl;
                 }
-            } catch (e) {}
+            } catch {}
         }, 100); // eslint-disable-line
 
         // clear the frame (removes all the handlers)

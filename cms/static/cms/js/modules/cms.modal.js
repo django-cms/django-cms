@@ -397,7 +397,7 @@ class Modal {
         keyboard.setContext(previousKeyboardContext);
         try {
             previouslyFocusedElement.focus();
-        } catch (e) {}
+        } catch {}
     }
 
     /**
@@ -751,7 +751,7 @@ class Modal {
 
             var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
-            // eslint-disable-next-line complexity
+
             el.on(that.click + ' ' + that.touchEnd, function(e) {
                 e.preventDefault();
 
@@ -799,7 +799,7 @@ class Modal {
                             // will and calling frm.submit() would throw NS_ERROR_UNEXPECTED
                             try {
                                 frm.submit();
-                            } catch (err) {}
+                            } catch {}
                         }
                     }
                 }
@@ -886,7 +886,7 @@ class Modal {
             try {
                 contents = iframe.contents();
                 body = contents.find('body');
-            } catch (error) {
+            } catch {
                 CMS.API.Messages.open({
                     message: '<strong>' + CMS.config.lang.errorLoadingEditForm + '</strong>',
                     error: true,
@@ -1019,7 +1019,7 @@ class Modal {
                         try {
                             CMS.API.Helpers.dataBridge = JSON.parse(dataBridge.textContent);
                             CMS.API.Helpers.onPluginSave();
-                        } catch (e) {
+                        } catch {
                             // istanbul ignore next
                             Helpers.reloadBrowser();
                         }
@@ -1082,7 +1082,7 @@ class Modal {
                         return;
                     }
                     iframe.trigger('focus');
-                }, 0); // eslint-disable-line
+                }, 0);
             }
 
             that._attachContentPreservingHandlers(iframe);

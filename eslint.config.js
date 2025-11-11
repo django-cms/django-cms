@@ -5,6 +5,14 @@ const js = require('@eslint/js');
 module.exports = [
     js.configs.recommended,
     {
+        ignores: [
+            'cms/tests/frontend/integration/**/*.js',
+            'cms/tests/frontend/integration/**/*.spec.js',
+            'cms/static/cms/js/dist/**/*.js',
+            'cms/static/cms/js/libs/**/*.js'
+        ]
+    },
+    {
         files: ['**/*.js'],
         languageOptions: {
             ecmaVersion: 2020,
@@ -37,6 +45,7 @@ module.exports = [
                 alert: 'readonly',
                 confirm: 'readonly',
                 prompt: 'readonly',
+                Image: 'readonly',
 
                 // jQuery
                 $: 'readonly',
@@ -46,6 +55,7 @@ module.exports = [
                 jasmine: 'readonly',
                 describe: 'readonly',
                 it: 'readonly',
+                xit: 'readonly',
                 expect: 'readonly',
                 beforeEach: 'readonly',
                 afterEach: 'readonly',
@@ -180,7 +190,7 @@ module.exports = [
             'no-undef-init': 'error',
             'no-undef': 'error',
             'no-undefined': 'off',
-            'no-unused-vars': 'error',
+            'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
             'no-use-before-define': 'error',
 
             // Stylistic Issues
@@ -270,7 +280,8 @@ module.exports = [
             'max-nested-callbacks': ['error', 8],
             'newline-after-var': 'off',
             'strict': 'off',
-            'require-jsdoc': 'off'
+            'no-redeclare': 'off',
+            'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }]
         }
     }
 ];

@@ -88,7 +88,7 @@ export const Helpers = {
      * @param {Number} timeout=0 timeout in ms
      * @returns {void}
      */
-    // eslint-disable-next-line max-params
+
     reloadBrowser: function(url, timeout) {
         var that = this;
         // is there a parent window?
@@ -356,7 +356,7 @@ export const Helpers = {
             localStorage.setItem(mod, mod);
             localStorage.removeItem(mod);
             return true;
-        } catch (e) {
+        } catch {
             // istanbul ignore next
             return false;
         }

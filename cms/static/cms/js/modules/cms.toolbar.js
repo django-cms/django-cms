@@ -181,6 +181,7 @@ var Toolbar = new Class({
             // remove events from first level
             navigation
                 .find('a')
+                // eslint-disable-next-line complexity
                 .on(that.click + ' ' + that.key, function(e) {
                     var el = $(this);
 
@@ -273,6 +274,7 @@ var Toolbar = new Class({
 
             // attach hover
             lists
+                // eslint-disable-next-line complexity
                 .on(that.pointerOverOut + ' keyup.cms.toolbar', 'li', function(e) {
                     var el = $(this);
                     var parent = el

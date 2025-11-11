@@ -1,4 +1,4 @@
-/* global CMS, gettext */
+/* global gettext */
 import $ from 'jquery';
 import addSlugHandlers from './slug';
 

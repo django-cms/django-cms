@@ -15,11 +15,11 @@ export default function tmpl(str, data) {
     var fn = !/\W/.test(str)
         ? (cache[str] = cache[str] || tmpl(document.getElementById(str).innerHTML))
         : // Generate a reusable function that will serve as a template
-          // generator (and which will be cached).
-          // eslint-disable-next-line
+    // generator (and which will be cached).
+    // eslint-disable-next-line
           new Function(
-              'obj',
-              'var p=[],print=function (){p.push.apply(p,arguments);};' +
+            'obj',
+            'var p=[],print=function (){p.push.apply(p,arguments);};' +
                   // Introduce the data as local variables using with(){}
                   "with(obj){p.push('" +
                   // Convert the template into pure JavaScript
@@ -36,7 +36,7 @@ export default function tmpl(str, data) {
                       .split('\r')
                       .join("\\'") +
                   "');}return p.join('');"
-          );
+        );
 
     // Provide some basic currying to the user
     return data ? fn(data) : fn;

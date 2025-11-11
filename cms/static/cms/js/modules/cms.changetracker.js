@@ -41,7 +41,7 @@ var ChangeTracker = new Class({
                 .find('.change-form form')
                 .find('input, textarea, select')
                 .on('change.cms.tracker keydown.cms.tracker', this._trackChange.bind(this));
-        } catch (e) {
+        } catch {
             // there can be cases when the iframe contents don't exist
         }
     },

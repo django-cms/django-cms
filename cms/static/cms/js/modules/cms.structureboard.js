@@ -4,7 +4,6 @@
 
 /* eslint-env es6 */
 /* jshint esversion: 6 */
-/* global CMS */
 
 import $ from 'jquery';
 import keyboard from './keyboard';
@@ -40,7 +39,7 @@ const triggerWindowResize = () => {
 
         evt.initUIEvent('resize', true, false, window, 0);
         window.dispatchEvent(evt);
-    } catch (e) {}
+    } catch {}
 };
 
 const arrayEquals = (a1, a2) => every(zip(a1, a2), ([a, b]) => a === b);
@@ -147,7 +146,7 @@ class StructureBoard {
 
         // check if modes should be visible
         if (this.ui.dragareas.not('.cms-clipboard .cms-dragarea').length || this.ui.placeholders.length) {
-            // eslint-disable-line
+
             this.ui.toolbarModeSwitcher.find('.cms-btn').removeClass('cms-btn-disabled');
         }
 
@@ -279,7 +278,7 @@ class StructureBoard {
         if (options.useHoveredPlugin && CMS.settings.mode !== 'structure') {
             that._showAndHighlightPlugin(options.successTimeout).then($.noop, $.noop);
         } else if (!options.useHoveredPlugin) {
-            // eslint-disable-next-line no-lonely-if
+
             if (CMS.settings.mode === 'structure') {
                 that.hide();
             } else if (CMS.settings.mode === 'edit') {
@@ -395,7 +394,7 @@ class StructureBoard {
                 CMS.settings.states = Helpers.getSettings().states;
 
                 const bodyRegex = /<body[\S\s]*?>([\S\s]*)<\/body>/gi;
-                const body = document.createElement('div');  // Switch to plain JS due to problem with $(body)
+                const body = document.createElement('div'); // Switch to plain JS due to problem with $(body)
 
                 body.innerHTML = bodyRegex.exec(contentMarkup)[1];
 
@@ -507,7 +506,7 @@ class StructureBoard {
                         !elem.is('.cms#cms-top') && !elem.is('[data-cms]:not([data-cms-generic])') // toolbar
                     ); // cms scripts
                 });
-                body.find('[data-cms]:not([data-cms-generic])').remove();  // cms scripts
+                body.find('[data-cms]:not([data-cms-generic])').remove(); // cms scripts
 
                 [].slice.call(bodyAttributes).forEach(function(attr) {
                     bodyElement.attr(attr.name, attr.value);
@@ -948,7 +947,7 @@ class StructureBoard {
      */
     // eslint-disable-next-line complexity
     invalidateState(action, data, { propagate = true } = {}) {
-        // eslint-disable-next-line default-case
+
 
         // By default, any edit action will result in changed content and therefore a need for an update
         let updateNeeded = true;
@@ -956,11 +955,11 @@ class StructureBoard {
         switch (action) {
             case 'COPY': {
                 this.handleCopyPlugin(data);
-                updateNeeded = false;  // Copying, however, only changes the clipboard - no update needed
+                updateNeeded = false; // Copying, however, only changes the clipboard - no update needed
                 break;
             }
 
-             // For other actions, only refresh, if the new state cannot be determined from the data bridge
+            // For other actions, only refresh, if the new state cannot be determined from the data bridge
             case 'ADD': {
                 updateNeeded = this.handleAddPlugin(data);
                 break;
@@ -1017,12 +1016,12 @@ class StructureBoard {
 
             if (this._loadedContent && updateNeeded) {
                 this.updateContent();
-                return;  // Toolbar loaded
+                return; // Toolbar loaded
             }
         } else if (updateNeeded === true) {
             this._requestcontent = null;
             this.updateContent();
-            return;  // Toolbar loaded
+            return; // Toolbar loaded
 
         }
         this._loadToolbar()
@@ -1116,11 +1115,11 @@ class StructureBoard {
             return true;
         }
         if (data.source_placeholder_id && !CMS._instances.some(
-                instance => instance.options.type === 'plugin' &&
-                instance.options.placeholder_id == data.source_placeholder_id  // eslint-disable-line eqeqeq
+            instance => instance.options.type === 'plugin' &&
+                instance.options.placeholder_id == data.source_placeholder_id // eslint-disable-line eqeqeq
         )) {
             // If last plugin was moved from a placeholder, the placeholder needs to be updated
-            return true;  // Update needed
+            return true; // Update needed
         }
 
         for (const content of data.content) {
@@ -1141,7 +1140,7 @@ class StructureBoard {
         let nextEl = $(`div.cms-placeholder.cms-placeholder-${placeholder_id}`);
         const nextPlugins = CMS._instances.filter(instance =>
             instance.options.type === 'plugin' &&
-            instance.options.placeholder_id == placeholder_id &&  // eslint-disable-line eqeqeq
+            instance.options.placeholder_id == placeholder_id && // eslint-disable-line eqeqeq
             instance.options.position >= position &&
             !excludedPlugins.includes(1 * instance.options.plugin_id));
 
@@ -1336,7 +1335,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return true;  // update needed
+        return true; // update needed
     }
 
     handleCutPlugin(data) {
@@ -1465,7 +1464,7 @@ class StructureBoard {
     handleDeletePlugin(data) {
         const { placeholder_id } = CMS._instances.find(
             // data.plugin_id might be string
-            plugin => plugin && plugin.options.plugin_id == data.plugin_id  // eslint-disable-line eqeqeq
+            plugin => plugin && plugin.options.plugin_id == data.plugin_id // eslint-disable-line eqeqeq
         ).options;
         const draggable = $('.cms-draggable-' + data.plugin_id);
         const children = draggable.find('.cms-draggable');
@@ -1484,13 +1483,13 @@ class StructureBoard {
 
         StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
         StructureBoard.actualizePlaceholders();
-        const contentData = (data.structure || data);  // delete has content in data.structure, cut in data
+        const contentData = (data.structure || data); // delete has content in data.structure, cut in data
 
         deletedPluginIds.forEach(function(pluginId) {
             if (!contentData.content) {
-                $(`.cms-plugin.cms-plugin-${pluginId}`).remove();  // Remove from content
+                $(`.cms-plugin.cms-plugin-${pluginId}`).remove(); // Remove from content
             }
-            $(`script[data-cms-plugin]#cms-plugin-${pluginId}`).remove();  // Remove script elements
+            $(`script[data-cms-plugin]#cms-plugin-${pluginId}`).remove(); // Remove script elements
             remove(CMS._plugins, settings => settings[0] === `cms-plugin-${pluginId}`);
             remove(
                 CMS._instances,
@@ -1499,7 +1498,7 @@ class StructureBoard {
         });
 
         const lastPluginDeleted = CMS._instances.find(
-            plugin => plugin.options.placeholder_id == placeholder_id  // eslint-disable-line eqeqeq
+            plugin => plugin.options.placeholder_id == placeholder_id // eslint-disable-line eqeqeq
         ) === undefined;
 
         return lastPluginDeleted || contentData.content && this._updateContentFromDataBridge(contentData);
@@ -1761,7 +1760,7 @@ class StructureBoard {
                 if (pluginData) {
                     try {
                         settings = JSON.parse(pluginData.textContent);
-                    } catch (e) {
+                    } catch {
                         settings = false;
                     }
                 } else {

@@ -55,7 +55,7 @@ CMS.$(function () {
     // this is a globally shared configuration
     try {
         CMS.config = CMS.config || JSON.parse(document.getElementById('cms-config-json').textContent || '{}');
-    } catch (e) {
+    } catch {
         CMS.config = CMS.config || {};
     }
     CMS.settings = CMS.API.Helpers.getSettings();

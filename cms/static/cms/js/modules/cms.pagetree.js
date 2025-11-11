@@ -341,10 +341,10 @@ var PageTree = new Class({
                 var column = $(data.data.origin.element);
 
                 var hover = ins.settings.dnd.large_drop_target ?
-                                $(data.event.target)
-                                    .closest('.jstree-node') :
-                                $(data.event.target)
-                                    .closest('.jstree-anchor').parent();
+                    $(data.event.target)
+                        .closest('.jstree-node') :
+                    $(data.event.target)
+                        .closest('.jstree-anchor').parent();
 
                 var width = root.width() - (column.width() - hover.width());
 
@@ -910,7 +910,7 @@ var PageTree = new Class({
             }
             try {
                 window.top.CMS.API.Toolbar.showLoader();
-            } catch (err) {}
+            } catch {}
 
             $.ajax({
                 method: 'post',
@@ -919,7 +919,7 @@ var PageTree = new Class({
                 .done(function() {
                     try {
                         window.top.CMS.API.Toolbar.hideLoader();
-                    } catch (err) {}
+                    } catch {}
 
                     if (window.self === window.top) {
                         // simply reload the page
@@ -931,7 +931,7 @@ var PageTree = new Class({
                 .fail(function(error) {
                     try {
                         window.top.CMS.API.Toolbar.hideLoader();
-                    } catch (err) {}
+                    } catch {}
                     that.showError(error.responseText ? error.responseText : error.statusText);
                 });
         });

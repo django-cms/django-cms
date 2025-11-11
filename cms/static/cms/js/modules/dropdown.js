@@ -6,8 +6,8 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
-/* eslint-disable complexity, semi, no-param-reassign, no-magic-numbers, require-jsdoc, curly, wrap-regex, eqeqeq,
-    new-cap, no-multi-spaces, no-bitwise, no-extra-parens */
+/* eslint-disable complexity, semi, no-param-reassign, no-magic-numbers, curly, eqeqeq,
+    new-cap, no-multi-spaces, no-bitwise */
 // modified for cms purposes - event names, parent resolutions, class names
 import $ from 'jquery';
 

@@ -337,7 +337,7 @@ var Plugin = new Class({
                     if (CMS.API.StructureBoard.dragging) {
                         return;
                     }
-                    // eslint-disable-next-line no-magic-numbers
+
                     Plugin._highlightPluginContent(this.options.plugin_id, { successTimeout: 0, seeThrough: true });
                 })
                 .on('mouseleave', e => {
@@ -345,7 +345,7 @@ var Plugin = new Class({
                         return;
                     }
                     e.stopPropagation();
-                    // eslint-disable-next-line no-magic-numbers
+
                     Plugin._removeHighlightPluginContent(this.options.plugin_id);
                 });
             // attach event to the plugin menu
@@ -390,7 +390,7 @@ var Plugin = new Class({
                 e.stopPropagation();
                 $('.cms-dragitem-success').remove();
                 $('.cms-draggable-success').removeClass('cms-draggable-success');
-                CMS.API.StructureBoard._showAndHighlightPlugin(0, true); // eslint-disable-line no-magic-numbers
+                CMS.API.StructureBoard._showAndHighlightPlugin(0, true);
             })
             .off('mouseout.cms.plugins')
             .on('mouseout.cms.plugins', e => {
@@ -635,7 +635,7 @@ var Plugin = new Class({
      * @param {String} source_language
      * @returns {Boolean|void}
      */
-    // eslint-disable-next-line complexity
+
     copyPlugin: function(opts, source_language) {
         // cancel request if already in progress
         if (CMS.API.locked) {
@@ -855,7 +855,7 @@ var Plugin = new Class({
         });
     },
 
-     /**
+    /**
      * Changes the settings attributes on an initialised plugin.
      *
      * @method _setSettings
@@ -1177,7 +1177,7 @@ var Plugin = new Class({
                 } else {
                     // only one plugin available, no need to show the modal
                     // instead directly add the single plugin
-                    const el = possibleChildClasses.find('a');  // only one result
+                    const el = possibleChildClasses.find('a'); // only one result
                     const pluginType = el.attr('href').replace('#', '');
                     const showAddForm = el.data('addForm');
                     const parentId = that._getId(nav.closest('.cms-draggable'));
@@ -1392,14 +1392,15 @@ var Plugin = new Class({
 
         // set switch for subnav entries
         switch (el.attr('data-rel')) {
-            // eslint-disable-next-line no-case-declarations
-            case 'add':
+
+            case 'add': {
                 const pluginType = el.attr('href').replace('#', '');
                 const showAddForm = el.data('addForm');
 
                 Plugin._updateUsageCount(pluginType);
                 that.addPlugin(pluginType, el.text(), el.closest('.cms-plugin-picker').data('parentId'), showAddForm);
                 break;
+            }
             case 'ajax_add':
                 CMS.API.Toolbar.openAjax({
                     url: el.attr('href'),
@@ -1444,7 +1445,7 @@ var Plugin = new Class({
                 break;
             case 'highlight':
                 hideLoader();
-                // eslint-disable-next-line no-magic-numbers
+
                 window.location.hash = `cms-plugin-${this.options.plugin_id}`;
                 Plugin._highlightPluginContent(this.options.plugin_id, { seeThrough: true });
                 e.stopImmediatePropagation();
@@ -1978,7 +1979,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
                 try {
                     $('.cms-plugin:hover').last().trigger('mouseenter');
                     $('.cms-dragitem:hover').last().trigger('mouseenter');
-                } catch (err) {}
+                } catch {}
             }
         })
         .on(Plugin.keyUp, function(e) {
@@ -1986,7 +1987,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
                 $document.data('expandmode', false);
                 try {
                     $(':hover').trigger('mouseleave');
-                } catch (err) {}
+                } catch {}
             }
         })
         .on(Plugin.click, '.cms-plugin a, a:has(.cms-plugin), a.cms-plugin', function(e) {
@@ -2105,7 +2106,7 @@ Plugin._isContainingMultiplePlugins = function _isContainingMultiplePlugins(node
  * @static
  * @param {jQuery} el draggable element
  */
-// eslint-disable-next-line no-magic-numbers
+
 Plugin._highlightPluginStructure = function _highlightPluginStructure(
     el,
     // eslint-disable-next-line no-magic-numbers
@@ -2138,9 +2139,9 @@ Plugin._highlightPluginStructure = function _highlightPluginStructure(
  * @static
  * @param {String|Number} pluginId
  */
+/* eslint-disable complexity, no-magic-numbers */
 Plugin._highlightPluginContent = function _highlightPluginContent(
     pluginId,
-    // eslint-disable-next-line no-magic-numbers
     { successTimeout = 200, seeThrough = false, delay = 1500, prominent = false } = {}
 ) {
     var coordinates = {};
@@ -2232,7 +2233,7 @@ Plugin._clickToHighlightHandler = function _clickToHighlightHandler() {
         return;
     }
     // FIXME refactor into an object
-    CMS.API.StructureBoard._showAndHighlightPlugin(200, true); // eslint-disable-line no-magic-numbers
+    CMS.API.StructureBoard._showAndHighlightPlugin(200, true);
 };
 
 Plugin._removeHighlightPluginContent = function(pluginId) {
@@ -2262,6 +2263,7 @@ Plugin._initializeTree = function _initializeTree() {
     // return the cms plugin instances just created
     return CMS._instances;
 };
+/* eslint-enable complexity, no-magic-numbers */
 
 Plugin._updateClipboard = function _updateClipboard() {
     clipboardDraggable = $('.cms-draggable-from-clipboard:first');

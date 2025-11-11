@@ -160,6 +160,7 @@ class Navigation {
      * @method _handleResize
      * @private
      */
+    // eslint-disable-next-line complexity
     _handleResize() {
         var remainingWidth;
         var availableWidth = this._calculateAvailableWidth();
