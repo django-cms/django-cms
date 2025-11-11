@@ -3,7 +3,6 @@
  * Multiple helpers used across all CMS features
  */
 import $ from 'jquery';
-import URL from 'urijs';
 import { once, debounce, throttle } from 'lodash';
 import { showLoader, hideLoader } from './loader';
 
@@ -309,18 +308,42 @@ export const Helpers = {
      * @param {Array[]} [params] array of [`param`, `value`] arrays to update the url
      * @returns {String}
      */
-    makeURL: function makeURL(url, params = []) {
-        let newUrl = new URL(URL.decode(url.replace(/&amp;/g, '&')));
+    makeURL: function makeURL(url, params) {
+        params = params || [];
+        // Decode URL and replace &amp; with &
+        const decodedUrl = decodeURIComponent(url.replace(/&amp;/g, '&'));
+        let newUrl;
+        let isAbsolute = false;
+        let hadLeadingSlash = decodedUrl.startsWith('/');
 
-        params.forEach(pair => {
-            const [key, value] = pair;
+        try {
+            // Try to parse as absolute URL
+            newUrl = new URL(decodedUrl);
+            isAbsolute = true;
+        } catch (e) {
+            // If relative, use window.location.origin as base
+            newUrl = new URL(decodedUrl, window.location.origin);
+        }
 
-            newUrl.removeSearch(key);
-            newUrl.addSearch(key, value);
+        params.forEach(function(pair) {
+            var key = pair[0];
+            var value = pair[1];
+
+            newUrl.searchParams.delete(key);
+            newUrl.searchParams.set(key, value);
         });
 
-        return newUrl
-            .toString();
+        // Return full URL if input was absolute, otherwise return relative path
+        if (isAbsolute) {
+            return newUrl.toString();
+        }
+
+        let result = newUrl.pathname + newUrl.search + newUrl.hash;
+        // Remove leading slash if original URL didn't have one
+        if (!hadLeadingSlash && result.startsWith('/')) {
+            result = result.substring(1);
+        }
+        return result;
     },
 
     /**

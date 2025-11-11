@@ -3,7 +3,6 @@
  */
 
 import $ from 'jquery';
-import URL from 'urijs';
 
 import Class from 'classjs';
 import { Helpers, KEYS } from './cms.base';
@@ -89,10 +88,11 @@ var PageTree = new Class({
         this.ui.languagesSelect.on('change', () => {
             const newLanguage = this.ui.languagesSelect.val();
 
-            const url = new URL(window.location.href).removeSearch('language')
-                .addSearch('language', newLanguage).toString();
+            const url = new URL(window.location.href);
+            url.searchParams.delete('language');
+            url.searchParams.set('language', newLanguage);
 
-            window.location.href = url;
+            window.location.href = url.toString();
         });
     },
 
