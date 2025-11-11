@@ -81,6 +81,18 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 
         if "get_extra_plugin_menu_items" in attrs:
             new_plugin._has_extra_plugin_menu_items = True
+
+        # Normalize valid_models entries to lowercase (app_label.model)
+        # to allow case-insensitive configuration such as "cms.PageContent".
+        # ContentType.app_label and .model are lowercase, so we match that.
+        valid_models = getattr(new_plugin, "valid_models", None)
+        if valid_models is not None:
+            # Accept any iterable (list/tuple/set) or a single string
+            if isinstance(valid_models, (list, tuple, set)):
+                new_plugin.valid_models = [str(item).lower() for item in valid_models]
+            else:
+                # Coerce single value into list
+                new_plugin.valid_models = [str(valid_models).lower()]
         return new_plugin
 
 
