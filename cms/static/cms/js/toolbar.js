@@ -46,7 +46,10 @@ CMS.KEYS = KEYS;
 CMS.$ = $;
 CMS.Class = Class;
 
-window.CMS = CMS;
+// Expose CMS globally for backwards compatibility
+if (typeof window !== 'undefined') {
+    window.CMS = CMS;
+}
 
 CMS.$(function () {
     // this is a globally shared configuration
@@ -70,3 +73,4 @@ CMS.$(function () {
     CMS.Plugin._initializeTree();
 });
 
+export default CMS;

@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
+var TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = function(opts) {
     'use strict';
@@ -13,15 +14,41 @@ module.exports = function(opts) {
     }
 
     var baseConfig = {
+        mode: debug ? 'development' : 'production',
+        target: ['web', 'es5'],
         devtool: false,
         watch: !!opts.watch,
         entry: {
             // CMS frontend
-            toolbar: PROJECT_PATH.js + '/toolbar.js',
+            toolbar: {
+                import: PROJECT_PATH.js + '/toolbar.js',
+                library: {
+                    name: 'CMS',
+                    type: 'window',
+                    export: 'default'
+                }
+            },
             // CMS admin
-            'admin.base': PROJECT_PATH.js + '/admin.base.js',
-            'admin.pagetree': PROJECT_PATH.js + '/admin.pagetree.js',
-            'admin.changeform': PROJECT_PATH.js + '/admin.changeform.js',
+            'admin.base': {
+                import: PROJECT_PATH.js + '/admin.base.js',
+                library: {
+                    name: 'CMS',
+                    type: 'window',
+                    export: 'default'
+                }
+            },
+            'admin.pagetree': {
+                import: PROJECT_PATH.js + '/admin.pagetree.js',
+                dependOn: 'admin.base'
+            },
+            'admin.changeform': {
+                import: PROJECT_PATH.js + '/admin.changeform.js',
+                library: {
+                    name: 'CMS',
+                    type: 'window',
+                    export: 'default'
+                }
+            },
             // CMS widgets
             // they will load the on-demand bundle called admin.widget
             'forms.pageselectwidget': PROJECT_PATH.js + '/widgets/forms.pageselectwidget.js',
@@ -33,21 +60,24 @@ module.exports = function(opts) {
             path: PROJECT_PATH.js + '/dist/' + CMS_VERSION + '/',
             filename: 'bundle.[name].min.js',
             chunkFilename: 'bundle.[name].min.js',
-            jsonpFunction: 'cmsWebpackJsonp'
+            publicPath: '/static/cms/js/dist/' + CMS_VERSION + '/',
+            scriptType: 'text/javascript',
+            globalObject: 'window'
         },
-        plugins: [
-            // this way admin.pagetree bundle won't
-            // include deps already required in admin.base bundle
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'admin.base',
-                chunks: ['admin.pagetree', 'admin.changeform']
-            })
-        ],
+        optimization: {
+            runtimeChunk: false,
+            splitChunks: false,
+            minimizer: []
+        },
+        plugins: [],
         resolve: {
             alias: {
                 jquery: PROJECT_PATH.js + '/libs/jquery.min.js',
                 classjs: PROJECT_PATH.js + '/libs/class.min.js',
                 jstree: PROJECT_PATH.js + '/libs/jstree/jstree.min.js'
+            },
+            fallback: {
+                path: false
             }
         },
         module: {
@@ -67,12 +97,32 @@ module.exports = function(opts) {
                     include: path.join(__dirname, 'cms')
                 },
                 {
-                    test: /(modules\/jquery|libs\/pep|select2\/select2)/,
+                    test: /libs\/pep/,
                     use: [
                         {
                             loader: 'imports-loader',
                             options: {
-                                jQuery: 'jquery'
+                                wrapper: {
+                                    thisArg: 'window',
+                                    args: {
+                                        module: false,
+                                        exports: false
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    test: /(modules\/jquery|select2\/select2)/,
+                    use: [
+                        {
+                            loader: 'imports-loader',
+                            options: {
+                                imports: {
+                                    moduleName: 'jquery',
+                                    name: 'jQuery'
+                                }
                             }
                         }
                     ]
@@ -83,18 +133,15 @@ module.exports = function(opts) {
                         {
                             loader: 'exports-loader',
                             options: {
-                                Class: true
+                                type: 'commonjs',
+                                exports: 'single Class'
                             }
                         }
                     ]
                 },
                 {
                     test: /.html$/,
-                    use: [
-                        {
-                            loader: 'raw-loader'
-                        }
-                    ]
+                    type: 'asset/source'
                 }
             ]
         },
@@ -102,9 +149,8 @@ module.exports = function(opts) {
     };
 
     if (debug) {
-        baseConfig.devtool = 'cheap-module-eval-source-map';
+        baseConfig.devtool = 'cheap-module-source-map';
         baseConfig.plugins = baseConfig.plugins.concat([
-            new webpack.NoEmitOnErrorsPlugin(),
             new webpack.DefinePlugin({
                 __DEV__: 'true',
                 __CMS_VERSION__: JSON.stringify(CMS_VERSION)
@@ -115,15 +161,21 @@ module.exports = function(opts) {
             new webpack.DefinePlugin({
                 __DEV__: 'false',
                 __CMS_VERSION__: JSON.stringify(CMS_VERSION)
-            }),
-            new webpack.optimize.ModuleConcatenationPlugin(),
-            new webpack.optimize.UglifyJsPlugin({
-                comments: false,
-                compressor: {
-                    drop_console: true // eslint-disable-line
-                }
             })
         ]);
+        baseConfig.optimization.minimizer.push(
+            new TerserPlugin({
+                terserOptions: {
+                    compress: {
+                        drop_console: true
+                    },
+                    format: {
+                        comments: false
+                    }
+                },
+                extractComments: false
+            })
+        );
     }
 
     return baseConfig;

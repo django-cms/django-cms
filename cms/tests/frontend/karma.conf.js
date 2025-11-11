@@ -22,17 +22,6 @@ var webpackConfig = require('../../../webpack.config.js')({
     debug: true
 });
 
-webpackConfig.module.rules.splice(1, 0, {
-    test: /cms\/js\/modules\/(?!jquery).*.js$/,
-    use: [{
-        loader: 'istanbul-instrumenter-loader',
-        query: {
-            esModules: true,
-            noCompact: true
-        }
-    }]
-});
-
 var files = ['*'];
 if (argv && argv.tests) {
     files = argv.tests.split(',');
@@ -126,11 +115,16 @@ module.exports = function (config) {
         reporters: ['dots', 'coverage', 'saucelabs'].concat(process.env.CI ? ['coveralls'] : []),
 
         webpack: {
+            mode: 'development',
             cache: true,
             devtool: 'inline-source-map',
             resolve: webpackConfig.resolve,
             plugins: webpackConfig.plugins,
-            module: webpackConfig.module
+            module: webpackConfig.module,
+            optimization: {
+                splitChunks: false,
+                runtimeChunk: false
+            }
         },
 
         // web server port

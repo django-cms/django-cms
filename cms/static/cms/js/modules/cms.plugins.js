@@ -12,7 +12,6 @@ import { toPairs, filter, isNaN, debounce, findIndex, find, every, uniqWith, onc
 import Class from 'classjs';
 import { Helpers, KEYS, $window, $document, uid } from './cms.base';
 import { showLoader, hideLoader } from './loader';
-import { filter as fuzzyFilter } from 'fuzzaldrin';
 
 var clipboardDraggable;
 var path = window.location.pathname + window.location.search;
@@ -1553,20 +1552,17 @@ var Plugin = new Class({
 
         mostRecentItems = mostRecentItems.add(mostRecentItems.nextUntil('.cms-submenu-item-title'));
 
-        var itemsToFilter = items.toArray().map(function(el) {
-            var element = $(el);
-
-            return {
-                value: element.text(),
-                element: element
-            };
-        });
-
-        var filteredItems = fuzzyFilter(itemsToFilter, query, { key: 'value' });
+        // Simple case-insensitive substring matching (replaces fuzzyFilter)
+        var queryLower = query.toLowerCase();
 
         items.hide();
-        filteredItems.forEach(function(item) {
-            item.element.show();
+        items.each(function() {
+            var item = $(this);
+            var text = item.text().toLowerCase();
+
+            if (text.indexOf(queryLower) !== -1) {
+                item.show();
+            }
         });
 
         // check if a title is matching

@@ -15,6 +15,11 @@ const CMS = {
     KEYS
 };
 
-window.CMS = CMS;
+// expose to browser
+if (typeof window !== 'undefined') {
+    window.CMS = CMS;
+}
 
 import './modules/cms.changeform';
+
+export default CMS;
