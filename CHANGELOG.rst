@@ -1,17 +1,26 @@
+5.0.5 (2025-11-12)
+==================
+
 Bug Fixes:
 ----------
+* Pin language of toolbar update to the request language
 * Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367) (#8390) (9e00f694e) -- Fabian Braun
+* Copying x-language lead to unique constraint violation (#8366) (#8386)
+* Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8384)
+* Set default value for edit_fields parameter to avoid AttributeError (#8381)
+* Link syntax in welcome.html
+* Searching pages for language-specific content failed due to wrong serach queryset (#8355) (#8358)
 
 Statistics:
 -----------
 
 This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
+* Fabian Braun (7 pull requests)
 
 With the review help of the following contributors:
 
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 

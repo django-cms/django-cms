@@ -4,9 +4,9 @@
 5.0.5 release notes
 ###################
 
-*October 3, 2025*
+*November 12, 2025*
 
-Welcome to django CMS 5.0.4!
+Welcome to django CMS 5.0.5!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you'll want to be aware of when upgrading from
@@ -17,10 +17,10 @@ features.
 Django and Python compatibility
 *******************************
 
-django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
+django CMS supports **Django 4.2, 5.0, 5.1, 5.2, and 6.0**. We highly recommend and only
 support the latest release of each series.
 
-It supports **Python 3.10, 3.11, 3.12, and 3.13**. As for Django we highly recommend and only
+It supports **Python 3.10, 3.11, 3.12, 3.13**. As for Django we highly recommend and only
 support the latest release of each series.
 
 ***********************
@@ -53,14 +53,20 @@ What's new in 5.0.5
 Bug Fixes:
 ----------
 
-* Wrong placeholders rendered when using apphooks with own placeholders (#8343) (#8348) -- Fabian Braun
+* Pin language of toolbar update to the request language
+* Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367) (#8390) (9e00f694e) -- Fabian Braun
+* Copying x-language lead to unique constraint violation (#8366) (#8386)
+* Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8384)
+* Set default value for edit_fields parameter to avoid AttributeError (#8381)
+* Link syntax in welcome.html
+* Searching pages for language-specific content failed due to wrong serach queryset (#8355) (#8358)
 
 Statistics:
 -----------
 
-This release includes 1 pull request, and was created with the help of the following contributors (in alphabetical order):
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
+* Fabian Braun (7 pull requests)
 
 With the review help of the following contributors:
 
