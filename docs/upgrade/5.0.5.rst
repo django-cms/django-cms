@@ -59,7 +59,7 @@ Bug Fixes:
 * Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8384)
 * Set default value for edit_fields parameter to avoid AttributeError (#8381)
 * Link syntax in welcome.html
-* Searching pages for language-specific content failed due to wrong serach queryset (#8355) (#8358)
+* Searching pages for language-specific content failed due to wrong search queryset (#8355) (#8358)
 
 Statistics:
 -----------
