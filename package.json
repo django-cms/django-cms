@@ -43,6 +43,7 @@
     "karma-sauce-launcher": "^4.3.6",
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "^5.0.1",
+    "license-webpack-plugin": "^4.0.2",
     "minimist": "^1.2.8",
     "puppeteer": "^24.29.1",
     "raw-loader": "^4.0.2",
@@ -55,7 +56,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
-    "diff-dom": "^5.1.4",
     "keyboardjs": "^2.7.0",
     "local-storage": "^2.0.0",
     "lodash": "4.17.21",

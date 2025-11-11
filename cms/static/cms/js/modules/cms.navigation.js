@@ -1,9 +1,9 @@
 /*
- * Copyright https://github.com/divio/django-cms
+ * Copyright https://github.com/django-cms/django-cms
  */
 
 import $ from 'jquery';
-import { throttle } from 'lodash';
+import throttle from 'lodash-es/throttle.js';
 
 /**
  * Responsible for creating usable navigation for narrow screens.

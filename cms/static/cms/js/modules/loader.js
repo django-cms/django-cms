@@ -1,5 +1,5 @@
 import Nprogress from 'nprogress';
-import { debounce } from 'lodash';
+import debounce from 'lodash-es/debounce.js';
 
 Nprogress.configure({
     showSpinner: false,

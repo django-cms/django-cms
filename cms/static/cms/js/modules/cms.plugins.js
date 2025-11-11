@@ -4,10 +4,13 @@
 import Modal from './cms.modal';
 import StructureBoard from './cms.structureboard';
 import $ from 'jquery';
-import '../polyfills/array.prototype.findindex';
 import nextUntil from './nextuntil';
 
-import { toPairs, filter, isNaN, debounce, findIndex, find, every, uniqWith, once, difference, isEqual } from 'lodash';
+import debounce from 'lodash-es/debounce.js';
+import uniqWith from 'lodash-es/uniqWith.js';
+import once from 'lodash-es/once.js';
+import difference from 'lodash-es/difference.js';
+import isEqual from 'lodash-es/isEqual.js';
 
 import Class from 'classjs';
 import { Helpers, KEYS, $window, $document, uid } from './cms.base';
@@ -1201,7 +1204,7 @@ var Plugin = new Class({
     _updateWithMostUsedPlugins: function _updateWithMostUsedPlugins(plugins) {
         const items = plugins.find('.cms-submenu-item');
         // eslint-disable-next-line no-unused-vars
-        const mostUsedPlugins = toPairs(pluginUsageMap).sort(([x, a], [y, b]) => a - b).reverse();
+        const mostUsedPlugins = Object.entries(pluginUsageMap).sort(([x, a], [y, b]) => a - b).reverse();
         const MAX_MOST_USED_PLUGINS = 5;
         let count = 0;
 
@@ -1673,9 +1676,8 @@ var Plugin = new Class({
 
         const openedPlugins = CMS.settings.states;
         const closedPlugins = difference(pluginsOfCurrentPlaceholder, openedPlugins);
-        const areAllRemainingPluginsLeafs = every(closedPlugins, id => {
-            return !find(
-                CMS._plugins,
+        const areAllRemainingPluginsLeafs = closedPlugins.every(id => {
+            return !CMS._plugins.find(
                 ([, o]) => o.placeholder_id === this.options.placeholder_id && o.plugin_parent === id
             );
         });
@@ -1887,7 +1889,7 @@ Plugin.touchEnd = 'touchend.cms.plugin';
 Plugin._updateRegistry = function _updateRegistry(plugins) {
     plugins.forEach(pluginData => {
         const pluginContainer = `cms-plugin-${pluginData.plugin_id}`;
-        const pluginIndex = findIndex(CMS._plugins, ([pluginStr]) => pluginStr === pluginContainer);
+        const pluginIndex = CMS._plugins.findIndex(([pluginStr]) => pluginStr === pluginContainer);
 
         if (pluginIndex === -1) {
             CMS._plugins.push([pluginContainer, pluginData]);
@@ -2162,16 +2164,16 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
             return;
         }
 
-        if (isNaN(ml)) {
+        if (Number.isNaN(ml)) {
             ml = 0;
         }
-        if (isNaN(mr)) {
+        if (Number.isNaN(mr)) {
             mr = 0;
         }
-        if (isNaN(mt)) {
+        if (Number.isNaN(mt)) {
             mt = 0;
         }
-        if (isNaN(mb)) {
+        if (Number.isNaN(mb)) {
             mb = 0;
         }
 
@@ -2315,8 +2317,7 @@ Plugin._refreshPlugins = function refreshPlugins() {
 
     CMS._plugins.forEach(([type, opts]) => {
         if (opts.type !== 'placeholder' && opts.type !== 'plugin') {
-            const instance = find(
-                CMS._instances,
+            const instance = CMS._instances.find(
                 i => i.options.type === opts.type && Number(i.options.plugin_id) === Number(opts.plugin_id)
             );
 
@@ -2335,7 +2336,7 @@ Plugin._refreshPlugins = function refreshPlugins() {
 };
 
 Plugin._getPluginById = function(id) {
-    return find(CMS._instances, ({ options }) => options.type === 'plugin' && Number(options.plugin_id) === Number(id));
+    return CMS._instances.find(({ options }) => options.type === 'plugin' && Number(options.plugin_id) === Number(id));
 };
 
 Plugin._updatePluginPositions = function(placeholder_id) {
@@ -2359,7 +2360,7 @@ Plugin._recalculatePluginPositions = function(action, data) {
     if (action === 'MOVE') {
         // le sigh - recalculate all placeholders cause we don't know from where the
         // plugin was moved from
-        filter(CMS._instances, ({ options }) => options.type === 'placeholder')
+        CMS._instances.filter(({ options }) => options.type === 'placeholder')
             .map(({ options }) => options.placeholder_id)
             .forEach(placeholder_id => Plugin._updatePluginPositions(placeholder_id));
     } else if (data.placeholder_id) {

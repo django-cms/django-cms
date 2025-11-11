@@ -330,6 +330,44 @@ const webpackBundle = function(opts) {
     };
 };
 
+// Build bundles and write detailed webpack stats to a JSON file for analysis
+const webpackBundleStats = function(opts) {
+    const webpackOptions = opts || {};
+    webpackOptions.PROJECT_PATH = PROJECT_PATH;
+    webpackOptions.debug = options.debug;
+    webpackOptions.CMS_VERSION = CMS_VERSION;
+
+    return function(done) {
+        const config = require('./webpack.config')(webpackOptions);
+
+        webpack(config, function(err, stats) {
+            if (err) {
+                throw new Error('webpack: ' + err);
+            }
+            const statsJson = stats.toJson({
+                all: false,
+                assets: true,
+                chunks: true,
+                chunkRelations: true,
+                modules: true,
+                moduleAssets: true,
+                reasons: false,
+                source: false,
+                usedExports: true
+            });
+            try {
+                fs.writeFileSync('webpack-stats.json', JSON.stringify(statsJson, null, 2));
+                log.success('Wrote webpack-stats.json');
+            } catch (e) {
+                log.error('Failed to write webpack-stats.json: ' + e.message);
+            }
+            if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
+                done();
+            }
+        });
+    };
+};
+
 const watchFiles = () => {
     browserSync.init();
     gulp.watch(PROJECT_PATTERNS.sass, css);
@@ -341,6 +379,7 @@ gulp.task("icons", icons);
 gulp.task("lint", lint);
 gulp.task('watch', gulp.parallel(watchFiles));
 gulp.task('bundle', webpackBundle());
+gulp.task('bundle:stats', webpackBundleStats());
 gulp.task('unitTest', unitTest);
 gulp.task('testsIntegration',testsIntegration);
 gulp.task('tests', gulp.series(unitTest, testsIntegration));

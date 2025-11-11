@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
 var TerserPlugin = require('terser-webpack-plugin');
+var LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
 
 module.exports = function(opts) {
     'use strict';
@@ -69,7 +70,19 @@ module.exports = function(opts) {
             splitChunks: false,
             minimizer: []
         },
-        plugins: [],
+        plugins: [
+            new LicenseWebpackPlugin({
+                outputFilename: 'licenses.txt',
+                perChunkOutput: false,
+                addBanner: false,
+                renderLicenses: (modules) => {
+                    return modules.map(module => {
+                        const licenseText = module.licenseText || 'License text not found';
+                        return `Package: ${module.packageJson.name || module.name}\nVersion: ${module.packageJson.version || 'N/A'}\nLicense: ${module.packageJson.license || 'N/A'}\n\n${licenseText}\n\n${'='.repeat(80)}\n`;
+                    }).join('\n');
+                }
+            })
+        ],
         resolve: {
             alias: {
                 jquery: PROJECT_PATH.js + '/libs/jquery.min.js',

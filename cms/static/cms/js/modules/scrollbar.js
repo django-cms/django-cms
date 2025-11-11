@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { memoize } from 'lodash';
+import memoize from 'lodash-es/memoize.js';
 
 export default memoize(function measure() {
     var scrollDiv = document.createElement('div');

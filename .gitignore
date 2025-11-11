@@ -48,6 +48,8 @@ cms/tests/frontend/coverage
 node_modules
 screenshots
 .idea
+# Webpack
+webpack-stats.json
 # Playwright
 /test-results/
 /playwright-report/

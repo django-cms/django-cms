@@ -6,7 +6,7 @@
 
 import $ from 'jquery';
 import Class from 'classjs';
-import { once } from 'lodash';
+import once from 'lodash-es/once.js';
 
 /**
  * The tooltip is the element which shows over plugins

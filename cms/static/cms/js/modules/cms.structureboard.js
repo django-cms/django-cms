@@ -10,9 +10,12 @@ import keyboard from './keyboard';
 import Plugin from './cms.plugins';
 import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
-import { DiffDOM, nodeToObj } from 'diff-dom';
+import { DiffDOM, nodeToObj } from './dom-diff';
 import PreventParentScroll from 'prevent-parent-scroll';
-import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
+import once from 'lodash-es/once.js';
+import remove from 'lodash-es/remove.js';
+import isEqual from 'lodash-es/isEqual.js';
+import zip from 'lodash-es/zip.js';
 import ls from 'local-storage';
 
 import './jquery.ui.custom';
@@ -42,7 +45,7 @@ const triggerWindowResize = () => {
     } catch {}
 };
 
-const arrayEquals = (a1, a2) => every(zip(a1, a2), ([a, b]) => a === b);
+const arrayEquals = (a1, a2) => zip(a1, a2).every(([a, b]) => a === b);
 
 /**
  * Handles drag & drop, mode switching and collapsables.
@@ -1242,9 +1245,8 @@ class StructureBoard {
 
             // external update, have to move the draggable to correct place first
             if (!draggable.closest('.cms-draggables').parent().is(`.cms-dragarea-${data.placeholder_id}`)) {
-                const pluginOrder = data.plugin_order;
-                const index = findIndex(
-                    pluginOrder,
+                const pluginOrder = data.plugin_order || [];
+                const index = pluginOrder.findIndex(
                     pluginId => Number(pluginId) === Number(data.plugin_id) || pluginId === '__COPY__'
                 );
                 const placeholderDraggables = $(`.cms-dragarea-${data.placeholder_id} > .cms-draggables`);
@@ -1270,9 +1272,8 @@ class StructureBoard {
 
                 if (!arrayEquals(actualPluginOrder, data.plugin_order)) {
                     // so the plugin order is not correct, means it's an external update and we need to move
-                    const pluginOrder = data.plugin_order;
-                    const index = findIndex(
-                        pluginOrder,
+                    const pluginOrder = data.plugin_order || [];
+                    const index = pluginOrder.findIndex(
                         pluginId => Number(pluginId) === Number(data.plugin_id)
                     );
 
@@ -1357,19 +1358,17 @@ class StructureBoard {
         if (messages.length) {
             messageList.remove();
 
-            return compact(
-                messages.toArray().map(el => {
-                    const msgEl = $(el);
-                    const message = $(el).text().trim();
+            return messages.toArray().map(el => {
+                const msgEl = $(el);
+                const message = $(el).text().trim();
 
-                    if (message) {
-                        return {
-                            message,
-                            error: msgEl.data('cms-message-tags') === 'error' || msgEl.hasClass('error')
-                        };
-                    }
-                })
-            );
+                if (message) {
+                    return {
+                        message,
+                        error: msgEl.data('cms-message-tags') === 'error' || msgEl.hasClass('error')
+                    };
+                }
+            }).filter(Boolean);
         }
 
         return [];
@@ -1583,7 +1582,7 @@ class StructureBoard {
      */
     static actualizePluginCollapseStatus(pluginId) {
         const el = $(`.cms-draggable-${pluginId}`);
-        const open = find(CMS.settings.states, openPluginId => Number(openPluginId) === Number(pluginId));
+        const open = (CMS.settings.states || []).find(openPluginId => Number(openPluginId) === Number(pluginId));
 
         // only add this class to elements which have a draggable area
         // istanbul ignore else
@@ -1752,24 +1751,22 @@ class StructureBoard {
      * @returns {Array<[String, Object]>}
      */
     static _getPluginDataFromMarkup(body, pluginIds) {
-        return compact(
-            pluginIds.map(pluginId => {
-                const pluginData = body.querySelector(`#cms-plugin-${pluginId}`);
-                let settings;
+        return pluginIds.map(pluginId => {
+            const pluginData = body.querySelector(`#cms-plugin-${pluginId}`);
+            let settings;
 
-                if (pluginData) {
-                    try {
-                        settings = JSON.parse(pluginData.textContent);
-                    } catch {
-                        settings = false;
-                    }
-                } else {
+            if (pluginData) {
+                try {
+                    settings = JSON.parse(pluginData.textContent);
+                } catch {
                     settings = false;
                 }
+            } else {
+                settings = false;
+            }
 
-                return settings;
-            })
-        );
+            return settings;
+        }).filter(Boolean);
     }
 
 }

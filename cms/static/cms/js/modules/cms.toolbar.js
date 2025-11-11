@@ -8,7 +8,7 @@ import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import Plugin from './cms.plugins';
-import { filter, throttle, uniq } from 'lodash';
+import throttle from 'lodash-es/throttle.js';
 import { showLoader, hideLoader } from './loader';
 import { Helpers, KEYS } from './cms.base';
 
@@ -16,7 +16,7 @@ var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
 
 export const getPlaceholderIds = pluginRegistry =>
-    uniq(filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id));
+    Array.from(new Set((pluginRegistry || []).filter(([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id)));
 
 /**
  * @function hideDropdownIfRequired
