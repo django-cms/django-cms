@@ -11,7 +11,6 @@ import Plugin from './cms.plugins';
 import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
 import { DiffDOM, nodeToObj } from './dom-diff';
-import PreventParentScroll from 'prevent-parent-scroll';
 import once from 'lodash-es/once.js';
 import remove from 'lodash-es/remove.js';
 import isEqual from 'lodash-es/isEqual.js';
@@ -111,8 +110,6 @@ class StructureBoard {
             toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
             toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
         };
-
-        this._preventScroll = new PreventParentScroll(this.ui.content[0]);
     }
 
     /**
@@ -654,7 +651,6 @@ class StructureBoard {
             this._makeFullWidth();
         }
 
-        this._preventScroll.start();
         this.ui.window.trigger('resize');
     }
 
@@ -702,7 +698,6 @@ class StructureBoard {
     _hideBoard() {
         // hide elements
         this.ui.container.hide();
-        this._preventScroll.stop();
 
         // this is sometimes required for user-side scripts to
         // render dynamic elements on the page correctly.

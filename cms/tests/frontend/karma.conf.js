@@ -57,7 +57,7 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine', 'fixture'],
+        frameworks: ['webpack', 'jasmine', 'fixture'],
 
         // list of files / patterns to load in the browser
         files: [
@@ -120,11 +120,7 @@ module.exports = function (config) {
             devtool: 'inline-source-map',
             resolve: webpackConfig.resolve,
             plugins: webpackConfig.plugins,
-            module: webpackConfig.module,
-            optimization: {
-                splitChunks: false,
-                runtimeChunk: false
-            }
+            module: webpackConfig.module
         },
 
         // web server port

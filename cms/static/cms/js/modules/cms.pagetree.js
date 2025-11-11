@@ -8,7 +8,9 @@ import Class from 'classjs';
 import { Helpers, KEYS } from './cms.base';
 import PageTreeDropdowns from './cms.pagetree.dropdown';
 import PageTreeStickyHeader from './cms.pagetree.stickyheader';
-import { debounce, without } from 'lodash';
+// switched from commonjs 'lodash' bundle to per-method ESM imports for better tree-shaking
+import debounce from 'lodash-es/debounce.js';
+import without from 'lodash-es/without.js';
 
 import 'jstree';
 import '../libs/jstree/jstree.grid.min';

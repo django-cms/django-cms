@@ -45,6 +45,9 @@
     .cms-structure-content {
         position: relative;
         overflow-y: scroll;
+        // Prevent scroll chaining to parent when reaching scroll limits
+        // Replaces the prevent-parent-scroll JavaScript library
+        overscroll-behavior: contain;
         top: 0;
         left: 0;
         padding: $toolbar-height 5%;

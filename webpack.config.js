@@ -87,7 +87,9 @@ module.exports = function(opts) {
             alias: {
                 jquery: PROJECT_PATH.js + '/libs/jquery.min.js',
                 classjs: PROJECT_PATH.js + '/libs/class.min.js',
-                jstree: PROJECT_PATH.js + '/libs/jstree/jstree.min.js'
+                jstree: PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
+                // Use ES6 entry point for keyboardjs instead of UMD dist
+                keyboardjs: 'keyboardjs/index.js'
             },
             fallback: {
                 path: false

@@ -6,11 +6,7 @@
     ],
     "plugins": ["@babel/plugin-transform-runtime"],
     "env": {
-        "production": {
-            "plugins": [
-                "lodash"
-            ]
-        },
+        "production": {},
         "test": {
             "presets": [
                 ["@babel/preset-env", {

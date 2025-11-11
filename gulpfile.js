@@ -14,7 +14,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const minifyCss = require('gulp-clean-css');
 const eslint = require('gulp-eslint-new');
 const webpack = require('webpack');
-const KarmaServer = require('karma').Server;
+const { Server: KarmaServer, config: karmaConfig } = require('karma');
 
 // Logging utilities to replace gulp-util
 const log = {
@@ -179,20 +179,25 @@ const lint = () => {
   );
 };
 
-const unitTest = (done) => {
-    return (
-        new KarmaServer({
-            configFile: PROJECT_PATH.tests + '/karma.conf.js',
-            singleRun: true
-        }, (exitCode) => {
-        if (exitCode !== 0) {
-            done(new Error(`Karma tests failed with exit code ${exitCode}`));
-            process.exit(exitCode);
-        } else {
-            done();
-        }
-    }).start()
-    );
+const unitTest = async (done) => {
+    try {
+        const parsedConfig = await karmaConfig.parseConfig(
+            PROJECT_PATH.tests + '/karma.conf.js',
+            { singleRun: true },
+            { promiseConfig: true, throwErrors: true }
+        );
+        const server = new KarmaServer(parsedConfig, (exitCode) => {
+            if (exitCode !== 0) {
+                done(new Error(`Karma tests failed with exit code ${exitCode}`));
+                process.exit(exitCode);
+            } else {
+                done();
+            }
+        });
+        server.start();
+    } catch (error) {
+        done(error);
+    }
 };
 
 const testsIntegration = (done) => {

@@ -1,5 +1,4 @@
 import keyboard from 'keyboardjs';
-import $ from 'jquery';
 
 /**
  * @function override
@@ -16,12 +15,32 @@ function override(originalFunction, functionBuilder) {
 }
 
 /**
+ * Check if the currently focused element is an input field
+ * @returns {boolean}
+ */
+function isInputFocused() {
+    const activeElement = document.activeElement;
+
+    if (!activeElement) {
+        return false;
+    }
+
+    const tagName = activeElement.tagName.toLowerCase();
+    const isContentEditable = activeElement.contentEditable === 'true';
+
+    return tagName === 'input' ||
+           tagName === 'textarea' ||
+           tagName === 'select' ||
+           isContentEditable;
+}
+
+/**
  * Override keyboardjs methods to disallow running callbacks
  * if input is focused
  */
 keyboard._applyBindings = override(keyboard._applyBindings, function(originalBind) {
     return function(event) {
-        if ($(':focus').is('input, textarea, select, [contenteditable]')) {
+        if (isInputFocused()) {
             return true;
         }
 

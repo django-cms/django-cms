@@ -3,7 +3,10 @@
  * Multiple helpers used across all CMS features
  */
 import $ from 'jquery';
-import { once, debounce, throttle } from 'lodash';
+// switched from commonjs 'lodash' bundle to per-method ESM imports for better tree-shaking
+import once from 'lodash-es/once.js';
+import debounce from 'lodash-es/debounce.js';
+import throttle from 'lodash-es/throttle.js';
 import { showLoader, hideLoader } from './loader';
 
 var _CMS = {
