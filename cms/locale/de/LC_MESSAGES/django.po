@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # djangoger <thomas.meitz@retailify.de>, 2023
 # Alexander Elvers <transifex@alex.kandru.de>, 2023
@@ -84,15 +84,15 @@ msgstr "Ob diese Seite von anderen Websites eingebunden werden kann."
 
 #: admin/forms.py:570
 msgid "URL options"
-msgstr "URL Optionen"
+msgstr "URL-Optionen"
 
 #: admin/forms.py:577
 msgid "Menu options"
-msgstr "Menu Optionen"
+msgstr "Menü-Optionen"
 
 #: admin/forms.py:584
 msgid "Headers"
-msgstr ""
+msgstr "Headers"
 
 #: admin/forms.py:712
 msgid "Application"
@@ -104,7 +104,7 @@ msgstr "Schließen Sie Applikationen an diese Seite an."
 
 #: admin/forms.py:720
 msgid "Application configurations"
-msgstr "Applikations Konfiguration"
+msgstr "Applikationskonfiguration"
 
 #: admin/forms.py:798
 msgid "A page with this reverse URL id exists already."
@@ -112,11 +112,11 @@ msgstr "Eine andere Seite mit dieser Reverse-URL-ID ist bereits vorhanden."
 
 #: admin/forms.py:817 admin/forms.py:823
 msgid "Invalid application config value"
-msgstr "Ungültiger Anwendungskonfigurationswert"
+msgstr "Ungültiger Applikationskonfigurationswert"
 
 #: admin/forms.py:830
 msgid "An application instance using this configuration already exists."
-msgstr "Eine Applikation-Instanz mit dieser Konfiguration existiert bereits."
+msgstr "Eine Applikationsinstanz mit dieser Konfiguration existiert bereits."
 
 #: admin/forms.py:838 admin/forms.py:849
 msgid "An application instance with this name already exists."
@@ -130,7 +130,7 @@ msgstr "Die Startseite kann nicht in ein andere Seite verschoben werden"
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
-msgstr ""
+msgstr "Es können nicht zwei Seiten mit demselben Slug auf derselben Ebene existieren. Bitte ändern Sie den Slug einer der Seiten, bevor Sie erneut versuchen zu verschieben."
 
 #: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:87
@@ -309,17 +309,17 @@ msgstr "Datenbankfehler"
 
 #: admin/pageadmin.py:1192
 msgid "Template not valid"
-msgstr "Template ist ungültig"
+msgstr "Vorlage ist ungültig"
 
 #: admin/pageadmin.py:1200
 msgid "The template was successfully changed"
-msgstr "Das Template wurde erfolgreich geändert"
+msgstr "Die Vorlage wurde erfolgreich geändert"
 
 #: admin/pageadmin.py:1227 admin/placeholderadmin.py:507
 #: admin/placeholderadmin.py:511 admin/placeholderadmin.py:578
 #: admin/placeholderadmin.py:582
 msgid "You do not have permission to copy these plugins."
-msgstr "Sie haben keine Berechtigung, diesen Baustein zu kopieren."
+msgstr "Sie haben keine Berechtigung, diese Bausteine zu kopieren."
 
 #: admin/pageadmin.py:1236
 msgid "You do not have permission to delete this page"
@@ -526,7 +526,7 @@ msgstr "Benutzeranleitung"
 
 #: cms_toolbars.py:79
 msgid "Discord community"
-msgstr ""
+msgstr "Discord-Community"
 
 #: cms_toolbars.py:80
 msgid "What's new"
@@ -987,7 +987,7 @@ msgstr ""
 
 #: models/pagemodel.py:120
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "Diese Seite als Seitentyp markieren"
 
 #: models/pagemodel.py:134
 msgid "pages"
@@ -995,7 +995,7 @@ msgstr "Seiten"
 
 #: models/pagemodel.py:153
 msgid "No available title"
-msgstr ""
+msgstr "Kein Titel verfügbar"
 
 #: models/pagemodel.py:1096
 msgid "slug"
@@ -1307,7 +1307,7 @@ msgstr "Speichern und weiter bearbeiten"
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie %(object_name)s „%(escaped_object)s“ löschen möchten? Alle der folgenden verknüpften Objekte werden gelöscht:"
 
 #: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
@@ -1584,11 +1584,11 @@ msgstr "Applikation: %(apphook)s"
 
 #: templates/admin/cms/page/tree/menu.html:118
 msgid "in menu"
-msgstr "Im Menu"
+msgstr "Im Menü"
 
 #: templates/admin/cms/page/tree/menu.html:123
 msgid "not in menu"
-msgstr "Nicht im Menu"
+msgstr "Nicht im Menü"
 
 #: templates/admin/cms/page/tree/menu.html:140
 #: templates/admin/cms/page/tree/menu.html:151
@@ -1601,7 +1601,7 @@ msgstr "Seiten-Berechtigungen"
 
 #: templates/cms/headless/placeholder.html:17
 msgid "inherited"
-msgstr ""
+msgstr "geerbt"
 
 #: templates/cms/noapphook.html:18
 #: templates/cms/toolbar/toolbar_with_structure.html:90
@@ -1794,7 +1794,7 @@ msgstr "Strukturmodus umschalten und angewählten Baustein hervorheben."
 
 #: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Open \\"
-msgstr ""
+msgstr "Öffnen"
 
 #: templates/cms/toolbar/toolbar_javascript.html:66
 msgid "Focus on Toolbar"
@@ -1862,11 +1862,11 @@ msgstr "Baustein hier fallen lassen"
 #: templates/cms/welcome.html:26
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "Version %(cms_version)s"
 
 #: templates/cms/welcome.html:30
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "Lassen Sie uns gemeinsam etwas Großartiges bauen!"
 
 #: templates/cms/welcome.html:32
 msgid "Please log in"
@@ -1877,7 +1877,9 @@ msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
-msgstr ""
+msgstr "\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Erstellen Sie Ihre erste Seite</a>\n"
+"            "
 
 #: templates/cms/welcome.html:43
 msgid ""
@@ -1892,7 +1894,17 @@ msgid ""
 "                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n"
+"                    <h2>Finanzierung unterstützen</h2>\n"
+"                    <p>\n"
+"                        Ihre Unterstützung kommt dem Produkt direkt zugute, vor allem durch das\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Eine schnelle Möglichkeit für Sie oder Ihre Organisation zu spenden ist über\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">GitHub Sponsors</a>.\n"
+"                    </p>\n"
+"                "
 
 #: templates/cms/welcome.html:56
 msgid ""
@@ -1907,7 +1919,17 @@ msgid ""
 "                        organisation</a>.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n"
+"                    <h2>Mach mit</h2>\n"
+"                    <p>\n"
+"                        Die django CMS Association ist eine gemeinnützige Organisation, die die Entwicklung von\n"
+"                        django CMS finanziert und lenkt.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Sie können <a href=\"https://www.django-cms.org/en/memberships/\">als Einzelperson oder als\n"
+"                        Organisation beitreten</a>.\n"
+"                    </p>\n"
+"                "
 
 #: templates/cms/welcome.html:69
 msgid ""
@@ -1922,7 +1944,17 @@ msgid ""
 "                            Make the ecosystem strong.</li>\n"
 "                    </ul>\n"
 "                "
-msgstr ""
+msgstr "\n"
+"                    <h2>Mitwirken</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Code beitragen:</a> einen Fehler beheben\n"
+"                            oder ein neues Feature umsetzen!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Ehrenamtlich engagieren:</a>\n"
+"                            Wir bieten ein motiviertes und effizientes Team!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Mach deine Arbeit Open Source:</a>\n"
+"                            Stärke das Ökosystem.</li>\n"
+"                    </ul>\n"
+"                "
 
 #: templates/cms/welcome.html:84
 msgid "Installation Notes"
@@ -1934,7 +1966,7 @@ msgstr "Support"
 
 #: templates/cms/welcome.html:90
 msgid "Give back"
-msgstr ""
+msgstr "Etwas zurückgeben"
 
 #: templates/cms/welcome.html:92
 msgid ""
@@ -2186,7 +2218,7 @@ msgstr ""
 
 #: tests/test_templates.py:57 utils/conf.py:186
 msgid "Inherit the template of the nearest ancestor"
-msgstr "Die Vorlage der nächsten übergeordneten Seite verwenden"
+msgstr "Die Vorlage der direkt übergeordneten Seite verwenden"
 
 #: tests/test_wizards.py:104
 msgid "UserSettings"
