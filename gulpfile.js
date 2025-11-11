@@ -1,7 +1,6 @@
 // #####################################################################################################################
 // #IMPORTS#
 const gulp = require('gulp');
-const gutil = require('gulp-util');
 const plumber = require('gulp-plumber');
 const fs = require('fs');
 const autoprefixer = require('autoprefixer');
@@ -14,11 +13,19 @@ const iconfontCss = require('gulp-iconfont-css');
 const sass = require('gulp-sass')(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 const minifyCss = require('gulp-clean-css');
-const eslint = require('gulp-eslint');
+const eslint = require('gulp-eslint-new');
 const webpack = require('webpack');
 const KarmaServer = require('karma').Server;
 // const integrationTests = require('djangocms-casper-helpers/gulp');
 const GulpPostCss = require('gulp-postcss');
+
+// Logging utilities to replace gulp-util
+const log = {
+    info: (msg) => console.log('\x1b[36m%s\x1b[0m', msg),
+    success: (msg) => console.log('\x1b[32m%s\x1b[0m', msg),
+    error: (msg) => console.log('\x1b[31m%s\x1b[0m', msg),
+    plain: (msg) => console.log(msg)
+};
 
 const argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
 
@@ -116,7 +123,7 @@ const css = () => {
         .pipe(gulpif(options.debug, sourcemaps.init()))
         .pipe(sass())
         .on('error', function(error) {
-            gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
+            log.error('Error (' + error.plugin + '): ' + error.messageFormatted);
         })
         .pipe(
             postcss([
@@ -155,7 +162,7 @@ const icons = () => {
             })
         )
         .on('glyphs', function(glyphs, opts) {
-            gutil.log.bind(glyphs, opts);
+            // Icon font glyphs generated
         })
         .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'))
   );
@@ -190,16 +197,113 @@ const unitTest = (done) => {
 };
 
 const testsIntegration = (done) => {
-    integrationTests({
-        tests: INTEGRATION_TESTS,
-        pathToTests: PROJECT_PATH.tests,
-        argv: argv,
-        dbPath: 'testdb.sqlite',
-        serverCommand: 'testserver.py',
-        logger: gutil.log.bind(gutil),
-        waitForMigrations: 5 // seconds
+    const { spawn } = require('child_process');
+    const http = require('http');
+
+    const baseUrl = process.env.BASE_URL || 'http://localhost:9009';
+    const port = argv.port || 9009;
+    const serverArgs = argv.serverArgs || '';
+
+    log.info('Starting Django test server...');
+
+    // Start the test server - use .venv/bin/python if exists, otherwise system python
+    const pythonCmd = fs.existsSync('.venv/bin/python') ? '.venv/bin/python' : 'python';
+    const serverProcess = spawn(pythonCmd, ['testserver.py', `--port=${port}`, ...serverArgs.split(' ').filter(Boolean)], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        cwd: __dirname
     });
-    done();
+
+    let serverOutput = '';
+    serverProcess.stdout.on('data', (data) => {
+        serverOutput += data.toString();
+        if (options.debug) {
+            process.stdout.write(data);
+        }
+    });
+
+    serverProcess.stderr.on('data', (data) => {
+        const errorMsg = data.toString();
+        serverOutput += errorMsg;
+        if (options.debug || errorMsg.includes('Error') || errorMsg.includes('Traceback')) {
+            process.stderr.write(data);
+        }
+    });
+
+    // Function to check if server is ready
+    const checkServerReady = (retries = 30) => {
+        return new Promise((resolve, reject) => {
+            const checkInterval = setInterval(() => {
+                http.get(`http://localhost:${port}`, (res) => {
+                    if (res.statusCode === 200 || res.statusCode === 302) {
+                        clearInterval(checkInterval);
+                        log.success('✓ Test server is ready');
+                        resolve();
+                    }
+                }).on('error', () => {
+                    retries--;
+                    if (retries <= 0) {
+                        clearInterval(checkInterval);
+                        reject(new Error('Test server failed to start'));
+                    }
+                });
+            }, 1000);
+        });
+    };
+
+    // Function to cleanup and exit
+    const cleanup = (code, error) => {
+        log.info('Stopping test server...');
+        serverProcess.kill('SIGTERM');
+
+        setTimeout(() => {
+            if (!serverProcess.killed) {
+                serverProcess.kill('SIGKILL');
+            }
+        }, 5000);
+
+        if (error) {
+            done(error);
+        } else if (code !== 0) {
+            done(new Error(`Playwright tests failed with exit code ${code}`));
+        } else {
+            log.success('✓ Playwright integration tests passed');
+            done();
+        }
+    };
+
+    // Wait for server to be ready, then run tests
+    checkServerReady()
+        .then(() => {
+            log.info('Running Playwright integration tests...');
+
+            const playwrightProcess = spawn('npx', ['playwright', 'test'], {
+                stdio: 'inherit',
+                shell: true,
+                env: {
+                    ...process.env,
+                    BASE_URL: baseUrl
+                }
+            });
+
+            playwrightProcess.on('exit', (code) => {
+                cleanup(code);
+            });
+
+            playwrightProcess.on('error', (err) => {
+                cleanup(1, err);
+            });
+        })
+        .catch((err) => {
+            cleanup(1, err);
+        });
+
+    // Handle process termination
+    process.on('SIGINT', () => {
+        cleanup(1, new Error('Process interrupted'));
+    });
+    process.on('SIGTERM', () => {
+        cleanup(1, new Error('Process terminated'));
+    });
 }
 
 const webpackBundle = function(opts) {
@@ -214,9 +318,9 @@ const webpackBundle = function(opts) {
 
         webpack(config, function(err, stats) {
             if (err) {
-                throw new gutil.PluginError('webpack', err);
+                throw new Error('webpack: ' + err);
             }
-            gutil.log('[webpack]', stats.toString({ maxModules: Infinity, colors: true, optimizationBailout: true }));
+            log.plain('[webpack] ' + stats.toString({ maxModules: Infinity, colors: true, optimizationBailout: true }));
             if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
                 done();
             }

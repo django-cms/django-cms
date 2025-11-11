@@ -48,5 +48,9 @@ cms/tests/frontend/coverage
 node_modules
 screenshots
 .idea
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
 .better_test.db
 .vscode/
