@@ -938,7 +938,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return super().response_add(request, obj)
 
     def get_filled_languages(self, request, page):
-        site_id = page.site.pk
+        site_id = page.site_id
         filled_languages = page.get_languages()
         allowed_languages = [lang[0] for lang in get_language_tuple(site_id)]
         return [lang for lang in filled_languages if lang in allowed_languages]

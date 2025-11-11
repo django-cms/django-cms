@@ -92,7 +92,7 @@ class PageContentManager(WithUserMixin, models.Manager):
             if language_fallback:
                 try:
                     titles = self.filter(page=page)
-                    fallbacks = get_fallback_languages(language, site_id=page.site.pk)
+                    fallbacks = get_fallback_languages(language, site_id=page.site_id)
                     for lang in fallbacks:
                         for title in titles:
                             if lang == title.language:
