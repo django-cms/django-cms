@@ -8,6 +8,7 @@ from typing import Any, Optional, Union
 
 from classytags.utils import flatten_context
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.http import HttpRequest
 from django.template import Context
@@ -150,8 +151,14 @@ class BaseRenderer:
 
     def get_placeholder_toolbar_js(self, placeholder, page=None):
         plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page)  # original
-
-        plugin_types = [cls.__name__ for cls in plugins]
+        try:
+            source_type = ContentType.objects.get_for_id(placeholder.content_type_id)
+            source_model = f"{source_type.app_label}.{source_type.model}"
+        except ContentType.DoesNotExist:
+            source_model = "None"
+        plugin_types = [cls.__name__ for cls in plugins if cls.valid_models is None or
+             source_model in cls.valid_models
+        ]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
         placeholder_toolbar_js = get_placeholder_toolbar_js(
             placeholder=placeholder,

@@ -174,7 +174,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Set to ``True`` if this plugin should only be used in a placeholder that is attached to a django CMS page,
     #: and not other models with ``PlaceholderRelationFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
     #: :attr:`require_parent`.
+    #:
+    #: Deprecated: Use valid_models attribute instead (e.g., `valid_models = ["cms.PageContent"]`)
     page_only = False
+
+    valid_models = None
+    """A list of valid models where this plugin can be added. Each entry must be the
+    dotted path to the model, e.g., ``["cms.pagecontent", "myapp.mymodel"]``. If ``None``, the plugin
+    can be added to any model that has placeholders.
+    """
 
     allow_children = False
     """Allows this plugin to have child plugins - other plugins placed inside it?

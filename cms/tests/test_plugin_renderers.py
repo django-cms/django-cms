@@ -266,3 +266,92 @@ class TestLegacyRenderer(TestContentRenderer):
 
 class TestLegacyRendererExceptionCatcher(TestExceptionCatchers):
     renderer_class = LegacyRenderer
+
+
+class TestValidModelsFiltering(CMSTestCase):
+    """Tests that get_placeholder_toolbar_js only lists plugins valid for the placeholder's source model.
+
+    We create a placeholder on a non-page model (Example1) and register two temporary plugins:
+    - AllowedExamplePlugin: valid_models explicitly lists the Example1 model.
+    - DisallowedExamplePlugin: valid_models lists a different model path.
+
+    The toolbar js should include AllowedExamplePlugin but exclude DisallowedExamplePlugin.
+    """
+
+    def setUp(self):
+        from cms.test_utils.project.placeholderapp.models import Example1
+        from cms.plugin_base import CMSPluginBase
+        from cms.plugin_pool import plugin_pool
+
+        self.example = Example1.objects.create(
+            char_1="ex1", char_2="ex2", char_3="ex3", char_4="ex4", publish=True
+        )
+        self.placeholder = self.example.placeholder
+
+        # dynamic registration of two plugins with differing valid_models
+        class AllowedExamplePlugin(CMSPluginBase):
+            name = "AllowedExamplePlugin"
+            render_template = "cms/content.html"
+            valid_models = ["placeholderapp.example1"]
+
+        class DisallowedExamplePlugin(CMSPluginBase):
+            name = "DisallowedExamplePlugin"
+            render_template = "cms/content.html"
+            valid_models = ["placeholderapp.someothermodel"]
+
+        self.AllowedExamplePlugin = AllowedExamplePlugin
+        self.DisallowedExamplePlugin = DisallowedExamplePlugin
+        plugin_pool.register_plugin(AllowedExamplePlugin)
+        plugin_pool.register_plugin(DisallowedExamplePlugin)
+
+    def tearDown(self):
+        # Unregister temporary plugins to avoid leaking into other tests
+        from cms.plugin_pool import plugin_pool
+        plugin_pool.unregister_plugin(self.AllowedExamplePlugin)
+        plugin_pool.unregister_plugin(self.DisallowedExamplePlugin)
+
+    def test_get_placeholder_toolbar_js_valid_models_filtering(self):
+        from cms.plugin_rendering import ContentRenderer
+
+        request = self.get_request("/", "en")
+        renderer = ContentRenderer(request)
+        js = renderer.get_placeholder_toolbar_js(self.placeholder, page=None)
+
+        # Allowed plugin should appear
+        self.assertIn('"AllowedExamplePlugin"', js)
+        # Disallowed plugin must not appear
+        self.assertNotIn('"DisallowedExamplePlugin"', js)
+        # Sanity check: placeholder id present
+        self.assertIn(f'"placeholder_id": "{self.placeholder.pk}"', js)
+
+    def test_get_placeholder_toolbar_js_pagecontent_valid_models(self):
+        from cms.plugin_base import CMSPluginBase
+        from cms.plugin_pool import plugin_pool
+        from cms.plugin_rendering import ContentRenderer
+        from cms.api import create_page
+
+        # Create a CMS page placeholder as source model cms.pagecontent
+        cms_page = create_page("page", 'nav_playground.html', "en")
+        page_placeholder = cms_page.get_placeholders("en").get(slot='body')
+
+        class PageOnlyTmpPlugin(CMSPluginBase):
+            name = "PageOnlyTmpPlugin"
+            render_template = "cms/content.html"
+            valid_models = ["cms.pagecontent"]
+
+        try:
+            plugin_pool.register_plugin(PageOnlyTmpPlugin)
+
+            # For a page placeholder, the page-only plugin should be present
+            request = self.get_request(cms_page.get_absolute_url('en'), 'en', page=cms_page)
+            renderer = ContentRenderer(request)
+            js_page = renderer.get_placeholder_toolbar_js(page_placeholder, page=cms_page)
+            self.assertIn('"PageOnlyTmpPlugin"', js_page)
+
+            # For a non-page model placeholder, it must be excluded
+            request2 = self.get_request('/', 'en')
+            renderer2 = ContentRenderer(request2)
+            js_obj = renderer2.get_placeholder_toolbar_js(self.placeholder, page=None)
+            self.assertNotIn('"PageOnlyTmpPlugin"', js_obj)
+        finally:
+            plugin_pool.unregister_plugin(PageOnlyTmpPlugin)
