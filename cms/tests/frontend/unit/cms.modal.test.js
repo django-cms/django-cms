@@ -1590,7 +1590,7 @@ describe('CMS.Modal', function() {
             expect(modal.ui.modalButtons).toBeEmpty();
             modal._setButtons($('.buttons-test-iframe'));
             expect(modal.ui.modalButtons).not.toBeEmpty();
-            /* eslint-disable indent */
+
             expect(modal.ui.modalButtons.html()).toMatch(
                 new RegExp(
                     [
@@ -1614,7 +1614,7 @@ describe('CMS.Modal', function() {
                     ].join('')
                 )
             );
-            /* eslint-enable indent */
+
         });
 
         it('adds handlers to the newly created buttons', function() {

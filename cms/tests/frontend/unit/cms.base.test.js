@@ -23,7 +23,7 @@ describe('cms.base.js', function() {
             localStorage.setItem(mod, mod);
             localStorage.removeItem(mod);
             return true;
-        } catch (e) {
+        } catch {
             // istanbul ignore next
             return false;
         }
