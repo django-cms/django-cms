@@ -698,6 +698,36 @@ class ToolbarTests(ToolbarTestBase):
                 response = self.client.post('/en/admin/logout/')
                 self.assertTrue(response.status_code, 200)
 
+    def test_toolbar_hidden_when_admin_not_available(self):
+        """
+        Test that the toolbar is hidden when admin URLs are not available.
+
+        When admin_reverse raises NoReverseMatch (e.g., admin not in urlpatterns),
+        the toolbar should be disabled even for staff users.
+        """
+        from unittest.mock import patch
+
+        from django.urls import NoReverseMatch
+
+        page = create_page("toolbar-page", "nav_playground.html", "en")
+        staff_user = self.get_staff()
+
+        # Create request manually without going through get_page_request
+        request = self.get_request('/', page=page)
+        request.user = staff_user
+        request.session = {}
+        request.current_page = page
+
+        # Mock admin_reverse to raise NoReverseMatch only for 'admin:index'
+        with patch('cms.toolbar.toolbar.admin_reverse') as mock_admin_reverse:
+            mock_admin_reverse.side_effect = NoReverseMatch("No admin URLs")
+
+            # Initialize toolbar - this should catch NoReverseMatch and set show_toolbar=False
+            toolbar = CMSToolbar(request)
+
+        # Toolbar should be hidden because admin is not available
+        self.assertFalse(toolbar.show_toolbar)
+
     def test_show_toolbar_without_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
         request = self.get_page_request(page, AnonymousUser())

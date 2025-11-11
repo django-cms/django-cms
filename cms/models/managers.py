@@ -10,6 +10,7 @@ from treebeard.mp_tree import MP_NodeManager
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.i18n import get_fallback_languages
 
 
@@ -85,6 +86,14 @@ class PageContentManager(WithUserMixin, models.Manager):
         Gets the latest content for a particular page and language. Falls back
         to another language if wanted.
         """
+        import warnings
+
+        warnings.warn(
+            "PageContentManager.get_title is deprecated and will be removed in a future release. "
+            "Please use page.get_page_content() or page.get_admin_content()instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         try:
             title = self.get(language=language, page=page)
             return title
