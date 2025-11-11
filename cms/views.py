@@ -109,6 +109,7 @@ def details(request, slug):
         return _handle_no_page(request)
 
     request.current_page = page
+    request.site = site
 
     if hasattr(request, 'user') and request.user.is_staff:
         user_languages = get_language_list(site_id=site.pk)
@@ -325,6 +326,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
+    request.site = get_current_site(request)
 
     redirect = getattr(content_type_obj, "redirect", None)
     if isinstance(redirect, str):
