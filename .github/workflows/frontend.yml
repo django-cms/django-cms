@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['18']
+        node-version: ['24']
 
     steps:
     - uses: actions/checkout@v5
@@ -20,7 +20,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-    - run: npm install -g gulp@4.0.2
+    - run: npm install -g gulp@latest
     - run: gulp unitTest
     - run: gulp lint
     - run: gulp icons
