@@ -9,15 +9,12 @@ const browserSync = require('browser-sync').create();
 const gulpif = require('gulp-if');
 const iconfont = require('gulp-iconfont');
 const iconfontCss = require('gulp-iconfont-css');
-// const sass = require('gulp-sass');
 const sass = require('gulp-sass')(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 const minifyCss = require('gulp-clean-css');
 const eslint = require('gulp-eslint-new');
 const webpack = require('webpack');
 const KarmaServer = require('karma').Server;
-// const integrationTests = require('djangocms-casper-helpers/gulp');
-const GulpPostCss = require('gulp-postcss');
 
 // Logging utilities to replace gulp-util
 const log = {

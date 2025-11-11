@@ -72,7 +72,7 @@ module.exports = function(opts) {
         },
         plugins: [
             new LicenseWebpackPlugin({
-                outputFilename: 'licenses.txt',
+                outputFilename: 'LICENSE-BUNDLES',
                 perChunkOutput: false,
                 addBanner: false,
                 renderLicenses: (modules) => {
