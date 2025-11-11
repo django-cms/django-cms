@@ -123,7 +123,7 @@ linter you need to do this:
 
 .. code-block:: sh
 
-    gulp lint
+    npx gulp lint
 
 Or you can also run the watcher by just running ``gulp``.
 
@@ -185,17 +185,17 @@ are located within ``cms/static/cms/sass`` and can be compiled using the
 In order to compile the stylesheets you need to run this command from the repo
 root::
 
-    gulp sass
+    npx gulp sass
 
 While developing it is also possible to run a watcher that compiles Sass files
 on change::
 
-    gulp
+    npx gulp watch
 
 By default, source maps are not included in the compiled files. In order to turn
 them on while developing just add the ``--debug`` option::
 
-    gulp --debug
+    npx gulp --debug
 
 Icons
 =====
@@ -207,7 +207,7 @@ the icon classes and ultimately compiles to CSS.
 
 In order to compile the web font you need to run::
 
-    gulp icons
+    npx gulp icons
 
 This simply takes all SVGs within ``cms/static/cms/fonts/src`` and embeds them
 into the web font. All classes will be automatically added to
@@ -236,8 +236,6 @@ the source modules.
 
 .. _fork: https://github.com/django-cms/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
-.. _Aldryn Boilerplate: https://aldryn-boilerplate-bootstrap3.readthedocs.io/en/latest/guidelines/index.html
-.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _GitHub: http://www.github.com
 .. _GitHub help: http://help.github.com
 .. _freenode: http://freenode.net/

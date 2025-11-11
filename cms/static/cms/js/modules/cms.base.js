@@ -309,7 +309,7 @@ export const Helpers = {
      * @returns {String}
      */
     makeURL: function makeURL(url, params) {
-        params = params || [];
+        const urlParams = params || [];
         // Decode URL and replace &amp; with &
         const decodedUrl = decodeURIComponent(url.replace(/&amp;/g, '&'));
         let newUrl;
@@ -318,14 +318,16 @@ export const Helpers = {
 
         try {
             // Try to parse as absolute URL
+            // eslint-disable-next-line compat/compat, no-undef
             newUrl = new URL(decodedUrl);
             isAbsolute = true;
-        } catch (e) {
+        } catch {
             // If relative, use window.location.origin as base
+            // eslint-disable-next-line compat/compat, no-undef
             newUrl = new URL(decodedUrl, window.location.origin);
         }
 
-        params.forEach(function(pair) {
+        urlParams.forEach(function(pair) {
             var key = pair[0];
             var value = pair[1];
 
@@ -340,6 +342,7 @@ export const Helpers = {
 
         let result = newUrl.pathname + newUrl.search + newUrl.hash;
         // Remove leading slash if original URL didn't have one
+
         if (!hadLeadingSlash && result.startsWith('/')) {
             result = result.substring(1);
         }

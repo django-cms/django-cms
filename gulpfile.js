@@ -169,12 +169,14 @@ const icons = () => {
 };
 
 const lint = () => {
+  const shouldFix = argv.fix || false;
   return (
     gulp
         .src(PROJECT_PATTERNS.js)
         .pipe(gulpif(!process.env.CI, plumber()))
-        .pipe(eslint())
+        .pipe(eslint({ fix: shouldFix }))
         .pipe(eslint.format())
+        .pipe(gulpif(shouldFix, gulp.dest((file) => file.base)))
         .pipe(eslint.failAfterError())
         .pipe(gulpif(!process.env.CI, plumber.stop()))
   );
