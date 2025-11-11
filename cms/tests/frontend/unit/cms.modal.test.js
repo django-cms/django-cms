@@ -1171,7 +1171,7 @@ describe('CMS.Modal', function() {
         });
         afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
-            modal.ui.body.removeAttr('data-touch-action');
+            document.body.style.touchAction = '';
             modal.ui.body.off(modal.pointerMove);
             modal.ui.body.off(modal.pointerUp);
             fixture.cleanup();
@@ -1241,10 +1241,10 @@ describe('CMS.Modal', function() {
             }, 1000);
         });
 
-        it('adds data-touch-action attribute', function() {
-            expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+        it('sets touchAction style property', function() {
+            expect(document.body.style.touchAction).toEqual('');
             modal._startMove();
-            expect(modal.ui.body).toHaveAttr('data-touch-action');
+            expect(document.body.style.touchAction).toEqual('none');
         });
     });
 
@@ -1288,10 +1288,10 @@ describe('CMS.Modal', function() {
             expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[1]);
         });
 
-        it('removes data-touch-action attribute', function() {
-            expect(modal.ui.body).toHaveAttr('data-touch-action');
+        it('resets touchAction style property', function() {
+            document.body.style.touchAction = 'none';
             modal._stopMove();
-            expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+            expect(document.body.style.touchAction).toEqual('');
         });
     });
 
@@ -1317,7 +1317,7 @@ describe('CMS.Modal', function() {
         });
         afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
-            modal.ui.body.removeAttr('data-touch-action');
+            document.body.style.touchAction = '';
             modal.ui.body.off(modal.pointerMove);
             modal.ui.body.off(modal.pointerUp);
             fixture.cleanup();
@@ -1433,10 +1433,10 @@ describe('CMS.Modal', function() {
             expect(modal._stopResize).toHaveBeenCalledTimes(2);
         });
 
-        it('adds data-touch-action attribute', function() {
-            expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+        it('sets touchAction style property', function() {
+            expect(document.body.style.touchAction).toEqual('');
             modal._startResize();
-            expect(modal.ui.body).toHaveAttr('data-touch-action');
+            expect(document.body.style.touchAction).toEqual('none');
         });
     });
 
@@ -1480,10 +1480,10 @@ describe('CMS.Modal', function() {
             expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[1]);
         });
 
-        it('removes data-touch-action attribute', function() {
-            expect(modal.ui.body).toHaveAttr('data-touch-action');
+        it('resets touchAction style property', function() {
+            document.body.style.touchAction = 'none';
             modal._stopResize();
-            expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+            expect(document.body.style.touchAction).toEqual('');
         });
     });
 

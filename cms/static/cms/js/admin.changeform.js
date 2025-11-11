@@ -1,6 +1,3 @@
-// polyfills
-import './libs/pep';
-
 import { Helpers, KEYS } from './modules/cms.base';
 import $ from 'jquery';
 import Class from 'classjs';

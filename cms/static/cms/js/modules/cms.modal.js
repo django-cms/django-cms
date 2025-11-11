@@ -542,8 +542,10 @@ class Modal {
                     left: left,
                     top: top
                 });
-            })
-            .attr('data-touch-action', 'none');
+            });
+
+        // Disable touch actions during modal move
+        document.body.style.touchAction = 'none';
     }
 
     /**
@@ -554,7 +556,9 @@ class Modal {
      */
     _stopMove() {
         this.ui.shim.hide();
-        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp).removeAttr('data-touch-action');
+        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp);
+        // Re-enable touch actions
+        document.body.style.touchAction = '';
     }
 
     /**
@@ -613,8 +617,10 @@ class Modal {
                     left: left,
                     top: top
                 });
-            })
-            .attr('data-touch-action', 'none');
+            });
+
+        // Disable touch actions during modal resize
+        document.body.style.touchAction = 'none';
     }
 
     /**
@@ -625,7 +631,9 @@ class Modal {
      */
     _stopResize() {
         this.ui.shim.hide();
-        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp).removeAttr('data-touch-action');
+        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp);
+        // Re-enable touch actions
+        document.body.style.touchAction = '';
     }
 
     /**

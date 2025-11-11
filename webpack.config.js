@@ -112,23 +112,6 @@ module.exports = function(opts) {
                     include: path.join(__dirname, 'cms')
                 },
                 {
-                    test: /libs\/pep/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: {
-                                wrapper: {
-                                    thisArg: 'window',
-                                    args: {
-                                        module: false,
-                                        exports: false
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
                     test: /(modules\/jquery|select2\/select2)/,
                     use: [
                         {

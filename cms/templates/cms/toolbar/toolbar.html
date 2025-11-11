@@ -1,12 +1,11 @@
 {% load i18n l10n cms_tags cms_js_tags %}
 
 <div id="cms-top"
-     class="cms cms-reset
+     class="cms cms-reset cms-touch-action-none
      {% if not user.is_authenticated %} cms-toolbar-auth{% endif %}
      {% if debug %} cms-toolbar-debug{% endif %}"
      lang="{{ request.toolbar.toolbar_language }}"
-     dir="{{ request.toolbar.toolbar_language_bidi|yesno:'rtl,ltr,auto' }}"
-     data-touch-action="none">
+     dir="{{ request.toolbar.toolbar_language_bidi|yesno:'rtl,ltr,auto' }}">
 
     {% block toolbar_top %}
     {% endblock toolbar_top %}
@@ -27,7 +26,7 @@
                         <a href="#">
                             <span>{% trans "More" %}...<span class="cms-icon cms-icon-arrow"></span></span>
                         </a>
-                        <ul data-touch-action="pan-y"></ul>
+                        <ul class="cms-touch-action-pan-y"></ul>
                     </li>
                 </ul>
             {% endif %}

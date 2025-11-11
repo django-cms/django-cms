@@ -925,10 +925,10 @@ describe('CMS.StructureBoard', function() {
         });
 
         describe('start', function() {
-            it('sets data-touch-action attribute', function() {
-                expect(board.ui.content).toHaveAttr('data-touch-action', 'pan-y');
+            it('sets touchAction style property', function() {
+                expect(board.ui.content[0].style.touchAction).toEqual('pan-y');
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
-                expect(board.ui.content).toHaveAttr('data-touch-action', 'none');
+                expect(board.ui.content[0].style.touchAction).toEqual('none');
             });
 
             it('sets dragging state', function() {
@@ -1094,10 +1094,10 @@ describe('CMS.StructureBoard', function() {
                 expect(board.ui.doc).not.toHandle('keyup.cms.interrupt');
             });
 
-            it('resets data-touch-action attribute', function() {
-                board.ui.content.removeAttr('data-touch-action');
+            it('resets touchAction style property', function() {
+                board.ui.content[0].style.touchAction = '';
                 options.beforeStop(null, { item: $('<div></div>') });
-                expect(board.ui.content).toHaveAttr('data-touch-action', 'pan-y');
+                expect(board.ui.content[0].style.touchAction).toEqual('pan-y');
             });
         });
 

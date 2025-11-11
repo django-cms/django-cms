@@ -110,6 +110,11 @@ class StructureBoard {
             toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
             toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
         };
+
+        // Set initial touch-action for vertical scrolling
+        if (this.ui.content[0]) {
+            this.ui.content[0].style.touchAction = 'pan-y';
+        }
     }
 
     /**
@@ -753,7 +758,8 @@ class StructureBoard {
                 // eslint-disable-next-line no-magic-numbers
                 scrollSensitivity: that.ui.window.height() * 0.2,
                 start: function(e, ui) {
-                    that.ui.content.attr('data-touch-action', 'none');
+                    // Disable touch scrolling during drag operations
+                    that.ui.content[0].style.touchAction = 'none';
 
                     originalPluginContainer = ui.item.closest('.cms-draggables');
 
@@ -793,7 +799,8 @@ class StructureBoard {
                     that.dragging = false;
                     ui.item.removeClass('cms-is-dragging cms-draggable-stack');
                     that.ui.doc.off('keyup.cms.interrupt');
-                    that.ui.content.attr('data-touch-action', 'pan-y');
+                    // Re-enable vertical scrolling after drag
+                    that.ui.content[0].style.touchAction = 'pan-y';
                 },
 
                 update: function(event, ui) {

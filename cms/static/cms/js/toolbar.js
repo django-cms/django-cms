@@ -2,8 +2,6 @@
 import initHelpShortcuts from './modules/shortcuts';
 
 // jquery plugins
-import './libs/pep';
-
 import './modules/dropdown';
 
 // CMS Core
