@@ -37,8 +37,24 @@ What's new in 5.1.0
 Feature 1
 =========
 
-Feature 2
-=========
+Model-specific plugins
+======================
+
+Plugins can now be restricted to specific models using the `valid_models` attribute.
+This is particularly useful for plugins that are bound to specific Django models and should
+not be available to editors on other models.
+
+These could be plugins that only make sense on pages, for example, or plugins that are
+designed to work with specific custom models in your project, say form field plugins for a
+``Form`` model.
+
+Example::
+
+    class TextFieldPlugin(CMSPluginBase):
+        name = "Text Field"
+        render_template = "forms/fields/text.html"
+        valid_models = ["my_form_app.form"]  # only on Form model placeholders
+
 
 Feature 3
 =========
