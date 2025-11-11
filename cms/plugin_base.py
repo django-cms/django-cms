@@ -175,13 +175,13 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: and not other models with ``PlaceholderRelationFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
     #: :attr:`require_parent`.
     #:
-    #: Deprecated: Use valid_models attribute instead (e.g., `valid_models = ["cms.PageContent"]`)
+    #: Deprecated: Use valid_models attribute instead (e.g., `valid_models = ["cms.pagecontent"]`)
     page_only = False
 
     valid_models = None
     """A list of valid models where this plugin can be added. Each entry must be the
-    dotted path to the model, e.g., ``["cms.pagecontent", "myapp.mymodel"]``. If ``None``, the plugin
-    can be added to any model that has placeholders.
+    dotted path to the model in the format ``"app_label.modelname"``, e.g., ``["cms.pagecontent", "myapp.mymodel"]``.
+    If ``None``, the plugin can be added to any model that has placeholders.
     """
 
     allow_children = False
