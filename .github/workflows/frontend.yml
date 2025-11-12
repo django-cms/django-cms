@@ -9,16 +9,15 @@ concurrency:
 jobs:
   frontend:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: ['18', '24']
+    env:
+      NODE_VERSION: '24'
 
     steps:
     - uses: actions/checkout@v5
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v6
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ env.NODE_VERSION }}
     - run: npm install
     - run: npm install -g gulp@latest
     - run: gulp unitTest
