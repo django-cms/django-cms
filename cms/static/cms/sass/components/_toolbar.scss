@@ -1,6 +1,7 @@
 //##############################################################################
 // TOOLBAR
 @use "sass:math";
+@use "sass:list";
 
 .cms-toolbar {
     position: fixed;
@@ -174,7 +175,7 @@
         .cms-toolbar-item-navigation-children {
             ul {
                 display: none;
-                top: -(nth($toolbar-dropdown-padding, 1) + 1px);
+                top: -(list.nth($toolbar-dropdown-padding, 1) + 1px);
                 inset-inline-start: 100%;
             }
             > a {

@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2013, Divio AG
+ * Copyright (c) 2013, django CMS Association
  * Licensed under BSD
- * https://github.com/aldryn/aldryn-boilerplate-bootstrap3
+ * https://github.com/django-cms/django-cms
  */
 
 'use strict';
@@ -112,7 +112,7 @@ module.exports = function (config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['dots', 'coverage', 'saucelabs'].concat(process.env.CI ? ['coveralls'] : []),
+        reporters: ['dots', 'coverage'].concat(process.env.CI ? ['coveralls'] : []),
 
         webpack: {
             mode: 'development',
