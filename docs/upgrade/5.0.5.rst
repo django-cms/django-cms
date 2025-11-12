@@ -1,0 +1,75 @@
+.. _upgrade-to-5.0.5:
+
+###################
+5.0.5 release notes
+###################
+
+*November 12, 2025*
+
+Welcome to django CMS 5.0.5!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
+features.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, 5.2, and 6.0**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.0.5
+***********************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.3 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+.. warning::
+
+    Since the migrations merge the ``TreeNode`` and ``Page`` models, you should run the
+    migration in a test environment first to ensure that the migration runs
+    successfully.
+
+
+*******************
+What's new in 5.0.5
+*******************
+
+Bug Fixes:
+----------
+
+* Pin language of toolbar update to the request language
+* Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367) (#8390) (9e00f694e) -- Fabian Braun
+* Copying x-language lead to unique constraint violation (#8366) (#8386)
+* Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8384)
+* Set default value for edit_fields parameter to avoid AttributeError (#8381)
+* Link syntax in welcome.html
+* Searching pages for language-specific content failed due to wrong search queryset (#8355) (#8358)
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!

@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # Mike C. <miguelmclara@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Mike C. <miguelmclara@gmail.com>, 2014\n"
 "Language-Team: Portuguese (Portugal) (http://app.transifex.com/divio/django-cms/language/pt_PT/)\n"
@@ -17,12 +18,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt_PT\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
-
-msgid "/"
-msgstr ""
-
-msgid ":"
-msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Tem a certeza que quer mudar de separador sem guardar a página primeiro?"
