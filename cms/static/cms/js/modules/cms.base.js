@@ -583,6 +583,10 @@ export const KEYS = {
     CTRL: 17
 };
 
+// Add Helpers and KEYS to _CMS for backwards compatibility with tests
+_CMS.API.Helpers = Helpers;
+_CMS.KEYS = KEYS;
+
 // shorthand for jQuery(document).ready();
 $(function() {
     CMS._eventRoot = $('#cms-top');
