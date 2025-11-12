@@ -40,14 +40,6 @@ terms above.
 
 ================================================================================
 
-Package: class.min.js
-Version: 1.0
-Author: Angelo Dini
-License: BSD License
-Copyright: Distributed under the BSD License.
-
-${'='.repeat(80)}
-
 Package: jQuery
 Version: 1.11.3
 License: MIT License
@@ -63,6 +55,42 @@ License URL: https://github.com/vakata/jstree/blob/master/LICENSE-MIT
 Copyright: (c) jsTree project
 Note: THIS FILE HAS BEEN MANUALLY PATCHED TO ALLOW COPYING INTO SELF/CHILDREN
 Source: https://github.com/FinalAngel/jstree
+
+${'='.repeat(80)}
+
+Package: jQuery UI
+Version: 1.11.4 (2015-11-13)
+License: MIT License
+License URL: http://jquery.org/license
+Copyright: jQuery Foundation and other contributors
+Includes: core.js, widget.js, mouse.js, sortable.js, effect.js
+
+${'='.repeat(80)}
+
+Package: jQuery UI Touch Punch
+Version: 0.2.3
+License: MIT or GPL Version 2 licenses (dual licensed)
+License URL: https://github.com/furf/jquery-ui-touch-punch
+Copyright: 2011–2014, Dave Furfero
+Note: Adds touch support to jQuery UI
+
+${'='.repeat(80)}
+
+Package: jQuery UI Nested Sortable
+Version: 2.0 (2012-10-29)
+License: MIT License
+License URL: http://www.opensource.org/licenses/mit-license.php
+Copyright: 2010-2013 Manuele J Sarfatti
+Website: http://mjsarfatti.com/sandbox/nestedSortable
+
+${'='.repeat(80)}
+
+Package: jQuery Trap Input
+Version: 1.2.0
+License: BSD-like (Redistribution and use permitted without condition)
+License URL: https://github.com/julienw/jquery-trap-input
+Copyright: 2011, 2012 Julien Wajsberg <felash@gmail.com>
+Note: Used for accessibility - traps focus within modals
 
 ${'='.repeat(80)}
 

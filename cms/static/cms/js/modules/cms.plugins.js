@@ -44,20 +44,20 @@ class Plugin {
         Object.assign(this, Helpers);
 
         this.options = $.extend(true, {}, {
-        type: '', // bar, plugin or generic
-        placeholder_id: null,
-        plugin_type: '',
-        plugin_id: null,
-        plugin_parent: null,
-        plugin_restriction: [],
-        plugin_parent_restriction: [],
-        urls: {
-            add_plugin: '',
-            edit_plugin: '',
-            move_plugin: '',
-            copy_plugin: '',
-            delete_plugin: ''
-        }
+            type: '', // bar, plugin or generic
+            placeholder_id: null,
+            plugin_type: '',
+            plugin_id: null,
+            plugin_parent: null,
+            plugin_restriction: [],
+            plugin_parent_restriction: [],
+            urls: {
+                add_plugin: '',
+                edit_plugin: '',
+                move_plugin: '',
+                copy_plugin: '',
+                delete_plugin: ''
+            }
         }, options);
 
         // create an unique for this component to use it internally
