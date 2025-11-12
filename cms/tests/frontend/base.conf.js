@@ -4,7 +4,6 @@
 // CONFIGURATION
 
 
-
 module.exports = {
     formatTaskName: function formatTaskName(browserName) {
         return [
@@ -14,7 +13,7 @@ module.exports = {
                 '' : 'pull request #' + process.env.TRAVIS_PULL_REQUEST,
             'build #' + process.env.TRAVIS_JOB_NUMBER
         ].join(' ');
-    },
+    }
 
     // SauceLabs-Konfiguration entfernt
 };
