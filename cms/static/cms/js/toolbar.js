@@ -7,7 +7,6 @@ import './modules/dropdown';
 // CMS Core
 import { Helpers, KEYS } from './modules/cms.base';
 import $ from 'jquery';
-import Class from 'classjs';
 
 // exposing globals for backwards compatibility
 import Messages from './modules/cms.messages';
@@ -40,7 +39,6 @@ CMS.API = {
 };
 CMS.KEYS = KEYS;
 CMS.$ = $;
-CMS.Class = Class;
 
 // Expose CMS globally for backwards compatibility
 if (typeof window !== 'undefined') {
