@@ -1,4 +1,7 @@
 // Minimal Keyboard-Modul mit Kontext und Event-Registrierung
+
+/* global KeyboardEvent */
+
 const contexts = {};
 let currentContext = 'global';
 let lastKey = null;
@@ -98,6 +101,7 @@ function handleKeyup(event) {
 
 function pressKey(key) {
     const event = new KeyboardEvent('keydown', { key });
+
     handleKeydown(event);
 }
 

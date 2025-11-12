@@ -134,7 +134,7 @@ module.exports = function(opts) {
             },
             'admin.pagetree': {
                 import: PROJECT_PATH.js + '/admin.pagetree.js',
-                dependOn: 'admin.base'
+                dependOn: ['admin.base']
             },
             'admin.changeform': {
                 import: PROJECT_PATH.js + '/admin.changeform.js',
@@ -145,11 +145,22 @@ module.exports = function(opts) {
                 }
             },
             // CMS widgets
-            // they will load the on-demand bundle called admin.widget
-            'forms.pageselectwidget': PROJECT_PATH.js + '/widgets/forms.pageselectwidget.js',
-            'forms.slugwidget': PROJECT_PATH.js + '/widgets/forms.slugwidget.js',
-            'forms.pagesmartlinkwidget': PROJECT_PATH.js + '/widgets/forms.pagesmartlinkwidget.js',
-            'forms.apphookselect': PROJECT_PATH.js + '/widgets/forms.apphookselect.js'
+            'forms.pageselectwidget': {
+                import: PROJECT_PATH.js + '/widgets/forms.pageselectwidget.js',
+                dependOn: ['admin.base']
+            },
+            'forms.slugwidget': {
+                import: PROJECT_PATH.js + '/widgets/forms.slugwidget.js',
+                dependOn: ['admin.base']
+            },
+            'forms.pagesmartlinkwidget': {
+                import: PROJECT_PATH.js + '/widgets/forms.pagesmartlinkwidget.js',
+                dependOn: ['admin.base']
+            },
+            'forms.apphookselect': {
+                import: PROJECT_PATH.js + '/widgets/forms.apphookselect.js',
+                dependOn: ['admin.base']
+            }
         },
         output: {
             path: PROJECT_PATH.js + '/dist/' + CMS_VERSION + '/',
