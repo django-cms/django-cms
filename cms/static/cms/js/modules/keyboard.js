@@ -1,51 +1,115 @@
-import keyboard from 'keyboardjs';
+// Minimal Keyboard-Modul mit Kontext und Event-Registrierung
+const contexts = {};
+let currentContext = 'global';
+let lastKey = null;
 
-/**
- * @function override
- * @private
- * @param {Function} originalFunction to override
- * @param {Function} functionBuilder function that accepts a function to wrap
- * @returns {Function}
- */
-function override(originalFunction, functionBuilder) {
-    var newFn = functionBuilder(originalFunction);
-
-    newFn.prototype = originalFunction.prototype;
-    return newFn;
-}
-
-/**
- * Check if the currently focused element is an input field
- * @returns {boolean}
- */
 function isInputFocused() {
     const activeElement = document.activeElement;
 
     if (!activeElement) {
         return false;
     }
-
     const tagName = activeElement.tagName.toLowerCase();
-    const isContentEditable = activeElement.contentEditable === 'true';
 
-    return tagName === 'input' ||
-           tagName === 'textarea' ||
-           tagName === 'select' ||
-           isContentEditable;
+    return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || activeElement.isContentEditable;
 }
 
-/**
- * Override keyboardjs methods to disallow running callbacks
- * if input is focused
- */
-keyboard._applyBindings = override(keyboard._applyBindings, function(originalBind) {
-    return function(event) {
-        if (isInputFocused()) {
-            return true;
-        }
+function setContext(ctx) {
+    currentContext = ctx;
+}
 
-        originalBind.call(this, event);
-    };
-});
+function getContext() {
+    return currentContext;
+}
+
+function bind(key, callback, ctx = null) {
+    if (Array.isArray(key)) {
+        key.forEach(k => bind(k, callback, ctx));
+        return;
+    }
+    const context = ctx || currentContext;
+
+    if (!contexts[context]) {
+        contexts[context] = {};
+    }
+    contexts[context][key] = callback;
+}
+
+function unbind(key, ctx = null) {
+    if (Array.isArray(key)) {
+        key.forEach(k => unbind(k, ctx));
+        return;
+    }
+    const context = ctx || currentContext;
+
+    if (contexts[context]) {
+        delete contexts[context][key];
+    }
+}
+
+function toKeyCode(event) {
+    const isLetter = /^Key[a-zA-Z]$/.test(event.code) || event.code === 'Space' || event.code === 'Enter';
+    let key = /^Key[a-zA-Z]$/.test(event.code) ? event.code.slice(-1) : event.key;
+
+    if (event.code === 'Space') {
+        key = 'space';
+    }
+    if (isLetter) {
+        if (event.altKey) {
+            key = `alt+${key}`;
+        }
+        if (event.ctrlKey) {
+            key = `ctrl+${key}`;
+        }
+        if (event.shiftKey) {
+            key = `shift+${key}`;
+        }
+    }
+    return key.toLowerCase();
+}
+
+function handleKeydown(event) {
+    if (isInputFocused()) {
+        return;
+    }
+    const context = contexts[currentContext];
+    const key = toKeyCode(event);
+
+    if (context) {
+        if (context[key]) {
+            context[key](event);
+        } else if (lastKey) {
+            const comboKey = `${lastKey} > ${key}`;
+
+            if (context[comboKey]) {
+                context[comboKey](event);
+            }
+        }
+    }
+    lastKey = null;
+}
+
+function handleKeyup(event) {
+    if (isInputFocused()) {
+        return;
+    }
+    lastKey = toKeyCode(event);
+}
+
+function pressKey(key) {
+    const event = new KeyboardEvent('keydown', { key });
+    handleKeydown(event);
+}
+
+window.addEventListener('keydown', handleKeydown);
+window.addEventListener('keyup', handleKeyup);
+
+const keyboard = {
+    setContext,
+    getContext,
+    bind,
+    unbind,
+    pressKey
+};
 
 export default keyboard;
