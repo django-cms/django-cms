@@ -14,7 +14,6 @@ require.ensure(
     [],
     function(require) {
         var $ = require('jquery');
-        var Class = require('classjs');
 
         /**
          * Manages the selection of two select fields. The first field
@@ -23,12 +22,12 @@ require.ensure(
          * @class PageSelectWidget
          * @namespace CMS
          */
-        var PageSelectWidget = new Class({
-            initialize: function initialize(options) {
-                this.options = $.extend(true, {}, this.options, options);
+        class PageSelectWidget {
+            constructor(options) {
+                this.options = $.extend(true, {}, options);
                 // load functionality
                 this._setup(options);
-            },
+            }
 
             /**
              * Setup internal functions and events.
@@ -38,7 +37,7 @@ require.ensure(
              * @param {Object} options
              * @param {String} options.name
              */
-            _setup: function _setup(options) {
+            _setup(options) {
                 var group0 = $('#id_' + options.name + '_0');
                 var group1 = $('#id_' + options.name + '_1');
                 var group2 = $('#id_' + options.name + '_2');
@@ -75,7 +74,7 @@ require.ensure(
                 // don't allow to add another page from in here
                 $('#add_id_' + options.name).hide();
             }
-        });
+        }
 
         window.CMS = window.CMS || {};
         window.CMS.PageSelectWidget = PageSelectWidget;

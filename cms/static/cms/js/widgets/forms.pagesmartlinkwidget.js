@@ -12,7 +12,6 @@ __webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.page
 // cms/forms/widgets.py used for redirects in admin/cms/page/advanced-settings
 require.ensure([], function (require) {
     var $ = require('jquery');
-    var Class = require('classjs');
 
     require('../select2/select2');
 
@@ -23,13 +22,12 @@ require.ensure([], function (require) {
      * @class PageSmartLinkWidget
      * @namespace CMS
      */
-    var PageSmartLinkWidget = new Class({
-
-        initialize: function initialize(options) {
-            this.options = $.extend(true, {}, this.options, options);
+    class PageSmartLinkWidget {
+        constructor(options) {
+            this.options = $.extend(true, {}, options);
             // load functionality
             this._setup(options);
-        },
+        }
 
         /**
          * Setup internal functions and events.
@@ -40,7 +38,7 @@ require.ensure([], function (require) {
          * @param {String} options.id
          * @param {String} options.url
          */
-        _setup: function _setup(options) {
+        _setup(options) {
             $('#' + options.id).select2({
                 placeholder: options.text,
                 allowClear: true,
@@ -48,14 +46,14 @@ require.ensure([], function (require) {
                 ajax: {
                     url: options.url,
                     dataType: 'json',
-                    data: function (term) {
+                    data(term) {
                         return {
                             q: term,
                             language_code: options.lang
                         };
                     },
                     // default search output, will be overridden if no results map
-                    results: function (data) {
+                    results(data) {
                         return {
                             more: false,
                             results: $.map(data, function (item) {
@@ -68,7 +66,7 @@ require.ensure([], function (require) {
                     }
                 },
                 // create fallback entry if no choices are found
-                createSearchChoice: function (term, data) {
+                createSearchChoice(term, data) {
                     if ($(data).filter(
                         function () {
                             return this.text.localeCompare(term) === 0;
@@ -81,7 +79,7 @@ require.ensure([], function (require) {
                     }
                 },
                 // ensures initial selection is loaded
-                initSelection: function (element, callback) {
+                initSelection(element, callback) {
                     callback({
                         id: element.val(),
                         text: element.val()
@@ -89,7 +87,7 @@ require.ensure([], function (require) {
                 }
             });
         }
-    });
+    }
 
     window.CMS = window.CMS || {};
     window.CMS.PageSmartLinkWidget = PageSmartLinkWidget;
