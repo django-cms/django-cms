@@ -27,7 +27,8 @@ import preloadImagesFromMarkup from './preload-images';
 import { Helpers, KEYS } from './cms.base';
 import { showLoader, hideLoader } from './loader';
 
-const DOMParser = window.DOMParser; // needed only for testing
+/* global DOMParser */
+
 const storageKey = 'cms-structure';
 
 let dd;

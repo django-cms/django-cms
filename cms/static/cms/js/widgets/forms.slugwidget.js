@@ -1,5 +1,5 @@
 /*
- * Copyright https://github.com/divio/django-cms
+ * Copyright https://github.com/django-cms/django-cms
  */
 
 // this essentially makes sure that dynamically required bundles are loaded

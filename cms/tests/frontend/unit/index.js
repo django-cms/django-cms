@@ -20,7 +20,7 @@ if (files[0] === '*') {
     require('./cms.clipboard.test');
     require('./cms.modal.test');
     require('./shortcuts.test');
-    // require('./keyboard.test');
+    require('./keyboard.test');
     require('./preload-images.test');
     require('./dom-diff.test');
     // FIXME this has to be last because it messes with the url
