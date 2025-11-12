@@ -6,7 +6,7 @@ const CMS = {
 
 // expose to browser
 if (typeof window !== 'undefined') {
-    window.CMS = window.CMS ||CMS;
+    window.CMS = window.CMS || CMS;
 }
 
 import './modules/cms.changeform';
