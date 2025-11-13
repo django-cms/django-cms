@@ -10,7 +10,6 @@ process.env.NODE_ENV = 'test';
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 
-var baseConf = require('./base.conf');
 var path = require('path');
 var fs = require('fs');
 var argv = require('minimist')(process.argv.slice(2));
@@ -151,7 +150,6 @@ module.exports = function (config) {
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false
     };
-
 
 
     config.set(settings);

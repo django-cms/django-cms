@@ -13,8 +13,6 @@
     "babel-plugin-istanbul": "^7.0.1",
     "babel-plugin-rewire": "^1.2.0",
     "browser-sync": "^3.0.3",
-    "chokidar": "^4.0.3",
-    "core-js": "^3.46.0",
     "eslint": "^9.39.1",
     "eslint-plugin-compat": "^6.0.2",
     "exports-loader": "^5.0.0",
@@ -27,7 +25,7 @@
     "gulp-plumber": "^1.1.0",
     "gulp-postcss": "^10.0.0",
     "gulp-sass": "^6.0.1",
-    "gulp-sourcemaps": "^3.0.0",
+    "gulp-sourcemaps": "^2.6.5",
     "imports-loader": "^5.0.0",
     "jasmine-core": "^2.3.4",
     "karma": "^6.4.4",
@@ -53,7 +51,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
-    "keyboardjs": "^2.7.0",
     "local-storage": "^2.0.0",
     "lodash-es": "^4.17.21"
   },
