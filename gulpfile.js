@@ -9,7 +9,7 @@ const browserSync = require('browser-sync').create();
 const gulpif = require('gulp-if');
 const iconfont = require('gulp-iconfont');
 const iconfontCss = require('gulp-iconfont-css');
-const sass = require('gulp-sass')(require('sass'));
+const gulpSass = require('gulp-sass')(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 const eslint = require('gulp-eslint-new');
 const webpack = require('webpack');
@@ -104,7 +104,6 @@ const INTEGRATION_TESTS = [
         'disableToolbar',
         'dragndrop',
         'copy-apphook-page',
-        // 'revertLive', // disabled
         'narrowScreen',
         'nonadmin'
     ]
@@ -112,68 +111,56 @@ const INTEGRATION_TESTS = [
 
 const CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' }).match(/__version__ = '(.*?)'/)[1];
 
-const css = () => {
-    return (
-        gulp
+function sass() {
+    return gulp
         .src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
-        .pipe(sass({ outputStyle: 'compressed' })) // Komprimiert das CSS
+        .pipe(gulpSass({ outputStyle: 'compressed' }))
         .on('error', function(error) {
             log.error('Error (' + error.plugin + '): ' + error.messageFormatted);
         })
-        .pipe(
-            postcss([
-                postcssPresetEnv({
-                    stage: 1,
-                    features: {
-                        'nesting-rules': true
-                    }
-                }),
-                cssnano()
-            ])
-        )
+        .pipe(postcss([
+            postcssPresetEnv({
+                stage: 1,
+                features: {
+                    'nesting-rules': true
+                }
+            }),
+            cssnano()
+        ]))
         .pipe(gulpif(options.debug, sourcemaps.write()))
-        .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'))
-    );
-};
+        .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
+}
 
-const icons = () => {
-  return (
-    gulp
+function icons() {
+    return gulp
         .src(PROJECT_PATTERNS.icons)
-        .pipe(
-            iconfontCss({
-                fontName: 'django-cms-iconfont',
-                path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
-                targetPath: '../../sass/components/_iconography.scss',
-                fontPath: '../../fonts/' + CMS_VERSION + '/'
-            })
-        )
-        .pipe(
-            iconfont({
-                fontName: 'django-cms-iconfont',
-                normalize: true,
-                formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
-            })
-        )
+        .pipe(iconfontCss({
+            fontName: 'django-cms-iconfont',
+            path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
+            targetPath: '../../sass/components/_iconography.scss',
+            fontPath: '../../fonts/' + CMS_VERSION + '/'
+        }))
+        .pipe(iconfont({
+            fontName: 'django-cms-iconfont',
+            normalize: true,
+            formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
+        }))
         .on('glyphs', function(glyphs, opts) {
             // Icon font glyphs generated
         })
-        .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'))
-  );
-};
+        .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
+}
 
-const lint = () => {
-  const shouldFix = argv.fix || false;
-  return (
-    gulp
-        .src(PROJECT_PATTERNS.js)
-        .pipe(eslint({ fix: shouldFix }))
-        .pipe(eslint.format())
-        .pipe(gulpif(shouldFix, gulp.dest((file) => file.base)))
-        .pipe(eslint.failAfterError())
-  );
-};
+function lint() {
+        const shouldFix = argv.fix || false;
+        return gulp
+                .src(PROJECT_PATTERNS.js)
+                .pipe(eslint({ fix: shouldFix }))
+                .pipe(eslint.format())
+                .pipe(gulpif(shouldFix, gulp.dest((file) => file.base)))
+                .pipe(eslint.failAfterError());
+}
 
 const unitTest = async (done) => {
     try {
@@ -451,22 +438,21 @@ const analyzeWebpackStatsStatic = (done) => {
     });
 };
 
-const watchFiles = () => {
+function watchFiles() {
     browserSync.init();
     gulp.watch(PROJECT_PATTERNS.sass, css);
     gulp.watch(PROJECT_PATTERNS.js, lint);
-};
+}
 
-gulp.task("sass", css);
-gulp.task("icons", icons);
-gulp.task("lint", lint);
-gulp.task('watch', gulp.parallel(watchFiles));
-gulp.task('bundle', webpackBundle());
-gulp.task('bundle:stats', webpackBundleStats());
-// Build + open interactive analyzer (server mode)
-gulp.task('bundle:analyze', gulp.series(webpackBundleStats(), analyzeWebpackStatsServer));
-// Build + generate a static HTML report (no server needed)
-gulp.task('bundle:analyze:static', gulp.series(webpackBundleStats(), analyzeWebpackStatsStatic));
-gulp.task('unitTest', unitTest);
-gulp.task('testsIntegration', testsIntegration);
-gulp.task('tests', gulp.series(unitTest, testsIntegration));
+exports.default = gulp.parallel(gulp.series(icons, sass), webpackBundle());
+exports.sass = sass;
+exports.icons = icons;
+exports.lint = lint;
+exports.watch = gulp.parallel(watchFiles);
+exports.bundle = webpackBundle();
+exports['bundle:stats'] = webpackBundleStats();
+exports['bundle:analyze'] = gulp.series(webpackBundleStats(), analyzeWebpackStatsServer);
+exports['bundle:analyze:static'] = gulp.series(webpackBundleStats(), analyzeWebpackStatsStatic);
+exports.unitTest = unitTest;
+exports.testsIntegration = testsIntegration;
+exports.tests = gulp.series(unitTest, testsIntegration);
