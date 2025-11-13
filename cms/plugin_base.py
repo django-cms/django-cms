@@ -754,7 +754,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     @template_slot_caching
     def get_child_classes(
         cls, slot, page: Page | None = None, instance: CMSPlugin | None = None, only_uncached: bool = False
-    ) -> list:
+    ) -> list[str]:
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
@@ -793,7 +793,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_parent_classes(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None):
+    def get_parent_classes(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None) -> list[str]:
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)
