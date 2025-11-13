@@ -1,17 +1,16 @@
 // #####################################################################################################################
 // #IMPORTS#
 const gulp = require('gulp');
-const plumber = require('gulp-plumber');
 const fs = require('fs');
-const autoprefixer = require('autoprefixer');
 const postcss = require('gulp-postcss');
+const cssnano = require('cssnano');
+const postcssPresetEnv = require('postcss-preset-env');
 const browserSync = require('browser-sync').create();
 const gulpif = require('gulp-if');
 const iconfont = require('gulp-iconfont');
 const iconfontCss = require('gulp-iconfont-css');
 const sass = require('gulp-sass')(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
-const minifyCss = require('gulp-clean-css');
 const eslint = require('gulp-eslint-new');
 const webpack = require('webpack');
 const { Server: KarmaServer, config: karmaConfig } = require('karma');
@@ -118,21 +117,20 @@ const css = () => {
         gulp
         .src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
-        .pipe(sass())
+        .pipe(sass({ outputStyle: 'compressed' })) // Komprimiert das CSS
         .on('error', function(error) {
             log.error('Error (' + error.plugin + '): ' + error.messageFormatted);
         })
         .pipe(
             postcss([
-                autoprefixer({
-                    cascade: false
-                })
+                postcssPresetEnv({
+                    stage: 1,
+                    features: {
+                        'nesting-rules': true
+                    }
+                }),
+                cssnano()
             ])
-        )
-        .pipe(
-            minifyCss({
-                rebase: false
-            })
         )
         .pipe(gulpif(options.debug, sourcemaps.write()))
         .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'))
@@ -170,12 +168,10 @@ const lint = () => {
   return (
     gulp
         .src(PROJECT_PATTERNS.js)
-        .pipe(gulpif(!process.env.CI, plumber()))
         .pipe(eslint({ fix: shouldFix }))
         .pipe(eslint.format())
         .pipe(gulpif(shouldFix, gulp.dest((file) => file.base)))
         .pipe(eslint.failAfterError())
-        .pipe(gulpif(!process.env.CI, plumber.stop()))
   );
 };
 
