@@ -18,11 +18,10 @@ from django.utils.safestring import SafeText, mark_safe
 from django.utils.translation import override
 from django.views.debug import ExceptionReporter
 
-from cms.plugin_pool import plugin_pool
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
-from cms.plugin_pool import PluginPool
+from cms.plugin_pool import PluginPool, plugin_pool
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
