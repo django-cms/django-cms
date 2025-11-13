@@ -42,11 +42,6 @@ webpackConfig.plugins = [
 ];
 
 module.exports = function (config) {
-    var useSauceLabs = function () {
-        var val = process.env.USE_SAUCE_LABS;
-        return (val === undefined || val !== '0') && process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY;
-    };
-
     var browsers = {
         ChromeHeadlessCI: 'used for local testing'
     };
@@ -157,33 +152,7 @@ module.exports = function (config) {
         singleRun: false
     };
 
-    // saucelabs are disabled for the moment because there are numerous connection problems
-    // between travis and sauce labs
-    if (useSauceLabs()) {
 
-        // Browsers to run on Sauce Labs
-        // Check out https://saucelabs.com/platforms for all browser/OS combos
-        browsers = baseConf.sauceLabsBrowsers.reduce(function (browsersMap, capability) {
-            browsersMap[JSON.stringify(capability)] = capability;
-            browsersMap[JSON.stringify(capability)].base = 'SauceLabs';
-            return browsersMap;
-        }, {});
-
-        settings.browsers = Object.keys(browsers);
-
-        if (process.env.CI) {
-            settings.concurrency = 5;
-        }
-
-        settings.sauceLabs = {
-            testName: baseConf.formatTaskName('Unit'),
-            build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
-            tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER || String(Math.random())
-        };
-        settings.logLevel = config.LOG_ERROR;
-        settings.captureTimeout = 0; // rely on SL timeout, see karma-runner/karma-sauce-launcher#37
-        settings.customLaunchers = browsers;
-    }
 
     config.set(settings);
 };

@@ -110,7 +110,7 @@ module.exports = function(opts) {
 
     var baseConfig = {
         mode: debug ? 'development' : 'production',
-        target: ['web', 'es5'],
+        target: ['web', 'es6'],
         devtool: false,
         watch: !!opts.watch,
         entry: {
@@ -175,27 +175,11 @@ module.exports = function(opts) {
             splitChunks: false,
             minimizer: []
         },
-        plugins: [
-            new LicenseWebpackPlugin({
-                outputFilename: '../../../../../../LICENSE',
-                perChunkOutput: false,
-                addBanner: false,
-                renderLicenses: (modules) => {
-                    const licenses = modules.map(module => {
-                        const licenseText = module.licenseText || 'License text not found';
-                        return `Package: ${module.packageJson.name || module.name}\nVersion: ${module.packageJson.version || 'N/A'}\nLicense: ${module.packageJson.license || 'N/A'}\n\n${licenseText}\n\n${'='.repeat(80)}\n`;
-                    }).join('\n');
-                    return cmsCopyright + licenses;
-                }
-            })
-        ],
+        plugins: [],
         resolve: {
             alias: {
                 jquery: PROJECT_PATH.js + '/libs/jquery.min.js',
-                classjs: PROJECT_PATH.js + '/libs/class.min.js',
                 jstree: PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
-                // Use ES6 entry point for keyboardjs instead of UMD dist
-                keyboardjs: 'keyboardjs/index.js'
             },
             fallback: {
                 path: false
@@ -262,6 +246,18 @@ module.exports = function(opts) {
         ]);
     } else {
         baseConfig.plugins = baseConfig.plugins.concat([
+            new LicenseWebpackPlugin({
+                outputFilename: '../../../../../../LICENSE',
+                perChunkOutput: false,
+                addBanner: false,
+                renderLicenses: (modules) => {
+                    const licenses = modules.map(module => {
+                        const licenseText = module.licenseText || 'License text not found';
+                        return `Package: ${module.packageJson.name || module.name}\nVersion: ${module.packageJson.version || 'N/A'}\nLicense: ${module.packageJson.license || 'N/A'}\n\n${licenseText}\n\n${'='.repeat(80)}\n`;
+                    }).join('\n');
+                    return cmsCopyright + licenses;
+                }
+            }),
             new webpack.DefinePlugin({
                 __DEV__: 'false',
                 __CMS_VERSION__: JSON.stringify(CMS_VERSION)
