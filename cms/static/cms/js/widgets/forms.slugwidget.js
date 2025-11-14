@@ -2,21 +2,13 @@
  * Copyright https://github.com/django-cms/django-cms
  */
 
-// this essentially makes sure that dynamically required bundles are loaded
-// from the same place
-// eslint-disable-next-line
-__webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.slugwidget');
 
-require.ensure([], function (require) {
-    var $ = require('jquery');
-    var addSlugHandlers = require('../modules/slug');
+import addSlugHandlers from '../modules/slug';
 
-    // init
-    $(function () {
-        // set local variables
-        var title = $('[id*=title]');
-        var slug = $('[id*=slug]');
+document.addEventListener('DOMContentLoaded', function () {
+    // set local variables
+    const title = document.querySelector('[id*=title]');
+    const slug = document.querySelector('[id*=slug]');
 
-        addSlugHandlers(title, slug);
-    });
-}, 'admin.widget');
+    addSlugHandlers(title, slug);
+});
