@@ -3,7 +3,6 @@
  */
 
 import $ from 'jquery';
-import Class from 'classjs';
 import { Helpers } from './cms.base';
 
 /**
@@ -12,25 +11,23 @@ import { Helpers } from './cms.base';
  * @class PageTreeStickyHeader
  * @namespace CMS
  */
-var PageTreeStickyHeader = new Class({
-    initialize: function initialize(options) {
-        var that = this;
+class PageTreeStickyHeader {
+    constructor(options) {
+        this.options = $.extend(true, {}, options);
+        this.resize = 'resize.cms.pagetree.header';
+        this.scroll = 'scroll.cms.pagetree.header';
+        this.areClonesInDOM = false;
 
-        that.options = $.extend(true, {}, that.options, options);
-        that.resize = 'resize.cms.pagetree.header';
-        that.scroll = 'scroll.cms.pagetree.header';
-        that.areClonesInDOM = false;
-
-        that._setupUI();
-        that._saveSizes();
-        that._events();
-    },
+        this._setupUI();
+        this._saveSizes();
+        this._events();
+    }
 
     /**
      * @method _setupUI
      * @private
      */
-    _setupUI: function _setupUI() {
+    _setupUI() {
         var container = this.options.container;
         var headers = container.find('.jstree-grid-header');
 
@@ -45,7 +42,7 @@ var PageTreeStickyHeader = new Class({
                 return $(el);
             })
         };
-    },
+    }
 
     /**
      * Determines positions/sizes of elements
@@ -53,7 +50,7 @@ var PageTreeStickyHeader = new Class({
      * @method _saveSizes
      * @private
      */
-    _saveSizes: function _saveSizes() {
+    _saveSizes() {
         this.headersTopOffset = this.ui.headers.offset().top;
         this.toolbarHeight = 0;
         if (this._isInSideframe()) {
@@ -61,14 +58,14 @@ var PageTreeStickyHeader = new Class({
         } else {
             this.toolbarHeight = $('#branding').height();
         }
-    },
+    }
 
     /**
      * @method _isInSideframe
      * @returns {Boolean} are we in sideframe?
      * @private
      */
-    _isInSideframe: function() {
+    _isInSideframe() {
         var win = Helpers._getWindow();
 
         if (win && win.parent && win.parent !== win) {
@@ -76,7 +73,7 @@ var PageTreeStickyHeader = new Class({
         }
 
         return false;
-    },
+    }
 
     /**
      * Event handlers.
@@ -84,15 +81,15 @@ var PageTreeStickyHeader = new Class({
      * @method _events
      * @private
      */
-    _events: function _events() {
+    _events() {
         this.ui.window.on([this.resize, this.scroll].join(' '), this._handleResizeOrScroll.bind(this));
-    },
+    }
 
     /**
      * @method _handleResizeOrScroll
      * @private
      */
-    _handleResizeOrScroll: function _handleResizeOrScroll() {
+    _handleResizeOrScroll() {
         var that = this;
         var scrollTop = that.ui.window.scrollTop();
         var scrollLeft = that.ui.window.scrollLeft();
@@ -102,7 +99,7 @@ var PageTreeStickyHeader = new Class({
         } else {
             that._unstickHeader();
         }
-    },
+    }
 
     /**
      * @method _shouldStick
@@ -110,9 +107,9 @@ var PageTreeStickyHeader = new Class({
      * @returns {Boolean} should headers stick
      * @private
      */
-    _shouldStick: function(scrollTop) {
+    _shouldStick(scrollTop) {
         return scrollTop + this.toolbarHeight >= this.headersTopOffset;
-    },
+    }
 
     /**
      * @method _stickHeader
@@ -120,7 +117,7 @@ var PageTreeStickyHeader = new Class({
      * @param {Number} scrollLeft left
      * @private
      */
-    _stickHeader: function _stickHeader(scrollTop, scrollLeft) {
+    _stickHeader(scrollTop, scrollLeft) {
         var that = this;
 
         that._insertClones();
@@ -140,13 +137,13 @@ var PageTreeStickyHeader = new Class({
         that.ui.headers.addClass('jstree-grid-header-fixed').css({
             top: that.toolbarHeight
         });
-    },
+    }
 
     /**
      * @method _unstickHeader
      * @private
      */
-    _unstickHeader: function _unstickHeader() {
+    _unstickHeader() {
         var that = this;
 
         that._detachClones();
@@ -156,7 +153,7 @@ var PageTreeStickyHeader = new Class({
             width: 'auto',
             left: 'auto'
         });
-    },
+    }
 
     /**
      * Inserts clones of headers so when header becomes sticky the
@@ -165,7 +162,7 @@ var PageTreeStickyHeader = new Class({
      * @method _insertClones
      * @private
      */
-    _insertClones: function _insertClones() {
+    _insertClones() {
         var that = this;
 
         if (!that.areClonesInDOM) {
@@ -174,7 +171,7 @@ var PageTreeStickyHeader = new Class({
             });
             that.areClonesInDOM = true;
         }
-    },
+    }
 
     /**
      * Detaches the clones of headers so then headers "unsticks"
@@ -183,7 +180,7 @@ var PageTreeStickyHeader = new Class({
      * @method _detachClones
      * @private
      */
-    _detachClones: function _detachClones() {
+    _detachClones() {
         var that = this;
 
         if (that.areClonesInDOM) {
@@ -193,6 +190,6 @@ var PageTreeStickyHeader = new Class({
             that.areClonesInDOM = false;
         }
     }
-});
+}
 
 export default PageTreeStickyHeader;
