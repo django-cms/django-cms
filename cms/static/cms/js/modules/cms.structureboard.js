@@ -284,11 +284,11 @@ class StructureBoard {
         if (options.useHoveredPlugin && CMS.settings.mode !== 'structure') {
             that._showAndHighlightPlugin(options.successTimeout).then($.noop, $.noop);
         } else if (!options.useHoveredPlugin) {
-
             if (CMS.settings.mode === 'structure') {
                 that.hide();
             } else if (CMS.settings.mode === 'edit') {
-                /* istanbul ignore else */ that.show();
+                /* istanbul ignore else */
+                that.show();
             }
         }
     }

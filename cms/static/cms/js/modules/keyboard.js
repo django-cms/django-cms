@@ -1,9 +1,11 @@
 // Minimal Keyboard-Modul mit Kontext und Event-Registrierung
 
 /* global KeyboardEvent */
-
-const contexts = {};
-let currentContext = 'global';
+const DEFAULT_CONTEXT = 'cms';
+const contexts = {
+    DEFAULT_CONTEXT: {}
+};
+let currentContext = DEFAULT_CONTEXT;
 let lastKey = null;
 
 function isInputFocused() {
@@ -75,7 +77,7 @@ function handleKeydown(event) {
     if (isInputFocused()) {
         return;
     }
-    const context = contexts[currentContext];
+    const context = contexts[currentContext] || contexts[DEFAULT_CONTEXT];
     const key = toKeyCode(event);
 
     if (context) {
