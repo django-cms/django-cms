@@ -7,7 +7,7 @@ import keyboard from './keyboard';
 
 import $ from 'jquery';
 import './jquery.transition';
-import './jquery.trap';
+import { trap, untrap } from './trap';
 
 import { Helpers, KEYS } from './cms.base';
 import { showLoader, hideLoader } from './loader';
@@ -226,8 +226,6 @@ class Modal {
         );
 
         keyboard.setContext('modal');
-        this.ui.modal.trap();
-
         return this;
     }
 
@@ -388,16 +386,15 @@ class Modal {
         if (this.options.onClose) {
             Helpers.reloadBrowser(this.options.onClose, false);
         }
-
-        this._hide({
-            duration: this.options.modalDuration / 2
-        });
-
-        this.ui.modal.untrap();
+        untrap(this.ui.body[0]);
         keyboard.setContext(previousKeyboardContext);
         try {
             previouslyFocusedElement.focus();
         } catch {}
+
+        this._hide({
+            duration: this.options.modalDuration / 2
+        });
     }
 
     /**
@@ -904,6 +901,9 @@ class Modal {
                 return;
             }
 
+            // trap focus within modal
+            trap(body[0]);
+
             // check if we are redirected - should only happen after successful form submission
             const redirect = body.find('a.cms-view-new-object').attr('href');
 
@@ -1187,6 +1187,7 @@ class Modal {
         this.ui.frame.empty().append(opts.html);
         this.ui.titlePrefix.text(opts.title || '');
         this.ui.titleSuffix.text(opts.subtitle || '');
+        trap(this.ui.frame[0]);
     }
 
     /**
