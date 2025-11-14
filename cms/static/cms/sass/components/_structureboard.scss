@@ -1,6 +1,7 @@
 //##############################################################################
 // STRUCTURE
 @use "sass:math";
+@use "sass:color";
 
 .cms-droppable {
     position: relative;
@@ -45,6 +46,9 @@
     .cms-structure-content {
         position: relative;
         overflow-y: scroll;
+        // Prevent scroll chaining to parent when reaching scroll limits
+        // Replaces the prevent-parent-scroll JavaScript library
+        overscroll-behavior: contain;
         top: 0;
         left: 0;
         padding: $toolbar-height 5%;
@@ -274,7 +278,7 @@
                 display: none;
             }
             &.cms-draggable-disallowed {
-                border: 2px solid saturate($color-danger, 80%);
+                border: 2px solid color.adjust($color-danger, $saturation: 80%);
                 background: rgba($color-danger, 0.1);
             }
         }
@@ -394,7 +398,7 @@
 
     .cms-draggable-selected .cms-dragitem,
     .cms-draggable-selected .cms-dragitem strong {
-        color: adjust-hue($color-primary-fallback, 15deg);
+        color: color.adjust($color-primary-fallback, $hue: 15deg);
     }
     .cms-draggable-selected .cms-draggable .cms-dragitem,
     .cms-draggable-selected .cms-draggable .cms-dragitem strong {
@@ -404,8 +408,8 @@
     .cms-draggable-allowed,
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: lighten($color-primary-fallback, 40%);
-        border-color: lighten($color-primary-fallback, 40%);
+        color: color.adjust($color-primary-fallback, $lightness: 40%);
+        border-color: color.adjust($color-primary-fallback, $lightness: 40%);
     }
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
@@ -415,9 +419,9 @@
 
     .cms-draggable-disallowed,
     .cms-draggable-hover-disallowed {
-        color: saturate($color-danger, 80%);
+        color: color.adjust($color-danger, $saturation: 80%);
         background: rgba($color-danger, 0.1);
-        box-shadow: 0 0 0 2px saturate($color-danger, 80%);
+        box-shadow: 0 0 0 2px color.adjust($color-danger, $saturation: 80%);
         &:before {
             display: none;
         }

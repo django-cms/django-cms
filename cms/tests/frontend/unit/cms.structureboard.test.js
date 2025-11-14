@@ -250,7 +250,7 @@ describe('CMS.StructureBoard', function() {
                 });
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
-                // eslint-disable-next-line compat/compat
+
                 spyOn(board, '_loadStructure').and.returnValue(Promise.resolve());
                 done();
             });
@@ -344,9 +344,9 @@ describe('CMS.StructureBoard', function() {
                 };
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
-                // eslint-disable-next-line compat/compat
+
                 spyOn(board, 'show').and.returnValue(Promise.resolve());
-                // eslint-disable-next-line compat/compat
+
                 spyOn(board, 'hide').and.returnValue(Promise.resolve());
                 spyOn(Plugin, '_highlightPluginStructure');
                 spyOn(Plugin, '_highlightPluginContent');
@@ -423,9 +423,9 @@ describe('CMS.StructureBoard', function() {
                 });
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
-                // eslint-disable-next-line compat/compat
+
                 spyOn(board, '_loadContent').and.returnValue(Promise.resolve());
-                // eslint-disable-next-line compat/compat
+
                 spyOn(board, '_loadStructure').and.returnValue(Promise.resolve());
                 done();
             });
@@ -925,10 +925,10 @@ describe('CMS.StructureBoard', function() {
         });
 
         describe('start', function() {
-            it('sets data-touch-action attribute', function() {
-                expect(board.ui.content).toHaveAttr('data-touch-action', 'pan-y');
+            it('sets touchAction style property', function() {
+                expect(board.ui.content[0].style.touchAction).toEqual('pan-y');
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
-                expect(board.ui.content).toHaveAttr('data-touch-action', 'none');
+                expect(board.ui.content[0].style.touchAction).toEqual('none');
             });
 
             it('sets dragging state', function() {
@@ -1094,10 +1094,10 @@ describe('CMS.StructureBoard', function() {
                 expect(board.ui.doc).not.toHandle('keyup.cms.interrupt');
             });
 
-            it('resets data-touch-action attribute', function() {
-                board.ui.content.removeAttr('data-touch-action');
+            it('resets touchAction style property', function() {
+                board.ui.content[0].style.touchAction = '';
                 options.beforeStop(null, { item: $('<div></div>') });
-                expect(board.ui.content).toHaveAttr('data-touch-action', 'pan-y');
+                expect(board.ui.content[0].style.touchAction).toEqual('pan-y');
             });
         });
 
@@ -2031,12 +2031,12 @@ describe('CMS.StructureBoard', function() {
         describe('handleCopyPlugin', () => {
             const clipboardConstructor = jasmine.createSpy();
             const close = jasmine.createSpy();
-            class FakeClipboard {
-                constructor(...args) {
-                    clipboardConstructor(...args);
-                }
+            // Use a function constructor instead of class to allow prototype mutation in tests
+            function FakeClipboard(...args) {
+                clipboardConstructor(...args);
             }
-            FakeClipboard.prototype = Object.assign(FakeClipboard.prototype, {
+            // Assign methods without replacing the non-writable ES6 class prototype
+            Object.assign(FakeClipboard.prototype, {
                 _isClipboardModalOpen: jasmine.createSpy(),
                 modal: {
                     close: jasmine.createSpy()
