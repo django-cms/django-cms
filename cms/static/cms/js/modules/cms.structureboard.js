@@ -4,16 +4,17 @@
 
 /* eslint-env es6 */
 /* jshint esversion: 6 */
-/* global CMS */
 
 import $ from 'jquery';
 import keyboard from './keyboard';
 import Plugin from './cms.plugins';
 import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
-import { DiffDOM, nodeToObj } from 'diff-dom';
-import PreventParentScroll from 'prevent-parent-scroll';
-import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
+import { DiffDOM, nodeToObj } from './dom-diff';
+import once from 'lodash-es/once.js';
+import remove from 'lodash-es/remove.js';
+import isEqual from 'lodash-es/isEqual.js';
+import zip from 'lodash-es/zip.js';
 import ls from 'local-storage';
 
 import './jquery.ui.custom';
@@ -26,7 +27,8 @@ import preloadImagesFromMarkup from './preload-images';
 import { Helpers, KEYS } from './cms.base';
 import { showLoader, hideLoader } from './loader';
 
-const DOMParser = window.DOMParser; // needed only for testing
+/* global DOMParser */
+
 const storageKey = 'cms-structure';
 
 let dd;
@@ -40,10 +42,10 @@ const triggerWindowResize = () => {
 
         evt.initUIEvent('resize', true, false, window, 0);
         window.dispatchEvent(evt);
-    } catch (e) {}
+    } catch {}
 };
 
-const arrayEquals = (a1, a2) => every(zip(a1, a2), ([a, b]) => a === b);
+const arrayEquals = (a1, a2) => zip(a1, a2).every(([a, b]) => a === b);
 
 /**
  * Handles drag & drop, mode switching and collapsables.
@@ -110,7 +112,10 @@ class StructureBoard {
             toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
         };
 
-        this._preventScroll = new PreventParentScroll(this.ui.content[0]);
+        // Set initial touch-action for vertical scrolling
+        if (this.ui.content[0]) {
+            this.ui.content[0].style.touchAction = 'pan-y';
+        }
     }
 
     /**
@@ -147,7 +152,7 @@ class StructureBoard {
 
         // check if modes should be visible
         if (this.ui.dragareas.not('.cms-clipboard .cms-dragarea').length || this.ui.placeholders.length) {
-            // eslint-disable-line
+
             this.ui.toolbarModeSwitcher.find('.cms-btn').removeClass('cms-btn-disabled');
         }
 
@@ -279,11 +284,11 @@ class StructureBoard {
         if (options.useHoveredPlugin && CMS.settings.mode !== 'structure') {
             that._showAndHighlightPlugin(options.successTimeout).then($.noop, $.noop);
         } else if (!options.useHoveredPlugin) {
-            // eslint-disable-next-line no-lonely-if
             if (CMS.settings.mode === 'structure') {
                 that.hide();
             } else if (CMS.settings.mode === 'edit') {
-                /* istanbul ignore else */ that.show();
+                /* istanbul ignore else */
+                that.show();
             }
         }
     }
@@ -395,7 +400,7 @@ class StructureBoard {
                 CMS.settings.states = Helpers.getSettings().states;
 
                 const bodyRegex = /<body[\S\s]*?>([\S\s]*)<\/body>/gi;
-                const body = document.createElement('div');  // Switch to plain JS due to problem with $(body)
+                const body = document.createElement('div'); // Switch to plain JS due to problem with $(body)
 
                 body.innerHTML = bodyRegex.exec(contentMarkup)[1];
 
@@ -507,7 +512,7 @@ class StructureBoard {
                         !elem.is('.cms#cms-top') && !elem.is('[data-cms]:not([data-cms-generic])') // toolbar
                     ); // cms scripts
                 });
-                body.find('[data-cms]:not([data-cms-generic])').remove();  // cms scripts
+                body.find('[data-cms]:not([data-cms-generic])').remove(); // cms scripts
 
                 [].slice.call(bodyAttributes).forEach(function(attr) {
                     bodyElement.attr(attr.name, attr.value);
@@ -652,7 +657,6 @@ class StructureBoard {
             this._makeFullWidth();
         }
 
-        this._preventScroll.start();
         this.ui.window.trigger('resize');
     }
 
@@ -700,7 +704,6 @@ class StructureBoard {
     _hideBoard() {
         // hide elements
         this.ui.container.hide();
-        this._preventScroll.stop();
 
         // this is sometimes required for user-side scripts to
         // render dynamic elements on the page correctly.
@@ -756,7 +759,8 @@ class StructureBoard {
                 // eslint-disable-next-line no-magic-numbers
                 scrollSensitivity: that.ui.window.height() * 0.2,
                 start: function(e, ui) {
-                    that.ui.content.attr('data-touch-action', 'none');
+                    // Disable touch scrolling during drag operations
+                    that.ui.content[0].style.touchAction = 'none';
 
                     originalPluginContainer = ui.item.closest('.cms-draggables');
 
@@ -796,7 +800,8 @@ class StructureBoard {
                     that.dragging = false;
                     ui.item.removeClass('cms-is-dragging cms-draggable-stack');
                     that.ui.doc.off('keyup.cms.interrupt');
-                    that.ui.content.attr('data-touch-action', 'pan-y');
+                    // Re-enable vertical scrolling after drag
+                    that.ui.content[0].style.touchAction = 'pan-y';
                 },
 
                 update: function(event, ui) {
@@ -948,7 +953,7 @@ class StructureBoard {
      */
     // eslint-disable-next-line complexity
     invalidateState(action, data, { propagate = true } = {}) {
-        // eslint-disable-next-line default-case
+
 
         // By default, any edit action will result in changed content and therefore a need for an update
         let updateNeeded = true;
@@ -956,11 +961,11 @@ class StructureBoard {
         switch (action) {
             case 'COPY': {
                 this.handleCopyPlugin(data);
-                updateNeeded = false;  // Copying, however, only changes the clipboard - no update needed
+                updateNeeded = false; // Copying, however, only changes the clipboard - no update needed
                 break;
             }
 
-             // For other actions, only refresh, if the new state cannot be determined from the data bridge
+            // For other actions, only refresh, if the new state cannot be determined from the data bridge
             case 'ADD': {
                 updateNeeded = this.handleAddPlugin(data);
                 break;
@@ -1017,12 +1022,12 @@ class StructureBoard {
 
             if (this._loadedContent && updateNeeded) {
                 this.updateContent();
-                return;  // Toolbar loaded
+                return; // Toolbar loaded
             }
         } else if (updateNeeded === true) {
             this._requestcontent = null;
             this.updateContent();
-            return;  // Toolbar loaded
+            return; // Toolbar loaded
 
         }
         this._loadToolbar()
@@ -1116,11 +1121,11 @@ class StructureBoard {
             return true;
         }
         if (data.source_placeholder_id && !CMS._instances.some(
-                instance => instance.options.type === 'plugin' &&
-                instance.options.placeholder_id == data.source_placeholder_id  // eslint-disable-line eqeqeq
+            instance => instance.options.type === 'plugin' &&
+                instance.options.placeholder_id == data.source_placeholder_id // eslint-disable-line eqeqeq
         )) {
             // If last plugin was moved from a placeholder, the placeholder needs to be updated
-            return true;  // Update needed
+            return true; // Update needed
         }
 
         for (const content of data.content) {
@@ -1141,7 +1146,7 @@ class StructureBoard {
         let nextEl = $(`div.cms-placeholder.cms-placeholder-${placeholder_id}`);
         const nextPlugins = CMS._instances.filter(instance =>
             instance.options.type === 'plugin' &&
-            instance.options.placeholder_id == placeholder_id &&  // eslint-disable-line eqeqeq
+            instance.options.placeholder_id == placeholder_id && // eslint-disable-line eqeqeq
             instance.options.position >= position &&
             !excludedPlugins.includes(1 * instance.options.plugin_id));
 
@@ -1211,7 +1216,8 @@ class StructureBoard {
                     placeholderIds +
                     '&' +
                     `obj_id=${CMS.config.request.pk}&` +
-                    `obj_type=${encodeURIComponent(CMS.config.request.model)}`
+                    `obj_type=${encodeURIComponent(CMS.config.request.model)}` +
+                    `&language=${encodeURIComponent(CMS.config.request.language)}`
             )
         });
     }
@@ -1242,9 +1248,8 @@ class StructureBoard {
 
             // external update, have to move the draggable to correct place first
             if (!draggable.closest('.cms-draggables').parent().is(`.cms-dragarea-${data.placeholder_id}`)) {
-                const pluginOrder = data.plugin_order;
-                const index = findIndex(
-                    pluginOrder,
+                const pluginOrder = data.plugin_order || [];
+                const index = pluginOrder.findIndex(
                     pluginId => Number(pluginId) === Number(data.plugin_id) || pluginId === '__COPY__'
                 );
                 const placeholderDraggables = $(`.cms-dragarea-${data.placeholder_id} > .cms-draggables`);
@@ -1270,9 +1275,8 @@ class StructureBoard {
 
                 if (!arrayEquals(actualPluginOrder, data.plugin_order)) {
                     // so the plugin order is not correct, means it's an external update and we need to move
-                    const pluginOrder = data.plugin_order;
-                    const index = findIndex(
-                        pluginOrder,
+                    const pluginOrder = data.plugin_order || [];
+                    const index = pluginOrder.findIndex(
                         pluginId => Number(pluginId) === Number(data.plugin_id)
                     );
 
@@ -1335,7 +1339,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return true;  // update needed
+        return true; // update needed
     }
 
     handleCutPlugin(data) {
@@ -1357,19 +1361,17 @@ class StructureBoard {
         if (messages.length) {
             messageList.remove();
 
-            return compact(
-                messages.toArray().map(el => {
-                    const msgEl = $(el);
-                    const message = $(el).text().trim();
+            return messages.toArray().map(el => {
+                const msgEl = $(el);
+                const message = $(el).text().trim();
 
-                    if (message) {
-                        return {
-                            message,
-                            error: msgEl.data('cms-message-tags') === 'error' || msgEl.hasClass('error')
-                        };
-                    }
-                })
-            );
+                if (message) {
+                    return {
+                        message,
+                        error: msgEl.data('cms-message-tags') === 'error' || msgEl.hasClass('error')
+                    };
+                }
+            }).filter(Boolean);
         }
 
         return [];
@@ -1464,7 +1466,7 @@ class StructureBoard {
     handleDeletePlugin(data) {
         const { placeholder_id } = CMS._instances.find(
             // data.plugin_id might be string
-            plugin => plugin && plugin.options.plugin_id == data.plugin_id  // eslint-disable-line eqeqeq
+            plugin => plugin && plugin.options.plugin_id == data.plugin_id // eslint-disable-line eqeqeq
         ).options;
         const draggable = $('.cms-draggable-' + data.plugin_id);
         const children = draggable.find('.cms-draggable');
@@ -1483,13 +1485,13 @@ class StructureBoard {
 
         StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
         StructureBoard.actualizePlaceholders();
-        const contentData = (data.structure || data);  // delete has content in data.structure, cut in data
+        const contentData = (data.structure || data); // delete has content in data.structure, cut in data
 
         deletedPluginIds.forEach(function(pluginId) {
             if (!contentData.content) {
-                $(`.cms-plugin.cms-plugin-${pluginId}`).remove();  // Remove from content
+                $(`.cms-plugin.cms-plugin-${pluginId}`).remove(); // Remove from content
             }
-            $(`script[data-cms-plugin]#cms-plugin-${pluginId}`).remove();  // Remove script elements
+            $(`script[data-cms-plugin]#cms-plugin-${pluginId}`).remove(); // Remove script elements
             remove(CMS._plugins, settings => settings[0] === `cms-plugin-${pluginId}`);
             remove(
                 CMS._instances,
@@ -1498,7 +1500,7 @@ class StructureBoard {
         });
 
         const lastPluginDeleted = CMS._instances.find(
-            plugin => plugin.options.placeholder_id == placeholder_id  // eslint-disable-line eqeqeq
+            plugin => plugin.options.placeholder_id == placeholder_id // eslint-disable-line eqeqeq
         ) === undefined;
 
         return lastPluginDeleted || contentData.content && this._updateContentFromDataBridge(contentData);
@@ -1583,7 +1585,7 @@ class StructureBoard {
      */
     static actualizePluginCollapseStatus(pluginId) {
         const el = $(`.cms-draggable-${pluginId}`);
-        const open = find(CMS.settings.states, openPluginId => Number(openPluginId) === Number(pluginId));
+        const open = (CMS.settings.states || []).find(openPluginId => Number(openPluginId) === Number(pluginId));
 
         // only add this class to elements which have a draggable area
         // istanbul ignore else
@@ -1752,24 +1754,22 @@ class StructureBoard {
      * @returns {Array<[String, Object]>}
      */
     static _getPluginDataFromMarkup(body, pluginIds) {
-        return compact(
-            pluginIds.map(pluginId => {
-                const pluginData = body.querySelector(`#cms-plugin-${pluginId}`);
-                let settings;
+        return pluginIds.map(pluginId => {
+            const pluginData = body.querySelector(`#cms-plugin-${pluginId}`);
+            let settings;
 
-                if (pluginData) {
-                    try {
-                        settings = JSON.parse(pluginData.textContent);
-                    } catch (e) {
-                        settings = false;
-                    }
-                } else {
+            if (pluginData) {
+                try {
+                    settings = JSON.parse(pluginData.textContent);
+                } catch {
                     settings = false;
                 }
+            } else {
+                settings = false;
+            }
 
-                return settings;
-            })
-        );
+            return settings;
+        }).filter(Boolean);
     }
 
 }

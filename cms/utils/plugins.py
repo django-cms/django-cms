@@ -305,7 +305,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
         try:
             position = positions_by_language[new_plugin.language]
         except KeyError:
-            offset = placeholder.get_last_plugin_position(language) or 0
+            offset = placeholder.get_last_plugin_position(new_plugin.language) or 0
             # The position is relative to language.
             position = placeholder.get_next_plugin_position(
                 language=new_plugin.language,
@@ -315,7 +315,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
             # Because it is the first time this language is processed,
             # shift all plugins to the right of the next position.
             placeholder._shift_plugin_positions(
-                language,
+                new_plugin.language,
                 start=position,
                 offset=offset,
             )
@@ -405,9 +405,9 @@ def get_bound_plugins(plugins):
 
 def downcast_plugins(
     plugins: Iterable[CMSPlugin],
-    placeholders: Optional[list] = None,
+    placeholders: list | None = None,
     select_placeholder: bool = False,
-    request: Optional[HttpRequest] = None,
+    request: HttpRequest | None = None,
 ) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins

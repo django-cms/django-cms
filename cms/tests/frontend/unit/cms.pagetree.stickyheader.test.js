@@ -1,4 +1,4 @@
-/* global document, window */
+/* global window */
 'use strict';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
 var PageTreeStickyHeader = require('../../../static/cms/js/modules/cms.pagetree.stickyheader').default;

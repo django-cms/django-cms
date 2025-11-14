@@ -9,6 +9,8 @@
     position: fixed;
     top: 50%;
     left: 50%;
+    max-width: unset;
+    max-height: unset;
     overflow: hidden;
     z-index: z(modal, base);
     border-radius: $modal-border-radius;

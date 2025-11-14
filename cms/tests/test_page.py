@@ -905,6 +905,38 @@ class PagesTestCase(TransactionCMSTestCase):
         en_cached = get_page_cache(en_request)
         self.assertIsNotNone(en_cached, "Fallback English version should be cached")
 
+    def test_page_objects_search(self):
+        """
+        Test the search method of Page.objects
+        """
+        page1 = create_page("test page 1", "nav_playground.html", "en", slug="test-page-1")
+        create_page_content("de", "some random content", page1)
+        create_page("another page", "nav_playground.html", "en", slug="another-page")
+        create_page_content("fr", "some more random content", page1)
+
+        # Search by title
+        results = Page.objects.search("test")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].pk, page1.pk)
+
+        # Search by content
+        results = Page.objects.search("more random")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].pk, page1.pk)
+
+        # Search by content and language
+        results = Page.objects.search("more random", language="fr")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].pk, page1.pk)
+
+        # Search with no results
+        results = Page.objects.search("nonexistent")
+        self.assertEqual(len(results), 0)
+
+        # Search with language that has no content
+        results = Page.objects.search("more random", language="en")
+        self.assertEqual(len(results), 0)
+
 
 class PageTreeTests(CMSTestCase):
     def test_rename_node(self):

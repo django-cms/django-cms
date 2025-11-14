@@ -1,26 +1,41 @@
-/* global CMS, gettext */
-import $ from 'jquery';
+
+/* global gettext, fetch */
+
 import addSlugHandlers from './slug';
 
-$(function() {
+document.addEventListener('DOMContentLoaded', () => {
     // set local variables
-    var title = $('#id_title');
-    var slug = $('#id_slug');
+    const title = document.getElementById('id_title');
+    const slug = document.getElementById('id_slug');
 
     addSlugHandlers(title, slug);
 
     // all permissions and page states loader
-    $('div.loading').each(function() {
-        $(this).load($(this).attr('rel'));
+    document.querySelectorAll('div.loading').forEach(div => {
+        const rel = div.getAttribute('rel');
+
+        if (rel) {
+            fetch(rel)
+                .then(response => response.text())
+                .then(html => {
+                    div.innerHTML = html;
+                });
+        }
     });
 
     // hide rows when hidden input fields are added
-    $('input[type="hidden"]').each(function() {
-        $(this).parent('.form-row').hide();
+    document.querySelectorAll('input[type="hidden"]').forEach(input => {
+        const parent = input.closest('.form-row');
+
+        if (parent) {
+            parent.style.display = 'none';
+        }
     });
 
-    $('#page_form_lang_tabs .language_button').on('click', function() {
-        CMS.API.changeLanguage(this.dataset.adminUrl);
+    document.querySelectorAll('#page_form_lang_tabs .language_button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            CMS.API.changeLanguage(this.dataset.adminUrl);
+        });
     });
 
     // public api for changing the language tabs
@@ -28,18 +43,21 @@ $(function() {
     window.CMS.API.changeLanguage = function(url) {
         // also make sure that we will display the confirm dialog
         // in case users switch tabs while editing plugins
-        var answer = true;
-        var changed = false;
+        let answer = true;
+        let changed = false;
 
-        if (slug.length) {
+        if (slug) {
             // check if the slug has the changed attribute
-            if (slug.data('changed') || title.data('changed')) {
+            if (slug.dataset.changed === 'true' || (title && title.dataset.changed === 'true')) {
                 changed = true;
             }
         }
 
         if (changed) {
-            var question = gettext('Are you sure you want to change tabs without saving the page first?');
+            const question = typeof gettext === 'function'
+                ? gettext('Are you sure you want to change tabs without saving the page first?')
+                : 'Are you sure you want to change tabs without saving the page first?';
+
 
             // eslint-disable-next-line no-alert
             answer = confirm(question);

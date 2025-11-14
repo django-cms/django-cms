@@ -420,6 +420,22 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # test subplugin copy
         copy_plugins_to_placeholder([link_plugin_en], ph_de, language="de")
+        self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 2)
+
+        # Assert that copied plugins have distinct, sequential positions
+        plugins = list(ph_de.cmsplugin_set.filter(language="de").order_by('position'))
+        positions = [plugin.position for plugin in plugins]
+        self.assertEqual(len(positions), len(set(positions)), "Plugin positions should be unique")
+        self.assertEqual(positions, list(range(positions[0], positions[0] + len(positions))), "Plugin positions should be sequential")
+
+        # Assert that no integrity errors are raised (uniqueness constraints maintained)
+        from django.db import IntegrityError
+        try:
+            for plugin in plugins:
+                # Try to save plugin again to check for uniqueness constraint
+                plugin.save()
+        except IntegrityError:
+            self.fail("IntegrityError raised: uniqueness constraint violated when saving copied plugins")
 
     def test_deep_copy_plugins(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
@@ -586,7 +602,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.registered_plugins)
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
 
-    def test_search_pages(self):
+    def test_search_pages_for_plugin_content(self):
         """
         Test search for pages
         To be fully useful, this testcase needs to have the following different
@@ -606,6 +622,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         text.save()
         self.assertEqual(Page.objects.search("hi").count(), 0)
         self.assertEqual(Page.objects.search("hello").count(), 1)
+        self.assertEqual(Page.objects.search("hi", language="en").count(), 0)
+        self.assertEqual(Page.objects.search("hello", language="fr").count(), 0)
+
 
     def test_empty_plugin_is_ignored(self):
         page = api.create_page("page", "nav_playground.html", "en")
