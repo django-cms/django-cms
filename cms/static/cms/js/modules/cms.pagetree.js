@@ -901,13 +901,20 @@ class PageTree {
                     parent = window.parent;
                 }
                 let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
-                let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                    ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
+                let csrfTokenValue = (formToken ? formToken.value : formToken) || window.CMS.config.csrf;
 
-                $('<form method="post" action="' + element.attr('href') + '">' +
-                    csrfToken + '</form>')
-                    .appendTo($(parent.document.body))
-                    .submit();
+                let form = document.createElement('form');
+                form.method = 'post';
+                form.action = element.attr('href');
+
+                let csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfTokenValue;
+                form.appendChild(csrfInput);
+
+                parent.document.body.appendChild(form);
+                form.submit();
                 return;
             }
             try {

@@ -756,8 +756,10 @@ class Modal {
 
             // Safely build the element using jQuery APIs to escape title and class
             var el = $('<a href="#"></a>');
+
             el.addClass(cls);
             var itemClasses = item.attr('class');
+
             if (itemClasses) {
                 el.addClass(itemClasses);
             }

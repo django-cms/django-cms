@@ -147,7 +147,7 @@ class Plugin {
 
         // in clipboard can be non-existent
         if (!contents.length) {
-            contents = $('<div></div>');
+            contents = $(document.createElement('div'));
         }
 
         this.ui = this.ui || {};
@@ -1228,11 +1228,16 @@ class Plugin {
         });
 
         if (count) {
-            plugins.find('.cms-quicksearch').after(
-                $(`<div class="cms-submenu-item cms-submenu-item-title" data-cms-most-used>
-                    <span>${CMS.config.lang.mostUsed}</span>
-                </div>`)
-            );
+            const titleDiv = document.createElement('div');
+
+            titleDiv.className = 'cms-submenu-item cms-submenu-item-title';
+            titleDiv.setAttribute('data-cms-most-used', '');
+            const span = document.createElement('span');
+
+            span.textContent = CMS.config.lang.mostUsed;
+            titleDiv.appendChild(span);
+
+            plugins.find('.cms-quicksearch').after($(titleDiv));
         }
 
         return plugins;
@@ -2112,16 +2117,18 @@ Plugin._highlightPluginStructure = function _highlightPluginStructure(
     // eslint-disable-next-line no-magic-numbers
     { successTimeout = 200, delay = 1500, seeThrough = false }
 ) {
-    const tpl = $(`
-        <div class="cms-dragitem-success ${seeThrough ? 'cms-plugin-overlay-see-through' : ''}">
-        </div>
-    `);
+    const tpl = document.createElement('div');
 
-    el.addClass('cms-draggable-success').append(tpl);
+    tpl.className = 'cms-dragitem-success';
+    if (seeThrough) {
+        tpl.classList.add('cms-plugin-overlay-see-through');
+    }
+
+    el.addClass('cms-draggable-success').append($(tpl));
     // start animation
     if (successTimeout) {
         setTimeout(() => {
-            tpl.fadeOut(successTimeout, function() {
+            $(tpl).fadeOut(successTimeout, function() {
                 $(this).remove();
                 el.removeClass('cms-draggable-success');
             });
@@ -2199,25 +2206,25 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
 
     $window.scrollTop(coordinates.top - $window.height() * OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO);
 
-    $(
-        `
-        <div class="
-            cms-plugin-overlay
-            cms-dragitem-success
-            cms-plugin-overlay-${escapeHtml(pluginId)}
-            ${seeThrough ? 'cms-plugin-overlay-see-through' : ''}
-            ${prominent ? 'cms-plugin-overlay-prominent' : ''}
-        "
-            data-success-timeout="${successTimeout}"
-        >
-        </div>
-    `
-    )
-        .css(coordinates)
-        .css({
-            zIndex: 9999
-        })
-        .appendTo($('body'));
+    const overlay = document.createElement('div');
+
+    overlay.className = 'cms-plugin-overlay cms-dragitem-success cms-plugin-overlay-' + pluginId;
+    if (seeThrough) {
+        overlay.classList.add('cms-plugin-overlay-see-through');
+    }
+    if (prominent) {
+        overlay.classList.add('cms-plugin-overlay-prominent');
+    }
+    overlay.setAttribute('data-success-timeout', successTimeout);
+
+    Object.assign(overlay.style, {
+        left: coordinates.left + 'px',
+        top: coordinates.top + 'px',
+        width: coordinates.width + 'px',
+        height: coordinates.height + 'px',
+        zIndex: 9999
+    });
+    document.body.appendChild(overlay);
 
     if (successTimeout) {
         setTimeout(() => {

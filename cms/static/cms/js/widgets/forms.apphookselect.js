@@ -4,6 +4,7 @@
  * Copyright https://github.com/django-cms/django-cms
  */
 
+/* global URL */
 
 let apphookData = {
     apphooks_configuration: {},
@@ -40,11 +41,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const u = new URL(url, window.location.origin);
             const allowedProtocols = ['http:', 'https:', ''];
             // '' is for relative URLs
+
             if (allowedProtocols.includes(u.protocol)) {
                 return u.href;
             }
             return '';
-        } catch (e) {
+        } catch {
             // Malformed URLs result in blank
             return '';
         }
@@ -70,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             if (appCfgsAdd) {
                 const safeUrl = sanitizeUrl(apphookData.apphooks_configuration_url[opt.value]);
+
                 appCfgsAdd.setAttribute('href', safeUrl +
                     (window.showRelatedObjectPopup ? '?_popup=1' : ''));
                 appCfgsAdd.addEventListener('click', function (ev) {
