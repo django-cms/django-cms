@@ -2204,7 +2204,7 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
         <div class="
             cms-plugin-overlay
             cms-dragitem-success
-            cms-plugin-overlay-${pluginId}
+            cms-plugin-overlay-${escapeHtml(pluginId)}
             ${seeThrough ? 'cms-plugin-overlay-see-through' : ''}
             ${prominent ? 'cms-plugin-overlay-prominent' : ''}
         "
