@@ -33,6 +33,23 @@ document.addEventListener('DOMContentLoaded', function () {
         return select ? select.options[select.selectedIndex] : null;
     }
 
+    // Helper: sanitize URL to prevent javascript: or other unsafe schemes
+    function sanitizeUrl(url) {
+        try {
+            // Allows absolute and relative URLs; bans 'javascript:', 'data:', etc.
+            const u = new URL(url, window.location.origin);
+            const allowedProtocols = ['http:', 'https:', ''];
+            // '' is for relative URLs
+            if (allowedProtocols.includes(u.protocol)) {
+                return u.href;
+            }
+            return '';
+        } catch (e) {
+            // Malformed URLs result in blank
+            return '';
+        }
+    }
+
     // Shows / hides namespace / config selection widgets depending on the user input
     // eslint-disable-next-line complexity
     function setupNamespaces() {
@@ -52,7 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 appCfgs.appendChild(option);
             }
             if (appCfgsAdd) {
-                appCfgsAdd.setAttribute('href', apphookData.apphooks_configuration_url[opt.value] +
+                const safeUrl = sanitizeUrl(apphookData.apphooks_configuration_url[opt.value]);
+                appCfgsAdd.setAttribute('href', safeUrl +
                     (window.showRelatedObjectPopup ? '?_popup=1' : ''));
                 appCfgsAdd.addEventListener('click', function (ev) {
                     ev.preventDefault();
