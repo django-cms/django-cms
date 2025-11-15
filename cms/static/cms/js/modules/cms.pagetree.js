@@ -900,14 +900,15 @@ class PageTree {
                 if (window.parent) {
                     parent = window.parent;
                 }
-                let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
-                let csrfTokenValue = (formToken ? formToken.value : formToken) || window.CMS.config.csrf;
+                const formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
+                const csrfTokenValue = (formToken ? formToken.value : formToken) || window.CMS.config.csrf;
+                const form = document.createElement('form');
+                const csrfInput = document.createElement('input');
 
-                let form = document.createElement('form');
                 form.method = 'post';
                 form.action = element.attr('href');
 
-                let csrfInput = document.createElement('input');
+
                 csrfInput.type = 'hidden';
                 csrfInput.name = 'csrfmiddlewaretoken';
                 csrfInput.value = csrfTokenValue;
