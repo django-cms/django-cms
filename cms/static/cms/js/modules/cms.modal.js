@@ -754,8 +754,14 @@ class Modal {
                 cls = 'cms-btn cms-btn-caution';
             }
 
-            var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
-
+            // Safely build the element using jQuery APIs to escape title and class
+            var el = $('<a href="#"></a>');
+            el.addClass(cls);
+            var itemClasses = item.attr('class');
+            if (itemClasses) {
+                el.addClass(itemClasses);
+            }
+            el.text(title);
 
             el.on(that.click + ' ' + that.touchEnd, function(e) {
                 e.preventDefault();
