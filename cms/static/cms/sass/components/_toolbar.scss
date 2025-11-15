@@ -147,12 +147,13 @@
             display: block;
             position: absolute;
             top: $toolbar-height;
-            inset-inline-start: 0;
+            inset-block-start: calc(100% - 2px);
+            inset-inline-start: -$toolbar-dropdown-border-radius/2;
             min-width: $toolbar-dropdown-min-width;
-            padding: $toolbar-dropdown-padding;
+            padding: $toolbar-dropdown-padding 0 $toolbar-dropdown-padding;
             border: 1px solid $gray-lightest;
             border-top: none;
-            border-radius: 0 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius;
+            border-radius: $toolbar-dropdown-border-radius;
             background-color: $toolbar-dropdown-bgcolor;
             box-shadow: $toolbar-dropdown-shadow;
         }
@@ -170,15 +171,15 @@
         }
         ul ul {
             border-top: 1px solid $gray-lightest;
-            border-radius: 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius 0;
+            border-radius: $toolbar-dropdown-border-radius;
         }
 
         // second level
         .cms-toolbar-item-navigation-children {
             ul {
                 display: none;
-                top: -(list.nth($toolbar-dropdown-padding, 1) + 1px);
-                inset-inline-start: 100%;
+                top: -$toolbar-dropdown-padding - 1px;
+                inset-inline-start: calc(100% - 2px);
             }
             > a {
                 cursor: default;
@@ -284,9 +285,6 @@
 }
 .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
     position: fixed;
-    width: 100%;
-    // 100vw is better because if the user's content exceeds the viewport width
-    // the dropdown will also go out of the screen, which is not ideal, esp. on mobile
     width: 100vw;
     top: $toolbar-height;
     bottom: 0;

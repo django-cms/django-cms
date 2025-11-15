@@ -69,7 +69,7 @@
     right: 10px;
     padding: 0 5px;
     border: 1px solid $gray-lighter;
-    border-radius: $border-radius-base;
+    border-radius: $dropdown-border-radius;
 }
 .cms-structure-content .cms-submenu-lang {
     display: none;
@@ -90,7 +90,7 @@
     min-width: $dropdown-width;
     background: $submenu-dropdown-bgcolor;
     border: $submenu-dropdown-border;
-    border-radius: $border-radius-normal;
+    border-radius: $dropdown-border-radius;
     box-shadow: $dropdown-shadow;
     inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
     transform: translateZ(0);
@@ -146,11 +146,11 @@
         }
         &:first-child a:hover,
         &:first-child a:focus {
-            border-radius: $border-radius-normal $border-radius-normal 0 0;
+            border-radius: $dropdown-border-radius $dropdown-border-radius 0 0;
         }
         &:last-child a:hover,
         &:last-child a:focus {
-            border-radius: 0 0 $border-radius-normal $border-radius-normal;
+            border-radius: 0 0 $dropdown-border-radius $dropdown-border-radius;
         }
     }
     .cms-submenu-item-paste-tooltip {
@@ -210,7 +210,7 @@
     .cms-dropdown-inner {
         z-index: 1;
         background-color: $white;
-        border-radius: $border-radius-normal;
+        border-radius: $dropdown-border-radius;
     }
 
 }

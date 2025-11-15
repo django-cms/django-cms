@@ -287,10 +287,11 @@ $toolbar-menu-item-color: $black;
 $toolbar-menu-item-hover-color: $white;
 $toolbar-menu-item-hover-bgcolor: $color-primary;
 
-$toolbar-dropdown-padding: 4px 0 3px;
-$toolbar-dropdown-shadow: 0 1.5px 1.5px color-mix(in srgb, $black 40%, transparent);
+$toolbar-dropdown-shadow: 0 1px 4px color-mix(in srgb, $black 40%, transparent);
 $toolbar-dropdown-bgcolor: $white;
-$toolbar-dropdown-border-radius: $border-radius-base + 1px;
+$toolbar-dropdown-border-radius: 2 * $border-radius-normal;
+$toolbar-dropdown-item-border-radius: 2 * $border-radius-normal;
+$toolbar-dropdown-padding: $toolbar-dropdown-border-radius - 2px;
 
 $toolbar-dropdown-min-width: 180px;
 $toolbar-dropdown-item-height: 30px;
@@ -386,6 +387,7 @@ $hover-tooltip-padding: 6px 8px;
 // Dropdown
 $dropdown-width: 180px;
 $dropdown-shadow: 0 0 10px color-mix(in srgb, $black 25%, transparent);
+$dropdown-border-radius: 2.5 * $border-radius-normal;
 $dropdown-item-height: 46px;
 $dropdown-item-icon-space: 40px;
 $dropdown-item-icon-position: 14px;
