@@ -3126,6 +3126,80 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             new_plugins = placeholder.get_plugins(translation.language)
             self.assertEqual(new_plugins.count(), 0)
 
+    def test_copy_plugins_to_language_skips_missing_placeholders(self):
+        """
+        When copying plugins to another language, placeholders that don't
+        exist in the target template should be skipped without raising
+        DoesNotExist exception.
+
+        Regression test for copying content when template placeholders have
+        changed between languages.
+        """
+        admin = self.get_superuser()
+
+        # Create page with nav_playground template (has 'body' and 'right-column' placeholders)
+        page = create_page(
+            "test-page",
+            "nav_playground.html",
+            "en",
+            created_by=admin,
+        )
+
+        # Add plugins to both placeholders in English
+        body_placeholder = page.get_placeholders("en").get(slot='body')
+        right_column_placeholder = page.get_placeholders("en").get(slot='right-column')
+
+        add_plugin(
+            body_placeholder,
+            'LinkPlugin',
+            'en',
+            name='Body Link',
+            external_link='https://example.com'
+        )
+        add_plugin(
+            right_column_placeholder,
+            'LinkPlugin',
+            'en',
+            name='Right Column Link',
+            external_link='https://example.com'
+        )
+
+        # Create German translation with col_two template (has 'col_sidebar' and 'col_left' placeholders)
+        # This simulates a template change where old placeholders no longer exist
+        de_content = create_page_content(
+            "de",
+            "test-page-de",
+            page,
+            slug="test-page-de",
+            template="col_two.html",
+        )
+
+        # Try to copy from English to German - should not raise DoesNotExist
+        endpoint = self.get_admin_url(PageContent, 'copy_language', de_content.pk)
+        data = {
+            'source_language': 'en',
+            'target_language': 'de',
+        }
+
+        with self.login_user_context(admin):
+            response = self.client.post(endpoint, data)
+            # Should succeed without exception
+            self.assertEqual(response.status_code, 200)
+
+        # Verify that no plugins were copied since no placeholders match
+        de_placeholders = de_content.get_placeholders()
+        for placeholder in de_placeholders:
+            plugins_count = placeholder.get_plugins('de').count()
+            self.assertEqual(
+                plugins_count,
+                0,
+                f"Placeholder '{placeholder.slot}' should have 0 plugins"
+            )
+
+        # Verify original English plugins are still intact
+        self.assertEqual(body_placeholder.get_plugins('en').count(), 1)
+        self.assertEqual(right_column_placeholder.get_plugins('en').count(), 1)
+
     # Placeholder related tests
 
     def test_user_can_clear_empty_placeholder(self):
