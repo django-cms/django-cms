@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import Class from 'classjs';
 
 /**
  * Dropdowns in the pagetree.
@@ -9,32 +8,31 @@ import Class from 'classjs';
  * @class PageTreeDropdowns
  * @namespace CMS
  */
-var PageTreeDropdowns = new Class({
-    options: {
-        dropdownSelector: '.js-cms-pagetree-dropdown',
-        triggerSelector: '.js-cms-pagetree-dropdown-trigger',
-        menuSelector: '.js-cms-pagetree-dropdown-menu',
-        openCls: 'cms-pagetree-dropdown-menu-open'
-    },
+class PageTreeDropdowns {
+    constructor(options) {
+        this.options = $.extend(true, {}, {
+            dropdownSelector: '.js-cms-pagetree-dropdown',
+            triggerSelector: '.js-cms-pagetree-dropdown-trigger',
+            menuSelector: '.js-cms-pagetree-dropdown-menu',
+            openCls: 'cms-pagetree-dropdown-menu-open'
+        }, options);
 
-    initialize: function initialize(options) {
-        this.options = $.extend(true, {}, this.options, options);
         this.click = 'click.cms.pagetree.dropdown';
 
         this._setupUI();
         this._events();
-    },
+    }
 
     /**
      * @method _setupUI
      * @private
      */
-    _setupUI: function _setupUI() {
+    _setupUI() {
         this.ui = {
             container: this.options.container,
             document: $(document)
         };
-    },
+    }
 
     /**
      * Event handlers.
@@ -42,7 +40,7 @@ var PageTreeDropdowns = new Class({
      * @method _events
      * @private
      */
-    _events: function _events() {
+    _events() {
         var that = this;
 
         // attach event to the trigger
@@ -65,7 +63,7 @@ var PageTreeDropdowns = new Class({
         this.ui.document.on(this.click, function() {
             that.closeAllDropdowns();
         });
-    },
+    }
 
     /**
      * @method _toggleDropdown
@@ -73,7 +71,7 @@ var PageTreeDropdowns = new Class({
      * @private
      * @returns {Boolean|void}
      */
-    _toggleDropdown: function _toggleDropdown(trigger) {
+    _toggleDropdown(trigger) {
         var dropdowns = $(this.options.dropdownSelector);
         var dropdown = $(trigger).closest(this.options.dropdownSelector);
 
@@ -88,7 +86,7 @@ var PageTreeDropdowns = new Class({
         dropdown.addClass(this.options.openCls);
 
         this._loadContent(dropdown);
-    },
+    }
 
     /**
      * @method _loadContent
@@ -96,7 +94,7 @@ var PageTreeDropdowns = new Class({
      * @param {jQuery} dropdown
      * @returns {Boolean|$.Deferred} false if not lazy or already loaded or promise
      */
-    _loadContent: function _loadContent(dropdown) {
+    _loadContent(dropdown) {
         var data = dropdown.data();
         var LOADER_SHOW_TIMEOUT = 200;
 
@@ -116,15 +114,23 @@ var PageTreeDropdowns = new Class({
             dropdown.data('loaded', true);
             clearTimeout(loaderTimeout);
         });
-    },
+    }
 
     /**
      * @method closeAllDropdowns
      * @public
      */
-    closeAllDropdowns: function closeAllDropdowns() {
+    closeAllDropdowns() {
         $(this.options.dropdownSelector).removeClass(this.options.openCls);
     }
-});
+}
+
+// Define default options on the prototype for test compatibility
+PageTreeDropdowns.prototype.options = {
+    dropdownSelector: '.js-cms-pagetree-dropdown',
+    triggerSelector: '.js-cms-pagetree-dropdown-trigger',
+    menuSelector: '.js-cms-pagetree-dropdown-menu',
+    openCls: 'cms-pagetree-dropdown-menu-open'
+};
 
 export default PageTreeDropdowns;

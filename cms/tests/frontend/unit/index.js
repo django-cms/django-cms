@@ -1,8 +1,6 @@
 /* global files */
 'use strict';
 
-require('../../../static/cms/js/polyfills/function.prototype.bind');
-require('../../../static/cms/js/polyfills/array.prototype.findindex');
 require('jquery');
 require('./helpers/mock-ajax');
 require('./helpers/jasmine-jquery');
@@ -22,8 +20,9 @@ if (files[0] === '*') {
     require('./cms.clipboard.test');
     require('./cms.modal.test');
     require('./shortcuts.test');
-    // require('./keyboard.test');
+    require('./keyboard.test');
     require('./preload-images.test');
+    require('./dom-diff.test');
     // FIXME this has to be last because it messes with the url
     require('./cms.structureboard.test'); // missing some tests
 } else {

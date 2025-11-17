@@ -35,12 +35,11 @@
     {% endif %}
 
     <div
-        class="cms-modal"
+        class="cms-modal cms-touch-action-none"
         tabindex="-1"
-        data-touch-action="none"
     >
-        <div class="cms-modal-head" data-touch-action="none">
-            <span class="cms-modal-title" data-touch-action="none">
+        <div class="cms-modal-head cms-touch-action-none">
+            <span class="cms-modal-title cms-touch-action-none">
                 <span class="cms-modal-title-prefix"></span>
                 <span class="cms-modal-title-suffix"></span>
             </span>
@@ -48,7 +47,7 @@
             <span tabindex="0" class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
             <span tabindex="0" class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
         </div>
-        <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
+        <div class="cms-modal-breadcrumb cms-touch-action-pan-x"></div>
         <div class="cms-modal-body">
             <div class="cms-modal-shim"></div>
             <div class="cms-modal-frame"></div>
@@ -60,7 +59,7 @@
     </div>
     {# start: structure #}
     <div class="cms-structure">
-        <div class="cms-structure-content" data-touch-action="pan-y">
+        <div class="cms-structure-content cms-touch-action-pan-y">
         {% if cms_renderer.load_structure %}
             {% for placeholder in cms_renderer.get_rendered_editable_placeholders %}
                {% with object_is_immutable=placeholder|placeholder_is_immutable:request.user %}

@@ -1,6 +1,7 @@
 //##############################################################################
 // TOOLBAR
 @use "sass:math";
+@use "sass:list";
 
 .cms-toolbar {
     position: fixed;
@@ -174,7 +175,7 @@
         .cms-toolbar-item-navigation-children {
             ul {
                 display: none;
-                top: -(nth($toolbar-dropdown-padding, 1) + 1px);
+                top: -(list.nth($toolbar-dropdown-padding, 1) + 1px);
                 inset-inline-start: 100%;
             }
             > a {
@@ -645,23 +646,45 @@
 
 .cms-loading-bar {
     background: $color-primary;
-
     position: fixed;
     z-index: 99999999;
     top: 0;
     inset-inline-start: 0;
-
     width: 100%;
     height: 3px;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    // Balken-Füllung animiert von 30% bis 100% Breite
+    min-width: 30%; // minimum
+    background: $color-primary;
+    opacity: 1;
+    animation: cms-loading-bar-fill 5s cubic-bezier(0.4,0,0.2,1) 1 forwards;
+
+    .cms-loading-peg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100px;
+        height: 100%;
+        box-shadow: 0 0 10px #29d, 0 0 5px $color-primary;
+        opacity: 1.0;
+        transform: rotate(3deg) translate(0px, -4px);
+        animation: cms-loading-peg-move 1s linear infinite;
+    }
 }
 
-.cms-loading-peg {
-    display: block;
-    position: absolute;
-    inset-inline-end: 0px;
-    width: 100px;
-    height: 100%;
-    box-shadow: 0 0 10px #29d, 0 0 5px $color-primary;
-    opacity: 1.0;
-    transform: rotate(3deg) translate(0px, -4px);
+@keyframes cms-loading-bar-fill {
+    0%   { width: 30%; }
+    20%  { width: 50%; }
+    40%  { width: 65%; }
+    60%  { width: 80%; }
+    80%  { width: 90%; }
+    100% { width: 95%; }
+}
+
+@keyframes cms-loading-peg-move {
+    0% { left: 0; }
+    100% { left: calc(100% - 100px); }
 }

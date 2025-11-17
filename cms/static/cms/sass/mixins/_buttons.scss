@@ -1,12 +1,13 @@
 // #############################################################################
 // BUTTONS
+@use "sass:string";
 
 // taken from bootstrap with adaptations
 @function important($important) {
     @if($important == true) {
         @return !important;
     } @else {
-        @return unquote('');
+        @return string.unquote('');
     }
 }
 @mixin button-variant($color, $background, $border, $important: false) {
