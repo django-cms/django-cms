@@ -414,7 +414,9 @@
     .cms-pagetree-dropdown-menu {
         inset-inline-end: 40px;
         inset-block-start: -2px;
-        width: 205px;
+        min-width: 205px;
+        max-width: 40vw;
+        overflow: hidden;
     }
 }
 
@@ -507,7 +509,9 @@
 .cms-tree-item-button .cms-pagetree-dropdown-menu {
     inset-inline-end: 40px;
     inset-block-start: -2px;
-    width: 205px;
+    min-width: 205px;
+    max-width: 40vw;
+    overflow: hidden;
 }
 .cms-tree-item-button .cms-hover-tooltip {
     &:before,
