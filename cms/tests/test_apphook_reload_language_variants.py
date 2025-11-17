@@ -10,8 +10,8 @@ from django.test import override_settings
 
 from cms.api import create_page, create_page_content
 from cms.models import UrlconfRevision
-from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks
 
 
