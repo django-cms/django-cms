@@ -161,7 +161,7 @@ class ApphookReloadLanguageVariantTests(CMSTestCase):
                 title="Test Page",
                 template="nav_playground.html",
                 language="en",
-                application_urls="SampleApp",
+                apphook="SampleApp",
                 application_namespace="test_app"
             )
 
