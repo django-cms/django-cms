@@ -1,3 +1,5 @@
+import time
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
@@ -5,6 +7,7 @@ from django.template import Template, TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
@@ -1478,6 +1481,29 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
             target_position += len(plugin_tree)
             self.assertPluginTreeEquals(source_plugin_tree_all)
             self.assertPluginTreeEquals(target_plugin_tree_all, placeholder=target)
+
+    def test_move_plugin_updates_changed_date(self):
+        """
+        Tests that the changed_date field is updated when a plugin's order is changed.
+        """
+        # Get a plugin to move
+        plugin = self.get_last_root_plugin()
+        initial_changed_date = plugin.changed_date
+
+        # Small sleep to ensure timestamp difference (OS time resolution may vary)
+        time.sleep(0.001)
+
+        # Move the plugin to the first position
+        self.placeholder.move_plugin(plugin, 1)
+        plugin.refresh_from_db()
+
+        # Check that changed_date was updated
+        # Using assertGreater ensures the timestamp has changed
+        self.assertGreater(
+            plugin.changed_date,
+            initial_changed_date,
+            "changed_date should be updated when plugin position changes"
+        )
 
 
 class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
