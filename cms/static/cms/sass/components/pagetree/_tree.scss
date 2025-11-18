@@ -2,6 +2,7 @@
 // PAGETREE
 @use "sass:math";
 @use "sass:color";
+@use "sass:list";
 
 // INFO: please note that all related styles to the pagetree itself are
 // handled through theming after the "PAGETREE THEME" section in this file.
@@ -66,8 +67,7 @@
 }
 
 .cms-pagetree {
-    border: $pagetree-border;
-    // box-shadow: $pagetree-box-shadow;
+    box-shadow: $pagetree-box-shadow;
 
     .cms-hover-tooltip {
         z-index: auto;
@@ -85,15 +85,15 @@
     .cms-btn.cms-icon {
         display: inline-block;
         box-sizing: border-box;
-        width: $pagetree-cell-inner-height + 7;
+        width: $pagetree-cell-inner-height + 5;
         height: $pagetree-cell-inner-height + 5;
         position: relative;
         &:before {
             position: absolute;
             inset-inline-start: 50%;
             inset-block-start: 50%;
-            margin-block-start: -8px;
-            margin-inline-start: -8px;
+            margin-block-start: -9px;
+            margin-inline-start: -9px;
         }
     }
     .cms-btn.cms-btn-no-border {
@@ -115,10 +115,8 @@
     z-index: z(pagetree, header);
     min-height: $pagetree-header-height;
     padding-block: $pagetree-header-padding-block;
-    padding-inline: $pagetree-header-padding-inline;
     box-shadow: none;
     border-block-end: none;
-    background: $pagetree-header-background;
     &:before {
         content: "";
         position: absolute;
@@ -148,6 +146,7 @@
     h1 {
         line-height: $pagetree-header-height;
         margin: 0 !important;
+        padding-top: 0;
         span {
             font-weight: normal;
         }
@@ -213,23 +212,8 @@
         display: table-cell;
         vertical-align: middle;
         position: relative;
-        outline: none;
-        color: $white !important;
-        padding-block: 8px !important;
-        padding-inline: 10px !important;
-        border: none !important;
-        background: $color-primary !important;
-        height: 36px;
-        border-radius: $border-radius-base;
-
-        &:hover {
-            background: color.adjust($color-primary-fallback, $lightness: -5%) !important;
-        }
-        &:active,
-        &:focus {
-            color: $white !important;
-            background: color.adjust($color-primary-fallback, $lightness: -15%) !important;
-        }
+        padding: 6px 8px;
+        @include button-variant($black, $color-secondary, $gray);
     }
     .cms-pagetree-header-filter {
         position: relative;
@@ -247,6 +231,7 @@
             line-height: 24px;
             padding-inline-end: 35px !important;
             transition: width $speed-base;
+            border: 1px solid $gray;
         }
     }
 
@@ -402,16 +387,15 @@
             float: right;
         }
     }
-    .cms-pagetree-container + & {
-        margin-block-start: -1px;
-    }
 }
 
 .cms-pagetree-section-header {
     display: flex;
     flex-direction: row;
     align-items: center;
-
+    background-color: $pagetree-bg;
+    border-top-left-radius: $border-radius-modal;
+    border-top-right-radius: $border-radius-modal;
     select {
         width: 120px !important;
         margin-inline-start: 15px;
@@ -423,14 +407,16 @@
 }
 .cms-pagetree-section-nav {
     position: absolute;
-    inset-inline-end: 4px;
+    inset-inline-end: 15px;
     inset-block-start: 50%;
     margin-block-start: math.div(-($pagetree-cell-inner-height + 6px), 2);
 
     .cms-pagetree-dropdown-menu {
         inset-inline-end: 40px;
         inset-block-start: -2px;
-        width: 205px;
+        min-width: 205px;
+        max-width: 40vw;
+        overflow: hidden;
     }
 }
 
@@ -449,8 +435,9 @@
     // overflow: auto;
     position: relative;
     z-index: z(pagetree, tree);
-    border: 1px solid $gray-lighter;
     border-block-end: none;
+    background-color: $pagetree-bg;
+    padding: 0 15px 20px 20px;
 }
 
 .cms-tree-col {
@@ -522,7 +509,9 @@
 .cms-tree-item-button .cms-pagetree-dropdown-menu {
     inset-inline-end: 40px;
     inset-block-start: -2px;
-    width: 205px;
+    min-width: 205px;
+    max-width: 40vw;
+    overflow: hidden;
 }
 .cms-tree-item-button .cms-hover-tooltip {
     &:before,
@@ -601,7 +590,7 @@
 
     .cms-tree-item-inner > a {
         display: block;
-        height: $pagetree-icon-size - 4;
+        height: $pagetree-icon-size;
     }
 
     .cms-icon {
@@ -610,7 +599,7 @@
 
     .cms-icon:before {
         display: block;
-        font-size: $pagetree-icon-size - 4;
+        font-size: $pagetree-icon-size;
         color: $gray-darker;
     }
     .cms-icon-check-square:before {
@@ -713,6 +702,9 @@
     .addlink {
         padding-inline-start: 16px;
     }
+    background: $pagetree-bg;
+    border-bottom-left-radius: $border-radius-modal;
+    border-bottom-right-radius: $border-radius-modal;
 }
 
 //##############################################################################
@@ -792,10 +784,6 @@
 //###########################################################
 // DJANGO-CMS THEME
 
-// general wrapper
-.jstree-grid-wrapper {
-    background: $gray-lightest;
-}
 
 // specificity required for admin styles and jstree resets
 .jstree-django-cms {
@@ -809,7 +797,7 @@
         padding-block: $pagetree-jstree-header-padding-block;
         padding-inline: $pagetree-jstree-header-padding-inline;
         border-block-end: 1px solid $gray-lighter;
-        background: $white;
+        background: $pagetree-bg;
     }
     .jstree-grid-header-fixed {
         position: fixed;
@@ -834,7 +822,7 @@
         inset-inline-start: $pagetree-nesting-padding;
         font-size: 12px;
         color: $gray-light;
-        padding-block-start: 18px;
+        padding-block-start: 7px + list.nth($pagetree-anchor-padding-block-with-icon, 1) ;
         padding-inline-end: 10px;
         padding-block-end: 10px;
         padding-inline-start: 0px;
@@ -885,16 +873,19 @@
         padding-block: $pagetree-anchor-padding-block;
         padding-inline: $pagetree-anchor-padding-inline;
         margin-block-start: -1px;
-        border-block: 1px solid $gray-lighter;
-        border-inline: 1px solid $gray-lighter;
+        margin-block-end: $pagetree-cell-spacing;
+        border-block: $pagetree-border;
+        border-inline: $pagetree-border;
         border-inline-end: none;
         background-color: $white;
         background-image: url('../../img/pagetree/tree-li-drag.gif');
         background-repeat: no-repeat;
         background-position: 2px center;
         image-rendering: pixelated;
-        white-space: normal;
-
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        min-width: 100%;
+        max-width: 1px;
         &:hover {
             color: $gray !important;
         }
@@ -929,8 +920,9 @@
     // style cells afterwards
     .jstree-grid-cell {
         height: $pagetree-cell-height;
-        border-block-end: 1px solid $gray-lighter;
+        border-block-end: $pagetree-border;
         background: $white;
+        margin-block-end: $pagetree-cell-spacing;
         > span {
             display: block;
         }
@@ -941,11 +933,15 @@
             background: none;
         }
     }
+
     .jstree-grid-cell-regular {
         text-align: center;
         padding-block: $pagetree-cell-padding-block;
         padding-inline: $pagetree-cell-padding-inline;
         border-inline-start: 1px solid $gray-lighter;
+        &.jstree-grid-cell-last {
+            border-inline-end: $pagetree-border
+        }
     }
     .jstree-grid-cell-regular-options {
         border-inline-start: none;
@@ -983,7 +979,7 @@
         margin: 0;
     }
     .jstree-anchor {
-        padding-block-start: 13px;
+        padding-block-start: 13px + 20px;
         padding-inline-start: 15px;
         border: none;
         background: none;

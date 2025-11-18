@@ -8,28 +8,50 @@
 $speed-base: 200ms;
 
 // COLORS
-$white: var(--dca-white);
-$black: var(--dca-black);
-:root, :root[data-theme="light"], :root[data-theme="auto"] {
-    --dca-light-mode: 1;
-    --dca-dark-mode: 0;
-    --dca-white: #FFFFFF;
-    --dca-black: #000000;
-    --dca-shadow: 0, 0, 0;
-    --dca-primary: #00bbff;
-    --dca-gray: #666;
-    --dca-gray-lightest: #f2f2f2;
-    --dca-gray-lighter: #ddd;
-    --dca-gray-light: #999;
-    --dca-gray-darker: #454545;
-    --dca-gray-darkest: #333;
-    --dca-gray-super-lightest: #f7f7f7;
-
-    --active-brightness: 0.9;
-    --focus-brightness: 0.95;
+:root {
+    color-scheme: dark light;
+    --dca-dark: #2d4c4d;
+    --dca-light: #defcb9;
+    --dca-white: light-dark(#FFF, #000);
+    --dca-black: light-dark(#2a2c2e, rgb(from white calc(r - 45) calc(g - 44) calc(b - 46)));
+    --dca-primary: light-dark(var(--dca-dark), rgb(from var(--dca-light) calc(r - 45) calc(g - 44) calc(b - 46)));
+    --dca-secondary: light-dark(var(--dca-light), var(--dca-dark));
+    --dca-red: #d44848;
+    --dca-action-bg: var(--dca-secondary);
+    --dca-action-text: var(--dca-black);
+    --dca-gray: light-dark(#7c7c7c, #a7a7a7);
+    --dca-gray-lightest: light-dark(#f7f7f7, #303030);
+    --dca-gray-lighter: light-dark(#ddd, #666);
+    --dca-gray-light: light-dark(#999, #888);
+    --dca-gray-darker: light-dark(#454545, #ddd);
+    --dca-gray-darkest: light-dark(#333, #eee);
+    --dca-border-radius: 20px;
+    --dca-btn-radius: 40px;
+    --dca-default-spacing: 2px;
 }
 
-:root, :root[data-theme="auto"] {
+:root[data-cms-theme="4"], :root[data-cms-theme="3"] {
+    --dca-dark: #00bbff;
+    --dca-light: color-mix(in srgb, var(--dca-dark), var(--dca-white) 55%);
+    --dca-white: light-dark(#FFF, #000);
+    --dca-black: light-dark(#000, #FFF);
+    --dca-primary: light-dark(var(--dca-dark), color-mix(in srgb, var(--dca-light), black 10%));
+    --dca-secondary: var(--dca-gray-lightest);
+    --dca-red: #d44848;
+    --dca-action-bg: var(--dca-primary);
+    --dca-action-text: var(--dca-white);
+    --dca-gray: light-dark(#7c7c7c, #aaa);
+    --dca-gray-lightest: light-dark(#f7f7f7, #303030);
+    --dca-gray-lighter: light-dark(#ddd, #666);
+    --dca-gray-light: light-dark(#999, #888);
+    --dca-gray-darker: light-dark(#454545, #ddd);
+    --dca-gray-darkest: light-dark(#333, #eee);
+    --dca-border-radius: 5px;
+    --dca-btn-radius: 3px;
+    --dca-default-spacing: 0px;
+}
+
+:root[data-theme="auto"] {
     color-scheme: dark light;
 }
 
@@ -39,50 +61,17 @@ $black: var(--dca-black);
 
 :root[data-theme="dark"] {
     color-scheme: dark;
-    --dca-light-mode: 0;
-    --dca-dark-mode: 1;
-    --dca-white: #2A2C2E;
-    --dca-black: #FFF;
-    --dca-primary: #58D1FC;
-    --dca-gray: #ccc;
-    --dca-gray-lightest: #444;
-    --dca-gray-lighter: #666;
-    --dca-gray-light: #888;
-    --dca-gray-darker: #ddd;
-    --dca-gray-darkest: #eee;
-    --dca-gray-super-lightest: #333;
-
-    --active-brightness: 2;
-    --focus-brightness: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme]), :root[data-theme="auto"] {
-        --dca-light-mode: 0;
-        --dca-dark-mode: 1;
-        --dca-white: #2A2C2E;
-        --dca-black: #FFF;
-        --dca-primary: #58D1FC;
-        --dca-gray: #ccc;
-        --dca-gray-lightest: #444;
-        --dca-gray-lighter: #666;
-        --dca-gray-light: #888;
-        --dca-gray-darker: #ddd;
-        --dca-gray-darkest: #eee;
-        --dca-gray-super-lightest: #333;
-
-        --active-brightness: 2;
-        --focus-brightness: 1.5;
-    }
-}
-
+$white: var(--dca-white);
+$black: var(--dca-black);
 
 $color-primary: var(--dca-primary);
-$color-primary-fallback: #00bbff;
-$color-success: #693;
-$color-danger: #f00;
+$color-secondary: var(--dca-secondary);
+$color-success: var(--dca-green, #693);
+$color-danger: var(--dca-red, #f00);
 $color-warning: #c93;
-
+$color-cms3: light-dark(#00bbff, color-mix(in srgb,#00bbff, black 10%));
 // COLORS gray
 $gray:            var(--dca-gray); // lighten(#000, 40%); // #666;
 $gray-lightest:   var(--dca-gray-lightest); //lighten($gray, 55%); // #f2f2f2
@@ -90,9 +79,6 @@ $gray-lighter:    var(--dca-gray-lighter); //lighten($gray, 46.5%); // #ddd
 $gray-light:      var(--dca-gray-light); // // #999
 $gray-darker:     var(--dca-gray-darker); // // #454545
 $gray-darkest:    var(--dca-gray-darkest); // // #333
-
-// used in pagetree / filer headers
-$gray-super-lightest: var(--dca-gray-super-lightest); //;
 
 
 
@@ -113,6 +99,8 @@ $line-height-normal: 20px;
 
 $border-radius-base: 3px;
 $border-radius-normal: 5px;
+$border-radius-buttons: var(--dca-btn-radius);
+$border-radius-modal: var(--dca-border-radius);
 
 $padding-base: 3px;
 $padding-normal: 10px;
@@ -198,30 +186,30 @@ $z-layers: (
 
 //##############################################################################
 // BUTTONS
-$btn-border-radius-base: $border-radius-base;
-$btn-active-shadow: inset 0 3px 5px rgba(var(--dca-shadow), 0.125);
+$btn-border-radius-base: $border-radius-buttons;
+$btn-active-shadow: none ; // inset 0 3px 5px color-mix(in srgb, $black, transparent 12.5%);
 
 $btn-default-color: $gray;
 $btn-default-bgcolor: $white;
-$btn-default-border: $gray-lighter;
+$btn-default-border: $gray;
 
-$btn-action-color: $white;
-$btn-action-bgcolor: $color-primary;
-$btn-action-border: $color-primary;
+$btn-action-color: var(--dca-action-text);
+$btn-action-bgcolor: var(--dca-action-bg);
+$btn-action-border: $gray;
 
 $btn-caution-color: $white;
-$btn-caution-bgcolor: color.adjust($color-danger, $hue: 15deg);
-$btn-caution-border: color.adjust($color-danger, $hue: 15deg);
+$btn-caution-bgcolor: $color-danger;
+$btn-caution-border: $gray; // hsl(from $color-danger calc(h + 15) s l);
 
 $btn-active-color: $white;
 $btn-active-bgcolor: $gray-darker;
-$btn-active-border: $gray-darkest;
+$btn-active-border: $gray;
 
 
 //##############################################################################
 // Structureboard
 $structure-max-width: 980px;
-$structure-bgcolor: $gray-super-lightest;
+$structure-bgcolor: $color-secondary;
 
 $structure-dragbar-height: 44px;
 $structure-dragbar-color: $black;
@@ -260,6 +248,7 @@ $submenu-item-color: $gray;
 $submenu-item-hover-color: $white;
 
 $submenu-dropdown-bgcolor: $white;
+$submenu-dropdown-border: 1px solid $gray-lightest;
 
 $submenu-quicksearch-icon-size: 14px;
 $submenu-quicksearch-padding: $structure-dragarea-padding * 2 + $submenu-quicksearch-icon-size;
@@ -281,12 +270,13 @@ $tooltip-second-line-color: $white;
 //##############################################################################
 // Toolbar
 $toolbar-height: 46px; // has to be even number
-$toolbar-shadow: 0 0 5px rgba(var(--dca-shadow), 0.2);
+$toolbar-shadow: 0 0 5px color-mix(in srgb, $black 20%, transparent);
 $toolbar-left-space: 15px;
 $toolbar-border: $gray-lighter;
 
 $toolbar-debug-height: 3px;
 $toolbar-debug-bgcolor: #fad507;
+$toolbar-debug-border: $gray;
 
 $toolbar-logo-height: 21px;
 
@@ -297,10 +287,11 @@ $toolbar-menu-item-color: $black;
 $toolbar-menu-item-hover-color: $white;
 $toolbar-menu-item-hover-bgcolor: $color-primary;
 
-$toolbar-dropdown-padding: 4px 0 3px;
-$toolbar-dropdown-shadow: 0 1.5px 1.5px rgba(var(--dca-shadow), 0.4);
+$toolbar-dropdown-shadow: 0 1px 4px color-mix(in srgb, $black 40%, transparent);
 $toolbar-dropdown-bgcolor: $white;
-$toolbar-dropdown-border-radius: $border-radius-base + 1px;
+$toolbar-dropdown-border-radius: 2 * $border-radius-normal;
+$toolbar-dropdown-item-border-radius: 2 * $border-radius-normal;
+$toolbar-dropdown-padding: $toolbar-dropdown-border-radius - 2px;
 
 $toolbar-dropdown-min-width: 180px;
 $toolbar-dropdown-item-height: 30px;
@@ -310,15 +301,15 @@ $toolbar-dropdown-item-icon-size: 10px;
 $toolbar-button-height: 30px;
 $toolbar-button-font-size: 12px;
 $toolbar-button-padding-horizontal: 12px;
-$toolbar-button-border-radius: $border-radius-base;
+$toolbar-button-border-radius: $border-radius-buttons;
 
 
 //##############################################################################
 // Modal
 $modal-header-title-font-size: $font-size-large;
-$modal-shadow: 0 0 20px rgba(var(--dca-shadow), .5);
-$modal-bgcolor: $white;
-$modal-border-radius: $border-radius-normal;
+$modal-shadow: 0 0 10px 2px color-mix(in srgb, $black 25%, transparent);
+$modal-bgcolor: $color-secondary;
+$modal-border-radius: $border-radius-modal;
 
 $modal-header-height: $toolbar-height;
 $modal-breadcrumb-height: $toolbar-height - 6px;
@@ -337,7 +328,8 @@ $loader-bgcolor: $white;
 //##############################################################################
 // Dialog
 $dialog-width: 500px;
-$dialog-border-radius: $border-radius-normal;
+$dialog-border-radius: $border-radius-modal;
+$dialog-bgcolor: $color-secondary;
 $dialog-shadow: $modal-shadow;
 
 
@@ -349,13 +341,13 @@ $messages-color: white;
 $messages-font-size: 12px;
 $messages-line-height: 16px;
 $messages-border-radius: $border-radius-base;
-$messages-bgcolor: rgba(var(--dca-shadow), 0.74);
+$messages-bgcolor: color-mix(in srgb, $black 75%, transparent);
 $messages-font-weight: 200;
 $messages-close-area-size: 20px;
 $messages-close-icon-size: 10px;
 
 $screenblock-color: $white;
-$screenblock-bgcolor: rgba(var(--dca-shadow), 0.9);
+$screenblock-bgcolor: color-mix(in srgb, $color-primary 90%, transparent);
 $screenblock-inner-position: 300px;
 
 $login-form-input-font-size: $font-size-normal;
@@ -379,8 +371,8 @@ $sideframe-button-area-size: 32px;
 $sideframe-button-icon-size: 12px;
 $sideframe-button-space: 2px;
 $sideframe-resize-width: 15px;
-$sideframe-box-shadow: 10px 0 5px -5px rgba(var(--dca-shadow), 0.2);
-$sideframe-dimmer: rgba(var(--dca-shadow), 0.6);
+$sideframe-box-shadow: 10px 0 5px -5px color-mix(in srgb, $black 20%, transparent);
+$sideframe-dimmer: color-mix(in srgb, $black 60%, transparent);
 
 
 //##############################################################################
@@ -394,7 +386,8 @@ $hover-tooltip-padding: 6px 8px;
 //##############################################################################
 // Dropdown
 $dropdown-width: 180px;
-$dropdown-shadow: 0 0 10px rgba(var(--dca-shadow), 0.25);
+$dropdown-shadow: 0 0 10px color-mix(in srgb, $black 25%, transparent);
+$dropdown-border-radius: 2.5 * $border-radius-normal;
 $dropdown-item-height: 46px;
 $dropdown-item-icon-space: 40px;
 $dropdown-item-icon-position: 14px;
