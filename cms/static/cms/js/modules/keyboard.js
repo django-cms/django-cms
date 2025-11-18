@@ -5,7 +5,6 @@ const DEFAULT_CONTEXT = 'cms';
 const contexts = {
     DEFAULT_CONTEXT: {}
 };
-let currentContext = DEFAULT_CONTEXT;
 let lastKey = null;
 
 function isInputFocused() {
@@ -20,11 +19,11 @@ function isInputFocused() {
 }
 
 function setContext(ctx) {
-    currentContext = ctx;
+    document.documentElement.dataset.cmsKbContext = ctx;
 }
 
 function getContext() {
-    return currentContext;
+    return document.documentElement.dataset.cmsKbContext || DEFAULT_CONTEXT;
 }
 
 function bind(key, callback, ctx = null) {
@@ -32,7 +31,7 @@ function bind(key, callback, ctx = null) {
         key.forEach(k => bind(k, callback, ctx));
         return;
     }
-    const context = ctx || currentContext;
+    const context = ctx || getContext();
 
     if (!contexts[context]) {
         contexts[context] = {};
@@ -45,7 +44,7 @@ function unbind(key, ctx = null) {
         key.forEach(k => unbind(k, ctx));
         return;
     }
-    const context = ctx || currentContext;
+    const context = ctx || getContext();
 
     if (contexts[context]) {
         delete contexts[context][key];
@@ -77,7 +76,7 @@ function handleKeydown(event) {
     if (isInputFocused()) {
         return;
     }
-    const context = contexts[currentContext] || contexts[DEFAULT_CONTEXT];
+    const context = contexts[getContext()];
     const key = toKeyCode(event);
 
     if (context) {
