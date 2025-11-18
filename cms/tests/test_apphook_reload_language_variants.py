@@ -162,7 +162,7 @@ class ApphookReloadLanguageVariantTests(CMSTestCase):
                 template="nav_playground.html",
                 language="en",
                 apphook="SampleApp",
-                application_namespace="test_app"
+                apphook_namespace="test_app"
             )
 
             # Reset the mock to ignore the call from page creation
