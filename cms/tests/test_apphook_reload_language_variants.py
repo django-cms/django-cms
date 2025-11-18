@@ -6,6 +6,7 @@ for pages with apphooks causes NoReverseMatch exceptions.
 """
 from unittest.mock import patch
 
+from django.core.signals import request_finished
 from django.test import override_settings
 
 from cms.api import create_page, create_page_content
@@ -50,6 +51,10 @@ class ApphookReloadLanguageVariantTests(CMSTestCase):
                 page=page
             )
 
+            # Simulate end of request to trigger deferred signal handlers
+            # In production, this happens automatically after each request
+            request_finished.send(sender=self.__class__)
+
             # Check that the URL revision has changed
             new_revision, _ = UrlconfRevision.get_or_create_revision()
             self.assertNotEqual(
@@ -81,6 +86,9 @@ class ApphookReloadLanguageVariantTests(CMSTestCase):
             title="Test Seite",
             page=page
         )
+
+        # Simulate end of request to trigger deferred signal handlers
+        request_finished.send(sender=self.__class__)
 
         # Check that the URL revision has NOT changed
         new_revision, _ = UrlconfRevision.get_or_create_revision()
