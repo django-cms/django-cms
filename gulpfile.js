@@ -3,8 +3,8 @@
 const gulp = require('gulp');
 const fs = require('fs');
 const postcss = require('gulp-postcss');
-const cssnano = require('cssnano');
-const postcssPresetEnv = require('postcss-preset-env');
+const autoprefixer = require('autoprefixer');
+const cleanCSS = require('gulp-clean-css');
 const browserSync = require('browser-sync').create();
 const gulpif = require('gulp-if');
 const iconfont = require('gulp-iconfont');
@@ -115,20 +115,19 @@ function sass() {
     return gulp
         .src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
-        .pipe(gulpSass({ outputStyle: 'compressed' }))
-        .on('error', function(error) {
-            log.error('Error (' + error.plugin + '): ' + error.messageFormatted);
-        })
+        .pipe(gulpSass({ outputStyle: 'expanded' }).on('error', gulpSass.logError))
         .pipe(postcss([
-            postcssPresetEnv({
-                stage: 1,
-                features: {
-                    'nesting-rules': true
-                }
-            }),
-            cssnano()
+            autoprefixer()
         ]))
-        .pipe(gulpif(options.debug, sourcemaps.write()))
+        .pipe(cleanCSS({
+            level: {
+                2: {
+                    all: false,
+                    removeDuplicateRules: true
+                }
+            }
+        }))
+        .pipe(gulpif(options.debug, sourcemaps.write('.')))
         .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
 }
 

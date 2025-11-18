@@ -219,11 +219,11 @@
 .cms-btn-group {
     > .cms-btn {
         &.cms-btn-action:last-child {
-            border-left: 1px solid color.adjust($color-primary-fallback, $lightness: -10%);
+            border-left: 1px solid color-mix(in srgb, $color-primary 10%, var(--dca-black));
 
         }
         &.cms-btn-caution:last-child {
-            border-left: 1px solid color.adjust($color-danger, $lightness: -10%);
+            border-left: 1px solid color-mix(in srgb, $color-primary 10%, var(--dca-black));
         }
     }
 }
