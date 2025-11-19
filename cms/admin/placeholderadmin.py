@@ -14,8 +14,10 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseNotFound,
+    JsonResponse,
 )
 from django.shortcuts import get_list_or_404, get_object_or_404
+from django.template.defaultfilters import escape
 from django.template.response import TemplateResponse
 from django.urls import include, re_path
 from django.utils.datastructures import MultiValueDict
@@ -386,12 +388,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
 
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
             message = _('You do not have permission to add a plugin')
-            return HttpResponseForbidden(message)
+            return HttpResponseForbidden(escape(message))
 
         if not placeholder.check_source(request.user):
             message = _('You do not have permission to add a plugin')
-            return HttpResponseForbidden(message)
-
+            return HttpResponseForbidden(escape(message))
         plugin_class = plugin_pool.get_plugin(plugin_type)
         plugin_instance = plugin_class(plugin_class.model, self.admin_site)
 
@@ -464,7 +465,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         target_placeholder = get_object_or_404(Placeholder, pk=target_placeholder_id)
 
         if not target_language or target_language not in get_language_list():
-            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+            return HttpResponseBadRequest(escape(_("Language must be set to a supported language!")))
 
         copy_to_clipboard = target_placeholder.pk == request.toolbar.clipboard.pk
         source_plugin_id = request.POST.get('source_plugin_id', None)
@@ -489,7 +490,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 target_placeholder,
             )
         data = get_plugin_tree(request, new_plugins)
-        return HttpResponse(json.dumps(data), content_type='application/json')
+        return JsonResponse(data)
 
     def _copy_plugin_to_clipboard(self, request, target_placeholder):
         source_language = request.POST['source_language']
@@ -624,7 +625,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         try:
             plugin_id = int(plugin_id)
         except ValueError:
-            return HttpResponseNotFound(_("Plugin not found"))
+            return HttpResponseNotFound(escape(_("Plugin not found")))
 
         obj = self._get_plugin_from_id(plugin_id)
 
@@ -632,7 +633,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         plugin_instance = obj.get_plugin_class_instance(admin=self.admin_site)
 
         if not self.has_change_plugin_permission(request, obj):
-            return HttpResponseForbidden(_("You do not have permission to edit this plugin"))
+            return HttpResponseForbidden(escape(_("You do not have permission to edit this plugin")))
 
         if not obj.placeholder.check_source(request.user):
             message = _("You do not have permission to edit this plugin")
@@ -1115,11 +1116,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
 
         if not self.has_clear_placeholder_permission(request, placeholder, language):
             message = _("You do not have permission to clear this placeholder")
-            return HttpResponseForbidden(message)
+            return HttpResponseForbidden(escape(message))
 
         if not placeholder.check_source(request.user):
             message = _("You do not have permission to clear this placeholder")
-            raise PermissionDenied(message)
+            raise PermissionDenied(escape(message))
 
         opts = Placeholder._meta
         plugins = placeholder.get_plugins_list(language)
@@ -1136,7 +1137,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             # The user has already confirmed the deletion.
             if perms_needed:
                 message = _("You do not have permission to clear this placeholder")
-                return HttpResponseForbidden(message)
+                return HttpResponseForbidden(escape(message))
 
             operation_token = self._send_pre_placeholder_operation(
                 request,
