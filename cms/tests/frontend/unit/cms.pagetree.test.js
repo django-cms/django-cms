@@ -8,6 +8,12 @@ window.CMS = window.CMS || CMS;
 CMS.PageTree = PageTree;
 CMS.PageTreeDropdowns = PageTreeDropdowns;
 
+// Create fake PageTreeDropdowns class for testing
+class FakePageTreeDropdowns {
+    constructor() {
+        this.closeAllDropdowns = jasmine.createSpy();
+    }
+}
 
 describe('CMS.PageTree', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -15,13 +21,13 @@ describe('CMS.PageTree', function () {
     beforeEach(function () {
         fixture.load('pagetree.html');
         jasmine.Ajax.install();
-        spyOn(CMS.PageTreeDropdowns.prototype, 'initialize').and.returnValue({
-            closeAllDropdowns: jasmine.createSpy()
-        });
+        // Use rewiring to inject fake PageTreeDropdowns
+        PageTree.__Rewire__('PageTreeDropdowns', FakePageTreeDropdowns);
     });
     afterEach(function () {
         fixture.cleanup();
         jasmine.Ajax.uninstall();
+        PageTree.__ResetDependency__('PageTreeDropdowns');
     });
 
     it('creates a PageTree class', function () {

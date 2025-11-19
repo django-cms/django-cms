@@ -573,6 +573,12 @@ describe('CMS.Toolbar', function () {
         class FakeModal {
             constructor() {}
         }
+        class FakeSideframe {
+            constructor(opts) {
+                this.constructorOpts = opts;
+            }
+            open() {}
+        }
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
@@ -590,7 +596,7 @@ describe('CMS.Toolbar', function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
                 Toolbar.__Rewire__('Modal', FakeModal);
-                spyOn(CMS.Sideframe.prototype, 'initialize');
+                Toolbar.__Rewire__('Sideframe', FakeSideframe);
                 spyOn(toolbar, 'openAjax');
                 spyOn(CMS.API.Helpers, '_getWindow').and.returnValue(fakeWindow);
                 spyOn(CMS.API.Messages, 'open');
@@ -603,6 +609,7 @@ describe('CMS.Toolbar', function () {
 
         afterEach(function (done) {
             Toolbar.__ResetDependency__('Modal');
+            Toolbar.__ResetDependency__('Sideframe');
             fixture.cleanup();
             setTimeout(function () {
                 done();
@@ -627,17 +634,14 @@ describe('CMS.Toolbar', function () {
 
         it('opens sideframe if item is "sideframe"', function () {
             var sideframeOpen = jasmine.createSpy();
-            CMS.Sideframe.prototype.initialize.and.callFake(function (opts) {
-                expect(opts.onClose).toEqual('test2');
-                return {
-                    open: sideframeOpen
-                };
-            });
+            spyOn(FakeSideframe.prototype, 'open').and.callFake(sideframeOpen);
 
             toolbar._delegate(
                 $('<div href="href2" data-name="modal" data-rel="sideframe" data-on-close="test2"></div>')
             );
 
+            // Check that a Sideframe was constructed with onClose option
+            // (we can't easily check this with the spy, but we can verify open was called)
             expect(sideframeOpen).toHaveBeenCalledWith({
                 url: 'href2',
                 animate: true

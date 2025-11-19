@@ -11,6 +11,7 @@
     inset-inline-end: -1px;
     z-index: z(pagetree, dropdown);
     min-width: $dropdown-width;
+    border: $pagetree-dropdown-border;
     border-radius: $border-radius-normal;
     background: $submenu-dropdown-bgcolor;
     box-shadow: $dropdown-shadow;
@@ -41,7 +42,7 @@
         border-end-end-radius: $border-radius-normal;
     }
     .cms-pagetree-dropdown-item-disabled {
-        opacity: 0.2;
+        opacity: 0.33;
         color: $dropdown-link-disabled-color;
         cursor: default;
         &:hover,
@@ -121,6 +122,7 @@
         background-color: $submenu-dropdown-bgcolor;
         box-shadow: $dropdown-shadow;
         transform: rotate(45deg) translateZ(0);
+        border: $pagetree-dropdown-border
     }
 
     .cms-pagetree-dropdown-menu-inner {

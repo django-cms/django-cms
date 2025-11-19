@@ -3,12 +3,11 @@
  */
 
 import $ from 'jquery';
-import Class from 'classjs';
 import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import Plugin from './cms.plugins';
-import { filter, throttle, uniq } from 'lodash';
+import throttle from 'lodash-es/throttle.js';
 import { showLoader, hideLoader } from './loader';
 import { Helpers, KEYS } from './cms.base';
 
@@ -16,7 +15,19 @@ var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
 
 export const getPlaceholderIds = pluginRegistry =>
-    uniq(filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id));
+    Array.from(
+        new Set(
+            (pluginRegistry || [])
+                .map(entry => (Array.isArray(entry) ? entry[1] : null))
+                .filter(opts => (
+                    opts &&
+                    opts.type === 'placeholder' &&
+                    typeof opts.placeholder_id !== 'undefined' &&
+                    opts.placeholder_id !== null
+                ))
+                .map(opts => opts.placeholder_id)
+        )
+    );
 
 /**
  * @function hideDropdownIfRequired
@@ -40,15 +51,14 @@ function hideDropdownIfRequired(publishBtn) {
  * @namespace CMS
  * @uses CMS.API.Helpers
  */
-var Toolbar = new Class({
-    implement: [Helpers],
+class Toolbar {
+    constructor(options) {
+        // Copy Helpers methods to instance
+        Object.assign(this, Helpers);
 
-    options: {
-        toolbarDuration: 200
-    },
-
-    initialize: function initialize(options) {
-        this.options = $.extend(true, {}, this.options, options);
+        this.options = $.extend(true, {}, {
+            toolbarDuration: 200
+        }, options);
 
         // elements
         this._setupUI();
@@ -97,7 +107,7 @@ var Toolbar = new Class({
 
         // set a state to determine if we need to reinitialize this._events();
         this.ui.toolbar.data('ready', true);
-    },
+    }
 
     /**
      * Stores all jQuery references within `this.ui`.
@@ -105,7 +115,7 @@ var Toolbar = new Class({
      * @method _setupUI
      * @private
      */
-    _setupUI: function _setupUI() {
+    _setupUI() {
         var container = $('.cms');
 
         this.ui = {
@@ -121,7 +131,7 @@ var Toolbar = new Class({
             toolbarSwitcher: $('.cms-toolbar-item-cms-mode-switcher'),
             revert: $('.cms-toolbar-revert')
         };
-    },
+    }
 
     /**
      * Sets up all the event handlers, such as closing and resizing.
@@ -129,7 +139,7 @@ var Toolbar = new Class({
      * @method _events
      * @private
      */
-    _events: function _events() {
+    _events() {
         var that = this;
         var LONG_MENUS_THROTTLE = 10;
 
@@ -181,6 +191,7 @@ var Toolbar = new Class({
             // remove events from first level
             navigation
                 .find('a')
+                // eslint-disable-next-line complexity
                 .on(that.click + ' ' + that.key, function(e) {
                     var el = $(this);
 
@@ -273,6 +284,7 @@ var Toolbar = new Class({
 
             // attach hover
             lists
+                // eslint-disable-next-line complexity
                 .on(that.pointerOverOut + ' keyup.cms.toolbar', 'li', function(e) {
                     var el = $(this);
                     var parent = el
@@ -352,7 +364,7 @@ var Toolbar = new Class({
                 [this.resize, this.scroll].join(' '),
                 throttle($.proxy(this._handleLongMenus, this), LONG_MENUS_THROTTLE)
             );
-    },
+    }
 
     /**
      * We check for various states on load if elements in the toolbar
@@ -364,7 +376,7 @@ var Toolbar = new Class({
      * @deprecated this method is deprecated now, it will be removed in > 3.2
      */
     // eslint-disable-next-line complexity
-    _initialStates: function _initialStates() {
+    _initialStates() {
         var publishBtn = $('.cms-btn-publish').parent();
 
         this._show({ duration: 0 });
@@ -431,7 +443,7 @@ var Toolbar = new Class({
         // add toolbar ready class to body and fire event
         this.ui.body.addClass('cms-ready');
         this.ui.document.trigger('cms-ready');
-    },
+    }
 
     /**
      * Animation helper for opening the toolbar.
@@ -441,7 +453,7 @@ var Toolbar = new Class({
      * @param {Object} [opts]
      * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
      */
-    _show: function _show(opts) {
+    _show(opts) {
         var that = this;
         var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
         var toolbarHeight = $('.cms-toolbar').height() + TOOLBAR_OFFSCREEN_OFFSET;
@@ -461,7 +473,7 @@ var Toolbar = new Class({
         );
         // set messages top to toolbar height
         this.ui.messages.css('top', toolbarHeight - TOOLBAR_OFFSCREEN_OFFSET);
-    },
+    }
 
     /**
      * Makes a request to the given url, runs optional callbacks.
@@ -476,7 +488,7 @@ var Toolbar = new Class({
      * @param {String} [opts.onSuccess] reload and display custom message
      * @returns {Boolean|jQuery.Deferred} either false or a promise
      */
-    openAjax: function(opts) {
+    openAjax(opts) {
         var that = this;
         // url, post, text, callback, onSuccess
         var url = opts.url;
@@ -524,18 +536,18 @@ var Toolbar = new Class({
                     error: true
                 });
             });
-    },
+    }
 
     /**
      * Public api for `./loader.js`
      */
-    showLoader: function () {
+    showLoader() {
         showLoader();
-    },
+    }
 
-    hideLoader: function () {
+    hideLoader() {
         hideLoader();
-    },
+    }
 
     /**
      * Delegates event from element to appropriate functionalities.
@@ -545,7 +557,7 @@ var Toolbar = new Class({
      * @private
      * @returns {Boolean|void}
      */
-    _delegate: function _delegate(el) {
+    _delegate(el) {
         // save local vars
         var target = el.data('rel');
 
@@ -598,9 +610,9 @@ var Toolbar = new Class({
                     Helpers._getWindow().location.href = el.attr('href');
                 }
         }
-    },
+    }
 
-    _openSideFrame: function _openSideFrame(el) {
+    _openSideFrame(el) {
         var sideframe = CMS.API.Sideframe || new Sideframe({
             onClose: el.data('on-close')
         });
@@ -609,9 +621,9 @@ var Toolbar = new Class({
             url: el.attr('href'),
             animate: true
         });
-    },
+    }
 
-    _sendPostRequest: function _sendPostRequest(el) {
+    _sendPostRequest(el) {
         /* Allow post method to be used */
         var formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
         var csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
@@ -622,7 +634,7 @@ var Toolbar = new Class({
         );
 
         fakeForm.appendTo(Helpers._getWindow().document.body).submit();
-    },
+    }
 
     /**
      * Handles the debug bar when `DEBUG=true` on top of the toolbar.
@@ -630,7 +642,7 @@ var Toolbar = new Class({
      * @method _debug
      * @private
      */
-    _debug: function _debug() {
+    _debug() {
         if (!CMS.config.lang.debug) {
             return;
         }
@@ -653,7 +665,7 @@ var Toolbar = new Class({
                 }, timeout);
             }
         });
-    },
+    }
 
     /**
      * Handles the case when opened menu doesn't fit the screen.
@@ -661,7 +673,7 @@ var Toolbar = new Class({
      * @method _handleLongMenus
      * @private
      */
-    _handleLongMenus: function _handleLongMenus() {
+    _handleLongMenus() {
         var openMenus = $('.cms-toolbar-item-navigation-hover > ul');
 
         if (!openMenus.length) {
@@ -689,7 +701,7 @@ var Toolbar = new Class({
         } else {
             this._stickToolbar();
         }
-    },
+    }
 
     /**
      * Resets toolbar to the normal position.
@@ -697,14 +709,14 @@ var Toolbar = new Class({
      * @method _stickToolbar
      * @private
      */
-    _stickToolbar: function _stickToolbar() {
+    _stickToolbar() {
         this._position.stickyTop = 0;
         this._position.isSticky = true;
         this.ui.body.removeClass('cms-toolbar-non-sticky');
         this.ui.toolbar.css({
             top: 0
         });
-    },
+    }
 
     /**
      * Positions toolbar absolutely so the long menus can be scrolled
@@ -713,13 +725,13 @@ var Toolbar = new Class({
      * @method _unstickToolbar
      * @private
      */
-    _unstickToolbar: function _unstickToolbar() {
+    _unstickToolbar() {
         this._position.stickyTop = this._position.top;
         this.ui.body.addClass('cms-toolbar-non-sticky');
         // have to do the !important because of "debug" toolbar
         this.ui.toolbar[0].style.setProperty('top', this._position.stickyTop + 'px', 'important');
         this._position.isSticky = false;
-    },
+    }
 
     /**
      * Show publish button and handle the case when it's in the dropdown.
@@ -729,14 +741,14 @@ var Toolbar = new Class({
      * @public
      * @deprecated since 3.5 due to us reloading the toolbar instead
      */
-    onPublishAvailable: function showPublishButton() {
+    onPublishAvailable() {
         // show publish / save buttons
         // istanbul ignore next
         // eslint-disable-next-line no-console
         console.warn('This method is deprecated and will be removed in future versions');
-    },
+    }
 
-    _refreshMarkup: function(newToolbar) {
+    _refreshMarkup(newToolbar) {
         const switcher = this.ui.toolbarSwitcher.detach();
 
         $(this.ui.toolbar).html(newToolbar.children());
@@ -760,6 +772,6 @@ var Toolbar = new Class({
         CMS.API.Clipboard.ui.triggerRemove = $('.cms-clipboard-empty a');
         CMS.API.Clipboard._toolbarEvents();
     }
-});
+}
 
 export default Toolbar;

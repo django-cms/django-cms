@@ -8,7 +8,7 @@
 function preload(image) {
     try {
         new Image().src = image;
-    } catch (e) {}
+    } catch {}
 }
 
 /**
