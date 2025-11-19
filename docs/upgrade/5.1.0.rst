@@ -34,6 +34,21 @@ How to upgrade to 5.1.0
 What's new in 5.1.0
 *******************
 
+New UI design
+=============
+
+The most prominent change in django CMS 5.1.0 is the new user interface design. While functionally
+similar to the previous design, it offers a more modern and streamlined experience, better color
+contrast, and more consistency between the frontend editor and Django's admin interface.
+
+Key changes include:
+* More Django-like green based color prefers-color-scheme
+* Modern design with round corners and updated icons
+* Improved visual hierarchy and spacing
+
+It is active by default, but the legacy design can be re-enabled by adding the ``data-cms-theme``
+attribute with the value ``4`` to the ``<html>`` tag in your templates.
+
 More flexible site configurations
 =================================
 
@@ -50,9 +65,6 @@ More flexible site configurations
 
   If you need more complex site determination logic, you can implement a custom
   middleware that sets `request.site` accordingly. It will respected by django CMS.
-
-Feature 2
-=========
 
 Feature 3
 =========

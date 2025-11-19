@@ -1,5 +1,7 @@
 // #############################################################################
 // BUTTONS
+// #############################################################################
+
 @use "sass:string";
 
 // taken from bootstrap with adaptations
@@ -10,6 +12,7 @@
         @return string.unquote('');
     }
 }
+
 @mixin button-variant($color, $background, $border, $important: false) {
     background-image: none important($important);
     margin-bottom: 0; // For input.btn
@@ -20,36 +23,53 @@
     background-clip: padding-box;
     -webkit-appearance: none;
     &:focus,
-    &.focus,
+    &.focus {
+        color: $color important($important);
+        background-color: color-mix(in srgb, $background, $black 5%) important($important);
+        border-color: color-mix(in srgb, $background, $black 5%) important($important);
+        text-decoration: none important($important);
+    }
     &:hover {
         color: $color important($important);
-        @if $background == $white {
-            background-color: $gray-lightest important($important);
-            border-color: $border important($important);
+        @if($background == $white) {
+            background-color: color-mix(in srgb, $background, $color-secondary 50%) important($important);
         } @else {
-            background-color: $background important($important);
-            border-color: $border important($important);
-            filter: brightness(var(--focus-brightness)) opacity(1) important($important);
-            // Strange: removing opacity(1.) or correcting it makes item transparent
+            background-color: color-mix(in srgb, $background, $black 10%) important($important);
         }
-      }
+        border-color: color-mix(in srgb, $border, $black 10%) important($important);
+        text-decoration: none important($important);
+    }
     &:active,
     &.cms-btn-active {
         color: $color important($important);
-        background-color: $background important($important);
-        border-color: $border important($important);
-        filter: brightness(var(--active-brightness)) opacity(1) important($important);
-        // Strange: removing opacity(1.) or correcting it makes item transparent
+        @if($background == $white) {
+            background-color: $color-secondary important($important);
+        } @else {
+            background-color: color-mix(in srgb, $background, $black 15%) important($important);
+        }
+        border-color: color-mix(in srgb, $border, $black 15%) important($important);
         box-shadow: $btn-active-shadow important($important);
 
-        &:hover,
+        &:hover {
+            color: $color important($important);
+            @if($background == $white) {
+                background-color: color-mix(in srgb, $color-secondary, $black 10%) important($important);
+            } @else {
+                background-color: color-mix(in srgb, $background, $black 10%) important($important);
+            }
+            border-color: color-mix(in srgb, $border, $black 10%) important($important);
+            text-decoration: none important($important);
+        }
         &:focus,
         &.focus {
             color: $color important($important);
-            background-color: $background important($important);
-            border-color: $border important($important);
-            filter: brightness(calc(var(--focus-brightness) * var(--active-brightness))) opacity(1) important($important);
-        }  // Strange: removing opacity(1.) or correcting it makes item transparent        }
+            @if($background == $white) {
+                background-color: $color-secondary important($important);
+            } @else {
+                background-color: color-mix(in srgb, $background, $black 20%) important($important);
+            }
+            border-color: color-mix(in srgb, $border, $black 25%) important($important);
+        }
     }
     &:active,
     &.cms-btn-active {
@@ -63,23 +83,13 @@
         &.focus,
         &:active,
         &.cms-btn-active {
-            background-color: $background important($important);
-            border-color: $border important($important);
-            @if $color == $gray {
-                color: $gray-lighter important(1);
-            } @else {
-                color: $color important(1);
-                filter: brightness(0.6) opacity(1);  // Strange: removing opacity(1.) or correcting it makes item transparent
-            }
+            background-color: color-mix(in srgb, $background 40%, transparent) important($important);
+            border-color: color-mix(in srgb, $border 40%, transparent) important($important);
+            color: color-mix(in srgb, $color, $white 50%) important(1);
             cursor: not-allowed;
             box-shadow: none important($important);
             &:before {
-                @if $color == $gray {
-                    color: $gray-lighter important(1);
-                } @else {
-                    color: $color important(1);
-                    filter: brightness(0.6) opacity(1); // Strange: removing opacity(1.) or correcting it makes item transparent
-                }
+                color: color-mix(in srgb, $color 40%, transparent) important(1);
             }
         }
     }
