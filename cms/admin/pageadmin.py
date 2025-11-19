@@ -1210,8 +1210,11 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         target_page_content = page.get_content_obj(target_language, fallback=False)
 
         for placeholder in source_page_content.get_placeholders():
-            # TODO: Handle missing placeholder
-            target = target_page_content.get_placeholders().get(slot=placeholder.slot)
+            try:
+                target = target_page_content.get_placeholders().get(slot=placeholder.slot)
+            except Placeholder.DoesNotExist:
+                messages.warning(request, _("Placeholder '%s' does not exist in target language") % placeholder.slot)
+                continue
             plugins = placeholder.get_plugins_list(source_page_content.language)
 
             if not target.has_add_plugins_permission(request.user, plugins):

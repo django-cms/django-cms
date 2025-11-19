@@ -1,4 +1,4 @@
-/* global document, window */
+/* global window */
 'use strict';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
 var PageTreeStickyHeader = require('../../../static/cms/js/modules/cms.pagetree.stickyheader').default;
@@ -83,8 +83,9 @@ describe('CMS.PageTreeStickyHeader', function() {
 
         it('saves toolbar height if in admin', function() {
             spyOn(sticky, '_isInSideframe').and.returnValue(false);
-            $('<div id="branding" style="height: 200px"></div>').prependTo(sticky.ui.container);
-            expect(sticky.toolbarHeight).toEqual(null);
+            $('<div class="djangocms-admin-style"><div id="branding" style="height: 200px"></div></div>')
+                .prependTo(sticky.ui.container);
+            expect(sticky.toolbarHeight).toEqual(0);
             sticky._saveSizes();
             expect(sticky.toolbarHeight).toEqual(200);
         });
@@ -97,7 +98,7 @@ describe('CMS.PageTreeStickyHeader', function() {
                 }
             });
             $('<div class="cms-toolbar" style="height: 250px"></div>').prependTo(sticky.ui.container);
-            expect(sticky.toolbarHeight).toEqual(null);
+            expect(sticky.toolbarHeight).toEqual(0);
             sticky._saveSizes();
             expect(sticky.toolbarHeight).toEqual(250);
         });
