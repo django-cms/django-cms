@@ -4,10 +4,11 @@ import sys
 from collections import OrderedDict
 from collections.abc import Generator
 from functools import partial
-from typing import Any, Optional, Union
+from typing import Any
 
 from classytags.utils import flatten_context
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.http import HttpRequest
 from django.template import Context
@@ -20,7 +21,7 @@ from django.views.debug import ExceptionReporter
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
-from cms.plugin_pool import PluginPool
+from cms.plugin_pool import PluginPool, plugin_pool
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -148,9 +149,23 @@ class BaseRenderer:
         plugin_menu_template = self.templates.placeholder_plugin_menu_template
         return plugin_menu_template.render({"plugin_menu": plugin_menu})
 
+    @staticmethod
+    def _filter_plugins_for_placeholder(plugins: list[type] | list[str], placeholder: Placeholder) -> list[type]:
+        if not hasattr(placeholder, "_source_model"):
+            try:
+                source_type = ContentType.objects.get_for_id(placeholder.content_type_id)
+                placeholder._source_model = f"{source_type.app_label}.{source_type.model}"
+            except ContentType.DoesNotExist:
+                placeholder._source_model = "None"
+        for plugin in plugins:
+            need_str = isinstance(plugin, str)
+            cls = plugin_pool.get_plugin(plugin) if need_str else plugin
+            if cls.valid_models is None or placeholder._source_model in cls.valid_models:
+                yield cls.__name__ if need_str else plugin
+
     def get_placeholder_toolbar_js(self, placeholder, page=None):
         plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page)  # original
-
+        plugins = self._filter_plugins_for_placeholder(plugins, placeholder)
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
         placeholder_toolbar_js = get_placeholder_toolbar_js(
@@ -170,7 +185,7 @@ class BaseRenderer:
         )
         content = get_plugin_toolbar_js(
             plugin,
-            children=child_classes,
+            children=list(self._filter_plugins_for_placeholder(child_classes, plugin.placeholder)),
             parents=parent_classes,
         )
         return content

@@ -1287,6 +1287,22 @@ class SimplePluginTests(TestCase):
         self.assertEqual(out_context["placeholder"], 2)
         self.assertIs(out_context, context)
 
+    def test_valid_models_is_lowercased_for_list(self):
+        class MyPlugin(CMSPluginBase):
+            render_template = "base.html"
+            valid_models = ["Cms.PageContent", "MyApp.MyModel"]
+
+        self.assertEqual(MyPlugin.valid_models, ["cms.pagecontent", "myapp.mymodel"])
+        self.assertIsInstance(MyPlugin.valid_models, list)
+
+    def test_valid_models_single_string_is_coerced_and_lowercased(self):
+        class SinglePlugin(CMSPluginBase):
+            render_template = "base.html"
+            valid_models = "Cms.PageContent"
+
+        self.assertEqual(SinglePlugin.valid_models, ["cms.pagecontent"])
+        self.assertIsInstance(SinglePlugin.valid_models, list)
+
 
 class BrokenPluginTests(TestCase):
     def test_import_broken_plugin(self):

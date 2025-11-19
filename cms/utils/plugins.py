@@ -4,10 +4,8 @@ import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache, lru_cache
 from itertools import starmap
 from operator import itemgetter
-from typing import Optional
 
 from django.db import models
 from django.http import HttpRequest
@@ -25,7 +23,6 @@ from cms.utils.placeholder import get_placeholder_conf
 logger = logging.getLogger(__name__)
 
 
-@cache
 def get_plugin_class(plugin_type: str) -> type[CMSPluginBase]:
     """Returns the plugin class for a given plugin_type (str)"""
     return plugin_pool.get_plugin(plugin_type)
@@ -184,7 +181,6 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
     parents_cache = cache.setdefault("plugin_parents", {})
     children_cache = cache.setdefault("plugin_children", {})
-
     try:
         parent_classes = parents_cache[plugin_type]
     except KeyError:

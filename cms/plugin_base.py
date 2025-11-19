@@ -81,6 +81,18 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 
         if "get_extra_plugin_menu_items" in attrs:
             new_plugin._has_extra_plugin_menu_items = True
+
+        # Normalize valid_models entries to lowercase (app_label.model)
+        # to allow case-insensitive configuration such as "cms.PageContent".
+        # ContentType.app_label and .model are lowercase, so we match that.
+        valid_models = getattr(new_plugin, "valid_models", None)
+        if valid_models is not None:
+            # Accept any iterable (list/tuple/set) or a single string
+            if isinstance(valid_models, (list, tuple, set)):
+                new_plugin.valid_models = [str(item).lower() for item in valid_models]
+            else:
+                # Coerce single value into list
+                new_plugin.valid_models = [str(valid_models).lower()]
         return new_plugin
 
 
@@ -174,7 +186,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Set to ``True`` if this plugin should only be used in a placeholder that is attached to a django CMS page,
     #: and not other models with ``PlaceholderRelationFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
     #: :attr:`require_parent`.
+    #:
+    #: Deprecated: Use valid_models attribute instead (e.g., `valid_models = ["cms.pagecontent"]`)
     page_only = False
+
+    valid_models = None
+    """A list of valid models where this plugin can be added. Each entry must be the
+    dotted path to the model in the format ``"app_label.modelname"``, e.g., ``["cms.pagecontent", "myapp.mymodel"]``.
+    If ``None``, the plugin can be added to any model that has placeholders.
+    """
 
     allow_children = False
     """Allows this plugin to have child plugins - other plugins placed inside it?
@@ -734,7 +754,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     @template_slot_caching
     def get_child_classes(
         cls, slot, page: Page | None = None, instance: CMSPlugin | None = None, only_uncached: bool = False
-    ) -> list:
+    ) -> list[str]:
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
@@ -773,7 +793,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_parent_classes(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None):
+    def get_parent_classes(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None) -> list[str]:
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)
