@@ -26,6 +26,7 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseRedirect,
+    JsonResponse,
     QueryDict,
 )
 from django.shortcuts import get_object_or_404, render
@@ -343,7 +344,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             raise self._get_404_exception(object_id)
 
         if not page.is_potential_home():
-            return HttpResponseBadRequest(_("The page is not eligible to be home."))
+            return HttpResponseBadRequest(escape(_("The page is not eligible to be home.")))
 
         new_home_tree, old_home_tree = page.set_as_homepage(request.user)
 
@@ -389,7 +390,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                         "redirect_url": page.get_absolute_url(language=language_code),
                     }
                 )
-            return HttpResponse(json.dumps(results), content_type="application/json")
+            return JsonResponse(results, safe=False)
         return HttpResponseForbidden()
 
     def changelist_view(self, request, extra_context=None):
@@ -555,7 +556,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         form = self.move_form(request.POST or None, page=page, site=site)
 
         if not form.is_valid():
-            return jsonify_request(HttpResponseBadRequest(str(form.errors.get("__all__", _("error")))))
+            return jsonify_request(HttpResponseBadRequest(escape(form.errors.get("__all__", _("error")))))
 
         target = form.cleaned_data["target"]
         can_move_page = self.has_move_page_permission(request, obj=page)
@@ -563,7 +564,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         # Does the user have permissions to do this...?
         if not can_move_page or (target and not target.has_add_permission(user)):
             message = _("Error! You don't have permissions to move this page. Please reload the page")
-            return jsonify_request(HttpResponseForbidden(message))
+            return jsonify_request(HttpResponseForbidden(escape(message)))
 
         operation_token = send_pre_page_operation(
             request=request,
@@ -679,14 +680,14 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             return jsonify_request(HttpResponseBadRequest(message))
 
         new_page = form.copy_page(user)
-        return HttpResponse(json.dumps({"id": new_page.pk}), content_type="application/json")
+        return JsonResponse({"id": new_page.pk})
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(request, object_id=page_id)
         translation = page.get_admin_content(language)
 
         if not self.has_change_permission(request, obj=page):
-            return HttpResponseForbidden(_("You do not have permission to edit this page"))
+            return HttpResponseForbidden(escape(_("You do not have permission to edit this page")))
 
         if page is None:
             raise self._get_404_exception(page_id)
@@ -1180,15 +1181,15 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         if get_cms_setting("TEMPLATES"):
             if to_template not in dict(get_cms_setting("TEMPLATES")):
-                return HttpResponseBadRequest(_("Template not valid"))
+                return HttpResponseBadRequest(escape(_("Template not valid")))
         else:
             if to_template not in (placeholder_set[0] for placeholder_set in get_cms_setting("PLACEHOLDERS")):
-                return HttpResponseBadRequest(_("Placeholder selection not valid"))
+                return HttpResponseBadRequest(escape(_("Placeholder selection not valid")))
 
         page_content.template = to_template
         page_content.save()
 
-        return HttpResponse(_("The template was successfully changed"))
+        return HttpResponse(escape(_("The template was successfully changed")))
 
     @require_POST
     @transaction.atomic
@@ -1205,7 +1206,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         page = source_page_content.page
 
         if not target_language or target_language not in get_language_list(site_id=page.site_id):
-            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+            return HttpResponseBadRequest(escape(_("Language must be set to a supported language!")))
 
         target_page_content = page.get_content_obj(target_language, fallback=False)
 
@@ -1218,7 +1219,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             plugins = placeholder.get_plugins_list(source_page_content.language)
 
             if not target.has_add_plugins_permission(request.user, plugins):
-                return HttpResponseForbidden(_("You do not have permission to copy these plugins."))
+                return HttpResponseForbidden(escape(_("You do not have permission to copy these plugins.")))
             copy_plugins_to_placeholder(plugins, target, language=target_language)
         return HttpResponse("ok")
 
@@ -1227,7 +1228,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         page = page_content.page
 
         if not self.has_delete_translation_permission(request, page_content.language, page):
-            return HttpResponseForbidden(_("You do not have permission to delete this page"))
+            return HttpResponseForbidden(escape(_("You do not have permission to delete this page")))
 
         if page is None:
             raise self._get_404_exception(object_id)
@@ -1291,7 +1292,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             else:
                 # Only this page? Can be permissions or versioning, or ...
                 message = "You cannot change this page's navigation status"
-            return HttpResponseForbidden(_(message))
+            return HttpResponseForbidden(escape(_(message)))
 
         if page_content is None:
             raise self._get_404_exception(object_id)

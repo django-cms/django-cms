@@ -9,6 +9,7 @@ from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseRedirect,
+    JsonResponse,
 )
 from django.http.request import QueryDict
 from django.urls import Resolver404, path, re_path, resolve
@@ -59,8 +60,7 @@ class SettingsAdmin(admin.ModelAdmin):
         POST should have a settings parameter
         """
         if not request.user.is_staff:
-            return HttpResponse(json.dumps(""),
-                                content_type="application/json")
+            return JsonResponse("", status=403)
         if request.method == "POST":
             request.session['cms_settings'] = conditional_escape(request.POST['settings'])
             request.session.save()
