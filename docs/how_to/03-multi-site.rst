@@ -52,7 +52,7 @@ local, unversioned overrides at the end (e.g. secrets, database credentials).
    want to expose the frontend editing and preview endpoints on certain sites, e.g., for security
    reasons.
 
-   The toolbar will only be available on sites which do have admin endponts.
+   The toolbar will only be available on sites which do have admin endpoints.
 
 
 Approach 2 (since 5.1): Shared settings without SITE_ID
