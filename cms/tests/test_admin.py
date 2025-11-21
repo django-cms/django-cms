@@ -27,6 +27,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
@@ -869,6 +870,125 @@ class AdminFormsTests(AdminTestsBase):
             page = page.reload()
             # Make sure no change was made
             self.assertEqual(page.application_urls, None)
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_advanced_settings_endpoint_permissions(self):
+        """
+        Test that the advanced settings endpoint respects various permission levels
+        """
+        admin_user = self.get_superuser()
+        staff_user = self._get_staff_user(use_global_permissions=False)
+        page = create_page("Page 1", "nav_playground.html", "en", created_by=admin_user)
+        path = admin_reverse("cms_page_advanced", args=(page.pk,))
+
+        # Test with no permissions
+        with self.login_user_context(staff_user):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 403)
+
+        # Test with change permission only (no advanced settings permission)
+        gpp = GlobalPagePermission.objects.create(
+            user=staff_user,
+            can_change=True,
+            can_change_advanced_settings=False,
+        )
+        gpp.sites.set(Site.objects.all())
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 403)
+
+        # Test with advanced settings permission only
+        gpp.can_change = False
+        gpp.can_change_advanced_settings = True
+        gpp.save()
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 403)
+
+        # Test with both permissions
+        gpp.can_change = True
+        gpp.can_change_advanced_settings = True
+        gpp.save()
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(path)
+            # Check that advanced settings fields are present
+            self.assertContains(response, 'name="reverse_id"')
+            self.assertContains(response, 'name="application_urls"')
+
+        # Test with permissions change permission only
+        gpp.can_change_advanced_settings = False
+        gpp.can_change_permissions = True
+        gpp.save()
+        # Ensure no advanced settings fields are shown without proper permissions
+        with self.login_user_context(staff_user):
+            response = self.client.get(path)
+            self.assertNotContains(response, 'name="reverse_id"')
+            self.assertNotContains(response, 'name="application_urls"')
+
+    def test_advanced_settings_toolbar_entry(self):
+        """
+        Test that the advanced settings toolbar entry is only shown to users with appropriate permissions
+        and offers the correct content
+        """
+        admin_user = self.get_superuser()
+        staff_user = self._get_staff_user(use_global_permissions=False)
+        page = create_page("Test Page", "nav_playground.html", "en", created_by=admin_user)
+        page_url = get_object_edit_url(page.get_admin_content("en"))
+        advanced_settings_url = admin_reverse("cms_page_advanced", args=(page.pk,))
+
+        snippet = """
+<li class="{} ">
+    <a {}href="{}?language=en" data-rel="modal" data-on-close="REFRESH_PAGE">
+        <span>Advanced settings...<span class="cms-icon cms-icon-arrow"></span></span>
+    </a>
+</li>"""
+        disabled_snippet = snippet.format("cms-toolbar-item-navigation-disabled", 'tabindex="-1" ', advanced_settings_url)
+        enabled_snippet = snippet.format("", "", advanced_settings_url)
+
+        # Test with admin user - should see advanced settings
+        with self.login_user_context(admin_user):
+            response = self.client.get(page_url)
+            self.assertEqual(response.status_code, 200)
+            # Check for advanced settings in toolbar
+            self.assertContains(response, enabled_snippet, html=True)
+
+        # Test with staff user with no permissions
+        with self.login_user_context(staff_user):
+            response = self.client.get(page_url)
+            # Should not contain advanced settings link
+            self.assertContains(response, disabled_snippet, html=True)
+
+        # Test with change permission but no advanced settings permission
+        gpp = GlobalPagePermission.objects.create(
+            user=staff_user,
+            can_change_permissions=True,
+            can_change_advanced_settings=False,
+        )
+        gpp.sites.set(Site.objects.all())
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(page_url)
+            self.assertContains(response, enabled_snippet, html=True)
+
+        # Test with permissions change permissions only
+        gpp.can_change_permissions = False
+        gpp.can_change_advanced_settings = True
+        gpp.save()
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(page_url)
+            self.assertContains(response, enabled_snippet, html=True)
+
+    def test_advanced_settings_returns_404(self):
+        invalid_page_pk = 0
+        path = admin_reverse("cms_page_advanced", args=(invalid_page_pk,))
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 404)
 
     def test_render_edit_mode(self):
         from django.core.cache import cache
