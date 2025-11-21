@@ -13,6 +13,7 @@ from django.template import (
     Context,
     NodeList,
     Template,
+    TemplateDoesNotExist,
     TemplateSyntaxError,
     Variable,
     engines,
@@ -219,7 +220,11 @@ def _scan_placeholders(
                     if isinstance(node.template.var, Variable):
                         continue
                     else:
-                        template = get_template(node.template.var)
+                        try:
+                            template = get_template(node.template.var)
+                        except (TemplateDoesNotExist, TemplateSyntaxError):
+                            # Include might be inside if else, so no need to error out here
+                            continue
                 else:
                     template = node.template
                 nodes += _scan_placeholders(
