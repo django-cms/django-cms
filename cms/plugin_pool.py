@@ -141,7 +141,7 @@ class PluginPool:
 
         plugins = self.plugins.values()
         template = (
-            lazy(page.get_template, str)() if page else None
+            lazy(page.get_template, str)() if page and hasattr(page, "get_template") else None
         )  # Make template lazy to avoid unnecessary db access
 
         allowed_plugins = (
