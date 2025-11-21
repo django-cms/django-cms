@@ -222,8 +222,9 @@ def _scan_placeholders(
                     else:
                         try:
                             template = get_template(node.template.var)
-                        except (TemplateDoesNotExist, TemplateSyntaxError):
+                        except TemplateDoesNotExist:
                             # Include might be inside if else, so no need to error out here
+                            # Actual errors will be raised at render time
                             continue
                 else:
                     template = node.template
