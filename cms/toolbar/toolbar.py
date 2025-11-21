@@ -7,7 +7,7 @@ from django.apps import apps
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
-from django.urls import Resolver404, resolve
+from django.urls import NoReverseMatch, Resolver404, resolve
 from django.utils.functional import cached_property
 from django.utils.translation import override as force_language
 
@@ -28,6 +28,7 @@ from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request
+from cms.utils.urlutils import admin_reverse
 
 cms_toolbar_extensions = apps.get_app_config('cms').cms_extension.toolbar_mixins
 
@@ -220,22 +221,28 @@ class CMSToolbarBase(BaseToolbar):
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
-        # Handle showing the toolbar for anonymous users when they supply
-        # the enable toolbar parameter
-        if (anonymous_on and request.user.is_anonymous) and enable_toolbar in self.request.GET:
-            self.show_toolbar = True
-
-        if self.show_toolbar:
-            edit_mode = (
-                self._resolver_match
-                and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
-            )
-            if enable_toolbar in self.request.GET or edit_mode:
+        try:
+            admin_reverse('index')
+            # Handle showing the toolbar for anonymous users when they supply
+            # the enable toolbar parameter
+            if (anonymous_on and request.user.is_anonymous) and enable_toolbar in self.request.GET:
                 self.show_toolbar = True
-            elif disable_toolbar in self.request.GET:
-                self.show_toolbar = False
-            elif self.request.session.get('cms_toolbar_disabled', False):
-                self.show_toolbar = False
+
+            if self.show_toolbar:
+                edit_mode = (
+                    self._resolver_match
+                    and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+                )
+                if enable_toolbar in self.request.GET or edit_mode:
+                    self.show_toolbar = True
+                elif disable_toolbar in self.request.GET:
+                    self.show_toolbar = False
+                elif self.request.session.get('cms_toolbar_disabled', False):
+                    self.show_toolbar = False
+
+        except NoReverseMatch:
+            # No admin on this site - disable toolbar
+            self.show_toolbar = False
 
         # We need to store the current language in case the user's preferred language is different.
         self.toolbar_language = self.request_language

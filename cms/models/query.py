@@ -21,10 +21,10 @@ class PageQuerySet(MP_NodeQuerySet):
         return self.filter(path__startswith=parent.path, depth__gte=parent.depth)
 
     def on_site(self, site=None):
-        from cms.utils import get_current_site
+        from django.contrib.sites.models import Site
 
         if site is None:
-            site = get_current_site()
+            site = Site.objects.get_current()
         return self.filter(site=site)
 
     def get_home(self, site=None):

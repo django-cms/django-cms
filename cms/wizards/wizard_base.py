@@ -55,7 +55,6 @@ def clear_wizard_cache():
     del apps.get_app_config('cms').cms_extension.wizards
 
 
-
 class WizardBase:
     """
 

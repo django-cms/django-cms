@@ -1,5 +1,4 @@
 from operator import attrgetter
-from typing import Optional
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, TemplateSyntaxError

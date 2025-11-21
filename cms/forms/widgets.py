@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils.encoding import force_str
-from django.utils.html import escape, escapejs
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from cms.forms.utils import get_page_choices, get_site_choices
@@ -38,7 +38,7 @@ class PageSelectWidget(MultiWidget):
         if value:
             page = Page.objects.get(pk=value)
             return [page.site_id, page.pk, page.pk]
-        site = Site.objects.get_current()
+        site = Site.objects.first()
         return [site.pk, None, None]
 
     def _has_changed(self, initial, data):

@@ -1,4 +1,3 @@
-import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import lru_cache, wraps
