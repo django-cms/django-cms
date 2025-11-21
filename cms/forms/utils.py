@@ -83,6 +83,7 @@ def update_site_and_page_choices(language=None):
 
 def get_site_choices(lang=None):
     from django.core.cache import cache
+
     lang = lang or i18n.get_current_language()
     site_choices = cache.get(_site_cache_key(lang))
     if site_choices is None:
@@ -92,6 +93,7 @@ def get_site_choices(lang=None):
 
 def get_page_choices(lang=None):
     from django.core.cache import cache
+
     lang = lang or i18n.get_current_language()
     page_choices = cache.get(_page_cache_key(lang))
     if page_choices is None:

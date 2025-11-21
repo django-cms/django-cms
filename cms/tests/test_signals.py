@@ -28,7 +28,7 @@ class SignalTests(CMSTestCase):
                         "nav_playground.html",
                         "en",
                     )
-                    redirect_to = self.get_pages_admin_list_uri()
+                    redirect_to = self.get_pages_admin_list_uri(site_id=cms_page.site_id)
                     endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
                     current_revision, _ = UrlconfRevision.get_or_create_revision()
                     page_data = {

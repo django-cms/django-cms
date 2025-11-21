@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.admin.utils import flatten_fieldsets
@@ -1408,7 +1409,7 @@ class AdminPageTreeTests(AdminTestsBase):
         admin_user, staff = self._get_guys()
         pagecontent_admin = self.pagecontent_admin_class
 
-        languages = get_language_list()  # Run through all languages
+        languages = get_language_list(site_id=settings.SITE_ID)  # Run through all languages
         url = admin_reverse("cms_pagecontent_changelist")
         add_url = admin_reverse("cms_pagecontent_add")  # "Add page" button
         self.assertIn("/en/", add_url + "?language=en")  # English admin (default in tests)
@@ -1420,7 +1421,7 @@ class AdminPageTreeTests(AdminTestsBase):
             for language in languages:  # Now check all language with the languages selector defined
                 request = self.get_request(path=f"{url}?language={language}")  # Language of the page tree
                 response = pagecontent_admin.changelist_view(request)
-                self.assertContains(response, f'href="{add_url}?language={language}"')
+                self.assertContains(response, f'href="{add_url}?language={language}&amp;site=1"')
 
             # Create pages in all languages
             page = {}

@@ -4,7 +4,7 @@ import sys
 from collections import OrderedDict
 from collections.abc import Generator
 from functools import partial
-from typing import Any, Optional, Union
+from typing import Any
 
 from classytags.utils import flatten_context
 from django.conf import settings

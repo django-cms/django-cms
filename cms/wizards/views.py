@@ -35,7 +35,7 @@ class WizardCreateView(SessionWizardView):
 
         if not user.is_active or not user.is_staff:
             raise PermissionDenied
-        self.site = get_current_site()
+        self.site = get_current_site(self.request)
         return super().dispatch(*args, **kwargs)
 
     def get_current_step(self):

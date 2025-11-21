@@ -595,7 +595,7 @@ class PageToolbar(CMSToolbar):
             current_page_menu = self.toolbar.get_or_create_menu(
                 PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 
-            new_page_params = {'edit': 1}
+            new_page_params = {'edit': 1, 'site': self.page.site_id}
             new_sub_page_params = {'edit': 1, 'parent_page': self.page.id}
 
             add_page_url = admin_reverse('cms_pagecontent_add')

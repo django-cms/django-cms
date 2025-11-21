@@ -12,6 +12,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 
 def gettext(s):
     return s
+
 warnings.filterwarnings("ignore", category=DontUsePageAttributeWarning)
 
 
