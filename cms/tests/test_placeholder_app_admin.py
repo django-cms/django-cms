@@ -1,5 +1,4 @@
 from django.forms.models import model_to_dict
-from django.test.utils import override_settings
 
 from cms.api import add_plugin
 from cms.models import CMSPlugin, Placeholder, UserSettings

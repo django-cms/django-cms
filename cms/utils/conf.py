@@ -259,20 +259,30 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if settings.SITE_ID != hash(settings.SITE_ID):
+    site_settings = getattr(settings, 'SITE_ID', None)
+    if site_settings and site_settings != hash(site_settings):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )
     if not settings.USE_I18N:
-        return _ensure_languages_settings(
-            {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
+        if site_settings:
+            return _ensure_languages_settings(
+                {site_settings: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]}
+            )
+        settings.LANGUAGES = ((settings.LANGUAGE_CODE, settings.LANGUAGE_CODE),)
+        return {'default': {}, VERIFIED: True}
+
     if settings.LANGUAGE_CODE not in dict(settings.LANGUAGES):
         raise ImproperlyConfigured(
             'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
         )
-    languages = getattr(settings, 'CMS_LANGUAGES', {
-        settings.SITE_ID: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
-    })
+
+    if site_settings:
+        languages = getattr(settings, 'CMS_LANGUAGES', {
+            site_settings: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
+        })
+    else:
+        languages = {'default': {}, VERIFIED: True}
     if VERIFIED in languages:
         return languages
     return _ensure_languages_settings(languages)
@@ -317,4 +327,4 @@ def get_site_id(site):
         return int(site)
     except (TypeError, ValueError):
         pass
-    return settings.SITE_ID
+    return getattr(settings, 'SITE_ID', None)

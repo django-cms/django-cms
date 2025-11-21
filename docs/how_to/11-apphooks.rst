@@ -325,11 +325,3 @@ The CMS the server will reload its URL caches. It does this by listening for the
     The signal is fired **after** a request - for example, upon saving a page's
     settings. If you change and apphook's setting via an API the signal will not fire
     until a subsequent request.
-
-Apphooks and placeholder template tags
---------------------------------------
-
-It's important to understand that while an apphooked application takes over the CMS page
-at that location completely, depending on how the application's templates extend other
-templates, a django CMS ``{% placeholder %}`` template tag may be invoked - **but will
-not work**.

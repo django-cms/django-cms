@@ -210,12 +210,15 @@ class Placeholder(models.Model):
     def page_getter(self):
         if not hasattr(self, "_page"):
             from cms.models.contentmodels import PageContent
-
-            try:
-                # Directly go through PageContent to avoid having to get the source and the page in separate queries
-                self._page = PageContent.admin_manager.filter(placeholders=self).select_related("page").first().page
-            except AttributeError:
-                self._page = None
+            # Check if the GenericForeignKey is cached by looking for the _source_cache attribute
+            if "source" in self._state.fields_cache and isinstance(self.source, PageContent):
+                self._page = self.source.page
+            else:
+                try:
+                    # Directly go through PageContent to avoid having to get the source and the page in separate queries
+                    self._page = PageContent.admin_manager.filter(placeholders=self).select_related("page").first().page
+                except AttributeError:
+                    self._page = None
         return self._page
 
     def page_setter(self, value):
@@ -241,7 +244,7 @@ class Placeholder(models.Model):
         """Checks if placeholder is empty (``False``) or populated (``True``)"""
         return self.get_plugins(language).exists()
 
-    def get_filled_languages(self):
+    def get_filled_languages(self, site_id=None):
         """
         Returns language objects for every language for which the placeholder
         has plugins.
@@ -249,10 +252,13 @@ class Placeholder(models.Model):
         This is not cached as it's meant to be used in the frontend editor.
         """
 
+        if site_id is None:
+            site_id = get_site_id(self.page.site_id if self.page else None)
+
         languages = []
         for lang_code in set(self.get_plugins().values_list("language", flat=True)):
             try:
-                languages.append(get_language_object(lang_code))
+                languages.append(get_language_object(lang_code, site_id=site_id))
             except LanguageError:
                 pass
         return languages
