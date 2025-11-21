@@ -1769,8 +1769,9 @@ class PageActionsTestCase(PageTestBase):
         # This test verifies the extra_context parameter functionality
         # Since we can't directly call the method with extra_context via URL,
         # we'll test it by directly calling the admin method
-        from cms.admin.pageadmin import PageAdmin
         from django.contrib.admin.sites import AdminSite
+
+        from cms.admin.pageadmin import PageAdmin
 
         page_admin = PageAdmin(Page, AdminSite())
         request = self.get_page_request(self.page, self.admin, '/')
