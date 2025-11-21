@@ -247,7 +247,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             form = type("EmptyForm", (ModelForm,), {"Meta": type("Meta", (self.form.Meta,), {"fields": []})})
         else:
             form = super().get_form(request, obj, **kwargs)
-        form._site = get_site(request)
+        form._site = get_site_from_request(request)
         form._request = request
         return form
 
