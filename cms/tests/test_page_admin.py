@@ -1795,6 +1795,31 @@ class PageActionsTestCase(PageTestBase):
             self.assertEqual(response.status_code, 200)
             self.assertFalse(response.context['CMS_PERMISSION'])
 
+    @override_settings(CMS_PERMISSION=True)
+    def test_get_copy_dialog_permission_denied_source(self):
+        """Test: Permission denied for source page (user cannot view source page)"""
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(username='noperm', password='noperm', is_staff=True)
+        page = create_page('Secret', 'nav_playground.html', 'en', site=self.site, created_by=self.admin)
+        with self.login_user_context(user):
+            url = admin_reverse('cms_page_get_copy_dialog', args=[page.pk])
+            response = self.client.get(url, {'source_site': self.site.pk})
+            self.assertEqual(response.status_code, 403)
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_get_copy_dialog_permission_denied_target(self):
+        """Test: Permission denied for target page (user cannot add subpage under target)"""
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(username='noperm2', password='noperm2', is_staff=True)
+        source_page = create_page('Source', 'nav_playground.html', 'en', site=self.site, created_by=self.admin)
+        target_page = create_page('Target', 'nav_playground.html', 'en', site=self.site, created_by=self.admin)
+        with self.login_user_context(user):
+            url = admin_reverse('cms_page_get_copy_dialog', args=[source_page.pk])
+            response = self.client.get(url, {'source_site': self.site.pk, 'target': target_page.pk})
+            self.assertEqual(response.status_code, 403)
+
 
 class PermissionsTestCase(PageTestBase):
     def assertContainsPermissions(self, response):
