@@ -127,20 +127,14 @@ class BaseRenderer:
     def get_plugins_with_perms(self) -> list[CMSPlugin]:
         if self._plugins_with_perms is None:
             registered_plugins = self.plugin_pool.registered_plugins
-            can_add_plugin = partial(
-                has_plugin_permission, user=self.request.user, permission_type="add"
-            )
+            can_add_plugin = partial(has_plugin_permission, user=self.request.user, permission_type="add")
             self._plugins_with_perms = [
-                plugin
-                for plugin in registered_plugins
-                if can_add_plugin(plugin_type=plugin.value)
+                plugin for plugin in registered_plugins if can_add_plugin(plugin_type=plugin.value)
             ]
 
         return self._plugins_with_perms
 
-    def get_placeholder_plugin_menu(
-        self, placeholder: Placeholder, page: Page | None = None
-    ):
+    def get_placeholder_plugin_menu(self, placeholder: Placeholder, page: Page | None = None):
         plugin_menu = get_toolbar_plugin_struct(
             plugins=self.get_plugins_with_perms(),
             slot=placeholder.slot,
@@ -150,23 +144,29 @@ class BaseRenderer:
         return plugin_menu_template.render({"plugin_menu": plugin_menu})
 
     @staticmethod
-    def _filter_plugins_for_placeholder(plugins: list[type] | list[str], placeholder: Placeholder) -> list[type]:
+    def _filter_plugins_for_placeholder(plugins: list[str], placeholder: Placeholder) -> Generator[str]:
         if not hasattr(placeholder, "_source_model"):
             try:
                 source_type = ContentType.objects.get_for_id(placeholder.content_type_id)
                 placeholder._source_model = f"{source_type.app_label}.{source_type.model}"
+                placeholder._source_allowed_plugins = getattr(source_type.model_class(), "allowed_plugins", [])
             except ContentType.DoesNotExist:
                 placeholder._source_model = "None"
-        for plugin in plugins:
-            need_str = isinstance(plugin, str)
-            cls = plugin_pool.get_plugin(plugin) if need_str else plugin
-            if cls.valid_models is None or placeholder._source_model in cls.valid_models:
-                yield cls.__name__ if need_str else plugin
+                placeholder._source_allowed_plugins = []
+        print(placeholder._source_allowed_plugins)
+        to_cls = (plugin_pool.get_plugin(plugin) for plugin in plugins)
+        return [
+            cls.__name__
+            for cls in to_cls
+            if (not placeholder._source_allowed_plugins
+            or cls.__name__ in placeholder._source_allowed_plugins)
+            and (cls.valid_models is None or placeholder._source_model in cls.valid_models)
+        ]
 
     def get_placeholder_toolbar_js(self, placeholder, page=None):
         plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page)  # original
-        plugins = self._filter_plugins_for_placeholder(plugins, placeholder)
         plugin_types = [cls.__name__ for cls in plugins]
+        plugin_types = self._filter_plugins_for_placeholder(plugin_types, placeholder)
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
         placeholder_toolbar_js = get_placeholder_toolbar_js(
             placeholder=placeholder,
@@ -175,9 +175,7 @@ class BaseRenderer:
         return placeholder_toolbar_js
 
     def get_plugin_toolbar_js(self, plugin: CMSPlugin, page: Page | None = None):
-        placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
-            plugin.placeholder_id, {}
-        )
+        placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
             page=page,
@@ -185,7 +183,7 @@ class BaseRenderer:
         )
         content = get_plugin_toolbar_js(
             plugin,
-            children=list(self._filter_plugins_for_placeholder(child_classes, plugin.placeholder)),
+            children=self._filter_plugins_for_placeholder(child_classes, plugin.placeholder),
             parents=parent_classes,
         )
         return content
@@ -194,14 +192,10 @@ class BaseRenderer:
         plugin_type = plugin.plugin_type
 
         if plugin_type not in self._cached_plugin_classes:
-            self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(
-                plugin_type
-            )
+            self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(plugin_type)
         return self._cached_plugin_classes[plugin_type]
 
-    def get_plugins_to_render(
-        self, placeholder: Placeholder, language: str, template: str | None
-    ):
+    def get_plugins_to_render(self, placeholder: Placeholder, language: str, template: str | None):
         from cms.utils.plugins import get_plugins
 
         plugins = get_plugins(
@@ -236,8 +230,7 @@ class ContentRenderer(BaseRenderer):
         '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
     )
     placeholder_edit_template = (
-        '{content} '
-        '<div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>{plugin_js}{placeholder_js}'
+        '{content} <div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>{plugin_js}{placeholder_js}'
     )
 
     def __init__(self, request: HttpRequest):
@@ -316,14 +309,9 @@ class ContentRenderer(BaseRenderer):
             placeholder_content = "".join(plugin_content)
         except Exception as e:
             context["exc_info"] = sys.exc_info()
-            placeholder_content = self.render_exception(
-                "rendering placeholder", context, placeholder, editable
-            )
+            placeholder_content = self.render_exception("rendering placeholder", context, placeholder, editable)
             if not get_cms_setting("CATCH_PLUGIN_500_EXCEPTION"):
-                if (
-                    not self.toolbar.edit_mode_active
-                    and not self.toolbar.preview_mode_active
-                ):
+                if not self.toolbar.edit_mode_active and not self.toolbar.preview_mode_active:
                     raise e from None
 
         if not placeholder_content and nodelist:
@@ -364,9 +352,7 @@ class ContentRenderer(BaseRenderer):
 
         if editable:
             request = context.get("request", None)
-            with override(
-                request.toolbar.toolbar_language
-            ) if request else contextlib.nullcontext():
+            with override(request.toolbar.toolbar_language) if request else contextlib.nullcontext():
                 data = self.get_editable_placeholder_context(placeholder, page=page)
             data["content"] = placeholder_content
             placeholder_content = self.placeholder_edit_template.format(**data)
@@ -374,14 +360,11 @@ class ContentRenderer(BaseRenderer):
         context.pop()
         return mark_safe(placeholder_content)
 
-    def get_editable_placeholder_context(
-        self, placeholder: Placeholder, page: Page | None = None
-    ) -> dict:
+    def get_editable_placeholder_context(self, placeholder: Placeholder, page: Page | None = None) -> dict:
         placeholder_cache = self.get_rendered_plugins_cache(placeholder)
         placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
         plugin_toolbar_js_bits = (
-            self.get_plugin_toolbar_js(plugin, page=page)
-            for plugin in placeholder_cache["plugins"]
+            self.get_plugin_toolbar_js(plugin, page=page) for plugin in placeholder_cache["plugins"]
         )
         context = {
             "plugin_js": "".join(plugin_toolbar_js_bits),
@@ -534,20 +517,13 @@ class ContentRenderer(BaseRenderer):
 
         if editable:
             content = self.plugin_edit_template.format(
-                pk=instance.pk,
-                placeholder=instance.placeholder_id,
-                content=content,
-                position=instance.position
+                pk=instance.pk, placeholder=instance.placeholder_id, content=content, position=instance.position
             )
-            placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
-                placeholder.pk, {}
-            )
+            placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
             placeholder_cache.setdefault("plugins", []).append(instance)
         return mark_safe(content)
 
-    def render_exception(
-        self, action: str, context: Context, placeholder: Placeholder, editable: bool
-    ) -> str:
+    def render_exception(self, action: str, context: Context, placeholder: Placeholder, editable: bool) -> str:
         exc, value, traceback = context["exc_info"]
         placeholder_source_obj = placeholder.source.__class__._meta.verbose_name
         message = (
@@ -557,9 +533,7 @@ class ContentRenderer(BaseRenderer):
         if "_last_plugin" in context:
             instance = context["_last_plugin"]
             try:
-                description = (
-                    f"{instance._meta.verbose_name} {instance.get_short_description()}"
-                )
+                description = f"{instance._meta.verbose_name} {instance.get_short_description()}"
             except Exception:
                 description = f"{instance._meta.verbose_name}"
             message += f', plugin #{instance.pk} "{description}"'
@@ -581,9 +555,7 @@ class ContentRenderer(BaseRenderer):
                     content=heading,
                     position=instance.position,
                 )
-                placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
-                    placeholder.pk, {}
-                )
+                placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
                 placeholder_cache.setdefault("plugins", []).append(instance)
 
             return f'<div class="cms-rendering-exception">{heading}{html}</div>'
@@ -648,17 +620,9 @@ class ContentRenderer(BaseRenderer):
                     .first()
                 )
             else:
-                page_content = page.pagecontent_set.filter(
-                    language=self.request_language
-                ).first()
-            return (
-                Placeholder.objects.get_for_obj(page_content)
-                if page_content
-                else Placeholder.objects.none()
-            )
-        elif page_content := page.get_content_obj(
-            self.request_language, fallback=False
-        ):
+                page_content = page.pagecontent_set.filter(language=self.request_language).first()
+            return Placeholder.objects.get_for_obj(page_content) if page_content else Placeholder.objects.none()
+        elif page_content := page.get_content_obj(self.request_language, fallback=False):
             PageContent.page.field.set_cached_value(page_content, page)
             # Creates any placeholders missing on the page
             return page_content.rescan_placeholders().values()
@@ -682,9 +646,7 @@ class ContentRenderer(BaseRenderer):
         elif not self.toolbar.edit_mode_active:
             # Scan through the page template to find all placeholders
             # that have inheritance turned on.
-            slots_w_inheritance = [
-                pl.slot for pl in page.get_declared_placeholders() if pl.inherit
-            ]
+            slots_w_inheritance = [pl.slot for pl in page.get_declared_placeholders() if pl.inherit]
         else:
             # Inheritance is turned off on edit-mode
             slots_w_inheritance = []
@@ -716,8 +678,7 @@ class ContentRenderer(BaseRenderer):
         placeholders_to_inherit = [
             pl.slot
             for pl in placeholders
-            if not getattr(pl, "_plugins_cache", None)
-            and pl.slot in slots_w_inheritance
+            if not getattr(pl, "_plugins_cache", None) and pl.slot in slots_w_inheritance
         ]
 
         if page.parent and placeholders_to_inherit:
@@ -755,9 +716,7 @@ class StructureRenderer(BaseRenderer):
             yield from _unpack_plugins(plugin)
 
     def render_placeholder(self, placeholder, language, page=None):
-        rendered_plugins = self.render_plugins(
-            placeholder, language=language, page=page
-        )
+        rendered_plugins = self.render_plugins(placeholder, language=language, page=page)
         plugin_js_output = "".join(rendered_plugins)
 
         placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
@@ -784,9 +743,7 @@ class StructureRenderer(BaseRenderer):
         return self.render_placeholder(placeholder, language=language, page=page)
 
     def render_plugin(self, instance, page=None):
-        placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
-            instance.placeholder_id, {}
-        )
+        placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(instance.placeholder_id, {})
         placeholder_cache.setdefault("plugins", []).append(instance)
         return self.get_plugin_toolbar_js(instance, page=page)
 
@@ -812,9 +769,7 @@ class LegacyRenderer(ContentRenderer):
 
     def get_editable_placeholder_context(self, placeholder, page=None):
         context = super().get_editable_placeholder_context(placeholder, page)
-        context["plugin_menu_js"] = self.get_placeholder_plugin_menu(
-            placeholder, page=page
-        )
+        context["plugin_menu_js"] = self.get_placeholder_plugin_menu(placeholder, page=page)
         return context
 
 

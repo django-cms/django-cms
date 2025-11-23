@@ -152,8 +152,8 @@ HELPER_SETTINGS = dict(
 
 
 def _helper_patch(*args, **kwargs):
-    from django.core.management import call_command
     from app_helper import utils
+    from django.core.management import call_command
 
     call_command('migrate', run_syncdb=True)
     utils.create_user(
@@ -163,8 +163,7 @@ def _helper_patch(*args, **kwargs):
 
 
 def run():
-    from app_helper import runner
-    from app_helper import utils
+    from app_helper import runner, utils
 
     os.environ.setdefault('DATABASE_URL', 'sqlite://localhost/testdb.sqlite')
 

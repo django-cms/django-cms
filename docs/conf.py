@@ -12,19 +12,18 @@
 # to show the default.
 
 
-import cms
 import datetime
 import os
 import sys
+
+import cms
 
 # Initialize Django for autodoc
 
 sys.path.append(os.path.abspath('./'))
 
 import django
-
-from djangocms_ecosystem import write_LTS_table, write_current_LTS, write_plugin_table
-
+from djangocms_ecosystem import write_current_LTS, write_LTS_table, write_plugin_table
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
 django.setup()
