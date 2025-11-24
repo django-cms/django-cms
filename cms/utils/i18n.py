@@ -14,7 +14,6 @@ def _ensure_site_id(site_id, name):
     """
     Ensure that the site_id is an integer.
     """
-    assert site_id is not None, f"{name} called without specifying 'site_id'. This may lead to unexpected behavior. Call {name} with 'site_id=<some_id>' instead."
     if site_id is None:
         import warnings
 
