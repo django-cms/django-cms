@@ -153,7 +153,6 @@ class BaseRenderer:
             except ContentType.DoesNotExist:
                 placeholder._source_model = "None"
                 placeholder._source_allowed_plugins = []
-        print(placeholder._source_allowed_plugins)
         to_cls = (plugin_pool.get_plugin(plugin) for plugin in plugins)
         return [
             cls.__name__
