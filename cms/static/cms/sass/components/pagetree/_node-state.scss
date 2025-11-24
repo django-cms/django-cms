@@ -41,8 +41,9 @@
         background-color: $color-success;
     }
     &-draft {
-        border-color: $color-primary;
+        border-color: $color-cms3;
         background-color: $white;
+        border-width: 2px;
     }
     &-dirty {
         animation: pulsate 2.5s ease-out infinite;
