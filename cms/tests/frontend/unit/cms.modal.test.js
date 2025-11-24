@@ -2333,13 +2333,13 @@ describe('CMS.Modal', function() {
             });
         });
 
-        it('adjusts content if object-tools available', function(done) {
+        it('does not adjust content if object-tools are available', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             spyOn($.fn, 'css');
             modal.ui.modal.find('iframe').on('load', function() {
-                expect($.fn.css).toHaveBeenCalledWith('padding-top', 38);
+                expect($.fn.css).not.toHaveBeenCalledWith('padding-top', 38);
                 done();
             });
         });
