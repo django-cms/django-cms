@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from importlib import import_module
 
+from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
 from django.urls import NoReverseMatch, Resolver404, URLResolver, reverse
@@ -32,7 +33,8 @@ def applications_page_check(request):
         path = request.path_info
 
     # check if application resolver can resolve this
-    for lang in get_language_list():
+    site = get_current_site(request)
+    for lang in get_language_list(site_id=site.pk):
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
 
@@ -153,6 +155,15 @@ def _set_permissions(patterns, exclude_permissions):
             pattern.callback = cms_perms(pattern.callback)
 
 
+def _set_site_filter(patterns, site_id):
+    for pattern in patterns:
+        if isinstance(pattern, URLResolver):
+            _set_site_filter(pattern.url_patterns, site_id)
+        else:
+            from cms.utils.decorators import cms_site_filter
+            pattern.callback = cms_site_filter(site_id)(pattern.callback)
+
+
 def get_app_urls(urls):
     for urlconf in urls:
         if isinstance(urlconf, str):
@@ -187,16 +198,22 @@ def get_patterns_for_page_url(page_url):
 
 def get_app_patterns():
     try:
-        site = get_current_site()
-        return _get_app_patterns(site)
-    except (OperationalError, ProgrammingError):
+        try:
+            site = Site.objects.get_current()
+            return _get_app_patterns(site)
+        except ImproperlyConfigured:
+            # Site framework not configured with SITE_ID, fallback to
+            # request-based site resolution (not possible here), so just
+            # add the apphook patterns with a site filter.
+            return _get_app_patterns(None)  # site-independent mode
+    except (OperationalError, ProgrammingError,):
         # ignore if DB is not ready
         # Starting with Django 1.9 this code gets called even when creating
         # or running migrations. So in many cases the DB will not be ready yet.
         return []
 
 
-def _get_app_patterns(site):
+def _get_app_patterns(site: Site | None) -> list[URLPattern]:
     """
     Get a list of patterns for all hooked apps.
 
@@ -222,7 +239,7 @@ def _get_app_patterns(site):
     # we don't have a request here so get_page_queryset() can't be used,
     # so use public() queryset.
     # This can be done because url patterns are used just in frontend
-    page_urls = PageUrl.objects.get_for_site(site)
+    page_urls = PageUrl.objects.get_for_site(site) if site else PageUrl.objects.all()
 
     # Loop over all titles with an application hooked to them
     page_urls = (
@@ -246,27 +263,27 @@ def _get_app_patterns(site):
         app = apphook_pool.get_apphook(page_url.page.application_urls)
         if not app:
             continue
-        if page_url.page_id not in hooked_applications:
-            hooked_applications[page_url.page_id] = {}
+        if page_url.page not in hooked_applications:
+            hooked_applications[page_url.page] = {}
         app_ns = app.app_name, page_url.page.application_namespace
         with override(page_url.language):
-            hooked_applications[page_url.page_id][page_url.language] = (
+            hooked_applications[page_url.page][page_url.language] = (
                 app_ns, get_patterns_for_page_url(page_url), app)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs
     app_patterns = []
-    for page_id in hooked_applications.keys():
+    for page, languages in hooked_applications.items():
         resolver = None
-        for lang in hooked_applications[page_id].keys():
-            (app_ns, inst_ns), current_patterns, app = hooked_applications[page_id][lang]  # nopyflakes
+        for lang, ((app_ns, inst_ns), current_patterns, app) in languages.items():
             if not resolver:
                 regex_pattern = RegexPattern(r'')
                 resolver = AppRegexURLResolver(
                     regex_pattern, 'app_resolver', app_name=app_ns, namespace=inst_ns)
-                resolver.page_id = page_id
+                resolver.page_id = page.pk
             if app.permissions:
                 _set_permissions(current_patterns, app.exclude_permissions)
-
+            if site is None:
+                _set_site_filter(current_patterns, page.site_id)
             resolver.url_patterns_dict[lang] = current_patterns
         app_patterns.append(resolver)
         APP_RESOLVERS.append(resolver)

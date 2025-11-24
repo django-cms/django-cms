@@ -16,6 +16,3 @@ Placeholders
     :members:
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
-.. autoclass:: PlaceholderAdminMixin
-    :members:
-    :exclude-members: DoesNotExist, MultipleObjectsReturned

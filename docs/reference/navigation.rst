@@ -301,9 +301,6 @@ Menu system classes and function
     :special-members: __init__
 
 
-..  autoclass:: menus.modifiers.Marker
-    :members:
-
 ..  autoclass:: menus.modifiers.AuthVisibility
     :members:
 
@@ -315,8 +312,9 @@ Menu system classes and function
 CMS menus
 #########
 
+*******************
 ``cms`` application
-===================
+*******************
 
 .. autoclass:: cms.cms_menus.CMSMenu
     :members:

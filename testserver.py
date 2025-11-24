@@ -68,8 +68,8 @@ def main(argv, **full_settings):
         normal_user.save()
 
         # Add view_page permission
-        from django.contrib.contenttypes.models import ContentType
         from django.contrib.auth.models import Permission
+        from django.contrib.contenttypes.models import ContentType
         try:
             from cms.models import Page
             content_type = ContentType.objects.get_for_model(Page)

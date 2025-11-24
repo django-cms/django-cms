@@ -625,7 +625,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(Page.objects.search("hi", language="en").count(), 0)
         self.assertEqual(Page.objects.search("hello", language="fr").count(), 0)
 
-
     def test_empty_plugin_is_ignored(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")

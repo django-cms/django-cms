@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.management import CommandError
@@ -9,7 +8,6 @@ from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import EmptyPageContent, Page, PageContent, PageUrl
 from cms.utils import get_language_list
 from cms.utils.page import get_available_slug
-from cms.utils.plugins import copy_plugins_to_placeholder
 
 User = get_user_model()
 
@@ -64,7 +62,7 @@ class CopyLangCommand(SubcommandsCommand):
         try:
             site = int(options.get('site', None))
         except Exception:
-            site = settings.SITE_ID
+            site = Site.objects.get_current().pk
 
         try:
             assert from_lang in get_language_list(site)
@@ -147,11 +145,11 @@ class CopySiteCommand(SubcommandsCommand):
         try:
             from_site = int(options.get('from_site', None))
         except Exception:
-            from_site = settings.SITE_ID
+            from_site = Site.objects.get_current().pk
         try:
             to_site = int(options.get('to_site', None))
         except Exception:
-            to_site = settings.SITE_ID
+            to_site = Site.objects.get_current().pk
         try:
             assert from_site != to_site
         except AssertionError:

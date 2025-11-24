@@ -1,6 +1,7 @@
 import warnings
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Template, TemplateSyntaxError, engines
 from django.template.loader import get_template
@@ -17,8 +18,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.settingmodels import UserSettings
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
-from cms.test_utils.project.fakemlng.models import Translations
 from cms.test_utils.project.placeholder_relation_field_app.models import (
     FancyPoll,
 )
@@ -868,7 +867,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
         # get languages
-        langs = [lang["code"] for lang in ex.placeholder.get_filled_languages()]
+        langs = [lang["code"] for lang in ex.placeholder.get_filled_languages(Site.objects.get_current().pk)]
         self.assertEqual(avail_langs, set(langs))
 
     def test_placeholder_languages_page(self):
@@ -891,7 +890,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # reload placeholder from database
         placeholder = page.get_placeholders("en").get(slot="col_sidebar")
         # get languages
-        langs = [lang["code"] for lang in placeholder.get_filled_languages()]
+        langs = [lang["code"] for lang in placeholder.get_filled_languages(Site.objects.get_current().pk)]
         self.assertEqual(avail_langs, set(langs))
 
     @override_settings(

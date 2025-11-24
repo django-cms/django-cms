@@ -3,12 +3,11 @@ import os
 import warnings
 from collections import OrderedDict, defaultdict
 from functools import cache
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
-from django.db.models.query_utils import Q
 from django.template import (
     Context,
     NodeList,
@@ -77,7 +76,6 @@ def _get_placeholder_settings():
             new_conf[key].update({k: v for k, v in value.items() if k != "inherit"})
         else:
             new_conf[key] = value
-
 
     settings = defaultdict(dict)
     for key, value in new_conf.items():
@@ -294,6 +292,7 @@ def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
             clean_placeholders.append(slot)
     return placeholders
 
+
 if settings.DEBUG is False or os.environ.get("DJANGO_TESTS"):
     # Cache in production only, so template changes in development
     # are always reflected without needing a server restart
@@ -369,10 +368,15 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     placeholders = {pl.slot: None for pl in declared_placeholders}  # Fix order of placeholders in dict
 
     # Fill in existing placeholders
-    placeholders.update({placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj) if placeholder.slot in placeholders})
+    placeholders.update(
+        {placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj)
+         if placeholder.slot in placeholders}
+    )
 
     # Create missing placeholders
-    new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
+    new_placeholders = [
+        Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None
+        ]
     if new_placeholders:
         if connection.features.can_return_rows_from_bulk_insert:
             Placeholder.objects.bulk_create(new_placeholders)
