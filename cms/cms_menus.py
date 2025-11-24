@@ -7,7 +7,7 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, PagePermission, PageUrl
-from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -297,9 +297,9 @@ class CMSMenu(Menu):
             )
         )
         if toolbar.edit_mode_active or toolbar.preview_mode_active:
-            # Preview URL for a "virtual" non-existing page content with id=0. This is used to quickly build many
-            # preview urls by replacing "/0/" by the page content pk in the preview url
-            preview_url = get_object_preview_url(PageContent(id=0))
+            # Edit URL for a "virtual" non-existing page content with id=0. This is used to quickly build many
+            # edit urls by replacing "/0/" by the page content pk in the edit url
+            preview_url = get_object_edit_url(PageContent(id=0))
 
             def prefetch_urls(page_content: PageContent) -> PageContent:
                 return page_content
