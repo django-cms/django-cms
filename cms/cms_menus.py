@@ -7,7 +7,7 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, PagePermission, PageUrl
-from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -163,7 +163,7 @@ class CMSMenu(Menu):
     def get_menu_node_for_page_content(
         self,
         page_content: PageContent,
-        preview_url: str | None = None,
+        view_url: str | None = None,
         cut: bool = False,
     ) -> CMSNavigationNode:
         """
@@ -171,7 +171,7 @@ class CMSMenu(Menu):
 
         :param page: The page to transform.
         :param languages: The list of the current language plus fallbacks used to render the menu.
-        :param preview_url: If given, serves as a "pattern" for a preview url with the assumption that "/0/" is replaced
+        :param view_url: If given, serves as a "pattern" for a view url with the assumption that "/0/" is replaced
             by the actual page content pk. Default is None.
         :param cut: If True the parent_id is set to None. Default is False.
         :returns: A CMSNavigationNode instance.
@@ -215,10 +215,10 @@ class CMSMenu(Menu):
 
         # Now finally, build the NavigationNode object and return it.
         # The parent_id is manually set by the menu get_nodes method.
-        if preview_url:
-            # Build preview url by replacing "/0/" in the url template by the actual pk of the page content object
+        if view_url:
+            # Build view url by replacing "/0/" in the url template by the actual pk of the page content object
             # Hacky, but faster than calling `admin_reverse` for each page content object
-            url = re.sub("(/0/)", f"/{page_content.pk}/", preview_url)
+            url = re.sub("(/0/)", f"/{page_content.pk}/", view_url)
         else:
             url = page.get_absolute_url(language=page_content.language)
 
@@ -299,12 +299,12 @@ class CMSMenu(Menu):
         if toolbar.edit_mode_active or toolbar.preview_mode_active:
             # Edit URL for a "virtual" non-existing page content with id=0. This is used to quickly build many
             # edit urls by replacing "/0/" by the page content pk in the edit url
-            preview_url = get_object_edit_url(PageContent(id=0))
+            view_url = get_object_edit_url(PageContent(id=0)) if toolbar.edit_mode_active else get_object_preview_url(PageContent(id=0))
 
             def prefetch_urls(page_content: PageContent) -> PageContent:
                 return page_content
         else:
-            preview_url = None  # No short-cut here
+            view_url = None  # No short-cut here
             prefetched_urls = PageUrl.objects.filter(
                 language__in=(page_content.language for page_content in page_contents),
                 page_id__in=(page_content.page.pk for page_content in page_contents),
@@ -331,7 +331,7 @@ class CMSMenu(Menu):
         return [
             self.get_menu_node_for_page_content(
                 prefetch_urls(page_content),
-                preview_url=preview_url,
+                view_url=view_url,
                 cut=page_content.page.parent_id == homepage_pk and cut_homepage,
             )
             for page_content in self.select_lang(page_contents)

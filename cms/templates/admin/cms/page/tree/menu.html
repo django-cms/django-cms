@@ -80,7 +80,7 @@
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
                     {% if page_content %}
                         <a class="js-cms-pagetree-page-view cms-icon-view" href="{% get_edit_url page_content %}"{% if lang in page_languages %} target="_top"{% endif %}">
-                            <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
+                            <span class="sr-only">{% autoescape on %}{% trans "Edit" %}/{% trans "View" %}{% endautoescape %}</span>
                         </a>
                     {% endif %}
                 </div>
