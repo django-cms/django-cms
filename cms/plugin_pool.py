@@ -145,7 +145,7 @@ class PluginPool:
         # Filters for allowed_models
         plugins = (plugin for plugin in self.plugins.values() if not plugin.allowed_models or obj_type in plugin.allowed_models)
         # Filters for allowed_plugins
-        if obj_allowed_plugins:
+        if obj_allowed_plugins is not None:
             plugins = (plugin for plugin in plugins if plugin.__name__ in obj_allowed_plugins)
         return list(plugins)
 
