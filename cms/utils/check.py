@@ -191,10 +191,6 @@ def check_sekizai(output):
                 section.success("Sekizai namespaces 'js' and 'css' found in %r" % template)
             else:
                 section.error("Sekizai namespaces 'js' and 'css' not found in %r" % template)
-        if section.successful:
-            section.finish_success("Sekizai configuration okay")
-        else:
-            section.finish_error("Sekizai configuration has errors")
 
 
 @define_check
@@ -215,7 +211,8 @@ def check_i18n(output):
                     "LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of "
                     "'en_US'): '%s' provided" % lang[0]
                 )
-        if settings.SITE_ID == hash(settings.SITE_ID):
+        site_id = getattr(settings, "SITE_ID", None)
+        if site_id == hash(site_id):
             for site, items in get_cms_setting("LANGUAGES").items():
                 if isinstance(site, int):
                     for lang in items:
@@ -224,8 +221,22 @@ def check_i18n(output):
                                 "CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: "
                                 "'en-us' instead of 'en_US'): '%s' provided" % lang["code"]
                             )
+
+
+@define_check
+def check_site_id(output):
+    with output.section("Site configuration") as section:
+        if not is_installed("django.contrib.sites"):
+            section.warn("django.contrib.sites is not in INSTALLED_APPS")
         else:
-            section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
+            section.success("django.contrib.sites is in INSTALLED_APPS")
+        site_id = getattr(settings, "SITE_ID", None)
+        if site_id is None:
+            section.warn("SITE_ID is not set - site identifictation will fall back to request host header or custom middleware")
+        elif site_id != hash(site_id):
+            section.error("SITE_ID must be an integer, not %r" % site_id)
+        else:
+            section.success("SITE_ID is set to %r" % site_id)
 
 
 @define_check
@@ -248,6 +259,8 @@ def check_middlewares(output):
         for middleware in required_middlewares:
             if middleware not in middlewares:
                 section.error("%s middleware must be in MIDDLEWARE" % middleware)
+            else:
+                section.success("%s middleware found" % middleware)
 
 
 @define_check
@@ -260,6 +273,8 @@ def check_context_processors(output):
         for processor in required_processors:
             if processor not in processors:
                 section.error("%s context processor must be in TEMPLATES option context_processors" % processor)
+            else:
+                section.success("%s context processor found" % processor)
 
 
 @define_check
@@ -281,9 +296,7 @@ def check_plugin_instances(output):
                     "{} has {} unsaved instances".format(plugin_type["type"], len(plugin_type["unsaved_instances"]))
                 )
 
-        if section.successful:
-            section.finish_success("The plugins in your database are in good order")
-        else:
+        if not section.successful:
             section.finish_error(
                 "There are potentially serious problems with the plugins in your database. \nEven if "
                 "your site works, you should run the 'manage.py cms list plugins' \ncommand and then "
@@ -358,8 +371,8 @@ def check_copy_relations(output):
             section.finish_success(
                 'Some plugins or page/page content extensions do not define a "copy_relations" method.\n'
                 "This might lead to data loss when publishing or copying plugins/extensions.\n"
-                "See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or "  # noqa
-                "https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations."
+                "See https://docs.django-cms.org/en/latest/how_to/09-custom_plugins.html#handling-relations or "  # noqa
+                "https://docs.django-cms.org/en/latest/how_to/18-extending_page_contents.html#handling-relations."
             )
 
 
@@ -406,10 +419,13 @@ def check_cmsapps_names(output):
     from cms.apphook_pool import apphook_pool
 
     with output.section("Apphooks") as section:
-        for hook, name in apphook_pool.get_apphooks():
+        apphooks = apphook_pool.get_apphooks()
+        for hook, name in apphooks:
             if apphook_pool.get_apphook(hook).name is None:
                 section.warn("CMSApps should define a name. %s doesn't have a name" % name)
-        if section.successful:
+            else:
+                section.success("CMSApp %s has a name defined" % name)
+        if not apphooks:
             section.finish_success("CMSApps configuration is okay")
 
 

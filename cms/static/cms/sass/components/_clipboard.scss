@@ -51,7 +51,7 @@
         margin: 0;
         border: 2px solid $color-primary;
         border-radius: $border-radius-base;
-        background-color: rgba($color-primary-fallback, 20%);
+        background-color: color-mix(in srgb, $color-primary 20%, transparent);
         box-shadow: none;
         transform: translateY(0) !important;
         &:before {

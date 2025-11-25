@@ -1,7 +1,6 @@
 import re
 from collections import defaultdict
 from collections.abc import Generator, Iterable
-from typing import Optional
 
 from django.utils.functional import SimpleLazyObject
 

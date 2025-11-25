@@ -17,8 +17,8 @@
         position: absolute;
         left: 50%;
         top: 50%;
-        margin-left: math.div(-$icon-size, 2);
-        margin-top: math.div(-$icon-size, 2);
+        margin-left: math.div(-$icon-size, 2) - 1;
+        margin-top: math.div(-$icon-size, 2) - 1;
         color: $submenu-icon-color;
     }
 
@@ -30,7 +30,7 @@
         bottom: 0;
     }
 }
-.cms-dragbar .cms-submenu-btn {
+.cms-submenu-btn {
     margin-right: 2px;
     background-color: transparent;
     &:active,
@@ -69,7 +69,7 @@
     right: 10px;
     padding: 0 5px;
     border: 1px solid $gray-lighter;
-    border-radius: $border-radius-base;
+    border-radius: $dropdown-border-radius;
 }
 .cms-structure-content .cms-submenu-lang {
     display: none;
@@ -89,7 +89,8 @@
     z-index: z(structure, content, dropdown);
     min-width: $dropdown-width;
     background: $submenu-dropdown-bgcolor;
-    border-radius: $border-radius-normal;
+    border: $submenu-dropdown-border;
+    border-radius: $dropdown-border-radius;
     box-shadow: $dropdown-shadow;
     inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
     transform: translateZ(0);
@@ -145,11 +146,11 @@
         }
         &:first-child a:hover,
         &:first-child a:focus {
-            border-radius: $border-radius-normal $border-radius-normal 0 0;
+            border-radius: $dropdown-border-radius $dropdown-border-radius 0 0;
         }
         &:last-child a:hover,
         &:last-child a:focus {
-            border-radius: 0 0 $border-radius-normal $border-radius-normal;
+            border-radius: 0 0 $dropdown-border-radius $dropdown-border-radius;
         }
     }
     .cms-submenu-item-paste-tooltip {
@@ -162,7 +163,7 @@
             &:hover,
             &:focus {
                 cursor: default !important;
-                opacity: 0.2;
+                opacity: 0.33;
                 color: $submenu-item-color !important;
                 background: none !important;
                 box-shadow: none;
@@ -187,6 +188,7 @@
         margin-inline-start: math.div(-$dropdown-arrow-side, 2);
         transform: rotate(45deg);
         background-color: $submenu-dropdown-bgcolor;
+        border: $submenu-dropdown-border;
         box-shadow: $dropdown-shadow;
     }
 
@@ -208,7 +210,7 @@
     .cms-dropdown-inner {
         z-index: 1;
         background-color: $white;
-        border-radius: $border-radius-normal;
+        border-radius: $dropdown-border-radius;
     }
 
 }

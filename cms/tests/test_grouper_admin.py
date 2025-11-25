@@ -1,6 +1,8 @@
 import copy
 
+from django.conf import settings
 from django.contrib.admin import site
+from django.contrib.sites.models import Site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
@@ -234,7 +236,7 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
         with self.login_user_context(self.admin_user):
             response = self.client.get(self.changelist_url)
         # Assert
-        for lang, verb in self.admin.get_language_tuple():
+        for lang, verb in self.admin.get_language_tuple(site=Site.objects.get_current()):
             self.assertContains(response, f'<option value="{lang}"')
 
     def test_empty_content(self) -> None:
@@ -266,9 +268,11 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
     def test_with_content_only(self) -> None:
         """Create one content object and see if it appears in the right admin"""
         # Arrange
-        random_content = {lang: self.createContentInstance(lang).secret_greeting for lang in get_language_list()}
+        random_content = {
+            lang: self.createContentInstance(lang).secret_greeting for lang in get_language_list(site_id=settings.SITE_ID)
+        }
         with self.login_user_context(self.admin_user):
-            for language in get_language_list():
+            for language in get_language_list(site_id=Site.objects.get_current().pk):
                 # Act
                 response = self.client.get(self.changelist_url + f"?language={language}")
                 # Assert

@@ -10,7 +10,7 @@
         </div>
     {% endif %}
     <div class="cms-submenu-settings cms-submenu-btn cms-btn"></div>
-    <div class="cms-submenu-dropdown cms-submenu-dropdown-settings" data-touch-action="pan-y">
+    <div class="cms-submenu-dropdown cms-submenu-dropdown-settings cms-touch-action-pan-y">
         <div class="cms-dropdown-inner">
             {% if placeholder.is_static %}
                 <div class="cms-submenu-item">
@@ -31,14 +31,14 @@
             {% render_extra_menu_items placeholder %}
         </div>
     </div>
-    <div class="cms-plugin-picker" data-touch-action="pan-y">
+    <div class="cms-plugin-picker cms-touch-action-pan-y">
         <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
         {# plugin child classes here #}
     </div>
 
     <div class="cms-dragbar-title" title="{{ placeholder.get_label }}">
         {{ placeholder.get_label }}
-        {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" data-cms-tooltip="{% trans 'This is a static placeholder' %}"><span class="cms-icon cms-icon-pin cms-dragarea-static-icon"></span></span>{% endif %}
+        {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-cms-tooltip="{% trans 'This is an external placeholder' %}"><span class="cms-icon cms-icon-external-placeholder cms-dragarea-static-icon"></span></span>{% endif %}
         <span class="cms-dragbar-toggler">
             <a href="#" class="cms-dragbar-expand-all" tabindex="-1">{% trans "Expand all" %}</a>
             <a href="#" class="cms-dragbar-collapse-all" tabindex="-1">{% trans "Collapse all" %}</a>

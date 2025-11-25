@@ -3,13 +3,11 @@
 import CMS, { Helpers, KEYS, uid } from '../../../static/cms/js/modules/cms.base';
 var jQuery = require('jquery');
 var $ = jQuery;
-var Class = require('classjs');
 var showLoader;
 var hideLoader;
 
 CMS.API.Helpers = Helpers;
 CMS.KEYS = KEYS;
-CMS.Class = Class;
 
 window.CMS = window.CMS || CMS;
 
@@ -23,7 +21,7 @@ describe('cms.base.js', function() {
             localStorage.setItem(mod, mod);
             localStorage.removeItem(mod);
             return true;
-        } catch (e) {
+        } catch {
             // istanbul ignore next
             return false;
         }

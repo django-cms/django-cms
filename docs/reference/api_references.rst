@@ -46,8 +46,6 @@ Functions and constants
 
 .. autofunction:: cms.api.create_page_content
 
-.. autofunction:: cms.api.create_title
-
 .. autofunction:: cms.api.add_plugin
 
 .. autofunction:: cms.api.create_page_user
