@@ -4,7 +4,7 @@ import sys
 from collections import OrderedDict
 from collections.abc import Generator
 from functools import partial
-from typing import Any, Optional, Union
+from typing import Any
 
 from classytags.utils import flatten_context
 from django.conf import settings
@@ -274,7 +274,7 @@ class ContentRenderer(BaseRenderer):
         context.push()
 
         width = width or placeholder.default_width
-        template = page.get_template() if page else None
+        template = page.get_template() if page and hasattr(page, "get_template") else None
 
         if width:
             context["width"] = width
@@ -776,7 +776,7 @@ class StructureRenderer(BaseRenderer):
         return self.get_plugin_toolbar_js(instance, page=page)
 
     def render_plugins(self, placeholder, language, page=None):
-        template = page.get_template() if page else None
+        template = page.get_template() if page and hasattr(page, "get_template") else None
         plugins = self.get_plugins_to_render(placeholder, language, template)
 
         for plugin in plugins:

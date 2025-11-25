@@ -1,5 +1,7 @@
 Sitemaps
 ========
 
-.. autoclass:: cms.sitemaps.CMSSitemap
+.. autoclass:: cms.sitemaps.cms_sitemap.CMSSitemap
     :members:
+    :show-inheritance:
+    :exclude-members: DoesNotExist, MultipleObjectsReturned

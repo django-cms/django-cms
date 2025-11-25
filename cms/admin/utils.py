@@ -8,6 +8,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.checks import ModelAdminChecks
 from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
+from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models import DateField, OuterRef, Subquery, functions
@@ -24,7 +25,7 @@ from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_preview_url
-from cms.utils import get_language_from_request
+from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
 
@@ -163,7 +164,9 @@ CONTENT_PREFIX = "content__"
 class GrouperChangeListBase(ChangeList):
     """Subclass ChangeList to disregard grouping fields get parameter as filter"""
 
-    _extra_grouping_fields = []
+    current_language: str = None
+    available_languages: tuple[tuple[str, str], ...] = ()
+    _extra_grouping_fields: list[str] = []
 
     def get_filters_params(self, params: dict | None = None):
         lookup_params = super().get_filters_params(params)
@@ -179,7 +182,7 @@ class GrouperModelAdminChecks(ModelAdminChecks):
         `field_name` is "content__title"."""
 
         if field_name.startswith(CONTENT_PREFIX) and obj.content_model:
-            field_name = field_name[len(CONTENT_PREFIX) :]
+            field_name = field_name[len(CONTENT_PREFIX):]
             obj = copy(obj)
             obj.model = obj.content_model
         return super()._check_prepopulated_fields_value_item(obj, field_name, label)
@@ -190,7 +193,7 @@ class GrouperModelAdminChecks(ModelAdminChecks):
         """
 
         if field_name.startswith(CONTENT_PREFIX) and obj.content_model:
-            field_name = field_name[len(CONTENT_PREFIX) :]
+            field_name = field_name[len(CONTENT_PREFIX):]
             obj = copy(obj)
             obj.model = obj.content_model
         return super()._check_prepopulated_fields_key(obj, field_name, label)
@@ -414,9 +417,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         property, use the property, otherwise let Django provide it."""
         return getattr(self, "language", get_language())
 
-    def get_language_tuple(self) -> tuple[tuple[str, str], ...]:
+    def get_language_tuple(self, site: typing.Optional[Site] = None) -> tuple[tuple[str, str], ...]:
         """Hook on how to get all available languages for the language selector."""
-        return get_language_tuple()
+        return get_language_tuple(site_id=site.pk if site else None)
 
     def get_extra_grouping_field(self, field):
         """Retrieves the current value for grouping fields - by default by calling self.get_<field>, e.g.,
@@ -436,7 +439,10 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def get_changelist_instance(self, request: HttpRequest) -> GrouperChangeListBase:
         """Update grouping field properties and get changelist instance"""
         self.get_grouping_from_request(request)
-        return super().get_changelist_instance(request)
+        cl = super().get_changelist_instance(request)
+        cl.current_language = self.get_language()
+        cl.available_languages = self.get_language_tuple(site=get_current_site(request))
+        return cl
 
     def changeform_view(
         self,
@@ -529,11 +535,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             else:
                 filled_languages = []
 
-            extra_context["language_tabs"] = self.get_language_tuple()
+            site = get_current_site(request)
+            extra_context["language_tabs"] = self.get_language_tuple(site=site)
             extra_context["language"] = language
             extra_context["filled_languages"] = filled_languages
             if content_instance is None:
-                subtitle = _("Add %(language)s content") % dict(language=get_language_dict().get(self.language))
+                subtitle = _("Add %(language)s content") % dict(language=get_language_dict(site_id=site.pk).get(self.language))
                 extra_context["subtitle"] = subtitle
 
         # TODO: Add context for other grouping fields to be shown as a dropdown
@@ -702,7 +709,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         grouper_search_fields = []
         for field_name in self.search_fields:
             if field_name.startswith(CONTENT_PREFIX):
-                content_search_fields.append(field_name[len(CONTENT_PREFIX) :])
+                content_search_fields.append(field_name[len(CONTENT_PREFIX):])
             else:
                 grouper_search_fields.append(field_name)
 
@@ -785,7 +792,8 @@ class _GrouperAdminFormMixin:
     def update_labels(self, fields: list[str]) -> None:
         """Adds a language indicator to field labels"""
         if "language" in self._admin.extra_grouping_fields:
-            language_dict = get_language_dict()
+            site = get_current_site(self._request)
+            language_dict = get_language_dict(site_id=site.pk if site else None)
             language_postfix = f" ({language_dict[self._admin.language]})"
             for field in fields:
                 if CONTENT_PREFIX + field in self.fields:
@@ -801,9 +809,10 @@ class _GrouperAdminFormMixin:
                     )
 
     def clean(self) -> dict:
+        site = get_current_site(self._request)
         if (
             f"{CONTENT_PREFIX}language" in self.cleaned_data
-            and self.cleaned_data[f"{CONTENT_PREFIX}language"] not in get_language_list()
+            and self.cleaned_data[f"{CONTENT_PREFIX}language"] not in get_language_list(site_id=site.pk)
         ):
             raise ValidationError(
                 _("Invalid language %(value)s. This form cannot be processed. Try changing languages."),

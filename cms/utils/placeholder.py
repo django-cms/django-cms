@@ -3,16 +3,16 @@ import os
 import warnings
 from collections import OrderedDict, defaultdict
 from functools import cache
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
-from django.db.models.query_utils import Q
 from django.template import (
     Context,
     NodeList,
     Template,
+    TemplateDoesNotExist,
     TemplateSyntaxError,
     Variable,
     engines,
@@ -77,7 +77,6 @@ def _get_placeholder_settings():
         else:
             new_conf[key] = value
 
-
     settings = defaultdict(dict)
     for key, value in new_conf.items():
         for setting, setting_value in value.items():
@@ -140,7 +139,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     """
     template = None
 
-    if page:
+    if page and hasattr(page, "get_template"):
         template = page.get_template()
 
     modules = get_placeholder_conf("plugin_modules", slot, template, default={})
@@ -219,7 +218,12 @@ def _scan_placeholders(
                     if isinstance(node.template.var, Variable):
                         continue
                     else:
-                        template = get_template(node.template.var)
+                        try:
+                            template = get_template(node.template.var)
+                        except TemplateDoesNotExist:
+                            # Include might be inside if else, so no need to error out here
+                            # Actual errors will be raised at render time
+                            continue
                 else:
                     template = node.template
                 nodes += _scan_placeholders(
@@ -287,6 +291,7 @@ def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
             placeholders.append(placeholder)
             clean_placeholders.append(slot)
     return placeholders
+
 
 if settings.DEBUG is False or os.environ.get("DJANGO_TESTS"):
     # Cache in production only, so template changes in development
@@ -363,10 +368,15 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     placeholders = {pl.slot: None for pl in declared_placeholders}  # Fix order of placeholders in dict
 
     # Fill in existing placeholders
-    placeholders.update({placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj) if placeholder.slot in placeholders})
+    placeholders.update(
+        {placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj)
+         if placeholder.slot in placeholders}
+    )
 
     # Create missing placeholders
-    new_placeholders = [Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None]
+    new_placeholders = [
+        Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None
+        ]
     if new_placeholders:
         if connection.features.can_return_rows_from_bulk_insert:
             Placeholder.objects.bulk_create(new_placeholders)

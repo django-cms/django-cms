@@ -13,7 +13,7 @@ jobs:
       NODE_VERSION: '24'
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v6
       with:

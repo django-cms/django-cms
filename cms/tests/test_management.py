@@ -1,11 +1,10 @@
-import os
 import sys
 from io import StringIO
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
-from django.core.management import CommandError, execute_from_command_line
+from django.core.management import CommandError
 from django.db import models
 from django.test.utils import override_settings
 from djangocms_text.cms_plugins import TextPlugin
@@ -651,6 +650,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             str(command_error.exception),
             'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES'
         )
+
 
 class DjangoCmsCommandTestCase(CMSTestCase):
     """

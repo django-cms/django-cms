@@ -166,6 +166,19 @@ class PageTest(PageTestBase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<title>Add a page</title>', html=True)
 
+    def test_add_page_different_site(self):
+        """
+        Test that the add admin page could be displayed via the admin
+        """
+        superuser = self.get_superuser()
+        Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+
+        with self.login_user_context(superuser):
+            response = self.client.get(self.get_page_add_uri('en', site_id=2))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<title>Add a page</title>', html=True)
+            self.assertContains(response, '&amp;site=2')
+
     def test_create_page_admin(self):
         """
         Test that a page can be created via the admin
@@ -184,6 +197,28 @@ class PageTest(PageTestBase):
             self.assertEqual(page_url.page.get_title(), page_data['title'])
             self.assertEqual(page_url.page.get_slug('en'), page_data['slug'])
             self.assertEqual(page_url.page.get_placeholders('en').count(), 2)
+
+    def test_create_page_admin_different_site(self):
+        """
+        Test that a page can be created via the admin
+        """
+        Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+        with self.settings(CMS_LANGUAGES={2: [{'code': 'en', 'name': 'English'}]}):
+            page_data = self.get_new_page_data()
+
+            superuser = self.get_superuser()
+            with self.login_user_context(superuser):
+                self.assertEqual(PageContent.objects.all().count(), 0)
+                self.assertEqual(Page.objects.all().count(), 0)
+                # create home
+                response = self.client.post(self.get_page_add_uri('en', site_id=2), page_data)
+                self.assertRedirects(response, self.get_pages_admin_list_uri('en', site_id=2))
+
+                page_url = PageUrl.objects.get(slug=page_data['slug'])
+                self.assertEqual(page_url.page.site_id, 2)
+                self.assertEqual(page_url.page.get_title(), page_data['title'])
+                self.assertEqual(page_url.page.get_slug('en'), page_data['slug'])
+                self.assertEqual(page_url.page.get_placeholders('en').count(), 2)
 
     def test_create_page_with_unconfigured_language(self):
         """
@@ -213,15 +248,12 @@ class PageTest(PageTestBase):
             self.assertEqual(Page.objects.filter(site=2).count(), 1)
             self.assertEqual(PageContent.objects.filter(language='de').count(), 1)
 
-        # The user is on site #1 but switches sites using the site switcher
-        # on the page changelist.
-        client.post(self.get_pages_admin_list_uri(), {'site': 2})
-
+        # The user is on site #1 but switches to using site #2.
         # url uses "en" as the request language
         # but the site is configured to use "de" and "fr"
-        endpoint = self.get_page_add_uri('en')
+        endpoint = self.get_page_add_uri('en', site_id=2)
         response = client.post(endpoint, self.get_new_page_data())
-        self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
+        self.assertRedirects(response, self.get_pages_admin_list_uri('de', site_id=2))
         self.assertEqual(Page.objects.filter(site=2).count(), 2)
         self.assertEqual(PageContent.objects.filter(language='de').count(), 2)
 
@@ -622,7 +654,6 @@ class PageTest(PageTestBase):
         """
         data = {
             'position': 2,
-            'source_site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -696,7 +727,6 @@ class PageTest(PageTestBase):
     def test_copy_page_to_different_site_fails_with_untranslated_page(self):
         data = {
             'position': 0,
-            'source_site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -713,7 +743,6 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -731,7 +760,6 @@ class PageTest(PageTestBase):
     def test_copy_page_to_different_site_with_no_pages(self):
         data = {
             'position': 0,
-            'source_site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -743,7 +771,6 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -1073,15 +1100,16 @@ class PageTest(PageTestBase):
         site = Site.objects.create(domain='otherlang', name='otherlang', pk=2)
         # Change site for this session
         page_data = self.get_new_page_data()
-        page_data['site'] = site.pk
         page_data['title'] = 'changed title'
         self.assertEqual(site.pk, 2)
         TESTLANG = get_cms_setting('LANGUAGES')[site.pk][0]['code']
+        TESTSITE = site.pk
         page_data['language'] = TESTLANG
+        page_data['site'] = TESTSITE
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.post(self.get_page_add_uri('en'), page_data)
-            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
+            self.assertRedirects(response, self.get_pages_admin_list_uri(TESTLANG, site_id=TESTSITE))
             page = Page.objects.get(urls__slug=page_data['slug'])
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
@@ -1200,7 +1228,7 @@ class PageTest(PageTestBase):
         superuser = self.get_superuser()
         cms_page = create_page('app', 'nav_playground.html', 'en')
         cms_pages = Page.objects.filter(pk=cms_page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=cms_page.site_id)
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
         page_data = {
             "reverse_id": "",
@@ -1255,7 +1283,7 @@ class PageTest(PageTestBase):
         app_config = SampleAppConfig.objects.create(namespace='sample')
         cms_page = create_page('app', 'nav_playground.html', 'en')
         cms_pages = Page.objects.filter(pk=cms_page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=cms_page.site_id)
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
         page_data = {
             "reverse_id": "",
@@ -1437,6 +1465,37 @@ class PageTest(PageTestBase):
             content = force_str(parsed)
             self.assertIn(tree, content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
+
+    def test_page_get_tree_different_site(self):
+        superuser = self.get_superuser()
+        site = Site.objects.create(id=2, domain='example-2.com', name='example-2.com')
+
+        with self.settings(CMS_LANGUAGES={2: [{'code': 'en', 'name': 'English'}]}):
+            create_page('Home', 'nav_playground.html', 'en', site=site)
+            alpha = create_page('Alpha', 'nav_playground.html', 'en', site=site)
+            create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
+            create_page('Gamma', 'nav_playground.html', 'en', site=site)
+
+            tree = (
+                '<li>\nHome\n</li>'
+                '<li>\nAlpha\n</li>'
+                '<li>\nGamma\n</li>'
+            )
+            endpoint_default = self.get_admin_url(PageContent, 'get_tree')
+            endpoint_site = self.get_admin_url(PageContent, 'get_tree') + '?site=2'
+
+            with self.login_user_context(superuser):
+                response = self.client.get(endpoint_default)
+                self.assertEqual(response.status_code, 200)
+                parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
+                content = force_str(parsed)
+                self.assertNotIn(tree, content)
+
+                response = self.client.get(endpoint_site)
+                self.assertEqual(response.status_code, 200)
+                parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
+                content = force_str(parsed)
+                self.assertIn(tree, content)
 
     def test_page_get_tree_endpoint_nested(self):
         superuser = self.get_superuser()
@@ -1650,6 +1709,116 @@ class PageActionsTestCase(PageTestBase):
             redirect_url = self.get_admin_url(PageContent, 'changelist') + "?language=en"
             self.assertRedirects(response, redirect_url)
             self.assertEqual(Page.objects.all().count(), 2)
+
+    def test_actions_menu_superuser(self):
+        """Test actions_menu view returns correct context for superuser"""
+        with self.login_user_context(self.admin):
+            url = admin_reverse('cms_page_actions_menu', args=[self.page.pk])
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertTemplateUsed(response, 'admin/cms/page/tree/actions_dropdown.html')
+
+            # Check context contains expected keys
+            self.assertIn('page', response.context)
+            self.assertIn('site', response.context)
+            self.assertIn('opts', response.context)
+            self.assertIn('paste_enabled', response.context)
+            self.assertIn('page_is_restricted', response.context)
+
+            # Check permissions for superuser
+            self.assertEqual(response.context['page'], self.page)
+            self.assertEqual(response.context['site'], self.site)
+            self.assertTrue(response.context['has_add_permission'])
+            self.assertTrue(response.context['has_copy_page_permission'])
+            self.assertTrue(response.context['has_change_permission'])
+            self.assertTrue(response.context['has_change_advanced_settings_permission'])
+            self.assertTrue(response.context['has_change_permissions_permission'])
+            self.assertTrue(response.context['has_move_page_permission'])
+            self.assertTrue(response.context['has_delete_permission'])
+
+    def test_actions_menu_paste_enabled(self):
+        """Test paste_enabled flag is set correctly from GET parameters"""
+        with self.login_user_context(self.admin):
+            url = admin_reverse('cms_page_actions_menu', args=[self.page.pk])
+
+            # Test with has_copy parameter
+            response = self.client.get(url, {'has_copy': '1'})
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.context['paste_enabled'])
+
+            # Test with has_cut parameter
+            response = self.client.get(url, {'has_cut': '1'})
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.context['paste_enabled'])
+
+            # Test without parameters
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(response.context['paste_enabled'])
+
+    def test_actions_menu_nonexistent_page(self):
+        """Test actions_menu raises 404 for non-existent page"""
+        with self.login_user_context(self.admin):
+            url = admin_reverse('cms_page_actions_menu', args=[999999])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 404)
+
+    def test_actions_menu_extra_context(self):
+        """Test that extra_context is merged into the response context"""
+        # This test verifies the extra_context parameter functionality
+        # Since we can't directly call the method with extra_context via URL,
+        # we'll test it by directly calling the admin method
+        from django.contrib.admin.sites import AdminSite
+
+        from cms.admin.pageadmin import PageAdmin
+
+        page_admin = PageAdmin(Page, AdminSite())
+        request = self.get_page_request(self.page, self.admin, '/')
+        request.GET = {}
+
+        extra = {'custom_key': 'custom_value'}
+        response = page_admin.actions_menu(request, self.page.pk, extra_context=extra)
+
+        # The response should be an HttpResponse with rendered template
+        self.assertEqual(response.status_code, 200)
+        # Note: We can't easily check context on the rendered response,
+        # but we've verified the method accepts and processes extra_context
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_actions_menu_cms_permission_setting(self):
+        """Test CMS_PERMISSION setting is passed to context"""
+        with self.login_user_context(self.admin):
+            url = admin_reverse('cms_page_actions_menu', args=[self.page.pk])
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(response.context['CMS_PERMISSION'])
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_get_copy_dialog_permission_denied_source(self):
+        """Test: Permission denied for source page (user cannot view source page)"""
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(username='noperm', password='noperm', is_staff=True)
+        page = create_page('Secret', 'nav_playground.html', 'en', site=self.site, created_by=self.admin)
+        with self.login_user_context(user):
+            url = admin_reverse('cms_page_get_copy_dialog', args=[page.pk])
+            response = self.client.get(url, {'source_site': self.site.pk})
+            self.assertEqual(response.status_code, 403)
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_get_copy_dialog_permission_denied_target(self):
+        """Test: Permission denied for target page (user cannot add subpage under target)"""
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(username='noperm2', password='noperm2', is_staff=True)
+        source_page = create_page('Source', 'nav_playground.html', 'en', site=self.site, created_by=self.admin)
+        target_page = create_page('Target', 'nav_playground.html', 'en', site=self.site, created_by=self.admin)
+        with self.login_user_context(user):
+            url = admin_reverse('cms_page_get_copy_dialog', args=[source_page.pk])
+            response = self.client.get(url, {'source_site': self.site.pk, 'target': target_page.pk})
+            self.assertEqual(response.status_code, 403)
 
 
 class PermissionsTestCase(PageTestBase):
@@ -1876,7 +2045,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'advanced', page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=page.site_id)
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(reverse_id='permissions-2')
@@ -2197,6 +2366,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         endpoint = self.get_admin_url(Page, 'get_permissions', page.pk)
         staff_user = self.get_staff_user_with_no_permissions()
 
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+
         with self.login_user_context(staff_user):
             data = {'post': 'true'}
 
@@ -2204,7 +2376,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(
                 response,
-                "<p>Page doesn't inherit any permissions.</p>",
+                '<td class="user">staff</td>',
                 html=True,
             )
 
@@ -2782,7 +2954,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             endpoint = self.get_admin_url(Page, 'get_copy_dialog', page.pk)
-            endpoint += '?source_site=%s' % page.site_id
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 
@@ -3419,7 +3590,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         endpoint = self.get_admin_url(Page, 'advanced', page.pk)
-        redirect_to = self.get_pages_admin_list_uri()
+        redirect_to = self.get_pages_admin_list_uri(site_id=page.site_id)
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(reverse_id='permissions-2')

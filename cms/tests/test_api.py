@@ -3,6 +3,7 @@ import sys
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from djangocms_text.cms_plugins import TextPlugin
@@ -193,6 +194,17 @@ class PythonAPITests(CMSTestCase):
         create_page('home', 'nav_playground.html', 'en', reverse_id="foo")
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', reverse_id="foo")
         self.assertTrue(Page.objects.count(), 2)
+
+    def test_create_page_parent_not_same_site(self):
+        site = Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+        home = create_page('home', 'nav_playground.html', 'en')
+        with self.settings(CMS_LANGUAGES={2: [{'code': 'en', 'name': 'English'}]}):
+            with self.assertRaises(AssertionError):
+                create_page('home', 'nav_playground.html', 'en', parent=home, site=site)
+
+            home_2 = create_page('home', 'nav_playground.html', 'en', site=site)
+            new_page = create_page('child', 'nav_playground.html', 'en', parent=home_2)
+            self.assertEqual(new_page.site_id, 2)
 
 
 class PythonAPIPluginTests(CMSTestCase):

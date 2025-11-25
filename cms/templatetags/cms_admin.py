@@ -289,6 +289,7 @@ def submit_row_plugin(context):
         ctx['original'] = context['original']
     return ctx
 
+
 @register.filter
 def placeholder_is_immutable(placeholder, user):
     if isinstance(placeholder, Placeholder):

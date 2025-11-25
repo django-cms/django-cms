@@ -1,17 +1,14 @@
 import logging
-import os
 import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache, lru_cache
+from functools import cache
 from itertools import starmap
 from operator import itemgetter
-from typing import Optional
 
 from django.db import models
 from django.http import HttpRequest
-from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
@@ -527,4 +524,3 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
             )
             % {"limit": type_limit, "plugin_name": plugin_name}
         )
-
