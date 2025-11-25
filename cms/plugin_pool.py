@@ -138,6 +138,23 @@ class PluginPool:
     def get_all_plugins_for_model(self, model: type[models.Model]) -> list[type[CMSPluginBase]]:
         """
         Retrieve all plugins that can be used to edit the given model.
+
+        This method applies two levels of filtering:
+
+        1. Plugin-level filtering (allowed_models on plugin):
+           - If a plugin has allowed_models defined, the model must be in that list
+           - If allowed_models is None, the plugin is available for all models
+
+        2. Model-level filtering (allowed_plugins on model):
+           - If the model has allowed_plugins defined, only those plugins are returned
+           - If allowed_plugins is None, all plugins (passing filter 1) are returned
+           - If allowed_plugins is an empty list [], no plugins are returned
+
+        Args:
+            model: The Django model class to get plugins for
+
+        Returns:
+            List of plugin classes that can be used with this model
         """
         obj_type = f"{model._meta.app_label}.{model._meta.model_name}" if model  else "None"
         assert obj_type != "cms.page"

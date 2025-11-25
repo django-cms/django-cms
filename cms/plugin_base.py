@@ -191,9 +191,19 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     page_only = False
 
     allowed_models = None
-    """A list of valid models where this plugin can be added. Each entry must be the
-    dotted path to the model in the format ``"app_label.modelname"``, e.g., ``["cms.pagecontent", "myapp.mymodel"]``.
-    If ``None``, the plugin can be added to any model that has placeholders.
+    """Plugin-level restriction: A list of valid models where this plugin can be added.
+
+    Each entry must be the dotted path to the model in the format ``"app_label.modelname"``,
+    e.g., ``["cms.pagecontent", "myapp.mymodel"]``.
+
+    - If ``None`` (default): The plugin can be added to any model that has placeholders.
+    - If a list/tuple is provided: The plugin can only be added to models in this list.
+    - If an empty list ``[]``: The plugin cannot be added to any model.
+
+    Note: This can be combined with the model's ``allowed_plugins`` attribute for fine-grained control.
+    Both filters must pass for a plugin to be available on a model.
+
+    See also: Model's ``allowed_plugins`` attribute for model-level restrictions.
     """
 
     allow_children = False

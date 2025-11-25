@@ -357,7 +357,16 @@ class TestValidModelsFiltering(CMSTestCase):
 
 
 class TestAllowedPluginsFiltering(CMSTestCase):
-    """Tests that get_placeholder_toolbar_js and get_all_plugins_for_model respect the allowed_plugins property on models.
+    """Tests for model-level plugin filtering via the allowed_plugins attribute.
+
+    Tests that get_placeholder_toolbar_js and get_all_plugins_for_model respect the
+    allowed_plugins property on models. This is a model-level restriction that works
+    in combination with the plugin-level allowed_models attribute.
+
+    Model-level filtering (allowed_plugins on model):
+    - None (default): All plugins are allowed (subject to plugin's allowed_models)
+    - List of plugin names: Only those plugins are allowed
+    - Empty list []: No plugins are allowed
 
     We create a placeholder on a model with an allowed_plugins property and verify that only
     those plugins appear in the toolbar and are returned by get_all_plugins_for_model.
@@ -402,7 +411,11 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         plugin_pool.unregister_plugin(self.DisallowedPlugin)
 
     def test_get_all_plugins_for_model_without_allowed_plugins(self):
-        """Test that models without allowed_plugins return all plugins (filtered by allowed_models)."""
+        """Test that models without allowed_plugins (None) return all plugins.
+
+        When allowed_plugins is None (not defined), no model-level filtering occurs.
+        Only plugin-level filtering (allowed_models) is applied.
+        """
         from cms.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
@@ -415,7 +428,11 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         self.assertIn('DisallowedPlugin', plugin_names)
 
     def test_get_all_plugins_for_model_with_allowed_plugins(self):
-        """Test that allowed_plugins property filters plugins correctly."""
+        """Test that allowed_plugins property applies model-level filtering.
+
+        When allowed_plugins is a list of plugin names, only those plugins
+        (and those passing the allowed_models filter) are returned.
+        """
         from cms.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
@@ -438,9 +455,12 @@ class TestAllowedPluginsFiltering(CMSTestCase):
             plugin_pool.get_all_plugins_for_model.cache_clear()
 
     def test_get_all_plugins_for_model_with_empty_allowed_plugins(self):
-        """Test that empty allowed_plugins returns no plugins.
+        """Test that empty allowed_plugins list returns no plugins.
 
-        An empty list explicitly means "no plugins allowed", different from None which means "all plugins allowed".
+        Semantic difference:
+        - None: No model-level restriction (all plugins allowed subject to allowed_models)
+        - []: Explicit restriction to allow no plugins
+        - ['PluginA']: Explicit restriction to specific plugins
         """
         from cms.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
@@ -457,7 +477,11 @@ class TestAllowedPluginsFiltering(CMSTestCase):
             plugin_pool.get_all_plugins_for_model.cache_clear()
 
     def test_get_placeholder_toolbar_js_with_allowed_plugins(self):
-        """Test that toolbar JS respects allowed_plugins on the model."""
+        """Test that toolbar JS respects model-level allowed_plugins filtering.
+
+        The toolbar should only show plugins that pass both the plugin's allowed_models
+        filter and the model's allowed_plugins filter.
+        """
         from cms.plugin_rendering import ContentRenderer
         from cms.test_utils.project.placeholderapp.models import Example1
 
@@ -479,7 +503,11 @@ class TestAllowedPluginsFiltering(CMSTestCase):
             plugin_pool.get_all_plugins_for_model.cache_clear()
 
     def test_allowed_plugins_with_nonexistent_plugin(self):
-        """Test that nonexistent plugins in allowed_plugins are safely ignored."""
+        """Test that nonexistent plugins in allowed_plugins are safely ignored.
+
+        If allowed_plugins contains plugin names that don't exist or aren't registered,
+        they are silently ignored without raising errors.
+        """
         from cms.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
@@ -500,7 +528,14 @@ class TestAllowedPluginsFiltering(CMSTestCase):
             plugin_pool.get_all_plugins_for_model.cache_clear()
 
     def test_allowed_plugins_combined_with_allowed_models(self):
-        """Test that both allowed_plugins and allowed_models work together."""
+        """Test that both allowed_plugins and allowed_models filters work together.
+
+        For a plugin to be available on a model, it must pass both filters:
+        1. Plugin-level: If plugin.allowed_models is set, model must be in the list
+        2. Model-level: If model.allowed_plugins is set, plugin must be in the list
+
+        If either filter excludes the plugin, it won't be available.
+        """
         from cms.plugin_base import CMSPluginBase
         from cms.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
