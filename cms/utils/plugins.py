@@ -178,7 +178,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
 
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
-    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
+    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page or plugin.placeholder.source)
     parents_cache = cache.setdefault("plugin_parents", {})
     children_cache = cache.setdefault("plugin_children", {})
     try:

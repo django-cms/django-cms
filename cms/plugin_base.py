@@ -82,17 +82,17 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         if "get_extra_plugin_menu_items" in attrs:
             new_plugin._has_extra_plugin_menu_items = True
 
-        # Normalize valid_models entries to lowercase (app_label.model)
+        # Normalize allowed_models entries to lowercase (app_label.model)
         # to allow case-insensitive configuration such as "cms.PageContent".
         # ContentType.app_label and .model are lowercase, so we match that.
-        valid_models = getattr(new_plugin, "valid_models", None)
-        if valid_models is not None:
+        allowed_models = getattr(new_plugin, "allowed_models", None)
+        if allowed_models is not None:
             # Accept any iterable (list/tuple/set) or a single string
-            if isinstance(valid_models, (list, tuple, set)):
-                new_plugin.valid_models = [str(item).lower() for item in valid_models]
+            if isinstance(allowed_models, (list, tuple, set)):
+                new_plugin.allowed_models = [str(item).lower() for item in allowed_models]
             else:
                 # Coerce single value into list
-                new_plugin.valid_models = [str(valid_models).lower()]
+                new_plugin.allowed_models = [str(allowed_models).lower()]
         return new_plugin
 
 
@@ -187,10 +187,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: and not other models with ``PlaceholderRelationFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
     #: :attr:`require_parent`.
     #:
-    #: Deprecated: Use valid_models attribute instead (e.g., `valid_models = ["cms.pagecontent"]`)
+    #: Deprecated: Use allowed_models attribute instead (e.g., `allowed_models = ["cms.pagecontent"]`)
     page_only = False
 
-    valid_models = None
+    allowed_models = None
     """A list of valid models where this plugin can be added. Each entry must be the
     dotted path to the model in the format ``"app_label.modelname"``, e.g., ``["cms.pagecontent", "myapp.mymodel"]``.
     If ``None``, the plugin can be added to any model that has placeholders.
@@ -366,7 +366,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def _get_template_for_conf(cls, page: Page | None, instance: CMSPlugin | None = None):
         """Cache page template because page.get_template() might have to fetch the page content object from the db
         since django CMS 4"""
-        if page:
+        if page and hasattr(page, "get_template"):
             # Make the database access lazy, so that it only happens if needed.
             return lazy(page.get_template, str)()
         if (

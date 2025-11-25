@@ -833,7 +833,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             request = self.get_request(page_edit_url, page=page)
             request.toolbar = CMSToolbar(request)
             renderer = self.get_structure_renderer(request=request)
-            output = renderer.render_placeholder(placeholder, language="en", page=page)
+            output = renderer.render_placeholder(placeholder, language="en")
             self.assertIn('<a data-rel="add" data-add-form="true" href="TextPlugin">Text</a>', output)
             self.assertNotIn('<a data-rel="add" data-add-form="true" href="LinkPlugin">Link</a>', output)
 
@@ -1287,21 +1287,21 @@ class SimplePluginTests(TestCase):
         self.assertEqual(out_context["placeholder"], 2)
         self.assertIs(out_context, context)
 
-    def test_valid_models_is_lowercased_for_list(self):
+    def test_allowed_models_is_lowercased_for_list(self):
         class MyPlugin(CMSPluginBase):
             render_template = "base.html"
-            valid_models = ["Cms.PageContent", "MyApp.MyModel"]
+            allowed_models = ["Cms.PageContent", "MyApp.MyModel"]
 
-        self.assertEqual(MyPlugin.valid_models, ["cms.pagecontent", "myapp.mymodel"])
-        self.assertIsInstance(MyPlugin.valid_models, list)
+        self.assertEqual(MyPlugin.allowed_models, ["cms.pagecontent", "myapp.mymodel"])
+        self.assertIsInstance(MyPlugin.allowed_models, list)
 
-    def test_valid_models_single_string_is_coerced_and_lowercased(self):
+    def test_allowed_models_single_string_is_coerced_and_lowercased(self):
         class SinglePlugin(CMSPluginBase):
             render_template = "base.html"
-            valid_models = "Cms.PageContent"
+            allowed_models = "Cms.PageContent"
 
-        self.assertEqual(SinglePlugin.valid_models, ["cms.pagecontent"])
-        self.assertIsInstance(SinglePlugin.valid_models, list)
+        self.assertEqual(SinglePlugin.allowed_models, ["cms.pagecontent"])
+        self.assertIsInstance(SinglePlugin.allowed_models, list)
 
 
 class BrokenPluginTests(TestCase):

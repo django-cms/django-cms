@@ -1,7 +1,8 @@
+from collections import defaultdict
 from operator import attrgetter
-from typing import Optional
 
 from django.core.exceptions import ImproperlyConfigured
+from django.db import models
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
 from django.urls import URLResolver, include, re_path
@@ -11,9 +12,7 @@ from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
-from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import normalize_name
 
 
@@ -21,13 +20,7 @@ class PluginPool:
     def __init__(self):
         self.plugins = {}
         self.discovered = False
-        self.global_restrictions_cache = {
-            # Initialize the global restrictions cache for each CMS_PLACEHOLDER_CONF
-            # granularity that contains "parent_classes" or "child_classes" overwrites
-            None: {},
-            **{key: {} for key, value in get_cms_setting("PLACEHOLDER_CONF").items()
-               if "parent_classes" in value or "child_classes" in value},
-        }
+        self.global_restrictions_cache = defaultdict(dict)
         self.global_template_restrictions = any(".htm" in (key or "") for key in self.global_restrictions_cache)
 
     def _clear_cached(self):
@@ -142,7 +135,7 @@ class PluginPool:
 
         plugins = self.plugins.values()
         template = (
-            lazy(page.get_template, str)() if page else None
+            lazy(page.get_template, str)() if page and hasattr(page, "get_template") else None
         )  # Make template lazy to avoid unnecessary db access
 
         allowed_plugins = (
@@ -162,10 +155,13 @@ class PluginPool:
             or ()
         )
 
-        if not include_page_only:
-            # Filters out any plugin marked as page only because
-            # the include_page_only flag has been set to False
-            plugins = (plugin for plugin in plugins if not plugin.page_only)
+        # Filters for allowed_plugins
+        obj_allowed_plugins = getattr(page, "allowed_plugins", None)
+        obj_type = f"{page._meta.app_label}.{page._meta.model_name}" if page else "None"
+        if obj_allowed_plugins:
+            plugins = (plugin for plugin in plugins if plugin.__name__ in obj_allowed_plugins)
+        # Filters for allowed_models
+        plugins = (plugin for plugin in plugins if not plugin.allowed_models or obj_type in plugin.allowed_models)
 
         if allowed_plugins:
             # Check that plugins are in the list of the allowed ones
@@ -229,7 +225,7 @@ class PluginPool:
         plugin_classes = [cls for cls in self.registered_plugins if cls._has_extra_placeholder_menu_items]
         return plugin_classes
 
-    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Page | None = None):
+    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, obj: models.Model) -> defaultdict[str, dict]:
         """
         Retrieve the restrictions cache for a given plugin instance.
 
@@ -250,21 +246,22 @@ class PluginPool:
             dict: The restrictions cache for the given plugin instance - or the cache valid for the request.
         """
         plugin_class = self.get_plugin(instance.plugin_type)
+        object_class = f"{obj._meta.app_label}.{obj._meta.model_name}" if obj else ""
         if not self.can_cache_globally(plugin_class):
             return request_cache
         slot = instance.placeholder.slot
         if self.global_template_restrictions:
-            template = plugin_class._get_template_for_conf(page)
+            template = plugin_class._get_template_for_conf(obj) if obj else ""
         else:
             template = ""
 
-        if template and f"{template} {slot}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{template} {slot}"]
-        if template and template in self.global_restrictions_cache:
-            return self.global_restrictions_cache[template]
-        if slot and slot in self.global_restrictions_cache:
-            return self.global_restrictions_cache[slot]
-        return self.global_restrictions_cache[None]
+        if template and f"{object_class}:{template} {slot}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{object_class}:{template} {slot}"]
+        if template and f"{object_class}:{template}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{object_class}:{template}"]
+        if slot and f"{object_class}:{slot}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{object_class}:{slot}"]
+        return self.global_restrictions_cache[object_class]
 
     restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
 

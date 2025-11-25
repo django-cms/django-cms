@@ -8,8 +8,8 @@ from typing import Any
 
 from classytags.utils import flatten_context
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.db import models
 from django.http import HttpRequest
 from django.template import Context
 from django.utils.functional import cached_property
@@ -21,13 +21,14 @@ from django.views.debug import ExceptionReporter
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
-from cms.plugin_pool import PluginPool, plugin_pool
+from cms.plugin_pool import PluginPool
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
@@ -138,34 +139,15 @@ class BaseRenderer:
         plugin_menu = get_toolbar_plugin_struct(
             plugins=self.get_plugins_with_perms(),
             slot=placeholder.slot,
-            page=page,
+            obj=page,
         )
         plugin_menu_template = self.templates.placeholder_plugin_menu_template
         return plugin_menu_template.render({"plugin_menu": plugin_menu})
 
-    @staticmethod
-    def _filter_plugins_for_placeholder(plugins: list[str], placeholder: Placeholder) -> Generator[str]:
-        if not hasattr(placeholder, "_source_model"):
-            try:
-                source_type = ContentType.objects.get_for_id(placeholder.content_type_id)
-                placeholder._source_model = f"{source_type.app_label}.{source_type.model}"
-                placeholder._source_allowed_plugins = getattr(source_type.model_class(), "allowed_plugins", [])
-            except ContentType.DoesNotExist:
-                placeholder._source_model = "None"
-                placeholder._source_allowed_plugins = []
-        to_cls = (plugin_pool.get_plugin(plugin) for plugin in plugins)
-        return [
-            cls.__name__
-            for cls in to_cls
-            if (not placeholder._source_allowed_plugins
-            or cls.__name__ in placeholder._source_allowed_plugins)
-            and (cls.valid_models is None or placeholder._source_model in cls.valid_models)
-        ]
-
-    def get_placeholder_toolbar_js(self, placeholder, page=None):
-        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page)  # original
+    def get_placeholder_toolbar_js(self, placeholder, page: models.Model | None = None):
+        obj = placeholder.source
+        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, obj)  # original
         plugin_types = [cls.__name__ for cls in plugins]
-        plugin_types = self._filter_plugins_for_placeholder(plugin_types, placeholder)
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
         placeholder_toolbar_js = get_placeholder_toolbar_js(
             placeholder=placeholder,
@@ -173,16 +155,16 @@ class BaseRenderer:
         )
         return placeholder_toolbar_js
 
-    def get_plugin_toolbar_js(self, plugin: CMSPlugin, page: Page | None = None):
+    def get_plugin_toolbar_js(self, plugin: CMSPlugin, obj: models.Model):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
-            page=page,
+            page=obj,
             restrictions_cache=placeholder_cache,  # Store non-global plugin-restriction in placeholder_cache
         )
         content = get_plugin_toolbar_js(
             plugin,
-            children=self._filter_plugins_for_placeholder(child_classes, plugin.placeholder),
+            children=child_classes,
             parents=parent_classes,
         )
         return content
@@ -360,10 +342,11 @@ class ContentRenderer(BaseRenderer):
         return mark_safe(placeholder_content)
 
     def get_editable_placeholder_context(self, placeholder: Placeholder, page: Page | None = None) -> dict:
+        obj = page or placeholder.source
         placeholder_cache = self.get_rendered_plugins_cache(placeholder)
-        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, obj)
         plugin_toolbar_js_bits = (
-            self.get_plugin_toolbar_js(plugin, page=page) for plugin in placeholder_cache["plugins"]
+            self.get_plugin_toolbar_js(plugin, obj=obj) for plugin in placeholder_cache["plugins"]
         )
         context = {
             "plugin_js": "".join(plugin_toolbar_js_bits),
@@ -714,11 +697,11 @@ class StructureRenderer(BaseRenderer):
         for plugin in plugins:
             yield from _unpack_plugins(plugin)
 
-    def render_placeholder(self, placeholder, language, page=None):
-        rendered_plugins = self.render_plugins(placeholder, language=language, page=page)
+    def render_placeholder(self, placeholder, language, obj=None):
+        rendered_plugins = self.render_plugins(placeholder, language=language, obj=obj)
         plugin_js_output = "".join(rendered_plugins)
 
-        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, obj)
         rendered_placeholder = RenderedPlaceholder(
             placeholder=placeholder,
             language=language,
@@ -733,26 +716,34 @@ class StructureRenderer(BaseRenderer):
         placeholder_structure_js = self.placeholder_edit_template.format(
             placeholder_id=placeholder.pk,
             plugin_js=plugin_js_output,
-            plugin_menu_js=self.get_placeholder_plugin_menu(placeholder, page=page),
+            plugin_menu_js=self.get_placeholder_plugin_menu(placeholder, page=obj),
             placeholder_js=placeholder_toolbar_js,
         )
         return mark_safe(placeholder_structure_js)
 
     def render_page_placeholder(self, page, placeholder, language=None):
+        import warnings
+
+        warnings.warn(
+            "StructureRenderer.render_page_placeholder is deprecated and will be removed in a future release. "
+            "Use StructureRenderer.render_placeholder instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         return self.render_placeholder(placeholder, language=language, page=page)
 
-    def render_plugin(self, instance, page=None):
+    def render_plugin(self, instance, obj=None):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(instance.placeholder_id, {})
         placeholder_cache.setdefault("plugins", []).append(instance)
-        return self.get_plugin_toolbar_js(instance, page=page)
+        return self.get_plugin_toolbar_js(instance, obj=obj)
 
-    def render_plugins(self, placeholder, language, page=None):
-        template = page.get_template() if page else None
+    def render_plugins(self, placeholder, language, obj=None):
+        template = obj.get_template() if obj and hasattr(obj, "get_template") else None
         plugins = self.get_plugins_to_render(placeholder, language, template)
 
         for plugin in plugins:
             plugin._placeholder_cache = placeholder
-            yield self.render_plugin(plugin, page=page)
+            yield self.render_plugin(plugin, obj=obj)
 
 
 class LegacyRenderer(ContentRenderer):

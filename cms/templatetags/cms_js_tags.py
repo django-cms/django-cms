@@ -41,7 +41,7 @@ def render_cms_structure_js(context, renderer, obj):
 
     for obj_placeholder in obj_placeholders_by_slot.values():
         if obj_placeholder:
-            placeholder_js = renderer.render_placeholder(obj_placeholder, language=lang, page=obj)
+            placeholder_js = renderer.render_placeholder(obj_placeholder, language=lang, obj=obj)
             markup_bits.append(placeholder_js)
 
     return mark_safe('\n'.join(markup_bits))
@@ -50,7 +50,7 @@ def render_cms_structure_js(context, renderer, obj):
 @register.simple_tag(takes_context=True)
 def render_plugin_init_js(context, plugin):
     renderer = context['cms_renderer']
-    plugin_js = renderer.get_plugin_toolbar_js(plugin)
+    plugin_js = renderer.get_plugin_toolbar_js(plugin, page=plugin.placeholder.source)
     # Add the toolbar javascript for this plugin to the
     # sekizai "js" namespace.
     context[get_varname()]['js'].append(plugin_js)

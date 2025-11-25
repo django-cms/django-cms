@@ -272,8 +272,8 @@ class TestValidModelsFiltering(CMSTestCase):
     """Tests that get_placeholder_toolbar_js only lists plugins valid for the placeholder's source model.
 
     We create a placeholder on a non-page model (Example1) and register two temporary plugins:
-    - AllowedExamplePlugin: valid_models explicitly lists the Example1 model.
-    - DisallowedExamplePlugin: valid_models lists a different model path.
+    - AllowedExamplePlugin: allowed_models explicitly lists the Example1 model.
+    - DisallowedExamplePlugin: allowed_models lists a different model path.
 
     The toolbar js should include AllowedExamplePlugin but exclude DisallowedExamplePlugin.
     """
@@ -288,16 +288,16 @@ class TestValidModelsFiltering(CMSTestCase):
         )
         self.placeholder = self.example.placeholder
 
-        # dynamic registration of two plugins with differing valid_models
+        # dynamic registration of two plugins with differing allowed_models
         class AllowedExamplePlugin(CMSPluginBase):
             name = "AllowedExamplePlugin"
             render_template = "cms/content.html"
-            valid_models = ["placeholderapp.example1"]
+            allowed_models = ["placeholderapp.example1"]
 
         class DisallowedExamplePlugin(CMSPluginBase):
             name = "DisallowedExamplePlugin"
             render_template = "cms/content.html"
-            valid_models = ["placeholderapp.someothermodel"]
+            allowed_models = ["placeholderapp.someothermodel"]
 
         self.AllowedExamplePlugin = AllowedExamplePlugin
         self.DisallowedExamplePlugin = DisallowedExamplePlugin
@@ -310,12 +310,12 @@ class TestValidModelsFiltering(CMSTestCase):
         plugin_pool.unregister_plugin(self.AllowedExamplePlugin)
         plugin_pool.unregister_plugin(self.DisallowedExamplePlugin)
 
-    def test_get_placeholder_toolbar_js_valid_models_filtering(self):
+    def test_get_placeholder_toolbar_js_allowed_models_filtering(self):
         from cms.plugin_rendering import ContentRenderer
 
         request = self.get_request("/", "en")
         renderer = ContentRenderer(request)
-        js = renderer.get_placeholder_toolbar_js(self.placeholder, page=None)
+        js = renderer.get_placeholder_toolbar_js(self.placeholder, page=self.placeholder.source)
 
         # Allowed plugin should appear
         self.assertIn('"AllowedExamplePlugin"', js)
@@ -324,7 +324,7 @@ class TestValidModelsFiltering(CMSTestCase):
         # Sanity check: placeholder id present
         self.assertIn(f'"placeholder_id": "{self.placeholder.pk}"', js)
 
-    def test_get_placeholder_toolbar_js_pagecontent_valid_models(self):
+    def test_get_placeholder_toolbar_js_pagecontent_allowed_models(self):
         from cms.api import create_page
         from cms.plugin_base import CMSPluginBase
         from cms.plugin_pool import plugin_pool
@@ -337,7 +337,7 @@ class TestValidModelsFiltering(CMSTestCase):
         class PageOnlyTmpPlugin(CMSPluginBase):
             name = "PageOnlyTmpPlugin"
             render_template = "cms/content.html"
-            valid_models = ["cms.pagecontent"]
+            allowed_models = ["cms.pagecontent"]
 
         try:
             plugin_pool.register_plugin(PageOnlyTmpPlugin)
@@ -351,7 +351,7 @@ class TestValidModelsFiltering(CMSTestCase):
             # For a non-page model placeholder, it must be excluded
             request2 = self.get_request('/', 'en')
             renderer2 = ContentRenderer(request2)
-            js_obj = renderer2.get_placeholder_toolbar_js(self.placeholder, page=None)
+            js_obj = renderer2.get_placeholder_toolbar_js(self.placeholder, page=cms_page)
             self.assertNotIn('"PageOnlyTmpPlugin"', js_obj)
         finally:
             plugin_pool.unregister_plugin(PageOnlyTmpPlugin)
