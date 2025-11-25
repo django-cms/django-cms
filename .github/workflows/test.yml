@@ -59,7 +59,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -132,7 +132,7 @@ jobs:
 
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -192,7 +192,7 @@ jobs:
             requirements-file: django-6.0.txt
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -232,7 +232,7 @@ jobs:
         ]
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -285,7 +285,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -341,7 +341,7 @@ jobs:
 
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -385,7 +385,7 @@ jobs:
         python-version: ['3.13']
         os: [ ubuntu-latest, ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         name: Set up Python ${{ matrix.python-version }}
 
       - uses: actions/setup-python@v6
