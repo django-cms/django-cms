@@ -69,20 +69,30 @@ More flexible site configurations
 Model-specific plugins
 ======================
 
-Plugins can now be restricted to specific models using the `valid_models` attribute.
-This is particularly useful for plugins that are bound to specific Django models and should
-not be available to editors on other models.
+Plugins can now be restricted to specific models using two complementary filters:
 
-These could be plugins that only make sense on pages, for example, or plugins that are
-designed to work with specific custom models in your project, say form field plugins for a
-``Form`` model.
+- Plugin-level: ``CMSPluginBase.allowed_models`` — list of model identifiers
+  (``"app_label.modelname"``). ``None`` = allowed everywhere; ``[]`` = nowhere.
+- Model-level: ``Model.allowed_plugins`` — list of plugin class names. ``None`` = all
+  plugins allowed (subject to their own ``allowed_models``); ``[]`` = none.
+
+Both filters must pass for the frontend editor offer plugins to the users.
+This is particularly useful for plugins that are bound to specific Django models and should
+not be available to editors on other models - or to restrict certain models to a curated set
+of plugins.
 
 Example::
 
     class TextFieldPlugin(CMSPluginBase):
-        name = "Text Field"
         render_template = "forms/fields/text.html"
-        valid_models = ["my_form_app.form"]  # only on Form model placeholders
+        allowed_models = ["my_form_app.form"]
+
+    class Form(models.Model):
+        fields = PlaceholderRelationField("fields")
+        allowed_plugins = ["TextFieldPlugin"]
+
+See also the how-to guide for details and more examples:
+:ref:`plugin-model-restrictions`.
 
 Feature 3
 =========

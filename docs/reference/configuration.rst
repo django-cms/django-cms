@@ -394,6 +394,13 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     A Boolean indication whether that plugin requires another plugin as parent or
     not.
 
+.. note::
+    For model-level and plugin-level filtering of available plugins, see
+    :ref:`plugin-model-restrictions` in the custom plugins documentation. The
+    ``allowed_models`` attribute (on plugins) and ``allowed_plugins`` attribute
+    (on models) provide fine-grained control over plugin availability beyond the
+    placeholder-level configuration described here.
+
 ``inherit``
     Placeholder name or template name + placeholder name which inherit. In the
     example, the configuration for ``base.html content`` inherits from ``content``

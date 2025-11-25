@@ -334,39 +334,39 @@ prevent the disappearance of existing plugin instances, as discussed in `Issue #
 
    This script can be added to the migration just created in step 3.
 
-    .. code-block:: python
+.. code-block:: python
 
-       def add_model_to_plugin(apps, schema_editor):
-           """ Adds instances for the new model.
-           ATTENTION: All fields of the model must have a valid default value!"""
+    def add_model_to_plugin(apps, schema_editor):
+        """ Adds instances for the new model.
+        ATTENTION: All fields of the model must have a valid default value!"""
 
-           # Adjust the following two lines
-           model = app.get_model("my_app", "MyGreatPluginModel")  # Name of the plugin's new model class
-           plugin_type = "MyGreatPlugin"  # Name of the plugin class
+        # Adjust the following two lines
+        model = app.get_model("my_app", "MyGreatPluginModel")  # Name of the plugin's new model class
+        plugin_type = "MyGreatPlugin"  # Name of the plugin class
 
-           CMSPlugin = apps.get_model("cms", "CMSPlugin")
+        CMSPlugin = apps.get_model("cms", "CMSPlugin")
 
-           plugin_instances = CMSPlugin.objects.filter(plugin_type=plugin_type)
-           for plugin_instance in plugin_instances:
-               logger.info('Creating new model instance for plugin instance %s', plugin_instance.pk)
-               obj = model()
-               obj.pk = plugin_instance.pk
-               obj.cmsplugin_ptr = plugin_instance
-               obj.plugin_type = plugin_type
-               obj.placeholder = plugin_instance.placeholder
-               obj.parent = plugin_instance.parent
-               obj.language = plugin_instance.language
-               obj.position = plugin_instance.position
-               obj.creation_date = plugin_instance.creation_date
-               obj.save()
+        plugin_instances = CMSPlugin.objects.filter(plugin_type=plugin_type)
+        for plugin_instance in plugin_instances:
+            logger.info('Creating new model instance for plugin instance %s', plugin_instance.pk)
+            obj = model()
+            obj.pk = plugin_instance.pk
+            obj.cmsplugin_ptr = plugin_instance
+            obj.plugin_type = plugin_type
+            obj.placeholder = plugin_instance.placeholder
+            obj.parent = plugin_instance.parent
+            obj.language = plugin_instance.language
+            obj.position = plugin_instance.position
+            obj.creation_date = plugin_instance.creation_date
+            obj.save()
 
-       class Migration(migrations.Migration):
-           ...
+    class Migration(migrations.Migration):
+        ...
 
-           operations = [
-               ...,
-               migrations.RunPython(add_model_to_plugin),  # Add at the end of migration operations
-           ]
+        operations = [
+            ...,
+            migrations.RunPython(add_model_to_plugin),  # Add at the end of migration operations
+        ]
 
    This script migrates existing plugin instances to the new model structure, preserving data integrity.
 
@@ -739,6 +739,166 @@ can access the parent instance using ``get_bound_plugin``:
             super().__init__(*args, **kwargs)
             if self.instance:
                 parent, parent_cls = self.instance.parent.get_bound_plugin()
+
+
+.. _plugin-model-restrictions:
+
+Restricting plugins to specific models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+Django CMS allows you to control which plugins can be used with which models through
+two complementary filtering mechanisms:
+
+Plugin-level filtering (``allowed_models``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``allowed_models`` attribute on a plugin class restricts where that plugin can be
+used. This is useful when you have a plugin that only makes sense in specific contexts.
+
+.. code-block:: python
+
+    @plugin_pool.register_plugin
+    class PageSpecificPlugin(CMSPluginBase):
+        name = "Page Only Plugin"
+        model = CMSPlugin
+        render_template = "page_specific.html"
+        allowed_models = ["cms.pagecontent"]  # Only available on CMS pages
+
+    @plugin_pool.register_plugin
+    class BlogPlugin(CMSPluginBase):
+        name = "Blog Plugin"
+        model = CMSPlugin
+        render_template = "blog.html"
+        allowed_models = ["blog.blogpost", "blog.blogcategory"]
+
+The ``allowed_models`` attribute accepts:
+
+- ``None`` (default): The plugin is available for all models with placeholders
+- A list of model identifiers in the format ``"app_label.modelname"``
+  (e.g., ``["cms.pagecontent", "myapp.mymodel"]``)
+- An empty list ``[]``: The plugin cannot be used with any model
+
+.. note::
+    Model identifiers are automatically normalized to lowercase, so
+    ``["cms.PageContent"]`` and ``["cms.pagecontent"]`` are equivalent.
+
+
+Use plugin-based restrictions (``allowed_models``) when:
+
+- You have a plugin that only works with specific model types
+- You want to prevent misuse of a plugin in inappropriate contexts
+- The plugin accesses model-specific attributes or methods (e.g., by evaluating ``plugin.placeholder.source``)
+
+
+
+Model-level filtering (``allowed_plugins``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``allowed_plugins`` attribute on a model class restricts which plugins can be added
+to placeholders on that model. This is useful when you want to limit the available
+plugins for a specific content type.
+
+.. code-block:: python
+
+    from django.db import models
+    from cms.models import PlaceholderField
+
+    class BlogPost(models.Model):
+        title = models.CharField(max_length=200)
+
+        placeholders = PlaceholderRelationField()
+
+        # Only allow specific plugins in blog posts
+        allowed_plugins = ['TextPlugin', 'LinkPlugin', 'PicturePlugin']
+
+    class LandingPage(models.Model):
+        title = models.CharField(max_length=200)
+
+        placeholders = PlaceholderRelationField()
+
+        # Restrict to layout and hero plugins
+        allowed_plugins = ['MultiColumnPlugin', 'HeroPlugin', 'CallToActionPlugin']
+
+The ``allowed_plugins`` attribute accepts:
+
+- ``None`` (default): All plugins are allowed (subject to their ``allowed_models`` filter)
+- A list of plugin class names (e.g., ``["TextPlugin", "LinkPlugin"]``)
+- An empty list ``[]``: No plugins are allowed
+
+
+Use model-level filtering (``allowed_plugins``) when:
+
+- You want to provide a curated editing experience for specific content types
+- You need to enforce content guidelines or branding requirements
+- You want to simplify the plugin selection for content editors
+
+Combined filtering
+^^^^^^^^^^^^^^^^^^
+
+When both ``allowed_models`` (on the plugin) and ``allowed_plugins`` (on the model) are
+defined, **both filters must pass** for a plugin to be available:
+
+.. code-block:: python
+
+    # Plugin definition
+    @plugin_pool.register_plugin
+    class ArticlePlugin(CMSPluginBase):
+        name = "Article Plugin"
+        model = CMSPlugin
+        render_template = "article.html"
+        allowed_models = ["blog.blogpost", "news.article"]
+
+    # Model definition
+    class BlogPost(models.Model):
+        placeholders = PlaceholderRelationField()
+        allowed_plugins = ['TextPlugin', 'ArticlePlugin', 'PicturePlugin']
+
+In this example:
+
+- ``ArticlePlugin`` will be available in ``BlogPost`` (passes both filters)
+- ``TextPlugin`` will be available in ``BlogPost`` (no model restriction on plugin,
+  listed in model's ``allowed_plugins``)
+- ``ArticlePlugin`` will **not** be available in ``cms.PageContent`` (not in plugin's
+  ``allowed_models``)
+- ``VideoPlugin`` will **not** be available in ``BlogPost`` (not in model's
+  ``allowed_plugins``)
+
+
+Example: Blog with restricted plugins
+.....................................
+
+.. code-block:: python
+
+    # models.py
+    class BlogPost(models.Model):
+        title = models.CharField(max_length=200)
+        author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+        placeholders = PlaceholderRelationField()
+
+        # Main content: rich editing tools
+        allowed_plugins = [
+            'TextPlugin',
+            'PicturePlugin',
+            'VideoPlugin',
+            'QuotePlugin',
+        ]
+
+    # cms_plugins.py
+    @plugin_pool.register_plugin
+    class QuotePlugin(CMSPluginBase):
+        name = "Quote"
+        model = QuoteModel
+        render_template = "quote.html"
+        # Only allow in blog posts and articles
+        allowed_models = ["blog.blogpost", "news.article"]
+
+.. note::
+    If a plugin name in ``allowed_plugins`` doesn't match any registered plugin,
+    or a model identifier in ``allowed_models`` doesn't correspond to any installed model,
+    they are silently ignored without raising an error.
 
 .. _extending_context_menus:
 
