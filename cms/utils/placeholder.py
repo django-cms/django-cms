@@ -139,7 +139,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     """
     template = None
 
-    if page:
+    if page and hasattr(page, "get_template"):
         template = page.get_template()
 
     modules = get_placeholder_conf("plugin_modules", slot, template, default={})

@@ -1074,11 +1074,6 @@ class Modal {
                     }
                 });
 
-                // figure out if .object-tools is available
-                if (contents.find('.object-tools').length) {
-                    contents.find('#content').css('padding-top', 38); // eslint-disable-line
-                }
-
                 // this is required for IE11. we assume that when the modal is opened the user is going to interact
                 // with it. if we don't focus the body directly the next time the user clicks on a field inside
                 // the iframe the focus will be stolen by body thus requiring two clicks. this immediately focuses the
