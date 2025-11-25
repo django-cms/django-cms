@@ -390,8 +390,9 @@ class CMSToolbarBase(BaseToolbar):
         a Django model instance that the toolbar should operate on, such as a :class:`~cms.models.contentmodels.PageContent` object or any
         other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
 
-        The object is used by other toolbar methods like :meth:`get_object_edit_url`,
-        :meth:`get_object_preview_url`, and :meth:`get_object_structure_url` to generate
+        The object is used by other toolbar methods like
+        ``get_object_edit_url()``, ``get_object_preview_url()``, and
+        ``get_object_structure_url()`` to generate
         appropriate URLs for the object.
 
         :param obj: The object to associate with the toolbar

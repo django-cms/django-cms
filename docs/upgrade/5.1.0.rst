@@ -52,19 +52,24 @@ attribute with the value ``4`` to the ``<html>`` tag in your templates.
 More flexible site configurations
 =================================
 
-* The Django admin app does not have to be available on all sites. You can now
-  configure which sites have access to the admin interface and still edit all sites
-  using the admin's frontend editing and preview endpoints. This is especially useful
-  if you do not want to expose the admin interface on external production sites.
+The Django admin app does not have to be available on all sites. You can now
+configure which sites have access to the admin interface and still edit all sites
+using the admin's frontend editing and preview endpoints. This is especially useful
+if you do not want to expose the admin interface on external production sites.
 
-* You can now run multiple sites with one settings file. If you omit the `SITE_ID` in
-  your settings, django CMS will determine the current site using Django's site framework
-  based on the request's host header. This allows you to run multiple sites with one
-  instance and one settings file. Note, that apphooks must not share the same URLs in
-  such a scenario to avoid conflicts.
+You can now run multiple sites with one settings file. If you omit the ``SITE_ID`` in
+your settings, django CMS will determine the current site using Django's site framework
+based on the request's host header. This allows you to run multiple sites with one
+instance and one settings file. Note, that apphooks must not share the same URLs in
+such a scenario to avoid conflicts.
 
-  If you need more complex site determination logic, you can implement a custom
-  middleware that sets `request.site` accordingly. It will respected by django CMS.
+If you need more complex site determination logic, you can implement a custom
+middleware that sets ``request.site`` accordingly. It will be respected by django CMS.
+
+For a step‑by‑step guide and examples, see :doc:`../how_to/03-multi-site` (including
+notes on apphook isolation and URL conflicts). For management commands that run without
+an HTTP request, consult :doc:`../reference/cli` for options like ``--site`` to select the
+target site context.
 
 Model-specific plugins
 ======================
@@ -154,7 +159,7 @@ Permissions
 -----------
 
 ``cms.utils.permissions.has_page_permission()`` has been removed. Use
-:meth:`cms.utils.page_permissions.has_generic_permission()` instead.
+:func:`cms.utils.page_permissions.has_generic_permission()` instead.
 
 As part of performance improvements, the following methods have been removed from
 ``cms.utils.page_permissions``. They were deprecated in django CMS 4.1:
