@@ -263,7 +263,7 @@ class ContentRenderer(BaseRenderer):
         context.push()
 
         width = width or placeholder.default_width
-        template = page.get_template() if page else None
+        template = page.get_template() if page and hasattr(page, "get_template") else None
 
         if width:
             context["width"] = width
@@ -739,6 +739,8 @@ class StructureRenderer(BaseRenderer):
 
     def render_plugins(self, placeholder, language, obj=None):
         template = obj.get_template() if obj and hasattr(obj, "get_template") else None
+    def render_plugins(self, placeholder, language, page=None):
+        template = page.get_template() if page and hasattr(page, "get_template") else None
         plugins = self.get_plugins_to_render(placeholder, language, template)
 
         for plugin in plugins:

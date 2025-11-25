@@ -9,7 +9,6 @@ from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import (
-    get_language_from_request,
     gettext_lazy as _,
 )
 
@@ -17,7 +16,6 @@ from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_default_language_for_site,
-    is_language_prefix_patterns_used,
 )
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
@@ -107,7 +105,12 @@ class MenuRenderer:
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.site = Site.objects.get_current(request)
+        page = getattr(self.request, 'current_page', None)
+        if page:
+            # Avoid resolving site
+            self.site = Site(id=page.site_id)
+        else:
+            self.site = get_current_site(request)
         self.request_language = None
         if hasattr(request, "LANGUAGE_CODE"):
             # use language from middleware - usually django.middleware.locale.LocaleMiddleware

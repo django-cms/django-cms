@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
@@ -52,7 +52,6 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
         extensions.configure_wizards(cms_config)
         with self.assertRaises(ImproperlyConfigured):
             extensions.wizards
-
 
     def test_raises_exception_if_not_iterable(self):
         """

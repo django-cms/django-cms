@@ -1,6 +1,6 @@
 import re
 from collections.abc import Sequence
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 from django.conf import settings

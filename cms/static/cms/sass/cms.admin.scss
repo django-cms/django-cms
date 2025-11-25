@@ -24,9 +24,8 @@ $pagetree: true;
 }
 
 a.btn.cms-action-btn {
-    color: var(--dca-gray-darkest, var(--body-fg));
-    border: 1px solid var(--dca-gray-lighter, #ddd);
-    border-radius: $border-radius-base;
+    @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, $pagetree);
+    color: $black;
     position: relative;
     display: inline-flex;
     padding: 0 !important;
@@ -59,7 +58,8 @@ a.btn.cms-action-btn img {
 
 a.btn.cms-action-btn.inactive:link,
 a.btn.cms-action-btn.inactive:visited {
-    color: var(--dca-gray-lighter, var(--border-color, #ccc))  !important;
+    color: $gray-lighter  !important;
+    border-color: $gray-lighter;
 }
 
 
@@ -129,10 +129,11 @@ extending the pagetree classes provided by CMS
     top: 16px;
 }
 
-/* add shadow on burger menu trigger */
+/* add shadow on burger menu trigger
 a.btn.cms-action-btn:hover, a.btn.cms-action-btn.open {
     box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
 }
+*/
 
 /* style for each option row */
 ul.cms-actions-dropdown-menu-inner {

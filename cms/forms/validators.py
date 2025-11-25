@@ -29,7 +29,7 @@ def validate_url_uniqueness(
     site, path: str, language: str, user_language: str | None = None, exclude_page: Optional["Page"] = None
 ):
     """Checks for conflicting urls"""
-    from cms.models.pagemodel import Page, PageUrl
+    from cms.models.pagemodel import PageUrl
 
     if "/" in path:
         validate_url(path)
