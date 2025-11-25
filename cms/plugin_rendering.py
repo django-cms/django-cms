@@ -147,10 +147,10 @@ class BaseRenderer:
     def get_placeholder_toolbar_js(self, placeholder, page: models.Model | None = None):
         if page:
             import warnings
-            raise AssertionError()
+
             warnings.warn(
                 "The 'page' argument of 'get_placeholder_toolbar_js' is deprecated and will be removed in a future "
-                "release. It can be savely removed.",
+                "release. It can be safely removed.",
                 RemovedInDjangoCMS60Warning,
                 stacklevel=2,
             )
@@ -747,8 +747,6 @@ class StructureRenderer(BaseRenderer):
 
     def render_plugins(self, placeholder, language, obj=None):
         template = obj.get_template() if obj and hasattr(obj, "get_template") else None
-    def render_plugins(self, placeholder, language, page=None):
-        template = page.get_template() if page and hasattr(page, "get_template") else None
         plugins = self.get_plugins_to_render(placeholder, language, template)
 
         for plugin in plugins:
