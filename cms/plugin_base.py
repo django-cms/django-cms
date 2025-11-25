@@ -346,7 +346,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def _get_template_for_conf(cls, page: Page | None, instance: CMSPlugin | None = None):
         """Cache page template because page.get_template() might have to fetch the page content object from the db
         since django CMS 4"""
-        if page:
+        if page and hasattr(page, "get_template"):
             # Make the database access lazy, so that it only happens if needed.
             return lazy(page.get_template, str)()
         if (
