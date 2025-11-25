@@ -145,8 +145,16 @@ class BaseRenderer:
         return plugin_menu_template.render({"plugin_menu": plugin_menu})
 
     def get_placeholder_toolbar_js(self, placeholder, page: models.Model | None = None):
-        obj = placeholder.source
-        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, obj)  # original
+        if page:
+            import warnings
+            raise AssertionError()
+            warnings.warn(
+                "The 'page' argument of 'get_placeholder_toolbar_js' is deprecated and will be removed in a future "
+                "release. It can be savely removed.",
+                RemovedInDjangoCMS60Warning,
+                stacklevel=2,
+            )
+        plugins = self.plugin_pool.get_root_plugins(placeholder)  # original
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
         placeholder_toolbar_js = get_placeholder_toolbar_js(
@@ -344,7 +352,7 @@ class ContentRenderer(BaseRenderer):
     def get_editable_placeholder_context(self, placeholder: Placeholder, page: Page | None = None) -> dict:
         obj = page or placeholder.source
         placeholder_cache = self.get_rendered_plugins_cache(placeholder)
-        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, obj)
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder)
         plugin_toolbar_js_bits = (
             self.get_plugin_toolbar_js(plugin, obj=obj) for plugin in placeholder_cache["plugins"]
         )
@@ -419,7 +427,7 @@ class ContentRenderer(BaseRenderer):
             content = self.render_placeholder(
                 placeholder,
                 context=context,
-                page=current_page,
+                page=placeholder.source,
                 editable=editable,
                 use_cache=True,
                 nodelist=None,
@@ -701,7 +709,7 @@ class StructureRenderer(BaseRenderer):
         rendered_plugins = self.render_plugins(placeholder, language=language, obj=obj)
         plugin_js_output = "".join(rendered_plugins)
 
-        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, obj)
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder)
         rendered_placeholder = RenderedPlaceholder(
             placeholder=placeholder,
             language=language,

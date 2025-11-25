@@ -48,7 +48,7 @@ class TestStructureRenderer(CMSTestCase):
         cms_page = create_page("page", 'nav_playground.html', "en")
         renderer = self.get_renderer()
         placeholder = cms_page.get_placeholders("en").get(slot='body')
-        content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
+        content = renderer.get_placeholder_toolbar_js(placeholder)
 
         expected_bits = [
             '"MultiColumnPlugin"',
@@ -68,7 +68,7 @@ class TestStructureRenderer(CMSTestCase):
         conf = {placeholder.slot: {'name': 'Content-with-dash'}}
 
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
-            content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
+            content = renderer.get_placeholder_toolbar_js(placeholder)
 
         expected_bits = [
             '"MultiColumnPlugin"',
@@ -315,8 +315,7 @@ class TestValidModelsFiltering(CMSTestCase):
 
         request = self.get_request("/", "en")
         renderer = ContentRenderer(request)
-        js = renderer.get_placeholder_toolbar_js(self.placeholder, page=self.placeholder.source)
-
+        js = renderer.get_placeholder_toolbar_js(self.placeholder)
         # Allowed plugin should appear
         self.assertIn('"AllowedExamplePlugin"', js)
         # Disallowed plugin must not appear
@@ -345,13 +344,13 @@ class TestValidModelsFiltering(CMSTestCase):
             # For a page placeholder, the page-only plugin should be present
             request = self.get_request(cms_page.get_absolute_url('en'), 'en', page=cms_page)
             renderer = ContentRenderer(request)
-            js_page = renderer.get_placeholder_toolbar_js(page_placeholder, page=cms_page)
+            js_page = renderer.get_placeholder_toolbar_js(page_placeholder)
             self.assertIn('"PageOnlyTmpPlugin"', js_page)
 
             # For a non-page model placeholder, it must be excluded
             request2 = self.get_request('/', 'en')
             renderer2 = ContentRenderer(request2)
-            js_obj = renderer2.get_placeholder_toolbar_js(self.placeholder, page=cms_page)
+            js_obj = renderer2.get_placeholder_toolbar_js(self.placeholder)
             self.assertNotIn('"PageOnlyTmpPlugin"', js_obj)
         finally:
             plugin_pool.unregister_plugin(PageOnlyTmpPlugin)

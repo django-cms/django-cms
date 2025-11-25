@@ -219,8 +219,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
-            page = Page.objects.first()
-            installed_plugins = plugin_pool.get_all_plugins("body", page)
+            page_content = Page.objects.first().get_admin_content("en")
+            installed_plugins = plugin_pool.get_all_plugins("body", page_content)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertEqual(["TextPlugin"], installed_plugins)
 
@@ -228,7 +228,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
 
-            child_plugins = ColumnPlugin.get_child_classes("body", page)
+            child_plugins = ColumnPlugin.get_child_classes("body", page_content)
             self.assertEqual(["TextPlugin"], child_plugins)
 
     def test_excluded_plugin(self):
@@ -243,8 +243,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
-            page = Page.objects.first()
-            installed_plugins = plugin_pool.get_all_plugins("body", page)
+            page_content = Page.objects.first().get_admin_content("en")
+            installed_plugins = plugin_pool.get_all_plugins("body", page_content)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertNotIn("TextPlugin", installed_plugins)
 
@@ -254,8 +254,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(add_page_endpoint, page_data)
-            page = Page.objects.first()
-            installed_plugins = plugin_pool.get_all_plugins("body", page)
+            page_content = Page.objects.first().get_admin_content("en")
+            installed_plugins = plugin_pool.get_all_plugins("body", page_content)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertNotIn("TextPlugin", installed_plugins)
 
@@ -777,7 +777,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             page = api.create_page("page", "nav_playground.html", "en")
             placeholder = page.get_placeholders("en").get(slot="body")
 
-            plugin_list = plugin_pool.get_all_plugins(placeholder=placeholder, page=page)
+            plugin_list = plugin_pool.get_root_plugins(placeholder)
             self.assertFalse(ParentRequiredPlugin in plugin_list)
 
     def test_plugin_toolbar_struct(self):
@@ -850,7 +850,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
             # assert baseline
-            self.assertEqual(["TextPlugin"], plugin.get_child_classes(placeholder.slot, page))
+            self.assertEqual(["TextPlugin"], plugin.get_child_classes(placeholder.slot, placeholder.source))
 
             CMS_PLACEHOLDER_CONF = {
                 "body": {
@@ -861,7 +861,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 }
             }
             with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
-                self.assertEqual(["LinkPlugin"], plugin.get_child_classes(placeholder.slot, page))
+                self.assertEqual(["LinkPlugin"], plugin.get_child_classes(placeholder.slot, placeholder.source))
 
     def test_plugin_parent_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -896,7 +896,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
             # assert baseline
-            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            child_classes = plugin.get_child_classes(placeholder.slot, placeholder.source)
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
@@ -920,7 +920,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
-            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
             # Baseline
             self.assertIn("ChildPlugin", child_classes)
@@ -929,7 +929,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             # Change parent class rules (cache should NOT be used)
             ChildPlugin.parent_classes = [""]
             # Use cache
-            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertNotIn("ChildPlugin", child_classes)
@@ -955,7 +955,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
-            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
             # Baseline
             self.assertNotIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
@@ -964,7 +964,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             ChildPlugin.parent_classes = ["ParentPlugin"]
 
             # Use cache
-            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
@@ -979,7 +979,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
             # assert baseline
-            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            child_classes = plugin.get_child_classes(placeholder.slot, placeholder.source)
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
