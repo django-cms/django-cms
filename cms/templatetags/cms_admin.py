@@ -59,7 +59,7 @@ class GetPreviewUrl(AsTag):
     def get_value(self, context, page_content):
         if isinstance(page_content, Page):
             # Advanced settings wants a preview for a Page object.
-            page_content = page_content.get_content_obj(
+            page_content = page_content.get_admin_content(
                 language=get_language_from_request(context["request"])
             )
         if not page_content:

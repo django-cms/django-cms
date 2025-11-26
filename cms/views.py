@@ -299,7 +299,8 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
             request.current_page = content_type_obj.page
             if (
                 content_type_obj.page.application_urls and
-                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
+                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks()) and
+                (not require_editable or content_type_obj.is_editable(request))
             ):
                 try:
                     # If so, try get the absolute URL and pass it to the toolbar as request_path

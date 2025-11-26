@@ -1371,7 +1371,7 @@ class PageTest(PageTestBase):
     def test_advanced_settings_view_on_site(self):
         """Advanced Page Settings `View on Site` object tool links to the Page's current language
         content preview url"""
-        from cms.toolbar.utils import get_object_preview_url
+
         superuser = self.get_superuser()
         cms_page = create_page('app', 'nav_playground.html', 'en')
         cms_page_content = cms_page.get_content_obj(language='en')
@@ -1380,7 +1380,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
 
-        self.assertContains(response, get_object_preview_url(cms_page_content, language="en"))
+        self.assertContains(response, get_object_edit_url(cms_page_content, language="en"))
 
     def test_form_url_page_change(self):
         superuser = self.get_superuser()
