@@ -1421,46 +1421,66 @@ class PluginPoolTestCase(CMSTestCase):
 
     def test_plugin_pool_clear(self):
         """Test that PluginPool.clear() resets the pool state"""
-        # Ensure discovery has happened
-        plugin_pool.discover_plugins()
+        # Save current pool state
+        original_plugins = dict(plugin_pool.plugins)
+        original_discovered = plugin_pool.discovered
 
-        # Register a test plugin
-        @plugin_pool.register_plugin
-        class TestClearPlugin(CMSPluginBase):
-            render_plugin = False
-            name = "Test Clear Plugin"
+        try:
+            # Ensure discovery has happened
+            plugin_pool.discover_plugins()
 
-        # Verify plugin is registered
-        self.assertIn("TestClearPlugin", plugin_pool.plugins)
-        self.assertTrue(plugin_pool.discovered)
+            # Register a test plugin
+            @plugin_pool.register_plugin
+            class TestClearPlugin(CMSPluginBase):
+                render_plugin = False
+                name = "Test Clear Plugin"
 
-        # Clear the pool
-        plugin_pool.clear()
+            # Verify plugin is registered
+            self.assertIn("TestClearPlugin", plugin_pool.plugins)
+            self.assertTrue(plugin_pool.discovered)
 
-        # Verify pool is reset
-        self.assertNotIn("TestClearPlugin", plugin_pool.plugins)
-        self.assertFalse(plugin_pool.discovered)
-        self.assertEqual(plugin_pool.root_plugin_cache, {})
+            # Clear the pool
+            plugin_pool.clear()
+
+            # Verify pool is reset
+            self.assertNotIn("TestClearPlugin", plugin_pool.plugins)
+            self.assertFalse(plugin_pool.discovered)
+            self.assertEqual(plugin_pool.root_plugin_cache, {})
+        finally:
+            # Restore the original pool state
+            plugin_pool.plugins = original_plugins
+            plugin_pool.discovered = original_discovered
+            plugin_pool._clear_cached()
 
     def test_plugin_pool_clear_clears_cached_properties(self):
         """Test that clear() removes cached properties"""
-        # Access cached properties to ensure they're created
-        _ = plugin_pool.registered_plugins
-        _ = plugin_pool.plugins_with_extra_menu
-        _ = plugin_pool.plugins_with_extra_placeholder_menu
+        # Save current pool state
+        original_plugins = dict(plugin_pool.plugins)
+        original_discovered = plugin_pool.discovered
 
-        # Verify cached properties exist
-        self.assertIn("registered_plugins", plugin_pool.__dict__)
-        self.assertIn("plugins_with_extra_menu", plugin_pool.__dict__)
-        self.assertIn("plugins_with_extra_placeholder_menu", plugin_pool.__dict__)
+        try:
+            # Access cached properties to ensure they're created
+            _ = plugin_pool.registered_plugins
+            _ = plugin_pool.plugins_with_extra_menu
+            _ = plugin_pool.plugins_with_extra_placeholder_menu
 
-        # Clear the pool
-        plugin_pool.clear()
+            # Verify cached properties exist
+            self.assertIn("registered_plugins", plugin_pool.__dict__)
+            self.assertIn("plugins_with_extra_menu", plugin_pool.__dict__)
+            self.assertIn("plugins_with_extra_placeholder_menu", plugin_pool.__dict__)
 
-        # Verify cached properties are removed
-        self.assertNotIn("registered_plugins", plugin_pool.__dict__)
-        self.assertNotIn("plugins_with_extra_menu", plugin_pool.__dict__)
-        self.assertNotIn("plugins_with_extra_placeholder_menu", plugin_pool.__dict__)
+            # Clear the pool
+            plugin_pool.clear()
+
+            # Verify cached properties are removed
+            self.assertNotIn("registered_plugins", plugin_pool.__dict__)
+            self.assertNotIn("plugins_with_extra_menu", plugin_pool.__dict__)
+            self.assertNotIn("plugins_with_extra_placeholder_menu", plugin_pool.__dict__)
+        finally:
+            # Restore the original pool state
+            plugin_pool.plugins = original_plugins
+            plugin_pool.discovered = original_discovered
+            plugin_pool._clear_cached()
 
     def test_get_restrictions_cache_with_global_cache(self):
         """Test get_restrictions_cache returns global cache for cacheable plugins"""
