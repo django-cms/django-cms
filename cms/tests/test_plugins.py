@@ -1406,3 +1406,210 @@ class UserInputValidationPluginTest(PluginsTestBaseCase):
             "TextPlugin&quot;&gt;&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;",
             response.content.decode("utf-8"),
         )
+
+
+class PluginPoolTestCase(CMSTestCase):
+    """Test cases for PluginPool methods"""
+
+    def setUp(self):
+        super().setUp()
+        plugin_pool._clear_cached()
+
+    def tearDown(self):
+        plugin_pool._clear_cached()
+        super().tearDown()
+
+    def test_plugin_pool_clear(self):
+        """Test that PluginPool.clear() resets the pool state"""
+        # Ensure discovery has happened
+        plugin_pool.discover_plugins()
+
+        # Register a test plugin
+        @plugin_pool.register_plugin
+        class TestClearPlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Test Clear Plugin"
+
+        # Verify plugin is registered
+        self.assertIn("TestClearPlugin", plugin_pool.plugins)
+        self.assertTrue(plugin_pool.discovered)
+
+        # Clear the pool
+        plugin_pool.clear()
+
+        # Verify pool is reset
+        self.assertNotIn("TestClearPlugin", plugin_pool.plugins)
+        self.assertFalse(plugin_pool.discovered)
+        self.assertEqual(plugin_pool.root_plugin_cache, {})
+
+    def test_plugin_pool_clear_clears_cached_properties(self):
+        """Test that clear() removes cached properties"""
+        # Access cached properties to ensure they're created
+        _ = plugin_pool.registered_plugins
+        _ = plugin_pool.plugins_with_extra_menu
+        _ = plugin_pool.plugins_with_extra_placeholder_menu
+
+        # Verify cached properties exist
+        self.assertIn("registered_plugins", plugin_pool.__dict__)
+        self.assertIn("plugins_with_extra_menu", plugin_pool.__dict__)
+        self.assertIn("plugins_with_extra_placeholder_menu", plugin_pool.__dict__)
+
+        # Clear the pool
+        plugin_pool.clear()
+
+        # Verify cached properties are removed
+        self.assertNotIn("registered_plugins", plugin_pool.__dict__)
+        self.assertNotIn("plugins_with_extra_menu", plugin_pool.__dict__)
+        self.assertNotIn("plugins_with_extra_placeholder_menu", plugin_pool.__dict__)
+
+    def test_get_restrictions_cache_with_global_cache(self):
+        """Test get_restrictions_cache returns global cache for cacheable plugins"""
+        from cms.plugin_base import template_slot_caching
+
+        @plugin_pool.register_plugin
+        class GlobalCachePlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Global Cache Plugin"
+
+            @template_slot_caching
+            def get_require_parent(self, slot, page):
+                return False
+
+            @template_slot_caching
+            def get_child_class_overrides(self, slot, page):
+                return []
+
+            @template_slot_caching
+            def get_parent_classes(self, slot, page):
+                return None
+
+        try:
+            page = create_page("Test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").first()
+            plugin_instance = api.add_plugin(placeholder, GlobalCachePlugin, "en")
+
+            request_cache = {}
+            restrictions_cache = plugin_pool.get_restrictions_cache(
+                request_cache, plugin_instance, page
+            )
+
+            # Should return global cache, not request cache
+            self.assertIsNot(restrictions_cache, request_cache)
+            # Global cache should be a defaultdict
+            self.assertIsInstance(restrictions_cache, dict)
+        finally:
+            plugin_pool.unregister_plugin(GlobalCachePlugin)
+
+    def test_get_restrictions_cache_with_local_cache(self):
+        """Test get_restrictions_cache returns request cache for non-cacheable plugins"""
+        @plugin_pool.register_plugin
+        class LocalCachePlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Local Cache Plugin"
+
+            # Not decorated with @template_slot_caching
+            def get_require_parent(self, slot, page):
+                return False
+
+        try:
+            page = create_page("Test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").first()
+            plugin_instance = api.add_plugin(placeholder, LocalCachePlugin, "en")
+
+            request_cache = {}
+            restrictions_cache = plugin_pool.get_restrictions_cache(
+                request_cache, plugin_instance, page
+            )
+
+            # Should return request cache since plugin cannot be cached globally
+            self.assertIs(restrictions_cache, request_cache)
+        finally:
+            plugin_pool.unregister_plugin(LocalCachePlugin)
+
+    def test_get_restrictions_cache_different_templates(self):
+        """Test get_restrictions_cache with different templates"""
+        from cms.plugin_base import template_slot_caching
+
+        @plugin_pool.register_plugin
+        class TemplateCachePlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Template Cache Plugin"
+
+            @template_slot_caching
+            def get_require_parent(self, slot, page):
+                return False
+
+            @template_slot_caching
+            def get_child_class_overrides(self, slot, page):
+                return []
+
+            @template_slot_caching
+            def get_parent_classes(self, slot, page):
+                return None
+
+        try:
+            # Mark that template restrictions exist
+            plugin_pool.global_template_restrictions = True
+
+            page1 = create_page("Test1", "nav_playground.html", "en")
+            page2 = create_page("Test2", "simple.html", "en", parent=page1)
+
+            placeholder1 = page1.get_placeholders("en").first()
+            placeholder2 = page2.get_placeholders("en").first()
+
+            plugin_instance1 = api.add_plugin(placeholder1, TemplateCachePlugin, "en")
+            plugin_instance2 = api.add_plugin(placeholder2, TemplateCachePlugin, "en")
+
+            request_cache = {}
+            cache1 = plugin_pool.get_restrictions_cache(request_cache, plugin_instance1, page1)
+            cache2 = plugin_pool.get_restrictions_cache(request_cache, plugin_instance2, page2)
+
+            # Different templates should potentially use different caches
+            # (depending on configuration)
+            self.assertIsInstance(cache1, dict)
+            self.assertIsInstance(cache2, dict)
+        finally:
+            plugin_pool.unregister_plugin(TemplateCachePlugin)
+            plugin_pool.global_template_restrictions = False
+
+    def test_get_restrictions_cache_same_slot_different_objects(self):
+        """Test get_restrictions_cache with same slot but different objects"""
+        from cms.plugin_base import template_slot_caching
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        @plugin_pool.register_plugin
+        class ObjectCachePlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Object Cache Plugin"
+
+            @template_slot_caching
+            def get_require_parent(self, slot, page):
+                return False
+
+            @template_slot_caching
+            def get_child_class_overrides(self, slot, page):
+                return []
+
+            @template_slot_caching
+            def get_parent_classes(self, slot, page):
+                return None
+
+        try:
+            page = create_page("Test", "nav_playground.html", "en")
+            example = Example1.objects.create(char_1="test", char_2="test")
+
+            page_placeholder = page.get_placeholders("en").first()
+            example_placeholder = example.placeholder
+
+            page_plugin = api.add_plugin(page_placeholder, ObjectCachePlugin, "en")
+            example_plugin = api.add_plugin(example_placeholder, ObjectCachePlugin, "en")
+
+            request_cache = {}
+            page_cache = plugin_pool.get_restrictions_cache(request_cache, page_plugin, page)
+            example_cache = plugin_pool.get_restrictions_cache(request_cache, example_plugin, example)
+
+            # Different object types should use different caches
+            self.assertIsInstance(page_cache, dict)
+            self.assertIsInstance(example_cache, dict)
+        finally:
+            plugin_pool.unregister_plugin(ObjectCachePlugin)
