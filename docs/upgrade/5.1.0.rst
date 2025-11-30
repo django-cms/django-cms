@@ -109,12 +109,11 @@ Bug Fixes
 =========
 
 **************************************
-Backward incompatible changes in 5.X.X
+Backward incompatible changes in 5.1.0
 **************************************
 
-TitleExtension
-==============
-
+Topic 1
+=======
 
 Miscellaneous
 =============
