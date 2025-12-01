@@ -176,8 +176,9 @@ class StructureBoard {
             // Create a temporary form and submit it
             const $form = $('<form>', {
                 method: 'POST',
-                action: url,
+                action: url
             });
+
             $form.append($('<input>', {
                 type: 'hidden',
                 name: 'csrfmiddlewaretoken',
