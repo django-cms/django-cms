@@ -51,7 +51,12 @@
     @include icon(plus);
     inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
 }
+.cms-submenu-edit-new {
+    @include icon(edit-new);
+    inset-inline-end: $submenu-right * 3 + $submenu-icon-area-size * 2;
+}
 .cms-submenu-edit,
+.cms-submenu-edit-new,
 .cms-submenu-add {
     &:before {
         margin-left: math.div(-$icon-size, 2);
@@ -124,6 +129,9 @@
             }
             &[data-cms-icon=edit] {
                 @include icon(edit);
+            }
+            &[data-cms-icon=edit-new] {
+                @include icon(edit-new);
             }
             &[data-cms-icon=copy] {
                 @include icon(copy);

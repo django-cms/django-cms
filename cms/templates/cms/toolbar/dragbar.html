@@ -1,47 +1,59 @@
 {% load i18n l10n cms_tags cms_admin %}
 <div class="cms-dragbar cms-dragbar-{{ placeholder.pk|unlocalize }}">
     {% if object_is_immutable %}
-        <div class="cms-submenu-btn cms-submenu-add cms-btn cms-btn-disabled">
-            <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "You do not have permission to edit this item" %}"></span>
-        </div>
+        {% if placeholder.is_static and placeholder.new_draft_url %}
+            <div class="cms-submenu-btn cms-submenu-edit-new cms-btn">
+                <a href="{{ placeholder.new_draft_url }}" class="{{ placeholder.new_draft_method }} cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{{ placeholder.new_draft }}"></a>
+            </div>
+        {% else %}
+            <div class="cms-submenu-btn cms-submenu-add cms-btn cms-btn-disabled">
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% translate "You do not have permission to edit this item" %}"></span>
+            </div>
+        {% endif %}
     {% else %}
         <div class="cms-submenu-btn cms-submenu-add cms-btn">
-            <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Add plugin" %}"></span>
+            <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% translate "Add plugin" %}"></span>
         </div>
     {% endif %}
     <div class="cms-submenu-settings cms-submenu-btn cms-btn"></div>
     <div class="cms-submenu-dropdown cms-submenu-dropdown-settings cms-touch-action-pan-y">
         <div class="cms-dropdown-inner">
             {% if placeholder.is_static %}
-                <div class="cms-submenu-item">
-                    <a data-cms-icon="edit" href="{% get_edit_url placeholder.source %}">{% translate "Edit" %}</a>
-                </div>
+                {% if object_is_immutable and placeholder.new_draft_url %}
+                    <div class="cms-submenu-item">
+                        <a data-cms-icon="edit-new" href="{% get_edit_url placeholder.source %}">{{ placeholder.new_draft }}</a>
+                    </div>
+                {% else %}
+                    <div class="cms-submenu-item">
+                        <a data-cms-icon="edit" href="{% get_edit_url placeholder.source %}">{% translate "Edit" %}</a>
+                    </div>
+                {% endif %}
             {% endif %}
-            <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
+            <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy" href="#">{% translate "Copy all" %}</a></div>
             {% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
-                <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
+                <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% translate "Copy from" %} {% translate language.name %}</a></div>
             {% endif %}{% endfor %}
             {% if object_is_immutable %}
-                <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="paste" href="#">{% trans "Paste" %}</a></div>
-                <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="bin" href="#">{% trans "Empty all" %}</a></div>
+                <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="paste" href="#">{% translate "Paste" %}</a></div>
+                <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="bin" href="#">{% translate "Empty all" %}</a></div>
             {% else %}
-                <div class="cms-submenu-item"><a data-cms-icon="paste" data-rel="paste" href="#">{% trans "Paste" %}</a></div>
+                <div class="cms-submenu-item"><a data-cms-icon="paste" data-rel="paste" href="#">{% translate "Paste" %}</a></div>
                 <div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="{% url "admin:cms_placeholder_clear_placeholder" placeholder.id %}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
             {% endif %}
             {% render_extra_menu_items placeholder %}
         </div>
     </div>
     <div class="cms-plugin-picker cms-touch-action-pan-y">
-        <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
+        <div class="cms-quicksearch"><label><input type="text" placeholder="{% translate 'Filter plugins...' %}" /></label></div>
         {# plugin child classes here #}
     </div>
 
     <div class="cms-dragbar-title" title="{{ placeholder.get_label }}">
         {{ placeholder.get_label }}
-        {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-cms-tooltip="{% trans 'This is an external placeholder' %}"><span class="cms-icon cms-icon-external-placeholder cms-dragarea-static-icon"></span></span>{% endif %}
+        {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-cms-tooltip="{% translate 'This is an external placeholder' %}"><span class="cms-icon cms-icon-external-placeholder cms-dragarea-static-icon"></span></span>{% endif %}
         <span class="cms-dragbar-toggler">
-            <a href="#" class="cms-dragbar-expand-all" tabindex="-1">{% trans "Expand all" %}</a>
-            <a href="#" class="cms-dragbar-collapse-all" tabindex="-1">{% trans "Collapse all" %}</a>
+            <a href="#" class="cms-dragbar-expand-all" tabindex="-1">{% translate "Expand all" %}</a>
+            <a href="#" class="cms-dragbar-collapse-all" tabindex="-1">{% translate "Collapse all" %}</a>
         </span>
     </div>
 </div>

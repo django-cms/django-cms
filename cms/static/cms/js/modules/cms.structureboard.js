@@ -165,6 +165,27 @@ class StructureBoard {
                 this._drag();
             })
         );
+
+        // Handle links with class 'cms-form-post-method' to trigger a POST request
+        $('.cms-structure').on('click', 'a.cms-form-post-method', function(e) {
+            e.preventDefault();
+            const $link = $(this);
+            const url = $link.attr('href');
+            const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+            // Create a temporary form and submit it
+            const $form = $('<form>', {
+                method: 'POST',
+                action: url,
+            });
+            $form.append($('<input>', {
+                type: 'hidden',
+                name: 'csrfmiddlewaretoken',
+                value: csrfToken
+            }));
+            $('body').append($form);
+            $form.submit();
+        });
     }
 
     _preloadOppositeMode() {

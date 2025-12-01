@@ -67,10 +67,11 @@
                         {% include cms_toolbar.templates.dragbar_template with placeholder=placeholder object_is_immutable=object_is_immutable %}
                         {% if object_is_immutable %}
                         <div class="cms-draggables cms-draggables-root cms-drag-disabled">
+                        <div class="cms-draggables-empty">{% trans "Placeholder not editable" %}</div>
                         {% else %}
                         <div class="cms-draggables cms-draggables-root">
+                        <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
                         {% endif %}
-                            <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
                             {% for plugin in placeholder.get_cached_plugins %}
                                 {% include cms_toolbar.templates.drag_item_template with plugin=plugin object_is_immutable=object_is_immutable %}
                             {% endfor %}
