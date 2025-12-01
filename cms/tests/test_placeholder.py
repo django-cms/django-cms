@@ -1193,7 +1193,7 @@ class PlaceholderConfTests(TestCase):
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
-            plugins = list(plugin_pool.get_all_plugins(placeholder, page))
+            plugins = list(plugin_pool.get_all_plugins(placeholder.slot, placeholder.source))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
 
@@ -1211,7 +1211,7 @@ class PlaceholderConfTests(TestCase):
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
-            plugins = list(plugin_pool.get_all_plugins(placeholder, page))
+            plugins = list(plugin_pool.get_all_plugins(placeholder.slot, placeholder.source))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
 
