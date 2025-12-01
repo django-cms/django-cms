@@ -24,7 +24,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models.managers import ContentAdminManager
-from cms.toolbar.utils import get_object_preview_url
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
@@ -660,7 +660,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         content_obj = self.get_content_obj(obj)
         if content_obj:
             # Try getting the language from the content object
-            return get_object_preview_url(content_obj, language=getattr(content_obj, "language", None))
+            return get_object_edit_url(content_obj, language=getattr(content_obj, "language", None))
         return None
 
     def get_readonly_fields(self, request: HttpRequest, obj: models.Model | None = None):

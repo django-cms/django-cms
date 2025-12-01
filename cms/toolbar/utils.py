@@ -127,6 +127,7 @@ def get_plugin_tree(
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
             restrictions_cache=restrictions,
+            page=placeholder.source,
         )
         plugin_info = get_plugin_info(
             plugin,

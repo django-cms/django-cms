@@ -24,6 +24,7 @@ from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import EmptyPageContent, Placeholder
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 
 if TYPE_CHECKING:
@@ -124,7 +125,7 @@ def get_placeholder_conf(setting: str, placeholder: str, template: str | None = 
     return default
 
 
-def get_toolbar_plugin_struct(plugins, slot=None, page=None):
+def get_toolbar_plugin_struct(plugins, slot=None, obj=None, page=None):
     """
     Return the list of plugins to render in the toolbar.
     The dictionary contains the label, the classname and the module for the
@@ -139,8 +140,17 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     """
     template = None
 
-    if page and hasattr(page, "get_template"):
-        template = page.get_template()
+    obj = obj or page
+    if page:
+        import warnings
+
+        warnings.warn(
+            "The 'page' argument is deprecated. Please use 'obj' instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
+    if obj and hasattr(obj, "get_template"):
+        template = obj.get_template()
 
     modules = get_placeholder_conf("plugin_modules", slot, template, default={})
     names = get_placeholder_conf("plugin_labels", slot, template, default={})

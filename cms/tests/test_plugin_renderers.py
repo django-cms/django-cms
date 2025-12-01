@@ -48,7 +48,7 @@ class TestStructureRenderer(CMSTestCase):
         cms_page = create_page("page", 'nav_playground.html', "en")
         renderer = self.get_renderer()
         placeholder = cms_page.get_placeholders("en").get(slot='body')
-        content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
+        content = renderer.get_placeholder_toolbar_js(placeholder)
 
         expected_bits = [
             '"MultiColumnPlugin"',
@@ -68,7 +68,7 @@ class TestStructureRenderer(CMSTestCase):
         conf = {placeholder.slot: {'name': 'Content-with-dash'}}
 
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
-            content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
+            content = renderer.get_placeholder_toolbar_js(placeholder)
 
         expected_bits = [
             '"MultiColumnPlugin"',
@@ -266,3 +266,311 @@ class TestLegacyRenderer(TestContentRenderer):
 
 class TestLegacyRendererExceptionCatcher(TestExceptionCatchers):
     renderer_class = LegacyRenderer
+
+
+class TestValidModelsFiltering(CMSTestCase):
+    """Tests that get_placeholder_toolbar_js only lists plugins valid for the placeholder's source model.
+
+    We create a placeholder on a non-page model (Example1) and register two temporary plugins:
+    - AllowedExamplePlugin: allowed_models explicitly lists the Example1 model.
+    - DisallowedExamplePlugin: allowed_models lists a different model path.
+
+    The toolbar js should include AllowedExamplePlugin but exclude DisallowedExamplePlugin.
+    """
+
+    def setUp(self):
+        from cms.plugin_base import CMSPluginBase
+        from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        self.example = Example1.objects.create(
+            char_1="ex1", char_2="ex2", char_3="ex3", char_4="ex4", publish=True
+        )
+        self.placeholder = self.example.placeholder
+
+        # dynamic registration of two plugins with differing allowed_models
+        class AllowedExamplePlugin(CMSPluginBase):
+            name = "AllowedExamplePlugin"
+            render_template = "cms/content.html"
+            allowed_models = ["placeholderapp.example1"]
+
+        class DisallowedExamplePlugin(CMSPluginBase):
+            name = "DisallowedExamplePlugin"
+            render_template = "cms/content.html"
+            allowed_models = ["placeholderapp.someothermodel"]
+
+        self.AllowedExamplePlugin = AllowedExamplePlugin
+        self.DisallowedExamplePlugin = DisallowedExamplePlugin
+        plugin_pool.register_plugin(AllowedExamplePlugin)
+        plugin_pool.register_plugin(DisallowedExamplePlugin)
+
+    def tearDown(self):
+        # Unregister temporary plugins to avoid leaking into other tests
+        from cms.plugin_pool import plugin_pool
+        plugin_pool.unregister_plugin(self.AllowedExamplePlugin)
+        plugin_pool.unregister_plugin(self.DisallowedExamplePlugin)
+
+    def test_get_placeholder_toolbar_js_allowed_models_filtering(self):
+        from cms.plugin_rendering import ContentRenderer
+
+        request = self.get_request("/", "en")
+        renderer = ContentRenderer(request)
+        js = renderer.get_placeholder_toolbar_js(self.placeholder)
+        # Allowed plugin should appear
+        self.assertIn('"AllowedExamplePlugin"', js)
+        # Disallowed plugin must not appear
+        self.assertNotIn('"DisallowedExamplePlugin"', js)
+        # Sanity check: placeholder id present
+        self.assertIn(f'"placeholder_id": "{self.placeholder.pk}"', js)
+
+    def test_get_placeholder_toolbar_js_pagecontent_allowed_models(self):
+        from cms.api import create_page
+        from cms.plugin_base import CMSPluginBase
+        from cms.plugin_pool import plugin_pool
+        from cms.plugin_rendering import ContentRenderer
+
+        # Create a CMS page placeholder as source model cms.pagecontent
+        cms_page = create_page("page", 'nav_playground.html', "en")
+        page_placeholder = cms_page.get_placeholders("en").get(slot='body')
+
+        class PageOnlyTmpPlugin(CMSPluginBase):
+            name = "PageOnlyTmpPlugin"
+            render_template = "cms/content.html"
+            allowed_models = ["cms.pagecontent"]
+
+        try:
+            plugin_pool.register_plugin(PageOnlyTmpPlugin)
+
+            # For a page placeholder, the page-only plugin should be present
+            request = self.get_request(cms_page.get_absolute_url('en'), 'en', page=cms_page)
+            renderer = ContentRenderer(request)
+            js_page = renderer.get_placeholder_toolbar_js(page_placeholder)
+            self.assertIn('"PageOnlyTmpPlugin"', js_page)
+
+            # For a non-page model placeholder, it must be excluded
+            request2 = self.get_request('/', 'en')
+            renderer2 = ContentRenderer(request2)
+            js_obj = renderer2.get_placeholder_toolbar_js(self.placeholder)
+            self.assertNotIn('"PageOnlyTmpPlugin"', js_obj)
+        finally:
+            plugin_pool.unregister_plugin(PageOnlyTmpPlugin)
+
+
+class TestAllowedPluginsFiltering(CMSTestCase):
+    """Tests for model-level plugin filtering via the allowed_plugins attribute.
+
+    Tests that get_placeholder_toolbar_js and get_all_plugins_for_model respect the
+    allowed_plugins property on models. This is a model-level restriction that works
+    in combination with the plugin-level allowed_models attribute.
+
+    Model-level filtering (allowed_plugins on model):
+    - None (default): All plugins are allowed (subject to plugin's allowed_models)
+    - List of plugin names: Only those plugins are allowed
+    - Empty list []: No plugins are allowed
+
+    We create a placeholder on a model with an allowed_plugins property and verify that only
+    those plugins appear in the toolbar and are returned by get_all_plugins_for_model.
+    """
+
+    def setUp(self):
+        from cms.plugin_base import CMSPluginBase
+        from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        # Create an Example1 instance
+        self.example = Example1.objects.create(
+            char_1="ex1", char_2="ex2", char_3="ex3", char_4="ex4", publish=True
+        )
+        self.placeholder = self.example.placeholder
+
+        # Register temporary test plugins
+        class AllowedPluginA(CMSPluginBase):
+            name = "AllowedPluginA"
+            render_template = "cms/content.html"
+
+        class AllowedPluginB(CMSPluginBase):
+            name = "AllowedPluginB"
+            render_template = "cms/content.html"
+
+        class DisallowedPlugin(CMSPluginBase):
+            name = "DisallowedPlugin"
+            render_template = "cms/content.html"
+
+        self.AllowedPluginA = AllowedPluginA
+        self.AllowedPluginB = AllowedPluginB
+        self.DisallowedPlugin = DisallowedPlugin
+
+        plugin_pool.register_plugin(AllowedPluginA)
+        plugin_pool.register_plugin(AllowedPluginB)
+        plugin_pool.register_plugin(DisallowedPlugin)
+
+    def tearDown(self):
+        from cms.plugin_pool import plugin_pool
+        plugin_pool.unregister_plugin(self.AllowedPluginA)
+        plugin_pool.unregister_plugin(self.AllowedPluginB)
+        plugin_pool.unregister_plugin(self.DisallowedPlugin)
+
+    def test_get_all_plugins_for_model_without_allowed_plugins(self):
+        """Test that models without allowed_plugins (None) return all plugins.
+
+        When allowed_plugins is None (not defined), no model-level filtering occurs.
+        Only plugin-level filtering (allowed_models) is applied.
+        """
+        from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        all_plugins = plugin_pool.get_all_plugins_for_model(Example1)
+        plugin_names = [p.__name__ for p in all_plugins]
+
+        # All three test plugins should be included
+        self.assertIn('AllowedPluginA', plugin_names)
+        self.assertIn('AllowedPluginB', plugin_names)
+        self.assertIn('DisallowedPlugin', plugin_names)
+
+    def test_get_all_plugins_for_model_with_allowed_plugins(self):
+        """Test that allowed_plugins property applies model-level filtering.
+
+        When allowed_plugins is a list of plugin names, only those plugins
+        (and those passing the allowed_models filter) are returned.
+        """
+        from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        # Temporarily add allowed_plugins to Example1
+        Example1.allowed_plugins = ['AllowedPluginA', 'AllowedPluginB']
+        # Clear the cache since get_all_plugins_for_model uses @lru_cache
+        plugin_pool.get_all_plugins_for_model.cache_clear()
+
+        try:
+            filtered_plugins = plugin_pool.get_all_plugins_for_model(Example1)
+            plugin_names = [p.__name__ for p in filtered_plugins]
+
+            # Only allowed plugins should be included
+            self.assertIn('AllowedPluginA', plugin_names)
+            self.assertIn('AllowedPluginB', plugin_names)
+            self.assertNotIn('DisallowedPlugin', plugin_names)
+        finally:
+            # Clean up
+            delattr(Example1, 'allowed_plugins')
+            plugin_pool.get_all_plugins_for_model.cache_clear()
+
+    def test_get_all_plugins_for_model_with_empty_allowed_plugins(self):
+        """Test that empty allowed_plugins list returns no plugins.
+
+        Semantic difference:
+        - None: No model-level restriction (all plugins allowed subject to allowed_models)
+        - []: Explicit restriction to allow no plugins
+        - ['PluginA']: Explicit restriction to specific plugins
+        """
+        from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        Example1.allowed_plugins = []
+        plugin_pool.get_all_plugins_for_model.cache_clear()
+
+        try:
+            filtered_plugins = plugin_pool.get_all_plugins_for_model(Example1)
+            # Empty list should result in no plugins
+            self.assertEqual(len(filtered_plugins), 0)
+        finally:
+            delattr(Example1, 'allowed_plugins')
+            plugin_pool.get_all_plugins_for_model.cache_clear()
+
+    def test_get_placeholder_toolbar_js_with_allowed_plugins(self):
+        """Test that toolbar JS respects model-level allowed_plugins filtering.
+
+        The toolbar should only show plugins that pass both the plugin's allowed_models
+        filter and the model's allowed_plugins filter.
+        """
+        from cms.plugin_rendering import ContentRenderer
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        Example1.allowed_plugins = ['AllowedPluginA', 'AllowedPluginB']
+
+        try:
+            request = self.get_request("/", "en")
+            renderer = ContentRenderer(request)
+            js = renderer.get_placeholder_toolbar_js(self.placeholder)
+
+            # Allowed plugins should appear
+            self.assertIn('"AllowedPluginA"', js)
+            self.assertIn('"AllowedPluginB"', js)
+            # Disallowed plugin must not appear
+            self.assertNotIn('"DisallowedPlugin"', js)
+        finally:
+            delattr(Example1, 'allowed_plugins')
+            from cms.plugin_pool import plugin_pool
+            plugin_pool.get_all_plugins_for_model.cache_clear()
+
+    def test_allowed_plugins_with_nonexistent_plugin(self):
+        """Test that nonexistent plugins in allowed_plugins are safely ignored.
+
+        If allowed_plugins contains plugin names that don't exist or aren't registered,
+        they are silently ignored without raising errors.
+        """
+        from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        Example1.allowed_plugins = ['AllowedPluginA', 'NonExistentPlugin']
+        plugin_pool.get_all_plugins_for_model.cache_clear()
+
+        try:
+            filtered_plugins = plugin_pool.get_all_plugins_for_model(Example1)
+            plugin_names = [p.__name__ for p in filtered_plugins]
+
+            # Only the existing allowed plugin should be included
+            self.assertIn('AllowedPluginA', plugin_names)
+            self.assertNotIn('AllowedPluginB', plugin_names)
+            self.assertNotIn('DisallowedPlugin', plugin_names)
+            # No error should be raised for nonexistent plugin
+        finally:
+            delattr(Example1, 'allowed_plugins')
+            plugin_pool.get_all_plugins_for_model.cache_clear()
+
+    def test_allowed_plugins_combined_with_allowed_models(self):
+        """Test that both allowed_plugins and allowed_models filters work together.
+
+        For a plugin to be available on a model, it must pass both filters:
+        1. Plugin-level: If plugin.allowed_models is set, model must be in the list
+        2. Model-level: If model.allowed_plugins is set, plugin must be in the list
+
+        If either filter excludes the plugin, it won't be available.
+        """
+        from cms.plugin_base import CMSPluginBase
+        from cms.plugin_pool import plugin_pool
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        # Register a plugin with allowed_models restriction
+        class RestrictedModelPlugin(CMSPluginBase):
+            name = "RestrictedModelPlugin"
+            render_template = "cms/content.html"
+            allowed_models = ["placeholderapp.example1"]
+
+        class WrongModelPlugin(CMSPluginBase):
+            name = "WrongModelPlugin"
+            render_template = "cms/content.html"
+            allowed_models = ["placeholderapp.someothermodel"]
+
+        plugin_pool.register_plugin(RestrictedModelPlugin)
+        plugin_pool.register_plugin(WrongModelPlugin)
+
+        Example1.allowed_plugins = ['AllowedPluginA', 'RestrictedModelPlugin', 'WrongModelPlugin']
+        plugin_pool.get_all_plugins_for_model.cache_clear()
+
+        try:
+            filtered_plugins = plugin_pool.get_all_plugins_for_model(Example1)
+            plugin_names = [p.__name__ for p in filtered_plugins]
+
+            # AllowedPluginA should be included (in allowed_plugins, no model restriction)
+            self.assertIn('AllowedPluginA', plugin_names)
+            # RestrictedModelPlugin should be included (in allowed_plugins AND correct allowed_models)
+            self.assertIn('RestrictedModelPlugin', plugin_names)
+            # WrongModelPlugin should be excluded (in allowed_plugins but wrong allowed_models)
+            self.assertNotIn('WrongModelPlugin', plugin_names)
+            # AllowedPluginB should be excluded (not in allowed_plugins)
+            self.assertNotIn('AllowedPluginB', plugin_names)
+        finally:
+            delattr(Example1, 'allowed_plugins')
+            plugin_pool.unregister_plugin(RestrictedModelPlugin)
+            plugin_pool.unregister_plugin(WrongModelPlugin)
+            plugin_pool.get_all_plugins_for_model.cache_clear()

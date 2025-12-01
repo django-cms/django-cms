@@ -1,6 +1,9 @@
+from collections import defaultdict
+from functools import lru_cache
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
+from django.db import models
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
 from django.urls import URLResolver, include, re_path
@@ -10,26 +13,22 @@ from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from cms.models.pagemodel import Page
+from cms.models.placeholdermodel import Placeholder
 from cms.plugin_base import CMSPluginBase
-from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import normalize_name
 
 
 class PluginPool:
     def __init__(self):
         self.plugins = {}
+        self.root_plugin_cache = {}
         self.discovered = False
-        self.global_restrictions_cache = {
-            # Initialize the global restrictions cache for each CMS_PLACEHOLDER_CONF
-            # granularity that contains "parent_classes" or "child_classes" overwrites
-            None: {},
-            **{key: {} for key, value in get_cms_setting("PLACEHOLDER_CONF").items()
-               if "parent_classes" in value or "child_classes" in value},
-        }
+        self.global_restrictions_cache = defaultdict(dict)
         self.global_template_restrictions = any(".htm" in (key or "") for key in self.global_restrictions_cache)
 
     def _clear_cached(self):
+        self.root_plugin_cache = {}
+        self.get_all_plugins_for_model.cache_clear()
         if "registered_plugins" in self.__dict__:
             del self.__dict__["registered_plugins"]
         if "plugins_with_extra_menu" in self.__dict__:
@@ -118,9 +117,9 @@ class PluginPool:
             raise PluginAlreadyRegistered(
                 f"Cannot register {plugin!r}, a plugin with this name ({plugin_name!r}) is already registered."
             )
-
         plugin.value = plugin_name
         self.plugins[plugin_name] = plugin
+        self._clear_cached()
         return plugin
 
     def unregister_plugin(self, plugin):
@@ -133,13 +132,46 @@ class PluginPool:
         if plugin_name not in self.plugins:
             raise PluginNotRegistered("The plugin %r is not registered" % plugin)
         del self.plugins[plugin_name]
+        self._clear_cached()
+
+    @lru_cache  # noqa: B019
+    def get_all_plugins_for_model(self, model: type[models.Model]) -> list[type[CMSPluginBase]]:
+        """
+        Retrieve all plugins that can be used to edit the given model.
+
+        This method applies two levels of filtering:
+
+        1. Plugin-level filtering (allowed_models on plugin):
+           - If a plugin has allowed_models defined, the model must be in that list
+           - If allowed_models is None, the plugin is available for all models
+
+        2. Model-level filtering (allowed_plugins on model):
+           - If the model has allowed_plugins defined, only those plugins are returned
+           - If allowed_plugins is None, all plugins (passing filter 1) are returned
+           - If allowed_plugins is an empty list [], no plugins are returned
+
+        Args:
+            model: The Django model class to get plugins for
+
+        Returns:
+            List of plugin classes that can be used with this model
+        """
+        obj_type = f"{model._meta.app_label}.{model._meta.model_name}" if model  else "None"
+        assert obj_type != "cms.page"
+        obj_allowed_plugins = getattr(model, "allowed_plugins", None)
+        # Filters for allowed_models
+        plugins = (plugin for plugin in self.plugins.values() if not plugin.allowed_models or obj_type in plugin.allowed_models)
+        # Filters for allowed_plugins
+        if obj_allowed_plugins is not None:
+            plugins = (plugin for plugin in plugins if plugin.__name__ in obj_allowed_plugins)
+        return list(plugins)
 
     def get_all_plugins(
-        self, placeholder=None, page=None, setting_key="plugins", include_page_only=True, root_plugin=True
+        self, placeholder=None, page=None, setting_key="plugins", include_page_only=True, root_plugin=False
     ):
         from cms.utils.placeholder import get_placeholder_conf
 
-        plugins = self.plugins.values()
+        plugins = self.get_all_plugins_for_model(page.__class__) if page else self.plugins.values()
         template = (
             lazy(page.get_template, str)() if page and hasattr(page, "get_template") else None
         )  # Make template lazy to avoid unnecessary db access
@@ -161,11 +193,6 @@ class PluginPool:
             or ()
         )
 
-        if not include_page_only:
-            # Filters out any plugin marked as page only because
-            # the include_page_only flag has been set to False
-            plugins = (plugin for plugin in plugins if not plugin.page_only)
-
         if allowed_plugins:
             # Check that plugins are in the list of the allowed ones
             plugins = (plugin for plugin in plugins if plugin.__name__ in allowed_plugins)
@@ -178,6 +205,13 @@ class PluginPool:
             # Filters out any plugin that requires a parent or has set parent classes
             plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
         return plugins
+
+    def get_root_plugins(self, placeholder: Placeholder) -> list[type[CMSPluginBase]]:
+        template = placeholder.source.get_template() if hasattr(placeholder.source, "get_template") else "None"
+        key = f"{template}:{placeholder.slot}"
+        if key not in self.root_plugin_cache:
+            self.root_plugin_cache[key] =list(self.get_all_plugins(placeholder.slot, placeholder.source, root_plugin=True))
+        return self.root_plugin_cache[key]
 
     def get_text_enabled_plugins(self, placeholder, page) -> list[type[CMSPluginBase]]:
         plugins = set(self.get_all_plugins(placeholder, page, root_plugin=False))
@@ -228,7 +262,7 @@ class PluginPool:
         plugin_classes = [cls for cls in self.registered_plugins if cls._has_extra_placeholder_menu_items]
         return plugin_classes
 
-    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Page | None = None):
+    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, obj: models.Model) -> defaultdict[str, dict]:
         """
         Retrieve the restrictions cache for a given plugin instance.
 
@@ -249,21 +283,22 @@ class PluginPool:
             dict: The restrictions cache for the given plugin instance - or the cache valid for the request.
         """
         plugin_class = self.get_plugin(instance.plugin_type)
+        object_class = f"{obj._meta.app_label}.{obj._meta.model_name}" if obj else ""
         if not self.can_cache_globally(plugin_class):
             return request_cache
         slot = instance.placeholder.slot
         if self.global_template_restrictions:
-            template = plugin_class._get_template_for_conf(page)
+            template = plugin_class._get_template_for_conf(obj) if obj else ""
         else:
             template = ""
 
-        if template and f"{template} {slot}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{template} {slot}"]
-        if template and template in self.global_restrictions_cache:
-            return self.global_restrictions_cache[template]
-        if slot and slot in self.global_restrictions_cache:
-            return self.global_restrictions_cache[slot]
-        return self.global_restrictions_cache[None]
+        if template and f"{object_class}:{template} {slot}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{object_class}:{template} {slot}"]
+        if template and f"{object_class}:{template}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{object_class}:{template}"]
+        if slot and f"{object_class}:{slot}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{object_class}:{slot}"]
+        return self.global_restrictions_cache[object_class]
 
     restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
 
