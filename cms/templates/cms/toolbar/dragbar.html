@@ -21,7 +21,7 @@
             {% if placeholder.is_static %}
                 {% if object_is_immutable and placeholder.new_draft_url %}
                     <div class="cms-submenu-item">
-                        <a data-cms-icon="edit-new" href="{% get_edit_url placeholder.source %}">{{ placeholder.new_draft }}</a>
+                        <a data-cms-icon="edit-new" href="{{ placeholder.new_draft_url }}">{{ placeholder.new_draft }}</a>
                     </div>
                 {% else %}
                     <div class="cms-submenu-item">
