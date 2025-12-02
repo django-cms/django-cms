@@ -469,6 +469,16 @@ class Page(MP_Node):
         new_page._state = ModelState()
         new_page._clear_internal_cache()
 
+        # Clear apphook fields to prevent unique constraint violations
+        # and server errors when copying page trees with apphooks.
+        # Fixes: https://github.com/django-cms/django-cms/issues/5899
+        if self.application_urls or self.application_namespace or self.navigation_extenders:
+            new_page.update(
+                application_urls=None,
+                application_namespace=None,
+                navigation_extenders=None,
+            )
+
         if language and translations:
             page_urls = self.urls.filter(language=language)
             translations = self.pagecontent_set(manager="admin_manager").filter(language=language)
@@ -667,7 +677,7 @@ class Page(MP_Node):
         return self.get_descendants().order_by("path")
 
     def get_root(self):
-        return self.__class__.objects.get(path=self.path[0: self.steplen])
+        return self.__class__.objects.get(path=self.path[0 : self.steplen])
 
     def get_parent_page(self):
         warnings.warn(
