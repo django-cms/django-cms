@@ -394,6 +394,13 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     A Boolean indication whether that plugin requires another plugin as parent or
     not.
 
+.. note::
+    For model-level and plugin-level filtering of available plugins, see
+    :ref:`plugin-model-restrictions` in the custom plugins documentation. The
+    ``allowed_models`` attribute (on plugins) and ``allowed_plugins`` attribute
+    (on models) provide fine-grained control over plugin availability beyond the
+    placeholder-level configuration described here.
+
 ``inherit``
     Placeholder name or template name + placeholder name which inherit. In the
     example, the configuration for ``base.html content`` inherits from ``content``
@@ -411,7 +418,7 @@ default
 
 A list of plugin context processors. Plugin context processors are callables
 that modify all plugins' context *before* rendering. See
-:doc:`/how_to/10-custom_plugins` for more information.
+:doc:`/how_to/09-custom_plugins` for more information.
 
 
 ..  setting:: CMS_PLUGIN_PROCESSORS
@@ -527,6 +534,9 @@ The ``default`` node defines default behaviour for all languages. You can
 overwrite the default settings with language-specific properties. For example
 we define ``hide_untranslated`` as ``False`` globally, but the English language
 overwrites this behaviour.
+
+See also :doc:`../how_to/03-multi-site` for patterns to run multiple sites and how
+per‑site language configurations are selected at runtime without a global ``SITE_ID``.
 
 Every language node needs at least a ``code`` and a ``name`` property. ``code``
 is the ISO 2 code for the language, and ``name`` is the verbose name of the
