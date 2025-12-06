@@ -738,7 +738,7 @@ class StructureRenderer(BaseRenderer):
             RemovedInDjangoCMS60Warning,
             stacklevel=2,
         )
-        return self.render_placeholder(placeholder, language=language, page=page)
+        return self.render_placeholder(placeholder, language=language, obj=page)
 
     def render_plugin(self, instance, obj=None):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(instance.placeholder_id, {})
