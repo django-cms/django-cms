@@ -880,12 +880,12 @@ class Modal {
         // eslint-disable-next-line complexity
         iframe.on('load', function() {
             clearTimeout(loaderTimeout);
-            var messages;
-            var messageList;
-            var contents;
-            var body;
-            var innerTitle;
-            var bc;
+            let messages;
+            let messageList;
+            let contents;
+            let body;
+            let innerTitle;
+            let bc;
 
             // check if iframe can be accessed
             try {
@@ -914,7 +914,8 @@ class Modal {
 
             // If the response contains the close-frame (and potentially the data bridge),
             // the form was saved successfully
-            that.saved = that.saved || body.hasClass('cms-close-frame');
+            that.saved = that.saved || body.hasClass('cms-close-frame')
+                || body.find('script#django-admin-popup-response-constants').length > 0;
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
@@ -948,7 +949,8 @@ class Modal {
                 });
             }
 
-            var saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length);
+            let saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length) ||
+                body.find('script#django-admin-popup-response-constants').length > 0;
 
             // in case message didn't appear, assume that admin page is actually a success
             // istanbul ignore if
@@ -1071,11 +1073,6 @@ class Modal {
                         }
                     }
                 });
-
-                // figure out if .object-tools is available
-                if (contents.find('.object-tools').length) {
-                    contents.find('#content').css('padding-top', 38); // eslint-disable-line
-                }
 
                 // this is required for IE11. we assume that when the modal is opened the user is going to interact
                 // with it. if we don't focus the body directly the next time the user clicks on a field inside

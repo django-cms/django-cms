@@ -1,8 +1,10 @@
+import warnings
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Template, TemplateSyntaxError
+from django.template import Template, TemplateSyntaxError, engines
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -138,6 +140,39 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
         phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
         self.assertListEqual(phs, sorted(["two", "new_one", "base_outside"]))
+
+    def test_placeholder_scanning_unresolvable_extends_variable(self):
+        """
+        Test that _scan_placeholders gracefully handles extends tags with
+        unresolvable variables (like CMS_TEMPLATE without a default).
+        Issue #8334.
+        """
+        # Template with an extends tag using a variable that won't be in the context
+        template_str = (
+            '{% extends CMS_TEMPLATE %}{% load cms_tags %}{% block content %}{% placeholder "slot" %}{% endblock %}'
+        )
+        tpl = Template(template_str)
+
+        # Should not raise TemplateSyntaxError, just return empty list
+        nodes = _scan_placeholders(tpl.nodelist)
+        slots = [node.get_declaration().slot for node in nodes]
+        self.assertEqual(slots, [])
+
+    def test_placeholder_scanning_nonexistent_template_extends(self):
+        """
+        Test that _scan_placeholders gracefully handles extends tags pointing
+        to nonexistent templates.
+        Regression test for issue #8334.
+        """
+        # Template extending a nonexistent template
+        t = Template(
+            '{% extends "nonexistent_template.html" %}{% load cms_tags %}'
+            '{% block content %}{% placeholder "test_slot" %}{% endblock %}'
+        )
+        # Should not raise TemplateDoesNotExist, just return empty list
+        nodes = _scan_placeholders(t.nodelist)
+        slots = [node.get_declaration().slot for node in nodes]
+        self.assertEqual(slots, [])
 
     def test_placeholder_scanning_no_object(self):
         """Placeholder scanning for a template without a toolbar object raises PlaceholderNotFound"""
@@ -1191,7 +1226,7 @@ class PlaceholderConfTests(TestCase):
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
-            plugins = list(plugin_pool.get_all_plugins(placeholder, page))
+            plugins = list(plugin_pool.get_all_plugins(placeholder.slot, placeholder.source))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
 
@@ -1209,7 +1244,7 @@ class PlaceholderConfTests(TestCase):
         }
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=conf):
-            plugins = list(plugin_pool.get_all_plugins(placeholder, page))
+            plugins = list(plugin_pool.get_all_plugins(placeholder.slot, placeholder.source))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
 
@@ -1539,3 +1574,104 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
             new_tree = self.get_plugins().values_list("pk", "position")
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
+
+    def test_scan_placeholders_basic(self):
+        """
+        Test that _scan_placeholders finds placeholders in a simple template.
+        """
+        template_str = '{% load cms_tags %}{% placeholder "slot2" %}{% placeholder "slot1" %}'
+        tpl = Template(template_str)
+        nodes = _scan_placeholders(tpl.nodelist)
+        slots = [node.get_declaration().slot for node in nodes]
+        assert slots == ["slot2", "slot1"]
+
+    def test_scan_placeholders_include(self):
+        """
+        Test that _scan_placeholders finds placeholders in included templates.
+        """
+
+        django_engine = engines["django"]
+        tpl_main = django_engine.from_string('{% load cms_tags %}{% include "included_template.html" %}')
+        tpl_included = django_engine.from_string('{% load cms_tags %}{% placeholder "included_slot" %}')
+        # Patch get_template to return our included template
+        import cms.utils.placeholder as placeholder_utils
+
+        orig_get_template = placeholder_utils.get_template
+
+        def fake_get_template(name):
+            if name == "included_template.html":
+                return tpl_included
+            return orig_get_template(name)
+
+        try:
+            placeholder_utils.get_template = fake_get_template
+            nodelist = getattr(tpl_main, "nodelist", getattr(tpl_main, "template", tpl_main).nodelist)
+            nodes = _scan_placeholders(nodelist)
+            slots = [node.get_declaration().slot for node in nodes]
+            self.assertEqual(slots, ["included_slot"])
+        finally:
+            placeholder_utils.get_template = orig_get_template
+
+    def test_scan_placeholders_extends_and_blocks(self):
+        """
+        Test that _scan_placeholders finds placeholders in extended templates and blocks.
+        """
+        django_engine = engines["django"]
+        tpl_base = django_engine.from_string(
+            '{% load cms_tags %}{% block content %}{% placeholder "base_slot" %}{% endblock %}'
+        )
+        tpl_child = django_engine.from_string(
+            '{% extends "base_template.html" %}{% load cms_tags %}{% block content %}{% placeholder "child_slot" %}{{ block.super }}{% endblock %}'
+        )
+        orig_find_template = django_engine.engine.find_template
+
+        def fake_find_template(name, skip=None):
+            if name == "base_template.html":
+                return tpl_base, None
+            return orig_find_template(name, skip=skip)
+
+        try:
+            django_engine.engine.find_template = fake_find_template
+            nodelist = getattr(tpl_child, "nodelist", getattr(tpl_child, "template", tpl_child).nodelist)
+            nodes = _scan_placeholders(nodelist)
+            slots = [node.get_declaration().slot for node in nodes]
+            self.assertEqual(sorted(slots), ["base_slot", "child_slot"])
+        finally:
+            django_engine.engine.find_template = orig_find_template
+
+    def test_scan_placeholders_ignore_variable_include(self):
+        """
+        Edge case: _scan_placeholders should skip includes with variable template names.
+        """
+        template_str = '{% load cms_tags %}{% include some_var %}{% placeholder "slotA" %}'
+        tpl = Template(template_str)
+        nodes = _scan_placeholders(getattr(tpl, "nodelist", getattr(tpl, "template", tpl).nodelist))
+        slots = [node.get_declaration().slot for node in nodes]
+        assert slots == ["slotA"]
+
+    def test_scan_placeholders_duplicate_slots_warns(self):
+        """
+        Edge case: duplicate placeholder slots should raise a warning when using get_placeholders.
+        """
+        template_str = '{% load cms_tags %}{% placeholder "dup_slot" %}{% placeholder "dup_slot" %}'
+        tpl_dup = Template(template_str)
+        import cms.utils.placeholder as placeholder_utils
+
+        orig_get_template = placeholder_utils.get_template
+
+        def fake_get_template(name):
+            if name == "duplicate_test.html":
+                return tpl_dup
+            return orig_get_template(name)
+
+        try:
+            placeholder_utils.get_template = fake_get_template
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                placeholders = get_placeholders("duplicate_test.html")
+                slots = [pl.slot for pl in placeholders]
+                # Duplicates should be collapsed to a single slot, warning emitted
+                self.assertEqual(slots, ["dup_slot"])
+                self.assertTrue(any(isinstance(warn.message, DuplicatePlaceholderWarning) for warn in w))
+        finally:
+            placeholder_utils.get_template = orig_get_template

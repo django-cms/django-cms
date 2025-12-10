@@ -147,10 +147,6 @@ Save the template and return to your browser. Refresh any page in Structure
 mode, then go to the "Aliases.." entry in the site menu and you'll see the new
 static alias listed in its category "Static alias".
 
-.. image:: images/static-alias.png
-   :alt: a static placeholder
-   :align: center
-
 ..  note::
 
     Like editing of pages and aliases publishing is independent.
