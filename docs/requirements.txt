@@ -38,7 +38,7 @@ coverage==7.7.0
     # via -r requirements.in
 datetime==5.5
     # via -r requirements.in
-django==4.2.26
+django==4.2.27
     # via
     #   -r requirements.in
     #   django-classy-tags
@@ -170,7 +170,7 @@ toml==0.10.2
     # via docstrfmt
 typing-extensions==4.12.2
     # via beautifulsoup4
-urllib3==2.5.0
+urllib3==2.6.0
     # via requests
 uvicorn==0.34.0
     # via sphinx-autobuild
