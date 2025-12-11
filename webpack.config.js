@@ -3,7 +3,9 @@ var path = require('path');
 var TerserPlugin = require('terser-webpack-plugin');
 var LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
 
-const cmsCopyright = `Copyright (c) 2008-present, Batiste Bieler
+const cmsCopyright = `Copyright (c) 2008, Batiste Bieler
+Copyright (c) 2008-2020, Divio AG and contributors
+Copyright (c) 2020-present, django CMS Association and contributors
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
