@@ -799,3 +799,159 @@ class RenderingTestCase(CMSTestCase):
         for plugin in plugins:
             start_tag = tag_format.format(plugin.pk, plugin.placeholder_id, plugin.position)
             self.assertIn(start_tag, output)
+
+
+@override_settings(
+    CMS_TEMPLATES=[
+        (TEMPLATE_NAME, TEMPLATE_NAME),
+    ],
+)
+class RenderedPlaceholderTestCase(CMSTestCase):
+    """Test cases for the RenderedPlaceholder class"""
+
+    def test_rendered_placeholder_init(self):
+        """Test RenderedPlaceholder initialization"""
+        from cms.plugin_rendering import RenderedPlaceholder
+
+        page = create_page("Test", TEMPLATE_NAME, "en")
+        placeholder = page.get_placeholders("en").first()
+
+        rendered_placeholder = RenderedPlaceholder(
+            placeholder=placeholder,
+            language="en",
+            site_id=1,
+            cached=True,
+            editable=False,
+            has_content=True,
+        )
+
+        self.assertEqual(rendered_placeholder.placeholder, placeholder)
+        self.assertEqual(rendered_placeholder.language, "en")
+        self.assertEqual(rendered_placeholder.site_id, 1)
+        self.assertTrue(rendered_placeholder.cached)
+        self.assertFalse(rendered_placeholder.editable)
+        self.assertTrue(rendered_placeholder.has_content)
+
+    def test_rendered_placeholder_equality(self):
+        """Test RenderedPlaceholder equality comparison"""
+        from cms.plugin_rendering import RenderedPlaceholder
+
+        page = create_page("Test", TEMPLATE_NAME, "en")
+        placeholders = page.get_placeholders("en")
+        placeholder1 = placeholders[0]
+
+        # Create two RenderedPlaceholder instances with same placeholder
+        # but different parameters
+        rendered1 = RenderedPlaceholder(
+            placeholder=placeholder1,
+            language="en",
+            site_id=1,
+            cached=True,
+            editable=True,
+        )
+
+        rendered2 = RenderedPlaceholder(
+            placeholder=placeholder1,
+            language="de",
+            site_id=2,
+            cached=False,
+            editable=False,
+        )
+
+        # They should be equal because they represent the same placeholder
+        self.assertEqual(rendered1, rendered2)
+
+    def test_rendered_placeholder_inequality(self):
+        """Test RenderedPlaceholder inequality comparison"""
+        from cms.plugin_rendering import RenderedPlaceholder
+
+        page = create_page("Test", TEMPLATE_NAME, "en")
+        placeholders = list(page.get_placeholders("en"))
+
+        # Need at least 2 placeholders
+        if len(placeholders) < 2:
+            self.skipTest("Template needs at least 2 placeholders")
+
+        placeholder1 = placeholders[0]
+        placeholder2 = placeholders[1]
+
+        rendered1 = RenderedPlaceholder(
+            placeholder=placeholder1,
+            language="en",
+            site_id=1,
+        )
+
+        rendered2 = RenderedPlaceholder(
+            placeholder=placeholder2,
+            language="en",
+            site_id=1,
+        )
+
+        # They should not be equal because they represent different placeholders
+        self.assertNotEqual(rendered1, rendered2)
+
+    def test_rendered_placeholder_hash(self):
+        """Test RenderedPlaceholder hash functionality"""
+        from cms.plugin_rendering import RenderedPlaceholder
+
+        page = create_page("Test", TEMPLATE_NAME, "en")
+        placeholder = page.get_placeholders("en").first()
+
+        rendered1 = RenderedPlaceholder(
+            placeholder=placeholder,
+            language="en",
+            site_id=1,
+        )
+
+        rendered2 = RenderedPlaceholder(
+            placeholder=placeholder,
+            language="de",
+            site_id=2,
+        )
+
+        # Hash should be the same because it's based on the placeholder
+        self.assertEqual(hash(rendered1), hash(rendered2))
+        self.assertEqual(hash(rendered1), hash(placeholder))
+
+    def test_rendered_placeholder_in_set(self):
+        """Test RenderedPlaceholder can be used in a set"""
+        from cms.plugin_rendering import RenderedPlaceholder
+
+        page = create_page("Test", TEMPLATE_NAME, "en")
+        placeholder = page.get_placeholders("en").first()
+
+        rendered1 = RenderedPlaceholder(
+            placeholder=placeholder,
+            language="en",
+            site_id=1,
+        )
+
+        rendered2 = RenderedPlaceholder(
+            placeholder=placeholder,
+            language="de",
+            site_id=2,
+        )
+
+        # Adding both to a set should result in only one item
+        # because they represent the same placeholder
+        placeholder_set = {rendered1, rendered2}
+        self.assertEqual(len(placeholder_set), 1)
+
+    def test_rendered_placeholder_default_values(self):
+        """Test RenderedPlaceholder default parameter values"""
+        from cms.plugin_rendering import RenderedPlaceholder
+
+        page = create_page("Test", TEMPLATE_NAME, "en")
+        placeholder = page.get_placeholders("en").first()
+
+        # Create with minimal required parameters
+        rendered = RenderedPlaceholder(
+            placeholder=placeholder,
+            language="en",
+            site_id=1,
+        )
+
+        # Check default values
+        self.assertFalse(rendered.cached)
+        self.assertFalse(rendered.editable)
+        self.assertFalse(rendered.has_content)

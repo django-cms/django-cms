@@ -24,6 +24,7 @@ from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import EmptyPageContent, Placeholder
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 
 if TYPE_CHECKING:
@@ -66,13 +67,15 @@ def _get_placeholder_settings():
             raise ImproperlyConfigured(f"Circular inheritance detected in CMS_PLACEHOLDER_CONF at key '{key}'")
         visited.add(key)
         if "inherit" in conf[key]:
-            return resolve_inheritance(conf[key]['inherit'], visited) | {k: v for k, v in conf.items() if k != "inherit"}
+            return resolve_inheritance(conf[key]["inherit"], visited) | {
+                k: v for k, v in conf.items() if k != "inherit"
+            }
         return conf[key]
 
     new_conf = {}
     for key, value in conf.items():
         if "inherit" in value:
-            new_conf[key] = resolve_inheritance(value['inherit'])
+            new_conf[key] = resolve_inheritance(value["inherit"])
             new_conf[key].update({k: v for k, v in value.items() if k != "inherit"})
         else:
             new_conf[key] = value
@@ -124,7 +127,7 @@ def get_placeholder_conf(setting: str, placeholder: str, template: str | None = 
     return default
 
 
-def get_toolbar_plugin_struct(plugins, slot=None, page=None):
+def get_toolbar_plugin_struct(plugins, slot=None, obj=None, page=None):
     """
     Return the list of plugins to render in the toolbar.
     The dictionary contains the label, the classname and the module for the
@@ -139,8 +142,17 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     """
     template = None
 
-    if page and hasattr(page, "get_template"):
-        template = page.get_template()
+    obj = obj or page
+    if page:
+        import warnings
+
+        warnings.warn(
+            "The 'page' argument is deprecated. Please use 'obj' instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
+    if obj and hasattr(obj, "get_template"):
+        template = obj.get_template()
 
     modules = get_placeholder_conf("plugin_modules", slot, template, default={})
     names = get_placeholder_conf("plugin_labels", slot, template, default={})
@@ -163,9 +175,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
 
 def validate_placeholder_name(name):
     if not isinstance(name, str):
-        raise ImproperlyConfigured(
-            "Placeholder identifier names need to be of type string. "
-        )
+        raise ImproperlyConfigured("Placeholder identifier names need to be of type string. ")
 
     try:
         name.encode("ascii")
@@ -188,9 +198,7 @@ def restore_sekizai_context(context, changes):
             sekizai_namespace.append(value)
 
 
-def _scan_placeholders(
-    nodelist, node_class=None, current_block=None, ignore_blocks=None
-):
+def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blocks=None):
     from cms.templatetags.cms_tags import Placeholder
 
     if not node_class:
@@ -226,22 +234,22 @@ def _scan_placeholders(
                             continue
                 else:
                     template = node.template
-                nodes += _scan_placeholders(
-                    _get_nodelist(template), node_class, current_block
-                )
+                nodes += _scan_placeholders(_get_nodelist(template), node_class, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
-            nodes += _get_placeholder_nodes_from_extend(node, node_class)
+            try:
+                nodes += _get_placeholder_nodes_from_extend(node, node_class)
+            except (TemplateSyntaxError, TemplateDoesNotExist):
+                # If the extends tag uses a variable that's not available in the
+                # scanning context (like CMS_TEMPLATE), we can't resolve the parent
+                # template. Skip scanning this extends node.
+                continue
         # in block nodes we have to scan for super blocks
         elif isinstance(node, VariableNode) and current_block:
             if node.filter_expression.token == "block.super":
                 if not hasattr(current_block.super, "nodelist"):
-                    raise TemplateSyntaxError(
-                        "Cannot render block.super for blocks without a parent."
-                    )
-                nodes += _scan_placeholders(
-                    _get_nodelist(current_block.super), node_class, current_block.super
-                )
+                    raise TemplateSyntaxError("Cannot render block.super for blocks without a parent.")
+                nodes += _scan_placeholders(_get_nodelist(current_block.super), node_class, current_block.super)
         # ignore nested blocks which are already handled
         elif isinstance(node, BlockNode) and node.name in ignore_blocks:
             continue
@@ -254,9 +262,7 @@ def _scan_placeholders(
                     if isinstance(subnodelist, NodeList):
                         if isinstance(node, BlockNode):
                             current_block = node
-                        nodes += _scan_placeholders(
-                            subnodelist, node_class, current_block, ignore_blocks
-                        )
+                        nodes += _scan_placeholders(subnodelist, node_class, current_block, ignore_blocks)
         # else just scan the node for nodelist instance attributes
         else:
             for attr in dir(node):
@@ -264,13 +270,11 @@ def _scan_placeholders(
                 if isinstance(obj, NodeList):
                     if isinstance(node, BlockNode):
                         current_block = node
-                    nodes += _scan_placeholders(
-                        obj, node_class, current_block, ignore_blocks
-                    )
+                    nodes += _scan_placeholders(obj, node_class, current_block, ignore_blocks)
     return nodes
 
 
-def get_placeholders(template: str) -> list['DeclaredPlaceholder']:
+def get_placeholders(template: str) -> list["DeclaredPlaceholder"]:
     compiled_template = get_template(template)
 
     placeholders = []
@@ -340,15 +344,11 @@ def _get_placeholder_nodes_from_extend(extend_node, node_class):
     placeholders = []
 
     for block in block_nodes.values():
-        placeholders.extend(
-            _scan_placeholders(_get_nodelist(block), node_class, block, block_names)
-        )
+        placeholders.extend(_scan_placeholders(_get_nodelist(block), node_class, block, block_names))
 
     # Scan topmost template for placeholder outside of blocks
     parent_template = _find_topmost_template(extend_node)
-    placeholders += _scan_placeholders(
-        _get_nodelist(parent_template), node_class, None, block_names
-    )
+    placeholders += _scan_placeholders(_get_nodelist(parent_template), node_class, None, block_names)
     return placeholders
 
 
@@ -369,14 +369,17 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
 
     # Fill in existing placeholders
     placeholders.update(
-        {placeholder.slot: placeholder for placeholder in Placeholder.objects.get_for_obj(obj)
-         if placeholder.slot in placeholders}
+        {
+            placeholder.slot: placeholder
+            for placeholder in Placeholder.objects.get_for_obj(obj)
+            if placeholder.slot in placeholders
+        }
     )
 
     # Create missing placeholders
     new_placeholders = [
         Placeholder(slot=slot, source=obj) for slot, placeholder in placeholders.items() if placeholder is None
-        ]
+    ]
     if new_placeholders:
         if connection.features.can_return_rows_from_bulk_insert:
             Placeholder.objects.bulk_create(new_placeholders)
@@ -395,7 +398,7 @@ def rescan_placeholders_for_obj(obj: models.Model) -> dict[str, Placeholder]:
     return placeholders
 
 
-def get_declared_placeholders_for_obj(obj: models.Model | EmptyPageContent | None) -> list['DeclaredPlaceholder']:
+def get_declared_placeholders_for_obj(obj: models.Model | EmptyPageContent | None) -> list["DeclaredPlaceholder"]:
     """Returns declared placeholders for an object. The object is supposed to either have a method
     ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns

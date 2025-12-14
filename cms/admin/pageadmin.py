@@ -17,6 +17,7 @@ from django.core.exceptions import (
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
+from django.forms import ModelForm
 from django.forms.fields import IntegerField
 from django.http import (
     Http404,
@@ -214,14 +215,14 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         url_patterns = [
             pat(r"^list/$", self.get_list),
-            pat(r"^([0-9]+)/actions-menu/$", self.actions_menu),
+            pat(r"^(?P<object_id>[0-9]+)/actions-menu/$", self.actions_menu),
             pat(r"^([0-9]+)/([a-z\-]+)/edit-field/$", self.edit_title_fields),
-            pat(r"^([0-9]+)/advanced-settings/$", self.advanced),
+            pat(r"^(?P<object_id>[0-9]+)/advanced-settings/$", self.advanced),  # named object_id
             pat(r"^([0-9]+)/move-page/$", self.move_page),
             pat(r"^([0-9]+)/copy-page/$", self.copy_page),
             pat(r"^([0-9]+)/dialog/copy/$", self.get_copy_dialog),  # copy dialog
             pat(r"^([0-9]+)/permissions/$", self.get_permissions),
-            pat(r"^([0-9]+)/set-home/$", self.set_home),
+            pat(r"^(?P<object_id>[0-9]+)/set-home/$", self.set_home),
         ]
 
         if plugin_pool.registered_plugins:
@@ -237,6 +238,19 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if can_change_perms:
             return super().get_inline_instances(request, obj)
         return []
+
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Get PageForm for the Page model and modify its fields depending on
+        the request.
+        """
+        if not self.has_change_advanced_settings_permission(request, obj=obj):
+            form = type("EmptyForm", (ModelForm,), {"Meta": type("Meta", (self.form.Meta,), {"fields": []})})
+        else:
+            form = super().get_form(request, obj, **kwargs)
+        form._site = get_site_from_request(request)
+        form._request = request
+        return form
 
     def actions_menu(self, request, object_id, extra_context=None):
         page = self.get_object(request, object_id=object_id)
@@ -272,9 +286,6 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     def advanced(self, request, object_id):
         page = self.get_object(request, object_id=object_id)
 
-        if not self.has_change_advanced_settings_permission(request, obj=page):
-            raise PermissionDenied("No permission for editing advanced settings")
-
         if page is None:
             raise self._get_404_exception(object_id)
 
@@ -282,7 +293,16 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             show_permissions = self.has_change_permissions_permission(request, obj=page)
         else:
             show_permissions = False
-        context = {"title": _("Advanced Settings"), "show_permissions": show_permissions}
+
+        show_advanced_settings = self.has_change_advanced_settings_permission(request, obj=page)
+
+        if not show_permissions and not show_advanced_settings:
+            raise PermissionDenied("No permission for editing advanced settings")
+
+        context = {
+            "title": _("Advanced Settings") if show_advanced_settings else _("Change Permissions"),
+            "show_permissions": show_permissions,
+       }
         return self.change_view(request, object_id, extra_context=context)
 
     def response_post_save_change(self, request, obj):
@@ -1325,6 +1345,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         user_can_add = page_permissions.user_can_add_subpage
         user_can_change = page_permissions.user_can_change_page
         user_can_change_advanced = page_permissions.user_can_change_page_advanced_settings
+        user_can_change_permissions = page_permissions.user_can_change_page_permissions
 
         def render_page_row(page):
             page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations}
@@ -1354,7 +1375,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 "is_popup": is_popup,
                 "has_add_page_permission": user_can_add(request.user, target=page),
                 "has_change_permission": user_can_change(request.user, page, site),
-                "has_change_advanced_settings_permission": user_can_change_advanced(request.user, page, site),
+                "has_change_advanced_settings_permission": (
+                    user_can_change_advanced(request.user, page, site) or user_can_change_permissions(request.user, page, site)
+                ),
                 "has_move_page_permission": has_move_page_permission,
             }
             context["is_concrete"] = context["page_content"].language == language
