@@ -47,16 +47,16 @@
     @include icon(edit);
     inset-inline-end: $submenu-right * 3 + $submenu-icon-area-size * 2;
 }
-.cms-submenu-edit-new {
-    @include icon(edit-new);
-    inset-inline-end: $submenu-right * 3 + $submenu-icon-area-size * 2;
+.cms-submenu-edit-obj {
+    @include icon(edit);
+    inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
 }
 .cms-submenu-add {
     @include icon(plus);
     inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
 }
 .cms-submenu-edit,
-.cms-submenu-edit-new,
+.cms-submenu-edit-obj,
 .cms-submenu-add {
     &:before {
         margin-left: math.div(-$icon-size, 2);
