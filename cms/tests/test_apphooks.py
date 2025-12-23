@@ -6,10 +6,11 @@ from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
 from django.core.checks.urls import check_url_config
+from django.http import Http404, HttpResponse
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
 from django.utils.timezone import now
-from django.utils.translation import override as force_language
+from django.utils.translation import activate, override as force_language
 
 from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_page_content
@@ -31,7 +32,11 @@ APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
 MENU_MODULE = "cms.test_utils.project.sampleapp.cms_menus"
 
 
-class ApphooksTestCase(CMSTestCase):
+class BaseApphooksTestCase(CMSTestCase):
+    """
+    Test cases for apphooks
+    """
+
     def setUp(self):
         clear_app_resolvers()
         clear_url_caches()
@@ -74,6 +79,8 @@ class ApphooksTestCase(CMSTestCase):
             if module in sys.modules:
                 del sys.modules[module]
 
+
+class ApphooksTestCase(BaseApphooksTestCase):
     def create_base_structure(self, apphook, content_langs, namespace=None):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
@@ -798,7 +805,7 @@ class ApphooksTestCase(CMSTestCase):
 
             self.user = self._create_user('admin_staff', True, True)
             with self.login_user_context(self.user):
-                response = self.client.get(path + "?edit")
+                response = self.client.get(path + "?toolbar_on")
 
             request = response.context['request']
             toolbar = request.toolbar
@@ -809,7 +816,7 @@ class ApphooksTestCase(CMSTestCase):
 
             self.user = self._create_user('staff', True, False)
             with self.login_user_context(self.user):
-                response = self.client.get(path + "?edit")
+                response = self.client.get(path + "?toolbar_on")
 
             request = response.context['request']
             request.user = get_user_model().objects.get(pk=self.user.pk)
@@ -821,7 +828,7 @@ class ApphooksTestCase(CMSTestCase):
 
             self.user.user_permissions.add(Permission.objects.get(codename='change_example1'))
             with self.login_user_context(self.user):
-                response = self.client.get(path + "?edit")
+                response = self.client.get(path + "?toolbar_on")
 
             request = response.context['request']
             request.user = get_user_model().objects.get(pk=self.user.pk)
@@ -833,7 +840,7 @@ class ApphooksTestCase(CMSTestCase):
 
             self.user.user_permissions.add(Permission.objects.get(codename='use_structure'))
             with self.login_user_context(self.user):
-                response = self.client.get(path + "?edit")
+                response = self.client.get(path + "?toolbar_on")
 
             request = response.context['request']
             request.user = get_user_model().objects.get(pk=self.user.pk)
@@ -1081,3 +1088,80 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
 
         self.apphook_clear()
+
+
+@override_settings(SITE_ID="")
+class ApphooksSiteTestCase(BaseApphooksTestCase):
+    """
+    Test cases for apphooks in a multisite configuration using a single instance. Sites
+    are mocked for the test, in reality either taken from the request or from a middleware.
+
+    These test cases verify that apphooks are only accessible on their respective sites
+    when multiple sites are configured in Django CMS.
+    """
+
+    def create_pages(self):
+        self.apphook_clear()
+        self.site1 = Site.objects.get(pk=1)
+        self.site2 = Site.objects.create(domain='otherserver', name='Site 2')
+
+        superuser = self.get_superuser()
+        self.page1 = create_page("Page 1", "nav_playground.html", "de", site=self.site1, apphook='SampleApp', created_by=superuser)
+        create_page_content("en", "en_title", self.page1, slug="page-1")
+        self.page2 = create_page("Page 2", "nav_playground.html", "de", site=self.site1, created_by=superuser)
+        self.page3 = create_page("Page 3", "nav_playground.html", "de", site=self.site2, apphook='SampleApp', created_by=superuser)
+        self.page4 = create_page("Page 4", "nav_playground.html", "de", site=self.site2, created_by=superuser)
+        self.page2.set_as_homepage()
+        self.page4.set_as_homepage()
+        activate("de")
+
+    def get_for_site(self, site, url):
+        resolver_match = resolve(url)
+        request = self.get_request(url)
+        request.META["host"] = f"{site.domain}:80"
+        request.site = site
+        request.resolver_match = resolver_match
+        try:
+            return resolver_match.func(request, *resolver_match.args, **resolver_match.kwargs)
+        except Http404 as e:
+            return HttpResponse(str(e), status=404)
+
+    def test_apphook_access_on_site1(self):
+        self.create_pages()
+
+        # Verify that the cms_site_filter decorator was called
+        url = self.page1.get_absolute_url("de")
+
+        response = self.get_for_site(self.site1, url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.get_for_site(self.site1, '/de/page-3/')
+        self.assertEqual(response.status_code, 404)  # Sollte nicht erreichbar sein
+
+    def test_apphook_access_on_site2(self):
+        self.create_pages()
+
+        # Verify that the cms_site_filter decorator was called
+        url = self.page3.get_absolute_url("de")
+
+        response = self.get_for_site(self.site2, url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.get_for_site(self.site2, '/de/page-1/')
+        self.assertEqual(response.status_code, 404)  # Sollte nicht erreichbar sein
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_site_filter_preserves_view_name(self):
+        self.create_pages()
+
+        view_names = (
+            ('sample-settings', 'sample_view'),
+            ('sample-class-view', 'ClassView'),
+            ('sample-class-based-view', 'view'),
+        )
+
+        with force_language("de"):
+            for url_name, view_name in view_names:
+                path = reverse(url_name)
+                match = resolve(path)
+                self.assertEqual(match.func.__name__, view_name)

@@ -1,21 +1,17 @@
-import os
-import shutil
 import sys
-import tempfile
-import uuid
 from io import StringIO
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
-from django.core.management import CommandError, execute_from_command_line
+from django.core.management import CommandError
 from django.db import models
 from django.test.utils import override_settings
 from djangocms_text.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models import Page
+from cms.models import Page, PageUrl
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
@@ -346,6 +342,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         """
         site = 1
         number_start_plugins = CMSPlugin.objects.all().count()
+        number_urls = PageUrl.objects.filter(language='en').count()
 
         out = StringIO()
         management.call_command(
@@ -381,6 +378,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         self.assertEqual(stack_text_en.plugin_type, stack_text_de.plugin_type)
         self.assertEqual(stack_text_en.body, stack_text_de.body)
+
+        self.assertEqual(PageUrl.objects.filter(language='de').count(), number_urls)
 
     def test_copy_langs_no_content(self):
         """
@@ -651,6 +650,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             str(command_error.exception),
             'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES'
         )
+
 
 class DjangoCmsCommandTestCase(CMSTestCase):
     """

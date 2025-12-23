@@ -1,5 +1,3 @@
-import warnings
-
 from django import forms
 from django.apps import apps
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -46,6 +44,7 @@ from cms.operations.helpers import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
+from cms.utils import get_current_site
 from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
@@ -905,7 +904,7 @@ class PageTreeForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.page = kwargs.pop("page")
-        self._site = kwargs.pop("site", Site.objects.get_current())
+        self._site = kwargs.pop("site", self.page.site)
         super().__init__(*args, **kwargs)
         self.fields["target"].queryset = Page.objects.filter(
             site=self._site,
@@ -1030,7 +1029,6 @@ class MovePageForm(PageTreeForm):
 
 
 class CopyPageForm(PageTreeForm):
-    source_site = forms.ModelChoiceField(queryset=Site.objects.all(), required=True)
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
     def copy_page(self, user):
@@ -1111,6 +1109,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
     level or under him in chosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
+    _page = None
 
     page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
@@ -1122,7 +1121,9 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         user = get_current_user()  # current user from threadlocals
-        site = Site.objects.get_current()
+
+        site_id = getattr(self._page, "site_id", None)
+        site = Site.objects._get_site_by_id(site_id) if site_id else None
         sub_users = get_subordinate_users(user, site)
 
         limit_choices = True
@@ -1433,8 +1434,8 @@ class PluginAddValidationForm(forms.Form):
         position = data["plugin_position"]
         placeholder = data["placeholder_id"]
         parent_plugin = data.get("plugin_parent")
-
-        if language not in get_language_list():
+        site = get_current_site(getattr(self, "_request", None))
+        if language not in get_language_list(site_id=site.pk):
             message = gettext("Language must be set to a supported language!")
             self.add_error("plugin_language", message)
             return self.cleaned_data

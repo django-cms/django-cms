@@ -83,7 +83,7 @@ def details(request, slug):
             return response
 
     # Get a Page model object from the request
-    site = get_current_site()
+    site = get_current_site(request)
     page = get_page_from_request(request, use_path=slug)
 
     if not page and not slug and not Page.objects.on_site(site).exists():
@@ -109,6 +109,7 @@ def details(request, slug):
         return _handle_no_page(request)
 
     request.current_page = page
+    request.site = site
 
     if hasattr(request, 'user') and request.user.is_staff:
         user_languages = get_language_list(site_id=site.pk)
@@ -252,7 +253,7 @@ def render_object_structure(request, content_type_id, object_id):
 
     try:
         if issubclass(content_type.model_class(), PageContent):
-            content_type_obj = PageContent._base_manager.select_related("page").get(pk=object_id)
+            content_type_obj = PageContent._base_manager.select_related("page", "page__site").get(pk=object_id)
             request.current_page = content_type_obj.page
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -294,11 +295,12 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     try:
         if issubclass(model, PageContent):
             # An apphook might be attached to a PageContent object
-            content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
+            content_type_obj = model.admin_manager.select_related("page", "page__site").get(pk=object_id)
             request.current_page = content_type_obj.page
             if (
                 content_type_obj.page.application_urls and
-                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
+                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks()) and
+                (not require_editable or content_type_obj.is_editable(request))
             ):
                 try:
                     # If so, try get the absolute URL and pass it to the toolbar as request_path
@@ -325,6 +327,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
+    request.site = get_current_site(request)
 
     redirect = getattr(content_type_obj, "redirect", None)
     if isinstance(redirect, str):

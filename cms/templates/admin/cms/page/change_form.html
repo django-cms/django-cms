@@ -21,7 +21,7 @@
 
 {% block content_title %}
     {% if title %}<h1>{{ title }}</h1>{% endif %}
-    {% get_preview_url original as admin_url %}
+    {% get_edit_url original as admin_url %}
     {% if not popup and not add %}
         <ul class="object-tools hide-in-modal">
             <li>
@@ -30,13 +30,11 @@
         </ul>
     {% endif %}
 {% endblock %}
-
 {% block content %}
 <div id="content-main">
-
 {% block object-tools %}{% endblock %}
 
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{% if request.GET.parent_page %}&amp;parent_page={{ request.GET.parent_page }}{% endif %}{%if request.GET.source %}&amp;source={{ request.GET.source }}{% endif %}" method="post" id="{{ opts.model_name }}_form">
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{% if request.GET.site %}&amp;site={{ request.GET.site }}{% endif %}{% if request.GET.parent_page %}&amp;parent_page={{ request.GET.parent_page }}{% endif %}{%if request.GET.source %}&amp;source={{ request.GET.source }}{% endif %}" method="post" id="{{ opts.model_name }}_form">
 {% csrf_token %}
 {% block form_top %}{% endblock %}
 
@@ -65,15 +63,15 @@
     {% include "admin/cms/page/includes/fieldset.html" %}
 {% endfor %}
 
-{% for inline_admin_formset in inline_admin_formsets %}
-    {% include inline_admin_formset.opts.template %}
-{% endfor %}
-
 {% if show_permissions %}
+
+    {% for inline_admin_formset in inline_admin_formsets %}
+        {% include inline_admin_formset.opts.template %}
+    {% endfor %}
     <div class="inline-group">
         <div class="tabular inline-related">
             <fieldset id="inherited_permissions" class="module aligned collapse">
-              <h2>{% trans 'All permissions' %}</h2>
+              <h2 class="fieldset-heading">{% trans 'All permissions' %}</h2>
               <div class="loading" rel="../permissions/">{% trans 'Loading...' %}</div>
             </fieldset>
         </div>

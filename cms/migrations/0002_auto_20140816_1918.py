@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import cms.models.fields
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -8,7 +6,7 @@ import django.utils.timezone
 
 User = get_user_model()
 
-user_model_label = '%s.%s' % (User._meta.app_label, User._meta.model_name)
+user_model_label = '{}.{}'.format(User._meta.app_label, User._meta.model_name)
 user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
 
 CREATION_METHODS = (
@@ -67,7 +65,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='page',
-            unique_together=set([('publisher_is_draft', 'application_namespace'), ('reverse_id', 'site', 'publisher_is_draft')]),
+            unique_together={('publisher_is_draft', 'application_namespace'), ('reverse_id', 'site', 'publisher_is_draft')},
         ),
         migrations.AddField(
             model_name='cmsplugin',
@@ -112,7 +110,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='staticplaceholder',
-            unique_together=set([('code', 'site')]),
+            unique_together={('code', 'site')},
         ),
         migrations.CreateModel(
             name='Title',
@@ -140,7 +138,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='title',
-            unique_together=set([('language', 'page')]),
+            unique_together={('language', 'page')},
         ),
         migrations.CreateModel(
             name='UserSettings',

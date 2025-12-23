@@ -1,10 +1,13 @@
 name: django CMS test.yml
 
-on: 
+on:
   pull_request:
   push:
     branches:
       - main
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,27 +19,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
           django-5.1.txt,
           django-5.2.txt,
+          django-6.0.txt,
         ]
+        # On nightly runs, test all postgres versions. On push/PR, only test latest.
+        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["16"]') }}
         os: [
           ubuntu-latest,
         ]
         exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
-          - requirements-file: django-5.1.txt
-            python-version: 3.9
-          - requirements-file: django-5.2.txt
-            python-version: 3.9
+          # Python 3.14 only works with Django 5.2+
+          - python-version: '3.14'
+            requirements-file: django-4.2.txt
+          - python-version: '3.14'
+            requirements-file: django-5.0.txt
+          - python-version: '3.14'
+            requirements-file: django-5.1.txt
+          # Python 3.10 and 3.11 only supported until Django 5.2
+          - python-version: '3.10'
+            requirements-file: django-6.0.txt
+          - python-version: '3.11'
+            requirements-file: django-6.0.txt
 
     services:
       postgres:
-        image: postgres:latest
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -47,7 +59,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -70,9 +82,9 @@ jobs:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-postgres${{ matrix.postgres-version }}
         include-hidden-files: true
         path: '.coverage*'
 
@@ -81,27 +93,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
           django-5.1.txt,
           django-5.2.txt,
+          django-6.0.txt,
         ]
+        # On nightly runs, test all mysql versions. On push/PR, only test latest.
+        mysql-version: ${{ github.event_name == 'schedule' && fromJSON('["8.4", "9.5"]') || fromJSON('["8.4"]') }}
         os: [
           ubuntu-latest,
         ]
         exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
-          - requirements-file: django-5.1.txt
-            python-version: 3.9
-          - requirements-file: django-5.2.txt
-            python-version: 3.9
+          # Python 3.14 only works with Django 5.2+
+          - python-version: '3.14'
+            requirements-file: django-4.2.txt
+          - python-version: '3.14'
+            requirements-file: django-5.0.txt
+          - python-version: '3.14'
+            requirements-file: django-5.1.txt
+          # Python 3.10 and 3.11 only supported until Django 5.2
+          - python-version: '3.10'
+            requirements-file: django-6.0.txt
+          - python-version: '3.11'
+            requirements-file: django-6.0.txt
 
     services:
       mysql:
-        image: mysql:8.4
+        image: mysql:${{ matrix.mysql-version }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -111,7 +132,7 @@ jobs:
 
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -134,9 +155,9 @@ jobs:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-mysql${{ matrix.mysql-version }}
         include-hidden-files: true
         path: '.coverage*'
 
@@ -145,26 +166,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
           django-5.1.txt,
           django-5.2.txt,
+          django-6.0.txt,
         ]
         os: [
           ubuntu-latest,
         ]
         exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
-          - requirements-file: django-5.1.txt
-            python-version: 3.9
-          - requirements-file: django-5.2.txt
-            python-version: 3.9
+          # Python 3.14 only works with Django 5.2+
+          - python-version: '3.14'
+            requirements-file: django-4.2.txt
+          - python-version: '3.14'
+            requirements-file: django-5.0.txt
+          - python-version: '3.14'
+            requirements-file: django-5.1.txt
+          # Python 3.10 and 3.11 only supported until Django 5.2
+          - python-version: '3.10'
+            requirements-file: django-6.0.txt
+          - python-version: '3.11'
+            requirements-file: django-6.0.txt
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -186,7 +214,7 @@ jobs:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
         include-hidden-files: true
@@ -204,7 +232,7 @@ jobs:
         ]
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -225,7 +253,7 @@ jobs:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
         include-hidden-files: true
@@ -236,15 +264,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.12', '3.13', '3.14']
         requirements-file: ['requirement_base_django_main.txt']
+        # On nightly runs, test all postgres versions. On push/PR, only test latest.
+        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["18"]') }}
         os: [
           ubuntu-latest,
         ]
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -255,7 +285,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -280,9 +310,9 @@ jobs:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-postgres${{ matrix.postgres-version }}
         include-hidden-files: true
         path: '.coverage*'
 
@@ -291,15 +321,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.12', '3.13', '3.14']
         requirements-file: ['requirement_base_django_main.txt']
+        # On nightly runs, test all mysql versions. On push/PR, only test latest.
+        mysql-version: ${{ github.event_name == 'schedule' && fromJSON('["8.4", "9.5"]') || fromJSON('["9.5"]') }}
         os: [
           ubuntu-latest,
         ]
 
     services:
       mysql:
-        image: mysql:8.4
+        image: mysql:${{ matrix.mysql-version }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -309,7 +341,7 @@ jobs:
 
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -333,9 +365,9 @@ jobs:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
 
     - name: Upload coverage data
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
-        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}
+        name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-mysql${{ matrix.mysql-version }}
         include-hidden-files: true
         path: '.coverage*'
 
@@ -350,10 +382,10 @@ jobs:
     ]
     strategy:
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.13']
         os: [ ubuntu-latest, ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         name: Set up Python ${{ matrix.python-version }}
 
       - uses: actions/setup-python@v6
@@ -364,7 +396,7 @@ jobs:
         run: python -m pip install --upgrade coverage[toml]
 
       - name: Download data
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           pattern: coverage-data-*
           merge-multiple: true
@@ -380,7 +412,7 @@ jobs:
 
       - name: Upload HTML report (for debugging)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: html-report
           path: htmlcov

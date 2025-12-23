@@ -9,6 +9,8 @@
     position: fixed;
     top: 50%;
     left: 50%;
+    max-width: unset;
+    max-height: unset;
     overflow: hidden;
     z-index: z(modal, base);
     border-radius: $modal-border-radius;
@@ -87,6 +89,7 @@
 
 .cms-modal-foot {
     position: absolute;
+    background-color: $white;
     overflow: hidden;
     clear: both;
     height: $modal-footer-height;
@@ -261,21 +264,19 @@
 .cms-modal-item-buttons {
     $margin: math.div($toolbar-height - $toolbar-button-height, 2);
     @extend .cms-toolbar-item-buttons;
-    float: right;
-    &:dir(rtl) {
-        float: left;
-    }
     margin-inline-start: $margin;
+    display: inline-block;
 
     .cancel-link {
         display: none;
     }
+    float: inline-end;
+    &:has(.deletelink) {
+        float: inline-start;
+    }
 }
 .cms-modal-item-buttons-left {
-    float: left;
-    &:dir(rtl) {
-        float: right;
-    }
+    float: inline-start;
 }
 
 // alter footer when html markup is loaded

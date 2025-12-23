@@ -43,7 +43,7 @@ from cms.models import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils import get_language_from_request
+from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_site_id
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
@@ -244,7 +244,6 @@ class PageUrl(AsTag):
             return ""
 
     def get_value(self, context, page_lookup, lang, site):
-        site_id = get_site_id(site)
         request = context.get("request", False)
 
         if not request:
@@ -253,6 +252,7 @@ class PageUrl(AsTag):
         if lang is None:
             lang = get_language_from_request(request)
 
+        site_id = get_site_id(site) if site else get_current_site(request).pk
         url = get_page_url_cache(page_lookup, lang, site_id)
         if url is None:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
@@ -436,11 +436,12 @@ class PageAttribute(AsTag):
         name = name.lower()
         request = context["request"]
         lang = get_language_from_request(request)
-        page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
+        site = get_current_site(request)
+        page = _get_page_by_untyped_arg(page_lookup, request, site.pk)
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)
-            if not isinstance(ret_val, datetime):
+            if not isinstance(ret_val, datetime) and ret_val is not None:
                 ret_val = escape(ret_val)
             return ret_val
         return ""

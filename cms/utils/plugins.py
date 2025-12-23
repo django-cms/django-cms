@@ -1,17 +1,13 @@
 import logging
-import os
 import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache, lru_cache
 from itertools import starmap
 from operator import itemgetter
-from typing import Optional
 
 from django.db import models
 from django.http import HttpRequest
-from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
@@ -25,7 +21,6 @@ from cms.utils.placeholder import get_placeholder_conf
 logger = logging.getLogger(__name__)
 
 
-@cache
 def get_plugin_class(plugin_type: str) -> type[CMSPluginBase]:
     """Returns the plugin class for a given plugin_type (str)"""
     return plugin_pool.get_plugin(plugin_type)
@@ -181,10 +176,9 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
 
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
-    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
+    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page or plugin.placeholder.source)
     parents_cache = cache.setdefault("plugin_parents", {})
     children_cache = cache.setdefault("plugin_children", {})
-
     try:
         parent_classes = parents_cache[plugin_type]
     except KeyError:
@@ -305,7 +299,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
         try:
             position = positions_by_language[new_plugin.language]
         except KeyError:
-            offset = placeholder.get_last_plugin_position(language) or 0
+            offset = placeholder.get_last_plugin_position(new_plugin.language) or 0
             # The position is relative to language.
             position = placeholder.get_next_plugin_position(
                 language=new_plugin.language,
@@ -315,7 +309,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
             # Because it is the first time this language is processed,
             # shift all plugins to the right of the next position.
             placeholder._shift_plugin_positions(
-                language,
+                new_plugin.language,
                 start=position,
                 offset=offset,
             )
@@ -405,9 +399,9 @@ def get_bound_plugins(plugins):
 
 def downcast_plugins(
     plugins: Iterable[CMSPlugin],
-    placeholders: Optional[list] = None,
+    placeholders: list | None = None,
     select_placeholder: bool = False,
-    request: Optional[HttpRequest] = None,
+    request: HttpRequest | None = None,
 ) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins
@@ -527,4 +521,3 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
             )
             % {"limit": type_limit, "plugin_name": plugin_name}
         )
-

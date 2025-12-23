@@ -1,6 +1,7 @@
 //##############################################################################
 // TOOLTIP
 @use "sass:math";
+@use "sass:list";
 
 // used when hover over plugins in edit mode
 .cms-tooltip,
@@ -15,7 +16,7 @@
     font-weight: bold;
     color: $tooltip-first-line-color;
     white-space: nowrap;
-    padding: 0 nth($tooltip-padding, 2) 0 $tooltip-icon-area-size;
+    padding: 0 list.nth($tooltip-padding, 2) 0 $tooltip-icon-area-size;
     margin: 0;
     border-radius: $border-radius-base;
     background: $gray-darker;
@@ -33,11 +34,11 @@
         position: absolute;
         top: 100%;
         right: 0;
-        margin-top: -(nth($tooltip-padding, 1) - 1px);
+        margin-top: -(list.nth($tooltip-padding, 1) - 1px);
         float: right;
         color: $tooltip-second-line-color;
         font-weight: normal;
-        padding: 0 nth($tooltip-padding, 2);
+        padding: 0 list.nth($tooltip-padding, 2);
         border-radius: $border-radius-base 0 $border-radius-base $border-radius-base;
         background: $gray-darker;
     }

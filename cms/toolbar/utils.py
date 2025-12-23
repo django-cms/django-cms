@@ -6,12 +6,14 @@ from typing import Any, Optional
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.db import models
 from django.http import HttpRequest
 from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
     get_language,
+    get_language_from_path,
     gettext,
     override as force_language,
 )
@@ -24,7 +26,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: Optional[list[str]] = None) -> str:
+def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[str] | None = None) -> str:
     label = placeholder.get_label() or ''
     help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -44,7 +46,7 @@ def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: Option
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> dict[str, Any]:
+def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> dict[str, Any]:
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
@@ -58,7 +60,7 @@ def get_plugin_toolbar_info(plugin: CMSPlugin, children: Optional[list[str]] = N
     return data
 
 
-def get_plugin_toolbar_js(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> str:
+def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> str:
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
@@ -87,8 +89,8 @@ def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]
 def get_plugin_tree(
     request: HttpRequest,
     plugins: list[CMSPlugin],
-    restrictions: Optional[dict] = None,
-    target_plugin: Optional[CMSPlugin] = None,
+    restrictions: dict | None = None,
+    target_plugin: CMSPlugin | None = None,
 ) -> dict[str, Any]:
     """
     Constructs a tree structure of CMS plugins for the toolbar.
@@ -125,6 +127,7 @@ def get_plugin_tree(
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
             restrictions_cache=restrictions,
+            page=placeholder.source,
         )
         plugin_info = get_plugin_info(
             plugin,
@@ -187,7 +190,6 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin]
         return []  # do not deliver content if rendering fails
 
 
-
 def get_plugin_tree_ids(plugin: CMSPlugin) -> list[int]:
     plugin_ids = [plugin.pk]
     for child in plugin.child_plugin_instances or []:
@@ -201,7 +203,7 @@ def get_toolbar_from_request(request: HttpRequest):
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
-def add_live_url_querystring_param(obj: models.Model, url: str, language: Optional[str] = None) -> str:
+def add_live_url_querystring_param(obj: models.Model, url: str, language: str | None = None) -> str:
     """
     Append a live url to a given object url using a supplied url parameter configured
     by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
@@ -241,6 +243,8 @@ def get_object_edit_url(obj: models.Model, language: str = None) -> str:
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+        if not get_language_from_path(url):
+            url += f'?language={language}'
     if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
         url = add_live_url_querystring_param(obj, url, language)
     return url
@@ -261,6 +265,8 @@ def get_object_preview_url(obj: models.Model, language: str = None) -> str:
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+        if not get_language_from_path(url):
+            url += f'?language={language}'
     if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
         url = add_live_url_querystring_param(obj, url, language)
     return url
@@ -281,10 +287,43 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+        url = admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+        if not get_language_from_path(url):
+            url += f'?language={language}'
+    return url
 
 
-def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> Optional[models.Model]:
+def get_object_live_url(obj: models.Model, language: str = None, site: Optional[Site] = None) -> str:
+    """
+    Returns the live url of the given object. The object must be frontend-editable
+    and registered as such with cms.
+
+    If the object has a language property, the language parameter is ignored.
+    If the object - or its grouper - has no site property, the site argument is ignored.
+    """
+
+    language = getattr(obj, "language", language)  # Object trumps parameter
+    if language is None:
+        language = get_language()
+
+    with force_language(language):
+        absolute_url = obj.get_absolute_url()
+
+    obj_site = getattr(obj, 'site', None)
+    if obj_site is None:
+        try:
+            grouper_field = apps.get_app_config('cms').cms_extension.model_groupers[obj.__class__]
+            obj_site = getattr(getattr(obj, grouper_field, None), 'site', None)
+        except KeyError:
+            pass
+    if obj_site and obj_site != site:
+        # Add domain if current and target sites are defined and different
+        absolute_url = f"//{obj_site.domain}{absolute_url}"
+
+    return absolute_url
+
+
+def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> models.Model | None:
     """
     Retrieves the correct content object for the target language. The object must be frontend-editable
     and registered as such with cms.

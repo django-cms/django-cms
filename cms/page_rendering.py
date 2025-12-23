@@ -67,8 +67,11 @@ def _handle_no_page(request):
 
     # redirect to PageContent's changelist if the root page is detected
     if match.url_name == 'pages-root':
-        redirect_url = admin_reverse('cms_pagecontent_changelist')
-        return HttpResponseRedirect(redirect_url)
+        try:
+            redirect_url = admin_reverse('cms_pagecontent_changelist')
+            return HttpResponseRedirect(redirect_url)
+        except Resolver404:
+            pass
     raise Http404(dict(path=request.path, tried=match.tried))
 
 

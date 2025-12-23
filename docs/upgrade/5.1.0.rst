@@ -34,11 +34,70 @@ How to upgrade to 5.1.0
 What's new in 5.1.0
 *******************
 
-Feature 1
-=========
+New UI design
+=============
 
-Feature 2
-=========
+The most prominent change in django CMS 5.1.0 is the new user interface design. While functionally
+similar to the previous design, it offers a more modern and streamlined experience, better color
+contrast, and more consistency between the frontend editor and Django's admin interface.
+
+Key changes include:
+* More Django-like green based color prefers-color-scheme
+* Modern design with round corners and updated icons
+* Improved visual hierarchy and spacing
+
+It is active by default, but the legacy design can be re-enabled by adding the ``data-cms-theme``
+attribute with the value ``4`` to the ``<html>`` tag in your templates.
+
+More flexible site configurations
+=================================
+
+The Django admin app does not have to be available on all sites. You can now
+configure which sites have access to the admin interface and still edit all sites
+using the admin's frontend editing and preview endpoints. This is especially useful
+if you do not want to expose the admin interface on external production sites.
+
+You can now run multiple sites with one settings file. If you omit the ``SITE_ID`` in
+your settings, django CMS will determine the current site using Django's site framework
+based on the request's host header. This allows you to run multiple sites with one
+instance and one settings file. Note, that apphooks must not share the same URLs in
+such a scenario to avoid conflicts.
+
+If you need more complex site determination logic, you can implement a custom
+middleware that sets ``request.site`` accordingly. It will be respected by django CMS.
+
+For a step‑by‑step guide and examples, see :doc:`../how_to/03-multi-site` (including
+notes on apphook isolation and URL conflicts). For management commands that run without
+an HTTP request, consult :doc:`../reference/cli` for options like ``--site`` to select the
+target site context.
+
+Model-specific plugins
+======================
+
+Plugins can now be restricted to specific models using two complementary filters:
+
+- Plugin-level: ``CMSPluginBase.allowed_models`` — list of model identifiers
+  (``"app_label.modelname"``). ``None`` = allowed everywhere; ``[]`` = nowhere.
+- Model-level: ``Model.allowed_plugins`` — list of plugin class names. ``None`` = all
+  plugins allowed (subject to their own ``allowed_models``); ``[]`` = none.
+
+Both filters must pass for the frontend editor offer plugins to the users.
+This is particularly useful for plugins that are bound to specific Django models and should
+not be available to editors on other models - or to restrict certain models to a curated set
+of plugins.
+
+Example::
+
+    class TextFieldPlugin(CMSPluginBase):
+        render_template = "forms/fields/text.html"
+        allowed_models = ["my_form_app.form"]
+
+    class Form(models.Model):
+        fields = PlaceholderRelationField("fields")
+        allowed_plugins = ["TextFieldPlugin"]
+
+See also the how-to guide for details and more examples:
+:ref:`plugin-model-restrictions`.
 
 Feature 3
 =========
@@ -50,12 +109,11 @@ Bug Fixes
 =========
 
 **************************************
-Backward incompatible changes in 5.X.X
+Backward incompatible changes in 5.1.0
 **************************************
 
-TitleExtension
-==============
-
+Topic 1
+=======
 
 Miscellaneous
 =============
@@ -100,7 +158,7 @@ Permissions
 -----------
 
 ``cms.utils.permissions.has_page_permission()`` has been removed. Use
-:meth:`cms.utils.page_permissions.has_generic_permission()` instead.
+:func:`cms.utils.page_permissions.has_generic_permission()` instead.
 
 As part of performance improvements, the following methods have been removed from
 ``cms.utils.page_permissions``. They were deprecated in django CMS 4.1:

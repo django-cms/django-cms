@@ -595,7 +595,7 @@ class PageToolbar(CMSToolbar):
             current_page_menu = self.toolbar.get_or_create_menu(
                 PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 
-            new_page_params = {'edit': 1}
+            new_page_params = {'edit': 1, 'site': self.page.site_id}
             new_sub_page_params = {'edit': 1, 'parent_page': self.page.id}
 
             add_page_url = admin_reverse('cms_pagecontent_add')
@@ -659,8 +659,9 @@ class PageToolbar(CMSToolbar):
             # advanced settings
             advanced_url = add_url_parameters(advanced_url, language=self.toolbar.request_language)
             can_change_advanced = self.page.has_advanced_settings_permission(self.request.user)
-            advanced_disabled = not can_change_advanced
-            current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
+            can_change_permissions = get_cms_setting("PERMISSION") and self.page.has_change_permissions_permission(self.request.user)
+            advanced_disabled = not can_change_advanced and not can_change_permissions
+            current_page_menu.add_modal_item(_("Advanced settings"), url=advanced_url, disabled=advanced_disabled)
 
             # templates menu
             if edit_mode:

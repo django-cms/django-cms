@@ -3,6 +3,8 @@
 
 @use "sass:math";
 
+$margin: math.div($toolbar-height - $toolbar-button-height, 2);
+
 // used in: /cms/admin/page/tree/copy_premissions
 .cms-dialog {
     position: fixed;
@@ -12,20 +14,22 @@
     box-sizing: border-box;
     width: $dialog-width;
     margin: -100px 0 0 math.div(-$dialog-width, 2);;
-    padding: $padding-large;
+    padding: $padding-large $padding-large 0 $padding-large;
     border: 1px solid $gray-lighter;
     border-radius: $dialog-border-radius;
-    background: $white;
+    background: $dialog-bgcolor;
     box-shadow: $dialog-shadow;
     transform: translateZ(0);
     h1 {
         margin: 0 0 $padding-normal;
         padding: 0;
     }
+    p {
+        padding: 0;
+    }
     form {
         margin: 0 (-$padding-large);
         padding: 0 $padding-large !important;
-        border-top: 1px solid $gray-lighter;
         label {
             display: inline;
         }
@@ -36,7 +40,6 @@
             line-height: 20px;
         }
         p {
-            margin: 0 $padding-large;
             margin-bottom: 0;
             padding: $padding-normal 0;
             &:after {
@@ -48,9 +51,16 @@
         }
         .submit-row {
             margin: 0 (-$padding-large);
-            padding: $padding-large $padding-large 0;
+            padding: $margin $margin;
+            background: $white;
+            border-radius: 0 0 $dialog-border-radius $dialog-border-radius;
+            border-top: 1px solid $gray-lighter;
             input {
-                margin-left: 0;
+                line-height: $toolbar-button-height;
+                height: $toolbar-button-height;
+                font-size: $toolbar-button-font-size;
+                padding: 0 $toolbar-button-padding-horizontal;
+                margin-inline-start: $margin;
             }
         }
     }

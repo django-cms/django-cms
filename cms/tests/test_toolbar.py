@@ -1,5 +1,6 @@
 import datetime
 import re
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import iptools
@@ -7,6 +8,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
@@ -47,6 +49,7 @@ from cms.toolbar.utils import (
     add_live_url_querystring_param,
     get_object_edit_url,
     get_object_for_language,
+    get_object_live_url,
     get_object_preview_url,
     get_object_structure_url,
 )
@@ -566,7 +569,7 @@ class ToolbarTests(ToolbarTestBase):
         response_text = response.render().rendered_content
         self.assertTrue(
             re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text),
-            "/en/admin/cms/placeholder/edit-plugin/%s not found in %s" % (plugin_1.pk, response_text)
+            f"/en/admin/cms/placeholder/edit-plugin/{plugin_1.pk} not found in {response_text}"
         )
         self.assertTrue(re.search('move_plugin.+/en/admin/cms/placeholder/move-plugin/', response_text))
         self.assertTrue(
@@ -695,6 +698,36 @@ class ToolbarTests(ToolbarTestBase):
                 response = self.client.post('/en/admin/logout/')
                 self.assertTrue(response.status_code, 200)
 
+    def test_toolbar_hidden_when_admin_not_available(self):
+        """
+        Test that the toolbar is hidden when admin URLs are not available.
+
+        When admin_reverse raises NoReverseMatch (e.g., admin not in urlpatterns),
+        the toolbar should be disabled even for staff users.
+        """
+        from unittest.mock import patch
+
+        from django.urls import NoReverseMatch
+
+        page = create_page("toolbar-page", "nav_playground.html", "en")
+        staff_user = self.get_staff()
+
+        # Create request manually without going through get_page_request
+        request = self.get_request('/', page=page)
+        request.user = staff_user
+        request.session = {}
+        request.current_page = page
+
+        # Mock admin_reverse to raise NoReverseMatch only for 'admin:index'
+        with patch('cms.toolbar.toolbar.admin_reverse') as mock_admin_reverse:
+            mock_admin_reverse.side_effect = NoReverseMatch("No admin URLs")
+
+            # Initialize toolbar - this should catch NoReverseMatch and set show_toolbar=False
+            toolbar = CMSToolbar(request)
+
+        # Toolbar should be hidden because admin is not available
+        self.assertFalse(toolbar.show_toolbar)
+
     def test_show_toolbar_without_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
         request = self.get_page_request(page, AnonymousUser())
@@ -751,7 +784,7 @@ class ToolbarTests(ToolbarTestBase):
         """
         user = self.get_staff()
         page = create_page('test', 'nav_playground.html', 'en')
-        for code, verbose in get_language_tuple():
+        for code, verbose in get_language_tuple(Site.objects.get_current().pk):
             if code != "en":
                 create_page_content(code, f"test {code}", page)
         page_content = self.get_pagecontent_obj(page)
@@ -776,7 +809,7 @@ class ToolbarTests(ToolbarTestBase):
         )
         self.assertEqual(
             [item.name for item in lang_menu.get_items()],
-            [language_name for _, language_name in get_language_tuple(1)],
+            [language_name for _, language_name in get_language_tuple(Site.objects.get_current().pk)],
         )
         self.assertIn(edit_url, [item.url for item in lang_menu.get_items()])  # Edit urls returned
 
@@ -2253,18 +2286,134 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
     def test_get_object_for_language_multiple_languages(self):
         page = create_page('Test', 'col_two.html', 'en')
         # Additional pages to ensure not a page content of another page is returned
-        for code, verbose in get_language_tuple():
+        for code, verbose in get_language_tuple(Site.objects.get_current().pk):
             create_page(f"Not this page ({verbose})", "col_two.html", code)
 
         page_content = {
             "en": self.get_pagecontent_obj(page, "en")
         }
-        for code, verbose in get_language_tuple():
+        for code, verbose in get_language_tuple(Site.objects.get_current().pk):
             if code != "en":
                 page_content[code] = create_page_content(code, verbose, page)
 
         self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
         self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
+
+    @patch('cms.toolbar.utils.get_cms_setting')
+    @patch('cms.toolbar.utils.get_language_from_path')
+    @patch('cms.toolbar.utils.admin_reverse')
+    @patch('cms.toolbar.utils.ContentType')
+    def test_get_object_edit_url_appends_language_if_no_i18n_prefix(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = '/admin/cms/placeholder/render/object/edit/1/'
+
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=42)
+
+        obj = SimpleNamespace(pk=1)
+        url = get_object_edit_url(obj, language='de')
+        self.assertIn('?language=de', url)
+
+    @patch('cms.toolbar.utils.get_cms_setting')
+    @patch('cms.toolbar.utils.get_language_from_path')
+    @patch('cms.toolbar.utils.admin_reverse')
+    @patch('cms.toolbar.utils.ContentType')
+    def test_get_object_preview_url_appends_language_if_no_i18n_prefix(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = '/admin/cms/placeholder/render/object/preview/1/'
+
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=99)
+
+        obj = SimpleNamespace(pk=2)
+        url = get_object_preview_url(obj, language='fr')
+        self.assertIn('?language=fr', url)
+
+    @patch('cms.toolbar.utils.get_language_from_path')
+    @patch('cms.toolbar.utils.admin_reverse')
+    @patch('cms.toolbar.utils.ContentType')
+    def test_get_object_structure_url_appends_language_if_no_i18n_prefix(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path
+    ):
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = '/admin/cms/placeholder/render/object/structure/1/'
+
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=7)
+
+        obj = SimpleNamespace(pk=3)
+        url = get_object_structure_url(obj, language='es')
+        self.assertIn('?language=es', url)
+
+
+class GetObjectLiveUrlTests(CMSTestCase):
+    """
+    Tests for get_object_live_url:
+    - no prefix if no target site is given
+    - no prefix if target site equals object's site
+    - protocol-relative domain prefix if target site differs from object's site
+    - no prefix if the object has no site information
+    """
+
+    class _Dummy:
+        def __init__(self, url='/en/dummy/', language='en', site=None):
+            self.language = language
+            if site is not None:
+                self.site = site  # optional site attribute
+            self._url = url
+
+        def get_absolute_url(self):
+            return self._url
+
+    def setUp(self):
+        # create two sites with distinct domains
+        Site.objects.all().delete()
+        self.site1 = Site.objects.create(domain='site1.test', name='Site 1')
+        self.site2 = Site.objects.create(domain='site2.test', name='Site 2')
+
+    def test_always_prefix_when_site_argument_is_none(self):
+        obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)
+        url = get_object_live_url(obj, language='en', site=None)
+        self.assertEqual(url, f'//{self.site1.domain}/en/dummy/')
+
+    def test_no_prefix_when_target_site_equals_object_site(self):
+        obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)
+        url = get_object_live_url(obj, language='en', site=self.site1)
+        self.assertEqual(url, '/en/dummy/')
+
+    def test_prefix_added_when_target_site_differs_from_object_site(self):
+        obj = self._Dummy(url='/en/dummy/', language='en', site=self.site1)
+        url = get_object_live_url(obj, language='en', site=self.site2)
+        self.assertEqual(url, f'//{self.site1.domain}/en/dummy/')
+
+    def test_no_prefix_when_object_has_no_site_info(self):
+        # No .site attribute and no cms_extension mapping -> site param ignored
+        obj = self._Dummy(url='/en/dummy/', language='en', site=None)
+        # Remove site attribute if present
+        if hasattr(obj, 'site'):
+            delattr(obj, 'site')
+        url = get_object_live_url(obj, language='en', site=self.site2)
+        self.assertEqual(url, '/en/dummy/')
+
+    def test_grouper_site_is_respected(self):
+        page = create_page('test page', 'nav_playground.html', 'de', site=self.site1)
+        obj = page.get_content_obj('de')
+
+        url = get_object_live_url(obj, language='de', site=self.site2)
+        self.assertEqual(url, f'//{self.site1.domain}/de/test-page/')
+        url = get_object_live_url(obj, language='de', site=self.site1)
+        self.assertEqual(url, '/de/test-page/')
+
+    def test_get_object_live_url_works_with_grouper(self):
+        page = create_page('test page', 'nav_playground.html', 'de', site=self.site1)
+
+        url = get_object_live_url(page, language='de', site=self.site2)
+        self.assertEqual(url, f'//{self.site1.domain}/de/test-page/')
+        url = get_object_live_url(page, language='de', site=self.site1)
+        self.assertEqual(url, '/de/test-page/')
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):

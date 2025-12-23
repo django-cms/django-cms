@@ -3,7 +3,6 @@ import functools
 import operator
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
 from treebeard.mp_tree import MP_NodeManager
@@ -11,6 +10,7 @@ from treebeard.mp_tree import MP_NodeManager
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.i18n import get_fallback_languages
 
 
@@ -30,7 +30,7 @@ class PageManager(MP_NodeManager):
     def get_home(self, site=None):
         return self.get_queryset().get_home(site)
 
-    def search(self, q, language=None, current_site_only=True):
+    def search(self, q, language=None, current_site_only=True, site=None):
         """Simple search function
 
         Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
@@ -39,8 +39,7 @@ class PageManager(MP_NodeManager):
 
         qs = self.get_queryset()
 
-        if current_site_only:
-            site = Site.objects.get_current()
+        if site or current_site_only:
             qs = qs.on_site(site)
 
         qt = Q(pagecontent_set__title__icontains=q)
@@ -62,7 +61,7 @@ class PageManager(MP_NodeManager):
                         f'pagecontent_set__placeholders__cmsplugin__{related_query_name}__{field}__icontains': q})
         if language:
             qt &= Q(pagecontent_set__language=language)
-            qp &= Q(cmsplugin__language=language)
+            qp &= Q(pagecontent_set__placeholders__cmsplugin__language=language)
 
         qs = qs.filter(qt | qp)
 
@@ -87,6 +86,14 @@ class PageContentManager(WithUserMixin, models.Manager):
         Gets the latest content for a particular page and language. Falls back
         to another language if wanted.
         """
+        import warnings
+
+        warnings.warn(
+            "PageContentManager.get_title is deprecated and will be removed in a future release. "
+            "Please use page.get_page_content() or page.get_admin_content()instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         try:
             title = self.get(language=language, page=page)
             return title
@@ -94,7 +101,7 @@ class PageContentManager(WithUserMixin, models.Manager):
             if language_fallback:
                 try:
                     titles = self.filter(page=page)
-                    fallbacks = get_fallback_languages(language)
+                    fallbacks = get_fallback_languages(language, site_id=page.site_id)
                     for lang in fallbacks:
                         for title in titles:
                             if lang == title.language:

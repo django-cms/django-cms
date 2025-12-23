@@ -12,19 +12,28 @@
 # to show the default.
 
 
-import cms
 import datetime
 import os
 import sys
 
-# Initialize Django for autodoc
+"""Sphinx configuration for django CMS docs.
 
+Ensure we import the local repository package (not the one installed in the
+virtualenv) by fixing sys.path before importing cms.
+"""
+
+# Make sure the project root is first on sys.path
+repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, repo_root)
+
+# Also add docs dir for custom modules
 sys.path.append(os.path.abspath('./'))
 
 import django
+from djangocms_ecosystem import write_current_LTS, write_LTS_table, write_plugin_table
 
-from djangocms_ecosystem import write_LTS_table, write_current_LTS, write_plugin_table
-
+# Now it's safe to import the local cms package
+import cms
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
 django.setup()
@@ -82,7 +91,7 @@ master_doc = 'index'
 current_year = datetime.datetime.now().year
 # General information about the project.
 project = 'django cms'
-copyright = '2009-{}, django CMS Association and contributors'.format(current_year)
+copyright = f'2009-{current_year}, django CMS Association and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -90,9 +99,8 @@ copyright = '2009-{}, django CMS Association and contributors'.format(current_ye
 #
 # The short X.Y version.
 
-path = os.path.split(os.path.dirname(__file__))[0]
-path = os.path.split(path)[0]
-sys.path.insert(0, path)
+# repo_root is already at position 0; keep variable for clarity
+path = repo_root
 
 version = cms.__version__
 # The full version, including alpha/beta/rc tags.
@@ -254,8 +262,8 @@ latex_paper_size = 'a4'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'djangocms.tex', u'django cms Documentation',
-     u'django CMS Association and contributors', 'manual'),
+    ('index', 'djangocms.tex', 'django cms Documentation',
+     'django CMS Association and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top

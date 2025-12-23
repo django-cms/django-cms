@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 07:36+0000\n"
+"POT-Creation-Date: 2025-10-31 07:54+0100\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -52,13 +52,11 @@ msgstr "menu visibility"
 msgid "limit when this page is visible in the menu"
 msgstr "limit when this page is visible in the menu"
 
-#, fuzzy
-#| msgid "Options"
 msgid "X Frame Options"
-msgstr "Options"
+msgstr "X Frame Options"
 
 msgid "Whether this page can be embedded in other pages or websites."
-msgstr ""
+msgstr "Whether this page can be embedded in other pages or websites."
 
 msgid "URL options"
 msgstr "URL options"
@@ -67,7 +65,7 @@ msgid "Menu options"
 msgstr "Menu options"
 
 msgid "Headers"
-msgstr ""
+msgstr "Headers"
 
 msgid "Application"
 msgstr "Application"
@@ -97,6 +95,8 @@ msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"You cannot have two pages with the same slug at the same page level. Please "
+"alter the slug of one of the pages before trying to move again."
 
 msgid "Yes"
 msgstr "Yes"
@@ -185,6 +185,9 @@ msgstr "Add Translation"
 
 msgid "Advanced Settings"
 msgstr "Advanced Settings"
+
+msgid "Change Permissions"
+msgstr "Change Permissions"
 
 msgid "The page is not eligible to be home."
 msgstr "The page is not eligible to be home."
@@ -383,6 +386,21 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Placeholder"
 
+msgid "Getting started developer guide"
+msgstr "Getting started developer guide"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "User guide"
+msgstr "User guide"
+
+msgid "Discord community"
+msgstr "Discord community"
+
+msgid "What's new"
+msgstr "What's new"
+
 msgid "Create"
 msgstr "Create"
 
@@ -394,6 +412,9 @@ msgstr "Structure"
 
 msgid "Content"
 msgstr "Content"
+
+msgid "Help"
+msgstr "Help"
 
 msgid "Sites"
 msgstr "Sites"
@@ -702,13 +723,13 @@ msgstr ""
 "to this page"
 
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "Mark this page as a page type"
 
 msgid "pages"
 msgstr "pages"
 
 msgid "No available title"
-msgstr ""
+msgstr "No available title"
 
 msgid "slug"
 msgstr "slug"
@@ -830,41 +851,6 @@ msgstr "user setting"
 msgid "user settings"
 msgstr "user settings"
 
-msgid "by template"
-msgstr "by template"
-
-msgid "by code"
-msgstr "by code"
-
-msgid "static placeholder name"
-msgstr "static placeholder name"
-
-msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to users."
-msgstr ""
-"Descriptive name to identify this static placeholder. Not displayed to users."
-
-msgid "placeholder code"
-msgstr "placeholder code"
-
-msgid "To render the static placeholder in templates."
-msgstr "To render the static placeholder in templates."
-
-msgid "placeholder content"
-msgstr "placeholder content"
-
-msgid "creation_method"
-msgstr "creation_method"
-
-msgid "static placeholder"
-msgstr "static placeholder"
-
-msgid "static placeholders"
-msgstr "static placeholders"
-
-msgid "A static placeholder with the same site and code already exists"
-msgstr "A static placeholder with the same site and code already exists"
-
 msgid "Advanced options"
 msgstr "Advanced options"
 
@@ -974,15 +960,17 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
 
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Yes, I’m sure"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "No, take me back"
 
 msgid "Summary"
-msgstr ""
+msgstr "Summary"
 
 msgid "User"
 msgstr "User"
@@ -1175,7 +1163,7 @@ msgid "Permissions"
 msgstr "Permissions"
 
 msgid "inherited"
-msgstr ""
+msgstr "inherited"
 
 msgid "This page has no preview!"
 msgstr "This page has no preview!"
@@ -1314,7 +1302,7 @@ msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Toggle structure mode and highlight hovered-over plugin"
 
 msgid "Open \\"
-msgstr ""
+msgstr "Open \\"
 
 msgid "Focus on Toolbar"
 msgstr "Focus on Toolbar"
@@ -1370,20 +1358,14 @@ msgstr "Welcome to django CMS"
 
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "Version %(cms_version)s"
 
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "Let’s build something great together!"
 
 msgid "Please log in"
 msgstr "Please log in"
 
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
-#| "add\">Add the first page</a> to the system to continue.\n"
-#| "                    "
 msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your "
@@ -1391,9 +1373,9 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
-"add\">Add the first page</a> to the system to continue.\n"
-"                    "
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your "
+"first page</a>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1402,7 +1384,7 @@ msgid ""
 "                        Your funding directly benefits the product, mainly "
 "through the\n"
 "                        <a href=\"https://www.django-cms.org/en/fellowship-"
-"program/)!\">django CMS Fellowship Program</a>!\n"
+"program/\">django CMS Fellowship Program</a>!\n"
 "                    </p>\n"
 "                    <p>\n"
 "                        A quick way for yourself or your organisation to "
@@ -1412,6 +1394,21 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Help Funding</h2>\n"
+"                    <p>\n"
+"                        Your funding directly benefits the product, mainly "
+"through the\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-"
+"program/\">django CMS Fellowship Program</a>!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        A quick way for yourself or your organisation to "
+"donate is on\n"
+"                        <a href=\"https://github.com/sponsors/django-"
+"cms\">Github Sponsors</a>.\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1428,6 +1425,19 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Join Us</h2>\n"
+"                    <p>\n"
+"                        The django CMS Association is a non-profit "
+"organisation that funds and steers the development of\n"
+"                        django CMS.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        You can <a href=\"https://www.django-cms.org/en/"
+"memberships/\">join both as an individual or as an\n"
+"                        organisation</a>.\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1445,6 +1455,20 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Contribute</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"contribute/\">Contribute code:</a> fix a bug or\n"
+"                            implement a new feature!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"volunteering-opportunities/\">Volunteer:</a>\n"
+"                            We offer fun and efficient team work!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"repositories-plugins/\">Open-source your work:</a>\n"
+"                            Make the ecosystem strong.</li>\n"
+"                    </ul>\n"
+"                "
 
 msgid "Installation Notes"
 msgstr "Installation Notes"
@@ -1452,16 +1476,8 @@ msgstr "Installation Notes"
 msgid "Support"
 msgstr "Support"
 
-msgid "Documentation"
-msgstr "Documentation"
-
-#, fuzzy
-#| msgid "User (page)"
-msgid "User guide"
-msgstr "User (page)"
-
 msgid "Give back"
-msgstr ""
+msgstr "Give back"
 
 msgid ""
 "\n"
@@ -1683,10 +1699,17 @@ msgstr "Add plugin to placeholder \"%(placeholder_label)s\""
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Add plugin to %(plugin_name)s"
 
-#, fuzzy
-#| msgid "placeholder"
 msgid "Single placeholder"
-msgstr "placeholder"
+msgstr "Single placeholder"
+
+msgid "Community forum"
+msgstr "Community forum"
+
+msgid "Getting started"
+msgstr "Getting started"
+
+msgid "Talk to us"
+msgstr "Talk to us"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - your user account was created."
@@ -1725,6 +1748,43 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid "by template"
+#~ msgstr "by template"
+
+#~ msgid "by code"
+#~ msgstr "by code"
+
+#~ msgid "static placeholder name"
+#~ msgstr "static placeholder name"
+
+#~ msgid ""
+#~ "Descriptive name to identify this static placeholder. Not displayed to "
+#~ "users."
+#~ msgstr ""
+#~ "Descriptive name to identify this static placeholder. Not displayed to "
+#~ "users."
+
+#~ msgid "placeholder code"
+#~ msgstr "placeholder code"
+
+#~ msgid "To render the static placeholder in templates."
+#~ msgstr "To render the static placeholder in templates."
+
+#~ msgid "placeholder content"
+#~ msgstr "placeholder content"
+
+#~ msgid "creation_method"
+#~ msgstr "creation_method"
+
+#~ msgid "static placeholder"
+#~ msgstr "static placeholder"
+
+#~ msgid "static placeholders"
+#~ msgstr "static placeholders"
+
+#~ msgid "A static placeholder with the same site and code already exists"
+#~ msgstr "A static placeholder with the same site and code already exists"
 
 #~ msgid "Title"
 #~ msgstr "Title"

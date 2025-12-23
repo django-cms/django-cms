@@ -3,7 +3,6 @@ import uuid
 import warnings
 from urllib.parse import parse_qsl, urlparse
 
-from django import forms
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects
@@ -92,7 +91,7 @@ class BaseEditableAdminMixin:
         opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
-        raw_fields = request.GET.get("edit_fields")
+        raw_fields = request.GET.get("edit_fields", "")
         admin_obj = self._get_model_admin(obj)
         allowed_fields = getattr(admin_obj, "frontend_editable_fields", [])
         fields = [field for field in raw_fields.split(",") if field in allowed_fields]
@@ -254,7 +253,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         # has a special meaning on the CMS.
         # It allows users to see another language while maintaining
         # the same url. This complicates language detection.
-        site = get_current_site()
+        site = get_current_site(request)
         parsed_url = urlparse(request.GET['cms_path'])
         queries = dict(parse_qsl(parsed_url.query))
         language = queries.get('language')
@@ -372,6 +371,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             - plugin_parent (optional)
         """
         form = PluginAddValidationForm(request.GET)
+        form._request = request
 
         if not form.is_valid():
             # list() is necessary for python 3 compatibility.
@@ -463,7 +463,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         source_placeholder = get_object_or_404(Placeholder, pk=source_placeholder_id)
         target_placeholder = get_object_or_404(Placeholder, pk=target_placeholder_id)
 
-        if not target_language or target_language not in get_language_list():
+        if not target_language or target_language not in get_language_list(site_id=get_current_site(request).pk):
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
         copy_to_clipboard = target_placeholder.pk == request.toolbar.clipboard.pk
@@ -815,7 +815,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             target_parent_id=target_parent_id,
         )
 
-        target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
+        target_last_plugin = target_placeholder.get_last_plugin(target_language)
 
         if target_last_plugin:
             target_offset = target_last_plugin.position + len(plugins)
@@ -1146,7 +1146,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             )
 
             placeholder.clear(language)
-            placeholder.clear_cache(language)
+            placeholder.clear_cache(language, site_id=get_current_site(request).pk)
 
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {
                 'obj': obj_display})

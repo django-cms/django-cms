@@ -13,6 +13,7 @@ from django.utils.timezone import now
 from cms.cache import _get_cache_key, _get_cache_version, _set_cache_version
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.toolbar.utils import get_toolbar_from_request
+from cms.utils import get_current_site
 from cms.utils.compat.response import get_response_headers
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
@@ -24,14 +25,15 @@ def _page_cache_key(request):
     Generate a cache key based on the request path and language.
     The language is determined following django-cms's language resolution order.
     """
+    site = get_current_site(request)
     if hasattr(request, "LANGUAGE_CODE"):
         language = request.LANGUAGE_CODE
     else:
-        language = get_default_language_for_site(settings.SITE_ID)
+        language = get_default_language_for_site(site.pk)
 
     cache_key = "%s:%d:%s:%s" % (
         get_cms_setting("CACHE_PREFIX"),
-        settings.SITE_ID,
+        site.pk,
         language,
         hashlib.sha1(iri_to_uri(request.get_full_path()).encode("utf-8")).hexdigest(),
     )
