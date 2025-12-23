@@ -40,8 +40,8 @@ class Placeholder(models.Model):
     source = GenericForeignKey("content_type", "object_id")
     cache_placeholder = True  #: Flag caching the palceholder's content
     is_static = False  #: Set to "True" for static placeholders (by the template tag)
-    edit_message = _("Edit object")  #: Message used in the frontend editing UI for static placholder edit link
-    static_message = _("This is an external placeholder")  #: Message used in the frontend editing UI for static placholder tooltip
+    edit_message = _("Edit object")  #: Message used in the frontend editing UI for static placeholder edit link
+    static_message = _("This is an external placeholder")  #: Message used in the frontend editing UI for static placeholder tooltip
     is_editable = True  #: If False the content of the placeholder is not editable in the frontend
 
     objects = PlaceholderManager()
