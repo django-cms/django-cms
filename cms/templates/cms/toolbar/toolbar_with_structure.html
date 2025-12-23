@@ -2,14 +2,14 @@
 {% load i18n l10n cms_admin %}
 
 {% block toolbar_top %}
-    <div class="cms-tooltip">{% trans "Double-click to edit" %}<span></span></div>
-    <div class="cms-tooltip-touch">{% trans "Tap to edit" %}<span></span></div>
+    <div class="cms-tooltip">{% translate "Double-click to edit" %}<span></span></div>
+    <div class="cms-tooltip-touch">{% translate "Tap to edit" %}<span></span></div>
 {% endblock %}
 
 {% block toolbar_bottom %}
     {# start: messages #}
     <div class="cms-messages">
-        <div class="cms-messages-close" title="{% trans 'Close' %}"><span class="cms-icon cms-icon-close"></span></div>
+        <div class="cms-messages-close" title="{% translate 'Close' %}"><span class="cms-icon cms-icon-close"></span></div>
         <div class="cms-messages-inner"></div>
     </div>
     {# end: messages #}
@@ -22,8 +22,8 @@
         {% spaceless %}
             <div class="cms-sideframe-controls">
                 <div class="cms-sideframe-history">
-                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-back cms-icon-disabled" title="{% trans 'Click to go back' %}"></span>
-                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-forward cms-icon-disabled" title="{% trans 'Click to go forward' %}"></span>
+                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-back cms-icon-disabled" title="{% translate 'Click to go back' %}"></span>
+                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-forward cms-icon-disabled" title="{% translate 'Click to go forward' %}"></span>
                 </div>
                 <div class="cms-sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
             </div>
@@ -44,9 +44,9 @@
                 <span class="cms-modal-title-prefix"></span>
                 <span class="cms-modal-title-suffix"></span>
             </span>
-            <span tabindex="0" class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
-            <span tabindex="0" class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
-            <span tabindex="0" class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
+            <span tabindex="0" class="cms-modal-minimize cms-icon cms-icon-minus" title="{% translate 'Minimize' %}"></span>
+            <span tabindex="0" class="cms-modal-maximize cms-icon cms-icon-window" title="{% translate 'Maximize' %}"></span>
+            <span tabindex="0" class="cms-modal-close cms-icon cms-icon-close" title="{% translate 'Close' %}"></span>
         </div>
         <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
         <div class="cms-modal-body">
@@ -68,10 +68,11 @@
                         {% include cms_toolbar.templates.dragbar_template with placeholder=placeholder object_is_immutable=object_is_immutable %}
                         {% if object_is_immutable %}
                         <div class="cms-draggables cms-draggables-root cms-drag-disabled">
+                        <div class="cms-draggables-empty">{% translate "Placeholder not editable" %}</div>
                         {% else %}
                         <div class="cms-draggables cms-draggables-root">
+                        <div class="cms-draggables-empty">{% translate "Drop a plugin here" %}</div>
                         {% endif %}
-                            <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
                             {% for plugin in placeholder.get_cached_plugins %}
                                 {% include cms_toolbar.templates.drag_item_template with plugin=plugin object_is_immutable=object_is_immutable %}
                             {% endfor %}
@@ -87,8 +88,8 @@
     {% if cms_toolbar.redirect_url %}
         <div class="cms-screenblock">
             <div class="cms-screenblock-inner">
-                <h1>{% trans "This page has no preview!" %}</h1>
-                <p>{% trans "It is being redirected to:" %} <a href="{{ cms_toolbar.redirect_url }}">{{ cms_toolbar.redirect_url }}</a></p>
+                <h1>{% translate "This page has no preview!" %}</h1>
+                <p>{% translate "It is being redirected to:" %} <a href="{{ cms_toolbar.redirect_url }}">{{ cms_toolbar.redirect_url }}</a></p>
             </div>
         </div>
     {% endif %}
