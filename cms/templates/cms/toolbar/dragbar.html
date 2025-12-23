@@ -38,7 +38,7 @@
 
     <div class="cms-dragbar-title" title="{{ placeholder.get_label }}">
         {{ placeholder.get_label }}
-        {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-cms-tooltip="{% translate 'This is an external placeholder' %}"><span class="cms-icon cms-icon-external-placeholder cms-dragarea-static-icon"></span></span>{% endif %}
+        {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-cms-tooltip="{{ placeholder.static_message }}"><span class="cms-icon cms-icon-external-placeholder cms-dragarea-static-icon"></span></span>{% endif %}
         <span class="cms-dragbar-toggler">
             <a href="#" class="cms-dragbar-expand-all" tabindex="-1">{% translate "Expand all" %}</a>
             <a href="#" class="cms-dragbar-collapse-all" tabindex="-1">{% translate "Collapse all" %}</a>
