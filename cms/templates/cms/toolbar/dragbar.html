@@ -26,7 +26,7 @@
                 <div class="cms-submenu-item cms-submenu-item-disabled"><a data-cms-icon="bin" href="#">{% translate "Empty all" %}</a></div>
             {% else %}
                 <div class="cms-submenu-item"><a data-cms-icon="paste" data-rel="paste" href="#">{% translate "Paste" %}</a></div>
-                <div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="{% url "admin:cms_placeholder_clear_placeholder" placeholder.id %}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
+                <div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="{% url "admin:cms_placeholder_clear_placeholder" placeholder.id %}" data-name="{{ placeholder.get_label }}">{% translate "Empty all" %}</a></div>
             {% endif %}
             {% render_extra_menu_items placeholder %}
         </div>
