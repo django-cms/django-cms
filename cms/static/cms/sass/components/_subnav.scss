@@ -47,11 +47,16 @@
     @include icon(edit);
     inset-inline-end: $submenu-right * 3 + $submenu-icon-area-size * 2;
 }
+.cms-submenu-edit-obj {
+    @include icon(edit);
+    inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
+}
 .cms-submenu-add {
     @include icon(plus);
     inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
 }
 .cms-submenu-edit,
+.cms-submenu-edit-obj,
 .cms-submenu-add {
     &:before {
         margin-left: math.div(-$icon-size, 2);
@@ -122,8 +127,17 @@
                     line-height: $dropdown-item-height
                 }
             }
+            &[data-cms-icon=view] {
+                @include icon(view);
+            }
             &[data-cms-icon=edit] {
                 @include icon(edit);
+            }
+            &[data-cms-icon=edit-new] {
+                @include icon(edit-new);
+            }
+            &[data-cms-icon=publish] {
+                @include icon(publish);
             }
             &[data-cms-icon=copy] {
                 @include icon(copy);
