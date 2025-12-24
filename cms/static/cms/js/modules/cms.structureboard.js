@@ -726,6 +726,96 @@ class StructureBoard {
      */
     _drag(elem = this.ui.sortables) {
         const that = this;
+        let dragHelper = null;
+        let alignLines = [];
+        let snapDistance = 10;
+
+        // 创建对齐线
+        function createAlignLines() {
+            const lines = [];
+            // 水平对齐线
+            const horizontalLine = $('<div class="cms-drag-align-line cms-drag-align-line-horizontal"></div>').appendTo('body');
+            // 垂直对齐线
+            const verticalLine = $('<div class="cms-drag-align-line cms-drag-align-line-vertical"></div>').appendTo('body');
+            lines.push(horizontalLine, verticalLine);
+            return lines;
+        }
+
+        // 显示对齐线
+        function showAlignLines(positions) {
+            alignLines.forEach(line => line.hide());
+            if (positions.horizontal) {
+                alignLines[0].css({ top: positions.horizontal + 'px' }).show();
+            }
+            if (positions.vertical) {
+                alignLines[1].css({ left: positions.vertical + 'px' }).show();
+            }
+        }
+
+        // 隐藏对齐线
+        function hideAlignLines() {
+            alignLines.forEach(line => line.hide());
+        }
+
+        // 计算对齐位置
+        function calculateAlignPositions(helperPos, sortables) {
+            const positions = {};
+            const helperOffset = helperPos.offset();
+            const helperWidth = helperPos.width();
+            const helperHeight = helperPos.height();
+
+            sortables.each(function() {
+                const $this = $(this);
+                const offset = $this.offset();
+                const width = $this.width();
+                const height = $this.height();
+
+                // 水平对齐（顶部、底部、中间）
+                const helperCenterY = helperOffset.top + helperHeight / 2;
+                const targetTop = offset.top;
+                const targetBottom = offset.top + height;
+                const targetCenterY = offset.top + height / 2;
+
+                if (Math.abs(helperCenterY - targetCenterY) < snapDistance) {
+                    positions.horizontal = targetCenterY - helperHeight / 2;
+                } else if (Math.abs(helperOffset.top - targetTop) < snapDistance) {
+                    positions.horizontal = targetTop;
+                } else if (Math.abs(helperOffset.top + helperHeight - targetBottom) < snapDistance) {
+                    positions.horizontal = targetBottom - helperHeight;
+                }
+
+                // 垂直对齐（左侧、右侧、中间）
+                const helperCenterX = helperOffset.left + helperWidth / 2;
+                const targetLeft = offset.left;
+                const targetRight = offset.left + width;
+                const targetCenterX = offset.left + width / 2;
+
+                if (Math.abs(helperCenterX - targetCenterX) < snapDistance) {
+                    positions.vertical = targetCenterX - helperWidth / 2;
+                } else if (Math.abs(helperOffset.left - targetLeft) < snapDistance) {
+                    positions.vertical = targetLeft;
+                } else if (Math.abs(helperOffset.left + helperWidth - targetRight) < snapDistance) {
+                    positions.vertical = targetRight - helperWidth;
+                }
+            });
+
+            return positions;
+        }
+
+        // 智能吸附
+        function snapToPosition(helperPos, sortables) {
+            const helperOffset = helperPos.offset();
+            const positions = calculateAlignPositions(helperPos, sortables);
+
+            if (positions.horizontal) {
+                helperPos.css({ top: positions.horizontal + 'px' });
+            }
+            if (positions.vertical) {
+                helperPos.css({ left: positions.vertical + 'px' });
+            }
+
+            return positions;
+        }
 
         elem
             .nestedSortable({
@@ -786,6 +876,24 @@ class StructureBoard {
                         ui.helper.addClass('cms-draggable-stack');
                     }
 
+                    // 初始化拖拽增强
+                    dragHelper = ui.helper;
+                    alignLines = createAlignLines();
+
+                    // 监听拖拽事件
+                    ui.helper.on('mousemove.cms-drag', function() {
+                        const allSortables = that.ui.sortables;
+                        const positions = snapToPosition(dragHelper, allSortables);
+                        showAlignLines(positions);
+                    });
+
+                    // 放置区高亮
+                    ui.helper.on('mouseenter.cms-drag', '.cms-draggables', function() {
+                        $(this).addClass('cms-drag-dropzone-highlight');
+                    }).on('mouseleave.cms-drag', '.cms-draggables', function() {
+                        $(this).removeClass('cms-drag-dropzone-highlight');
+                    });
+
                     // attach escape event to cancel dragging
                     that.ui.doc.on('keyup.cms.interrupt', function(event, cancel) {
                         if ((event.keyCode === KEYS.ESC && that.dragging) || cancel) {
@@ -802,6 +910,16 @@ class StructureBoard {
                     that.ui.doc.off('keyup.cms.interrupt');
                     // Re-enable vertical scrolling after drag
                     that.ui.content[0].style.touchAction = 'pan-y';
+
+                    // 清理拖拽增强
+                    if (dragHelper) {
+                        dragHelper.off('mousemove.cms-drag mouseenter.cms-drag mouseleave.cms-drag');
+                    }
+                    hideAlignLines();
+                    alignLines.forEach(line => line.remove());
+                    alignLines = [];
+                    // 移除所有高亮
+                    $('.cms-drag-dropzone-highlight').removeClass('cms-drag-dropzone-highlight');
                 },
 
                 update: function(event, ui) {

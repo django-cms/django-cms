@@ -246,6 +246,37 @@
         }
     }
 
+    // #DRAG & DROP ENHANCEMENTS#
+    .cms-drag-align-line {
+        position: absolute;
+        background-color: #4a90e2;
+        pointer-events: none;
+        z-index: 99999999;
+        opacity: 0.8;
+    }
+
+    .cms-drag-align-line-horizontal {
+        left: 0;
+        right: 0;
+        height: 2px;
+    }
+
+    .cms-drag-align-line-vertical {
+        top: 0;
+        bottom: 0;
+        width: 2px;
+    }
+
+    .cms-drag-dropzone-highlight {
+        background-color: rgba(74, 144, 226, 0.1);
+        border: 2px dashed #4a90e2 !important;
+    }
+
+    .cms-draggable-dropzone-highlight {
+        background-color: rgba(74, 144, 226, 0.1);
+        border-radius: $border-radius-base;
+    }
+
     .cms-collapsable-container.cms-hidden > .cms-draggable {
         display: none !important;
     }
