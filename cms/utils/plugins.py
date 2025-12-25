@@ -20,6 +20,9 @@ from cms.utils.placeholder import get_placeholder_conf
 
 logger = logging.getLogger(__name__)
 
+# List of child plugins which evaluates to an empty list (a real empty list is assumed to mean "all plugins")
+NO_CHILDREN = [""]
+
 
 def get_plugin_class(plugin_type: str) -> type[CMSPluginBase]:
     """Returns the plugin class for a given plugin_type (str)"""
@@ -203,8 +206,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 instance=plugin,
                 only_uncached=True,
             )
-            child_classes = child_classes + uncached_child_classes  # Creates a new list to not change the cache
-            child_classes = child_classes or [""]
+            child_classes = list(set(child_classes + uncached_child_classes)) or NO_CHILDREN  # Creates a new list to not change the cache
         except KeyError:
             child_classes = plugin_class.get_child_classes(
                 slot=plugin.placeholder.slot,
@@ -216,7 +218,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 # Only add plugins to the cache that have the cache_parent_class attribute set
                 children_cache[plugin_type] = [
                     plugin for plugin in (child_classes or []) if plugin_pool.get_plugin(plugin).cache_parent_classes
-                ] or [""]
+                ] or NO_CHILDREN
 
     return child_classes, parent_classes
 
