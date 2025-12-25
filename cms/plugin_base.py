@@ -323,7 +323,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Avoid a bug in Django's template engine that is incompatible with Python 3.9+
         # type hinting. By default, the parent class has no __class_getitem__ method.
         # There exist third-party packages, however, that inject type hinting into Django.
-        # This ensures, that any type hinting is ignore for CMSPlugin (below Django 5.2)
+        # This ensures, that any type hinting is ignored for CMSPlugin (below Django 5.2)
         # See https://github.com/django-cms/django-cms/issues/7948
         def __class_getitem__(cls, item):
             raise TypeError
