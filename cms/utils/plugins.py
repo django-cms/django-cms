@@ -204,7 +204,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 only_uncached=True,
             )
             child_classes = child_classes + uncached_child_classes  # Creates a new list to not change the cache
-
+            child_classes = child_classes or [""]
         except KeyError:
             child_classes = plugin_class.get_child_classes(
                 slot=plugin.placeholder.slot,
@@ -216,10 +216,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 # Only add plugins to the cache that have the cache_parent_class attribute set
                 children_cache[plugin_type] = [
                     plugin for plugin in (child_classes or []) if plugin_pool.get_plugin(plugin).cache_parent_classes
-                ]
-                if not children_cache[plugin_type] and child_classes:
-                    # Edge case: NO child classes available
-                    children_cache[plugin_type] = [""]
+                ] or [""]
 
     return child_classes, parent_classes
 
