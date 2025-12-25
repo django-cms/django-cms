@@ -968,6 +968,30 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
+    def test_plugin_child_classes_empty_list_replaced_with_none(self):
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+
+        # Create a plugin that allows children
+        NoChildPlugin = type("NoChildPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
+
+        # Set CMS_PLACEHOLDER_CONF to restrict child_classes to a non-existent plugin
+        CMS_PLACEHOLDER_CONF = {"body": {"child_classes": {"NoChildPlugin": ["NonExistentPlugin"]}}}
+
+        with register_plugins(NoChildPlugin):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+                plugin = api.add_plugin(placeholder, NoChildPlugin, settings.LANGUAGES[0][0])
+                restriction_cache = {}
+                # First call populates the cache
+                get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+                # Second call uses the cache, which should have [""] instead of []
+                child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+
+                # Since the restriction results in no valid child classes, it should be replaced with [""]
+                self.assertEqual(child_classes, [""])
+
     def test_plugin_require_parent_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
