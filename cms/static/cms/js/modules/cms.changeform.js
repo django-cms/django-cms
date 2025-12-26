@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
+                    div.textContent = '';
                     while (doc.body.firstChild) {
                         div.appendChild(doc.body.firstChild);
                     }
