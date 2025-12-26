@@ -289,6 +289,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
     """
 
+    #: This flag is used to determine whether a plugin is considered a “system” (internal) plugin — meaning,
+    #: it is used by the cms itself to structure content or placeholders,
+    #: not meant to be added, edited, or deleted directly by end users in the admin or frontend editor.
+    #: When set to ``True``, the cms treats that plugin as infrastructure, not user content (e.g djangocms-transfer).
     system = False
 
     opts = {}
@@ -323,7 +327,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Avoid a bug in Django's template engine that is incompatible with Python 3.9+
         # type hinting. By default, the parent class has no __class_getitem__ method.
         # There exist third-party packages, however, that inject type hinting into Django.
-        # This ensures, that any type hinting is ignore for CMSPlugin (below Django 5.2)
+        # This ensures, that any type hinting is ignored for CMSPlugin (below Django 5.2)
         # See https://github.com/django-cms/django-cms/issues/7948
         def __class_getitem__(cls, item):
             raise TypeError
