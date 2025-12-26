@@ -105,6 +105,9 @@ Feature 3
 Minor features
 ==============
 
+* Moved from ``Autofield`` as default primary key field to ``BigAutoField``
+
+
 Bug Fixes
 =========
 
