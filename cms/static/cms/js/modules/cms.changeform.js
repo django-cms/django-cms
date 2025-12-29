@@ -1,5 +1,5 @@
 
-/* global gettext, fetch */
+/* global gettext, fetch, DOMParser */
 
 import addSlugHandlers from './slug';
 
@@ -18,7 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch(rel)
                 .then(response => response.text())
                 .then(html => {
-                    div.innerHTML = html;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    div.textContent = '';
+                    while (doc.body.firstChild) {
+                        div.appendChild(doc.body.firstChild);
+                    }
                 });
         }
     });
