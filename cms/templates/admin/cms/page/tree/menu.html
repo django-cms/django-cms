@@ -68,6 +68,18 @@
                             </div>
                         </div>
                     {% endif %}
+                    {% if page_content.redirect %}
+                        <div class="cms-tree-item cms-tree-item-icons">
+                            <div class="cms-tree-item-inner">
+                                <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                    data-cms-tooltip="{% autoescape on %}{% trans 'Redirect' %}{% endautoescape %}">
+                                    <a href="{% url opts|admin_urlname:'change' page_content.pk %}">
+                                        <span class="cms-icon cms-icon-redirect"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endblock %}
             </div>
         </div>
@@ -108,9 +120,9 @@
     '
     data-colmenu='
         <div class="cms-tree-col">
-            <div class="cms-tree-item cms-tree-item-menu{% if not has_change_permission %} cms-tree-item-disabled{% endif %} js-cms-tree-item-menu">
+            <div class="cms-tree-item cms-tree-item-menu{% if not has_change_permission or not can_change %} cms-tree-item-disabled{% endif %} js-cms-tree-item-menu">
                 <div class="cms-tree-item-inner">
-                    {% if page_content and is_concrete and has_change_permission %}
+                    {% if page_content and can_change and is_concrete and has_change_permission %}
                         <a href="{% url opts|admin_urlname:'change_innavigation' page_content.pk %}">
                     {% endif %}
                     {% if is_concrete and page_content.in_navigation %}
@@ -124,7 +136,7 @@
                             <span class="cms-icon cms-icon-minus-square"></span>
                         </div>
                     {% endif %}
-                    {% if has_change_permission %}
+                    {% if page_content and can_change and is_concrete and has_change_permission %}
                         </a>
                     {% endif %}
                 </div>

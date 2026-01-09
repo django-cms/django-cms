@@ -525,12 +525,12 @@ class ChangePageForm(BasePageContentForm):
         help_text=_("Keep this field empty if standard path should be used."),
     )
     soft_root = forms.BooleanField(
-        label=PageContent._meta.get_field("soft_root").verbose_name,
+        label=PageContent._meta.get_field("soft_root").verbose_name.capitalize(),
         required=False,
         help_text=PageContent._meta.get_field("soft_root").help_text,
     )
     redirect = PageSmartLinkField(
-        label=PageContent._meta.get_field("redirect").verbose_name,
+        label=PageContent._meta.get_field("redirect").verbose_name.capitalize(),
         required=False,
         help_text=PageContent._meta.get_field("redirect").help_text,
         placeholder_text=_("Start typing..."),
@@ -538,7 +538,7 @@ class ChangePageForm(BasePageContentForm):
     )
     limit_visibility_in_menu = forms.TypedChoiceField(
         choices=PageContent._meta.get_field("limit_visibility_in_menu").choices,
-        label=_("menu visibility"),
+        label=PageContent._meta.get_field("limit_visibility_in_menu").verbose_name.capitalize(),
         help_text=_("limit when this page is visible in the menu"),
         initial=PageContent._meta.get_field("limit_visibility_in_menu").default,
         required=False,
@@ -1109,6 +1109,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
     level or under him in chosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
+
     _page = None
 
     page = forms.ModelChoiceField(
