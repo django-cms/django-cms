@@ -9,7 +9,6 @@ jobs:
   build-n-publish:
     name: Build and publish Python 🐍 distributions 📦 to pypi
     runs-on: ubuntu-latest
-    if: "!contains(github.ref_name, 'dev')"
     environment:
       name: pypi
       url: https://pypi.org/p/django-cms
@@ -38,5 +37,5 @@ jobs:
         .
 
     - name: Publish distribution 📦 to PyPI
-      if: startsWith(github.ref, 'refs/tags')
+      if: "!contains(github.ref_name, 'dev')"
       uses: pypa/gh-action-pypi-publish@release/v1
