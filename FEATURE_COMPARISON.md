@@ -13,7 +13,35 @@ This document compares the features and changes between the `release/build` bran
 
 ## Major Features in release/build
 
-### 1. Build System Modernization
+### 1. Removal of StaticPlaceholder Model
+**Impact**: CRITICAL (Breaking Change)  
+**Type**: Major Feature / Deprecation
+
+**BREAKING CHANGE**: The `StaticPlaceholder` model has been completely removed from django CMS.
+
+**Changes**:
+- Deleted `cms/models/static_placeholder.py` (77 lines removed)
+- Deleted `cms/admin/static_placeholder.py` (15 lines removed)
+- Removed `StaticPlaceholder` imports from `cms/models/__init__.py`
+- Removed `StaticPlaceholder` admin import from `cms/admin/__init__.py`
+- Added migration `0042_remove_placeholderreference_placeholder_ref_and_more.py` to:
+  - Remove `placeholder_ref` field from `PlaceholderReference` model
+  - Delete the `StaticPlaceholder` model from database
+
+**Impact on Users**:
+- **Sites using StaticPlaceholder will break** when upgrading to 5.1.0dev2
+- Migration 0042 will delete all StaticPlaceholder data from the database
+- Any templates using `{% static_placeholder %}` template tag may need updates
+- Any custom code referencing StaticPlaceholder model will need refactoring
+
+**Migration Path**:
+- Users must migrate away from StaticPlaceholder before upgrading
+- Consider using regular placeholders or alias plugins as alternatives
+- Backup StaticPlaceholder data before running migrations
+
+**Note**: This is a legacy feature removal. The StaticPlaceholder feature was hidden behind the `CMS_HIDE_LEGACY_FEATURES` setting in previous versions and is now fully removed in 5.1.0dev2.
+
+### 2. Build System Modernization
 **Impact**: High (Infrastructure)  
 **Type**: Major Feature
 
@@ -37,7 +65,7 @@ The release/build branch migrates from the legacy `setup.cfg` + `setup.py` confi
 - Simplified build process
 - Better tooling integration
 
-### 2. CI/CD Pipeline Enhancement
+### 3. CI/CD Pipeline Enhancement
 **Impact**: Medium (Development Infrastructure)  
 **Type**: Major Feature
 
@@ -57,7 +85,7 @@ The release/build branch migrates from the legacy `setup.cfg` + `setup.py` confi
 - Prevents pollution of production package index with dev versions
 - Allows for more frequent development releases
 
-### 3. License and Copyright Updates
+### 4. License and Copyright Updates
 **Impact**: Medium (Legal/Compliance)  
 **Type**: Major Feature
 
@@ -210,10 +238,11 @@ Net: -19,008 lines (reduction in code size)
 The `release/build` branch (5.1.0dev2) is primarily focused on **infrastructure modernization** rather than new CMS features:
 
 ### Major Improvements
-1. ✅ Modern Python packaging (pyproject.toml)
-2. ✅ Enhanced CI/CD pipeline safety
-3. ✅ Updated legal/copyright clarity
-4. ✅ Frontend tooling modernization
+1. ✅ **BREAKING**: Removal of legacy StaticPlaceholder model
+2. ✅ Modern Python packaging (pyproject.toml)
+3. ✅ Enhanced CI/CD pipeline safety
+4. ✅ Updated legal/copyright clarity
+5. ✅ Frontend tooling modernization
 
 ### Notable Absences
 1. ❌ **No new CMS end-user features** compared to 5.0.0
@@ -224,9 +253,12 @@ The `release/build` branch (5.1.0dev2) is primarily focused on **infrastructure 
 
 ### Version Strategy
 The 5.1.0 development version appears to be a **consolidation and modernization release** that prepares the codebase for future development by:
+- **Removing legacy features** (StaticPlaceholder)
 - Adopting modern Python packaging standards
 - Improving CI/CD infrastructure
 - Cleaning up technical debt
 - Setting the stage for future feature additions
+
+**Important**: The StaticPlaceholder removal is a **breaking change** that requires migration planning for sites using this feature.
 
 **Next Steps**: The release/build branch should merge the latest fixes from release/5.0.x before proceeding with new feature development for a true 5.1.0 release.
