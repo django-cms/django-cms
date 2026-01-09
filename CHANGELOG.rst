@@ -1,3 +1,19 @@
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Copilot (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* copilot-swe-agent[bot]
+* fsbraun
+
+Thanks to all contributors for their efforts!
+
 5.0.0 (2025-05-12)
 ==================
 
