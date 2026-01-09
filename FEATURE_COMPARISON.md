@@ -4,7 +4,9 @@
 
 This document compares the features and changes between the `release/build` branch (version 5.1.0dev2) and the `release/5.0.x` branch (version 5.0.5) of django CMS.
 
-**Key Finding**: The `release/build` branch represents an early development version of 5.1.0 that branches from a specific point in the codebase. The main differences are infrastructure improvements and build system modernization rather than new CMS features.
+**Key Finding**: The `release/build` branch represents an early development version of 5.1.0 that branches from a specific point in the codebase. The main differences are infrastructure improvements, build system modernization, and **the removal of the legacy StaticPlaceholder model** rather than new CMS features.
+
+**⚠️ BREAKING CHANGE**: The StaticPlaceholder model has been completely removed in release/build. Sites using this feature will need to migrate before upgrading.
 
 ## Version Information
 
