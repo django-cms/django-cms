@@ -1638,6 +1638,7 @@ class PageTest(PageTestBase):
             # The response should contain page structure
             self.assertIn("Home", content)
             self.assertIn("About", content)
+            self.assertNotIn("cms-icon-redirect", content)
 
     def test_page_changelist_search(self):
         superuser = self.get_superuser()
