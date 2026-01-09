@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # cafe-click <cafeclick@rocketmail.com>, 2013
 # Pouya Abbassi, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Pouya Abbassi, 2016\n"
 "Language-Team: Persian (http://app.transifex.com/divio/django-cms/language/fa/)\n"
@@ -18,12 +19,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-msgid "/"
-msgstr ""
-
-msgid ":"
-msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "آیا مطمئن هستید میخواهید تب‌ها را تغییر دهید بدون اینکه صفحه را از قبل ذخیره کرده باشید؟"
