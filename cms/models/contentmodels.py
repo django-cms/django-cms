@@ -11,30 +11,33 @@ from cms.utils.conf import get_cms_setting
 
 class PageContent(models.Model):
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
-        (constants.VISIBILITY_ALL, _('no limit set')),
-        (constants.VISIBILITY_USERS, _('for logged in users only')),
-        (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
+        (constants.VISIBILITY_ALL, _("no limit set")),
+        (constants.VISIBILITY_USERS, _("for logged in users only")),
+        (constants.VISIBILITY_ANONYMOUS, _("for anonymous users only")),
     )
-    TEMPLATE_DEFAULT = constants.TEMPLATE_INHERITANCE_MAGIC if get_cms_setting(
-        'TEMPLATE_INHERITANCE') else (get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else "")
+    TEMPLATE_DEFAULT = (
+        constants.TEMPLATE_INHERITANCE_MAGIC
+        if get_cms_setting("TEMPLATE_INHERITANCE")
+        else (get_cms_setting("TEMPLATES")[0][0] if get_cms_setting("TEMPLATES") else "")
+    )
 
     X_FRAME_OPTIONS_CHOICES = (
-        (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
-        (constants.X_FRAME_OPTIONS_DENY, _('Deny')),
-        (constants.X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
-        (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
+        (constants.X_FRAME_OPTIONS_INHERIT, _("Inherit from parent page")),
+        (constants.X_FRAME_OPTIONS_DENY, _("Deny")),
+        (constants.X_FRAME_OPTIONS_SAMEORIGIN, _("Only this website")),
+        (constants.X_FRAME_OPTIONS_ALLOW, _("Allow")),
     )
 
-    template_choices = get_cms_setting('TEMPLATES')
+    template_choices = get_cms_setting("TEMPLATES")
 
     # These are the fields whose values are compared when saving
     # a PageContent object to know if it has changed.
     editable_fields = [
-        'title',
-        'redirect',
-        'page_title',
-        'menu_title',
-        'meta_description',
+        "title",
+        "redirect",
+        "page_title",
+        "menu_title",
+        "meta_description",
     ]
 
     language = models.CharField(_("language"), max_length=15, db_index=True)
@@ -48,9 +51,7 @@ class PageContent(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        help_text=_(
-            "Overwrites what is displayed at the top of your browser or in bookmarks"
-        ),
+        help_text=_("Overwrites what is displayed at the top of your browser or in bookmarks"),
     )
     menu_title = models.CharField(
         verbose_name=_("Menu Title"),
@@ -72,17 +73,8 @@ class PageContent(models.Model):
         null=True,
         help_text=_("Redirects to this URL."),
     )
-    page = models.ForeignKey(
-        Page,
-        on_delete=models.CASCADE,
-        verbose_name=_("page"),
-        related_name="pagecontent_set"
-    )
-    creation_date = models.DateTimeField(
-        verbose_name=_("creation date"),
-        editable=False,
-        default=timezone.now
-    )
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
+    creation_date = models.DateTimeField(verbose_name=_("creation date"), editable=False, default=timezone.now)
     # Placeholders (plugins)
     placeholders = PlaceholderRelationField()
 
@@ -113,7 +105,7 @@ class PageContent(models.Model):
         verbose_name=_("template"),
         max_length=100,
         choices=template_choices,
-        help_text=_('The template used to render the content.'),
+        help_text=_("The template used to render the content."),
         default=TEMPLATE_DEFAULT,
     )
     limit_visibility_in_menu = models.SmallIntegerField(
@@ -129,7 +121,7 @@ class PageContent(models.Model):
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
-        default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
+        default=get_cms_setting("DEFAULT_X_FRAME_OPTIONS"),
         verbose_name=_("X Frame Options"),
     )
 
@@ -146,18 +138,18 @@ class PageContent(models.Model):
         verbose_name = _("page content")
         verbose_name_plural = _("page contents")
         default_permissions = []
-        unique_together = (('language', 'page'),)
+        unique_together = (("language", "page"),)
         # TODO: unique_together shall be replaced against:
         # constraints = [
         #     models.UniqueConstraint(fields=['language', 'page'], name='language_and_page_uniq')
         # ]
-        app_label = 'cms'
+        app_label = "cms"
 
     def __str__(self):
         return f"{self.title} ({self.language})"
 
     def __repr__(self):
-        display = f'<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>'
+        display = f"<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>"
         return display
 
     def update(self, **data):
@@ -167,14 +159,14 @@ class PageContent(models.Model):
 
     def save(self, **kwargs):
         # delete template cache
-        if hasattr(self, '_template_cache'):
-            delattr(self, '_template_cache')
+        if hasattr(self, "_template_cache"):
+            delattr(self, "_template_cache")
         super().save(**kwargs)
 
     def toggle_in_navigation(self, set_to=None):
-        '''
+        """
         Toggles (or sets) in_navigation and invalidates the cms page cache
-        '''
+        """
         old = bool(self.in_navigation)
 
         if set_to in [True, False]:
@@ -204,7 +196,7 @@ class PageContent(models.Model):
         return rescan_placeholders_for_obj(self)
 
     def get_placeholders(self):
-        if not hasattr(self, '_placeholder_cache'):
+        if not hasattr(self, "_placeholder_cache"):
             self._placeholder_cache = self.placeholders.all()
         return self._placeholder_cache
 
@@ -218,30 +210,30 @@ class PageContent(models.Model):
         """
         Returns a list of placeholder slots for this page content object.
         """
-        if not get_cms_setting('PLACEHOLDERS'):
+        if not get_cms_setting("PLACEHOLDERS"):
             return []
         if not hasattr(self, "_placeholder_slot_cache"):
             if self.template == constants.TEMPLATE_INHERITANCE_MAGIC:
                 templates = (
-                    self
-                    .get_ancestor_titles()
+                    self.get_ancestor_titles()
                     .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-                    .order_by('-page__path')
-                    .values_list('template', flat=True)
+                    .order_by("-page__path")
+                    .values_list("template", flat=True)
                 )
                 if templates:
                     placeholder_set = templates[0]
                 else:
-                    placeholder_set = get_cms_setting('PLACEHOLDERS')[0][0]
+                    placeholder_set = get_cms_setting("PLACEHOLDERS")[0][0]
             else:
-                placeholder_set = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
+                placeholder_set = self.template or get_cms_setting("PLACEHOLDERS")[0][0]
 
             for key, value, __ in get_cms_setting("PLACEHOLDERS"):
-                if key == placeholder_set or key == "":  # NOQA: PLR1714 - Empty string matches always
+                if key in (placeholder_set, ""):
+                    # - Empty string matches always
                     self._placeholder_slot_cache = value
                     break
             else:  # No matching placeholder list found
-                self._placeholder_slot_cache = get_cms_setting('PLACEHOLDERS')[0][1]
+                self._placeholder_slot_cache = get_cms_setting("PLACEHOLDERS")[0][1]
         if isinstance(self._placeholder_slot_cache, str):
             # Accidentally a strong not a tuple? Make it a 1-element tuple
             self._placeholder_slot_cache = (self._placeholder_slot_cache,)
@@ -252,28 +244,27 @@ class PageContent(models.Model):
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
-        if hasattr(self, '_template_cache'):
+        if hasattr(self, "_template_cache"):
             return self._template_cache
 
         if not get_cms_setting("TEMPLATES"):
             return ""
 
         if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
-            self._template_cache = self.template or get_cms_setting('TEMPLATES')[0][0]
+            self._template_cache = self.template or self.template_choices[0][0]
             return self._template_cache
 
         templates = (
-            self
-            .get_ancestor_titles()
+            self.get_ancestor_titles()
             .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-            .order_by('-page__path')
-            .values_list('template', flat=True)
+            .order_by("-page__path")
+            .values_list("template", flat=True)
         )
 
         try:
             self._template_cache = templates[0]
         except IndexError:
-            self._template_cache = get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else ""
+            self._template_cache = self.template_choices[0][0] if self.template_choices else ""
         return self._template_cache
 
     def get_template_name(self):
@@ -283,7 +274,7 @@ class PageContent(models.Model):
         name of the default template.
         """
         template = self.get_template()
-        for t in get_cms_setting('TEMPLATES'):
+        for t in get_cms_setting("TEMPLATES"):
             if t[0] == template:
                 return t[1]
         return _("default")
@@ -305,18 +296,18 @@ class PageContent(models.Model):
         return "public" if self.get_absolute_url(language=self.language) else "unpublished-parent"
 
     def get_xframe_options(self):
-        """ Finds X_FRAME_OPTION from tree if inherited """
+        """Finds X_FRAME_OPTION from tree if inherited"""
         xframe_options = self.xframe_options or constants.X_FRAME_OPTIONS_INHERIT
 
         if xframe_options != constants.X_FRAME_OPTIONS_INHERIT:
             return xframe_options
 
         # Ignore those pages which just inherit their value
-        ancestors = self.get_ancestor_titles().order_by('-page__path')
+        ancestors = self.get_ancestor_titles().order_by("-page__path")
         ancestors = ancestors.exclude(xframe_options=constants.X_FRAME_OPTIONS_INHERIT)
 
         # Now just give me the clickjacking setting (not anything else)
-        xframe_options = ancestors.values_list('xframe_options', flat=True)
+        xframe_options = ancestors.values_list("xframe_options", flat=True)
 
         try:
             return xframe_options[0]
@@ -334,6 +325,7 @@ class EmptyPageContent:
     Empty title object, can be returned from :meth:`cms.models.pagemodel.Page.get_content_obj` if required
     title object doesn't exist.
     """
+
     title = ""
     meta_description = ""
     redirect = ""

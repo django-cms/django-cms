@@ -17,7 +17,7 @@ from cms.api import create_page
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.constants import MODAL_HTML_REDIRECT, TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
-from cms.models import Page, UserSettings
+from cms.models import Page, PageContent, UserSettings
 from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
@@ -93,7 +93,7 @@ class WizardTestMixin:
             weight=100,
             form=WizardForm,
             model=Page,
-            template_name='my_template.html',  # This doesn't exist anywhere
+            template_name="my_template.html",  # This doesn't exist anywhere
         )
 
         class SettingsWizard(Wizard):
@@ -115,7 +115,7 @@ class WizardTestMixin:
             title=_("Page"),
             weight=100,
             form=BadModelForm,
-            template_name='my_template.html',  # This doesn't exist anywhere
+            template_name="my_template.html",  # This doesn't exist anywhere
         )
 
     def setUp(self):
@@ -124,7 +124,6 @@ class WizardTestMixin:
 
 
 class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
-
     def test_user_has_add_permission(self):
         # Test does not have permission
         user = self.get_staff_user_with_no_permissions()
@@ -145,8 +144,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             in_navigation=True,
         )
         url = page.get_absolute_url(language="en")
-        self.assertEqual(self.page_wizard.get_success_url(
-            page, language="en"), url)
+        self.assertEqual(self.page_wizard.get_success_url(page, language="en"), url)
 
         # Now again without a language code
         url = page.get_absolute_url()
@@ -163,13 +161,11 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             in_navigation=True,
         )
 
-        extension = apps.get_app_config('cms').cms_extension
+        extension = apps.get_app_config("cms").cms_extension
 
-        with patch.object(extension, 'toolbar_enabled_models', {Page: page}):
-            url = self.page_wizard.get_success_url(
-                page, language="en")
-            self.assertEqual(
-                url, get_object_edit_url(page, language="en"))
+        with patch.object(extension, "toolbar_enabled_models", {Page: page}):
+            url = self.page_wizard.get_success_url(page, language="en")
+            self.assertEqual(url, get_object_edit_url(page, language="en"))
 
     def test_get_preview_url(self):
         wizard_preview_mode = Wizard(
@@ -177,8 +173,8 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             weight=100,
             form=WizardForm,
             model=Page,
-            template_name='my_template.html',  # This doesn't exist anywhere
-            edit_mode_on_success=False
+            template_name="my_template.html",  # This doesn't exist anywhere
+            edit_mode_on_success=False,
         )
 
         user = self.get_superuser()
@@ -191,13 +187,11 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             in_navigation=True,
         )
 
-        extension = apps.get_app_config('cms').cms_extension
+        extension = apps.get_app_config("cms").cms_extension
 
-        with patch.object(extension, 'toolbar_enabled_models', {Page: page}):
-            url = wizard_preview_mode.get_success_url(
-                page, language="en")
-            self.assertEqual(
-                url, get_object_preview_url(page, language="en"))
+        with patch.object(extension, "toolbar_enabled_models", {Page: page}):
+            url = wizard_preview_mode.get_success_url(page, language="en")
+            self.assertEqual(url, get_object_preview_url(page, language="en"))
 
     def test_get_model(self):
         self.assertEqual(self.page_wizard.get_model(), Page)
@@ -206,7 +200,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             self.title_wizard.get_model()
 
     def test_endpoint_auth_required(self):
-        endpoint = reverse('admin:cms_wizard_create')
+        endpoint = reverse("admin:cms_wizard_create")
         staff_active = self._create_user("staff-active", is_staff=True, is_superuser=False, is_active=True)
 
         response = self.client.get(endpoint)
@@ -218,17 +212,15 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
 
 
 class TestWizardPool(WizardTestMixin, CMSTestCase):
-
     def tearDown(self):
         # Clean up in case anything has been removed or added to the
         # registered wizards, so other tests don't have problems
-        extension = apps.get_app_config('cms').cms_extension
+        extension = apps.get_app_config("cms").cms_extension
         # Reset the cached property 'wizards'
-        if hasattr(extension, 'wizards'):
+        if hasattr(extension, "wizards"):
             del extension.wizards
         configs_with_wizards = [
-            app.cms_config for app in app_registration.get_cms_config_apps()
-            if hasattr(app.cms_config, 'cms_wizards')
+            app.cms_config for app in app_registration.get_cms_config_apps() if hasattr(app.cms_config, "cms_wizards")
         ]
         for config in configs_with_wizards:
             extension.configure_wizards(config)
@@ -261,7 +253,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         Removes a wizard from the wizards dict.
         """
         was_unregistered = wizard_pool.unregister(cms_page_wizard)
-        registered_wizards = apps.get_app_config('cms').cms_extension.wizards
+        registered_wizards = apps.get_app_config("cms").cms_extension.wizards
         self.assertNotIn(cms_page_wizard.id, registered_wizards)
         self.assertTrue(was_unregistered)
 
@@ -288,10 +280,10 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         Adds the wizard to the wizards dict.
         """
         wizard_pool.register(self.page_wizard)
-        registered_wizards = apps.get_app_config('cms').cms_extension.wizards
+        registered_wizards = apps.get_app_config("cms").cms_extension.wizards
         self.assertIn(self.page_wizard.id, registered_wizards)
 
-    @patch('cms.wizards.wizard_pool.get_entry')
+    @patch("cms.wizards.wizard_pool.get_entry")
     def test_get_entry(self, mocked_get_entry):
         """
         Test for backwards compatibility of wizard_pool.get_entry.
@@ -312,9 +304,9 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # gets loaded with the default apps and then again with
         # the overridden ones.
         INSTALLED_APPS = [
-            'cms',
-            'treebeard',
-            'cms.test_utils.project.backwards_wizards',
+            "cms",
+            "treebeard",
+            "cms.test_utils.project.backwards_wizards",
         ]
         mocked_apps = Apps(installed_apps=INSTALLED_APPS)
         # clear out app registration cache now that installed apps have
@@ -325,8 +317,8 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # of imports and other fun things, apps have to be patched
         # in multiple places. If functions are moved around the code
         # this could get worse.
-        with patch('cms.app_registration.apps', mocked_apps):
-            with patch('cms.wizards.wizard_pool.apps', mocked_apps):
+        with patch("cms.app_registration.apps", mocked_apps):
+            with patch("cms.wizards.wizard_pool.apps", mocked_apps):
                 setup_cms_apps()
         # Check the wizards built into the cms app and the wizard from
         # the backwards_wizards app have been picked up.
@@ -334,7 +326,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # registers its wizard by adding wizard_pool.register(wizard)
         # to cms_wizards.py which is the old way we want backwards
         # compatibility with.
-        cms_app = mocked_apps.get_app_config('cms')
+        cms_app = mocked_apps.get_app_config("cms")
         expected_wizards = {
             cms_page_wizard.id: cms_page_wizard,
             cms_subpage_wizard.id: cms_subpage_wizard,
@@ -344,7 +336,6 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
 
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
-
     def test_str(self):
         self.assertEqual(str(cms_page_wizard), cms_page_wizard.title)
 
@@ -364,15 +355,15 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             language="en",
         )
         data = {
-            'title': 'Child',
-            'slug': 'child',
-            'page_type': None,
+            "title": "Child",
+            "slug": "child",
+            "page_type": None,
         }
         form = CreateCMSSubPageForm(
             data=data,
             wizard_page=parent_page,
             wizard_site=self.site,
-            wizard_language='en',
+            wizard_language="en",
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
@@ -380,8 +371,8 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         self.assertEqual(child_page.depth, 2)
         self.assertEqual(child_page.parent, parent_page)
-        self.assertEqual(child_page.get_title('en'), 'Child')
-        self.assertEqual(child_page.get_path('en'), 'parent/child')
+        self.assertEqual(child_page.get_title("en"), "Child")
+        self.assertEqual(child_page.get_path("en"), "parent/child")
 
     def test_wizard_create_atomic(self):
         # Ref: https://github.com/divio/django-cms/issues/5652
@@ -394,22 +385,22 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         with self.login_user_context(superuser):
             request = self.get_request()
         data = {
-            'title': 'page 1',
-            'slug': 'page_1',
-            'page_type': None,
+            "title": "page 1",
+            "slug": "page_1",
+            "page_type": None,
         }
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
             wizard_site=self.site,
-            wizard_language='en',
+            wizard_language="en",
             wizard_request=request,
         )
 
         self.assertTrue(form.is_valid())
         self.assertFalse(Page.objects.filter(pagecontent_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
-        with self.settings(CMS_TEMPLATES=[("col_invalid.html", "notvalid")]):
+        with patch.object(PageContent, "template_choices", [("col_invalid.html", "notvalid")]):
             self.assertRaises(TemplateSyntaxError, form.save)
             # The template raised an exception which should cause the database to roll back
             # instead of committing a page in a partial state.
@@ -424,39 +415,44 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         with self.login_user_context(superuser):
             request = self.get_request()
-        templates = get_cms_setting('TEMPLATES')
+        templates = get_cms_setting("TEMPLATES")
         # NOTE, there are 4 placeholders on this template, defined in this
         # order: 'header', 'content', 'sub-content', 'footer'.
         # 'footer' is a static-placeholder.
-        templates.append(('page_wizard.html', 'page_wizard.html', ))
+        templates.append(
+            (
+                "page_wizard.html",
+                "page_wizard.html",
+            )
+        )
 
         settings = {
-            'CMS_TEMPLATES': templates,
-            'CMS_PAGE_WIZARD_DEFAULT_TEMPLATE': 'page_wizard.html',
-            'CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER': 'sub-content',
+            "CMS_TEMPLATES": templates,
+            "CMS_PAGE_WIZARD_DEFAULT_TEMPLATE": "page_wizard.html",
+            "CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER": "sub-content",
         }
 
         with override_settings(**settings):
             page = create_page("wizard home", "page_wizard.html", "en")
-            content = '<p>sub-content content.</p>'
+            content = "<p>sub-content content.</p>"
             data = {
-                'title': 'page 1',
-                'slug': 'page_1',
-                'page_type': None,
-                'content': content,
+                "title": "page 1",
+                "slug": "page_1",
+                "page_type": None,
+                "content": content,
             }
             form = CreateCMSPageForm(
                 data=data,
                 wizard_page=page,
                 wizard_site=self.site,
-                wizard_language='en',
+                wizard_language="en",
                 wizard_request=request,
             )
             self.assertTrue(form.is_valid())
             page = form.save()
 
             with self.login_user_context(superuser):
-                url = page.get_absolute_url('en')
+                url = page.get_absolute_url("en")
                 expected = f'<div class="sub-content">{content}</div>'
                 unexpected = f'<div class="content">{content}</div>'
                 response = self.client.get(url)
@@ -473,40 +469,45 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         with self.login_user_context(superuser):
             request = self.get_request()
-        templates = get_cms_setting('TEMPLATES')
+        templates = get_cms_setting("TEMPLATES")
         # NOTE, there are 4 placeholders on this template, defined in this
         # order: 'header', 'content', 'sub-content', 'footer'.
         # 'footer' is a static-placeholder.
-        templates.append(('page_wizard.html', 'page_wizard.html', ))
+        templates.append(
+            (
+                "page_wizard.html",
+                "page_wizard.html",
+            )
+        )
 
         settings = {
-            'CMS_TEMPLATES': templates,
-            'CMS_PAGE_WIZARD_DEFAULT_TEMPLATE': 'page_wizard.html',
+            "CMS_TEMPLATES": templates,
+            "CMS_PAGE_WIZARD_DEFAULT_TEMPLATE": "page_wizard.html",
             # This is a bad setting.
-            'CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER': 'footer',
+            "CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER": "footer",
         }
 
         with override_settings(**settings):
             page = create_page("wizard home", "page_wizard.html", "en")
-            content = '<p>footer content.</p>'
+            content = "<p>footer content.</p>"
             data = {
-                'title': 'page 1',
-                'slug': 'page_1',
-                'page_type': None,
-                'content': content,
+                "title": "page 1",
+                "slug": "page_1",
+                "page_type": None,
+                "content": content,
             }
             form = CreateCMSPageForm(
                 data=data,
                 wizard_page=page,
                 wizard_site=self.site,
-                wizard_language='en',
+                wizard_language="en",
                 wizard_request=request,
             )
             self.assertTrue(form.is_valid())
             page = form.save()
 
             with self.login_user_context(superuser):
-                url = page.get_absolute_url('en')
+                url = page.get_absolute_url("en")
                 response = self.client.get(url)
                 self.assertNotContains(response, content, status_code=200)
 
@@ -516,15 +517,15 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         with self.login_user_context(superuser):
             request = self.get_request()
         data = {
-            'title': '',
-            'slug': '',
-            'page_type': None,
+            "title": "",
+            "slug": "",
+            "page_type": None,
         }
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
             wizard_site=self.site,
-            wizard_language='en',
+            wizard_language="en",
             wizard_request=request,
         )
         self.assertFalse(form.is_valid())
@@ -535,83 +536,78 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         with self.login_user_context(superuser):
             request = self.get_request()
         data = {
-            'title': 'page',
-            'slug': 'page',
-            'page_type': None,
+            "title": "page",
+            "slug": "page",
+            "page_type": None,
         }
-        create_page(
-            'page',
-            'nav_playground.html',
-            language='en',
-            slug='page'
-        )
+        create_page("page", "nav_playground.html", language="en", slug="page")
 
         # slug -> page-1
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
             wizard_site=self.site,
-            wizard_language='en',
+            wizard_language="en",
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().get_urls().filter(slug='page-2'))
+        self.assertTrue(form.save().get_urls().filter(slug="page-2"))
 
         # slug -> page-2
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
             wizard_site=self.site,
-            wizard_language='en',
+            wizard_language="en",
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().get_urls().filter(slug='page-3'))
+        self.assertTrue(form.save().get_urls().filter(slug="page-3"))
 
         # Now explicitly request the page-2 slug
-        data['slug'] = 'page-2'
+        data["slug"] = "page-2"
 
         # slug -> page-2-2
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
             wizard_site=self.site,
-            wizard_language='en',
+            wizard_language="en",
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().get_urls().filter(slug='page-2-2'))
+        self.assertTrue(form.save().get_urls().filter(slug="page-2-2"))
 
         # slug -> page-2-3
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
             wizard_site=self.site,
-            wizard_language='en',
+            wizard_language="en",
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().get_urls().filter(slug='page-2-3'))
+        self.assertTrue(form.save().get_urls().filter(slug="page-2-3"))
 
 
 class TestPageWizardSubmission(CMSTestCase):
     def test_page_wizard_submission(self):
         from cms.wizards.helpers import get_entries
 
-        page = create_page('home', 'nav_playground.html', 'en')
+        page = create_page("home", "nav_playground.html", "en")
         entry_id = get_entries()[0].id
         endpoint = admin_reverse("cms_wizard_create")
         data_step1 = {
-            'wizard_create_view-current_step': '0',
-            '0-entry': entry_id,
-            '0-language': 'en',
-            '0-page': page.pk,
+            "wizard_create_view-current_step": "0",
+            "0-entry": entry_id,
+            "0-language": "en",
+            "0-page": page.pk,
         }
         data_step2 = {
-            'wizard_create_view-current_step': '1',
-            '1-title': 'my test page',
-            '1-slug': 'my-test-page',
-            '1-content': '',
+            "wizard_create_view-current_step": "1",
+            "1-title": "my test page",
+            "1-slug": "my-test-page",
+            "1-content": "",
         }
 
         with self.login_user_context(self.get_superuser()):
@@ -619,15 +615,11 @@ class TestPageWizardSubmission(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             response = self.client.post(endpoint, data_step2)
 
-        edit_endpoint = get_object_edit_url(
-            Page.objects.exclude(pk=page.pk).last().get_content_obj("en"),
-            "en"
-        )
+        edit_endpoint = get_object_edit_url(Page.objects.exclude(pk=page.pk).last().get_content_obj("en"), "en")
         self.assertContains(response, MODAL_HTML_REDIRECT.format(url=edit_endpoint))
 
 
 class TestWizardHelpers(CMSTestCase):
-
     def setUp(self):
         # The results of get_cms_extension_apps and get_cms_config_apps
         # are cached. Clear this cache because installed apps change
@@ -663,13 +655,12 @@ class TestWizardHelpers(CMSTestCase):
 
 
 class TestEntryChoices(CMSTestCase):
-
     def test_generates_choices_in_weighted_order(self):
         """
         The entry_choices function returns the wizards ordered by weight
         """
         user = self.get_superuser()
-        page = create_page('home', 'nav_playground.html', 'en')
+        page = create_page("home", "nav_playground.html", "en")
         wizard_choices = [option for option in entry_choices(user, page)]
         expected = [
             (cms_page_wizard.id, cms_page_wizard.title),
@@ -678,17 +669,14 @@ class TestEntryChoices(CMSTestCase):
         ]
         self.assertListEqual(wizard_choices, expected)
 
-    @patch.object(
-        cms_page_wizard, 'user_has_add_permission',
-        Mock(return_value=False)
-    )
+    @patch.object(cms_page_wizard, "user_has_add_permission", Mock(return_value=False))
     def test_doesnt_generate_choice_if_user_doesnt_have_permission(self):
         """
         The entry_choices function only returns the wizards that the
         user has permissions for
         """
         user = self.get_superuser()
-        page = create_page('home', 'nav_playground.html', 'en')
+        page = create_page("home", "nav_playground.html", "en")
         wizard_choices = [option for option in entry_choices(user, page)]
         expected = [
             # Missing cms_page_wizard entry
