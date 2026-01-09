@@ -194,15 +194,14 @@ The following bug fixes were added to release/5.0.x after the branching point an
 ### Bug Fixes in 5.0.5 (Missing from release/build)
 1. **fix**: Improved UX for external placeholders (e.g., static aliases) (#8416, #8435)
 2. **fix**: ApphookReloadMiddleware not handling new language variants #2 (#8401, #8412)
-3. **fix**: Copying failed if a target placeholders was missing (#8399, #8410)
+3. **fix**: Copying failed if a target placeholder was missing (#8399, #8410, #8402)
 4. **fix**: Save fallback for includes when scanning for placeholders (#8405, #8407)
-5. **fix**: Copying failed if a target placeholders was missing (#8399, #8402)
-6. **fix**: Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367, #8390)
-7. **fix**: Copying x-language lead to unique constraint violation (#8366, #8386)
-8. **fix**: Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375, #8384)
-9. **fix**: Fix default value for edit_fields parameter to avoid AttributeError (#8381)
-10. **fix**: Link syntax in welcome.html
-11. **fix**: Searching pages for language-specific content failed due to wrong search queryset (#8355, #8358)
+5. **fix**: Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367, #8390)
+6. **fix**: Copying x-language lead to unique constraint violation (#8366, #8386)
+7. **fix**: Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375, #8384)
+8. **fix**: Fix default value for edit_fields parameter to avoid AttributeError (#8381)
+9. **fix**: Link syntax in welcome.html
+10. **fix**: Searching pages for language-specific content failed due to wrong search queryset (#8355, #8358)
 
 ### Bug Fixes in 5.0.4 (Missing from release/build)
 1. **fix**: Wrong placeholders rendered when using apphooks with own placeholders (#8343, #8348)
@@ -248,7 +247,7 @@ The `release/build` branch (5.1.0dev2) is primarily focused on **infrastructure 
 
 ### Notable Absences
 1. ❌ **No new CMS end-user features** compared to 5.0.0
-2. ❌ **Missing recent bug fixes** from 5.0.x branch (11+ fixes)
+2. ❌ **Missing recent bug fixes** from 5.0.x branch (11 fixes from v5.0.3-5.0.5)
 3. ❌ No new admin interface improvements
 4. ❌ No new template tags or features
 5. ❌ No new API endpoints
