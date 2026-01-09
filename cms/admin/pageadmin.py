@@ -301,7 +301,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         context = {
             "title": _("Advanced Settings") if show_advanced_settings else _("Change Permissions"),
             "show_permissions": show_permissions,
-       }
+        }
         return self.change_view(request, object_id, extra_context=context)
 
     def response_post_save_change(self, request, obj):
@@ -1076,9 +1076,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return site in user_sites
 
     def raise_site_permission_denied(self):
-        raise PermissionDenied(
-             _("You do not have permission to access this site. Please contact your administrator.")
-        )
+        raise PermissionDenied(_("You do not have permission to access this site. Please contact your administrator."))
 
     def changelist_view(self, request, extra_context=None):
         from django.contrib.admin.views.main import ERROR_FLAG
@@ -1357,12 +1355,13 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             else:
                 metadata = ""
 
+            page_content = page.get_admin_content(language)
             context = {
                 "admin": self,
                 "opts": self.opts,
                 "site": site,
                 "page": page,
-                "page_content": page.get_admin_content(language),
+                "page_content": page_content,
                 "ancestors": [page for page in page.get_cached_ancestors()],
                 "descendants": [page for page in page.get_cached_descendants()],
                 "request": request,
@@ -1376,9 +1375,11 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 "has_add_page_permission": user_can_add(request.user, target=page),
                 "has_change_permission": user_can_change(request.user, page, site),
                 "has_change_advanced_settings_permission": (
-                    user_can_change_advanced(request.user, page, site) or user_can_change_permissions(request.user, page, site)
+                    user_can_change_advanced(request.user, page, site)
+                    or user_can_change_permissions(request.user, page, site)
                 ),
                 "has_move_page_permission": has_move_page_permission,
+                "can_change": page_content.is_editable(request) if hasattr(page_content, "is_editable") else True,
             }
             context["is_concrete"] = context["page_content"].language == language
             return template.render(context)
