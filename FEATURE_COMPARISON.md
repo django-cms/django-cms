@@ -230,7 +230,7 @@ Net: -19,008 lines (reduction in code size)
 2. **If using release/build**: This is a development version. Use only for testing future features and providing feedback.
 
 ### For Developers
-1. **Backport Needed**: The 11+ bug fixes from release/5.0.x should be cherry-picked/merged into release/build to ensure it has the latest stability fixes.
+1. **Backport Needed**: The 11 bug fixes from release/5.0.x should be cherry-picked/merged into release/build to ensure it has the latest stability fixes.
 2. **Testing Required**: The build system modernization needs thorough testing to ensure packaging and distribution work correctly.
 3. **CI/CD Validation**: Test the new PyPI publishing logic with actual dev tag releases.
 
@@ -247,7 +247,7 @@ The `release/build` branch (5.1.0dev2) is primarily focused on **infrastructure 
 
 ### Notable Absences
 1. ❌ **No new CMS end-user features** compared to 5.0.0
-2. ❌ **Missing recent bug fixes** from 5.0.x branch (11 fixes from v5.0.3-5.0.5)
+2. ❌ **Missing recent bug fixes** from 5.0.x branch (11 fixes from versions 5.0.3 through 5.0.5)
 3. ❌ No new admin interface improvements
 4. ❌ No new template tags or features
 5. ❌ No new API endpoints
