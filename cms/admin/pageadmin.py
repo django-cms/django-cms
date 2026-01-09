@@ -1379,7 +1379,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                     or user_can_change_permissions(request.user, page, site)
                 ),
                 "has_move_page_permission": has_move_page_permission,
-                "can_change": page_content.is_editable(request) if hasattr(page_content, "is_editable") else True,
+                "can_change": page_content.is_editable(request),
             }
             context["is_concrete"] = context["page_content"].language == language
             return template.render(context)
