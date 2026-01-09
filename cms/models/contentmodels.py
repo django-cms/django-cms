@@ -15,10 +15,13 @@ class PageContent(models.Model):
         (constants.VISIBILITY_USERS, _("for logged in users only")),
         (constants.VISIBILITY_ANONYMOUS, _("for anonymous users only")),
     )
+
+    template_choices = get_cms_setting("TEMPLATES")
+
     TEMPLATE_DEFAULT = (
         constants.TEMPLATE_INHERITANCE_MAGIC
         if get_cms_setting("TEMPLATE_INHERITANCE")
-        else (get_cms_setting("TEMPLATES")[0][0] if get_cms_setting("TEMPLATES") else "")
+        else (template_choices[0][0] if template_choices else "")
     )
 
     X_FRAME_OPTIONS_CHOICES = (
@@ -27,8 +30,6 @@ class PageContent(models.Model):
         (constants.X_FRAME_OPTIONS_SAMEORIGIN, _("Only this website")),
         (constants.X_FRAME_OPTIONS_ALLOW, _("Allow")),
     )
-
-    template_choices = get_cms_setting("TEMPLATES")
 
     # These are the fields whose values are compared when saving
     # a PageContent object to know if it has changed.
