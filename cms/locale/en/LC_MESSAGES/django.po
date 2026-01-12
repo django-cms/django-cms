@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-31 07:54+0100\n"
+"POT-Creation-Date: 2026-01-12 15:47+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -45,9 +45,6 @@ msgstr "Keep this field empty if standard path should be used."
 
 msgid "Start typing..."
 msgstr "Start typing..."
-
-msgid "menu visibility"
-msgstr "menu visibility"
 
 msgid "limit when this page is visible in the menu"
 msgstr "limit when this page is visible in the menu"
@@ -228,6 +225,13 @@ msgstr "New sub page"
 msgid "New page"
 msgstr "New page"
 
+#, fuzzy
+#| msgid "You do not have permission to copy this placeholder."
+msgid ""
+"You do not have permission to access this site. Please contact your "
+"administrator."
+msgstr "You do not have permission to copy this placeholder."
+
 msgid "Database error"
 msgstr "Database error"
 
@@ -241,6 +245,10 @@ msgstr "placeholder content"
 
 msgid "The template was successfully changed"
 msgstr "The template was successfully changed"
+
+#, python-format
+msgid "Placeholder '%s' does not exist in target language"
+msgstr ""
 
 msgid "You do not have permission to copy these plugins."
 msgstr "You do not have permission to copy these plugins."
@@ -633,6 +641,9 @@ msgstr "template"
 msgid "login required"
 msgstr "login required"
 
+msgid "menu visibility"
+msgstr "menu visibility"
+
 msgid "application"
 msgstr "application"
 
@@ -828,6 +839,16 @@ msgstr "slot"
 
 msgid "width"
 msgstr "width"
+
+#, fuzzy
+#| msgid "Edit model"
+msgid "Edit object"
+msgstr "Edit model"
+
+#, fuzzy
+#| msgid "This is a static placeholder"
+msgid "This is an external placeholder"
+msgstr "This is a static placeholder"
 
 #, fuzzy
 #| msgid "Add plugin"
@@ -1146,6 +1167,9 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
+msgid "Redirect"
+msgstr "Redirect"
+
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Application: %(apphook)s"
@@ -1192,9 +1216,6 @@ msgstr "Empty all"
 
 msgid "Filter plugins..."
 msgstr "Filter plugins..."
-
-msgid "This is a static placeholder"
-msgstr "This is a static placeholder"
 
 msgid "Expand all"
 msgstr "Expand all"
@@ -1347,6 +1368,11 @@ msgstr "Minimize"
 
 msgid "Maximize"
 msgstr "Maximize"
+
+#, fuzzy
+#| msgid "placeholder code"
+msgid "Placeholder not editable"
+msgstr "placeholder code"
 
 msgid "Drop a plugin here"
 msgstr "Drop a plugin here"
@@ -1765,9 +1791,6 @@ msgstr "A wizard has already been registered for model: %s"
 #~ "Descriptive name to identify this static placeholder. Not displayed to "
 #~ "users."
 
-#~ msgid "placeholder code"
-#~ msgstr "placeholder code"
-
 #~ msgid "To render the static placeholder in templates."
 #~ msgstr "To render the static placeholder in templates."
 
@@ -1791,9 +1814,6 @@ msgstr "A wizard has already been registered for model: %s"
 
 #~ msgid "Soft root"
 #~ msgstr "Soft root"
-
-#~ msgid "Redirect"
-#~ msgstr "Redirect"
 
 #, python-format
 #~ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
