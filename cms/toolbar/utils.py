@@ -8,7 +8,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db import models
-from django.http import HttpRequest
+from django.http import HttpRequest, QueryDict
 from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
@@ -228,69 +228,53 @@ def add_live_url_querystring_param(obj: models.Model, url: str, language: str | 
     return url
 
 
-def get_object_edit_url(obj: models.Model, language: str = None) -> str:
+def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, params: QueryDict = None) -> str:
+    content_type = ContentType.objects.get_for_model(obj)
+
+    language = getattr(obj, "language", language)  # Object trumps parameter
+    if language is None:
+        language = get_language()
+
+    with force_language(language):
+        url = admin_reverse(reverse_name, args=[content_type.pk, obj.pk])
+        get_params = params.copy() if params else QueryDict(mutable=True)
+        if not get_language_from_path(url):
+            get_params["language"] = language
+        if get_params:
+            url = url + "?" + get_params.urlencode()
+    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
+        url = add_live_url_querystring_param(obj, url, language)
+    return url
+
+
+def get_object_edit_url(obj: models.Model, language: str = None, params: dict = None) -> str:
     """
     Returns the url of the edit endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
     """
-    content_type = ContentType.objects.get_for_model(obj)
-
-    language = getattr(obj, "language", language)  # Object trumps parameter
-    if language is None:
-        language = get_language()
-
-    with force_language(language):
-        url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
-        if not get_language_from_path(url):
-            url += f'?language={language}'
-    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
-        url = add_live_url_querystring_param(obj, url, language)
-    return url
+    return _get_object_url("cms_placeholder_render_object_edit", obj, language, params)
 
 
-def get_object_preview_url(obj: models.Model, language: str = None) -> str:
+def get_object_preview_url(obj: models.Model, language: str = None, params: dict = None) -> str:
     """
     Returns the url of the preview endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
     """
-    content_type = ContentType.objects.get_for_model(obj)
-
-    language = getattr(obj, "language", language)  # Object trumps parameter
-    if language is None:
-        language = get_language()
-
-    with force_language(language):
-        url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
-        if not get_language_from_path(url):
-            url += f'?language={language}'
-    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
-        url = add_live_url_querystring_param(obj, url, language)
-    return url
+    return _get_object_url("cms_placeholder_render_object_preview", obj, language, params)
 
 
-def get_object_structure_url(obj: models.Model, language: str = None) -> str:
+def get_object_structure_url(obj: models.Model, language: str = None, params: dict = None) -> str:
     """
     Returns the url of the structure endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
     """
-
-    content_type = ContentType.objects.get_for_model(obj)
-
-    language = getattr(obj, "language", language)  # Object trumps parameter
-    if language is None:
-        language = get_language()
-
-    with force_language(language):
-        url = admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
-        if not get_language_from_path(url):
-            url += f'?language={language}'
-    return url
+    return _get_object_url("cms_placeholder_render_object_structure", obj, language, params)
 
 
 def get_object_live_url(obj: models.Model, language: str = None, site: Optional[Site] = None) -> str:
