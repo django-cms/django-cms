@@ -303,7 +303,7 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Site | No
         if params and url_param in params:
             params = params.copy()
             del params[url_param]
-        if params and not "?" in absolute_url:
+        if params and "?" not in absolute_url:
             absolute_url = absolute_url + "?" + params.urlencode()
 
     obj_site = getattr(obj, 'site', None)
