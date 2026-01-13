@@ -2398,6 +2398,44 @@ class GetObjectLiveUrlTests(CMSTestCase):
         url = get_object_live_url(page, language="de", site=self.site1)
         self.assertEqual(url, "/de/test-page/")
 
+    def test_get_object_live_url_includes_querydict_params(self):
+        """
+        Verifies that get_object_live_url includes QueryDict parameters
+        but excludes the ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
+        """
+        from django.http import QueryDict
+
+        page = create_page("test page", "nav_playground.html", "de", site=self.site1)
+
+        # Create a QueryDict with test parameters
+        params = QueryDict(mutable=True)
+        params["param1"] = "value1"
+        params["param2"] = "value2"
+        params[get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM")] = "should_be_excluded"
+
+        # Test without site argument (should include params)
+        url = get_object_live_url(page, language="de", site=None, params=params)
+        self.assertIn("param1=value1", url)
+        self.assertIn("param2=value2", url)
+        self.assertNotIn("should_be_excluded", url)
+        self.assertIn("?", url)
+
+        # Test with same site (should include params, no domain prefix)
+        url = get_object_live_url(page, language="de", site=self.site1, params=params)
+        self.assertIn("param1=value1", url)
+        self.assertIn("param2=value2", url)
+        self.assertNotIn("should_be_excluded", url)
+        self.assertIn("?", url)
+        self.assertFalse(url.startswith("//"))
+
+        # Test with different site (should include params, with domain prefix)
+        url = get_object_live_url(page, language="de", site=self.site2, params=params)
+        self.assertIn("param1=value1", url)
+        self.assertIn("param2=value2", url)
+        self.assertNotIn("should_be_excluded", url)
+        self.assertTrue(url.startswith(f"//{self.site1.domain}"))
+        self.assertIn("?", url)
+
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
     def get_admin(self):

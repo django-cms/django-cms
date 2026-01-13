@@ -228,7 +228,7 @@ def add_live_url_querystring_param(obj: models.Model, url: str, language: str | 
     return url
 
 
-def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, params: QueryDict = None) -> str:
+def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
@@ -242,42 +242,49 @@ def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, 
             get_params["language"] = language
         if get_params:
             url = url + "?" + get_params.urlencode()
-    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
+    if get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED"):
         url = add_live_url_querystring_param(obj, url, language)
     return url
 
 
-def get_object_edit_url(obj: models.Model, language: str = None, params: dict = None) -> str:
+def get_object_edit_url(obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the edit endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
+
+    params is an optional QueryDict to be added to the URL.
     """
     return _get_object_url("cms_placeholder_render_object_edit", obj, language, params)
 
 
-def get_object_preview_url(obj: models.Model, language: str = None, params: dict = None) -> str:
+def get_object_preview_url(obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the preview endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
+
+    params is an optional QueryDict to be added to the URL.
     """
     return _get_object_url("cms_placeholder_render_object_preview", obj, language, params)
 
 
-def get_object_structure_url(obj: models.Model, language: str = None, params: dict = None) -> str:
+def get_object_structure_url(obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the structure endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
+
+    params is an optional QueryDict to be added to the URL.
+
     """
     return _get_object_url("cms_placeholder_render_object_structure", obj, language, params)
 
 
-def get_object_live_url(obj: models.Model, language: str = None, site: Optional[Site] = None) -> str:
+def get_object_live_url(obj: models.Model, language: str = None, site: Site | None = None, params: QueryDict | None = None) -> str:
     """
     Returns the live url of the given object. The object must be frontend-editable
     and registered as such with cms.
@@ -292,6 +299,12 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Optional[
 
     with force_language(language):
         absolute_url = obj.get_absolute_url()
+        url_param = get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM")
+        if params and url_param in params:
+            params = params.copy()
+            del params[url_param]
+        if params and not "?" in absolute_url:
+            absolute_url = absolute_url + "?" + params.urlencode()
 
     obj_site = getattr(obj, 'site', None)
     if obj_site is None:

@@ -201,8 +201,12 @@ class PlaceholderToolbar(CMSToolbar):
     def add_structure_mode(self, extra_classes=("cms-toolbar-item-cms-mode-switcher",)):
         structure_active = self.toolbar.structure_mode_active
         edit_mode_active = not structure_active and self.toolbar.edit_mode_active
-        build_url = get_object_structure_url(self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET)
-        edit_url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET)
+        build_url = get_object_structure_url(
+            self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET
+        )
+        edit_url = get_object_edit_url(
+            self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET
+        )
         switcher = self.toolbar.add_button_list(
             "Mode Switcher",
             side=self.toolbar.RIGHT,
