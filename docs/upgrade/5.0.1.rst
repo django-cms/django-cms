@@ -20,7 +20,7 @@ Django and Python compatibility
 django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
 support the latest release of each series.
 
-It supports **Python 3.10, 3.11, 3.12, and 3.13**. As for Django we highly recommend and only
+It supports **Python 3.10, 3.11, 3.12, and 3.13**. As for Django, we highly recommend and only
 support the latest release of each series.
 
 ***********************
