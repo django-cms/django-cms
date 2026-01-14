@@ -229,9 +229,9 @@ git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 status "- preparing documentation"
 "${SCRIPTS}/make-changelog" "${FULL_VERSION}" || echo "Manual update of changelog necessary"
 
-upgrade_doc="docs/upgrade/${VERSION}.rst"
+upgrade_doc="docs/upgrade/${FULL_VERSION}.rst"
 
-if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
+if [ ! -f "docs/upgrade/${FULL_VERSION}.rst" ]; then
     echo "Creating upgrade instructions"
 
     # looking for last upgrade by version number:
@@ -252,26 +252,26 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
     while [ ! -f "docs/upgrade/${needle}.rst" ]; do
         error "Can not find docs/upgrade/${needle}.rst"
         status "Can not find base version to create upgrade instructions (from $OLDVER)"
-        echo  -e "Please ${BLUE}enter base version${NORMAL} to use (ex: 3.8) (Ctrl-C to abort)"
-        ls docs/upgrades/
+        echo  -e "Please ${BLUE}enter base version${NORMAL} to use (ex: 3.8.0) (Ctrl-C to abort)"
+        ls docs/upgrade/
         read -r needle
     done
 
     cp "docs/upgrade/${needle}.rst" "${upgrade_doc}"
-    git add "docs/upgrade/${VERSION}.rst"
+    git add "docs/upgrade/${FULL_VERSION}.rst"
 
     sed -i "${upgrade_doc}" \
-        -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to-${VERSION}:/" \
-        -e "s/^${needle}.* release notes$/${VERSION} release notes/i" \
-        -e "s/^What's new in ${needle}.*$/What's new in ${VERSION}/i" \
-        -e "s/^How to upgrade to ${needle}.*$/How to upgrade to ${VERSION}/i" \
+        -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to-${FULL_VERSION}:/" \
+        -e "s/^${needle}.* release notes$/${FULL_VERSION} release notes/i" \
+        -e "s/^What's new in ${needle}.*$/What's new in ${FULL_VERSION}/i" \
+        -e "s/^How to upgrade to ${needle}.*$/How to upgrade to ${FULL_VERSION}/i" \
         -e "s/^We assume you are upgrading from django CMS.*\.$/We assume you are upgrading from django CMS ${needle}./"
 fi
 
-if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
-    status "Adding ${VERSION} to doc index"
+if ! grep -q " *${FULL_VERSION}$" docs/upgrade/index.rst; then
+    status "Adding ${FULL_VERSION} to doc index"
     # note: the new line in the following command is not a mistake, it is needed for sed to process the command
-    sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
+    sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${FULL_VERSION}
 }" docs/upgrade/index.rst
 fi
 #
