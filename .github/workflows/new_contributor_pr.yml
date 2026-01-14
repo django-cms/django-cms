@@ -26,18 +26,34 @@ jobs:
   discord:
     name: Discord Notification
     runs-on: ubuntu-latest
-    if: always()
+    needs: new
     steps:
       - name: Send Discord Webhook
         continue-on-error: true
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          status: success
-          title: "New Contributor Alert"
-          description: |
-            A new contributor has opened a pull request!
-            **Repository:** ${{ github.repository }}
-            **Contributor:** ${{ github.event.pull_request.user.login }}
-            **PR:** ${{ github.event.pull_request.html_url }}
-          color: 3066993
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_EMBEDS: |
+            {
+              "embeds": [
+                {
+                  "title": "New Contributor Alert",
+                  "description": "A new contributor has opened a pull request!",
+                  "color": 3066993,
+                  "fields": [
+                    {
+                      "name": "Repository",
+                      "value": "${{ github.repository }}"
+                    },
+                    {
+                      "name": "Pull Request",
+                      "value": "${{ github.event.pull_request.html_url }}"
+                    },
+                    {
+                      "name": "Contributor",
+                      "value": "${{ github.event.pull_request.user.login }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        uses: Ilshidur/action-discord@master
