@@ -1,0 +1,80 @@
+.. _upgrade-to-5.0.3:
+
+###################
+5.0.3 release notes
+###################
+
+*September 17, 2025*
+
+Welcome to django CMS 5.0.3!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
+features.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, and 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.0.3
+***********************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.3 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+.. warning::
+
+    Since the migrations merge the ``TreeNode`` and ``Page`` models, you should run the
+    migration in a test environment first to ensure that the migration runs
+    successfully.
+
+
+*******************
+What's new in 5.0.3
+*******************
+
+Bug Fixes:
+----------
+
+* Django 6 compatibility (July 2025) (8302) -- Fabian Braun
+* Respect individual placeholder checks if they can be changed (#8318) -- Fabian Braun
+* Cut children from inactive menu nodes when level is less or equal to 0 (#8324) -- Stefan Wehrmeyer
+* Copy lang management command - include PageUrl (#8335) -- Vašek Chalupníček
+* Optimize placeholder and plugin utilities (#8337) -- Fabian Braun
+* Migration 0033 failed when empty placeholder objects were not present in the db (#8339) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+* Stefan Wehrmeyer (1 pull request)
+* Vašek Chalupníček (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+
+Thanks to all contributors for their efforts!
