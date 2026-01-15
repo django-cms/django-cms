@@ -470,10 +470,8 @@ class Placeholder(models.Model):
 
         """
 
-        # A plugin needs a reference to the placeholder it is in. For backwards
-        # compatibility, we don't overwrite it if it is already set.
-        if not instance.placeholder:
-            instance.placeholder = self
+        # A plugin needs a reference to the placeholder it is in. 
+        instance.placeholder = self
 
         last_position = self.get_last_plugin_position(instance.language) or 0
         # A shift is only needed if the distance between the new plugin
