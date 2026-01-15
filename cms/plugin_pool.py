@@ -294,7 +294,7 @@ class PluginPool:
         Args:
             request_cache (dict): The current request cache (only filled is non globally cacheable).
             instance (CMSPluginBase): The plugin instance for which to retrieve the restrictions cache.
-            obj (Optional[models.Model]): The page associated with the plugin instance, if any.
+            obj (Optional[models.Model]): The model instance associated with the plugin instance, if any.
 
         Returns:
             dict: The restrictions cache for the given plugin instance - or the cache valid for the request.
