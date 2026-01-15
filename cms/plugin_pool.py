@@ -132,7 +132,7 @@ class PluginPool:
         self._clear_cached()
         return plugin
 
-    def unregister_plugin(self, plugin: type[CMSPluginBase]):
+    def unregister_plugin(self, plugin: type[CMSPluginBase]) -> None:
         """
         Unregister the given plugin.
 
