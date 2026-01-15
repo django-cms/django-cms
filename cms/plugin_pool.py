@@ -24,14 +24,16 @@ class PluginPool:
     root_plugin_cache: dict[str, list[type[CMSPluginBase]]]
     discovered: bool
     global_restrictions_cache: defaultdict[str, dict]
-    global_template_restrictions: bool
 
     def __init__(self):
         self.plugins = {}
         self.root_plugin_cache = {}
         self.discovered = False
         self.global_restrictions_cache = defaultdict(dict)
-        self.global_template_restrictions = any(".htm" in (key or "") for key in self.global_restrictions_cache)
+
+    @property
+    def global_template_restrictions(self) -> bool:
+        return any(".htm" in (key or "") for key in self.global_restrictions_cache)
 
     def _clear_cached(self) -> None:
         self.root_plugin_cache = {}
