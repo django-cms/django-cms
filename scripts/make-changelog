@@ -33,6 +33,7 @@ if [ -z "$1" ] ; then
 fi
 
 FULL_VERSION="$1"
+OLD_FULL_VERSION="$2"
 
 # extracting version from the FULL_VERSION, and sanity checks
 check_version_string "${FULL_VERSION}"
@@ -42,7 +43,6 @@ VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
 
 
 # extracting the base version from changelog
-OLD_FULL_VERSION="$2"
 if [ -z "${OLD_FULL_VERSION}" ]; then
     OLD_FULL_VERSION=$(grep -vi "unreleased\|unpublished" CHANGELOG.rst | awk '/^[0-9]+\.[0-9]+\.[0-9] \(.+\)$/ { print $1; nextfile }')
 else
