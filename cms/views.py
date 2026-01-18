@@ -320,6 +320,23 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     except ObjectDoesNotExist as err:
         raise Http404 from err
 
+    if not getattr(request, "current_page", None):
+        live_url = request.GET.get(get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM"))
+        if live_url:
+            from cms.appresolver import applications_page_check
+
+            # Try to resolve the page from the live_url
+            # First, check if it's a regular CMS page
+            request.current_page = get_page_from_request(request, use_path=live_url, clean_path=True)
+            if not request.current_page:
+                # If not, check if it's an apphook
+                original_path_info = request.path_info
+                request.path_info = live_url
+                try:
+                    request.current_page = applications_page_check(request)
+                finally:
+                    request.path_info = original_path_info
+
     extension = apps.get_app_config('cms').cms_extension
 
     if model not in extension.toolbar_enabled_models:
