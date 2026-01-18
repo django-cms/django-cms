@@ -479,7 +479,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual(new_plugins.count(), len(old_plugins))
 
-        for old_plugin, new_plugin in zip(old_plugins, new_plugins):
+        for old_plugin, new_plugin in zip(old_plugins, new_plugins, strict=False):
             self.assertEqual(old_plugin.get_children().count(), new_plugin.get_children().count())
 
     def test_copy_plugin_without_custom_model(self):
