@@ -417,7 +417,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         property, use the property, otherwise let Django provide it."""
         return getattr(self, "language", get_language())
 
-    def get_language_tuple(self, site: typing.Optional[Site] = None) -> tuple[tuple[str, str], ...]:
+    def get_language_tuple(self, site: Site | None = None) -> tuple[tuple[str, str], ...]:
         """Hook on how to get all available languages for the language selector."""
         return get_language_tuple(site_id=site.pk if site else None)
 
