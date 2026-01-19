@@ -150,7 +150,7 @@ Plugin rendering
 ----------------
 
 * ``BaseRenderer`` method ``renderer.get_placeholder_toolbar_js()`` has a keyword argument ``page`` which will be
-  removed in django CMS 6.0. It can already be savely removed from all calls.
+  removed in django CMS 6.0. It can already be safely removed from all calls.
 
 Utility functions
 -----------------
