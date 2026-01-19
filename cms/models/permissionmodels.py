@@ -221,8 +221,8 @@ class PermissionTuple(tuple):
     This tuple subclass provides utility methods for checking if a page path
     matches the permission scope defined by the grant level and path.
 
-    :ivar grant_on: The grant level (ACCESS_PAGE, ACCESS_CHILDREN, etc.)
-    :ivar perm_path: The page path associated with this permission
+    :ivar [0] grant_on: The grant level (ACCESS_PAGE, ACCESS_CHILDREN, etc.)
+    :ivar [1] perm_path: The page path associated with this permission
     """
     def contains(self, path: str, steplen: int = Page.steplen) -> bool:
         """Check if the given path is contained within this permission's scope.
