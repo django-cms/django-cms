@@ -1,228 +1,179 @@
-.. raw:: html
 
-    <style>
-        .row {
-           clear: both;
-        }
+.
 
-        .column img {border: 1px solid gray;}
-
-        @media only screen and (min-width: 1000px),
-               only screen and (min-width: 500px) and (max-width: 768px){
-
-            .column {
-                padding-left: 5px;
-                padding-right: 5px;
-                float: left;
-            }
-
-            .column3  {
-                width: calc(33.3% - 10px);
-            }
-
-            .column2  {
-                width: calc(50% - 11px);
-                position: relative;
-            }
-            .column2:before {
-                padding-top: 61.8%;
-                content: "";
-                display: block;
-                float: left;
-            }
-            .top-left {
-                border-right: 1px solid var(--color-background-border);
-                border-bottom: 1px solid var(--color-background-border);
-            }
-            .top-right {
-                border-bottom: 1px solid var(--color-background-border);
-            }
-            .bottom-left {
-                border-right: 1px solid var(--color-background-border);
-            }
-        }
-    </style>
+.. image:: /images/django-cms-logo.png
+   :alt: django CMS logo
+   :align: right
+   :height: 40px
+   :class: doc-logo-no-margin
 
 django CMS documentation
 ========================
 
-.. image:: /images/django-cms-logo.png
-    :alt: django CMS logo
 
-Philosophy
-----------
+Welcome to the **django CMS** developer documentation.
 
-The design philosophy of django CMS is to solve something complex with many simple
-things.
+django CMS is a modern, open-source content management system built on Django,
+designed to solve complex publishing requirements using simple, composable parts.
 
-The core of django CMS is designed to be simple and integrate with simple packages to
-create complex applications. For example, you may add ``djangocms-versioning`` to manage
-versions of your content, ``djangocms-moderation`` to define workflows for how content
-moves from authoring to being published.
+This documentation is organised using the **Diátaxis framework**, which separates
+learning material, practical guides, conceptual explanations, and technical
+reference — so you can quickly find the information you need.
 
-Overview
---------
+If you are looking for editor or administrator documentation, see the
+`django CMS User Guide <https://user-guide.django-cms.org/>`_.
 
-django CMS is a modern web publishing platform built with Django_, the web application
-framework "for perfectionists with deadlines".
+----
 
-django CMS offers out-of-the-box support for the common features you'd expect from a
-CMS, but can also be easily customised and extended by developers to create a site that
-is tailored to their precise needs.
+🧭 Choose your path
+------------------
 
-This is the developer documentation. To get an overview on how to use django CMS, see
-the `django CMS User Guide <https://user-guide.django-cms.org/>`_.
+.. grid:: 2
+   :gutter: 3
 
-.. rst-class:: clearfix row
+   .. grid-item-card:: 🚀 Tutorials
+      :link: tutorials
+      :link-type: ref
 
-.. rst-class:: column column2 top-left
+      Step-by-step lessons that teach django CMS from installation
+      through building your first project.
 
-:ref:`tutorials`
-~~~~~~~~~~~~~~~~
+   .. grid-item-card:: 🛠 How-to guides
+      :link: how-to
+      :link-type: ref
 
-**Start here as a new django CMS developer**:
+      Practical, goal-oriented guides for solving specific problems
+      in real projects.
 
-- installation
-- using additional packages
-- creating your own addon applications.
+   .. grid-item-card:: 🧠 Explanation
+      :link: explanation
+      :link-type: ref
 
-.. rst-class:: column column2 top-right
+      Background, concepts, and architectural decisions explained
+      to help you understand how django CMS works.
 
-:ref:`how-to`
-~~~~~~~~~~~~~
+   .. grid-item-card:: 📖 Reference
+      :link: reference
+      :link-type: ref
 
-Practical **step-by-step guides** for the more experienced developer, covering several
-important topics.
+      Authoritative technical reference for APIs, settings,
+      commands, and internals.
 
-.. rst-class:: column column2 bottom-left
+----
 
-:ref:`explanation`
-~~~~~~~~~~~~~~~~~~
+✨ Why django CMS?
+-----------------
 
-Explanation and analysis of some key concepts in django CMS.
+django CMS is a mature, open-source content management system built on
+Django. It is designed for projects that require flexibility, long-term
+stability, and close integration with custom Django applications.
 
-.. rst-class:: column column2 bottom-right
+Key features include:
 
-:ref:`reference`
-~~~~~~~~~~~~~~~~
+- robust internationalisation (i18n) and multi-site support
+- front-end (and inline) editing that allows editors to work directly on
+  rendered pages
+- a flexible placeholder and plugin system for composing reusable
+  content components
+- integration with multiple rich-text editors
+- support for content versioning, editorial workflows, and headless setups through
+  official add-on packages
 
-Technical reference material, for
+Compared to other Django-based CMS platforms, django CMS stands out for:
 
-- classes,
-- methods,
-- APIs,
-- commands.
+- a small, stable core that integrates cleanly into existing Django
+  projects
+- non-monolithic architecture that allows incremental adoption
+- thorough, structured documentation organised using the Diátaxis
+  framework
+- an active, long-running open-source community
+- an emphasis on code quality, testing, and long-term support
 
-.. rst-class:: clearfix row
+----
 
-Join us online
---------------
+🤝 Community & contribution
+---------------------------
 
-The `django CMS Association <https://www.django-cms.org/en/about-us/>`_ is a non-profit
-organisation that exists to support the development of django CMS and its community.
+django CMS is developed and maintained by an open community.
+Participation is welcome at every level, from asking questions
+to improving documentation or contributing code.
 
-.. rst-class:: column column2
+.. grid:: 3
+   :gutter: 2
 
-Discord
-~~~~~~~
+   .. grid-item-card:: 💬 Community chat
+      :link: https://discord-support-channel.django-cms.org
+      :link-type: url
 
-Join `our friendly Discord server <https://discord-support-channel.django-cms.org>`_ for **support** and
-to **share ideas** and **discuss technical questions** with other members of the
-community.
+      Join the Discord server to ask questions and talk
+      with other django CMS users and contributors.
 
-.. rst-class:: column column2
+   .. grid-item-card:: ✍️ Improve the docs
+      :link: contributing/index
+      :link-type: doc
 
-StackOverflow
-~~~~~~~~~~~~~
+      Documentation improvements — including small fixes —
+      are one of the easiest ways to contribute.
 
-`StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ is also a good
-place for questions around django CMS and its plugin ecosystem.
+   .. grid-item-card:: 🧩 About the project
+      :link: whoisbehind/index
+      :link-type: doc
 
-.. rst-class:: row clearfix
+      Learn more about the people and organisations
+      behind django CMS.
 
-Why django CMS?
----------------
+----
 
-django CMS is a well-tested CMS platform that powers sites both large and small. Here
-are a few of the key features:
+📦 Versions, compatibility & support
+------------------------------------
 
-- robust internationalisation (i18n) support for creating multilingual sites
-- front-end editing, providing rapid access to the content management interface
-- support for a variety of editors with advanced text editing features.
-- a flexible plugin system that lets developers put powerful tools at the fingertips of
-  editors, without overwhelming them with a difficult interface
-- ...and much more
+This documentation refers to django CMS version |release|.
 
-There are other capable Django-based CMS platforms, but here's why you should consider
-django CMS:
+django CMS follows Django’s
+`long-term support (LTS) policy <https://www.djangoproject.com/download/#supported-versions>`_
+and provides aligned LTS releases.
 
-- thorough documentation
-- easy and comprehensive integration into existing projects - django CMS isn't a
-  monolithic application
-- a healthy, active and supportive developer community
-- a strong culture of good code, including an emphasis on automated testing
-
-.. _requirements:
-
-Software version requirements and release notes
------------------------------------------------
-
-This document refers to version |release|.
-
-Long-term support (LTS)
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Django has a `long-term support (LTS)
-<https://www.djangoproject.com/download/#supported-versions>`_ policy which django CMS
-adapts.
-
-Designated django CMS versions receive support for use with official Django LTS
-versions:
-
-Current LTS table
-+++++++++++++++++
+Current LTS versions
+++++++++++++++++++++
 
 .. include:: autogenerate/lts.include
 
-After feature freeze, new features go into the next major version of django CMS.
+After feature freeze, new features are developed for the next major
+django CMS release.
 
 Unsupported LTS versions
 ++++++++++++++++++++++++
 
-The following LTS versions **do not** receive any support any more:
+The following LTS versions are **no longer supported**:
 
 .. include:: autogenerate/past_lts.include
 
-Django/Python compatibility table
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Django / Python compatibility
++++++++++++++++++++++++++++++
 
-*LTS* in the table indicates a combination of Django and django CMS *both* covered by a
-long-term support policy.
+*LTS* indicates a Django and django CMS combination covered by long-term support.
 
-*✓* indicates that the version has been tested and works. *×* indicates that it has not
-been tested, or is known to be incompatible.
+*✓* means tested and supported. *×* means untested or incompatible.
 
 .. include:: autogenerate/compatibility.include
 
-.. _django: https://www.djangoproject.com
+For dependency details, see the project’s ``pyproject.toml`` or the
+:ref:`release-notes`.
 
-.. _python: https://www.python.org
+The :ref:`Commonly Used Plugin section <commonly-used-plugins>` lists
+additional packages commonly used in django CMS projects.
 
-See the repository's ``pyproject.toml`` for details of dependencies, or the
-:ref:`release-notes` for information about what is required or has changed in particular
-versions of the CMS.
-
-The :ref:`Commonly Used Plugin section <commonly-used-plugins>` provides an overview of
-other packages required in a django CMS project.
+----
 
 .. toctree::
-    :maxdepth: 2
-    :hidden:
+   :maxdepth: 2
+   :hidden:
 
-    introduction/index
-    explanation/index
-    how_to/index
-    reference/index
-    upgrade/index
-    contributing/index
-    whoisbehind/index
+   introduction/index
+   tutorials/index
+   explanation/index
+   how_to/index
+   reference/index
+   upgrade/index
+   contributing/index
+   whoisbehind/index

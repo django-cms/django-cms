@@ -1,0 +1,13 @@
+/* Custom styles for django CMS documentation */
+
+.doc-logo-no-margin {
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 6px !important;
+}
+
+@media (max-width: 768px) {
+    .doc-logo-no-margin {
+        display: none;
+    }
+}
