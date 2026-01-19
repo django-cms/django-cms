@@ -15,7 +15,7 @@ mode you will need an application that serves the content from the CMS via an
 API, such as `djangocms-rest <https://github.com/django-cms/djangocms-rest>`_.
 
 To run django CMS in headless mode, you simply remove the catch-all URL pattern
-from your projects' ``urls.py`` file and replace it by an API endpoint:
+from your project's ``urls.py`` file and replace it by an API endpoint:
 
 .. code-block:: python
 
