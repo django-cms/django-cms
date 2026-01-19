@@ -115,7 +115,7 @@ This design philosophy leads to several practical outcomes:
 - applications and CMS pages can evolve independently
 - long-term maintenance and upgrades are easier to manage
 - editors gain flexible content tools without being exposed to
-  unneccessary application complexity
+  unnecessary application complexity
 
 The rest of the Explanation section explores how these principles are
 applied in areas such as plugins, apphooks, publishing, permissions, and
