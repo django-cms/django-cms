@@ -132,7 +132,7 @@ Page model
 * ``Page`` attribute ``page.parent_page`` is deprecated. Instead use the attribute ``page.parent``.
 * ``Page`` method ``page.get_parent_page()`` is deprecated and will be removed in django CMS 6.0. Instead use the `page.parent` attribute.
 * ``Page`` attribute ``page.languages`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_languages()`` instead.
-* ``Page`` method ``page.remove_language()`` and ``page.update_languages()`` are deprecated and will be removed in django CMS 6.0.
+* ``Page`` methods ``page.remove_language()`` and ``page.update_languages()`` are deprecated and will be removed in django CMS 6.0.
   They have no effect any more.
 * ``Page`` method ``page.get_published_languages()`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_languages(admin_manager=False)`` instead.
 * ``Page`` method ``page.set_translations_cache()`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_content_obj()`` instead - it leaves the translations
