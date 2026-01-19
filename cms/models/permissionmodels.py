@@ -216,7 +216,24 @@ class GlobalPagePermission(AbstractPagePermission):
 
 
 class PermissionTuple(tuple):
+    """Represents a permission tuple containing grant level and permission path.
+
+    This tuple subclass provides utility methods for checking if a page path
+    matches the permission scope defined by the grant level and path.
+
+    :ivar grant_on: The grant level (ACCESS_PAGE, ACCESS_CHILDREN, etc.)
+    :ivar perm_path: The page path associated with this permission
+    """
     def contains(self, path: str, steplen: int = Page.steplen) -> bool:
+        """Check if the given path is contained within this permission's scope.
+
+        :param path: The page path to check
+        :type path: str
+        :param steplen: The step length used for path hierarchy (default: Page.steplen)
+        :type steplen: int
+        :return: True if the path is contained within this permission's scope
+        :rtype: bool
+        """
         grant_on, perm_path = self
         if grant_on == ACCESS_PAGE:
             return path == perm_path
@@ -231,6 +248,15 @@ class PermissionTuple(tuple):
         return False
 
     def allow_list(self, filter: str = "", steplen: int = Page.steplen) -> Q:
+        """Generate a Django Q object for filtering pages based on permission scope.
+
+        :param filter: The field name prefix for the query filter (default: "")
+        :type filter: str
+        :param steplen: The step length used for path hierarchy (default: Page.steplen)
+        :type steplen: int
+        :return: A Q object representing the page filter for this permission's scope
+        :rtype: Q
+        """
         if filter != "":
             filter = f"{filter}__"
         grant_on, path = self

@@ -124,7 +124,54 @@ Miscellaneous
 Features deprecated in 5.1.0
 ============================
 
-Empty sections are to be removed before release.
+Page model
+----------
+
+* The manager method ``Page.objects.get_title(page, language, language_fallback=False)`` will be removed in django CMS 6.0.
+  Use ``page.get_content_obj()`` or ``page.get_admin_content()`` instead.
+* ``Page`` attribute ``page.parent_page`` is deprecated. Instead use the attribute ``page.parent``.
+* ``Page`` method ``page.get_parent_page()`` is deprecated and will be removed in django CMS 6.0. Instead use the `page.parent` attribute.
+* ``Page`` attribute ``page.languages`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_languages()`` instead.
+* ``Page`` method ``page.remove_language()`` and ``page.update_languages()`` are deprecated and will be removed in django CMS 6.0.
+  They have no effect any more.
+* ``Page`` method ``page.get_published_languages()`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_languages(admin_manager=False)`` instead.
+* ``Page`` method ``page.set_translations_cache()`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_content_obj()`` instead - it leaves the translations
+  cache populated. For admin views use ``page.set_admin_content_cache()`` instead.
+* ``Page`` methods ``page.copy()`` and ``page.copy_descendant()``have a keyword argument ``parent_node`` which has been renamed
+  to ``parent_page``. ``parent_node`` is deprecated and will be removed in django CMS 6.0.
+
+Page permissions
+----------------
+
+* ``PagePermission``method ``permission.get_page_ids()`` is deprecated and will be removed in django CMS 6.0.
+  Use ``permission.get_page_permission_tuple()`` instead for faster permission checks by path and not id.
+
+Plugin rendering
+----------------
+
+* ``BaseRenderer`` method ``renderer.get_placeholder_toolbar_js()`` has a keyword argument ``page`` which will be
+  removed in django CMS 6.0. It can already be savely removed from all calls.
+
+Utility functions
+-----------------
+
+* Most ``cms.utils.i18n`` utility functions accepting an optional ``site_id`` argument will require this argument
+  in django CMS 6.0. These functions are ``get_languages()``, ``get_language_code()``, ``get_language_list()``,
+  ``get_language_tuple()``, ``get_language_dict()``, ``get_public_languages()``, ``get_language_object()``,
+  ``get_language_objects()``, ``get_default_language()``, ``get_fallback_languages()``, ``get_redirect_on_fallback()``, and
+  ``hide_untranslated()``.
+* ``cms.utils.page_permissions.user_can_add_page()`` and ``cms.utils.page_permissions.has_generic_permission``
+  accepting an optional ``site`` argument will require this argument in django CMS 6.0.
+* ``cms.utils.page.get_page_queryset()`` is deprecated and will be removed in django CMS 6.0. Use ``Page.objects.on_site(site)``
+  instead.
+* ``cms.utils.placeholder.get_toolbar_plugin_struct()`` has a keyword argument ``page`` which has been renamed to ``obj``.
+  ``page`` is deprecated and will be removed in django CMS 6.0.
+
+Wizard helpers
+--------------
+
+* The ``cms.wizards.helpers`` module has been deprecated and will be removed in django CMS 6.0. Use
+  ``cms.wizards.wizard_base.get_entries()`` and ``cms.wizards.wizard_pool.get_entry()`` instead.
 
 Removal of deprecated functionality
 ===================================

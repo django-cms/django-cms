@@ -150,7 +150,7 @@ class BaseRenderer:
 
             warnings.warn(
                 "The 'page' argument of 'get_placeholder_toolbar_js' is deprecated and will be removed in a future "
-                "release. It can be safely removed.",
+                "release. It can be safely removed from the call.",
                 RemovedInDjangoCMS60Warning,
                 stacklevel=2,
             )
@@ -730,14 +730,6 @@ class StructureRenderer(BaseRenderer):
         return mark_safe(placeholder_structure_js)
 
     def render_page_placeholder(self, page, placeholder, language=None):
-        import warnings
-
-        warnings.warn(
-            "StructureRenderer.render_page_placeholder is deprecated and will be removed in a future release. "
-            "Use StructureRenderer.render_placeholder instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
         return self.render_placeholder(placeholder, language=language, obj=page)
 
     def render_plugin(self, instance, obj=None):
