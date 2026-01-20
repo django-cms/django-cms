@@ -90,7 +90,7 @@ class PageContentManager(WithUserMixin, models.Manager):
 
         warnings.warn(
             "PageContentManager.get_title is deprecated and will be removed in a future release. "
-            "Please use page.get_page_content() or page.get_admin_content()instead.",
+            "Please use page.get_page_content() or page.get_admin_content() instead.",
             RemovedInDjangoCMS60Warning,
             stacklevel=2,
         )
