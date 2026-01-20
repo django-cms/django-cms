@@ -322,6 +322,12 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     if not getattr(request, "current_page", None):
         live_url = request.GET.get(get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM"))
+        if not live_url and hasattr(content_type_obj, "get_absolute_url"):
+            try:
+                live_url = content_type_obj.get_absolute_url()
+            except Exception:
+                live_url = None
+
         if live_url:
             from cms.appresolver import applications_page_check
 
