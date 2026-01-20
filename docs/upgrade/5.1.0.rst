@@ -106,7 +106,7 @@ Minor features
 ==============
 
 * Changed the default primary key field from ``AutoField`` to ``BigAutoField``.
-* Apphooks now by default allow allowing access to the page content object's placeholders on
+* Apphooks now by default allow access to the page content object's placeholders on
   the apphook's root page.
 
 
