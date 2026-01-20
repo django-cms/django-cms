@@ -470,7 +470,7 @@ class Placeholder(models.Model):
 
         """
 
-        # A plugin needs a reference to the placeholder it is in. 
+        # A plugin needs a reference to the placeholder it is in.
         instance.placeholder = self
 
         last_position = self.get_last_plugin_position(instance.language) or 0
