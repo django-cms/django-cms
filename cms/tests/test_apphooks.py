@@ -1019,6 +1019,7 @@ class ApphooksTestCase(BaseApphooksTestCase):
         for the root page of an apphook.
         """
         from django.contrib.contenttypes.models import ContentType
+
         from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
 
         # Create a page with an apphook attached
@@ -1031,7 +1032,6 @@ class ApphooksTestCase(BaseApphooksTestCase):
             apphook="SampleApp3"
         )
         content = page.get_content_obj("en")
-        content_type = ContentType.objects.get_for_model(PageContent)
 
         self.reload_urls()
 
