@@ -1012,6 +1012,72 @@ class ApphooksTestCase(BaseApphooksTestCase):
         self.assertEqual(menu_nodes[1].id, app_root.pk)
         self.assertEqual(menu_nodes[1].selected, True)
 
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
+    def test_apphook_root_page_placeholders_in_endpoints(self):
+        """
+        Test that page content placeholders are available in edit and preview endpoints
+        for the root page of an apphook.
+        """
+        from django.contrib.contenttypes.models import ContentType
+        from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
+
+        # Create a page with an apphook attached
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        page = create_page(
+            "apphook-root",
+            "nav_playground.html",
+            "en",
+            created_by=superuser,
+            apphook="SampleApp3"
+        )
+        content = page.get_content_obj("en")
+        content_type = ContentType.objects.get_for_model(PageContent)
+
+        self.reload_urls()
+
+        # Test edit endpoint
+        edit_url = get_object_edit_url(content, language="en")
+        with self.login_user_context(superuser):
+            response = self.client.get(edit_url)
+            self.assertEqual(response.status_code, 200)
+            # Check that toolbar was set with the page content object
+            self.assertTrue(hasattr(response.wsgi_request, 'toolbar'))
+            toolbar = response.wsgi_request.toolbar
+            # Verify the toolbar object is the page content
+            self.assertEqual(toolbar.obj, content)
+
+        # Test preview endpoint
+        preview_url = get_object_preview_url(content, language="en")
+        with self.login_user_context(superuser):
+            response = self.client.get(preview_url)
+            self.assertEqual(response.status_code, 200)
+            # Check that toolbar was set with the page content object
+            self.assertTrue(hasattr(response.wsgi_request, 'toolbar'))
+            toolbar = response.wsgi_request.toolbar
+            # Verify the toolbar object is the page content
+            self.assertEqual(toolbar.obj, content)
+
+        # Test structure endpoint
+        structure_url = get_object_structure_url(content, language="en")
+        with self.login_user_context(superuser):
+            response = self.client.get(structure_url)
+            self.assertEqual(response.status_code, 200)
+            # Check that toolbar was set with the page content object
+            self.assertTrue(hasattr(response.wsgi_request, 'toolbar'))
+            toolbar = response.wsgi_request.toolbar
+            # Verify the toolbar object is the page content
+            self.assertEqual(toolbar.obj, content)
+            # Verify that page content placeholders are present in the markup
+            for placeholder in content.get_placeholders():
+                # Check that placeholder ID is in the response content
+                self.assertContains(
+                    response,
+                    f'"placeholder_id": "{placeholder.pk}"',
+                    msg_prefix=f"Placeholder {placeholder.slot} should be present in structure markup"
+                )
+
+        self.apphook_clear()
+
 
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):
     def setUp(self):
