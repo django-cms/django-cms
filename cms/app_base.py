@@ -138,7 +138,7 @@ class CMSAppConfig:
         self.app_config = django_app_config
 
     @staticmethod
-    def get_contract(contract_name):
+    def get_contract(contract_name: str) -> type:
         """
         Retrieve a contract implementation from registered CMS extension apps.
 
@@ -152,8 +152,8 @@ class CMSAppConfig:
 
         :param contract_name: The name identifier of the contract to retrieve
         :type contract_name: str
-        :return: The contract object if found, or None if no matching contract exists
-        :rtype: object or None
+        :return: The contract class if found, or None if no matching contract exists
+        :rtype: type or None
         :raises: None
 
         Example::
@@ -167,9 +167,9 @@ class CMSAppConfig:
         from cms.app_registration import get_cms_extension_apps
 
         for app in get_cms_extension_apps():
-            name, obj = getattr(app.cms_extension, "contract", (None, None))
+            name, cls = getattr(app.cms_extension, "contract", (None, None))
             if name == contract_name:
-                return obj
+                return cls
         return None
 
 
