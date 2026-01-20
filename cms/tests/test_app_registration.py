@@ -354,101 +354,6 @@ class SetupCmsAppsTestCase(CMSTestCase):
             feature_app.cms_extension.configured_apps,
             ['app_with_cms_config'])
 
-
-class CMSAppConfigGetContractTestCase(CMSTestCase):
-    """Tests for CMSAppConfig.get_contract() method."""
-
-    def setUp(self):
-        # Clear cache for get_cms_extension_apps
-        app_registration.get_cms_extension_apps.cache_clear()
-
-    def test_get_contract_returns_none_when_no_extensions_exist(self):
-        """Test that get_contract returns None when no CMS extensions are registered."""
-        from cms.app_base import CMSAppConfig
-
-        result = CMSAppConfig.get_contract('non_existent_contract')
-        self.assertIsNone(result)
-
-    @override_settings(INSTALLED_APPS=[
-        'cms.test_utils.project.app_with_cms_feature',
-    ])
-    def test_get_contract_returns_none_when_contract_not_found(self):
-        """Test that get_contract returns None when contract name doesn't match any registered contract."""
-        from cms.app_base import CMSAppConfig
-
-        app_registration.autodiscover_cms_configs()
-
-        result = CMSAppConfig.get_contract('non_existent_contract')
-        self.assertIsNone(result)
-
-    def test_get_contract_with_mocked_extension(self):
-        """Test that get_contract correctly retrieves a contract from a mocked extension."""
-        from cms.app_base import CMSAppConfig
-
-        # Create a mock app with a contract
-        mock_extension = Mock()
-        contract_obj = Mock()
-        contract_obj.some_method = Mock(return_value='contract_result')
-        mock_extension.contract = ('test_contract', contract_obj)
-
-        mock_app = Mock()
-        mock_app.cms_extension = mock_extension
-
-        # Patch get_cms_extension_apps to return our mock
-        with patch.object(app_registration, 'get_cms_extension_apps', return_value=[mock_app]):
-            result = CMSAppConfig.get_contract('test_contract')
-
-            # Verify the contract was returned
-            self.assertEqual(result, contract_obj)
-            # Verify we can use the returned contract
-            self.assertEqual(result.some_method(), 'contract_result')
-
-    def test_get_contract_returns_none_when_extension_has_no_contract(self):
-        """Test that get_contract returns None when extension doesn't define a contract attribute."""
-        from cms.app_base import CMSAppConfig
-
-        # Create a mock app without a contract attribute
-        mock_extension = Mock(spec=[])  # No contract attribute
-        mock_app = Mock()
-        mock_app.cms_extension = mock_extension
-
-        with patch.object(app_registration, 'get_cms_extension_apps', return_value=[mock_app]):
-            result = CMSAppConfig.get_contract('test_contract')
-            self.assertIsNone(result)
-
-    def test_get_contract_stops_at_first_match(self):
-        """Test that get_contract returns the first matching contract and stops searching."""
-        from cms.app_base import CMSAppConfig
-
-        # Create two mock apps with contracts
-        contract_obj1 = Mock()
-        mock_extension1 = Mock()
-        mock_extension1.contract = ('matching_contract', contract_obj1)
-        mock_app1 = Mock()
-        mock_app1.cms_extension = mock_extension1
-
-        contract_obj2 = Mock()
-        mock_extension2 = Mock()
-        mock_extension2.contract = ('matching_contract', contract_obj2)
-        mock_app2 = Mock()
-        mock_app2.cms_extension = mock_extension2
-
-        with patch.object(app_registration, 'get_cms_extension_apps',
-                         return_value=[mock_app1, mock_app2]):
-            result = CMSAppConfig.get_contract('matching_contract')
-
-            # Should return the first contract, not the second
-            self.assertEqual(result, contract_obj1)
-            self.assertNotEqual(result, contract_obj2)
-
-
-class ConfigureCmsAppsTestCase(CMSTestCase):
-    """Tests for configure_cms_apps() function."""
-
-    def setUp(self):
-        # Clear cache for get_cms_config_apps
-        app_registration.get_cms_config_apps.cache_clear()
-
     def test_configure_cms_apps_uses_contract_name_as_enabled_property(self):
         """Test that configure_cms_apps respects the contract name when determining enabled property."""
         # Create mock extension with a custom contract name
@@ -564,3 +469,91 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
             calls = [call[0][0] for call in mock_extension.configure_app.call_args_list]
             self.assertIn(mock_cms_config1, calls)
             self.assertIn(mock_cms_config2, calls)
+
+
+class CMSAppConfigGetContractTestCase(CMSTestCase):
+    """Tests for CMSAppConfig.get_contract() method."""
+
+    def setUp(self):
+        # Clear cache for get_cms_extension_apps
+        app_registration.get_cms_extension_apps.cache_clear()
+
+    def test_get_contract_returns_none_when_no_extensions_exist(self):
+        """Test that get_contract returns None when no CMS extensions are registered."""
+        from cms.app_base import CMSAppConfig
+
+        result = CMSAppConfig.get_contract('non_existent_contract')
+        self.assertIsNone(result)
+
+    @override_settings(INSTALLED_APPS=[
+        'cms.test_utils.project.app_with_cms_feature',
+    ])
+    def test_get_contract_returns_none_when_contract_not_found(self):
+        """Test that get_contract returns None when contract name doesn't match any registered contract."""
+        from cms.app_base import CMSAppConfig
+
+        app_registration.autodiscover_cms_configs()
+
+        result = CMSAppConfig.get_contract('non_existent_contract')
+        self.assertIsNone(result)
+
+    def test_get_contract_with_mocked_extension(self):
+        """Test that get_contract correctly retrieves a contract from a mocked extension."""
+        from cms.app_base import CMSAppConfig
+
+        # Create a mock app with a contract
+        mock_extension = Mock()
+        contract_obj = Mock()
+        contract_obj.some_method = Mock(return_value='contract_result')
+        mock_extension.contract = ('test_contract', contract_obj)
+
+        mock_app = Mock()
+        mock_app.cms_extension = mock_extension
+
+        # Patch get_cms_extension_apps to return our mock
+        with patch.object(app_registration, 'get_cms_extension_apps', return_value=[mock_app]):
+            result = CMSAppConfig.get_contract('test_contract')
+
+            # Verify the contract was returned
+            self.assertEqual(result, contract_obj)
+            # Verify we can use the returned contract
+            self.assertEqual(result.some_method(), 'contract_result')
+
+    def test_get_contract_returns_none_when_extension_has_no_contract(self):
+        """Test that get_contract returns None when extension doesn't define a contract attribute."""
+        from cms.app_base import CMSAppConfig
+
+        # Create a mock app without a contract attribute
+        mock_extension = Mock(spec=[])  # No contract attribute
+        mock_app = Mock()
+        mock_app.cms_extension = mock_extension
+
+        with patch.object(app_registration, 'get_cms_extension_apps', return_value=[mock_app]):
+            result = CMSAppConfig.get_contract('test_contract')
+            self.assertIsNone(result)
+
+    def test_get_contract_stops_at_first_match(self):
+        """Test that get_contract returns the first matching contract and stops searching."""
+        from cms.app_base import CMSAppConfig
+
+        # Create two mock apps with contracts
+        contract_obj1 = Mock()
+        mock_extension1 = Mock()
+        mock_extension1.contract = ('matching_contract', contract_obj1)
+        mock_app1 = Mock()
+        mock_app1.cms_extension = mock_extension1
+
+        contract_obj2 = Mock()
+        mock_extension2 = Mock()
+        mock_extension2.contract = ('matching_contract', contract_obj2)
+        mock_app2 = Mock()
+        mock_app2.cms_extension = mock_extension2
+
+        with patch.object(app_registration, 'get_cms_extension_apps',
+                         return_value=[mock_app1, mock_app2]):
+            result = CMSAppConfig.get_contract('matching_contract')
+
+            # Should return the first contract, not the second
+            self.assertEqual(result, contract_obj1)
+            self.assertNotEqual(result, contract_obj2)
+
