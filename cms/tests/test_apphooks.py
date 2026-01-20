@@ -1012,7 +1012,7 @@ class ApphooksTestCase(BaseApphooksTestCase):
         self.assertEqual(menu_nodes[1].id, app_root.pk)
         self.assertEqual(menu_nodes[1].selected, True)
 
-    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
+    @override_settings(CMS_APPHOOKS=['cms.test_utils.project.sampleapp.cms_apps.SampleApp3'],)
     def test_apphook_root_page_placeholders_in_endpoints(self):
         """
         Test that page content placeholders are available in edit and preview endpoints
