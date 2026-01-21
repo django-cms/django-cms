@@ -13,7 +13,7 @@ Start here
 ==========
 
 * Read the docs: `Documentation (stable) <https://docs.django-cms.org/>`_
-* Installing / learning: `Installation (How-to) <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ · `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
+* Installing / learning: `Installation <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ · `Docker quickstart <https://github.com/django-cms/django-cms-quickstart>`_ · `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
 * Upgrading: `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
 * Get help: `Discord <https://discord-support-channel.django-cms.org>`_ or Stackoverflow
 * Contribute safely: `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
@@ -61,10 +61,9 @@ If you already have a Django project, you can still use the same steps and integ
     python -m pip install django-cms
 
 Next, follow the official installation guide and tutorials:
+`Installation <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_
 
-* `Installation (How-to) <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_
-* `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
-
+Using Docker? Check out our `django-cms-quickstart project <https://github.com/django-cms/django-cms-quickstart>`_.
 
 Documentation
 =============
