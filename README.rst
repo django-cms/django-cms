@@ -19,9 +19,8 @@ Quick links
 * Contribute safely: `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
 
 
-********
 Features
-********
+========
 
 Build complex publishing workflows with simple, composable parts:
 
@@ -34,13 +33,11 @@ Build complex publishing workflows with simple, composable parts:
 * extensible navigation and application integration (apphooks)
 
 Developing applications that integrate with and take advantage of django CMS features is easy and well-documented.
-
 More information on `our website <https://www.django-cms.org>`_.
 
 
-*************************
 Installation & Quickstart
-*************************
+=========================
 
 Get a working setup by following the official guide (recommended). If you already have a Django project, you can still
 use the same steps and integrate django CMS incrementally.
@@ -55,9 +52,8 @@ Next, follow the official installation guide and tutorials:
 * `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
 
 
-*************
 Documentation
-*************
+=============
 
 Find tutorials, how-to guides, explanation, and reference material here:
 
@@ -68,9 +64,8 @@ Find tutorials, how-to guides, explanation, and reference material here:
 Branch policy details: `Development policies <https://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
 
 
-***************************
 Test django CMS in our demo
-***************************
+===========================
 
 The demo platform is kindly provided by Divio, platinum member of the django CMS Association.
 
@@ -82,43 +77,39 @@ Want to get a feel for the editing experience before you install anything? Start
 
 
 Development
-***********
+===========
 
 If you want to contribute code, start here (you'll be productive quickly):
 
 * `CONTRIBUTING.rst <CONTRIBUTING.rst>`_ (workflow, PR process)
 * `Contributing docs <https://docs.django-cms.org/en/latest/contributing/>`_
 
-************
 Getting Help
-************
+============
 
 Need help choosing an approach, debugging an issue, or reviewing an implementation idea?
 Head over to our `Discord Server <https://discord-support-channel.django-cms.org>`_ or Stackoverflow.
 
-********************
 Professional support
-********************
+====================
 
 Choose from a list of `trusted tech partner <https://www.django-cms.org/en/tech-partners/>`_ of the django CMS Association to get your website project delivered successfully.
 
 Choose a `trusted web host <https://www.django-cms.org/en/hosting-services/>`_ for your django CMS project and get your website online today.
 
 
-**************************
 The django CMS Association
-**************************
+==========================
 
 The django CMS Association is a non-profit founded in 2020 to drive the success of django CMS by providing guidance,
 infrastructure and funding for core development and community projects.
 
 If your business depends on django CMS, consider supporting its long-term health:
-`Join the django CMS Association <https://www.django-cms.org/en/contribute/>`_ or `become a member <https://www.django-cms.org/en/memberships/>`_.
+`Join forces with the django CMS Association <https://www.django-cms.org/en/contribute/>`_ or `become a paying member <https://www.django-cms.org/en/memberships/>`_.
 
 
-*******
 Credits
-*******
+=======
 
 * Includes icons and adapted icons from `Bootstrap <https://icons.getbootstrap.com>`_.
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
