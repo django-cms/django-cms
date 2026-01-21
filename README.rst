@@ -9,14 +9,17 @@ Backed by the non-profit django CMS Association (`Sponsor us <https://www.django
 
 This repository contains the core package published as ``django-cms`` on PyPI.
 
-Quick links
-===========
+Start here
+==========
 
-* Start here: `Documentation (stable) <https://docs.django-cms.org/>`_
-* Developing on ``main``: `Documentation (latest) <https://docs.django-cms.org/en/latest/>`_
-* Planning an upgrade: `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
-* Project info: `Website <https://www.django-cms.org/>`_ · `Changelog <CHANGELOG.rst>`_
+* Read the docs: `Documentation (stable) <https://docs.django-cms.org/>`_
+* Try it first: `Demo platform <https://www.django-cms.org/en/django-cms-demo/>`_
+* Installing / learning: `Installation (How-to) <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ ·
+    `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
+* Upgrading: `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
+* Get help: `Discord <https://discord-support-channel.django-cms.org>`_ or Stackoverflow
 * Contribute safely: `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
+* Project info: `Website <https://www.django-cms.org/>`_ · `Changelog <CHANGELOG.rst>`_
 
 
 Features
@@ -36,11 +39,24 @@ Developing applications that integrate with and take advantage of django CMS fea
 More information on `our website <https://www.django-cms.org>`_.
 
 
+Test django CMS in our demo
+===========================
+
+The demo platform is kindly provided by Divio, platinum member of the django CMS Association.
+
+.. image:: docs/images/try-with-divio.png
+    :target: https://www.django-cms.org/en/django-cms-demo/
+    :alt: Try demo with Divio Cloud
+
+Want to get a feel for the editing experience before you install anything?
+Start with the demo link above.
+
+
 Installation & Quickstart
 =========================
 
-Get a working setup by following the official guide (recommended). If you already have a Django project, you can still
-use the same steps and integrate django CMS incrementally.
+Get a working setup by following the official guide (recommended).
+If you already have a Django project, you can still use the same steps and integrate django CMS incrementally.
 
 .. code-block:: console
 
@@ -62,18 +78,6 @@ Find tutorials, how-to guides, explanation, and reference material here:
 * Sources in this repo: `docs/ <docs/>`_
 
 Branch policy details: `Development policies <https://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
-
-
-Test django CMS in our demo
-===========================
-
-The demo platform is kindly provided by Divio, platinum member of the django CMS Association.
-
-.. image:: docs/images/try-with-divio.png
-   :target: https://www.django-cms.org/en/django-cms-demo/
-   :alt: Try demo with Divio Cloud
-
-Want to get a feel for the editing experience before you install anything? Start with the demo link above.
 
 
 Development
