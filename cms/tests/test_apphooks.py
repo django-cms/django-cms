@@ -1,11 +1,16 @@
 import sys
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
 from django.core.checks.urls import check_url_config
+from django.http import Http404, HttpResponse
+from django.template import Context, Template
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
 from django.utils.timezone import now
@@ -22,6 +27,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
+from cms.views import render_object_edit
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -1081,3 +1087,140 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
 
         self.apphook_clear()
+
+
+@override_settings(SITE_ID="")
+class ApphooksSiteTestCase(BaseApphooksTestCase):
+    """
+    Test cases for apphooks in a multisite configuration using a single instance. Sites
+    are mocked for the test, in reality either taken from the request or from a middleware.
+
+    These test cases verify that apphooks are only accessible on their respective sites
+    when multiple sites are configured in Django CMS.
+    """
+
+    def create_pages(self):
+        self.apphook_clear()
+        self.site1 = Site.objects.get(pk=1)
+        self.site2 = Site.objects.create(domain='otherserver', name='Site 2')
+
+        superuser = self.get_superuser()
+        self.page1 = create_page("Page 1", "nav_playground.html", "de", site=self.site1, apphook='SampleApp', created_by=superuser)
+        create_page_content("en", "en_title", self.page1, slug="page-1")
+        self.page2 = create_page("Page 2", "nav_playground.html", "de", site=self.site1, created_by=superuser)
+        self.page3 = create_page("Page 3", "nav_playground.html", "de", site=self.site2, apphook='SampleApp', created_by=superuser)
+        self.page4 = create_page("Page 4", "nav_playground.html", "de", site=self.site2, created_by=superuser)
+        self.page2.set_as_homepage()
+        self.page4.set_as_homepage()
+        activate("de")
+
+    def get_for_site(self, site, url):
+        resolver_match = resolve(url)
+        request = self.get_request(url)
+        request.META["host"] = f"{site.domain}:80"
+        request.site = site
+        request.resolver_match = resolver_match
+        try:
+            return resolver_match.func(request, *resolver_match.args, **resolver_match.kwargs)
+        except Http404 as e:
+            return HttpResponse(str(e), status=404)
+
+    def test_apphook_access_on_site1(self):
+        self.create_pages()
+
+        # Verify that the cms_site_filter decorator was called
+        url = self.page1.get_absolute_url("de")
+
+        response = self.get_for_site(self.site1, url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.get_for_site(self.site1, '/de/page-3/')
+        self.assertEqual(response.status_code, 404)  # Sollte nicht erreichbar sein
+
+    def test_apphook_access_on_site2(self):
+        self.create_pages()
+
+        # Verify that the cms_site_filter decorator was called
+        url = self.page3.get_absolute_url("de")
+
+        response = self.get_for_site(self.site2, url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.get_for_site(self.site2, '/de/page-1/')
+        self.assertEqual(response.status_code, 404)  # Sollte nicht erreichbar sein
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_site_filter_preserves_view_name(self):
+        self.create_pages()
+
+        view_names = (
+            ('sample-settings', 'sample_view'),
+            ('sample-class-view', 'ClassView'),
+            ('sample-class-based-view', 'view'),
+        )
+
+        with force_language("de"):
+            for url_name, view_name in view_names:
+                path = reverse(url_name)
+                match = resolve(path)
+                self.assertEqual(match.func.__name__, view_name)
+
+
+class ApphookFrontendEditingTests(BaseApphooksTestCase):
+    """
+    Tests for rendering external models attached via apphooks in frontend editing mode.
+    Ensures that context remains consistent (e.g., current_page is resolved).
+    """
+
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_current_page_resolution_in_render_object_edit(self):
+        from django.contrib.sessions.backends.base import SessionBase
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        # 1. Setup: Create an apphooked page
+        superuser = self.get_superuser()
+        create_page(
+            title="Apphook Page",
+            template="nav_playground.html",
+            language="en",
+            created_by=superuser,
+            apphook="SampleApp"
+        )
+        self.reload_urls()
+
+        # 2. Setup: Create an external model instance (Category)
+        category = Category.add_root(name="Test Category")
+        ct = ContentType.objects.get_for_model(Category)
+
+        # 3. Setup: Register a mock renderer
+        cms_extension = apps.get_app_config('cms').cms_extension
+
+        def mock_render_category(request, obj):
+            t = Template("{% load cms_tags %}[{% page_attribute 'page_title' %}]")
+            return HttpResponse(t.render(Context({"request": request})))
+
+        original_renderer = cms_extension.toolbar_enabled_models.get(Category)
+        cms_extension.toolbar_enabled_models[Category] = mock_render_category
+
+        try:
+            # 4. Action: Create a request
+            url = f"/admin/cms/placeholder/render-object-edit/{ct.pk}/{category.pk}/"
+            request = RequestFactory().get(url)
+            request.user = superuser
+            request.session = SessionBase()
+            request.toolbar = CMSToolbar(request)
+
+            # 5. Execution
+            response = render_object_edit(request, ct.pk, category.pk)
+            content = response.content.decode('utf-8')
+
+            # 6. Verification
+            self.assertEqual(content, "[Apphook Page]")
+
+        finally:
+            if original_renderer:
+                cms_extension.toolbar_enabled_models[Category] = original_renderer
+            elif Category in cms_extension.toolbar_enabled_models:
+                del cms_extension.toolbar_enabled_models[Category]
