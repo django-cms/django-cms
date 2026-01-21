@@ -13,9 +13,7 @@ Start here
 ==========
 
 * Read the docs: `Documentation (stable) <https://docs.django-cms.org/>`_
-* Try it first: `Demo platform <https://www.django-cms.org/en/django-cms-demo/>`_
-* Installing / learning: `Installation (How-to) <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ ·
-    `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
+* Installing / learning: `Installation (How-to) <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ · `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
 * Upgrading: `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
 * Get help: `Discord <https://discord-support-channel.django-cms.org>`_ or Stackoverflow
 * Contribute safely: `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
