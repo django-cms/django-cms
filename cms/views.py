@@ -15,7 +15,7 @@ from django.http import (
 from django.shortcuts import render
 from django.template.defaultfilters import title
 from django.template.response import TemplateResponse
-from django.urls import Resolver404, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
@@ -23,6 +23,7 @@ from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
+from cms.appresolver import applications_page_check
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
@@ -321,23 +322,16 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
         raise Http404 from err
 
     if not getattr(request, "current_page", None):
-        live_url = request.GET.get(get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM"))
-        if not live_url and hasattr(content_type_obj, "get_absolute_url"):
+        if hasattr(content_type_obj, "get_absolute_url"):
+            # Attempt to resolve current_page via the object's absolute URL (fallback for apphooks)
             try:
-                live_url = content_type_obj.get_absolute_url()
-            except Exception:
-                live_url = None
+                object_url = content_type_obj.get_absolute_url()
+            except NoReverseMatch:
+                object_url = None
 
-        if live_url:
-            from cms.appresolver import applications_page_check
-
-            # Try to resolve the page from the live_url
-            # First, check if it's a regular CMS page
-            request.current_page = get_page_from_request(request, use_path=live_url, clean_path=True)
-            if not request.current_page:
-                # If not, check if it's an apphook
+            if object_url:
                 original_path_info = request.path_info
-                request.path_info = live_url
+                request.path_info = object_url
                 try:
                     request.current_page = applications_page_check(request)
                 finally:
