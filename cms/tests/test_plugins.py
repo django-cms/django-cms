@@ -2,7 +2,7 @@ import datetime
 import pickle
 import warnings
 from contextlib import contextmanager
-from unittest import skipIf
+from unittest import mock, skipIf
 
 from django import http
 from django.conf import settings
@@ -479,7 +479,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual(new_plugins.count(), len(old_plugins))
 
-        for old_plugin, new_plugin in zip(old_plugins, new_plugins):
+        for old_plugin, new_plugin in zip(old_plugins, new_plugins, strict=False):
             self.assertEqual(old_plugin.get_children().count(), new_plugin.get_children().count())
 
     def test_copy_plugin_without_custom_model(self):
@@ -1593,28 +1593,26 @@ class PluginPoolTestCase(CMSTestCase):
 
         try:
             # Mark that template restrictions exist
-            plugin_pool.global_template_restrictions = True
+            with mock.patch.object(plugin_pool.__class__, "global_template_restrictions", return_value=True):
+                page1 = create_page("Test1", "nav_playground.html", "en")
+                page2 = create_page("Test2", "simple.html", "en", parent=page1)
 
-            page1 = create_page("Test1", "nav_playground.html", "en")
-            page2 = create_page("Test2", "simple.html", "en", parent=page1)
+                placeholder1 = page1.get_placeholders("en").first()
+                placeholder2 = page2.get_placeholders("en").first()
 
-            placeholder1 = page1.get_placeholders("en").first()
-            placeholder2 = page2.get_placeholders("en").first()
+                plugin_instance1 = api.add_plugin(placeholder1, TemplateCachePlugin, "en")
+                plugin_instance2 = api.add_plugin(placeholder2, TemplateCachePlugin, "en")
 
-            plugin_instance1 = api.add_plugin(placeholder1, TemplateCachePlugin, "en")
-            plugin_instance2 = api.add_plugin(placeholder2, TemplateCachePlugin, "en")
+                request_cache = {}
+                cache1 = plugin_pool.get_restrictions_cache(request_cache, plugin_instance1, page1)
+                cache2 = plugin_pool.get_restrictions_cache(request_cache, plugin_instance2, page2)
 
-            request_cache = {}
-            cache1 = plugin_pool.get_restrictions_cache(request_cache, plugin_instance1, page1)
-            cache2 = plugin_pool.get_restrictions_cache(request_cache, plugin_instance2, page2)
-
-            # Different templates should potentially use different caches
-            # (depending on configuration)
-            self.assertIsInstance(cache1, dict)
-            self.assertIsInstance(cache2, dict)
+                # Different templates should potentially use different caches
+                # (depending on configuration)
+                self.assertIsInstance(cache1, dict)
+                self.assertIsInstance(cache2, dict)
         finally:
             plugin_pool.unregister_plugin(TemplateCachePlugin)
-            plugin_pool.global_template_restrictions = False
 
     def test_get_restrictions_cache_same_slot_different_objects(self):
         """Test get_restrictions_cache with same slot but different objects"""
