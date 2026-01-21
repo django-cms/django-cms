@@ -18,6 +18,9 @@ from cms.utils import get_language_from_request, permissions
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
 
+if TYPE_CHECKING:
+    from cms.models.pluginmodel import CMSPlugin
+
 
 class Placeholder(models.Model):
     """
@@ -442,7 +445,7 @@ class Placeholder(models.Model):
         )
         return new_plugins
 
-    def add_plugin(self, instance: "cms.models.pluginmodel.CMSPlugin"):  # noqa: F821
+    def add_plugin(self, instance: "CMSPlugin"):
         """
         .. versionadded:: 4.0
 
