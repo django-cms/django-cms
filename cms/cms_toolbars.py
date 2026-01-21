@@ -176,7 +176,7 @@ class PlaceholderToolbar(CMSToolbar):
 
     # Buttons
     def add_edit_button(self):
-        url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
+        url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET)
         item = ButtonList(side=self.toolbar.RIGHT)
         item.add_button(
             _("Edit"),
@@ -187,7 +187,7 @@ class PlaceholderToolbar(CMSToolbar):
         self.toolbar.add_item(item)
 
     def add_preview_button(self):
-        url = get_object_preview_url(self.toolbar.obj, language=self.toolbar.request_language)
+        url = get_object_preview_url(self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET)
         if url:
             item = ButtonList(side=self.toolbar.RIGHT)
             item.add_button(
@@ -201,8 +201,12 @@ class PlaceholderToolbar(CMSToolbar):
     def add_structure_mode(self, extra_classes=("cms-toolbar-item-cms-mode-switcher",)):
         structure_active = self.toolbar.structure_mode_active
         edit_mode_active = not structure_active and self.toolbar.edit_mode_active
-        build_url = get_object_structure_url(self.toolbar.obj, language=self.toolbar.request_language)
-        edit_url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
+        build_url = get_object_structure_url(
+            self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET
+        )
+        edit_url = get_object_edit_url(
+            self.toolbar.obj, language=self.toolbar.request_language, params=self.request.GET
+        )
         switcher = self.toolbar.add_button_list(
             "Mode Switcher",
             side=self.toolbar.RIGHT,

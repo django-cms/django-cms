@@ -208,7 +208,7 @@ been tested, or is known to be incompatible.
 
 .. _python: https://www.python.org
 
-See the repository's ``setup.cfg`` for details of dependencies, or the
+See the repository's ``pyproject.toml`` for details of dependencies, or the
 :ref:`release-notes` for information about what is required or has changed in particular
 versions of the CMS.
 

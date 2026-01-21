@@ -15,7 +15,7 @@ from django.http import (
 from django.shortcuts import render
 from django.template.defaultfilters import title
 from django.template.response import TemplateResponse
-from django.urls import Resolver404, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
@@ -23,6 +23,7 @@ from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
+from cms.appresolver import applications_page_check
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
@@ -319,6 +320,22 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist as err:
         raise Http404 from err
+
+    # Attempt to resolve current_page via the object's absolute URL (for apphooks)
+    if not getattr(request, "current_page", None):
+        try:
+            object_url = content_type_obj.get_absolute_url()
+        except (AttributeError, NoReverseMatch):
+            object_url = None
+
+        if object_url:
+            original_path_info = request.path_info
+            try:
+                # Temporarily patch the request object and use the appresolver
+                request.path_info = object_url
+                request.current_page = applications_page_check(request)
+            finally:
+                request.path_info = original_path_info
 
     extension = apps.get_app_config('cms').cms_extension
 

@@ -1249,7 +1249,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         """
         msg = f"root nodes: {len(a)!r} != {len(b)!r} with {a!r}, {b!r}"
         self.assertEqual(len(a), len(b), msg)
-        for n1, n2 in zip(a, b):
+        for n1, n2 in zip(a, b, strict=False):
             for attr in attrs:
                 a1 = getattr(n1, attr)
                 a2 = getattr(n2, attr)
