@@ -321,21 +321,21 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     except ObjectDoesNotExist as err:
         raise Http404 from err
 
+    # Attempt to resolve current_page via the object's absolute URL (for apphooks)
     if not getattr(request, "current_page", None):
-        if hasattr(content_type_obj, "get_absolute_url"):
-            # Attempt to resolve current_page via the object's absolute URL (fallback for apphooks)
-            try:
-                object_url = content_type_obj.get_absolute_url()
-            except NoReverseMatch:
-                object_url = None
+        try:
+            object_url = content_type_obj.get_absolute_url()
+        except (AttributeError, NoReverseMatch):
+            object_url = None
 
-            if object_url:
-                original_path_info = request.path_info
+        if object_url:
+            original_path_info = request.path_info
+            try:
+                # Temporarily patch the request object and use the appresolver
                 request.path_info = object_url
-                try:
-                    request.current_page = applications_page_check(request)
-                finally:
-                    request.path_info = original_path_info
+                request.current_page = applications_page_check(request)
+            finally:
+                request.path_info = original_path_info
 
     extension = apps.get_app_config('cms').cms_extension
 
