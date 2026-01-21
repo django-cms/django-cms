@@ -13,20 +13,29 @@ from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
+from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import normalize_name
 
 
 class PluginPool:
+    plugins: dict[str, type[CMSPluginBase]]
+    root_plugin_cache: dict[str, list[type[CMSPluginBase]]]
+    discovered: bool
+    global_restrictions_cache: defaultdict[str, dict]
+
     def __init__(self):
         self.plugins = {}
         self.root_plugin_cache = {}
         self.discovered = False
         self.global_restrictions_cache = defaultdict(dict)
-        self.global_template_restrictions = any(".htm" in (key or "") for key in self.global_restrictions_cache)
 
-    def _clear_cached(self):
+    @property
+    def global_template_restrictions(self) -> bool:
+        return any(".htm" in (key or "") for key in self.global_restrictions_cache)
+
+    def _clear_cached(self) -> None:
         self.root_plugin_cache = {}
         self.get_all_plugins_for_model.cache_clear()
         if "registered_plugins" in self.__dict__:
@@ -36,7 +45,7 @@ class PluginPool:
         if "plugins_with_extra_placeholder_menu" in self.__dict__:
             del self.__dict__["plugins_with_extra_placeholder_menu"]
 
-    def discover_plugins(self):
+    def discover_plugins(self) -> None:
         if self.discovered:
             return
 
@@ -45,14 +54,17 @@ class PluginPool:
         # Sort plugins by their module and name
         self.plugins = dict(sorted(self.plugins.items(), key=lambda key: (key[1].module, key[1].name)))
 
-    def clear(self):
+    def clear(self) -> None:
         self.discovered = False
         self.plugins = {}
         self._clear_cached()
 
-    def validate_templates(self, plugin=None):
+    def validate_templates(self, plugin: type[CMSPluginBase] | None = None) -> None:
         """
-        Plugins templates are validated at this stage
+        Verify that all plugins have a valid render template.
+
+        Plugins that have render_plugin=False and allow_children=False are
+        always deemed valid.
         """
         if plugin:
             plugins = [plugin]
@@ -102,9 +114,9 @@ class PluginPool:
                         "CMS Plugins can not define render_plugin=False and allow_children=True: %s" % plugin_class
                     )
 
-    def register_plugin(self, plugin):
+    def register_plugin(self, plugin: type[CMSPluginBase]) -> type[CMSPluginBase]:
         """
-        Registers the given plugin(s).
+        Register the given plugin.
 
         Static sanity checks is also performed.
 
@@ -122,11 +134,11 @@ class PluginPool:
         self._clear_cached()
         return plugin
 
-    def unregister_plugin(self, plugin):
+    def unregister_plugin(self, plugin: type[CMSPluginBase]) -> None:
         """
-        Unregisters the given plugin(s).
+        Unregister the given plugin.
 
-        If a plugin isn't already registered, this will raise PluginNotRegistered.
+        If the plugin isn't already registered, this will raise PluginNotRegistered.
         """
         plugin_name = plugin.__name__
         if plugin_name not in self.plugins:
@@ -167,7 +179,12 @@ class PluginPool:
         return list(plugins)
 
     def get_all_plugins(
-        self, placeholder=None, page=None, setting_key="plugins", include_page_only=True, root_plugin=False
+        self,
+        placeholder: str | None = None,
+        page: Page | None = None,
+        setting_key: str = "plugins",
+        include_page_only: bool = True,
+        root_plugin: bool = False,
     ):
         from cms.utils.placeholder import get_placeholder_conf
 
@@ -262,7 +279,9 @@ class PluginPool:
         plugin_classes = [cls for cls in self.registered_plugins if cls._has_extra_placeholder_menu_items]
         return plugin_classes
 
-    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, obj: models.Model) -> defaultdict[str, dict]:
+    def get_restrictions_cache(
+        self, request_cache: dict, instance: CMSPluginBase, obj: models.Model | None
+    ) -> defaultdict[str, dict]:
         """
         Retrieve the restrictions cache for a given plugin instance.
 
@@ -277,7 +296,7 @@ class PluginPool:
         Args:
             request_cache (dict): The current request cache (only filled is non globally cacheable).
             instance (CMSPluginBase): The plugin instance for which to retrieve the restrictions cache.
-            page (Optional[Page]): The page associated with the plugin instance, if any.
+            obj (Optional[models.Model]): The model instance associated with the plugin instance, if any.
 
         Returns:
             dict: The restrictions cache for the given plugin instance - or the cache valid for the request.
@@ -302,7 +321,7 @@ class PluginPool:
 
     restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
 
-    def can_cache_globally(self, plugin_class: CMSPluginBase) -> bool:
+    def can_cache_globally(self, plugin_class: type[CMSPluginBase]) -> bool:
         """
         Check if the restrictions for a given plugin class can be cached globally.
 
