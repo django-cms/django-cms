@@ -180,7 +180,7 @@ class PluginPool:
 
     def get_all_plugins(
         self,
-        placeholder: str = "",
+        placeholder: str | None = None,
         page: Page | None = None,
         setting_key: str = "plugins",
         include_page_only: bool = True,
