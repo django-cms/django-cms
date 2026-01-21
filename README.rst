@@ -4,33 +4,32 @@ django CMS
 
 |PyPiVersion| |PyVersion| |DjVersion| |License| |Coverage|
 
-Lean, open-source Enterprise Content Management powered by Django, backed by the non-profit django CMS Association
-(`Sponsor us <https://www.django-cms.org/en/memberships/>`_).
+Lean, open-source enterprise content management powered by Django.
+Backed by the non-profit django CMS Association (`Sponsor us <https://www.django-cms.org/en/memberships/>`_).
 
 This repository contains the core package published as ``django-cms`` on PyPI.
 
 Quick links
 ===========
 
-* `Website <https://www.django-cms.org/>`_
-* `Documentation (stable) <https://docs.django-cms.org/>`_
-* `Documentation (latest / main branch) <https://docs.django-cms.org/en/latest/>`_
-* `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
-* `Changelog <CHANGELOG.rst>`_
-* `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
+* Start here: `Documentation (stable) <https://docs.django-cms.org/>`_
+* Developing on ``main``: `Documentation (latest) <https://docs.django-cms.org/en/latest/>`_
+* Planning an upgrade: `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
+* Project info: `Website <https://www.django-cms.org/>`_ · `Changelog <CHANGELOG.rst>`_
+* Contribute safely: `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
 
 
 ********
 Features
 ********
 
-Key features include:
+Build complex publishing workflows with simple, composable parts:
 
 * robust internationalisation (i18n) and multi-site support
-* front-end (inline) editing that allows editors to work directly on rendered pages
-* a flexible placeholder and plugin system for composing reusable content components
+* front-end (inline) editing so editors can work directly on rendered pages
+* a flexible placeholder and plugin system for reusable content components
 * integration with multiple rich-text editors
-* support for content versioning, editorial workflows, and headless setups through official add-on packages
+* content versioning, editorial workflows, and headless setups via official add-on packages
 * a hierarchical page tree with SEO-friendly URLs
 * extensible navigation and application integration (apphooks)
 
@@ -42,6 +41,9 @@ More information on `our website <https://www.django-cms.org>`_.
 *************************
 Installation & Quickstart
 *************************
+
+Get a working setup by following the official guide (recommended). If you already have a Django project, you can still
+use the same steps and integrate django CMS incrementally.
 
 .. code-block:: console
 
@@ -57,7 +59,7 @@ Next, follow the official installation guide and tutorials:
 Documentation
 *************
 
-Find tutorials, how-to guides, explanation, and references here:
+Find tutorials, how-to guides, explanation, and reference material here:
 
 * `Current stable version <https://docs.django-cms.org/>`_ (current release)
 * `Latest development version <https://docs.django-cms.org/en/latest/>`_ (main branch)
@@ -76,11 +78,13 @@ The demo platform is kindly provided by Divio, platinum member of the django CMS
    :target: https://www.django-cms.org/en/django-cms-demo/
    :alt: Try demo with Divio Cloud
 
+Want to get a feel for the editing experience before you install anything? Start with the demo link above.
+
 
 Development
 ***********
 
-If you want to contribute code, start here:
+If you want to contribute code, start here (you'll be productive quickly):
 
 * `CONTRIBUTING.rst <CONTRIBUTING.rst>`_ (workflow, PR process)
 * `Contributing docs <https://docs.django-cms.org/en/latest/contributing/>`_
@@ -89,7 +93,8 @@ If you want to contribute code, start here:
 Getting Help
 ************
 
-Please head over to our `Discord Server <https://discord-support-channel.django-cms.org>`_ or Stackoverflow for support.
+Need help choosing an approach, debugging an issue, or reviewing an implementation idea?
+Head over to our `Discord Server <https://discord-support-channel.django-cms.org>`_ or Stackoverflow.
 
 ********************
 Professional support
@@ -107,6 +112,7 @@ The django CMS Association
 The django CMS Association is a non-profit founded in 2020 to drive the success of django CMS by providing guidance,
 infrastructure and funding for core development and community projects.
 
+If your business depends on django CMS, consider supporting its long-term health:
 `Join the django CMS Association <https://www.django-cms.org/en/contribute/>`_ or `become a member <https://www.django-cms.org/en/memberships/>`_.
 
 
