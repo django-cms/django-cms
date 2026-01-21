@@ -1,5 +1,6 @@
-import warnings
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
+import warnings
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
