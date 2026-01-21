@@ -1,5 +1,7 @@
+.. |_| unicode:: 0xA0
+   :trim:
 
-.
+|_|
 
 .. image:: /images/django-cms-logo.png
    :alt: django CMS logo
