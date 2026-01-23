@@ -1,6 +1,6 @@
+import threading
 from collections import OrderedDict
 from importlib import import_module
-import threading
 
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
