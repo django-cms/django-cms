@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from importlib import import_module
+import threading
 
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
@@ -103,6 +104,28 @@ class AppRegexURLResolver(URLResolver):
                         pattern = getattr(pattern, 'pattern', pattern)
                         tried.append(pattern.regex.pattern)
             raise Resolver404({'tried': tried, 'path': new_path})
+
+
+class LazyURLResolver(URLResolver):
+    def __init__(self, *args, get_urlpatterns, **kwargs):
+        self._get_urlpatterns = get_urlpatterns
+        self._lazy_url_patterns = None
+        self._lazy_lock = threading.Lock()
+        super().__init__(*args, **kwargs)
+
+    @property
+    def urlconf_module(self):
+        # Django allows urlconf_module to be a list of URLPattern/URLResolver.
+        return self.url_patterns
+
+    @property
+    def url_patterns(self):
+        if self._lazy_url_patterns is None:
+            with self._lazy_lock:
+                if self._lazy_url_patterns is None:
+                    patterns = self._get_urlpatterns() or []
+                    self._lazy_url_patterns = list(patterns)
+        return self._lazy_url_patterns
 
 
 def recurse_patterns(path, pattern_list, page_id, default_args=None,
