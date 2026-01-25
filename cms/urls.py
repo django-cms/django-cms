@@ -1,8 +1,8 @@
-from functools import cached_property
 
 from django.conf import settings
 from django.urls import URLResolver, include, path, re_path
 from django.urls.resolvers import RegexPattern
+from django.utils.functional import cached_property
 
 from cms import views
 from cms.constants import SLUG_REGEXP
