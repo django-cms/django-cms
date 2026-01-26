@@ -1,5 +1,5 @@
 
-/* global gettext, fetch */
+/* global gettext, fetch, DOMParser */
 
 import addSlugHandlers from './slug';
 
