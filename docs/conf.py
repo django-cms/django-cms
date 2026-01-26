@@ -64,6 +64,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinxcontrib.spelling',
     "sphinx_copybutton",
+    "sphinx_design",
     "sphinxext.opengraph",
     ]
 intersphinx_mapping = {
@@ -210,6 +211,7 @@ html_js_files = [
 # include the following files in the build output
 html_css_files = [
     "kapa-ai.css",
+    "custom.css",
 ]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
