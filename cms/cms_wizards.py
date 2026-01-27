@@ -1,4 +1,3 @@
-from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
@@ -32,7 +31,7 @@ class CMSSubPageWizard(Wizard):
             # We can't really add a sub-page to a non-existent page. Or to an
             # app-hooked page.
             return False
-        return user_can_add_subpage(user, target=page)
+        return False
 
     def get_success_url(self, obj, **kwargs):
         page_content = obj.pagecontent_set(manager="admin_manager").first()
