@@ -17,7 +17,7 @@ class CMSPageWizard(Wizard):
             return user_can_add_subpage(user, target=parent_page)
         elif page:
             return user_can_add_page(user, site=page.site)
-        return user_can_add_page(user, site=Site.objects.first())
+        return False
 
     def get_success_url(self, obj, **kwargs):
         page_content = obj.pagecontent_set(manager="admin_manager").first()
@@ -31,7 +31,7 @@ class CMSSubPageWizard(Wizard):
             # We can't really add a sub-page to a non-existent page. Or to an
             # app-hooked page.
             return False
-        return False
+        return user_can_add_subpage(user, target=page)
 
     def get_success_url(self, obj, **kwargs):
         page_content = obj.pagecontent_set(manager="admin_manager").first()
