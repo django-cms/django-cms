@@ -17,7 +17,7 @@ class CMSPageWizard(Wizard):
             return user_can_add_subpage(user, target=parent_page)
         elif page:
             return user_can_add_page(user, site=page.site)
-        return False
+        return user_can_add_page(user, site=Site.objects.first())
 
     def get_success_url(self, obj, **kwargs):
         page_content = obj.pagecontent_set(manager="admin_manager").first()
