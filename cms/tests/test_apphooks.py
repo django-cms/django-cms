@@ -1,12 +1,16 @@
 import sys
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
 from django.core.checks.urls import check_url_config
 from django.http import Http404, HttpResponse
+from django.template import Context, Template
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
 from django.utils.timezone import now
@@ -23,6 +27,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
+from cms.views import render_object_edit
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -1239,3 +1244,62 @@ class ApphooksSiteTestCase(BaseApphooksTestCase):
                 path = reverse(url_name)
                 match = resolve(path)
                 self.assertEqual(match.func.__name__, view_name)
+
+class ApphookFrontendEditingTests(BaseApphooksTestCase):
+    """
+    Tests for rendering external models attached via apphooks in frontend editing mode.
+    Ensures that context remains consistent (e.g., current_page is resolved).
+    """
+
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_current_page_resolution_in_render_object_edit(self):
+        from django.contrib.sessions.backends.base import SessionBase
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        # 1. Setup: Create an apphooked page
+        superuser = self.get_superuser()
+        create_page(
+            title="Apphook Page",
+            template="nav_playground.html",
+            language="en",
+            created_by=superuser,
+            apphook="SampleApp"
+        )
+        self.reload_urls()
+
+        # 2. Setup: Create an external model instance (Category)
+        category = Category.add_root(name="Test Category")
+        ct = ContentType.objects.get_for_model(Category)
+
+        # 3. Setup: Register a mock renderer
+        cms_extension = apps.get_app_config('cms').cms_extension
+
+        def mock_render_category(request, obj):
+            t = Template("{% load cms_tags %}[{% page_attribute 'page_title' %}]")
+            return HttpResponse(t.render(Context({"request": request})))
+
+        original_renderer = cms_extension.toolbar_enabled_models.get(Category)
+        cms_extension.toolbar_enabled_models[Category] = mock_render_category
+
+        try:
+            # 4. Action: Create a request
+            url = f"/admin/cms/placeholder/render-object-edit/{ct.pk}/{category.pk}/"
+            request = RequestFactory().get(url)
+            request.user = superuser
+            request.session = SessionBase()
+            request.toolbar = CMSToolbar(request)
+
+            # 5. Execution
+            response = render_object_edit(request, ct.pk, category.pk)
+            content = response.content.decode('utf-8')
+
+            # 6. Verification
+            self.assertEqual(content, "[Apphook Page]")
+
+        finally:
+            if original_renderer:
+                cms_extension.toolbar_enabled_models[Category] = original_renderer
+            elif Category in cms_extension.toolbar_enabled_models:
+                del cms_extension.toolbar_enabled_models[Category]

@@ -1,10 +1,11 @@
 MarkupSafe
 Pygments
 furo
-Sphinx>=4.2.0
+Sphinx
 sphinx-copybutton
 sphinxext-opengraph
 sphinxcontrib-spelling
+sphinx-design
 pyenchant>3
 sphinx-autobuild
 datetime
