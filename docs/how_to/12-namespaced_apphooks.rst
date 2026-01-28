@@ -1,10 +1,18 @@
 .. _complex_apphooks_how_to:
 
-How to manage complex apphook configuration
-===========================================
+How to manage complex apphook configurations
+============================================
 
-In :ref:`apphooks_how_to` we discuss some basic points of using apphooks. In this
-document we will cover some more complex implementation possibilities.
+This how-to builds on :ref:`apphooks_how_to` and focuses on two advanced, practical needs:
+
+- attaching the *same* application to multiple CMS pages (multiple mount points)
+- selecting per-mount behaviour using editor-managed configuration ("apphook configurations")
+
+Use this guide when you need multiple instances of one apphook (for example ``/faq`` and
+``/support/faq``) or when your application must behave differently depending on where it is
+mounted. Before starting, you should be familiar with the :ref:`about_apphooks` conceptual model
+and have successfully created a basic apphook (see :ref:`apphooks_how_to`). Understanding
+:ref:`django:topics-http-reversing-url-namespaces` will also help.
 
 .. _multi_apphook:
 
@@ -17,7 +25,7 @@ Define a namespace at class-level
 If you want to attach an application multiple times to different pages, then the class
 defining the apphook *must* have an ``app_name`` attribute:
 
-.. code-block::
+.. code-block:: python
 
     class MyApphook(CMSApp):
         name = _("My Apphook")
@@ -79,7 +87,7 @@ To capture the configuration that different instances of an apphook can take, a 
 model needs to be created - each apphook instance will be an instance of that model, and
 administered through the Django admin in the usual way.
 
-Once set up, an apphook configuration can be applied to to an apphook instance, in the
+Once set up, an apphook configuration can be applied to an apphook instance, in the
 *Advanced settings* of the page the apphook instance belongs to:
 
 .. image:: /how_to/images/select_apphook_configuration.png
@@ -88,7 +96,7 @@ Once set up, an apphook configuration can be applied to to an apphook instance, 
     :align: center
 
 The configuration is then loaded in the application's views for that namespace, and will
-be used to determined how it behaves.
+be used to determine how it behaves.
 
 Creating an application configuration in fact creates an apphook instance namespace.
 Once created, the namespace of a configuration cannot be changed - if a different
@@ -111,14 +119,14 @@ Let us quickly create the new app:
 
 1. **Create a new app in your project**:
 
-   .. code-block::
+    .. code-block:: bash
 
        python -m manage startapp faq
 
 2. **Create a model for the app config in ``models.py``**: The app config will be
    identified by its namespace.
 
-   .. code-block::
+    .. code-block:: python
 
        from django.db import models
        from django.utils.translation import gettext_lazy as _
@@ -139,12 +147,16 @@ Let us quickly create the new app:
            )
 
 3. **Create the FAQ model** also in ``models.py``: All entries will be assigned to an
-   instance of the app hook.
+    instance of the apphook.
 
-   .. code-block::
+    .. code-block:: python
 
        class Entry(models.Model):
-           app_config = models.ForeignKey(FaqConfigModel, null=False, on_delete=models.PROTECT)  # We need to assign an FAQ entry to its app instance
+           app_config = models.ForeignKey(
+               FaqConfigModel,
+               null=False,
+               on_delete=models.PROTECT,
+           )
            question = models.TextField(blank=True, default='')
            answer = models.TextField()
 
@@ -154,10 +166,10 @@ Let us quickly create the new app:
            class Meta:
                verbose_name_plural = 'entries'
 
-4. **Create the FAQ CMS app**: In the apps's ``cms_apps.py`` create the ``FaqConfig``
-   class. This extensions tells django CMS how to get the app config instances.
+4. **Create the FAQ CMS app**: In the app's ``cms_apps.py`` create the ``FaqConfig``
+    class. This extension tells django CMS how to get the app config instances.
 
-   .. code-block::
+    .. code-block:: python
 
        from django.core.exceptions import ObjectDoesNotExist
        from django.urls import reverse
@@ -171,6 +183,7 @@ Let us quickly create the new app:
        @apphook_pool.register
        class FaqConfig(CMSApp):
            name = "FAQ"
+           app_name = "faq"
            app_config = FaqConfigModel
 
            def get_urls(self, page=None, language=None, **kwargs):
@@ -185,9 +198,14 @@ Let us quickly create the new app:
                except ObjectDoesNotExist:
                    return None
 
-           def  get_config_add_url(self):
+           def get_config_add_url(self):
                try:
-                   return reverse("admin:{}_{}_add".format(self.app_config._meta.app_label, self.app_config._meta.model_name))
+                   return reverse(
+                       "admin:{}_{}_add".format(
+                           self.app_config._meta.app_label,
+                           self.app_config._meta.model_name,
+                       )
+                   )
                except AttributeError:
                    return reverse(
                        "admin:{}_{}_add".format(self.app_config._meta.app_label, self.app_config._meta.module_name)
@@ -196,7 +214,7 @@ Let us quickly create the new app:
 5. **Add models to the admin interface**: Its admin properties are defined in
    ``admin.py``:
 
-   .. code-block::
+    .. code-block:: python
 
        from django.contrib import admin
 
@@ -223,7 +241,7 @@ Let us quickly create the new app:
    view will have to determine which app instance it is showing. Here's a short reusable
    mixin to help with that:
 
-   .. code-block::
+    .. code-block:: python
 
        from django.views.generic import ListView
        from django.urls import Resolver404, resolve
@@ -241,10 +259,9 @@ Let us quickly create the new app:
                app = apphook_pool.get_apphook(request.current_page.application_urls)
                if app and app.app_config:
                    try:
-                       config = None
                        with override(get_language_from_request(request)):
                            if hasattr(request, "toolbar") and hasattr(request.toolbar, "request_path"):
-                               path = request.toolbar.request_path  # If v4 endpoint take request_path from toolbar
+                               path = request.toolbar.request_path  # If using the v4 endpoint, take request_path from toolbar
                            else:
                                path = request.path_info
                            namespace = resolve(path).namespace
@@ -276,9 +293,9 @@ Let us quickly create the new app:
                except AttributeError:
                    return 10
 
-7. **Declare the app's URLs** in ``urls.py``: .. code-block:
+7. **Declare the app's URLs** in ``urls.py``:
 
-   .. code-block::
+    .. code-block:: python
 
        from django.urls import path
        from . import views
@@ -288,9 +305,9 @@ Let us quickly create the new app:
            path("", views.IndexView.as_view(), name='index'),
        ]
 
-8. Finally, **create a template for the index view**: .. code-block:
+8. Finally, **create a template for the index view**:
 
-   .. code-block::
+    .. code-block:: html+django
 
        {% extends 'base.html' %}
 

@@ -105,7 +105,11 @@ Feature 3
 Minor features
 ==============
 
-* Changed the default primary key field from ``AutoField`` to ``BigAutoField``.
+* Async support: User middleware and apphook registration support async setups
+  and now let you run django CMS using asgi.
+
+* Apphooks now by default allow access to the page content object's placeholders on
+  the apphook's root page.
 
 
 Bug Fixes

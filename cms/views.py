@@ -309,6 +309,8 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     absolute_url = content_type_obj.get_absolute_url()
                     from cms.toolbar.toolbar import CMSToolbar
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
+                    # Make page content's placeholders available, can be overwritten by apphook view
+                    request.toolbar.set_object(content_type_obj)
                     # Resolve the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
                     if view_func is not details:
