@@ -100,6 +100,7 @@ packaging==25.0
     #   black
     #   build
     #   sphinx
+    #   wheel
 pathspec==1.0.3
     # via black
 pip-tools==7.5.2
@@ -205,7 +206,7 @@ watchfiles==1.1.1
     # via sphinx-autobuild
 websockets==16.0
     # via sphinx-autobuild
-wheel==0.45.1
+wheel==0.46.2
     # via pip-tools
 zope-interface==8.2
     # via datetime
