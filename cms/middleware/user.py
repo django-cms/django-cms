@@ -14,3 +14,9 @@ class CurrentUserMiddleware:
 
         set_current_user(getattr(request, 'user', None))
         return self.get_response(request)
+
+    async def __acall__(self, request):
+        from cms.utils.permissions import set_current_user
+
+        set_current_user(getattr(request, 'user', None))
+        return await self.get_response(request)
