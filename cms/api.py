@@ -65,7 +65,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
-from cms.utils.permissions import _thread_locals
+from cms.utils.permissions import _current_user
 from cms.utils.plugins import copy_plugins_to_placeholder
 from menus.menu_pool import menu_pool
 
@@ -239,10 +239,10 @@ def create_page(
 
     # ugly permissions hack
     if created_by and isinstance(created_by, get_user_model()):
-        _thread_locals.user = created_by
+        _current_user.set(created_by)
         created_by = get_clean_username(created_by)
     else:
-        _thread_locals.user = None
+        _current_user.set(None)
 
     if reverse_id:
         if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
@@ -278,8 +278,7 @@ def create_page(
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-
-    del _thread_locals.user
+    _current_user.set(None)
     return page
 
 
@@ -348,7 +347,7 @@ def create_page_content(
         path = page.get_path_for_slug(slug, language)
 
     if created_by and isinstance(created_by, get_user_model()):
-        _thread_locals.user = created_by
+        _current_user.set(created_by)
         created_by = get_clean_username(created_by)
 
     try:
@@ -369,7 +368,7 @@ def create_page_content(
     )
 
     # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
-    user = getattr(_thread_locals, "user", "unknown user")
+    user = _current_user.get(None)
     page_content = PageContent.objects.with_user(user).create(
         language=language,
         title=title,
