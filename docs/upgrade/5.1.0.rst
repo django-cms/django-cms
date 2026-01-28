@@ -105,6 +105,10 @@ Feature 3
 Minor features
 ==============
 
+* Apphooks now by default allow access to the page content object's placeholders on
+  the apphook's root page.
+
+
 Bug Fixes
 =========
 
