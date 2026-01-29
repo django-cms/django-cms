@@ -137,6 +137,41 @@ class CMSAppConfig:
     def __init__(self, django_app_config):
         self.app_config = django_app_config
 
+    @staticmethod
+    def get_contract(contract_name: str) -> type:
+        """
+        Retrieve a contract implementation from registered CMS extension apps.
+
+        Searches through all registered CMS extension applications for a contract
+        that matches the given contract name. A contract is a named interface that
+        allows apps to provide functionality that other apps can use.
+
+        This method enables an architecture where apps can query for
+        specific contracts and use the implementation provided by any registered
+        extension app that exports that contract.
+
+        :param contract_name: The name identifier of the contract to retrieve
+        :type contract_name: str
+        :return: The contract class if found, or None if no matching contract exists
+        :rtype: type or None
+        :raises: None
+
+        Example::
+
+            # Get a versioning contract implementation
+            versioning_contract = CMSAppConfig.get_contract('versioning')
+            if versioning_contract:
+                # Use the versioning functionality
+                version = versioning_contract.create_version(obj)
+        """
+        from cms.app_registration import get_cms_extension_apps
+
+        for app in get_cms_extension_apps():
+            name, cls = getattr(app.cms_extension, "contract", (None, None))
+            if name == contract_name:
+                return cls
+        return None
+
 
 class CMSAppExtension(metaclass=ABCMeta):
     """
