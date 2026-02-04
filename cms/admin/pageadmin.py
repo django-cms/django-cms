@@ -63,6 +63,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
+from cms.models.permissionmodels import PermissionTuple
 from cms.operations.helpers import (
     send_post_page_operation,
     send_pre_page_operation,
@@ -615,7 +616,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 can_change = True
             else:
                 page_path = permission.page.path
-                can_change = any(perm_tuple.contains(page_path) for perm_tuple in allowed_pages)
+                can_change = any(PermissionTuple(perm_tuple).contains(page_path) for perm_tuple in allowed_pages)
 
             row = PermissionRow(
                 is_global=False,
