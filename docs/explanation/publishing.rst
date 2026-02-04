@@ -3,99 +3,165 @@
 Publishing
 ==========
 
-Without an additional package installed that supports versioning all django CMS pages
-are published by default. This means they are visible to the public the moment you save
-them. Accordingly, all changes you make are visible immediately.
+Publishing in django CMS controls when content becomes visible to site visitors.
+Separating editing from publishing is fundamental to professional content management
+workflows, allowing editors to prepare, review, and approve content before it goes live.
 
-`djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_ is a
-general purpose package that manages versions within different categories, like
-**published**, **draft**, **unpublished**, or **archived**. django CMS, however, is not
-restricted to work with djangocms-versioning. You can use other versioning packages or
-come up with your own either from scratch or by forking djangocms-versioning.
+.. note::
 
-This section gives a short introduction on how to work with djangocms-versioning. For
-details please consult the `djangocms-versioning documentation
-<https://django-cms-docs.readthedocs.io/>`_.
+    Publishing and versioning capabilities are provided by **separate packages**, not by
+    django CMS core. This modular design allows projects to choose the versioning
+    strategy that best fits their needs—though most sites use the standard
+    djangocms-versioning package described below.
 
-Also, while this section focuses on pages, djangocms-versioning can lend its versioning
-capabilities to other objects, too, e.g., aliases as defined in djangocms-alias.
+Default behavior
+----------------
+
+Without a versioning package installed, django CMS pages are published immediately upon
+saving. Every change is visible to the public the moment you save it. This simple model
+works well for small sites or development environments where immediate visibility is
+acceptable.
+
+djangocms-versioning
+--------------------
+
+`djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_ is the
+standard versioning package endorsed by the django CMS Association. It provides a
+full-featured versioning system with multiple states: **draft**, **published**,
+**unpublished**, and **archived**.
+
+This package is recommended for most production sites requiring editorial workflows,
+content approval processes, or the ability to prepare content in advance.
+
+For complex editorial requirements, djangocms-versioning can be extended with
+`djangocms-moderation <https://github.com/django-cms/djangocms-moderation>`_, which
+adds custom moderation workflows. This allows you to define approval chains where
+content must pass through multiple review stages before publication—useful for
+organisations with formal content governance processes.
 
 .. _version_states:
 
 Version states
---------------
+~~~~~~~~~~~~~~
 
-Each :class:`~cms.models.pagemodel.Page` object can have many
-:class:`~cms.models.contentmodels.PageContent` objects assigned actually containing the
-page's content (hence the name) in a specific language. Djangocms-versioning extends
-this relationship by allowing more :class:`~cms.models.contentmodels.PageContent`
-objects to carry a version number and version state. The states are:
+Each :class:`~cms.models.pagemodel.Page` object can have multiple
+:class:`~cms.models.contentmodels.PageContent` objects, each carrying a version number
+and state. The states are:
 
-    - **draft**: This is the version which currently can be edited. Only draft versions
-      can be edited and only one draft version per language is allowed. Changes made to
-      draft pages are not visible to the public.
-    - **published**: This is the version currently visible on the website to the public.
-      Only one version per language can be public. It cannot be changed. If it needs to
-      be changed a new draft is created based on a published page and the published page
-      stays unchanged.
-    - **unpublished**: This is a version which was published at one time but now is not
-      visible to the public any more. There can be many unpublished versions.
-    - **archived**: This is a version which has not been published and therefore has
-      never been visible to the public. It represents a state which is intended to be
-      used for later work (by reverting it to a draft state).
+**draft**
+    The version currently being edited. Only draft versions can be modified, and only
+    one draft per language is allowed. Changes to drafts are not visible to the public.
 
-Each new draft version will generate a new version number.
+**published**
+    The version currently visible on the website. Only one published version per
+    language can exist. Published versions cannot be edited directly—to make changes,
+    you create a new draft based on the published version.
+
+**unpublished**
+    A version that was previously published but has been taken offline. Multiple
+    unpublished versions can exist, preserving the history of what was once live.
+
+**archived**
+    A version that was never published. Archived versions preserve work that may be
+    useful later and can be reverted to draft state when needed.
+
+Each new draft generates a new version number, providing a complete history of changes.
 
 .. image:: /images/version-states.png
     :align: center
     :alt: Version states
 
-When a page is published, it is publicly visible even if its parent pages are not
+When a page is published, it becomes publicly visible even if its parent pages are not
 published.
 
-Code and PageContent
---------------------
+Scope of versioning
+~~~~~~~~~~~~~~~~~~~
 
-When handling :class:`~cms.models.contentmodels.PageContent` in code, you'll generally
-only "see" published pages:
+While this section focuses on pages, djangocms-versioning can version other content
+types as well. For example, `djangocms-alias <https://github.com/django-cms/
+djangocms-alias>`_ uses djangocms-versioning to provide versioned aliases—reusable
+content blocks that can be managed with the same editorial workflow as pages.
 
-.. code-block::
+Working with PageContent in code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    PageContent.objects.filter(language="en")   # get all published English page contents
+When querying :class:`~cms.models.contentmodels.PageContent` objects, the default
+manager only returns published content:
 
-will only give published pages. This is to ensure that no draft or unpublished versions
-leaks or become visible to the public.
+.. code-block:: python
 
-Since often draft page contents are the ones you interact with in the admin interface,
-or in draft mode in the CMS frontend, djangocms-versioning introduces an additional
-model manager for the PageContents **which may only be used on admin sites and admin
-forms**:
+    PageContent.objects.filter(language="en")  # Returns only published English content
 
-.. code-block::
+This default behavior ensures that draft or unpublished content never accidentally
+leaks to the public.
 
-    PageContent.admin_manager.filter(page=my_page, language="en")
+For admin interfaces and editorial views where you need access to all versions,
+djangocms-versioning provides an ``admin_manager``. **Use this manager only in admin
+contexts**:
 
-will retrieve page content objects of all versions. Alternatively, to get the current
-draft version you can to filter the ``Version`` object:
+.. code-block:: python
 
-.. code-block::
+    PageContent.admin_manager.filter(page=my_page, language="en")  # All versions
+
+To retrieve a specific draft version:
+
+.. code-block:: python
 
     from djangocms_versioning.constants import DRAFT
     from djangocms_versioning.models import Version
 
-    version = Version.objects.get(content__page=my_page, content__language="en", status=DRAFT)
-    draft_content = Version.content
+    version = Version.objects.get(
+        content__page=my_page,
+        content__language="en",
+        state=DRAFT
+    )
+    draft_content = version.content
 
-Finally, there are instance where you want to access the "current" version of a page.
-This is either the current draft version or - there is no draft - the published version.
-You can easily achieve this by using:
+To access the "current" version (draft if one exists, otherwise published):
 
-.. code-block::
+.. code-block:: python
+
+    from djangocms_versioning.constants import DRAFT
 
     for content in PageContent.admin_manager.filter(page=my_page).current_content():
-        # iterates over the current (draft or published) version of all languages of my page
         if content.versions.first().state == DRAFT:
-            # do something
+            # Handle draft version
+            pass
 
-For more details see the `documentation of djangocms-versioning
-<https://djangocms-versioning.readthedocs.io>`_!
+For comprehensive details, see the `djangocms-versioning documentation
+<https://djangocms-versioning.readthedocs.io>`_.
+
+Alternative versioning packages
+-------------------------------
+
+Django CMS uses a contract-based approach (the ``CMSAppExtension`` interface) that
+allows alternative versioning implementations. While djangocms-versioning is the
+endorsed standard, you can use or create alternatives when your requirements differ.
+
+An example is `djangocms-no-versioning
+<https://github.com/benzkji/djangocms-no-versioning>`_, which provides simplified
+publish/unpublish toggling without maintaining a full version history—suitable when
+you need basic visibility control but not complete version tracking.
+
+This flexibility allows you to:
+
+- Use the endorsed djangocms-versioning for full version control
+- Use a lighter-weight alternative when simpler workflows suffice
+- Create a custom versioning package tailored to your specific requirements
+
+Considerations when choosing or switching
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Different versioning packages may have fundamentally different model structures and
+approaches to managing content states. This has important implications:
+
+**Switching versioning packages on an existing project is difficult.** While possible,
+the process typically requires uninstalling the current package (leaving an unversioned
+django CMS installation), then installing the new package and creating its required
+data structures. This migration may result in data loss—for example, archived versions
+or version history would not transfer between incompatible systems.
+
+**The versioning package affects all content types using the contract.** Packages like
+`djangocms-alias <https://github.com/django-cms/djangocms-alias>`_ consume the
+versioning contract, meaning your choice of versioning package determines how *all*
+versioned content behaves across your site—not just pages.

@@ -128,7 +128,14 @@ def configure_cms_apps(apps_with_features):
     and run code to register them with their config
     """
     for app_with_feature in apps_with_features:
-        enabled_property = f"{app_with_feature.label}_enabled"
+        contract = getattr(app_with_feature.cms_extension, "contract", None)
+        if contract is None:
+            contract_label = app_with_feature.label  # default contract name
+        elif isinstance(contract, (tuple, list)) and len(contract) == 2:
+            contract_label = contract[0]
+        else:
+            raise ImproperlyConfigured("CMSExtension contract property needs to be a 2-tuple consisting of the form (contract_name, contract_object)")
+        enabled_property = f"{contract_label}_enabled"
         configure_app = app_with_feature.cms_extension.configure_app
 
         for app_config in get_cms_config_apps():
