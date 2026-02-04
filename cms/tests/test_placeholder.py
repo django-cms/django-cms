@@ -1675,3 +1675,13 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
                 self.assertTrue(any(isinstance(warn.message, DuplicatePlaceholderWarning) for warn in w))
         finally:
             placeholder_utils.get_template = orig_get_template
+
+    def test_placeholder_adds_itself_to_added_plugins(self):
+        """
+        When using `Placeholder.add_plugin(p)`, `p.placeholder` should be set as a side effect.
+        """
+        placeholder = Placeholder.objects.create(slot="placeholder")
+        plugin = CMSPlugin()
+
+        placeholder.add_plugin(plugin)
+        self.assertEqual(plugin.placeholder, placeholder)

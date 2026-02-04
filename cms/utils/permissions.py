@@ -1,7 +1,7 @@
 from collections import defaultdict
 from contextlib import contextmanager
+from contextvars import ContextVar
 from functools import lru_cache, wraps
-from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
@@ -14,23 +14,23 @@ from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
-# thread local support
-_thread_locals = local()
+# context variable support for async-safe user tracking
+_current_user: ContextVar = ContextVar('current_user', default=None)
 
 
 def set_current_user(user):
     """
-    Assigns current user from request to thread_locals, used by
+    Assigns current user from request to context variable, used by
     CurrentUserMiddleware.
     """
-    _thread_locals.user = user
+    _current_user.set(user)
 
 
 def get_current_user():
     """
     Returns current user, or None
     """
-    return getattr(_thread_locals, 'user', None)
+    return _current_user.get()
 
 
 def get_current_user_name():

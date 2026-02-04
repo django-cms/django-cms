@@ -1,12 +1,16 @@
 import sys
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
 from django.core.checks.urls import check_url_config
 from django.http import Http404, HttpResponse
+from django.template import Context, Template
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
 from django.utils.timezone import now
@@ -23,6 +27,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
+from cms.views import render_object_edit
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -1012,6 +1017,80 @@ class ApphooksTestCase(BaseApphooksTestCase):
         self.assertEqual(menu_nodes[1].id, app_root.pk)
         self.assertEqual(menu_nodes[1].selected, True)
 
+    @override_settings(CMS_APPHOOKS=['cms.test_utils.project.sampleapp.cms_apps.SampleApp3'],)
+    def test_apphook_root_page_placeholders_in_endpoints(self):
+        """
+        Test that page content placeholders are available in edit and preview endpoints
+        for the root page of an apphook.
+        """
+        from django.contrib.contenttypes.models import ContentType
+
+        from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
+
+        # Create a page with an apphook attached
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        page = create_page(
+            "apphook-root",
+            "nav_playground.html",
+            "en",
+            created_by=superuser,
+            apphook="SampleApp3"
+        )
+        content = page.get_content_obj("en")
+
+        self.reload_urls()
+
+        # Test edit endpoint
+        edit_url = get_object_edit_url(content, language="en")
+        with self.login_user_context(superuser):
+            response = self.client.get(edit_url)
+            self.assertEqual(response.status_code, 200)
+            # Verify the apphook view is called
+            self.assertContains(response, 'Sample App 3 Response')
+            # Check that toolbar was set with the page content object
+            self.assertTrue(hasattr(response.wsgi_request, 'toolbar'))
+            toolbar = response.wsgi_request.toolbar
+            # Verify the toolbar object is the page content
+            self.assertIsNotNone(toolbar.obj, "toolbar.obj should be set for edit endpoint")
+            self.assertEqual(toolbar.obj, content, "toolbar.obj should match the page content")
+
+        # Test preview endpoint
+        preview_url = get_object_preview_url(content, language="en")
+        with self.login_user_context(superuser):
+            response = self.client.get(preview_url)
+            self.assertEqual(response.status_code, 200)
+            # Verify the apphook view is called
+            self.assertContains(response, 'Sample App 3 Response')
+            # Check that toolbar was set with the page content object
+            self.assertTrue(hasattr(response.wsgi_request, 'toolbar'))
+            toolbar = response.wsgi_request.toolbar
+            # Verify the toolbar object is the page content
+            self.assertIsNotNone(toolbar.obj, "toolbar.obj should be set for preview endpoint")
+            self.assertEqual(toolbar.obj, content, "toolbar.obj should match the page content")
+
+        # Test structure endpoint
+        structure_url = get_object_structure_url(content, language="en")
+        with self.login_user_context(superuser):
+            response = self.client.get(structure_url)
+            self.assertEqual(response.status_code, 200)
+            # Check that toolbar was set with the page content object
+            self.assertTrue(hasattr(response.wsgi_request, 'toolbar'))
+            toolbar = response.wsgi_request.toolbar
+            # Verify the toolbar object is the page content
+            self.assertIsNotNone(toolbar.obj, "toolbar.obj should be set for structure endpoint")
+            self.assertEqual(toolbar.obj, content, "toolbar.obj should match the page content")
+            # Verify that page content placeholders are present in the markup
+            for placeholder in content.get_placeholders():
+                # Check that placeholder ID is in the response content
+                self.assertContains(
+                    response,
+                    f'"placeholder_id": "{placeholder.pk}"',
+                    msg_prefix=f"Placeholder {placeholder.slot} should be present in structure markup"
+                )
+
+        self.apphook_clear()
+
 
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):
     def setUp(self):
@@ -1165,3 +1244,62 @@ class ApphooksSiteTestCase(BaseApphooksTestCase):
                 path = reverse(url_name)
                 match = resolve(path)
                 self.assertEqual(match.func.__name__, view_name)
+
+class ApphookFrontendEditingTests(BaseApphooksTestCase):
+    """
+    Tests for rendering external models attached via apphooks in frontend editing mode.
+    Ensures that context remains consistent (e.g., current_page is resolved).
+    """
+
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_current_page_resolution_in_render_object_edit(self):
+        from django.contrib.sessions.backends.base import SessionBase
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        # 1. Setup: Create an apphooked page
+        superuser = self.get_superuser()
+        create_page(
+            title="Apphook Page",
+            template="nav_playground.html",
+            language="en",
+            created_by=superuser,
+            apphook="SampleApp"
+        )
+        self.reload_urls()
+
+        # 2. Setup: Create an external model instance (Category)
+        category = Category.add_root(name="Test Category")
+        ct = ContentType.objects.get_for_model(Category)
+
+        # 3. Setup: Register a mock renderer
+        cms_extension = apps.get_app_config('cms').cms_extension
+
+        def mock_render_category(request, obj):
+            t = Template("{% load cms_tags %}[{% page_attribute 'page_title' %}]")
+            return HttpResponse(t.render(Context({"request": request})))
+
+        original_renderer = cms_extension.toolbar_enabled_models.get(Category)
+        cms_extension.toolbar_enabled_models[Category] = mock_render_category
+
+        try:
+            # 4. Action: Create a request
+            url = f"/admin/cms/placeholder/render-object-edit/{ct.pk}/{category.pk}/"
+            request = RequestFactory().get(url)
+            request.user = superuser
+            request.session = SessionBase()
+            request.toolbar = CMSToolbar(request)
+
+            # 5. Execution
+            response = render_object_edit(request, ct.pk, category.pk)
+            content = response.content.decode('utf-8')
+
+            # 6. Verification
+            self.assertEqual(content, "[Apphook Page]")
+
+        finally:
+            if original_renderer:
+                cms_extension.toolbar_enabled_models[Category] = original_renderer
+            elif Category in cms_extension.toolbar_enabled_models:
+                del cms_extension.toolbar_enabled_models[Category]

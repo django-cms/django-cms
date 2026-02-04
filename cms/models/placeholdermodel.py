@@ -1,5 +1,6 @@
 import warnings
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -17,6 +18,9 @@ from cms.models.managers import PlaceholderManager
 from cms.utils import get_language_from_request, permissions
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
+
+if TYPE_CHECKING:
+    from cms.models.pluginmodel import CMSPlugin
 
 
 class Placeholder(models.Model):
@@ -442,13 +446,16 @@ class Placeholder(models.Model):
         )
         return new_plugins
 
-    def add_plugin(self, instance):
+    def add_plugin(self, instance: "CMSPlugin"):
         """
         .. versionadded:: 4.0
 
         Adds a plugin to the placeholder. The plugin's position field must be set to the target
-        position. Positions are enumerated from the start of the palceholder's plugin tree (1) to
+        position. Positions are enumerated from the start of the placeholder's plugin tree (1) to
         the last plugin (*n*, where *n* is the number of plugins in the placeholder).
+
+        It is discouraged to call this method directly from outside the CMS. Use the
+        :func:`cms.api.add_plugin` function instead.
 
         :param instance: Plugin to add. It's position parameter needs to be set.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
@@ -466,6 +473,10 @@ class Placeholder(models.Model):
             parent_plugin.placeholder.add(new_child)
 
         """
+
+        # A plugin needs a reference to the placeholder it is in.
+        instance.placeholder = self
+
         last_position = self.get_last_plugin_position(instance.language) or 0
         # A shift is only needed if the distance between the new plugin
         # and the last plugin is greater than 1 position.

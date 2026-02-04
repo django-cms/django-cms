@@ -9,7 +9,10 @@ you can create a normal django CMS page without any content of its own, and atta
 news application to the page; the news application's content will be delivered at the
 page's URL.
 
-All URLs in that URL path will be passed to the attached application's URL configs.
+All URLs under that page's URL path will be passed to the attached application's URLconf.
+
+For the conceptual model ("mount points" and what it means for request routing), see
+:ref:`about_apphooks`.
 
 The :ref:`Tutorials <tutorials>` section contains a basic guide to :ref:`getting started
 with apphooks <apphooks_introduction>`. This document assumes more familiarity with the
@@ -18,7 +21,11 @@ CMS generally.
 The basics of apphook creation
 ------------------------------
 
-To create an apphook, create a ``cms_apps.py`` file in your application.
+To create an apphook:
+
+1. Create a ``cms_apps.py`` file in your application.
+2. Add a :class:`CMSApp <cms.app_base.CMSApp>` sub-class.
+3. Register it with the apphook pool.
 
 The file needs to contain a :class:`CMSApp <cms.app_base.CMSApp>` sub-class. For
 example:
@@ -46,7 +53,7 @@ In the example above, the application uses the ``myapp`` namespace. Your ``CMSAp
 sub-class **must reflect the application's namespace** in the ``app_name`` attribute.
 
 The application may specify a namespace by supplying an ``app_name`` in its ``urls.py``,
-or its documentation might advise that you when include its URLs, you do it thus:
+or its documentation might advise that when you include its URLs, you do it like this:
 
 .. code-block:: python
 
@@ -61,14 +68,14 @@ Apphooks for non-namespaced applications
 
 If you are writing apphooks for third-party applications, you may find one that in fact
 does not have an application namespace for its URLs. Such an application is liable to
-tun into namespace conflicts, and doesn't represent good practice.
+run into namespace conflicts, and doesn't represent good practice.
 
 However if you *do* encounter such an application, your own apphook for it will need in
 turn to forgo the ``app_name`` attribute.
 
-Note that unlike apphooks without ``app_name`` attributes can be attached only to one
-page at a time; attempting to apply them a second time will cause an error. Only one
-instance of these apphooks can exist.
+Note that apphooks without ``app_name`` attributes can be attached only to one page at a
+time; attempting to apply them a second time will cause an error. Only one instance of
+these apphooks can exist.
 
 See :ref:`multi_apphook` for more on having multiple apphook instances.
 
@@ -146,6 +153,36 @@ follows:
 - ``index_view`` at ``/hello/world/``
 - ``archive_view`` at ``/hello/world/archive/``
 
+Using page placeholders on an apphooked page
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+Even though the URL routing is delegated to your application, the *page* still exists and can
+carry content in its placeholders.
+
+If you want an "app landing page" that editors can manage (for example, intro text above the app
+output), render the page's placeholders in your application template.
+
+For example, in the template used by your app's view:
+
+.. code-block:: html+django
+
+        {% load cms_tags %}
+        {% block content %}
+            {% placeholder "content" %}
+            {# application output below #}
+        {% endblock %}
+
+This works because django CMS sets ``request.current_page`` for apphook requests.
+
+.. note::
+
+        If your apphook view calls ``request.toolbar.set_object(some_model_instance)``, placeholder
+        editing/rendering will apply to that object (for example if it uses
+        :class:`~cms.models.fields.PlaceholderRelationField`). If you want to edit the page's
+        placeholders instead, avoid overriding the toolbar object.
+
 Sub-pages of an apphooked page
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -180,7 +217,7 @@ URL patterns from above as:
 Here we created a short function-based view named ``reroute_cms_page``. It handles
 the requests which otherwise would be swallowed by the apphook.
 
-A requests starting with the URL ``/hello/`` then is handled by ``index_view``,
+A request starting with the URL ``/hello/`` then is handled by ``index_view``,
 ``/hello/archive/`` is handled by ``archive_view``, and ``/hello/world/``,
 ``/hello/world/foo``, etc. are handled by our special view ``reroute_cms_page``,
 routing the request back to the ``detail()`` view of Django-CMS.
@@ -312,7 +349,7 @@ As mentioned above, whenever you:
 - change the slug of a page containing an apphook
 - change the slug of a page with a descendant with an apphook
 
-The CMS the server will reload its URL caches. It does this by listening for the signal
+The CMS server will reload its URL caches. It does this by listening for the signal
 ``cms.signals.urls_need_reloading``.
 
 .. warning::
@@ -323,5 +360,5 @@ The CMS the server will reload its URL caches. It does this by listening for the
     way we can provide a generic solution for this problem that will always work.
 
     The signal is fired **after** a request - for example, upon saving a page's
-    settings. If you change and apphook's setting via an API the signal will not fire
+    settings. If you change an apphook's setting via an API the signal will not fire
     until a subsequent request.

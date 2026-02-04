@@ -4,116 +4,113 @@ django CMS
 
 |PyPiVersion| |PyVersion| |DjVersion| |License| |Coverage|
 
-Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_).
+Lean, open-source enterprise content management powered by Django.
+Backed by the non-profit django CMS Association (`Sponsor us <https://www.django-cms.org/en/memberships/>`_).
 
-*******************************************
-Contribute to this project and win rewards
-*******************************************
+This repository contains the core package published as ``django-cms`` on PyPI.
 
-Because django CMS is a community-driven project, we welcome everyone to `get involved in the project <https://www.django-cms.org/en/contribute/>`_. Become part of a fantastic community and help us make django CMS the best open source CMS in the world.
+Start here
+==========
+
+* Read the docs: `Documentation (stable) <https://docs.django-cms.org/>`_
+* Installing / learning: `Installation <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ · `Docker quickstart <https://github.com/django-cms/django-cms-quickstart>`_ · `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
+* Upgrading: `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
+* Get help: `Discord <https://discord-support-channel.django-cms.org>`_ or Stackoverflow
+* Contribute safely: `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
+* Project info: `Website <https://www.django-cms.org/>`_ · `Changelog <CHANGELOG.rst>`_
 
 
-.. ATTENTION::
-
-    Please use the ``main`` branch as the target for pull requests for on-going development.
-
-    Security fixes will be backported to older branches by the core team as appropriate.
-
-
-********
 Features
-********
+========
 
-* hierarchical pages
-* extensive built-in support for multilingual websites
-* multi-site support
-* draft/publish workflows
-* version control
-* a sophisticated publishing architecture, that's also usable in your own applications
-* frontend content editing
-* a hierarchical content structure for nested plugins
-* an extensible navigation system that your own applications can hook into
-* SEO-friendly URLs
-* designed to integrate thoroughly into other applications
+Build complex publishing workflows with simple, composable parts:
+
+* robust internationalisation (i18n) and multi-site support
+* front-end (inline) editing so editors can work directly on rendered pages
+* a flexible placeholder and plugin system for reusable content components
+* integration with multiple rich-text editors
+* content versioning, editorial workflows, and headless setups via official add-on packages
+* a hierarchical page tree with SEO-friendly URLs
+* extensible navigation and application integration (apphooks)
 
 Developing applications that integrate with and take advantage of django CMS features is easy and well-documented.
-
 More information on `our website <https://www.django-cms.org>`_.
 
-************
-Requirements
-************
 
-See the `Python/Django requirements for the current release version
-<http://docs.django-cms.org/en/latest/#software-version-requirements-and-release-notes>`_ in our documentation.
-
-See the `installation how-to guide for an overview of some other requirements and dependencies of the current release
-<https://docs.django-cms.org/en/latest/introduction/01-install.html>`_.
-
-
-***************
-Getting started
-***************
-
-These `tutorials <http://docs.django-cms.org/en/latest/introduction/index.html>`_ take you step-by-step through some key aspects of django CMS.
-
-
-*************
-Documentation
-*************
-
-Our documentation working group maintains documentation for several versions of the project. Key versions are:
-
-* `stable <http://docs.django-cms.org>`_ (default), for the **current release** version
-* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **main branch**
-
-For more information about our branch policy, see `Branches
-<http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
-
-Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
-
-The dependencies for the docs are compiled by `pip-tools <https://github.com/jazzband/pip-tools>`_.
-
-
-***************************
 Test django CMS in our demo
-***************************
+===========================
 
 The demo platform is kindly provided by Divio, platinum member of the django CMS Association.
 
-.. image:: https://raw.githubusercontent.com/django-cms/django-cms/develop/docs/images/try-with-divio.png
-   :target: https://www.django-cms.org/en/django-cms-demo/
-   :alt: Try demo with Divio Cloud
+.. image:: docs/images/try-with-divio.png
+    :target: https://www.django-cms.org/en/django-cms-demo/
+    :alt: Try demo with Divio Cloud
 
-************
+Want to get a feel for the editing experience before you install anything?
+Start with the demo link above.
+
+
+Installation & Quickstart
+=========================
+
+Get a working setup by following the official guide (recommended).
+If you already have a Django project, you can still use the same steps and integrate django CMS incrementally.
+
+.. code-block:: console
+
+    python -m pip install django-cms
+
+Next, follow the official installation guide and tutorials:
+`Installation <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_
+
+Using Docker? Check out our `django-cms-quickstart project <https://github.com/django-cms/django-cms-quickstart>`_.
+
+Documentation
+=============
+
+Find tutorials, how-to guides, explanation, and reference material here:
+
+* `Current stable version <https://docs.django-cms.org/>`_ (current release)
+* `Latest development version <https://docs.django-cms.org/en/latest/>`_ (main branch)
+* Sources in this repo: `docs/ <docs/>`_
+
+Branch policy details: `Development policies <https://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
+
+
+Development
+===========
+
+If you want to contribute code, start here (you'll be productive quickly):
+
+* `CONTRIBUTING.rst <CONTRIBUTING.rst>`_ (workflow, PR process)
+* `Contributing docs <https://docs.django-cms.org/en/latest/contributing/>`_
+
 Getting Help
-************
+============
 
-Please head over to our `Discord Server <https://discord-support-channel.django-cms.org>`_ or Stackoverflow for support.
+Need help choosing an approach, debugging an issue, or reviewing an implementation idea?
+Head over to our `Discord Server <https://discord-support-channel.django-cms.org>`_ or Stackoverflow.
 
-********************
 Professional support
-********************
+====================
 
 Choose from a list of `trusted tech partner <https://www.django-cms.org/en/tech-partners/>`_ of the django CMS Association to get your website project delivered successfully.
 
 Choose a `trusted web host <https://www.django-cms.org/en/hosting-services/>`_ for your django CMS project and get your website online today.
 
 
-**************************
 The django CMS Association
-**************************
+==========================
 
-The django CMS Association is a non-profit organization that was founded in 2020 with the goal to drive the success of django CMS, by increasing customer happiness, market share and open-source contributions. We provide infrastructure and guidance for the django CMS project.
+The django CMS Association is a non-profit founded in 2020 to drive the success of django CMS by providing guidance,
+infrastructure and funding for core development and community projects.
 
-The non-profit django CMS Association is dependent on donations to fulfill its purpose. The best way to donate is to become a member of the association and pay membership fees. The funding will be funneled back into core development and community projects.
+If your business depends on django CMS, consider supporting its long-term health:
+`Join forces with the django CMS Association <https://www.django-cms.org/en/contribute/>`_ or `become a paying member <https://www.django-cms.org/en/memberships/>`_.
 
-`Join the django CMS Association <https://www.django-cms.org/en/contribute/>`_.
 
-
-*******
 Credits
-*******
+=======
 
 * Includes icons and adapted icons from `Bootstrap <https://icons.getbootstrap.com>`_.
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
