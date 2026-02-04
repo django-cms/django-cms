@@ -228,6 +228,25 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         # Assert
         self.assertEqual(len(check_results), 4)  # 4 errors expected (see above)
 
+    @wo_content_permission
+    def test_prepopulated_fields_exclude_readonly_fields(self):
+        """Read-only fields are removed from prepopulated field keys."""
+        # Arrange
+        admin = copy.copy(self.admin)
+        admin.prepopulated_fields = {
+            "content__secret_greeting": ["category_name"],
+            "category_name": ["content__secret_greeting"],
+        }
+        admin._prepopulated_fields = admin.prepopulated_fields
+
+        # Act
+        readonly_fields = admin.get_readonly_fields(None)
+
+        # Assert
+        self.assertIn("content__secret_greeting", readonly_fields)
+        self.assertNotIn("content__secret_greeting", admin.prepopulated_fields)
+        self.assertIn("category_name", admin.prepopulated_fields)
+
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
     def test_language_selector(self):
