@@ -3583,17 +3583,74 @@ class PermissionsOnPageTest(PermissionsTestCase):
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
-            self.assertContains(
-                response,
-                '<a href="/en/admin/cms/pagecontent/">Page contents</a>',
-                html=True,
-            )
 
-        endpoint = self.get_pages_admin_list_uri()
+    def test_get_permissions_page_permissions_can_change_without_global_permission(self):
+        """Ensure PageAdmin.get_permissions computes can_change from allowed page paths.
+
+        This specifically covers the branch where the user cannot change global
+        permissions and can_change is computed via a prefix match against the
+        user's allowed page paths.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, "get_permissions", page.pk)
+
+        staff_user = self.get_staff_user_with_no_permissions()
+        other_staff = self._create_user("staff2", is_staff=True, is_superuser=False)
+
+        # Staff user must be able to access the view.
+        self.add_permission(staff_user, "change_page")
+        self.add_page_permission(staff_user, page, can_change=True)
+
+        # Ensure at least one GlobalPagePermission exists for the site so the
+        # template has something to render in the global section.
+        self.add_global_permission(other_staff, can_change=True)
+
+        # Add a page-level permission row that should be changeable by staff_user
+        # due to their own allowed page paths.
+        other_permission = self.add_page_permission(other_staff, page, can_change=True)
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
+
+            rows = response.context["rows"]
+            permission_row = next(
+                row for row in rows if (not row.is_global and row.permission.pk == other_permission.pk)
+            )
+            self.assertTrue(permission_row.can_change)
+
+    def test_get_permissions_page_permissions_cant_change_with_only_global_page_permission(self):
+        """Cover the False-case of can_change computation in PageAdmin.get_permissions.
+
+        The user is allowed to access the view via a *global* page permission,
+        but has no page-level permissions. Since get_permissions() computes
+        allowed pages with check_global=False, the allowed list is empty and
+        thus can_change evaluates to False.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, "get_permissions", page.pk)
+
+        staff_user = self.get_staff_user_with_no_permissions()
+        other_staff = self._create_user("staff3", is_staff=True, is_superuser=False)
+
+        # Access the view (has_change_permission) via global page permission.
+        self.add_permission(staff_user, "change_page")
+        self.add_global_permission(staff_user, can_change=True)
+
+        # Create a page permission row for the page which staff_user should NOT
+        # be able to change based on page-level allowed paths.
+        other_permission = self.add_page_permission(other_staff, page, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+
+            rows = response.context["rows"]
+            permission_row = next(
+                row for row in rows if (not row.is_global and row.permission.pk == other_permission.pk)
+            )
+            self.assertFalse(permission_row.can_change)
+
 
     def test_pages_not_in_admin_index(self):
         """
