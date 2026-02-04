@@ -600,7 +600,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 can_change = True
             else:
                 page_path = permission.page.path
-                can_change = any(perm_tuple[1].startswith(page_path) for perm_tuple in allowed_pages)
+                can_change = any(page_path.startswith(perm_tuple[1]) for perm_tuple in allowed_pages)
 
             row = PermissionRow(
                 is_global=False,
