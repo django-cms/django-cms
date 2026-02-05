@@ -442,7 +442,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         self.get_grouping_from_request(request)
         cl = super().get_changelist_instance(request)
         cl.current_language = self.get_language()
-        cl.available_languages = self.get_language_tuple(site=get_current_site(request))
+        if "language" in self.extra_grouping_fields:
+            cl.available_languages = self.get_language_tuple(site=get_current_site(request))
         return cl
 
     def changeform_view(
