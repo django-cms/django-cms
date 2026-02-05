@@ -321,6 +321,15 @@ class SimpleGrouperChangeListTestCase(SimpleSetupMixin, CMSTestCase):
             self.assertContains(response, "Grouper Category")
             self.assertContains(response, random_content.secret_greeting)
 
+    def test_no_language_selector_without_extra_grouping_field(self) -> None:
+        """No language selector is shown when no extra grouping field exists."""
+        with self.login_user_context(self.admin_user):
+            # Act
+            response = self.client.get(self.changelist_url)
+            # Assert
+            self.assertNotContains(response, 'class="language-selector"')
+            self.assertNotContains(response, 'class="language-selector js-language-selector"')
+
 
 class GrouperChangeTestCase(SetupMixin, CMSTestCase):
     def test_mixed_change_form(self):
