@@ -26,11 +26,12 @@ from django.utils.translation import get_language, gettext_lazy as _
 from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, get_language_from_request
+from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 
-class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
+class ChangeListActionsMixin(metaclass=forms.widgets.MediaDefiningClass):
     """ChangeListActionsMixin is a mixin for the ModelAdmin class. It adds the ability to have
     action buttons and a burger menu in the admin's change list view. Unlike actions that affect
     multiple listed items the list action buttons only affect one item at a time.
@@ -568,9 +569,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     # * View button that takes the user to the preview endpoint of the content model
     # * Settings button that lets the user change the grouper AND the content model
     #   using one form
-    def _get_view_action(self, obj, request: HttpRequest) -> str:
-        if self.get_content_obj(obj):
-            view_url = self.view_on_site(self.get_content_obj(obj))
+    def _get_view_action(self, obj: models.Model, request: HttpRequest) -> str:
+        view_url = self.view_on_site(obj)
+        if view_url:
             return self.admin_action_button(
                 url=view_url,
                 icon="view",
@@ -579,7 +580,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 keepsideframe=False,
                 name="view",
             )
-        return self.EMPTY_ACTION
+        return ""
 
     def _get_settings_action(self, obj: models.Model, request: HttpRequest) -> str:
         edit_url = admin_reverse(f"{obj._meta.app_label}_{obj._meta.model_name}_change", args=(obj.pk,))
@@ -658,7 +659,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def view_on_site(self, obj: models.Model) -> str | None:
         # Adds the View on Site button to the admin
         content_obj = self.get_content_obj(obj)
-        if content_obj:
+        if content_obj is not None and is_editable_model(content_obj.__class__):
             # Try getting the language from the content object
             return get_object_edit_url(content_obj, language=getattr(content_obj, "language", None))
         return None

@@ -114,11 +114,10 @@ class SimpleChangeListActionsTestCase(SimpleSetupMixin, CMSTestCase):
             # Act
             response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
             # Assert
-            self.assertContains(response, 'class="cms-icon cms-icon-view"')
+            self.assertNotContains(response, 'class="cms-icon cms-icon-view"')  # Not frontend-editable
             self.assertContains(
                 response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
             )
-            self.assertContains(response, 'class="cms-icon cms-icon-view"')
 
     def test_get_action(self):
         admin = site._registry[GrouperModel]
