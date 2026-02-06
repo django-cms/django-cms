@@ -1,3 +1,21 @@
+Bug Fixes:
+----------
+* Grouper admin kept read-only fields as prepopulated fields (#8471) (fd4aac915) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 5.0.0 (2025-05-12)
 ==================
 
