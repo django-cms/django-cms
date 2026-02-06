@@ -114,11 +114,10 @@ class SimpleChangeListActionsTestCase(SimpleSetupMixin, CMSTestCase):
             # Act
             response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
             # Assert
-            self.assertContains(response, 'class="cms-icon cms-icon-view"')
+            self.assertNotContains(response, 'class="cms-icon cms-icon-view"')  # Not frontend-editable
             self.assertContains(
                 response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
             )
-            self.assertContains(response, 'class="cms-icon cms-icon-view"')
 
     def test_get_action(self):
         admin = site._registry[GrouperModel]
@@ -340,6 +339,15 @@ class SimpleGrouperChangeListTestCase(SimpleSetupMixin, CMSTestCase):
             # Assert
             self.assertContains(response, "Grouper Category")
             self.assertContains(response, random_content.secret_greeting)
+
+    def test_no_language_selector_without_extra_grouping_field(self) -> None:
+        """No language selector is shown when no extra grouping field exists."""
+        with self.login_user_context(self.admin_user):
+            # Act
+            response = self.client.get(self.changelist_url)
+            # Assert
+            self.assertNotContains(response, 'class="language-selector"')
+            self.assertNotContains(response, 'class="language-selector js-language-selector"')
 
 
 class GrouperChangeTestCase(SetupMixin, CMSTestCase):
