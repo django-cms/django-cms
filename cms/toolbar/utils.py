@@ -167,7 +167,7 @@ def get_plugin_tree(
     return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}
 
 
-def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict = None) -> dict[str, Any]:
+def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict | None = None) -> list[dict[str, Any]]:
     if context is None:
         context = {}
     plugin_list = plugin if isinstance(plugin, list) else [plugin]
@@ -176,12 +176,12 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin]
     # Switch to edit mode despite the request originally coming from the admin
     toolbar.edit_mode_active = True
     renderer._placeholders_are_editable = True
-    context = SekizaiContext({'request': request, **context})
+    sekizai_context = SekizaiContext({'request': request, **context})
     try:
         return [{
-            "html": renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True),
-            "js": "".join(context[get_varname()].get("js", [])),
-            "css": "".join(context[get_varname()].get("css", [])),
+            "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
+            "js": "".join(sekizai_context[get_varname()].get("js", [])),
+            "css": "".join(sekizai_context[get_varname()].get("css", [])),
             "position": plugin.position,
             "placeholder_id": plugin.placeholder_id,
             "pluginIds": get_plugin_tree_ids(plugin),
@@ -247,7 +247,7 @@ def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, 
     return url
 
 
-def get_object_edit_url(obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
+def get_object_edit_url(obj: models.Model, language: str | None = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the edit endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
@@ -259,7 +259,7 @@ def get_object_edit_url(obj: models.Model, language: str = None, params: QueryDi
     return _get_object_url("cms_placeholder_render_object_edit", obj, language, params)
 
 
-def get_object_preview_url(obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
+def get_object_preview_url(obj: models.Model, language: str | None = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the preview endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
@@ -271,7 +271,7 @@ def get_object_preview_url(obj: models.Model, language: str = None, params: Quer
     return _get_object_url("cms_placeholder_render_object_preview", obj, language, params)
 
 
-def get_object_structure_url(obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
+def get_object_structure_url(obj: models.Model, language: str | None = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the structure endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
@@ -284,7 +284,7 @@ def get_object_structure_url(obj: models.Model, language: str = None, params: Qu
     return _get_object_url("cms_placeholder_render_object_structure", obj, language, params)
 
 
-def get_object_live_url(obj: models.Model, language: str = None, site: Site | None = None, params: QueryDict | None = None) -> str:
+def get_object_live_url(obj: models.Model, language: str | None = None, site: Site | None = None, params: QueryDict | None = None) -> str | None:
     """
     Returns the live url of the given object. The object must be frontend-editable
     and registered as such with cms.
@@ -292,6 +292,8 @@ def get_object_live_url(obj: models.Model, language: str = None, site: Site | No
     If the object has a language property, the language parameter is ignored.
     If the object - or its grouper - has no site property, the site argument is ignored.
     """
+    if not hasattr(obj, "get_absolute_url"):
+        return None
 
     language = getattr(obj, "language", language)  # Object trumps parameter
     if language is None:

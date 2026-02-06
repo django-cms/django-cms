@@ -41,7 +41,9 @@ class SampleAppConfig(models.Model):
 
 
 class SomeEditableModel(models.Model):
-    pass
+    def get_absolute_url(self):
+        return reverse("some_editable_model_view", args=[self.pk])
+
 
 
 class GrouperModel(models.Model):
