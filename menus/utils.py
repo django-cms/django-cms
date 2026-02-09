@@ -267,29 +267,29 @@ class DefaultLanguageChanger:
                 view = None
         if (
             hasattr(self.request, 'toolbar') and
-            self.request.toolbar.obj and
-            hasattr(self.request.toolbar.obj, "get_absolute_url")
+            self.request.toolbar.obj
         ):
             # Toolbar object
+            obj = self.request.toolbar.obj
             if self.request.toolbar.edit_mode_active:
-                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                lang_obj = get_object_for_language(obj, lang, latest=True)
                 return '' if lang_obj is None else get_object_edit_url(lang_obj, language=lang)
             if self.request.toolbar.preview_mode_active:
-                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                lang_obj = get_object_for_language(obj, lang, latest=True)
                 return '' if lang_obj is None else get_object_preview_url(lang_obj, language=lang)
-            try:
-                # First see, if object can get language-specific absolute urls (like PageContent)
-                return self.request.toolbar.obj.get_absolute_url(language=lang)
-            except (TypeError, NoReverseMatch):
-                # Object's get_absolute_url does not accept language parameter, set the language
-                with force_language(lang):
-                    try:
-                        url = self.request.toolbar.obj.get_absolute_url()
-                    except NoReverseMatch:
-                        url = None
-                if url:
-                    return url
-        elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
+            if hasattr(obj, 'get_absolute_url'):
+                try:
+                    # First see, if object can get language-specific absolute urls (like PageContent)
+                    return obj.get_absolute_url(language=lang)
+                except (TypeError, NoReverseMatch):
+                    # Object's get_absolute_url does not accept language parameter, set the language
+                    with force_language(lang):
+                        try:
+                            return obj.get_absolute_url()
+                        except NoReverseMatch:
+                            # Fall back to view
+                            pass
+        if view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
                 view_name = f"{view.namespace}:{view_name}"
