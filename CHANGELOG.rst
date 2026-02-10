@@ -1,6 +1,42 @@
+5.1.0a1 (2025-11-12)
+====================
+
+
+Features:
+---------
+
+* introduce contracts for django CMS Extensions (#8455) -- Fabian Braun
+* Avoid database access when registering apphook urls to make them async-safe (#8460) -- Fabian Braun
+* Make page content placeholders available to apphook root pages (#8456) -- Fabian Braun
+* Preserve GET params when switching to preview or edit mode (#8444) -- Fabian Braun
+* Add icon for redirected pages in page tree (#8437) -- Fabian Braun
+* Improved UX for external placeholders (e.g., static aliases) (#8416) -- Fabian Braun
+* Allow page permission change from advanced settings (#8387) -- Fabian Braun
+* Allow plugins to restrict themselves to specific models (#8395) -- Fabian Braun
+* Let the "eye" icon in the page tree directly go to edit endpoints for editable content (#8414) -- Fabian Braun
+* Refactor site handling, and allow single-instance multi-site configurations (#8303) -- Stefan Wehrmeyer
+* Implement new Django CMS design language for Django CMS 5.1 (#8320) -- Fabian Braun and Vinit Kumar
+* Optimize placeholder and plugin utilities (#8319) -- Fabian Braun
+* Re-introduced help menu (#8300) (#8301) -- Florian Schieder
+* Django 6 compatibility (#8299) -- Fabian Braun
+
+
 Bug Fixes:
 ----------
+* get_permissions failed for missing global permissions (#8468) (65d84a929) -- Fabian Braun
+* Create page wizard not available on empty install (#8463) -- Fabian Braun
+* Make Placeholder.add_plugin() set plugin.instance to self (#8442) (#8447) -- Jasper Bok
+* Resolve empty page_title in frontend edit mode for apphooks (#8449) -- 김주희
+* Improve anti-aliasing of django CMS logo png (#8452)  -- Fabian Braun
+* Use PageContent.template_choices attribute for template choices instead of settings (#8441)  -- Fabian Braun
+* Existing child plugin restriction cannot be reduced to an empty list (which implies all plugins allowed) (#8433) -- Fabian Braun
+* Gracefully handle unresolvable extends variables in placeholder scanning (#8420) -- Vincent Ngobeh
+* Allow frontend-editable models to omit get_template method (#8406) -- Fabian Braun
+* Safe fallback for includes when scanning for placeholders (#8405) -- Fabian Braun
+* Fix ApphookReloadMiddleware not handling new language variants (#8401) -- Moritz Pietzschke
+* Copying failed if a target placeholders was missing (#8399) -- Moritz Pietzschke
 * Grouper admin kept read-only fields as prepopulated fields (#8471) (fd4aac915) -- Fabian Braun
+
 
 Statistics:
 -----------
@@ -12,7 +48,146 @@ This release includes 5 pull requests, and was created with the help of the foll
 
 With the review help of the following contributors:
 
+
+Thanks to all contributors for their efforts!
+
+5.0.5 (2025-11-12)
+==================
+
+Bug Fixes:
+----------
+* Pin language of toolbar update to the request language
+* Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367) (#8390) (9e00f694e) -- Fabian Braun
+* Copying x-language lead to unique constraint violation (#8366) (#8386)
+* Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8384) -- Wolfgang Fehr
+* Set default value for edit_fields parameter to avoid AttributeError (#8381)
+* Link in welcome.html for fellowship program (#8365) -- Fabian Braun
+* Searching pages for language-specific content failed due to wrong search queryset (#8355) (#8358)
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull requests)
+
+With the review help of the following contributors:
+
 * Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.4 (2025-10-03)
+==================
+
+Bug Fixes:
+----------
+* Wrong placeholders rendered when using apphooks with own placeholders (#8343) (#8348) (775392390) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 1 pull request, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.3 (2025-09-17)
+==================
+
+Bug Fixes:
+----------
+
+* Django 6 compatibility (July 2025) (8302) -- Fabian Braun
+* Respect individual placeholder checks if they can be changed (#8318) -- Fabian Braun
+* Cut children from inactive menu nodes when level is less or equal to 0 (#8324) -- Stefan Wehrmeyer
+* Copy lang management command - include PageUrl (#8335) -- Vašek Chalupníček
+* Optimize placeholder and plugin utilities (#8337) -- Fabian Braun
+* Migration 0033 failed when empty placeholder objects were not present in the db (#8339) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+* Stefan Wehrmeyer (1 pull request)
+* Vašek Chalupníček (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+
+Thanks to all contributors for their efforts!
+
+5.0.2 (2025-07-17)
+==================
+
+Bug Fixes:
+----------
+* The headless template included inline CSS (#8291) (#8292) (14dd89faf) -- Fabian Braun
+* GrouperAdmin Search in content model (#8284) (#8290) (46f0e0775) -- Muhammad Hassan Siddiqi
+* Allow clicks to propagate to plugins (#8288) (#8289) (2c1ab2d7d) -- Fabian Braun
+* show_placeholder did not respect edit/preview mode and failed loudly (#8272) (#8274) (e7be7bc9b) -- Fabian Braun
+* Allow lazy wizard initialization (#8265) (365185848) -- Fabian Braun
+* Apphook widgets were not always detected correctly (#8263) (ec2f4e815) -- Fabian Braun
+* Migrating from django CMS 3.x failed in some rare cases (#8249) (bcf7f895a) -- jmit-modern
+* Added default_auto_field to cms/apps.py (#8254) (4a12dd38a) -- Fabian Braun
+* 404 not raised in CMS view when no URLs matched (#8240) (3d069cbe5) -- Stefan Wehrmeyer
+* Replaced outdated usage of page__node__path with page__path (#8238) (a9105a738) -- Stefan Wehrmeyer
+
+
+
+Statistics:
+-----------
+
+This release includes 13 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull request)
+* Github Release Action (3 pull requests)
+* jmit-modern (1 pull request)
+* Muhammad Hassan Siddiqi (1 pull request)
+* Stefan Wehrmeyer (2 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.1 (2025-05-21)
+==================
+
+Bug Fixes:
+----------
+
+* Adjust checks for GrouperAdmin to allow for `prepopulated_fields` (d6be4747e) -- Fabian Braun
+* Show all text-enabled plugins inside djangocms-text (0a2ce64c4) -- Fabian Braun
+* Structure board update sometimes failed to add all interactive elements (d040cee) -- Fabian Braun
+* Remove circular import in ``cms.forms.validators`` (1548fba) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (4 pull request)
+
+With the review help of the following contributors:
+
+* Jacob Rief
+* Vinit Kumar
+
 
 Thanks to all contributors for their efforts!
 

@@ -111,6 +111,13 @@ Minor features
 * Apphooks now by default allow access to the page content object's placeholders on
   the apphook's root page.
 
+* Allow page permission change from advanced settings with appropriate permissions
+
+* Add icon for redirected pages in page tree
+
+* Let the "eye" icon in the page tree directly go to edit endpoints for editable content
+
+
 
 Bug Fixes
 =========
