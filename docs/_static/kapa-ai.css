@@ -1,9 +1,28 @@
-#kapa-widget-container {
-  z-index: 10000 !important;
-  position: absolute !important;
+#kapa-ai-button {
+  position: fixed;
+  inset-inline-start: 20px;
+  inset-block-end: 20px;
+  z-index: 10001;
+  background: #344c4c;
+  color: #ffffff;
+  border: 0;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font: 600 14px/1.2 "Source Sans 3", "Source Sans Pro", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
-.mantine-Modal-root {
-  z-index: 10000;
-  position: absolute;
+#kapa-ai-button:hover,
+#kapa-ai-button:focus-visible {
+  background: #2b3d3d;
+  animation: kapa-ai-wiggle 320ms ease-in-out;
+}
+
+@keyframes kapa-ai-wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+  75% { transform: rotate(-2deg); }
+  100% { transform: rotate(0deg); }
 }
