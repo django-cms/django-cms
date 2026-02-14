@@ -1,19 +1,19 @@
 .. _upgrade-to-5.1.0:
 
 ###################
-5.1.0 release notes
+5.1.0a1 release notes
 ###################
 
-*Month day, year*
+*February 14, 2026*
 
-Welcome to django CMS 5.1.0!
+Welcome to django CMS 5.1.0a1!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you'll want to be aware of when upgrading from
 django CMS 4.0 or earlier. We've begun the deprecation process for some
 features.
 
-See the How to upgrade to 5.1.0 to a newer version guide if you’re
+See the How to upgrade to 5.1.0a1 to a newer version guide if you’re
 updating an existing project.
 
 *******************************
@@ -42,6 +42,7 @@ similar to the previous design, it offers a more modern and streamlined experien
 contrast, and more consistency between the frontend editor and Django's admin interface.
 
 Key changes include:
+
 * More Django-like green based color prefers-color-scheme
 * Modern design with round corners and updated icons
 * Improved visual hierarchy and spacing
@@ -77,9 +78,10 @@ Model-specific plugins
 Plugins can now be restricted to specific models using two complementary filters:
 
 - Plugin-level: ``CMSPluginBase.allowed_models`` — list of model identifiers
-  (``"app_label.modelname"``). ``None`` = allowed everywhere; ``[]`` = nowhere.
-- Model-level: ``Model.allowed_plugins`` — list of plugin class names. ``None`` = all
-  plugins allowed (subject to their own ``allowed_models``); ``[]`` = none.
+  (``"app_label.modelname"``) with the two special values ``None`` (allowed everywhere) and
+  ``[]`` (allowed nowhere).
+- Model-level: ``Model.allowed_plugins`` — list of plugin class names, with the special
+  value ``None`` (all plugins allowed, subject to their own ``allowed_models``).
 
 Both filters must pass for the frontend editor offer plugins to the users.
 This is particularly useful for plugins that are bound to specific Django models and should
@@ -99,14 +101,12 @@ Example::
 See also the how-to guide for details and more examples:
 :ref:`plugin-model-restrictions`.
 
-Feature 3
-=========
-
 Minor features
 ==============
 
 * Async support: User middleware and apphook registration support async setups
-  and now let you run django CMS using asgi.
+  and now let you run django CMS using asgi. Database access is avoided when
+  registering apphook URLs to make them async-safe.
 
 * Apphooks now by default allow access to the page content object's placeholders on
   the apphook's root page.
@@ -117,20 +117,40 @@ Minor features
 
 * Let the "eye" icon in the page tree directly go to edit endpoints for editable content
 
+* Preserve GET parameters when switching to preview or edit mode
+
+* Improved UX for external placeholders (e.g., static aliases)
+
+* Optimized placeholder and plugin utilities for better performance
+
+* Re-introduced help menu
+
+* Django 6 compatibility support
+
+* Introduce contracts for django CMS Extensions
+
 
 
 Bug Fixes
 =========
 
+* Get_permissions failed for missing global permissions
+* Create page wizard not available on empty install
+* Make Placeholder.add_plugin() set plugin.instance to self
+* Resolve empty page_title in frontend edit mode for apphooks
+* Improve anti-aliasing of django CMS logo png
+* Use PageContent.template_choices attribute for template choices instead of settings
+* Existing child plugin restriction cannot be reduced to an empty list (which implies all plugins allowed)
+* Gracefully handle unresolvable extends variables in placeholder scanning
+* Allow frontend-editable models to omit get_template method
+* Safe fallback for includes when scanning for placeholders
+* Fix ApphookReloadMiddleware not handling new language variants
+* Copying failed if a target placeholders was missing
+* Grouper admin kept read-only fields as prepopulated fields
+
 **************************************
 Backward incompatible changes in 5.1.0
 **************************************
-
-Topic 1
-=======
-
-Miscellaneous
-=============
 
 Features deprecated in 5.1.0
 ============================
