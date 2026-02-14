@@ -1,7 +1,7 @@
 #kapa-ai-button {
   position: fixed;
   inset-inline-start: 20px;
-  inset-block-end: 20px;
+  inset-block-end: 50px;
   z-index: 10001;
   background: #344c4c;
   color: #ffffff;

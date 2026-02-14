@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Denis Darii <denis.darii@gmail.com>, 2011\n"
 "Language-Team: Romanian (http://app.transifex.com/divio/django-cms/language/ro/)\n"
@@ -18,12 +19,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ro\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
-
-msgid "/"
-msgstr ""
-
-msgid ":"
-msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Sunteți sigur că doriţi să schimbaţi filele fără a salva pagina întîi?"
