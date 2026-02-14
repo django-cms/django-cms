@@ -1,8 +1,8 @@
 .. _upgrade-to-5.1.0:
 
-###################
+#####################
 5.1.0a1 release notes
-###################
+#####################
 
 *February 14, 2026*
 
@@ -20,7 +20,7 @@ updating an existing project.
 Django and Python compatibility
 *******************************
 
-django CMS supports **Django 4.2, 5.2, and 6.0**. We highly recommend and only
+django CMS supports **Django 5.2, and 6.0**. We highly recommend and only
 support the latest release of each series.
 
 It supports **Python 3.11, 3.12, 3.13, and 3.14**. As for Django we highly recommend and only
