@@ -58,5 +58,5 @@ class Migration(migrations.Migration):
             },
             bases=('cms.page',),
         ),
-        migrations.RunPython(migrate_to_page_types, migrations.RunPython.noop),
+        migrations.RunPython(migrate_to_page_types, migrations.RunPython.noop, elidable=True),
     ]

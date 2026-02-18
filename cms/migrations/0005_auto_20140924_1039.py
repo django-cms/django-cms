@@ -172,5 +172,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(move_to_mp),
+        migrations.RunPython(move_to_mp, elidable=True),
     ]
