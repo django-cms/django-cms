@@ -38,16 +38,53 @@ Bug Fixes:
 * Grouper admin kept read-only fields as prepopulated fields (#8471) (fd4aac915) -- Fabian Braun
 
 
+Internal Tools:
+---------------
+* Upgrade docs (181179414) -- Fabian Braun
+
 Statistics:
 -----------
 
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes      148 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
+* Abdulwasiu Apalowo (2 pull requests)
+* Copilot (2 pull requests)
+* Daniel (2 pull requests)
+* Django CMS Release (1 pull request)
+* Fabian Braun (66 pull requests)
+* Florian Schieder (1 pull request)
+* Github Release Action (5 pull requests)
+* Jasper (2 pull requests)
+* Mario Colombo (1 pull request)
+* Mark Walker (1 pull request)
+* Moritz Pietzschke (2 pull requests)
+* Muhammad Hassan Siddiqi (2 pull requests)
+* Peter Wischer (1 pull request)
+* Stefan Wehrmeyer (5 pull requests)
+* Thiago Chaves de Oliveira Horta (1 pull request)
+* Vašek Chalupníček (1 pull request)
+* Vincent Ngobeh (2 pull requests)
+* Vinit Kumar (4 pull requests)
+* Wesley B (1 pull request)
+* Wolfgang Fehr (1 pull request)
+* dependabot[bot] (0 pull request)
+* jmit-modern (1 pull request)
+* 김주희 (1 pull request)
 
 With the review help of the following contributors:
 
+* Claude Opus 4.5
+* Copilot Autofix powered by AI
+* Fabian Braun
+* Github Release Action
+* Thiago Chaves de Oliveira Horta
+* Vinit Kumar
+* [Aaditya1273]
+* copilot-swe-agent[bot]
+* dependabot[bot]
+* fsbraun
+* keni
+* sourcery-ai[bot]
 
 Thanks to all contributors for their efforts!
 
