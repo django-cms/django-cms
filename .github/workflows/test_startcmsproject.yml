@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         django-version: [
-          '4.2', '5.0', '5.1'
+          '4.2', '5.0', '5.1', '5.2',
         ]
         python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
@@ -34,6 +34,5 @@ jobs:
         python -m venv .venv
         source ./.venv/bin/activate
         python -m pip install --upgrade pip
-        pip install Django~=${{ matrix.django-version }}
-        pip install -e .
+        pip install Django~=${{ matrix.django-version }} -e .
         djangocms mysite --noinput
