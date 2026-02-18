@@ -328,13 +328,7 @@ class Migration(migrations.Migration):
                 (
                     "language",
                     models.CharField(
-                        choices=[
-                            ("en", "English"),
-                            ("de", "German"),
-                            ("it", "Italian"),
-                            ("fr", "French"),
-                            ("zh", "Chinese"),
-                        ],
+                        choices=settings.LANGUAGES,
                         help_text="The language for the admin interface and toolbar",
                         max_length=10,
                         verbose_name="Language",
