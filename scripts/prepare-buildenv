@@ -40,5 +40,13 @@ fi
 
 status "- Installing transifex cli and gettext"
 ( cd "$SCRIPTS" && curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash &>/dev/null )
-sudo apt-get -qq install gettext &>/dev/null
+
+if command -v apt-get &>/dev/null; then
+    sudo apt-get -qq install gettext &>/dev/null
+elif command -v brew &>/dev/null; then
+    brew install gettext &>/dev/null
+else
+    error "Cannot install gettext: neither apt-get nor brew found. Please install gettext manually."
+    exit 1
+fi
 

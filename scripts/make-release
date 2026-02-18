@@ -42,7 +42,7 @@ fi
 if [ -n "$2" ]; then
     base_branch="$2"
     if [[ $base_branch == refs/heads/* ]]; then
-        base_branch=$(echo $base_branch | cut -d/ -f3-)
+        base_branch=$(echo "$base_branch" | cut -d/ -f3-)
     fi
     if ! git branch -a | grep -q "${base_branch}\$"; then
         error "Can not find specified base branch ${base_branch}"
@@ -55,7 +55,7 @@ check_version_string "${FULL_VERSION}"
 VERSION=$(get_main_version "${FULL_VERSION}")
 VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
 
-BRANCH_SUFFIX=$(echo "${FULL_VERSION}" | awk -F '.' -e '{print $1 "." $2 ".x"}')
+BRANCH_SUFFIX=$(echo "${FULL_VERSION}" | awk -F '.' '{print $1 "." $2 ".x"}')
 BRANCH="release/${BRANCH_SUFFIX}"
 TAG="${FULL_VERSION}"
 
@@ -201,7 +201,7 @@ echo ""
 
 status "- Bumping version to ${FULL_VERSION}"
 # bump the version
-sed -i -e "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/" __init__.py
+sed -i '' "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/" __init__.py
 git commit __init__.py -m "${COMMIT_PREFIX}Bumped version to ${FULL_VERSION}"
 
 status "- Fetching strings from transifex"
@@ -242,10 +242,10 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
         if [ "${last}" -gt 0 ]; then
             last=$(( last - 1 ))
             #shellcheck disable=SC2001
-            needle=$(echo "${needle}" | sed -e "s/\.[0-9]\+\$/.${last}/")
+            needle=$(echo "${needle}" | sed "s/\.[0-9]\+\$/.${last}/")
         else
             #shellcheck disable=SC2001
-            needle=$(echo "${needle}" | sed -e 's/\.[0-9]\+$//')
+            needle=$(echo "${needle}" | sed 's/\.[0-9]\+$//')
         fi
     done
 
@@ -260,18 +260,19 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
     cp "docs/upgrade/${needle}.rst" "${upgrade_doc}"
     git add "docs/upgrade/${VERSION}.rst"
 
-    sed -i "${upgrade_doc}" \
+    sed -i '' \
         -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to-${VERSION}:/" \
-        -e "s/^${needle}.* release notes$/${VERSION} release notes/i" \
+        -e "s/^${needle}.* release notes$/\/i" \
         -e "s/^What's new in ${needle}.*$/What's new in ${VERSION}/i" \
         -e "s/^How to upgrade to ${needle}.*$/How to upgrade to ${VERSION}/i" \
-        -e "s/^We assume you are upgrading from django CMS.*\.$/We assume you are upgrading from django CMS ${needle}./"
+        -e "s/^We assume you are upgrading from django CMS.*\.$/We assume you are upgrading from django CMS ${needle}./" \
+        "${upgrade_doc}"
 fi
 
 if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
     status "Adding ${VERSION} to doc index"
     # note: the new line in the following command is not a mistake, it is needed for sed to process the command
-    sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
+    sed -i '' -e "/:maxdepth: 1/{N;a\\ \\ \\ \\ ${VERSION}
 }" docs/upgrade/index.rst
 fi
 #

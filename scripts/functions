@@ -14,8 +14,53 @@ if [ -z "${EDITOR}" ]; then
 fi
 
 ##############################################################################
+#                   Compatibility functions                                  #
+##############################################################################
+
+#
+# Cross-platform realpath implementation
+# macOS doesn't have realpath, so we provide a compatible version
+#
+realpath() {
+    local path="$1"
+    if [ -n "$(command -v realpath 2>/dev/null)" ]; then
+        # Linux and newer macOS have realpath
+        /usr/bin/env realpath "$path"
+    else
+        # Fallback for older macOS: use python
+        python3 -c "import os; print(os.path.realpath('$path'))"
+    fi
+}
+
+#
+# Cross-platform sed -i implementation
+# macOS requires sed -i '', Linux doesn't
+# Usage: sed_inplace [sed_options] file
+# Note: Last argument must be the file to edit
+#
+sed_inplace() {
+    local file="${@: -1}"
+    local args=("${@:1:$#-1}")
+
+    if sed --version 2>/dev/null | grep -q GNU; then
+        # Linux: GNU sed
+        sed -i "${args[@]}" "$file"
+    else
+        # macOS: BSD sed
+        sed -i '' "${args[@]}" "$file"
+    fi
+}
+
+##############################################################################
 #                   Status reporting (echo with colors)                      #
 ##############################################################################
+
+#
+# Note on awk compatibility:
+# - Always use awk without -e flag (works on both GNU awk and macOS awk)
+# - Use simple awk patterns instead of complex regex modifiers
+# - Avoid GNU awk specific features like strtonum() or gensub()
+#
 
 #
 # show a progress status
