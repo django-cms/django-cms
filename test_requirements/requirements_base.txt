@@ -4,7 +4,7 @@ unittest-xml-reporting==1.11.0
 Pillow==10.0.1
 django-treebeard>=4.3
 argparse
-dj-database-url
+dj-database-url<=2.2.0
 djangocms-admin-style>=1.5
 django-sekizai>=0.7
 django-classy-tags>=0.7.2
