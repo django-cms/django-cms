@@ -1,3 +1,6 @@
+4.1.10 (2026-02-18)
+===================
+
 Bug Fixes:
 ----------
 * Migrations failed for django-treebeard >= 5.0.3 (#8486) (aa7a02aaa) -- Fabian Braun
