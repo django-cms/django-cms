@@ -8,17 +8,39 @@ SCRIPTS=$(dirname "$(realpath "$0")")
 #shellcheck disable=SC1090
 source "${SCRIPTS}/functions"
 
-# Scope used in this script
-declare -A SCOPES_HEADINGS
-declare -a SCOPES
+# Detect if we're on macOS or Linux
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    IS_MAC=true
+else
+    IS_MAC=false
+fi
 
+# Helper function for cross-platform sed -i
+sed_inplace_file() {
+    local file="$1"
+    shift
+    if [[ "$IS_MAC" == "true" ]]; then
+        sed -i '' "$@" "$file"
+    else
+        sed -i "$@" "$file"
+    fi
+}
+
+# Scope used in this script
 SCOPES=("feat" "security" "fix" "style" "refactor" "tools")
-SCOPES_HEADINGS["feat"]="Features:"
-SCOPES_HEADINGS["fix"]="Bug Fixes:"
-SCOPES_HEADINGS["security"]="Security Updates:"
-SCOPES_HEADINGS["style"]="Styles:"
-SCOPES_HEADINGS["refactor"]="Refactoring and Cleanups:"
-SCOPES_HEADINGS["tools"]="Internal Tools:"
+
+# Function to get heading text for a scope (replaces associative array for POSIX compatibility)
+get_scope_heading() {
+    case "$1" in
+        feat) echo "Features:" ;;
+        fix) echo "Bug Fixes:" ;;
+        security) echo "Security Updates:" ;;
+        style) echo "Styles:" ;;
+        refactor) echo "Refactoring and Cleanups:" ;;
+        tools) echo "Internal Tools:" ;;
+        *) echo "" ;;
+    esac
+}
 
 
 # argument checks
@@ -98,31 +120,40 @@ fi
 
 if [ "${VERSION}" = "${LAST_VERSION}" ]; then
     # releasing a golden release from RC, so we just change the version RC to the new one
-    sed -i "${current}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${title}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${line}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/,+1d" \
-        -e "s/(unpublished)/(${DATE})/"
+    sed_script=$(mktemp)
+    cat > "$sed_script" << EOF
+/^${LAST_FULL_VERSION} (unpublished)$/a\\
+${title}\\
+${line}
+/^${LAST_FULL_VERSION} (unpublished)$/,+1d
+s/(unpublished)/(${DATE})/
+EOF
+    sed_inplace_file "${current}" -f "$sed_script"
+    rm "$sed_script"
 else
 
     # This is a first release (RC or equivalent),
     # let's add some headings to be sure we got all of them right for next steps
-    sed -i "${current}" \
-        -e "/^unreleased$/a${title}" \
-        -e "/^unreleased$/a${line}" \
-        -e "/^unreleased$/a
-" \
-        -e "/^unreleased$/aHighlights:" \
-        -e "/^unreleased$/a-----------" \
-        -e "/^unreleased$/,+1d" \
-        -e "s/(unpublished)/(${DATE})/"
+    sed_script=$(mktemp)
+    cat > "$sed_script" << EOF
+/^unreleased$/a\\
+${title}\\
+${line}\\
+\\
+Highlights:\\
+-----------
+/^unreleased$/,+1d
+s/(unpublished)/(${DATE})/
+EOF
+    sed_inplace_file "${current}" -f "$sed_script"
+    rm "$sed_script"
 fi
 
 # computing / updating each section
 
 for scope in "${SCOPES[@]}"; do
     content=$(mktemp)
-    heading="${SCOPES_HEADINGS[$scope]}"
+    heading=$(get_scope_heading "$scope")
 
     # only checking on the last version *in the changelog" (ex:rc1 to rc2, the changelog already includes old to rc1)
     git log "${LAST_FULL_VERSION}.." --pretty="format:%s (%h) -- %aN" | grep -i "^${scope}:" | sed -e "s/^${scope}:/*/i" > "${content}"
@@ -139,14 +170,30 @@ for scope in "${SCOPES[@]}"; do
         echo "" >> "${current}"
     fi
 
-    sed -i "${current}" -e "/^${heading}\$/{N
+    # Use a sed script file to properly handle multi-line sed commands
+    sed_script=$(mktemp)
+    cat > "$sed_script" << EOF
+/^${heading}$/{
+N
 r${content}
-}"
+}
+EOF
+    sed_inplace_file "${current}" -f "$sed_script"
+    rm "$sed_script"
 
    rm "${content}"
 done
 
 # generating statistics
+
+# List of bot accounts to exclude from contributors
+EXCLUDE_BOTS=(
+    "Copilot"
+    "Django CMS Release"
+    "Github Release Action"
+    "dependabot\[bot\]"
+    "Claude"
+)
 
 PR_NUMBER=$(git log --pretty=oneline "${OLD_FULL_VERSION}.." | wc -l)
 
@@ -159,6 +206,19 @@ This release includes ${PR_NUMBER} pull requests, and was created with the help 
 EOF
 
 while read -r name; do
+    # Skip bot accounts
+    skip=false
+    for bot in "${EXCLUDE_BOTS[@]}"; do
+        if [[ "$name" =~ $bot ]]; then
+            skip=true
+            break
+        fi
+    done
+
+    if [ "$skip" = "true" ]; then
+        continue
+    fi
+
     count=$( git log "${OLD_FULL_VERSION}.." --pretty=format:"%aN" | grep -c "${name}" )
     if [ "${count}" -gt 1 ]; then
         pl="s"
