@@ -1,3 +1,20 @@
+Bug Fixes:
+----------
+* make-changelog script (#8492) (e4751d605) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+* Django CMS Release
+
+Thanks to all contributors for their efforts!
+
 5.0.5 (2025-11-12)
 ==================
 
