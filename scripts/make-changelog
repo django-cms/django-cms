@@ -173,7 +173,7 @@ for scope in "${SCOPES[@]}"; do
     # Use a sed script file to properly handle multi-line sed commands
     sed_script=$(mktemp)
     cat > "$sed_script" << EOF
-/^${heading}$/{ 
+/^${heading}$/{
 N
 r${content}
 }
@@ -214,11 +214,11 @@ while read -r name; do
             break
         fi
     done
-    
+
     if [ "$skip" = "true" ]; then
         continue
     fi
-    
+
     count=$( git log "${OLD_FULL_VERSION}.." --pretty=format:"%aN" | grep -c "${name}" )
     if [ "${count}" -gt 1 ]; then
         pl="s"
