@@ -10,12 +10,12 @@
 # François Palmier <fp@kapt.mobi>, 2023
 # Sylvain Chiron <chironsylvain@orange.fr>, 2023
 # Frédéric Roland, 2023
-# Corentin Bettiol, 2023
 # Adrien Delhorme, 2025
 # Florian Delizy <florian.delizy@gmail.com>, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2025
 # Robin Durner, 2025
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2025
+# Corentin Bettiol, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -23,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-30 19:36+0100\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Bertrand Bordage <bordage.bertrand@gmail.com>, 2025\n"
+"Last-Translator: Corentin Bettiol, 2026\n"
 "Language-Team: French (https://app.transifex.com/divio/teams/58664/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,6 +84,7 @@ msgstr "Options X-Frame"
 #: admin/forms.py:552
 msgid "Whether this page can be embedded in other pages or websites."
 msgstr ""
+"Cette page peut être intégrée ou pas dans d'autres pages ou sites web."
 
 #: admin/forms.py:570
 msgid "URL options"
@@ -95,7 +96,7 @@ msgstr "Options du menu"
 
 #: admin/forms.py:584
 msgid "Headers"
-msgstr ""
+msgstr "En-têtes"
 
 #: admin/forms.py:712
 msgid "Application"
@@ -136,6 +137,9 @@ msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"Vous ne pouvez pas avoir deux pages avec le même slug au même niveau de "
+"page. Veuillez modifier le slug de l'une des pages avant d'essayer à nouveau"
+" de la déplacer."
 
 #: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:87
@@ -534,7 +538,7 @@ msgstr "Manuel d'utilisation"
 
 #: cms_toolbars.py:79
 msgid "Discord community"
-msgstr ""
+msgstr "Communauté Discord"
 
 #: cms_toolbars.py:80
 msgid "What's new"
@@ -996,7 +1000,7 @@ msgstr ""
 
 #: models/pagemodel.py:120
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "Définir cette page en tant que type de page"
 
 #: models/pagemodel.py:134
 msgid "pages"
@@ -1004,7 +1008,7 @@ msgstr "pages"
 
 #: models/pagemodel.py:153
 msgid "No available title"
-msgstr ""
+msgstr "Aucun titre disponible"
 
 #: models/pagemodel.py:1096
 msgid "slug"
@@ -1313,18 +1317,20 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Êtes-vous sûr de vouloir supprimer %(object_name)s \"%(escaped_object)s\"? "
+"Tous les éléments liés suivants seront supprimés :"
 
 #: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Oui, je suis sûr"
 
 #: templates/admin/cms/page/delete_confirmation.html:58
 msgid "No, take me back"
-msgstr ""
+msgstr "Non, ramenez-moi en arrière"
 
 #: templates/admin/cms/page/delete_summary.html:2
 msgid "Summary"
-msgstr ""
+msgstr "Résumé"
 
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
@@ -1609,7 +1615,7 @@ msgstr "Permissions"
 
 #: templates/cms/headless/placeholder.html:17
 msgid "inherited"
-msgstr ""
+msgstr "hérité"
 
 #: templates/cms/noapphook.html:18
 #: templates/cms/toolbar/toolbar_with_structure.html:90
@@ -1797,7 +1803,7 @@ msgstr "Passer en mode structure et surligner le bloc pointé"
 
 #: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Open \\"
-msgstr ""
+msgstr "Ouvrir \\"
 
 #: templates/cms/toolbar/toolbar_javascript.html:66
 msgid "Focus on Toolbar"
@@ -1865,11 +1871,11 @@ msgstr "Déposez un bloc ici"
 #: templates/cms/welcome.html:26
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "Version %(cms_version)s"
 
 #: templates/cms/welcome.html:30
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "Construisons ensemble quelque chose de formidable !"
 
 #: templates/cms/welcome.html:32
 msgid "Please log in"
@@ -1881,6 +1887,8 @@ msgid ""
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
+"\n"
+"<a class=\"js-welcome-add cms-btn cms-btn-action\">Ajouter votre première page</a>"
 
 #: templates/cms/welcome.html:43
 msgid ""
@@ -1896,6 +1904,17 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Aidez au financement</h2>\n"
+"                    <p>\n"
+"                        Votre financement profite directement au produit, principalement par le biais du\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">programme de bourses Django CMS</a>!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Un moyen rapide pour vous ou votre organisation de faire un don est disponible sur\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"                    </p>\n"
+"                "
 
 #: templates/cms/welcome.html:56
 msgid ""
@@ -1911,6 +1930,17 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Nous rejoindre</h2>\n"
+"                    <p>\n"
+"                        L'association Django CMS est une organisation à but non lucratif qui finance et dirige le développement de\n"
+"                        django CMS.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Vous pouvez <a href=\"https://www.django-cms.org/en/memberships/\">nous rejoindre à titre individuel ou en tant\n"
+"                        qu'organisation</a>.\n"
+"                    </p>\n"
+"                "
 
 #: templates/cms/welcome.html:69
 msgid ""
@@ -1926,6 +1956,17 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Contribuer</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Au code :</a> résoudre un bug ou\n"
+"                            implémenter de nouvelles fonctionnalités !</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">En tant que bénévole :</a>\n"
+"                            Nous proposons un travail d'équipe agréable et efficace !</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">En rendant votre code open-source :</a>\n"
+"                            Rendre l'écosystème plus puissant.</li>\n"
+"                    </ul>\n"
+"                "
 
 #: templates/cms/welcome.html:84
 msgid "Installation Notes"
@@ -1937,7 +1978,7 @@ msgstr "Assistance"
 
 #: templates/cms/welcome.html:90
 msgid "Give back"
-msgstr ""
+msgstr "Contribuer"
 
 #: templates/cms/welcome.html:92
 msgid ""

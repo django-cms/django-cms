@@ -1222,9 +1222,9 @@ msgstr ""
 #: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Por favor, corrija el error de abajo."
+msgstr[1] "Por favor, corrija los errores de abajo."
+msgstr[2] "Por favor, corrija los errores de abajo."
 
 #: templates/admin/cms/page/change_form.html:73
 msgid "All permissions"

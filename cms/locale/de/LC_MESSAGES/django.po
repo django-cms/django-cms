@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # djangoger <thomas.meitz@retailify.de>, 2023
 # Alexander Elvers <transifex@alex.kandru.de>, 2023
@@ -130,7 +130,10 @@ msgstr "Die Startseite kann nicht in ein andere Seite verschoben werden"
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
-msgstr "Es können nicht zwei Seiten mit demselben Slug auf derselben Ebene existieren. Bitte ändern Sie den Slug einer der Seiten, bevor Sie erneut versuchen zu verschieben."
+msgstr ""
+"Es können nicht zwei Seiten mit demselben Slug auf derselben Ebene "
+"existieren. Bitte ändern Sie den Slug einer der Seiten, bevor Sie erneut "
+"versuchen zu verschieben."
 
 #: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:87
@@ -1307,7 +1310,9 @@ msgstr "Speichern und weiter bearbeiten"
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr "Sind Sie sicher, dass Sie %(object_name)s „%(escaped_object)s“ löschen möchten? Alle der folgenden verknüpften Objekte werden gelöscht:"
+msgstr ""
+"Sind Sie sicher, dass Sie %(object_name)s „%(escaped_object)s“ löschen "
+"möchten? Alle der folgenden verknüpften Objekte werden gelöscht:"
 
 #: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
@@ -1877,7 +1882,8 @@ msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
-msgstr "\n"
+msgstr ""
+"\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Erstellen Sie Ihre erste Seite</a>\n"
 "            "
 
@@ -1894,7 +1900,8 @@ msgid ""
 "                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
 "                    </p>\n"
 "                "
-msgstr "\n"
+msgstr ""
+"\n"
 "                    <h2>Finanzierung unterstützen</h2>\n"
 "                    <p>\n"
 "                        Ihre Unterstützung kommt dem Produkt direkt zugute, vor allem durch das\n"
@@ -1919,7 +1926,8 @@ msgid ""
 "                        organisation</a>.\n"
 "                    </p>\n"
 "                "
-msgstr "\n"
+msgstr ""
+"\n"
 "                    <h2>Mach mit</h2>\n"
 "                    <p>\n"
 "                        Die django CMS Association ist eine gemeinnützige Organisation, die die Entwicklung von\n"
@@ -1944,7 +1952,8 @@ msgid ""
 "                            Make the ecosystem strong.</li>\n"
 "                    </ul>\n"
 "                "
-msgstr "\n"
+msgstr ""
+"\n"
 "                    <h2>Mitwirken</h2>\n"
 "                    <ul>\n"
 "                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Code beitragen:</a> einen Fehler beheben\n"

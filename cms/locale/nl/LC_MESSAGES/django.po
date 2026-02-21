@@ -7,8 +7,8 @@
 # Koen Molenaar <koen.molenaar26@gmail.com>, 2025
 # 9b534940ba88da102a8b2023ae8b0a5c_833de33 <6eff1839cb13e50fd6e97f7bd38c9dda_152118>, 2025
 # Stefan van den Eertwegh <stefan@corebyte.nl>, 2025
-# Fabian Braun <fsbraun@gmx.de>, 2025
 # kurdyma <transifex.com@kurdyenviolien.nl>, 2025
+# Fabian Braun <fsbraun@gmx.de>, 2025
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-30 19:36+0100\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: kurdyma <transifex.com@kurdyenviolien.nl>, 2025\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2025\n"
 "Language-Team: Dutch (https://app.transifex.com/divio/teams/58664/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -77,6 +77,7 @@ msgstr "X Frame Opties"
 #: admin/forms.py:552
 msgid "Whether this page can be embedded in other pages or websites."
 msgstr ""
+"Ob diese Seite von anderen Seiten oder Websites eingebunden werden kann"
 
 #: admin/forms.py:570
 msgid "URL options"
@@ -127,6 +128,9 @@ msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"Sie können nicht zwei Seiten mit demselben Slug auf derselben Seitenebene "
+"haben. Bitte ändern Sie den Slug einer der Seiten, bevor Sie sie erneut "
+"verschieben."
 
 #: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:87
@@ -988,7 +992,7 @@ msgstr "pagina's"
 
 #: models/pagemodel.py:153
 msgid "No available title"
-msgstr ""
+msgstr "Titel nicht verfügbar"
 
 #: models/pagemodel.py:1096
 msgid "slug"
@@ -1294,18 +1298,21 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Sind Sie sicher, dass Sie das Objekt \"%(escaped_object)s\" "
+"(%(object_name)s) löschen wollen? Folgende zugehörige Objekte werden "
+"ebenfalls gelöscht:"
 
 #: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Ja, ich bin sicher"
 
 #: templates/admin/cms/page/delete_confirmation.html:58
 msgid "No, take me back"
-msgstr ""
+msgstr "Nein, bitte abbrechen"
 
 #: templates/admin/cms/page/delete_summary.html:2
 msgid "Summary"
-msgstr ""
+msgstr "Zusammenfassung"
 
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
@@ -1590,7 +1597,7 @@ msgstr "Rechten"
 
 #: templates/cms/headless/placeholder.html:17
 msgid "inherited"
-msgstr ""
+msgstr "ererbt"
 
 #: templates/cms/noapphook.html:18
 #: templates/cms/toolbar/toolbar_with_structure.html:90
