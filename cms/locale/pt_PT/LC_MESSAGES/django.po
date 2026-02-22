@@ -3,8 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Francisco Jesus <franciscocjesus@outlook.com>, 2025
 # Mike C. <miguelmclara@gmail.com>, 2025
+# Francisco Jesus <franciscocjesus@outlook.com>, 2025
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -12,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-30 19:36+0100\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Mike C. <miguelmclara@gmail.com>, 2025\n"
+"Last-Translator: Francisco Jesus <franciscocjesus@outlook.com>, 2025\n"
 "Language-Team: Portuguese (Portugal) (https://app.transifex.com/divio/teams/58664/pt_PT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1259,9 +1259,9 @@ msgstr ""
 #: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Por favor, corrija os erros abaixo."
+msgstr[1] "Por favor, corrija os erros abaixo."
+msgstr[2] "Por favor, corrija os erros abaixo."
 
 #: templates/admin/cms/page/change_form.html:73
 msgid "All permissions"
