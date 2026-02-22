@@ -4,7 +4,7 @@
 5.0.6 release notes
 ###################
 
-*Feburary 22, 2026*
+*February 22, 2026*
 
 Welcome to django CMS 5.0.6!
 
