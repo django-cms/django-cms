@@ -1,17 +1,35 @@
+5.0.6 (2026-02-22)
+==================
+
+Features:
+---------
+* Add button for django CMS chat (#8478) (8c383c9e6) -- Fabian Braun
+* Preserve GET params when switching to preview or edit mode (#8444) (#8446) (9bcfb0871) -- Fabian Braun
+
 Bug Fixes:
 ----------
+* Fix ApphookReloadMiddleware not handling new language variants #2 (#8401) (#8412) (4fc76cff0) -- Fabian Braun
+* Improved UX for external placeholders (e.g., static aliases) (#8416) (#8435) (19f8c9dcf) -- Fabian Braun
+* Migrations failed for django-treebeard >= 5.0.3 (#8485) (a5f73980a) -- Fabian Braun
+* Save fallback for includes when scanning for placeholders (#8405) (#8407) (3afd42bf7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8402) (1e8a3f9c7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8410) (15cebb33c) -- Fabian Braun
+* get_permissions failed for missing global permissions (#8468) (#8469) (132736417) -- Fabian Braun
 * make-changelog script (#8492) (e4751d605) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes       15 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
+* Fabian Braun (10 pull requests)
 
 With the review help of the following contributors:
 
 * Django CMS Release
+* Moritz Pietzschke
+* Vinit Kumar
+* [Aaditya1273]
 
 Thanks to all contributors for their efforts!
 

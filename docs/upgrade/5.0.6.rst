@@ -4,9 +4,9 @@
 5.0.6 release notes
 ###################
 
-*November 12, 2025*
+*Feburary 22, 2026*
 
-Welcome to django CMS 5.0.5!
+Welcome to django CMS 5.0.6!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you'll want to be aware of when upgrading from
@@ -50,26 +50,35 @@ Run migrations::
 What's new in 5.0.6
 *******************
 
+
+Features:
+---------
+* Add button for django CMS chat (#8478) (8c383c9e6) -- Fabian Braun
+* Preserve GET params when switching to preview or edit mode (#8444) (#8446) (9bcfb0871) -- Fabian Braun
+
 Bug Fixes:
 ----------
-
-* Pin language of toolbar update to the request language
-* Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367) (#8390) (9e00f694e) -- Fabian Braun
-* Copying x-language lead to unique constraint violation (#8366) (#8386)
-* Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8384)
-* Set default value for edit_fields parameter to avoid AttributeError (#8381)
-* Link syntax in welcome.html
-* Searching pages for language-specific content failed due to wrong search queryset (#8355) (#8358)
+* Fix ApphookReloadMiddleware not handling new language variants #2 (#8401) (#8412) (4fc76cff0) -- Fabian Braun
+* Improved UX for external placeholders (e.g., static aliases) (#8416) (#8435) (19f8c9dcf) -- Fabian Braun
+* Migrations failed for django-treebeard >= 5.0.3 (#8485) (a5f73980a) -- Fabian Braun
+* Save fallback for includes when scanning for placeholders (#8405) (#8407) (3afd42bf7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8402) (1e8a3f9c7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8410) (15cebb33c) -- Fabian Braun
+* get_permissions failed for missing global permissions (#8468) (#8469) (132736417) -- Fabian Braun
+* make-changelog script (#8492) (e4751d605) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes       15 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (7 pull requests)
+* Fabian Braun (10 pull requests)
 
 With the review help of the following contributors:
 
+* Django CMS Release
+* Moritz Pietzschke
 * Vinit Kumar
+* [Aaditya1273]
 
 Thanks to all contributors for their efforts!
