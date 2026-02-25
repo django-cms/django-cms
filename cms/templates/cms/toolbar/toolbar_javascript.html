@@ -113,9 +113,9 @@
         "sideframe": { "url": "" },
         "sideframe_enabled": {{ cms_toolbar.sideframe_enabled|yesno:"true,false" }},
         "states": [],
-        "edit": "{{ cms_edit_url | safe }}",
-        "edit_off": "{{ cms_preview_url | safe }}",
-        "structure": "{{ cms_structure_url | safe }}",
+        "edit": "{{ cms_edit_url | escapejs }}",
+        "edit_off": "{{ cms_preview_url | escapejs }}",
+        "structure": "{{ cms_structure_url | escapejs }}",
         "legacy_mode": {{ cms_toolbar.uses_legacy_structure_mode|yesno:"true,false" }}
     },
     "clipboard": {
