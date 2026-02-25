@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.db.models import signals
@@ -33,6 +35,7 @@ from cms.signals.permissions import (
     user_m2m_changed,
 )
 from cms.utils.conf import get_cms_setting
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
 
 @receiver(pre_migrate)
@@ -49,8 +52,30 @@ def check_v4_confirmation(**kwargs):
 
 # ################### Our own signals ###################
 
+
+class DeprecatedSignal(Signal):
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._deprecation_name = name
+
+    def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
+        warnings.warn(
+            f"The '{self._deprecation_name}' signal is deprecated and will be removed in django CMS 6.0.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
+        return super().connect(
+            receiver,
+            sender=sender,
+            weak=weak,
+            dispatch_uid=dispatch_uid,
+        )
+
 # fired if a public page with an apphook is added or changed
 urls_need_reloading = Signal()
+
+# Deprecated: use operations hooks or other signals instead.
+move_page = DeprecatedSignal("move_page")
 
 # *disclaimer*
 # The generic object operation signals are very likely to change
