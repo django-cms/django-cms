@@ -49,10 +49,6 @@ def check_v4_confirmation(**kwargs):
 
 # ################### Our own signals ###################
 
-
-# fired after page location is changed - is moved from one node to other
-page_moved = Signal()
-
 # fired if a public page with an apphook is added or changed
 urls_need_reloading = Signal()
 
