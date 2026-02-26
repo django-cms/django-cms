@@ -665,7 +665,7 @@ class StructureBoard {
         this.ui.container.addClass('cms-structure-condensed');
 
         if (CMS.settings.mode === 'structure') {
-            history.replaceState({}, '', CMS.config.settings.edit + window.location.search);
+            history.replaceState({}, '', CMS.config.settings.edit);
         }
 
         const width = this.ui.toolbar.width();
@@ -688,7 +688,7 @@ class StructureBoard {
         this.ui.container.removeClass('cms-structure-condensed');
 
         if (CMS.settings.mode === 'structure') {
-            history.replaceState({}, '', CMS.config.settings.structure + window.location.search);
+            history.replaceState({}, '', CMS.config.settings.structure);
             $('html.cms-structure-mode-structure').addClass('cms-overflow');
         }
 
