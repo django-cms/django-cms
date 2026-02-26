@@ -417,17 +417,17 @@ class CMSToolbarBase(BaseToolbar):
 
     def get_object_preview_url(self):
         if self.obj:
-            return get_object_preview_url(self.obj, language=self.request_language)
+            return get_object_preview_url(self.obj, language=self.request_language, params=self.request.GET)
         return ''
 
     def get_object_edit_url(self):
         if self.obj:
-            return get_object_edit_url(self.obj, language=self.request_language)
+            return get_object_edit_url(self.obj, language=self.request_language, params=self.request.GET)
         return ''
 
     def get_object_structure_url(self):
         if self.obj:
-            return get_object_structure_url(self.obj, language=self.request_language)
+            return get_object_structure_url(self.obj, language=self.request_language, params=self.request.GET)
         return ''
 
     def object_is_editable(self, obj=None):
