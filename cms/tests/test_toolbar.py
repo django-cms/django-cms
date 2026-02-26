@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -2279,6 +2279,183 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         obj = SimpleNamespace(pk=3)
         url = get_object_structure_url(obj, language="es")
         self.assertIn("?language=es", url)
+
+    # --- Tests for GET parameter forwarding (params argument) ---
+
+    @patch("cms.toolbar.utils.get_cms_setting")
+    @patch("cms.toolbar.utils.get_language_from_path")
+    @patch("cms.toolbar.utils.admin_reverse")
+    @patch("cms.toolbar.utils.ContentType")
+    def test_get_object_edit_url_appends_extra_params(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        """Extra GET parameters passed via a QueryDict are appended to the edit URL."""
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = "/admin/cms/placeholder/render/object/edit/1/"
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=42)
+
+        params = QueryDict("foo=bar&baz=qux")
+        obj = SimpleNamespace(pk=1)
+        url = get_object_edit_url(obj, language="de", params=params)
+        self.assertIn("foo=bar", url)
+        self.assertIn("baz=qux", url)
+        self.assertIn("language=de", url)
+
+    @patch("cms.toolbar.utils.get_cms_setting")
+    @patch("cms.toolbar.utils.get_language_from_path")
+    @patch("cms.toolbar.utils.admin_reverse")
+    @patch("cms.toolbar.utils.ContentType")
+    def test_get_object_preview_url_appends_extra_params(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        """Extra GET parameters passed via a QueryDict are appended to the preview URL."""
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = "/admin/cms/placeholder/render/object/preview/1/"
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=99)
+
+        params = QueryDict("alpha=1&beta=2")
+        obj = SimpleNamespace(pk=2)
+        url = get_object_preview_url(obj, language="fr", params=params)
+        self.assertIn("alpha=1", url)
+        self.assertIn("beta=2", url)
+        self.assertIn("language=fr", url)
+
+    @patch("cms.toolbar.utils.get_language_from_path")
+    @patch("cms.toolbar.utils.admin_reverse")
+    @patch("cms.toolbar.utils.ContentType")
+    def test_get_object_structure_url_appends_extra_params(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path
+    ):
+        """Extra GET parameters passed via a QueryDict are appended to the structure URL."""
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = "/admin/cms/placeholder/render/object/structure/1/"
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=7)
+
+        params = QueryDict("x=10&y=20")
+        obj = SimpleNamespace(pk=3)
+        url = get_object_structure_url(obj, language="es", params=params)
+        self.assertIn("x=10", url)
+        self.assertIn("y=20", url)
+        self.assertIn("language=es", url)
+
+    @patch("cms.toolbar.utils.get_cms_setting")
+    @patch("cms.toolbar.utils.get_language_from_path")
+    @patch("cms.toolbar.utils.admin_reverse")
+    @patch("cms.toolbar.utils.ContentType")
+    def test_get_object_url_without_params_has_no_extra_querystring(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        """When params is None, only the language parameter (if needed) is appended."""
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = "/admin/cms/placeholder/render/object/edit/1/"
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=42)
+
+        obj = SimpleNamespace(pk=1)
+        url = get_object_edit_url(obj, language="de", params=None)
+        self.assertEqual(url, "/admin/cms/placeholder/render/object/edit/1/?language=de")
+
+    @patch("cms.toolbar.utils.get_cms_setting")
+    @patch("cms.toolbar.utils.get_language_from_path")
+    @patch("cms.toolbar.utils.admin_reverse")
+    @patch("cms.toolbar.utils.ContentType")
+    def test_get_object_url_does_not_mutate_original_params(
+        self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
+    ):
+        """Calling get_object_*_url must not mutate the original QueryDict."""
+        mock_get_cms_setting.return_value = False
+        mock_get_lang_from_path.return_value = None
+        mock_admin_reverse.return_value = "/admin/cms/placeholder/render/object/edit/1/"
+        mock_contenttype.objects.get_for_model.return_value = SimpleNamespace(pk=42)
+
+        params = QueryDict("keep=me")
+        obj = SimpleNamespace(pk=1)
+        get_object_edit_url(obj, language="de", params=params)
+        # The original immutable QueryDict must not have been altered
+        self.assertNotIn("language", params)
+        self.assertEqual(params["keep"], "me")
+
+    # --- Integration tests: toolbar methods forward request.GET ---
+
+    def test_toolbar_get_object_edit_url_passes_request_get(self):
+        """CMSToolbar.get_object_edit_url forwards request.GET to the utility function."""
+        page = create_page("home", "nav_playground.html", "en")
+        page_content = page.get_content_obj()
+
+        superuser = self.get_superuser()
+        edit_url = get_object_edit_url(page_content)
+        request = self.get_page_request(page, superuser, edit_url + "?custom=value")
+        toolbar = CMSToolbar(request)
+        toolbar.set_object(page_content)
+
+        url = toolbar.get_object_edit_url()
+        self.assertIn("custom=value", url)
+
+    def test_toolbar_get_object_preview_url_passes_request_get(self):
+        """CMSToolbar.get_object_preview_url forwards request.GET to the utility function."""
+        page = create_page("home", "nav_playground.html", "en")
+        page_content = page.get_content_obj()
+
+        superuser = self.get_superuser()
+        edit_url = get_object_edit_url(page_content)
+        request = self.get_page_request(page, superuser, edit_url + "?custom=value")
+        toolbar = CMSToolbar(request)
+        toolbar.set_object(page_content)
+
+        url = toolbar.get_object_preview_url()
+        self.assertIn("custom=value", url)
+
+    def test_toolbar_get_object_structure_url_passes_request_get(self):
+        """CMSToolbar.get_object_structure_url forwards request.GET to the utility function."""
+        page = create_page("home", "nav_playground.html", "en")
+        page_content = page.get_content_obj()
+
+        superuser = self.get_superuser()
+        edit_url = get_object_edit_url(page_content)
+        request = self.get_page_request(page, superuser, edit_url + "?custom=value")
+        toolbar = CMSToolbar(request)
+        toolbar.set_object(page_content)
+
+        url = toolbar.get_object_structure_url()
+        self.assertIn("custom=value", url)
+
+    # --- Template integration test: URLs with params are correctly escaped in JS config ---
+
+    def test_toolbar_javascript_template_contains_escaped_urls_with_params(self):
+        """
+        The toolbar_javascript.html template renders cms_edit_url, cms_preview_url,
+        and cms_structure_url through the escapejs filter so that query-string
+        ampersands appear as \\u0026 inside the JSON string literals.
+        """
+        page = create_page("home", "nav_playground.html", "en")
+        page_content = page.get_content_obj()
+        superuser = self.get_superuser()
+        edit_url = get_object_edit_url(page_content)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(edit_url + "?myparam=myval")
+        self.assertEqual(response.status_code, 200)
+
+        content = response.content.decode()
+        # The rendered JSON should contain the custom parameter in all three URLs.
+        # The template uses {{ ... | escapejs }} so '&' becomes '\\u0026'.
+        self.assertIn("myparam=myval", content)
+
+        # Verify the edit, edit_off (preview), and structure keys exist with the param
+        import json
+        # Extract the JSON config block from the <script> tag
+        match = re.search(
+            r'<script[^>]*id="cms-config-json"[^>]*>\s*(\{.*?\})\s*</script>',
+            content,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(match, "Could not find cms-config-json script block")
+        config = json.loads(match.group(1))
+        self.assertIn("myparam=myval", config["settings"]["edit"])
+        self.assertIn("myparam=myval", config["settings"]["edit_off"])
+        self.assertIn("myparam=myval", config["settings"]["structure"])
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
