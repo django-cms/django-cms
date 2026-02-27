@@ -196,9 +196,9 @@ class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
     can_recover_page = models.BooleanField(
-    verbose_name=_("can recover pages"),
-    default=True,
-    help_text=_("Allows the user to restore pages from the trash/delete history."),
+        verbose_name=_("can recover pages"),
+        default=True,
+        help_text=_("Allows the user to restore pages from the trash/delete history."),
     )
     sites = models.ManyToManyField(
         to=Site,
