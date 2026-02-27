@@ -43,7 +43,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 dependencies = [
-  "Django >= 4.2",
+  "Django >= 4.2.26",
   "django-classy-tags >=0.7.2",
   "django-formtools >=2.1",
   "django-treebeard >=4.3",
