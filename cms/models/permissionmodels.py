@@ -120,7 +120,7 @@ class AbstractPagePermission(models.Model):
             raise ValidationError(message)
 
         if self.can_publish:
-            message = _("To grant 'Can publish' permissions, the 'Can edit' permission must also be checked.")
+            message = _("To grant 'can publish' permissions, the 'can edit' permission must also be checked.")
             raise ValidationError(message)
 
         if self.can_change_advanced_settings:
