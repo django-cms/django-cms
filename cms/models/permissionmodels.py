@@ -91,9 +91,9 @@ class AbstractPagePermission(models.Model):
     )
     can_move_page = models.BooleanField(_("can move"), default=True)
     can_view = models.BooleanField(
-    _("Can view restricted pages"), 
-    default=False, 
-    help_text=_("Grant access to pages that are otherwise hidden from the public.")
+        _("Can view restricted pages"),
+        default=False,
+        help_text=_("Grant access to pages that are otherwise hidden from the public.")
     )
 
     class Meta:
