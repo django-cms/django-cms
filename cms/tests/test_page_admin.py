@@ -1463,8 +1463,8 @@ class PageTest(PageTestBase):
 
             with self.assertNumQueries(0):
                 # Both still cached
-                content_admin.slug(content1)
                 content_admin.overwrite_url(content1)
+                content_admin.slug(content1)
                 content_admin.slug(content2)
                 content_admin.overwrite_url(content2)
 
