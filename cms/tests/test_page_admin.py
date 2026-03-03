@@ -1324,6 +1324,33 @@ class PageTest(PageTestBase):
             self.assertTrue('form_url' in response.context_data)
             self.assertEqual(response.context_data['form_url'], form_url)
 
+    def test_pagecontent_change_view_uses_cached_url_obj(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            content_admin = PageContentAdmin(PageContent, admin.site)
+            page1 = self.get_page()
+            content1 = self.get_pagecontent_obj(page1, "en")
+            content1.page = page1
+            page2 = self.get_page()
+            content2 = self.get_pagecontent_obj(page2, "en")
+
+            content_admin.slug(content1)
+            content_admin.overwrite_url(content1)
+
+            with self.assertNumQueries(0):
+                # Slugs and overwrite urls are cached
+                slug = content_admin.slug(content1)
+                content_admin.overwrite_url(content1)
+
+            self.assertNotEqual(slug, content_admin.slug(content2))
+
+            with self.assertNumQueries(0):
+                # Both still cached
+                content_admin.overwrite_url(content1)
+                content_admin.slug(content1)
+                content_admin.slug(content2)
+                content_admin.overwrite_url(content2)
+
     def _parse_page_tree(self, response, parser_class):
         content = response.content
         content = content.decode(response.charset)
@@ -3333,7 +3360,6 @@ class PermissionsOnPageTest(PermissionsTestCase):
                 row for row in rows if (not row.is_global and row.permission.pk == other_permission.pk)
             )
             self.assertFalse(permission_row.can_change)
-
 
     def test_pages_not_in_admin_index(self):
         """
