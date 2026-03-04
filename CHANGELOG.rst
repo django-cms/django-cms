@@ -1,3 +1,15 @@
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 4.1.9 (2025-09-30)
 ==================
 
