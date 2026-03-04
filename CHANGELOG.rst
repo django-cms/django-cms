@@ -1,3 +1,36 @@
+4.1.9 (2026-03-04)
+==================
+
+Bug Fixes:
+----------
+* Copying x-language lead to unique constraint violation (#8366) (#8385) (571f4b5cd) -- Fabian Braun
+* Fix ApphookReloadMiddleware not handling new language variants #2 (#8401) (#8413) (b67c5ef60) -- Fabian Braun
+* Fix default value for edit_fields parameter to avoid AttributeError (#8382) (14af13453) -- Fabian Braun
+* Migrations failed for django-treebeard >= 5.0.3 (#8486) (aa7a02aaa) -- Fabian Braun
+* Save fallback for includes when scanning for placeholders (#8405) (#8408) (f4662ab55) -- Fabian Braun
+* Searching pages for language-specific content failed due to wrong search queryset (#8355) (#8360) (b63d1f5fd) -- Fabian Braun
+* avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8383) (cdbe8c334) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8403) (6e733a378) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8411) (1f5423cd3) -- Fabian Braun
+* get_permissions failed for missing global permissions (#8468) (#8470) (56752b2fb) -- Fabian Braun
+* link syntax in welcome.html (f1ba5db17) -- Fabian Braun
+* slug and overwrite_url caching failed in read-only change_views (#8507) (#8508) (b1e3dc997) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 18 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (13 pull requests)
+
+With the review help of the following contributors:
+
+* Moritz Pietzschke
+* Wolfgang Fehr
+* [Aaditya1273]
+
+Thanks to all contributors for their efforts!
+
 4.1.9 (2025-09-30)
 ==================
 

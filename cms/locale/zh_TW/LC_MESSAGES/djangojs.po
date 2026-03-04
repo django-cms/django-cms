@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # kochin <kochinc@outlook.com>, 2013
 # kochin <kochinc@outlook.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: kochin <kochinc@outlook.com>, 2013\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/divio/django-cms/language/zh_TW/)\n"
@@ -18,12 +19,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-msgid "/"
-msgstr ""
-
-msgid ":"
-msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "您確定您想要變換分頁而不先儲存該頁面嗎？"
