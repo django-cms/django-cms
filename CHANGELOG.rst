@@ -8,7 +8,7 @@ Bug Fixes:
 * Fix default value for edit_fields parameter to avoid AttributeError (#8382) (14af13453) -- Fabian Braun
 * Migrations failed for django-treebeard >= 5.0.3 (#8486) (aa7a02aaa) -- Fabian Braun
 * Save fallback for includes when scanning for placeholders (#8405) (#8408) (f4662ab55) -- Fabian Braun
-* Searching pages for language-specific content failed due to wrong serach queryset (#8355) (#8360) (b63d1f5fd) -- Fabian Braun
+* Searching pages for language-specific content failed due to wrong search queryset (#8355) (#8360) (b63d1f5fd) -- Fabian Braun
 * avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8383) (cdbe8c334) -- Fabian Braun
 * copying failed if a target placeholders was missing (#8399) (#8403) (6e733a378) -- Fabian Braun
 * copying failed if a target placeholders was missing (#8399) (#8411) (1f5423cd3) -- Fabian Braun
