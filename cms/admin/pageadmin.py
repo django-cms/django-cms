@@ -837,24 +837,19 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         form._request = request
         return form
 
-    # def get_changeform_initial_data(self, request):
-    #     site = get_site(request)
-    #     language = get_site_language_from_request(request, site_id=site.pk)
-    #     return {"language": language, "site": site}
-
     def slug(self, obj):
-        # For read-only views: Get slug from the page
-        if not hasattr(self, "url_obj"):
-            self.url_obj = obj.page.get_url(obj.language)
-        return self.url_obj.slug
+        # For read-only views: Get slug from the page content object
+        if not hasattr(obj, "_url_obj"):
+            obj._url_obj = obj.page.get_url(obj.language)
+        return obj._url_obj.slug
 
     def overwrite_url(self, obj):
-        # For read-only views: Get slug from the page
-        if not hasattr(self, "url_obj"):
-            self.url_obj = obj.page.get_url(obj.language)
-        if self.url_obj.managed:
+        # For read-only views: Get slug from the page content object
+        if not hasattr(obj, "_url_obj"):
+            obj._url_obj = obj.page.get_url(obj.language)
+        if obj._url_obj.managed:
             return None
-        return self.url_obj.path
+        return obj._url_obj.path
 
     def duplicate(self, request, object_id):
         """
