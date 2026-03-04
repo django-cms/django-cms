@@ -87,6 +87,14 @@
             margin: 50px auto 10px;
         }
     }
+    
+        @media (prefers-color-scheme: dark) {
+            .cms-welcome-logo,
+            .cms-welcome-logo:hover,
+            .cms-welcome-logo:focus {
+                filter: brightness(0) invert(1) !important;
+            }
+        }
 
     .cms-welcome-cards {
         display: grid;
