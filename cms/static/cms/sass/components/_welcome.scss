@@ -77,22 +77,15 @@
         &:hover,
         &:focus {
             display: inline-block;
-            background-image: url('../../fonts/src/logo-dark.svg');
+            background-image: url('../../fonts/src/logo.svg');
             background-repeat: no-repeat;
             background-position: center center;
+            filter: invert(var(--cms-dark-mode));
             height: 35px;
             width: 200px;
             font-size: 35px;
             text-decoration: none;
             margin: 50px auto 10px;
-        }
-    }
-
-    @media (prefers-color-scheme: dark) {
-        .cms-welcome-logo,
-        .cms-welcome-logo:hover,
-        .cms-welcome-logo:focus {
-            background-image: url('../../fonts/src/logo-light.svg');
         }
     }
 
