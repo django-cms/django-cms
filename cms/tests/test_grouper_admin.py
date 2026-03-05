@@ -114,11 +114,10 @@ class SimpleChangeListActionsTestCase(SimpleSetupMixin, CMSTestCase):
             # Act
             response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
             # Assert
-            self.assertContains(response, 'class="cms-icon cms-icon-view"')
+            self.assertNotContains(response, 'class="cms-icon cms-icon-view"')  # Not frontend-editable
             self.assertContains(
                 response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}/change/?'
             )
-            self.assertContains(response, 'class="cms-icon cms-icon-view"')
 
     def test_get_action(self):
         admin = site._registry[GrouperModel]
@@ -228,6 +227,25 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         # Assert
         self.assertEqual(len(check_results), 4)  # 4 errors expected (see above)
 
+    @wo_content_permission
+    def test_prepopulated_fields_exclude_readonly_fields(self):
+        """Read-only fields are removed from prepopulated field keys."""
+        # Arrange
+        admin = copy.copy(self.admin)
+        admin.prepopulated_fields = {
+            "content__secret_greeting": ["category_name"],
+            "category_name": ["content__secret_greeting"],
+        }
+        admin._prepopulated_fields = admin.prepopulated_fields
+
+        # Act
+        readonly_fields = admin.get_readonly_fields(None)
+
+        # Assert
+        self.assertIn("content__secret_greeting", readonly_fields)
+        self.assertNotIn("content__secret_greeting", admin.prepopulated_fields)
+        self.assertIn("category_name", admin.prepopulated_fields)
+
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
     def test_language_selector(self):
@@ -321,6 +339,15 @@ class SimpleGrouperChangeListTestCase(SimpleSetupMixin, CMSTestCase):
             # Assert
             self.assertContains(response, "Grouper Category")
             self.assertContains(response, random_content.secret_greeting)
+
+    def test_no_language_selector_without_extra_grouping_field(self) -> None:
+        """No language selector is shown when no extra grouping field exists."""
+        with self.login_user_context(self.admin_user):
+            # Act
+            response = self.client.get(self.changelist_url)
+            # Assert
+            self.assertNotContains(response, 'class="language-selector"')
+            self.assertNotContains(response, 'class="language-selector js-language-selector"')
 
 
 class GrouperChangeTestCase(SetupMixin, CMSTestCase):

@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # Diego Ponci <dgo.ponciano@gmail.com>, 2016
 # Juliano Fischer Naves <>, 2012
 # Rafael Duarte Trevisan <rafa.trevisan@gmail.com>, 2013
@@ -10,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Diego Ponci <dgo.ponciano@gmail.com>, 2016\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/divio/django-cms/language/pt_BR/)\n"
@@ -19,12 +20,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
-
-msgid "/"
-msgstr ""
-
-msgid ":"
-msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Você tem certeza que deseja trocar as abas sem salvar o conteúdo da página primeiro?"

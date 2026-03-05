@@ -26,11 +26,12 @@ from django.utils.translation import get_language, gettext_lazy as _
 from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, get_language_from_request
+from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 
-class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
+class ChangeListActionsMixin(metaclass=forms.widgets.MediaDefiningClass):
     """ChangeListActionsMixin is a mixin for the ModelAdmin class. It adds the ability to have
     action buttons and a burger menu in the admin's change list view. Unlike actions that affect
     multiple listed items the list action buttons only affect one item at a time.
@@ -306,8 +307,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 dict(),
             )
 
+        # Store prepopulated fields to be used in get_readonly_fields
+        self._prepopulated_fields = self.prepopulated_fields
+
         # Generate accessor functions for content model fields
-        for content_field in self.form._content_fields:
+        content_field_names = modelform_factory(self.content_model, fields="__all__").base_fields.keys()
+        for content_field in content_field_names:
             if (
                 not hasattr(self, CONTENT_PREFIX + content_field)
                 and content_field != self.grouper_field_name
@@ -334,7 +339,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             getter.admin_order_field = CONTENT_PREFIX + field
             if isinstance(self.content_model._meta.get_field(field), self.LC_SORTED_FIELDS):
                 getter.admin_order_field += "__lc"
-        getter.boolean = isinstance(self.form.base_fields[CONTENT_PREFIX + field], forms.BooleanField)
+        getter.boolean = isinstance(self.content_model._meta.get_field(field), models.BooleanField)
         if not getter.boolean:
             # First non-boolean field will show empty content value by default.
             for display in getattr(self, "list_display", ()):
@@ -441,7 +446,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         self.get_grouping_from_request(request)
         cl = super().get_changelist_instance(request)
         cl.current_language = self.get_language()
-        cl.available_languages = self.get_language_tuple(site=get_current_site(request))
+        if "language" in self.extra_grouping_fields:
+            cl.available_languages = self.get_language_tuple(site=get_current_site(request))
         return cl
 
     def changeform_view(
@@ -549,8 +555,11 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def get_form(self, request: HttpRequest, obj: models.Model | None = None, **kwargs) -> type:
         """Adds the language from the request to the form class"""
         form_class = super().get_form(request, obj, **kwargs)
-        form_class._admin = self
-        form_class._request = request
+        form_class = type(form_class)(
+            form_class.__name__,
+            (form_class,),
+            {"_admin": self, "_request": request},
+        )
 
         for field in self.extra_grouping_fields:
             form_class.base_fields[CONTENT_PREFIX + field].widget = forms.HiddenInput()
@@ -568,9 +577,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     # * View button that takes the user to the preview endpoint of the content model
     # * Settings button that lets the user change the grouper AND the content model
     #   using one form
-    def _get_view_action(self, obj, request: HttpRequest) -> str:
-        if self.get_content_obj(obj):
-            view_url = self.view_on_site(self.get_content_obj(obj))
+    def _get_view_action(self, obj: models.Model, request: HttpRequest) -> str:
+        view_url = self.view_on_site(obj)
+        if view_url:
             return self.admin_action_button(
                 url=view_url,
                 icon="view",
@@ -579,7 +588,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 keepsideframe=False,
                 name="view",
             )
-        return self.EMPTY_ACTION
+        return ""
 
     def _get_settings_action(self, obj: models.Model, request: HttpRequest) -> str:
         edit_url = admin_reverse(f"{obj._meta.app_label}_{obj._meta.model_name}_change", args=(obj.pk,))
@@ -658,7 +667,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def view_on_site(self, obj: models.Model) -> str | None:
         # Adds the View on Site button to the admin
         content_obj = self.get_content_obj(obj)
-        if content_obj:
+        if content_obj is not None and is_editable_model(content_obj.__class__):
             # Try getting the language from the content object
             return get_object_edit_url(content_obj, language=getattr(content_obj, "language", None))
         return None
@@ -677,6 +686,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     for field in self.form._content_fields
                     if field != self.grouper_field_name and field not in self.extra_grouping_fields
                 )
+        # Ensure no read-only fields are in prepopulated_fields
+        self.prepopulated_fields = {key: value for key, value in self._prepopulated_fields.items() if key not in fields}
         return fields
 
     def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
@@ -849,7 +860,7 @@ class GrouperAdminFormMixin:
             (_GrouperAdminFormMixin,),
             {
                 **base_fields,  # inherit the content model form's fields
-                "_content_model": model_form._meta.model,  # remember the model and
+                "_content_model": content_model,  # remember the model and
                 "_content_fields": model_form.base_fields.keys(),  # fields that come from the content form
             },
         )

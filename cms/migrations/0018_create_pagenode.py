@@ -64,7 +64,6 @@ class Migration(IrreversibleMigration):
         ('sites', '0001_initial'),
         ('cms', '0017_pagetype'),
     ]
-    replaces = [('cms', '0018_pagenode')]
 
     operations = [
         migrations.CreateModel(
@@ -82,7 +81,7 @@ class Migration(IrreversibleMigration):
                 'default_permissions': [],
             },
         ),
-        migrations.RunPython(create_page_nodes),
+        migrations.RunPython(create_page_nodes, elidable=True),
         migrations.AddField(
             model_name='page',
             name='node',

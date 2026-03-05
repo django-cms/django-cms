@@ -388,7 +388,7 @@ class Page(MP_Node):
         """
         Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
-        to django-treebeard, but after move is done page_moved signal is fired.
+        to django-treebeard.
         """
         assert isinstance(target_page, Page), f"{target_page} is not an instance of Page."
         inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC

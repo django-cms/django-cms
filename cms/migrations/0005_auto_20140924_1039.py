@@ -14,7 +14,10 @@ class MP_AddHandler():
         self.stmts = []
 
 
-NUM = NumConv(len(ALPHABET), ALPHABET)
+try:
+    NUM = NumConv(len(ALPHABET), ALPHABET)
+except TypeError:
+    NUM = NumConv(ALPHABET)
 
 
 def _int2str(num):
@@ -172,5 +175,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(move_to_mp),
+        migrations.RunPython(move_to_mp, elidable=True),
     ]
