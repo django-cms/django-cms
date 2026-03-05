@@ -62,7 +62,7 @@ This shortcut command performs the following five steps:
 2. Installs additional *optional packages* used in the template project:
 
    - `djangocms-text <https://github.com/django-cms/djangocms-text>`_ for rich text input
-   - `djangocms-frontend <https://github.com/django-cms/djangocms-frontend>`_ for Bootstrap5 support
+   - `djangocms-frontend <https://github.com/django-cms/djangocms-frontend>`_ for Bootstrap 5 support
    - `django-filer <https://github.com/django-cms/django-filer>`_ for media file management
    - `djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_ for publishing and version management
    - `djangocms-alias <https://github.com/django-cms/djangocms-alias>`_ for managing common content parts
