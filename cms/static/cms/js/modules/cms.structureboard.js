@@ -1205,20 +1205,6 @@ class StructureBoard {
     _loadToolbar() {
         const placeholderIds = getPlaceholderIds(CMS._plugins).map(id => `placeholders[]=${id}`).join('&');
 
-        const EXCLUDED = ['obj_id', 'obj_type', 'language', 'cms_path',];
-
-        const params = new URLSearchParams(window.location.search);
-        for (const key of EXCLUDED) {
-            params.delete(key);
-        }
-
-        let extraParams = "";
-        const paramsString = params.toString();
-
-        if (paramsString) {
-            extraParams = "&" + paramsString;
-        }
-
         return $.ajax({
             url: Helpers.updateUrlWithPath(
                 `${CMS.config.request.toolbar}?` +
@@ -1226,7 +1212,7 @@ class StructureBoard {
                     '&' +
                     `obj_id=${CMS.config.request.pk}&` +
                     `obj_type=${encodeURIComponent(CMS.config.request.model)}` +
-                    `&language=${encodeURIComponent(CMS.config.request.language)}${extraParams}`,
+                    `&language=${encodeURIComponent(CMS.config.request.language)}`,
             ),
         });
     }
