@@ -463,7 +463,7 @@ export const Helpers = {
             params.delete(key);
         }
 
-        return this.makeURL(url, [['cms_path', path], ...new URLSearchParams(params).entries()]);
+        return this.makeURL(url, [['cms_path', path], ...params.entries()]);
     },
 
     /**
