@@ -447,10 +447,9 @@ export const Helpers = {
         var win = this._getWindow();
         var path = win.location.pathname + win.location.search;
 
-        
-        const queryString = url.includes("?") ? url.split("?")[1] : "";        
-        // any URL params present in the url parameter should be of higher priority
-        const paramsFromUrl = new URLSearchParams(queryString);
+        const fullUrl = new URL(url, win.location.origin);        
+        // any URL params present in the url parameter should be of higher priority        
+        const paramsFromUrl = new URLSearchParams(fullUrl.search);
 
         const excluded_params  = ['cms_path'];
         for (const [key] of paramsFromUrl.entries()) {
