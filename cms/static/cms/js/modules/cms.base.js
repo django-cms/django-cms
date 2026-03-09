@@ -458,7 +458,7 @@ export const Helpers = {
         }        
 
         // remove any conflicts
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(win.location.search);
         for (const key of excluded_params) {
             params.delete(key);
         }
