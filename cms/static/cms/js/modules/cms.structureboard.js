@@ -1212,8 +1212,8 @@ class StructureBoard {
                     '&' +
                     `obj_id=${CMS.config.request.pk}&` +
                     `obj_type=${encodeURIComponent(CMS.config.request.model)}` +
-                    `&language=${encodeURIComponent(CMS.config.request.language)}`,
-            ),
+                    `&language=${encodeURIComponent(CMS.config.request.language)}`
+            )
         });
     }
 
