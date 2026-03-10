@@ -399,6 +399,103 @@ describe('DiffDOM', function() {
             delete window.__domDiffNewCounter;
         });
 
+        it('reuses unchanged nodes (same DOM reference) and removes changed ones', function() {
+            // Set up container with three children
+            var meta = document.createElement('meta');
+            meta.setAttribute('name', 'description');
+            meta.setAttribute('content', 'Original');
+            meta.marker = 'meta'; // Custom property to identify this node
+
+            var link = document.createElement('link');
+            link.setAttribute('rel', 'stylesheet');
+            link.setAttribute('href', '/static/style.css');
+
+            var title = document.createElement('title');
+            title.textContent = 'Old Title';
+
+            container.appendChild(meta);
+            container.appendChild(link);
+            container.appendChild(title);
+
+            // Keep references to the original DOM nodes
+            var originalMeta = container.childNodes[0];
+            var originalLink = container.childNodes[1];
+            var originalTitle = container.childNodes[2];
+
+            // Build new content: link unchanged, meta changed, title removed, script added
+            var wrapper = document.createElement('div');
+
+            var newMeta = document.createElement('meta');
+            newMeta.setAttribute('name', 'description');
+            newMeta.setAttribute('content', 'Updated');
+            wrapper.appendChild(newMeta);
+
+            var sameLinkCopy = document.createElement('link');
+            sameLinkCopy.setAttribute('rel', 'stylesheet');
+            sameLinkCopy.setAttribute('href', '/static/style.css');
+            wrapper.appendChild(sameLinkCopy);
+
+            var newScript = document.createElement('script');
+            newScript.setAttribute('src', '/static/app.js');
+            wrapper.appendChild(newScript);
+
+            var diff = dd.diff(container, nodeToObj(wrapper));
+            dd.apply(container, diff);
+
+            // Link was unchanged — must be the exact same DOM node (not a clone)
+            expect(container.childNodes.length).toBe(3);
+            expect(container.childNodes[1]).toBe(originalLink);
+
+            // Meta was changed — must NOT be the original node
+            expect(container.childNodes[0]).not.toBe(originalMeta);
+            expect(container.childNodes[0].getAttribute('content')).toBe('Updated');
+            expect(container.childNodes[0].marker).toBeUndefined(); // Custom property should not be copied
+
+            // Title was removed
+            expect(container.querySelector('title')).toBeNull();
+
+            // Script was added
+            expect(container.querySelector('script')).not.toBeNull();
+            expect(container.querySelector('script').getAttribute('src')).toBe('/static/app.js');
+        });
+
+        it('removes all unmatched nodes even when keys collide', function() {
+            // Multiple identical whitespace text nodes — a common case in <head>
+            var p1 = document.createElement('p');
+            p1.textContent = 'Keep';
+            p1.marker = 'marked'; // Custom property to identify this node
+            var p2 = document.createElement('p');
+            p2.textContent = 'Remove';
+
+            container.appendChild(document.createTextNode('\n'));
+            container.appendChild(p1);
+            container.appendChild(document.createTextNode('\n'));
+            container.appendChild(p2);
+            container.appendChild(document.createTextNode('\n'));
+
+            var originalP1 = p1;
+
+            // New content: only one <p> and two text nodes
+            var wrapper = document.createElement('div');
+            wrapper.appendChild(document.createTextNode('\n'));
+            var pKeep = document.createElement('p');
+            pKeep.textContent = 'Keep';
+            wrapper.appendChild(pKeep);
+            wrapper.appendChild(document.createTextNode('\n'));
+
+            var diff = dd.diff(container, nodeToObj(wrapper));
+            dd.apply(container, diff);
+
+            // Should have exactly 3 children: text, p, text
+            expect(container.childNodes.length).toBe(3);
+            expect(container.childNodes[1].textContent).toBe('Keep');
+            expect(container.childNodes[1]).toBe(originalP1);
+
+            // "Remove" paragraph must be gone
+            expect(container.querySelector('p:last-of-type').textContent).toBe('Keep');
+            expect(container.querySelector('p:last-of-type').marker).toBe('marked');
+        });
+
         it('handles SVG elements', function() {
             const svgHTML = `<div>
                 <svg width="100" height="100">
