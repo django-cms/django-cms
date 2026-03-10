@@ -49,6 +49,31 @@ describe('DiffDOM', function() {
             expect(obj.childNodes[0].nodeName).toBe('SPAN');
         });
 
+        it('converts a comment node to object', function() {
+            var comment = document.createComment(' a comment ');
+            var obj = nodeToObj(comment);
+
+            expect(obj.nodeName).toBe('#comment');
+            expect(obj.data).toBe(' a comment ');
+        });
+
+        it('preserves comments inside elements', function() {
+            var div = document.createElement('div');
+            div.appendChild(document.createComment('before'));
+            div.appendChild(document.createElement('p'));
+            div.appendChild(document.createComment('after'));
+
+            var obj = nodeToObj(div);
+
+            // All three children should be present, no nulls
+            expect(obj.childNodes.length).toBe(3);
+            expect(obj.childNodes[0].nodeName).toBe('#comment');
+            expect(obj.childNodes[0].data).toBe('before');
+            expect(obj.childNodes[1].nodeName).toBe('P');
+            expect(obj.childNodes[2].nodeName).toBe('#comment');
+            expect(obj.childNodes[2].data).toBe('after');
+        });
+
         it('handles nested elements', function() {
             const div = document.createElement('div');
             div.innerHTML = '<ul><li>Item 1</li><li>Item 2</li></ul>';
@@ -162,6 +187,25 @@ describe('DiffDOM', function() {
             expect(container.querySelector('span')).not.toBeNull();
             expect(container.querySelector('span').className).toBe('test');
             expect(container.querySelector('span').textContent).toBe('Text content');
+        });
+
+        it('preserves comment nodes through round-trip', function() {
+            var original = document.createElement('div');
+            original.appendChild(document.createComment(' server-rendered '));
+            original.appendChild(document.createElement('p'));
+            original.appendChild(document.createComment(' end '));
+
+            var obj = nodeToObj(original);
+            var diff = dd.diff(container, obj);
+            dd.apply(container, diff);
+
+            // Comments should survive the nodeToObj -> _objToNode -> apply round-trip
+            expect(container.childNodes.length).toBe(3);
+            expect(container.childNodes[0].nodeType).toBe(Node.COMMENT_NODE);
+            expect(container.childNodes[0].data).toBe(' server-rendered ');
+            expect(container.childNodes[1].nodeName).toBe('P');
+            expect(container.childNodes[2].nodeType).toBe(Node.COMMENT_NODE);
+            expect(container.childNodes[2].data).toBe(' end ');
         });
 
         it('preserves text nodes with whitespace', function() {
@@ -307,6 +351,52 @@ describe('DiffDOM', function() {
             expect(function() {
                 dd.apply(container, diff);
             }).not.toThrow();
+        });
+
+        it('does not re-execute identical script elements', function() {
+            // Set up container with a script that sets a global counter
+            var script = document.createElement('script');
+            script.textContent = 'window.__domDiffTestCounter = (window.__domDiffTestCounter || 0) + 1;';
+            container.appendChild(script);
+
+            // Script executed once on initial insert
+            expect(window.__domDiffTestCounter).toBe(1);
+
+            // Build a new node with an identical script
+            var wrapper = document.createElement('div');
+            var identicalScript = document.createElement('script');
+            identicalScript.textContent = 'window.__domDiffTestCounter = (window.__domDiffTestCounter || 0) + 1;';
+            wrapper.appendChild(identicalScript);
+
+            var diff = dd.diff(container, nodeToObj(wrapper));
+            dd.apply(container, diff);
+
+            // Counter should still be 1 — the identical script was reused, not re-executed
+            expect(window.__domDiffTestCounter).toBe(1);
+
+            delete window.__domDiffTestCounter;
+        });
+
+        it('executes new script elements that differ from existing ones', function() {
+            var script = document.createElement('script');
+            script.textContent = 'window.__domDiffNewCounter = 1;';
+            container.appendChild(script);
+
+            expect(window.__domDiffNewCounter).toBe(1);
+
+            // Apply diff with a different script
+            var wrapper = document.createElement('div');
+            var newScript = document.createElement('script');
+            newScript.textContent = 'window.__domDiffNewCounter = 42;';
+            wrapper.appendChild(newScript);
+
+            var diff = dd.diff(container, nodeToObj(wrapper));
+            dd.apply(container, diff);
+
+            // New script should have executed
+            expect(window.__domDiffNewCounter).toBe(42);
+
+            delete window.__domDiffNewCounter;
         });
 
         it('handles SVG elements', function() {
