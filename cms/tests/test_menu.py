@@ -2,6 +2,7 @@ import copy
 
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
+from django.core.cache import caches
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
@@ -482,6 +483,32 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             #     get all page url objects
             #     set the menu cache key
             Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+    @override_settings(
+        CMS_MENU_CACHE_BACKEND="secondary",
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "menu-test-default",
+            },
+            "secondary": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "menu-test-secondary",
+            },
+        },
+    )
+    def test_menu_cache_uses_configured_backend(self):
+        cms_page = self.get_page(1)
+        context = self.get_context(path=cms_page.get_absolute_url(), page=cms_page)
+        context["request"].session["cms_edit"] = False
+
+        Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+        cache_keys = CacheKey.objects.filter(language=context["request"].LANGUAGE_CODE, site=1)
+        self.assertEqual(cache_keys.count(), 1)
+        cache_key = cache_keys.get().key
+        self.assertIsNone(caches["default"].get(cache_key))
+        self.assertIsNotNone(caches["secondary"].get(cache_key))
 
     def test_menu_keys_duplicate_clear(self):
         """
