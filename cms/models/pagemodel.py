@@ -237,8 +237,17 @@ class Page(MP_Node):
                 site=self.site_id,
             )
         except self.__class__.DoesNotExist:
+            # Lock the tree root to serialize concurrent URL path updates
+            # and prevent deadlocks on cms_pageurl.
+            Page.objects.filter(pk=self.get_root().pk).select_for_update().first()
             old_home_tree = []
         else:
+            # Lock both tree roots to serialize concurrent URL path updates
+            # and prevent deadlocks on cms_pageurl. Lock in pk order to avoid
+            # deadlocks between the two lock acquisitions themselves.
+            pks = sorted({self.get_root().pk, old_home.get_root().pk})
+            list(Page.objects.filter(pk__in=pks).order_by("pk").select_for_update())
+
             old_home.update(
                 is_home=False,
                 changed_by=changed_by,
@@ -417,7 +426,12 @@ class Page(MP_Node):
         self.refresh_from_db(fields=("path", "depth"))
 
         # Update the urls for the page being moved
-        # and is descendants.
+        # and its descendants.
+        # Lock the tree root row to serialize concurrent URL path updates
+        # and prevent deadlocks on cms_pageurl when multiple page moves
+        # happen simultaneously in the same tree.
+        Page.objects.filter(pk=self.get_root().pk).select_for_update().first()
+
         languages = self.urls.values_list("language", flat=True)
 
         for language in languages:

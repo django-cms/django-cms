@@ -681,6 +681,11 @@ class ChangePageForm(BasePageContentForm):
             changed_date=timezone.now(),
             **data,
         )
+        # Lock the tree root row to serialize concurrent URL path updates
+        # and prevent deadlocks on cms_pageurl.
+        from cms.models import Page
+        Page.objects.filter(pk=page.get_root().pk).select_for_update().first()
+
         page.update_urls(
             self._language,
             path=page_path,
