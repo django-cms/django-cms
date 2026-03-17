@@ -186,7 +186,7 @@ closes the gap by providing editors central access to such custom content areas.
 Customizing the alias preview template
 --------------------------------------
 
-When editing or previewing content managed via ``djangocms-alias`` (for example
+When editing or previewing content managed via ``djangocms-alias`` (for example,
 static aliases like headers or footers), django CMS renders the content inside
 a dedicated template.
 
