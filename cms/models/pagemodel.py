@@ -427,9 +427,9 @@ class Page(MP_Node):
 
         # Update the urls for the page being moved
         # and its descendants.
-        # Lock the tree root row to serialize concurrent URL path updates
-        # and prevent deadlocks on cms_pageurl when multiple page moves
-        # happen simultaneously in the same tree.
+        # Lock the tree root to serialize concurrent URL path updates and
+        # prevent deadlocks on cms_pageurl when multiple page moves happen
+        # simultaneously in the same tree.
         Page.objects.filter(pk=self.get_root().pk).select_for_update().first()
 
         languages = self.urls.values_list("language", flat=True)
