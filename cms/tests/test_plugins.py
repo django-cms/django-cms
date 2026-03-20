@@ -1040,6 +1040,37 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
 
+    def test_iterator_chunk_size_in_get_bound_plugins(self):
+        """iterator() must pass PLUGIN_ITERATOR_CHUNK_SIZE so that
+        querysets with prefetch_related (from custom managers) don't
+        crash on Django 5.0+."""
+        from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
+        from cms.utils.plugins import get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DumbFixturePlugin):
+            plugin = api.add_plugin(placeholder, DumbFixturePlugin, "en")
+            plugins = CMSPlugin.objects.filter(pk=plugin.pk)
+
+            with mock.patch(
+                "cms.utils.plugins.PLUGIN_ITERATOR_CHUNK_SIZE", 999
+            ):
+                # Patch the queryset's iterator to inspect the chunk_size kwarg
+                original_iterator = None
+
+                def patched_iterator(chunk_size=None):
+                    self.assertEqual(chunk_size, 999)
+                    return original_iterator(chunk_size=chunk_size)
+
+                qs = DumbFixturePlugin.model.objects.filter(pk__in=[plugin.pk])
+                original_iterator = qs.iterator
+
+                with mock.patch.object(
+                    DumbFixturePlugin.model.objects, "filter", return_value=qs
+                ):
+                    with mock.patch.object(qs, "iterator", side_effect=patched_iterator):
+                        list(get_bound_plugins(plugins))
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):

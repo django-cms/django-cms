@@ -14,6 +14,7 @@ from django.http import HttpRequest
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
+from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -388,7 +389,7 @@ def get_bound_plugins(plugins):
         plugin_queryset = base_model.objects.filter(pk__in=pks)
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_queryset.iterator():
+        for instance in plugin_queryset.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
             model = get_plugin_model(instance.plugin_type)  # Get original class
             instance.__class__ = model  # Cast to correct model (including proxies)
             plugin_lookup[instance.pk] = instance
@@ -455,7 +456,7 @@ def downcast_plugins(
 
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs.iterator():
+        for instance in plugin_qs.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
             cls = get_plugin_class(instance.plugin_type)  # Plugin class
             instance.__class__ = cls.model  # Cast to original model (including proxies)
             plugin_lookup[instance.pk] = instance
