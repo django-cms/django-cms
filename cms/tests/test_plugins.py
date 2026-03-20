@@ -2,7 +2,7 @@ import datetime
 import pickle
 import warnings
 from contextlib import contextmanager
-from unittest import skipIf
+from unittest import mock, skipIf
 
 from django import http
 from django.conf import settings
