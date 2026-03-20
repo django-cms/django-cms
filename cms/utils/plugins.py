@@ -9,6 +9,7 @@ from operator import itemgetter
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
+from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -374,7 +375,7 @@ def get_bound_plugins(plugins):
 
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_queryset.iterator():
+        for instance in plugin_queryset.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
             plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
@@ -433,7 +434,7 @@ def downcast_plugins(plugins,
 
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs.iterator():
+        for instance in plugin_qs.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
             placeholder = placeholders_by_id.get(instance.placeholder_id)
 
             if placeholder:

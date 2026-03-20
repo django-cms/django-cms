@@ -80,3 +80,7 @@ SCRIPT_USERNAME = 'script'
 CMS_CONFIG_NAME = 'cms_config'
 
 MODAL_HTML_REDIRECT = '<body><a class="cms-view-new-object" target="_top" href="{url}">Redirecting...</a></body>'
+
+#: Default chunk_size for QuerySet.iterator() calls on plugin querysets.
+#: Required since Django 5.0 when prefetch_related is applied.
+PLUGIN_ITERATOR_CHUNK_SIZE = 2000
