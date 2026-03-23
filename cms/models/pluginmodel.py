@@ -256,7 +256,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
         plugin = self.get_plugin_class()
 
-        if plugin.model != self.__class__:
+        if plugin.model._meta.concrete_model != self.__class__._meta.concrete_model:
             self._inst = plugin.model.objects.get(cmsplugin_ptr=self)
             # Preserve prefetched placeholder
             self._inst._state.fields_cache["placeholder"] = self.placeholder
