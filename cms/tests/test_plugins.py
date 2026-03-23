@@ -76,6 +76,7 @@ class DumbFixturePlugin(CMSPluginBase):
 class DirectProxyCMSPluginModel(CMSPlugin):
     class Meta:
         proxy = True
+        app_label = "test_app"
 
 
 class DirectProxyCMSPlugin(CMSPluginBase):
