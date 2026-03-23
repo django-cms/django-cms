@@ -1,3 +1,459 @@
+5.1.0a1 (2025-11-12)
+====================
+
+
+Features:
+---------
+
+* introduce contracts for django CMS Extensions (#8455) -- Fabian Braun
+* Avoid database access when registering apphook urls to make them async-safe (#8460) -- Fabian Braun
+* Make page content placeholders available to apphook root pages (#8456) -- Fabian Braun
+* Preserve GET params when switching to preview or edit mode (#8444) -- Fabian Braun
+* Add icon for redirected pages in page tree (#8437) -- Fabian Braun
+* Improved UX for external placeholders (e.g., static aliases) (#8416) -- Fabian Braun
+* Allow page permission change from advanced settings (#8387) -- Fabian Braun
+* Allow plugins to restrict themselves to specific models (#8395) -- Fabian Braun
+* Let the "eye" icon in the page tree directly go to edit endpoints for editable content (#8414) -- Fabian Braun
+* Refactor site handling, and allow single-instance multi-site configurations (#8303) -- Stefan Wehrmeyer
+* Implement new Django CMS design language for Django CMS 5.1 (#8320) -- Fabian Braun and Vinit Kumar
+* Optimize placeholder and plugin utilities (#8319) -- Fabian Braun
+* Re-introduced help menu (#8300) (#8301) -- Florian Schieder
+* Django 6 compatibility (#8299) -- Fabian Braun
+
+
+Bug Fixes:
+----------
+* get_permissions failed for missing global permissions (#8468) (65d84a929) -- Fabian Braun
+* Create page wizard not available on empty install (#8463) -- Fabian Braun
+* Make Placeholder.add_plugin() set plugin.instance to self (#8442) (#8447) -- Jasper Bok
+* Resolve empty page_title in frontend edit mode for apphooks (#8449) -- 김주희
+* Improve anti-aliasing of django CMS logo png (#8452)  -- Fabian Braun
+* Use PageContent.template_choices attribute for template choices instead of settings (#8441)  -- Fabian Braun
+* Existing child plugin restriction cannot be reduced to an empty list (which implies all plugins allowed) (#8433) -- Fabian Braun
+* Gracefully handle unresolvable extends variables in placeholder scanning (#8420) -- Vincent Ngobeh
+* Allow frontend-editable models to omit get_template method (#8406) -- Fabian Braun
+* Safe fallback for includes when scanning for placeholders (#8405) -- Fabian Braun
+* Fix ApphookReloadMiddleware not handling new language variants (#8401) -- Moritz Pietzschke
+* Copying failed if a target placeholders was missing (#8399) -- Moritz Pietzschke
+* Grouper admin kept read-only fields as prepopulated fields (#8471) (fd4aac915) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
+5.0.5 (2025-11-12)
+==================
+
+Bug Fixes:
+----------
+* Pin language of toolbar update to the request language
+* Ensure edit endpoint language selection when admin is not using i18n_patterns (#8367) (#8390) (9e00f694e) -- Fabian Braun
+* Copying x-language lead to unique constraint violation (#8366) (#8386)
+* Avoid escaping (= stringify) None-values in PageAttribute-TemplateTag (#8375) (#8384) -- Wolfgang Fehr
+* Set default value for edit_fields parameter to avoid AttributeError (#8381)
+* Link in welcome.html for fellowship program (#8365) -- Fabian Braun
+* Searching pages for language-specific content failed due to wrong search queryset (#8355) (#8358)
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.4 (2025-10-03)
+==================
+
+Bug Fixes:
+----------
+* Wrong placeholders rendered when using apphooks with own placeholders (#8343) (#8348) (775392390) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 1 pull request, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.3 (2025-09-17)
+==================
+
+Bug Fixes:
+----------
+
+* Django 6 compatibility (July 2025) (8302) -- Fabian Braun
+* Respect individual placeholder checks if they can be changed (#8318) -- Fabian Braun
+* Cut children from inactive menu nodes when level is less or equal to 0 (#8324) -- Stefan Wehrmeyer
+* Copy lang management command - include PageUrl (#8335) -- Vašek Chalupníček
+* Optimize placeholder and plugin utilities (#8337) -- Fabian Braun
+* Migration 0033 failed when empty placeholder objects were not present in the db (#8339) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+* Stefan Wehrmeyer (1 pull request)
+* Vašek Chalupníček (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+
+Thanks to all contributors for their efforts!
+
+5.0.2 (2025-07-17)
+==================
+
+Bug Fixes:
+----------
+* The headless template included inline CSS (#8291) (#8292) (14dd89faf) -- Fabian Braun
+* GrouperAdmin Search in content model (#8284) (#8290) (46f0e0775) -- Muhammad Hassan Siddiqi
+* Allow clicks to propagate to plugins (#8288) (#8289) (2c1ab2d7d) -- Fabian Braun
+* show_placeholder did not respect edit/preview mode and failed loudly (#8272) (#8274) (e7be7bc9b) -- Fabian Braun
+* Allow lazy wizard initialization (#8265) (365185848) -- Fabian Braun
+* Apphook widgets were not always detected correctly (#8263) (ec2f4e815) -- Fabian Braun
+* Migrating from django CMS 3.x failed in some rare cases (#8249) (bcf7f895a) -- jmit-modern
+* Added default_auto_field to cms/apps.py (#8254) (4a12dd38a) -- Fabian Braun
+* 404 not raised in CMS view when no URLs matched (#8240) (3d069cbe5) -- Stefan Wehrmeyer
+* Replaced outdated usage of page__node__path with page__path (#8238) (a9105a738) -- Stefan Wehrmeyer
+
+
+
+Statistics:
+-----------
+
+This release includes 13 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull request)
+* Github Release Action (3 pull requests)
+* jmit-modern (1 pull request)
+* Muhammad Hassan Siddiqi (1 pull request)
+* Stefan Wehrmeyer (2 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.1 (2025-05-21)
+==================
+
+Bug Fixes:
+----------
+
+* Adjust checks for GrouperAdmin to allow for `prepopulated_fields` (d6be4747e) -- Fabian Braun
+* Show all text-enabled plugins inside djangocms-text (0a2ce64c4) -- Fabian Braun
+* Structure board update sometimes failed to add all interactive elements (d040cee) -- Fabian Braun
+* Remove circular import in ``cms.forms.validators`` (1548fba) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (4 pull request)
+
+With the review help of the following contributors:
+
+* Jacob Rief
+* Vinit Kumar
+
+
+Thanks to all contributors for their efforts!
+
+5.0.0 (2025-05-12)
+==================
+
+Features:
+---------
+* Port forward of automatic JS updates (#8165) (fae83a8dd) -- Fabian Braun
+* Adds backwards migration of the ``Page``/``TreeNode`` model merge (#8163) (f85297d33) -- Fabian Braun
+* Add ``CMS_ALWAYS_REFRESH_CONTENT`` setting and other fixes (#8154) (1e2ff09e1) -- Fabian Braun
+* Improved editing response time by global caching of plugin restrictions (#8157) (3981f92d5) -- Fabian Braun
+* Better editor turn-around times (#8140) (2704cd41e) -- Fabian Braun
+* add django 5.2 to the test matrix (#8151) (203dfcb0e) -- Vinit Kumar
+* Allow for CSP - remove inline scripts from edit endpoint markup  (#8109) (6731f246e) -- Fabian Braun
+* Optimize DB queries for edit and structure endpoints (#8120) (be71c9d1d) -- Fabian Braun
+* add placeholder-level error handling (#8118) (8274ff6c7) -- Fabian Braun
+* Don't show plugin selector if only one plugin can be selected (#8105) (ea9830151) -- Fabian Braun
+* Improved delete page confirmation message (#8070) (47b63015f) -- Fabian Braun
+* Add ``FrontendEditableAdminMixin`` endpoint to plugins (#8062) (0224f1e36) -- Fabian Braun
+* Updated welcome page (#8057) (adbcb71be) -- Fabian Braun
+* Headless readiness (#7850) (d0a25c004) -- Fabian Braun
+* merge page with node tree (#7947) (8577444c1) -- Jacob Rief
+* Performant permission calculation for pages (#7943) (8630db8aa) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Remove more text decorations in page tree introduced by Django 5.2 (#8219) (7f8a6e312) -- Fabian Braun
+* Racing condition after content update through data bridge (4b5d0f0d3) -- Fabian Braun
+* deleting users cascaded to deleting PageUser or PageUserGroup (#8167) (2403d4ea1) -- Fabian Braun
+* Add get_ancestors method to ``CMSPlugin`` (#8159) (502ced1ca) -- Fabian Braun
+* respect object-level permissions in placeholder model (#8156) (eab0f3410) -- Hana Belay
+* ensure page content translations are created with the same template than existing (#8145) (4777a022c) -- Amanda Savluchinske
+* Async support and middleware update for django CMS 4.2+ (#8147) (693e910c3) -- Fabian Braun
+* Creation of text plugins failed (#8149) (fa3618e01) -- Fabian Braun
+* accept custom template engines that inherit from DjangoTemplates (#8144) (579db863f) -- Hana Belay
+* Replace inline script ``done.html`` redirect wizard (#8142) (1ee530c77) -- Fabian Braun
+* Copy plugins was broken  (#8135) (733c377ab) -- Fabian Braun
+* Detect page when getting toolbar for endpoint (#8137) (76cb708f8) -- Fabian Braun
+* Django 6 tried to adding object tools to the page tree throwing an error (#8133) (01fd09bca) -- Fabian Braun
+* Allow frontend editing of page title fields (#8131) (5f36e1c40) -- Fabian Braun
+* #7904 - ``manage.py cms fixtree`` did not fix PageUrl model (#7905) (63a38367b) -- Jacob Rief
+* Respect setting CMS_DEFAULT_IN_NAVIGATION (#8094) (ded96db00) -- Fabian Braun
+* Added the new delete confirmation for pages also to delete translation (#8111) (df4066639) -- Fabian Braun
+* Use correct ``changed_date`` of page content in sitemap (#8122) (d98757609) -- Jacob Rief
+* Placeholder page getter failed for unpublished pages (#8115) (4bcb4b43e) -- Fabian Braun
+* Fallback page names were not escaped (#8113) (463294977) -- Fabian Braun
+* Adjust tests for updated django 5.2 admin templates (#8095) (f2c367ddc) -- Fabian Braun
+* Correct ContentRenderer logic for toolbar and page content handling (#8092) (3f8fcb5fb) -- Fabian Braun
+* Resolve incorrect example in django CMS API reference documentation (#8079) (58eb76bb9) -- 사재혁
+* Remove `Page` object from admin index (introduced by #7995) (#8066) (fe54de417) -- Fabian Braun
+* Ensure plugin class properties are available to the Django template engine (#8071) (9e33db4f4) -- Fabian Braun
+* Replaced ``languages`` field from ``Page`` which used to become inconsistent (#8080) (1031d20fc) -- Fabian Braun
+* XSS vulnerability for page title (#8075) (241d1cbe4) -- Fabian Braun
+* Grouper admin raised AttributeError when used outside the admin views (#8067) (e1af99804) -- Fabian Braun
+* Sites menu was empty in the page tree (#8064) (d4b811d94) -- Fabian Braun
+* Fall back to class name when app name is None (#8059) (17343b02e) -- Halit Çelik
+* Handle cms command raising error (#8054) (69962fe81) -- Abdulwasiu Apalowo
+* added redirect message when in editing a redirect toolbar object (#8056) (835938c2d) -- Sal
+* Issue 7997 remove edit page dialog (#7999) (e8d1abf72) -- Jacob Rief
+* In rare situations the page tree preview button did not view the latest version (#8050) (052eac598) -- Jens-Erik Weber
+* Language tabs didn't show existing content due to caching issue (#8046) (db0a0c7ca) -- Filip Weidemann
+* X frame options added to page settings form (#8041) (1acb81677) -- Sal
+* Improve UX when page content is missing in selected language (#8033) (19ef774c1) -- Jacob Rief
+* Sitemap: Return a QuerySet in CMSSitemap.items() (#8031) (accc8dafc) -- Jens-Erik Weber
+* Accept legacy action names for page permission check (#8021) (9a1e178a7) -- Fabian Braun
+* Consistent toolbar mode (#8011) (1f864af6f) -- Fabian Braun
+* Respect ContentAdminManager pattern for frontend-editable models (#7998) (a56decf11) -- Fabian Braun
+* Also clear menu cache if page permissions are changed (#7988) (4f1cbc5c9) -- Fabian Braun
+* Consistent labels and help texts for page content model and page content forms (#7968) (5f2f9e465) -- Fabian Braun
+* Inconsistent color codes for dark mode and ``prefers-color-scheme: auto`` (#7979) (f82bcaca4) -- Fabian Braun
+* Refactor menus app: significant time saving (queries and cpu) (#7956) (59d50f249) -- Fabian Braun
+* template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) (b4f54a517) -- Fabian Braun
+* Regression: Turning a cached property into a property in a subclass leads to side-effects (#7971) (93f6fc508) -- Fabian Braun
+* Invalidate permissions cache if group assignment of user changes (1240e189e) -- Fabian Braun
+* Fail silently when rendering a placeholder on a missing toolbar object (#7954) (0f81ceaea) -- Fabian Braun
+* Show fallback language titles in pagetree (#7955) (302c1b5cc) -- Fabian Braun
+
+Refactoring and Cleanups:
+-------------------------
+* Replace PageAdmin.delete_view by two smaller methods (#7995) (cca00a57a) -- Jacob Rief
+
+Statistics:
+-----------
+
+This release includes 137 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* 사재혁 (1 pull request)
+* Abdulwasiu Apalowo (2 pull requests)
+* Amanda Savluchinske (2 pull requests)
+* dependabot[bot] (0 pull request)
+* Fabian Braun (88 pull requests)
+* Filip Weidemann (3 pull requests)
+* Github Release Action (5 pull requests)
+* Halit Çelik (1 pull request)
+* Hana Belay (2 pull requests)
+* Jacob Rief (7 pull requests)
+* Jeffrey de Lange (1 pull request)
+* Jens-Erik Weber (2 pull requests)
+* jianghuyiyuan (1 pull request)
+* Mario Colombo (1 pull request)
+* Mark Walker (2 pull requests)
+* Sal (2 pull requests)
+* Stefan Heinen (1 pull request)
+* Vinit Kumar (2 pull requests)
+* Waithaka Waweru (1 pull request)
+
+With the review help of the following contributors:
+
+* dependabot[bot]
+* Fabian Braun
+* Github Release Action
+* Jacob Rief
+* John Bazik
+* Mario Colombo
+* sourcery-ai[bot]
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.6 (2025-04-22)
+==================
+
+Bug Fixes:
+----------
+* Django 5.2 tried adding object tools to the page tree throwing an error  (#8200) (52af3ffc9) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.5 (2025-04-04)
+==================
+
+Bug Fixes:
+----------
+* Grouper models must not assume language grouper (#8194) (#8195) (35521bc7f) -- Fabian Braun
+* Ensure correct placeholder retrieval for PageContent instances (#8088) -- Fabian Braun
+* Fallback page names were not escaped (#8113) (#8114) -- Fabian Braun
+* Use PageContent.changed_date for sitemap lastmod (#8125) -- Jacob Rief
+* Allow frontend editing of page title fields -- Fabian Braun
+* Detect page when getting toolbar for endpoint (#8137) (#8138) -- Fabian Braun
+* CMS_TOOLBAR_HIDE broke endpoints in django CMS 4+ (#8176) -- Fabian Braun
+* Preview did not show the redirect page (#8175) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull requests)
+* Jacob Rief (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+* sourcery-ai[bot]
+
+Thanks to all contributors for their efforts!
+
+4.1.4 (2024-11-12)
+==================
+
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (c045a990e) -- Fabian Braun
+* Menus crashed when unexpected page content was present (#8052) -- Fabian Braun
+* Sites menu was empty in the page tree (#8064) -- Fabian Braun
+* Added redirect message when in editing a redirect toolbar object (#8056) -- Sal
+* X frame options added to page settings form (#8041) -- Sal
+* template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) -- Fabian Braun
+* Sitemap return a QuerySet in CMSSitemap.items() (#8031) -- Jens-Erik Weber
+* Improved UX when page content is missing in selected language (#8033) -- Jacob Rief
+
+Other:
+------
+* Updated welcome page (#8057) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+* Jacob Rief (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Sal (2 pull requests)
+
+With the review help of the following contributors:
+
+* Jacob Rief
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.3 (2024-09-11)
+==================
+
+Bug Fixes:
+----------
+* Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
+* Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
+* Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
+* Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
+* Inconsistent color codes for dark mode and ``prefers-color-scheme: auto`` (#7979) (46ff58321) -- Fabian Braun
+* Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
+* Accept legacy action names for page permission checks (#8021) (9a1e178) -- Fabian Braun
+* Mark language and user middleware synchronous for ASGI (#7985) -- John Bazik
+
+Statistics:
+-----------
+
+This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull request)
+
+With the review help of the following contributors:
+
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.2 (2024-07-12)
+==================
+
+Features:
+---------
+* More performant permission calculation for pages (#7943) (6b8269e1c) -- Fabian Braun
+* Reintroduce default_plugins setting -- Fabian Braun
+* Reintroduce page-level publish permission (just as in v4.0) -- Fabian Braun
+
+
+Bug Fixes:
+----------
+* Also use key-length of 200 for the actual cache-key of placeholders -- wfehr
+* Set toolbar direction based on toolbar language -- Fabian Braun
+* Allow viewing page settings even if change page settings is not possible -- Fabian Braun
+* Versioning-safe implementation of placeholder in heritance -- Fabian Braun
+* Only switch to structure endpoint on viewport breakpoint if in edit mode -- Fabian Braun
+* Allow special characters in page title -- Jacob Rief
+* Fail silently when rendering a placeholder on a missing toolbar object -- Fabian Braun
+* Show fallback language titles in pagetree -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull requests)
+* Jacob Rief (1 pull request)
+* wfehr (1 pull request)
+
+Thanks to all contributors for their efforts!
+
 4.1.1 (2024-04-30)
 ==================
 

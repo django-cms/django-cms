@@ -5,8 +5,7 @@
 /* eslint-disable max-params */
 
 import $ from 'jquery';
-import Class from 'classjs';
-import { once } from 'lodash';
+import once from 'lodash-es/once.js';
 
 /**
  * The tooltip is the element which shows over plugins
@@ -15,8 +14,8 @@ import { once } from 'lodash';
  * @class Tooltip
  * @namespace CMS
  */
-var Tooltip = new Class({
-    initialize: function initialize() {
+class Tooltip {
+    constructor() {
         this.body = $('body');
         /**
          * Are we on touch device?
@@ -31,9 +30,9 @@ var Tooltip = new Class({
          */
         this.domElem = this._pick();
 
-        this._forceTouchOnce = once(this._forceTouch);
+        this._forceTouchOnce = once(this._forceTouch.bind(this));
         this._checkTouch();
-    },
+    }
 
     /**
      * Checks for touch event and switches to touch tooltip if detected.
@@ -41,9 +40,9 @@ var Tooltip = new Class({
      * @method _checkTouch
      * @private
      */
-    _checkTouch: function _checkTouch() {
-        this.body.one('touchstart.cms', $.proxy(this._forceTouchOnce, this));
-    },
+    _checkTouch() {
+        this.body.one('touchstart.cms', this._forceTouchOnce);
+    }
 
     /**
      * Force tooltip to be "touch".
@@ -51,7 +50,7 @@ var Tooltip = new Class({
      * @method _forceTouch
      * @private
      */
-    _forceTouch: function _forceTouch() {
+    _forceTouch() {
         this.isTouch = true;
         this.domElem = this._pick();
 
@@ -72,7 +71,7 @@ var Tooltip = new Class({
                 generic.eq(0).trigger('dblclick.cms');
             }
         });
-    },
+    }
 
     /**
      * Manages show/hide calls.
@@ -83,13 +82,13 @@ var Tooltip = new Class({
      * @param {String} name current plugin name
      * @param {String} id current plugin id
      */
-    displayToggle: function displayToggle(isShown, e, name, id) {
+    displayToggle(isShown, e, name, id) {
         if (isShown) {
             this.show(e, name, id);
         } else {
             this.hide();
         }
-    },
+    }
 
     /**
      * Shows tooltip with specific plugin-related parameters.
@@ -99,7 +98,7 @@ var Tooltip = new Class({
      * @param {String} name current plugin name
      * @param {String} id current plugin id
      */
-    show: function show(e, name, id) {
+    show(e, name, id) {
         var tooltip = this.domElem;
         var that = this;
 
@@ -116,14 +115,14 @@ var Tooltip = new Class({
                 that.position(mouseMoveEvent, tooltip);
             });
         }
-    },
+    }
 
     /**
      * Hides tooltip.
      *
      * @method hide
      */
-    hide: function hide() {
+    hide() {
         // change css
         this.domElem.css('visibility', 'hidden').hide();
 
@@ -131,7 +130,7 @@ var Tooltip = new Class({
         if (!this.isTouch) {
             this.body.off('mousemove.cms.tooltip');
         }
-    },
+    }
 
     /**
      * Picks tooltip to show (touch or desktop).
@@ -140,10 +139,10 @@ var Tooltip = new Class({
      * @private
      * @returns {jQuery} tooltip element
      */
-    _pick: function _pick() {
+    _pick() {
         $('.cms-tooltip-touch, .cms-tooltip').css('visibility', 'hidden').hide();
         return this.isTouch ? $('.cms-tooltip-touch') : $('.cms-tooltip');
-    },
+    }
 
     /**
      * Positions tooltip next to the pointer event coordinates.
@@ -152,7 +151,7 @@ var Tooltip = new Class({
      * @param {Object} e event object
      * @param {jQuery} tooltip element
      */
-    position: function position(e, tooltip) {
+    position(e, tooltip) {
         // so lets figure out where we are
         var offset = 20;
         var arrowOffset = 12;
@@ -166,6 +165,6 @@ var Tooltip = new Class({
             top: relY - arrowOffset
         });
     }
-});
+}
 
 export default Tooltip;

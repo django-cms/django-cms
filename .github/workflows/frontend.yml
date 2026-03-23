@@ -8,21 +8,19 @@ concurrency:
 
 jobs:
   frontend:
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        node-version: ['18']
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: '24'
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+    - uses: actions/checkout@v6
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v6
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ env.NODE_VERSION }}
     - run: npm install
-    - run: npm install -g gulp@4.0.2
-    - run: |
-          gulp unitTest
-          gulp lint
+    - run: npm install -g gulp@latest
+    - run: gulp unitTest
+    - run: gulp lint
     - run: gulp icons
     - run: gulp sass

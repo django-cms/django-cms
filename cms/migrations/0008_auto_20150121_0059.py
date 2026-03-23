@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models, migrations
 
 
@@ -12,6 +10,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterUniqueTogether(
             name='page',
-            unique_together=set([('reverse_id', 'site', 'publisher_is_draft'), ('publisher_is_draft', 'site', 'application_namespace')]),
+            unique_together={('reverse_id', 'site', 'publisher_is_draft'), ('publisher_is_draft', 'site', 'application_namespace')},
         ),
     ]

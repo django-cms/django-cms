@@ -1,17 +1,12 @@
 // polyfills
-import './polyfills/function.prototype.bind';
-import './polyfills/domparser';
 import initHelpShortcuts from './modules/shortcuts';
 
 // jquery plugins
-import './libs/pep';
-
 import './modules/dropdown';
 
 // CMS Core
 import { Helpers, KEYS } from './modules/cms.base';
 import $ from 'jquery';
-import Class from 'classjs';
 
 // exposing globals for backwards compatibility
 import Messages from './modules/cms.messages';
@@ -44,8 +39,32 @@ CMS.API = {
 };
 CMS.KEYS = KEYS;
 CMS.$ = $;
-CMS.Class = Class;
 
-initHelpShortcuts();
+// Expose CMS globally for backwards compatibility
+if (typeof window !== 'undefined') {
+    window.CMS = CMS;
+}
 
-window.CMS = CMS;
+CMS.$(function () {
+    // this is a globally shared configuration
+    try {
+        CMS.config = CMS.config || JSON.parse(document.getElementById('cms-config-json').textContent || '{}');
+    } catch {
+        CMS.config = CMS.config || {};
+    }
+    CMS.settings = CMS.API.Helpers.getSettings();
+
+    initHelpShortcuts();
+
+    // extends API
+    CMS.API.Clipboard = new CMS.Clipboard();
+    CMS.API.StructureBoard = new CMS.StructureBoard();
+    CMS.API.Messages = new CMS.Messages();
+    CMS.API.Tooltip = new CMS.Tooltip();
+    CMS.API.Toolbar = new CMS.Toolbar();
+    CMS.API.Sideframe = new CMS.Sideframe();
+
+    CMS.Plugin._initializeTree();
+});
+
+export default CMS;

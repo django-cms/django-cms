@@ -10,6 +10,8 @@ from django.http import Http404, HttpResponse
 from django.template import Variable
 from django.test.utils import override_settings
 from django.urls import clear_url_caches, reverse
+from django.utils import translation
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_page_content
@@ -29,16 +31,44 @@ from cms.utils.urlutils import admin_reverse
 from cms.views import details, login, render_object_structure
 from menus.menu_pool import menu_pool
 
-APP_NAME = 'SampleApp'
+APP_NAME = "SampleApp"
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
+
+
+# Middleware that sets language based on subdomain - used in test_language_code_is_respected_with_prefix_subdomains
+class LanguageSettingMiddleware(MiddlewareMixin):
+    """Middleware that sets language based on subdomain.
+    Example URLs:
+    - de.example.com -> German
+    - en.example.com -> English
+    Falls back to German if no valid language subdomain is found.
+    """
+
+    def process_request(self, request):
+        # Get the hostname from the request and remove port if present
+        hostname = request.get_host().split(":")[0]
+
+        # Extract language code from the subdomain
+        try:
+            language_code = hostname.split(".")[0].lower()
+
+            # Only allow English and German
+            if language_code == "en":
+                request.LANGUAGE_CODE = "en"
+                translation.activate("en")
+            else:
+                # Default to German for any other subdomain
+                request.LANGUAGE_CODE = "de"
+                translation.activate("de")
+        except IndexError:
+            pass
 
 
 @override_settings(
     CMS_PERMISSION=True,
-    ROOT_URLCONF='cms.test_utils.project.urls',
+    ROOT_URLCONF="cms.test_utils.project.urls",
 )
 class ViewTests(CMSTestCase):
-
     def setUp(self):
         clear_url_caches()
 
@@ -49,31 +79,31 @@ class ViewTests(CMSTestCase):
     def test_welcome_screen_debug_on(self):
         clear_url_caches()
         with self.settings(DEBUG=True):
-            response = self.client.get('/en/')
+            response = self.client.get("/en/")
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.template_name, 'cms/welcome.html')
+            self.assertEqual(response.template_name, "cms/welcome.html")
 
     def test_welcome_screen_debug_off(self):
         with self.settings(DEBUG=False):
-            response = self.client.get('/en/')
+            response = self.client.get("/en/")
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.template_name, 'cms/welcome.html')
+            self.assertEqual(response.template_name, "cms/welcome.html")
 
     def test_handle_no_page(self):
         """
         Test handle nopage correctly works with DEBUG=True
         """
-        request = self.get_request('/not-existing/')
+        request = self.get_request("/not-existing/")
         self.assertRaises(Http404, _handle_no_page, request)
 
     def test_handle_no_page_for_root_url(self):
         """
         Test if _handle_no_page correctly works for root url
         """
-        request = self.get_request('/en/')
+        request = self.get_request("/en/")
         response = _handle_no_page(request)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
+        self.assertEqual(response.url, reverse("admin:cms_pagecontent_changelist"))
 
     def test_handle_no_page_for_root_url_no_homepage(self):
         """
@@ -90,9 +120,7 @@ class ViewTests(CMSTestCase):
         """
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
-        apphooks = (
-            f'{APP_MODULE}.{APP_NAME}',
-        )
+        apphooks = (f"{APP_MODULE}.{APP_NAME}",)
         page = create_page("page2", "nav_playground.html", "en")
         with self.settings(CMS_APPHOOKS=apphooks):
             self.apphook_clear()
@@ -101,130 +129,125 @@ class ViewTests(CMSTestCase):
             self.apphook_clear()
 
     def test_redirect_preview_in_edit_mode(self):
-
         user = self.get_superuser()
         page = create_page("page", "nav_playground.html", "fr")
         page_content = create_page_content("en", "home", page, redirect="https://example.com")
 
         page.set_as_homepage()
-
+        expected = f"""
+            <div class="cms-screenblock">
+            <div class="cms-screenblock-inner">
+            <h1>This page has no preview!</h1>
+            <p>It is being redirected to: <a href="{page_content.redirect}">{page_content.redirect}</a></p>
+            </div>
+            </div>
+        """
         with self.login_user_context(user), force_language('fr'):
-            edit_url = get_object_edit_url(page_content, language='fr')
-            response = self.client.get(edit_url, follow=True)
-
-            expected = f"""
-                <div class="cms-screenblock">
-                <div class="cms-screenblock-inner">
-                <h1>This page has no preview!</h1>
-                <p>It is being redirected to: <a href="{page_content.redirect}">{page_content.redirect}</a></p>
-                </div>
-                </div>
-            """
-            self.assertContains(response, expected, count=1, html=True)
+            with self.subTest("Edit endpoint shows redirect message"):
+                url = get_object_edit_url(page_content, language='fr')
+                response = self.client.get(url)
+                self.assertContains(response, expected, count=1, html=True)
+            with self.subTest("Preview endpoint shows redirect message"):
+                url = get_object_preview_url(page_content, language='fr')
+                response = self.client.get(url)
+                self.assertContains(response, expected, count=1, html=True)
 
     def test_external_redirect(self):
         # test external redirect
-        redirect_one = 'https://www.django-cms.org/'
-        one = create_page("one", "nav_playground.html", "en",
-                          redirect=redirect_one)
+        redirect_one = "https://www.django-cms.org/"
+        one = create_page("one", "nav_playground.html", "en", redirect=redirect_one)
         url = one.get_absolute_url()
         request = self.get_request(url)
         response = details(request, one.get_path("en"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], redirect_one)
+        self.assertEqual(response["Location"], redirect_one)
 
     def test_internal_neutral_redirect(self):
         # test internal language neutral redirect
-        redirect_one = 'https://www.django-cms.org/'
-        redirect_two = '/'
-        one = create_page("one", "nav_playground.html", "en",
-                          redirect=redirect_one)
-        two = create_page("two", "nav_playground.html", "en", parent=one,
-                          redirect=redirect_two)
+        redirect_one = "https://www.django-cms.org/"
+        redirect_two = "/"
+        one = create_page("one", "nav_playground.html", "en", redirect=redirect_one)
+        two = create_page("two", "nav_playground.html", "en", parent=one, redirect=redirect_two)
         url = two.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, two.get_path('en'))
+        response = details(request, two.get_path("en"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/en/')
+        self.assertEqual(response["Location"], "/en/")
 
     def test_internal_forced_redirect(self):
         # test internal forced language redirect
-        redirect_one = 'https://www.django-cms.org/'
-        redirect_three = '/en/'
-        one = create_page("one", "nav_playground.html", "en",
-                          redirect=redirect_one)
-        three = create_page("three", "nav_playground.html", "en", parent=one,
-                            redirect=redirect_three)
+        redirect_one = "https://www.django-cms.org/"
+        redirect_three = "/en/"
+        one = create_page("one", "nav_playground.html", "en", redirect=redirect_one)
+        three = create_page("three", "nav_playground.html", "en", parent=one, redirect=redirect_three)
         url = three.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, three.get_path('en'))
+        response = details(request, three.get_path("en"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], redirect_three)
+        self.assertEqual(response["Location"], redirect_three)
 
     def test_redirect_to_self(self):
-        one = create_page("one", "nav_playground.html", "en",
-                          redirect='/one/')
+        one = create_page("one", "nav_playground.html", "en", redirect="/one/")
         url = one.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, one.get_path('en'))
+        response = details(request, one.get_path("en"))
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_to_self_with_host(self):
-        one = create_page("one", "nav_playground.html", "en",
-                          redirect='http://testserver/en/one/')
+        one = create_page("one", "nav_playground.html", "en", redirect="http://testserver/en/one/")
         url = one.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, one.get_path('en'))
+        response = details(request, one.get_path("en"))
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_not_preserving_query_parameters(self):
         # test redirect checking that the query parameters aren't preserved
-        redirect = '/en/'
+        redirect = "/en/"
         one = create_page("one", "nav_playground.html", "en", redirect=redirect)
         url = one.get_absolute_url()
         params = "?param_name=param_value"
         request = self.get_request(url + params)
         response = details(request, one.get_path(language="en"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], redirect)
+        self.assertEqual(response["Location"], redirect)
 
     @override_settings(CMS_REDIRECT_PRESERVE_QUERY_PARAMS=True)
     def test_redirect_preserving_query_parameters(self):
         # test redirect checking that query parameters are preserved
-        redirect = '/en/'
+        redirect = "/en/"
         one = create_page("one", "nav_playground.html", "en", redirect=redirect)
         url = one.get_absolute_url()
         params = "?param_name=param_value"
         request = self.get_request(url + params)
         response = details(request, one.get_path(language="en"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], redirect + params)
+        self.assertEqual(response["Location"], redirect + params)
 
     @override_settings(CMS_REDIRECT_TO_LOWERCASE_SLUG=True)
     def test_redirecting_to_lowercase_slug(self):
-        redirect = '/en/one/'
+        redirect = "/en/one/"
         one = create_page("one", "nav_playground.html", "en", redirect=redirect)
-        url = reverse('pages-details-by-slug', kwargs={"slug": "One"})
+        url = reverse("pages-details-by-slug", kwargs={"slug": "One"})
         request = self.get_request(url)
         response = details(request, one.get_path(language="en"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], redirect)
+        self.assertEqual(response["Location"], redirect)
 
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", login_required=True)
-        plain_url = '/accounts/'
+        plain_url = "/accounts/"
         login_rx = re.compile("%s\\?(signin=|next=/en/)&" % plain_url)
-        with self.settings(LOGIN_URL=plain_url + '?signin'):
-            request = self.get_request('/en/')
-            response = details(request, '')
+        with self.settings(LOGIN_URL=plain_url + "?signin"):
+            request = self.get_request("/en/")
+            response = details(request, "")
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(login_rx.search(response['Location']))
+            self.assertTrue(login_rx.search(response["Location"]))
         login_rx = re.compile("%s\\?(signin=|next=/)&" % plain_url)
-        with self.settings(USE_I18N=False, LOGIN_URL=plain_url + '?signin'):
-            request = self.get_request('/')
-            response = details(request, '')
+        with self.settings(USE_I18N=False, LOGIN_URL=plain_url + "?signin"):
+            request = self.get_request("/")
+            response = details(request, "")
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(login_rx.search(response['Location']))
+            self.assertTrue(login_rx.search(response["Location"]))
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en")
@@ -232,7 +255,7 @@ class ViewTests(CMSTestCase):
         page_preview_url = get_object_preview_url(page_content)
         # Anon user
         response = self.client.get(page_preview_url)
-        self.assertRedirects(response, f'/en/admin/login/?next={page_preview_url}')
+        self.assertRedirects(response, f"/en/admin/login/?next={page_preview_url}")
 
         # Superuser
         user = self.get_superuser()
@@ -240,16 +263,13 @@ class ViewTests(CMSTestCase):
             response = self.client.get(page_preview_url)
         toolbar = response.wsgi_request.toolbar
         edit_button = toolbar.get_right_items()[2].buttons[0]
-        self.assertEqual(edit_button.name, 'Edit')
+        self.assertEqual(edit_button.name, "Edit")
         self.assertEqual(edit_button.url, get_object_edit_url(page_content))
-        self.assertEqual(
-            edit_button.extra_classes,
-            ['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit']
-        )
+        self.assertEqual(edit_button.extra_classes, ["cms-btn", "cms-btn-action", "cms-btn-switch-edit"])
 
         # Admin but with no permission
         user = self.get_staff_user_with_no_permissions()
-        user.user_permissions.add(Permission.objects.get(codename='change_page'))
+        user.user_permissions.add(Permission.objects.get(codename="change_page"))
 
         with self.login_user_context(user):
             response = self.client.get(page_preview_url)
@@ -261,12 +281,9 @@ class ViewTests(CMSTestCase):
             response = self.client.get(page_preview_url)
         toolbar = response.wsgi_request.toolbar
         edit_button = toolbar.get_right_items()[2].buttons[0]
-        self.assertEqual(edit_button.name, 'Edit')
+        self.assertEqual(edit_button.name, "Edit")
         self.assertEqual(edit_button.url, get_object_edit_url(page_content))
-        self.assertEqual(
-            edit_button.extra_classes,
-            ['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit']
-        )
+        self.assertEqual(edit_button.extra_classes, ["cms-btn", "cms-btn-action", "cms-btn-switch-edit"])
 
     def test_toolbar_switch_urls(self):
         from django.utils.translation import gettext_lazy as _
@@ -283,10 +300,10 @@ class ViewTests(CMSTestCase):
 
         page.set_as_homepage()
 
-        with self.login_user_context(user), force_language('fr'):
-            edit_url = get_object_edit_url(page_content, language='fr')
-            preview_url = get_object_preview_url(page_content, language='fr')
-            structure_url = get_object_structure_url(page_content, language='fr')
+        with self.login_user_context(user), force_language("fr"):
+            edit_url = get_object_edit_url(page_content, language="fr")
+            preview_url = get_object_preview_url(page_content, language="fr")
+            structure_url = get_object_structure_url(page_content, language="fr")
 
             response = self.client.get(edit_url)
             expected = f"""
@@ -304,12 +321,9 @@ class ViewTests(CMSTestCase):
             toolbar = response.wsgi_request.toolbar
             self.assertEqual(len(toolbar.get_right_items()[2].buttons), 1)
             preview_button = toolbar.get_right_items()[2].buttons[0]
-            self.assertEqual(preview_button.name, _('Preview'))
+            self.assertEqual(preview_button.name, _("Preview"))
             self.assertEqual(preview_button.url, preview_url)
-            self.assertEqual(
-                preview_button.extra_classes,
-                ['cms-btn', 'cms-btn-switch-save']
-            )
+            self.assertEqual(preview_button.extra_classes, ["cms-btn", "cms-btn-switch-save"])
 
             response = self.client.get(preview_url)
             self.assertContains(
@@ -321,12 +335,9 @@ class ViewTests(CMSTestCase):
             toolbar = response.wsgi_request.toolbar
             self.assertEqual(len(toolbar.get_right_items()[2].buttons), 1)
             edit_button = toolbar.get_right_items()[2].buttons[0]
-            self.assertEqual(edit_button.name, _('Edit'))
+            self.assertEqual(edit_button.name, _("Edit"))
             self.assertEqual(edit_button.url, edit_url)
-            self.assertEqual(
-                edit_button.extra_classes,
-                ['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit']
-            )
+            self.assertEqual(edit_button.extra_classes, ["cms-btn", "cms-btn-action", "cms-btn-switch-edit"])
 
     def test_incorrect_slug_for_language(self):
         """
@@ -336,14 +347,54 @@ class ViewTests(CMSTestCase):
         create_page("home", "nav_playground.html", "en")
         cms_page = create_page("stevejobs", "nav_playground.html", "en")
         create_page_content("de", "jobs", cms_page)
-        response = self.client.get('/de/stevejobs/')
+        response = self.client.get("/de/stevejobs/")
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/de/jobs/')
+        self.assertRedirects(response, "/de/jobs/")
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.middleware.locale.LocaleMiddleware",
+            "cms.tests.test_views.LanguageSettingMiddleware",
+            "django.middleware.common.CommonMiddleware",
+            "django.middleware.csrf.CsrfViewMiddleware",
+            "django.middleware.clickjacking.XFrameOptionsMiddleware",
+            "cms.middleware.user.CurrentUserMiddleware",
+            "cms.middleware.page.CurrentPageMiddleware",
+            "cms.middleware.toolbar.ToolbarMiddleware",
+            "cms.middleware.language.LanguageCookieMiddleware",
+        ],
+        ALLOWED_HOSTS=["en.example.com", "de.example.com"],
+    )
+    def test_language_code_is_respected_with_prefix_subdomains(self):
+        """
+        Test that the language code is respected with subdomains.
+        Tests that:
+        - German subdomain (de.example.com) serves content in German
+        - English subdomain (en.example.com) serves content in English
+        """
+        # Create a homepage with English and German versions
+        page = create_page("home", "nav_playground.html", "en")
+        create_page_content("de", "heim", page)
+        page.set_as_homepage()
+
+        # Test German subdomain
+        response = self.client.get("/", HTTP_HOST="de.example.com")
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, "/de/")
+        self.assertEqual(response.wsgi_request.LANGUAGE_CODE, "de")
+
+        # Test English subdomain
+        response = self.client.get("/", HTTP_HOST="en.example.com")
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, "/en/")
+        self.assertEqual(response.wsgi_request.LANGUAGE_CODE, "en")
 
     def test_page_sanitisation_xss_attack(self):
         """
-            When sending a request the CMS uses get_page_from_request to return the appropriate page.
-            None should be returned
+        When sending a request the CMS uses get_page_from_request to return the appropriate page.
+        None should be returned
         """
         request = self.get_request("/")
         request.path_info = "<script>alert('attack!')</script>"
@@ -358,7 +409,7 @@ class ViewTests(CMSTestCase):
         username = getattr(self.get_superuser(), get_user_model().USERNAME_FIELD)
         request = self.get_request(
             "/en/admin/login/?q=<script>alert('Attack')</script>",
-            post_data={"username": username, "password": username}
+            post_data={"username": username, "password": username},
         )
 
         response = login(request)
@@ -378,9 +429,8 @@ class ViewTests(CMSTestCase):
             self.client.get(url)
 
 
-@override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
+@override_settings(ROOT_URLCONF="cms.test_utils.project.urls")
 class ContextTests(CMSTestCase):
-
     def test_context_current_page(self):
         """
         Asserts the number of queries triggered by
@@ -389,10 +439,9 @@ class ContextTests(CMSTestCase):
         from django.template import context
 
         page_template = "nav_playground.html"
-        original_context = {'TEMPLATES': settings.TEMPLATES}
+        original_context = {"TEMPLATES": settings.TEMPLATES}
         page = self.create_homepage("page", page_template, "en")
-        page_2 = create_page("page-2", page_template, "en",
-                             parent=page)
+        page_2 = create_page("page-2", page_template, "en", parent=page)
 
         # Tests for standard django applications
         # 1 query is executed in get_app_patterns(), not related
@@ -411,13 +460,13 @@ class ContextTests(CMSTestCase):
                 response = self.client.get("/en/plain_view/")
             # One query when determining current page
             with self.assertNumQueries(FuzzyInt(0, 1)):
-                self.assertFalse(response.context['request'].current_page)
-                self.assertFalse(response.context['request']._current_page_cache)
+                self.assertFalse(response.context["request"].current_page)
+                self.assertFalse(response.context["request"]._current_page_cache)
             # Zero more queries when determining the current template
             with self.assertNumQueries(0):
                 # Template is the first in the CMS_TEMPLATES list
-                template = Variable('CMS_TEMPLATE').resolve(response.context)
-                self.assertEqual(template, get_cms_setting('TEMPLATES')[0][0])
+                template = Variable("CMS_TEMPLATE").resolve(response.context)
+                self.assertEqual(template, get_cms_setting("TEMPLATES")[0][0])
         cache.clear()
         menu_pool.clear()
 
@@ -425,23 +474,22 @@ class ContextTests(CMSTestCase):
         with self.settings(**original_context):
             with self.assertNumQueries(FuzzyInt(13, 30)) as context:
                 response = self.client.get("/en/page-2/")
-                template = Variable('CMS_TEMPLATE').resolve(response.context)
+                template = Variable("CMS_TEMPLATE").resolve(response.context)
                 self.assertEqual(template, page_template)
                 num_queries_page = len(context.captured_queries)
         cache.clear()
         menu_pool.clear()
-        page_2.update_translations(template='INHERIT')
+        page_2.update_translations(template="INHERIT")
 
         with self.settings(**original_context):
             # One query more triggered as page inherits template from ancestor
             with self.assertNumQueries(num_queries_page + 1):
                 response = self.client.get("/en/page-2/")
-                template = Variable('CMS_TEMPLATE').resolve(response.context)
+                template = Variable("CMS_TEMPLATE").resolve(response.context)
                 self.assertEqual(template, page_template)
 
 
 class EndpointTests(CMSTestCase):
-
     def setUp(self) -> None:
         page_template = "simple.html"
         self.page = self.create_homepage("page", page_template, "en")
@@ -475,13 +523,16 @@ class EndpointTests(CMSTestCase):
             setting.save()
             structure_endpoint_url = admin_reverse(
                 "cms_placeholder_render_object_structure",
-                args=(self.content_type.id, self.page_content_fr.pk,)
+                args=(
+                    self.content_type.id,
+                    self.page_content_fr.pk,
+                ),
             )
             response = self.client.get(structure_endpoint_url)
-            self.assertContains(response, '<strong>Texte</strong>')
+            self.assertContains(response, "<strong>Texte</strong>")
 
             setting.language = "en"
             setting.save()
 
             response = self.client.get(structure_endpoint_url)
-            self.assertContains(response, '<strong>Text</strong>')
+            self.assertContains(response, "<strong>Text</strong>")

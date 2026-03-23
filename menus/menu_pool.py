@@ -9,7 +9,6 @@ from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import (
-    get_language_from_request,
     gettext_lazy as _,
 )
 
@@ -17,7 +16,6 @@ from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_default_language_for_site,
-    is_language_prefix_patterns_used,
 )
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
@@ -107,12 +105,18 @@ class MenuRenderer:
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
+        page = getattr(self.request, 'current_page', None)
+        if page:
+            # Avoid resolving site
+            self.site = Site(id=page.site_id)
+        else:
+            self.site = get_current_site(request)
         self.request_language = None
-        if is_language_prefix_patterns_used():
-            self.request_language = get_language_from_request(request, check_path=True)
+        if hasattr(request, "LANGUAGE_CODE"):
+            # use language from middleware - usually django.middleware.locale.LocaleMiddleware
+            self.request_language = request.LANGUAGE_CODE
         if not self.request_language:
-            self.request_language = get_default_language_for_site(get_current_site().pk)
-        self.site = Site.objects.get_current(request)
+            self.request_language = get_default_language_for_site(self.site.pk)
         toolbar = getattr(request, "toolbar", None)
         self.edit_or_preview = toolbar.edit_mode_active or toolbar.preview_mode_active if toolbar else False
 

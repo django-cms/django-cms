@@ -1,0 +1,295 @@
+.. _upgrade-to-5.0.0:
+
+###################
+5.0.0 release notes
+###################
+
+*May 12, 2025*
+
+Welcome to django CMS 5.0.0!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
+features.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, and 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.0.0
+***********************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.0 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+.. warning::
+
+    Since the migrations merge the ``TreeNode`` and ``Page`` models, you should run the
+    migration in a test environment first to ensure that the migration runs
+    successfully.
+
+
+*******************
+What's new in 5.0.0
+*******************
+
+Editor experience: Improved turn-around times
+=============================================
+
+Significant improvements have been made to enhance the editor experience by
+reducing turn-around times.
+
+Faster plugin addition
+----------------------
+
+In django CMS 5.0.0, adding child plugins has been made easier when only one plugin
+type is allowed. When adding a plugin to a placeholder, there is no need for a
+plugin selector modal if only one plugin is available. Now in this situation the
+plugin selector modal is skipped, streamlining the process. Typical use cases include
+"nested" plugins such as accordions, rows with columns, and similar structures.
+
+Additionally, if the plugin form contains no fields to edit or has default values for
+all fields, a plugin can be created without add plugin form. To enable this quick creation
+of content, set the plugin's property :attr:`~cms.plugin_base.CMSPluginBase.show_add_form` to
+``False``.
+
+Improved plugin updates
+-----------------------
+
+One of the key changes is the introduction of a new mechanism for handling plugin data updates.
+This mechanism reduces the number request-response cycles and optimizes the rendering process,
+resulting in faster load times and more responsive interactions when managing content. Editors will
+benefit from a more efficient and enjoyable editing workflow, with quicker updates by a factor of roughly
+two and smoother transitions between editing tasks.
+
+Full content updates are only necessary for so-called "non-local" changes. Plugins that
+change content at other places than its position on the page or its children, can be
+marked by setting the new :attr:`~cms.plugin_base.CMSPluginBase.is_local` attribute to
+``False``. This will trigger a full content update if the plugin is changed. An example
+of a non-local change is a plugin that adds a title to a table of contents. If changed,
+both the title itself and the table of contents need to be updated.
+
+Less server load
+----------------
+
+Global caching of plugin restrictions improves the server response time by ~100ms after
+changing a plugin.
+
+Plugin restrictions need to be recalculated on every request in edit and structure
+mode, which is of n² complexity (n: number of plugins). While the plugin restrictions
+can be widely customized, the standard implementation respects the
+:setting:`CMS_PLACEHOLDER_CONF` setting, allowing restrictions to depend on template
+and slot names. This release caches these restrictions globally in the plugin pool
+for all plugins that follow the standard implementation, i.e., plugins that do not
+override the ``get_require_parent()``, ``get_parent_classes()``,
+``get_child_class_overrides()``, or ``get_child_classes()`` methods.
+
+Performance: Optimized database access
+======================================
+
+To enhance database performance, one of the key changes is the **merging of the**
+``TreeNode`` **model into the** ``Page`` **model**. This change simplifies database accesses and
+improves performance by reducing the number of joins required for common queries. As a result,
+page-related operations are faster and more efficient. Compatibility shims have been
+added to ensure that custom code accessing the `Page.node` attribute continues to work
+and will reference back to the page itself.
+
+Additionally, this release optimizes the number of queries needed for the **edit and structure
+endpoints** to improve responsiveness and the editor experience. When rendering plugins, django CMS
+first needs to get the plugin tree (``CMSPlugin`` instances) for each placeholder, and then turn
+each of the plugins into its actual class, such as ``Text`` or ``Picture``, by getting the plugin
+models from the database. This process is called downcasting. When downcasting plugins are now
+queried by their concrete model, benefiting plugins that use proxy models, such as
+``djangocms-frontend`` or ``djangocms-cascade``. Downcasting is fully avoided for plugins without
+a model. During downcasting, the cache for parent references is prepopulated with downcasted parent
+plugins, avoiding database hits when plugin templates access ``plugin.parent``. Note that after
+downcasting ``plugin.parent`` now returns a downcasted plugin, not a ``CMSPlugin`` instance.
+
+Plugin renderers now cache their page's template name, necessary to respect the
+:setting:`CMS_PLACEHOLDER_CONF` setting, solving an n+1 issue that led to a page object being
+fetched for each plugin type used. The ``Placeholder`` model's internal code has been simplified
+to reduce the number of database hits. Its manager's ``get_for_obj()`` method now automatically
+prepopulates the cache for the source field of fetched placeholders, solving another n+1 issue
+when accessing ``placeholder.source``.
+
+Security: Improved content security policy support
+==================================================
+
+Earlier versions of django CMS added inline JavaScript to the page in edit mode to
+communicate with the frontend editor. This effectively barred projects from enforcing
+meaningful content security policies. In django CMS 5.0.0, we have removed all inline
+JavaScript from the edit mode (or other places in django CMS core), replacing it with
+text/json objects to communicate with the frontend editor. This allows projects to
+enforce strict Content Security Policies (CSP) without any issues.
+
+For a fully working project, it is also important that other packages used, especially
+plugins, do not rely on inline JavaScript. This change enhances the security
+posture of your django CMS projects by enabling the use of CSP headers to mitigate
+cross-site scripting (XSS) and other code injection attacks.
+
+Use cases: Full Headless support
+================================
+
+Django CMS 5.0.0 is headless-ready, allowing you to use django CMS as a backend
+service to provide content to the frontend technology of your choice. Traditionally,
+django CMS serves the content as HTML pages. In headless mode, django CMS does not
+publish the HTML page tree. Instead, you can retrieve content via an API, such as
+`djangocms-rest <https://github.com/django-cms/djangocms-rest>`_.
+
+To run django CMS in headless mode, remove the catch-all URL pattern from your
+project's `urls.py` file and replace it with an API endpoint. This allows django
+CMS to be fully accessible through the admin interface while serving content
+exclusively through the API.
+
+Additionally, you can continue running a hybrid mode where both HTML pages and API
+content are served.
+
+See :ref:`headless_mode`.
+
+Development: Exception handling
+===============================
+
+Since django CMS 4, exceptions that happen during plugin rendering have been
+caught and displayed a message at the plugin's position. After feedback from
+the community, django CMS 5.0 refactored exception handling.
+
+* Exceptions are now caught on placeholder level.
+
+* In edit mode, a message about the exception is shown for the placeholder. If
+  ``settings.DEBUG == True`` this message includes the full Django trace.
+
+* Editors still can edit plugins causing the exception. It can be edited by
+  double-clicking the error message or through the structure board.
+
+* In preview mode and on site, the placeholder containing the plugin will
+  render empty.
+
+* If :setting:`CMS_CATCH_PLUGIN_500_EXCEPTION` is set to ``False``, trying
+  to view content that raises an exception will trigger a server error
+  (http 500). Preview and edit modes will still work.
+
+
+Minor features
+==============
+
+* Deleting pages or deleting translations now gives a much clearer delete
+  confirmation message. It does not list all objects deleted but summarizes
+  how many pages, translations (counted by ``PageUrl`` objects) and plugins
+  are about to be deleted.
+
+* ``CMS_PLACEHOLDER_CONF`` now allows to add configuration by template name for
+  placeholders that not necessarily are part of a page, but could be part of
+  any model (e.g., an alias). Instead for looking at pages, the placeholder tries
+  to access a ``get_template()`` method on its source model instance to identify
+  the template name its rendered on.
+
+* Due to the faster way of updating content in edit mode, ``<script>`` tags do
+  not need to be marked with classes like ``cms-trigger-event-document-DOMContentLoaded``,
+  ``cms-trigger-event-window-DOMContentLoaded``, or ``cms-trigger-event-window-load``.
+  Each script in the Sekizai ``js`` block is now executed in the order they are
+  defined in the template. After all scripts have been loaded and executed, the
+  document's ``DOMContentLoaded``, the window's ``load`` events are triggered. The
+  ``cms-content-refresh`` jQuery event on the window is also triggered for backwards
+  compatibility.
+
+* Plugins now inherit the ``FrontendEditableMixin``. While plugins always have been
+  frontend editable, this allows for defining parts of the rendered plugin to just
+  edit, say, a subset of fields. Other packages, such as djangocms-text, can use this
+  common endpoint to provide inline editing for selected fields of their plugins.
+
+
+************************************
+Backward incompatible changes in 5.0
+************************************
+
+Merging of Page.node into Page
+==============================
+
+To improve performance and simplify database accesses, the ``TreeNode`` model
+has been merged into the ``Page`` model. This change is backward incompatible
+and will require a database migration.
+
+Compatibility shims have been added to the ``Page`` model to ensure that custom
+code that accesses the ``Page.node`` attribute will continue to work. However,
+this compatibility shim will be removed in django CMS 6.0 release. For now,
+they raise a ``RemovedInDjangoCMS60Warning`` warning.
+
+Most prominent changes to custom code are:
+
+* Pages have a ``site`` field again: ``page.node.site`` becomes ``page.site``
+* ``page.node.path`` becomes ``page.path``
+* ``page.node.depth`` becomes ``page.depth``
+* ``page.node.numchild`` becomes ``page.numchild``
+* ``page.node.parent`` and ``page.page_parent`` become ``page.parent``
+
+Please also check your ``.filter()``, ``.order()``, ``.select_related()``, and
+``.prefetch_related()`` calls to ensure they are still correct:
+``.filter(node__site=site)`` becomes ``.filter(site=site)`` etc.
+
+If you have custom code that accesses the ``Page.node`` attribute, you should
+update it to use the new attributes on the ``Page`` model.
+
+*************
+Miscellaneous
+*************
+
+* The function ``cms.cms_menus.get_visible_nodes`` has been deprecated. For
+  performance reasons, the ``cms_menus`` builds the navigation node list based
+  on page content objects. Use ``cms.cms_menus.get_visible_page_contents``
+  instead.
+
+* The ``cms.test_utils.testcases.CMSTestCase`` class's ``assertWarns`` has been
+  removed since it was an alias of ``CMSTestCase.failUnlessWarns`` and shadows
+  Python's ``assertWarns``. In your test cases, use
+  Python's ``assertWarns`` instead, or use the ``failUnlessWarns`` method
+  of ``CMSTestCase`` which retains the syntax of the original method.
+
+* ``CMSPluginBase.get_require_parent()``, ``CMSPluginBase.get_child_class_overrides()``,
+  ``CMSPluginBase.get_child_plugin_candidates()``, ``CMSPluginBase.get_child_classes()``,
+  ``CMSPluginBase.get_parent_classes()`` by default receive ``None`` for their
+  ``page`` argument.
+
+**************************
+Features deprecated in 5.0
+**************************
+
+* Use of the ``node`` property of the :class:`~cms.models.pagemodel.Page` model
+  is deprecated. Use its attributes on the :class:`~cms.models.pagemodel.Page`
+  model directly instead.
+
+***********************************
+Removal of deprecated functionality
+***********************************
+
+* Built-in alias plugin: The alias plugin has been removed. If you need
+  this functionality, you can use the ``djangocms-alias`` package.
+
+* ``SuperLazyIterator``: This class has been removed. If you need this
+  functionality, you can use the ``django.utils.functional.lazy``.
+
+* ``LazyChoiceField``: This class has been removed. If you need this
+  functionality, you can use the default ``django.forms.fields.ChoiceField`` class.
+
+* ``SlugWidget``: This class has been removed from ``cms.wizard.forms``. If you
+  need this functionality, you can use the ``cms.admin.forms.SlugWidget`` class.
+
+* ``CMSPlugin.get_breadcrumb`` and ``CMSPlugin.get_breadcrumb_json``: These
+  methods have been removed. They are unused, undocumented, and were broken since
+  django CMS 4.0.

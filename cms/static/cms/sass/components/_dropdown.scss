@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .cms-dropdown-caret {
     display: inline-block;
     width: 0;
@@ -217,15 +219,15 @@
 .cms-btn-group {
     > .cms-btn {
         &.cms-btn-action:last-child {
-            border-left: 1px solid darken($color-primary-fallback, 10%);
+            border-left: 1px solid color-mix(in srgb, $color-primary 10%, var(--dca-black));
 
         }
         &.cms-btn-caution:last-child {
-            border-left: 1px solid darken($color-danger, 10%);
+            border-left: 1px solid color-mix(in srgb, $color-primary 10%, var(--dca-black));
         }
     }
 }
 
 &.cms.cms-toolbar-debug .cms-btn-group > .cms-btn.cms-btn-action:last-child {
-    border-left: 1px solid darken($toolbar-debug-bgcolor, 10%) !important;
+    border-left: 1px solid color.adjust($toolbar-debug-bgcolor, $lightness: -10%) !important;
 }

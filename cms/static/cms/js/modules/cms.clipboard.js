@@ -92,7 +92,7 @@ class Clipboard {
 
         try {
             ls.off(storageKey);
-        } catch (e) {}
+        } catch {}
         ls.on(storageKey, value => this._handleExternalUpdate(value));
 
         this._toolbarEvents();

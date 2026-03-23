@@ -6,11 +6,11 @@ from django.utils.translation import gettext_lazy as _
 from cms.utils.urlutils import admin_reverse, urljoin
 
 
-def send_mail(subject, txt_template, to, context=None, html_template=None, fail_silently=True):
+def send_mail(subject, txt_template, to, context=None, html_template=None, fail_silently=True, site=None):
     """
     Multipart message helper with template rendering.
     """
-    site = Site.objects.get_current()
+    site = site or Site.objects.get_current()
 
     context = context or {}
     context.update({
@@ -28,7 +28,7 @@ def send_mail(subject, txt_template, to, context=None, html_template=None, fail_
     message.send(fail_silently=fail_silently)
 
 
-def mail_page_user_change(user, created=False, password=""):
+def mail_page_user_change(user, created=False, password="", site=None):
     """
     Send email notification to given user.
     Used it PageUser profile creation/update.
@@ -41,4 +41,4 @@ def mail_page_user_change(user, created=False, password=""):
         'user': user,
         'password': password or "*" * 8,
         'created': created,
-    }, 'admin/cms/mail/page_user_change.html')
+    }, 'admin/cms/mail/page_user_change.html', site=site)

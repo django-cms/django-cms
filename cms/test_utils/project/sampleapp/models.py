@@ -9,7 +9,7 @@ from cms.utils.placeholder import get_placeholder_from_slot
 
 
 class Category(MP_Node):
-    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
+    parent = models.ForeignKey("self", blank=True, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
     placeholders = PlaceholderRelationField()
 
@@ -21,10 +21,10 @@ class Category(MP_Node):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('category_view', args=[self.pk])
+        return reverse("category_view", args=[self.pk])
 
     class Meta:
-        verbose_name_plural = 'categories'
+        verbose_name_plural = "categories"
 
 
 class Picture(models.Model):
@@ -41,11 +41,14 @@ class SampleAppConfig(models.Model):
 
 
 class SomeEditableModel(models.Model):
-    pass
+    def get_absolute_url(self):
+        return reverse("some_editable_model_view", args=[self.pk])
+
 
 
 class GrouperModel(models.Model):
     category_name = models.CharField(max_length=200, default="")
+    some_field = models.CharField(max_length=200, default="")
 
 
 class GrouperModelContent(models.Model):
@@ -61,7 +64,7 @@ class GrouperModelContent(models.Model):
             ("en", "English"),
             ("de", "German"),
             ("it", "Italian"),
-        )
+        ),
     )
 
     region = models.TextField(
@@ -73,8 +76,51 @@ class GrouperModelContent(models.Model):
             ("europe", "Europe"),
             ("africa", "Africa"),
             ("asia", "Asia"),
-            ("australia", "Australia")
-        )
+            ("australia", "Australia"),
+        ),
+    )
+
+    uptodate = models.BooleanField(
+        verbose_name="Yes/No",
+        default=False,
+    )
+
+    secret_greeting = models.TextField(
+        max_length=100,
+    )
+
+
+class SimpleGrouperModel(models.Model):
+    category_name = models.CharField(max_length=200, default="")
+
+
+class SimpleGrouperModelContent(models.Model):
+    # grouper field name: snake case of GrouperModel
+    simple_grouper_model = models.ForeignKey(
+        SimpleGrouperModel,
+        on_delete=models.CASCADE,
+    )
+
+    language = models.TextField(
+        default="en",
+        choices=(
+            ("en", "English"),
+            ("de", "German"),
+            ("it", "Italian"),
+        ),
+    )
+
+    region = models.TextField(
+        default="world",
+        max_length=10,
+        choices=(
+            ("world", "World"),
+            ("americas", "Americas"),
+            ("europe", "Europe"),
+            ("africa", "Africa"),
+            ("asia", "Asia"),
+            ("australia", "Australia"),
+        ),
     )
 
     uptodate = models.BooleanField(

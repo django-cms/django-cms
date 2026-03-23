@@ -11,6 +11,7 @@ cms/django
 /*env*/
 /*docs/env*/
 /*docs/build*/
+/*docs/autogenerate*/
 *.sqlite
 cms/media/cms_page_media/
 example/run
@@ -47,4 +48,11 @@ cms/tests/frontend/coverage
 node_modules
 screenshots
 .idea
+# Webpack
+webpack-stats.json
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
 .better_test.db
+.vscode/

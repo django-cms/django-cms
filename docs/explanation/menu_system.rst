@@ -239,11 +239,6 @@ The default Modifiers, in the order they are called, are:
   If ``post_cut`` is ``True``, removes all nodes below the appropriate soft root;
   otherwise, returns immediately.
 
-- :py:class:`menus.modifiers.Marker`
-
-  If ``post_cut`` or ``breadcrumb`` is ``True``, returns immediately; otherwise, loops
-  over all nodes; finds selected, marks its ancestors, siblings and children
-
 - :py:class:`menus.modifiers.AuthVisibility`
 
   Removes nodes that require authorization to see

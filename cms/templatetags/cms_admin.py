@@ -11,9 +11,8 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
-from cms.models import Page
-from cms.models.contentmodels import PageContent
-from cms.toolbar.utils import get_object_preview_url
+from cms.models import Page, PageContent, Placeholder
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -60,15 +59,27 @@ class GetPreviewUrl(AsTag):
     def get_value(self, context, page_content):
         if isinstance(page_content, Page):
             # Advanced settings wants a preview for a Page object.
-            page_content = page_content.get_content_obj(
+            page_content = page_content.get_admin_content(
                 language=get_language_from_request(context["request"])
             )
         if not page_content:
             return ""
-        return get_object_preview_url(page_content, language=page_content.language)
+        return self.get_url(page_content, language=page_content.language)
+
+    def get_url(self, object, language):
+        return get_object_preview_url(object, language=language)
+
+
+class GetEditUrl(GetPreviewUrl):
+    """Classy tag that returns the url for editing PageContent in the admin."""
+    name = "get_edit_url"
+
+    def get_url(self, object, language):
+        return get_object_edit_url(object, language=language)
 
 
 register.tag(GetPreviewUrl.name, GetPreviewUrl)
+register.tag(GetEditUrl.name, GetEditUrl)
 
 
 @register.simple_tag(takes_context=True)
@@ -277,3 +288,10 @@ def submit_row_plugin(context):
     if context.get('original') is not None:
         ctx['original'] = context['original']
     return ctx
+
+
+@register.filter
+def placeholder_is_immutable(placeholder, user):
+    if isinstance(placeholder, Placeholder):
+        return not placeholder.check_source(user)
+    return True

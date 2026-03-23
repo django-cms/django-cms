@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='page',
             name='depth',
-            field=models.PositiveIntegerField(default=0),  # TODO: drop depth=0
+            field=models.PositiveIntegerField(default=0),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -57,13 +57,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='page',
             name='path',
-            field=models.CharField(default=None, null=True, max_length=255, unique=True),  # TODO: drop default=None
+            field=models.CharField(default=None, null=True, max_length=255, unique=True),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='page',
             name='site',
-            # TODO: drop default=None
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='djangocms_pages', to='sites.site', verbose_name='site'),
             preserve_default=False,
         ),
@@ -72,7 +71,7 @@ class Migration(migrations.Migration):
             name='is_page_type',
             field=models.BooleanField(default=False, help_text='Mark this page as a page type'),
         ),
-        migrations.RunPython(merge_page_treenode),
+        migrations.RunPython(merge_page_treenode, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
             model_name='page',
             name='depth',

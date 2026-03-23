@@ -6,10 +6,7 @@ from django.utils.safestring import mark_safe
 from sekizai.helpers import get_varname
 
 from cms.utils.encoder import SafeJSONEncoder
-from cms.utils.placeholder import (
-    get_declared_placeholders_for_obj,
-    rescan_placeholders_for_obj,
-)
+from cms.utils.placeholder import rescan_placeholders_for_obj
 
 register = template.Library()
 
@@ -34,17 +31,14 @@ def bool(value):
 def render_cms_structure_js(context, renderer, obj):
     markup_bits = []
     obj_placeholders_by_slot = rescan_placeholders_for_obj(obj)
-    declared_placeholders = get_declared_placeholders_for_obj(obj)
     try:
         lang = context["request"].toolbar.request_language
     except AttributeError:
         lang = None
 
-    for placeholder_node in declared_placeholders:
-        obj_placeholder = obj_placeholders_by_slot.get(placeholder_node.slot)
-
+    for obj_placeholder in obj_placeholders_by_slot.values():
         if obj_placeholder:
-            placeholder_js = renderer.render_placeholder(obj_placeholder, language=lang, page=obj)
+            placeholder_js = renderer.render_placeholder(obj_placeholder, language=lang, obj=obj)
             markup_bits.append(placeholder_js)
 
     return mark_safe('\n'.join(markup_bits))
@@ -53,10 +47,10 @@ def render_cms_structure_js(context, renderer, obj):
 @register.simple_tag(takes_context=True)
 def render_plugin_init_js(context, plugin):
     renderer = context['cms_renderer']
-    plugin_js = renderer.get_plugin_toolbar_js(plugin)
+    plugin_js = renderer.get_plugin_toolbar_js(plugin, obj=plugin.placeholder.source)
     # Add the toolbar javascript for this plugin to the
     # sekizai "js" namespace.
-    context[get_varname()]['js'].append(f'<script data-cms>{plugin_js}</script>')
+    context[get_varname()]['js'].append(plugin_js)
 
 
 @register.tag(name="javascript_string")

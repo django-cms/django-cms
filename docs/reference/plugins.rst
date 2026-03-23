@@ -5,6 +5,7 @@ Plugins
 .. autoclass:: cms.plugin_base.CMSPluginBase
   :members:
 
+
   ..  method:: get_render_template(self, context, instance, placeholder)
 
         If you need to determine the plugin render model at render time
@@ -23,6 +24,14 @@ Plugins
 
         See also: :meth:`render_plugin` , :meth:`render_template`
 
+  .. attribute:: allowed_models
+
+        A list of model identifiers (in the format ``"app_label.modelname"``) that
+        restricts where this plugin can be used. If ``None`` (default), the plugin
+        is available for all models with placeholders.
+
+        See :ref:`plugin-model-restrictions` for details.
+
 
 .. autoclass:: cms.plugin_base.PluginMenuItem
 
@@ -33,9 +42,9 @@ Plugins
   :members:
 
 
-******************************************
+************************
 Plugin utility functions
-******************************************
+************************
 
 .. autofunction:: cms.utils.plugins.assign_plugins
 

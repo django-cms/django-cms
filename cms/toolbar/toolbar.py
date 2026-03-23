@@ -7,7 +7,7 @@ from django.apps import apps
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
-from django.urls import Resolver404, resolve
+from django.urls import NoReverseMatch, Resolver404, resolve
 from django.utils.functional import cached_property
 from django.utils.translation import override as force_language
 
@@ -28,6 +28,7 @@ from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request
+from cms.utils.urlutils import admin_reverse
 
 cms_toolbar_extensions = apps.get_app_config('cms').cms_extension.toolbar_mixins
 
@@ -220,22 +221,28 @@ class CMSToolbarBase(BaseToolbar):
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
-        # Handle showing the toolbar for anonymous users when they supply
-        # the enable toolbar parameter
-        if (anonymous_on and request.user.is_anonymous) and enable_toolbar in self.request.GET:
-            self.show_toolbar = True
-
-        if self.show_toolbar:
-            edit_mode = (
-                self._resolver_match
-                and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
-            )
-            if enable_toolbar in self.request.GET or edit_mode:
+        try:
+            admin_reverse('index')
+            # Handle showing the toolbar for anonymous users when they supply
+            # the enable toolbar parameter
+            if (anonymous_on and request.user.is_anonymous) and enable_toolbar in self.request.GET:
                 self.show_toolbar = True
-            elif disable_toolbar in self.request.GET:
-                self.show_toolbar = False
-            elif self.request.session.get('cms_toolbar_disabled', False):
-                self.show_toolbar = False
+
+            if self.show_toolbar:
+                edit_mode = (
+                    self._resolver_match
+                    and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+                )
+                if enable_toolbar in self.request.GET or edit_mode:
+                    self.show_toolbar = True
+                elif disable_toolbar in self.request.GET:
+                    self.show_toolbar = False
+                elif self.request.session.get('cms_toolbar_disabled', False):
+                    self.show_toolbar = False
+
+        except NoReverseMatch:
+            # No admin on this site - disable toolbar
+            self.show_toolbar = False
 
         # We need to store the current language in case the user's preferred language is different.
         self.toolbar_language = self.request_language
@@ -376,10 +383,34 @@ class CMSToolbarBase(BaseToolbar):
         return item
 
     def set_object(self, obj):
+        """
+        Associates an object with the toolbar.
+
+        Sets the toolbar's object if one has not already been set. This object is typically
+        a Django model instance that the toolbar should operate on, such as a :class:`~cms.models.contentmodels.PageContent` object or any
+        other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
+
+        The object is used by other toolbar methods like
+        ``get_object_edit_url()``, ``get_object_preview_url()``, and
+        ``get_object_structure_url()`` to generate
+        appropriate URLs for the object.
+
+        :param obj: The object to associate with the toolbar
+        :type obj: django.db.models.Model
+        """
         if not self.obj:
             self.obj = obj
 
     def get_object(self):
+        """
+        Returns the object currently associated with the toolbar.
+
+        This returns the object that was previously set using :meth:`set_object`,
+        or ``None`` if no object has been associated with the toolbar.
+
+        :returns: The object associated with the toolbar, or None
+        :rtype: django.db.models.Model or None
+        """
         return self.obj
 
     def get_object_model(self):
@@ -394,17 +425,17 @@ class CMSToolbarBase(BaseToolbar):
 
     def get_object_preview_url(self):
         if self.obj:
-            return get_object_preview_url(self.obj, language=self.request_language)
+            return get_object_preview_url(self.obj, language=self.request_language, params=self.request.GET)
         return ''
 
     def get_object_edit_url(self):
         if self.obj:
-            return get_object_edit_url(self.obj, language=self.request_language)
+            return get_object_edit_url(self.obj, language=self.request_language, params=self.request.GET)
         return ''
 
     def get_object_structure_url(self):
         if self.obj:
-            return get_object_structure_url(self.obj, language=self.request_language)
+            return get_object_structure_url(self.obj, language=self.request_language, params=self.request.GET)
         return ''
 
     def object_is_editable(self, obj=None):
@@ -523,7 +554,6 @@ class CMSToolbarBase(BaseToolbar):
 
         context = {
             'cms_toolbar': self,
-            'object_is_immutable': not self.object_is_editable(),
             'cms_renderer': renderer,
             'cms_edit_url': self.get_object_edit_url(),
             'cms_preview_url': self.get_object_preview_url(),
@@ -565,7 +595,7 @@ class CMSToolbarBase(BaseToolbar):
         return f'{toolbar}\n{rendered_contents}'
 
 
-# Add toolbar mixins from extensions to toolbar
+#: :class:`CMSToolbarBase` including toolbar mixins from extensions to toolbar
 CMSToolbar = type("CMSToolbar", tuple(cms_toolbar_extensions + [CMSToolbarBase]), dict())
 
 

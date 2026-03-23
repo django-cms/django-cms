@@ -36,7 +36,6 @@ def get_local_revision(default=None):
     if use_threadlocal:
         return getattr(_urlconf_revision_threadlocal, "value", default)
     else:
-        global _urlconf_revision
         return _urlconf_revision.get('urlconf_revision', default)
 
 
@@ -48,7 +47,6 @@ def set_local_revision(revision):
             if hasattr(_urlconf_revision_threadlocal, "value"):
                 del _urlconf_revision_threadlocal.value
     else:
-        global _urlconf_revision
         _urlconf_revision['urlconf_revision'] = revision
 
 

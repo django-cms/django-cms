@@ -106,15 +106,15 @@ Branches
 We maintain a number of branches on
 `our GitHub repository <https://github.com/django-cms/django-cms>`_:
 
-``develop-4``
+``-main``
     The default target branch for on-going development and new pull requests.
 
 ``release/x.y.z`` are the latest released versions of django CMS. Commits
-    are cherry-picked from ``develop-4`` and merged into ``release/x.y.z``
+    are cherry-picked from ``main`` and merged into ``release/x.y.z``
     when suitable. We **officially support** the latest, highest released version
     and the latest LTS.
 
-Please always open PR's against ``develop-4`` and indicate that they should be
+Please always open PR's against ``main`` and indicate that they should be
 backported to the latest LTS release when necessary. Older branches are not
 supported any longer.
 

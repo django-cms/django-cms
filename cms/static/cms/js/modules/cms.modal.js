@@ -7,7 +7,7 @@ import keyboard from './keyboard';
 
 import $ from 'jquery';
 import './jquery.transition';
-import './jquery.trap';
+import { trap, untrap } from './trap';
 
 import { Helpers, KEYS } from './cms.base';
 import { showLoader, hideLoader } from './loader';
@@ -226,8 +226,6 @@ class Modal {
         );
 
         keyboard.setContext('modal');
-        this.ui.modal.trap();
-
         return this;
     }
 
@@ -388,16 +386,15 @@ class Modal {
         if (this.options.onClose) {
             Helpers.reloadBrowser(this.options.onClose, false);
         }
+        untrap(this.ui.body[0]);
+        keyboard.setContext(previousKeyboardContext);
+        try {
+            previouslyFocusedElement.focus();
+        } catch {}
 
         this._hide({
             duration: this.options.modalDuration / 2
         });
-
-        this.ui.modal.untrap();
-        keyboard.setContext(previousKeyboardContext);
-        try {
-            previouslyFocusedElement.focus();
-        } catch (e) {}
     }
 
     /**
@@ -542,8 +539,10 @@ class Modal {
                     left: left,
                     top: top
                 });
-            })
-            .attr('data-touch-action', 'none');
+            });
+
+        // Disable touch actions during modal move
+        document.body.style.touchAction = 'none';
     }
 
     /**
@@ -554,7 +553,9 @@ class Modal {
      */
     _stopMove() {
         this.ui.shim.hide();
-        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp).removeAttr('data-touch-action');
+        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp);
+        // Re-enable touch actions
+        document.body.style.touchAction = '';
     }
 
     /**
@@ -613,8 +614,10 @@ class Modal {
                     left: left,
                     top: top
                 });
-            })
-            .attr('data-touch-action', 'none');
+            });
+
+        // Disable touch actions during modal resize
+        document.body.style.touchAction = 'none';
     }
 
     /**
@@ -625,7 +628,9 @@ class Modal {
      */
     _stopResize() {
         this.ui.shim.hide();
-        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp).removeAttr('data-touch-action');
+        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp);
+        // Re-enable touch actions
+        document.body.style.touchAction = '';
     }
 
     /**
@@ -751,7 +756,7 @@ class Modal {
 
             var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
-            // eslint-disable-next-line complexity
+
             el.on(that.click + ' ' + that.touchEnd, function(e) {
                 e.preventDefault();
 
@@ -772,49 +777,34 @@ class Modal {
                         that.ui.modal.find('.cms-modal-frame iframe').hide();
                         // page has been saved or deleted, run checkup
                         that.saved = true;
-                        if (item.hasClass('deletelink')) {
-                            that.justDeleted = true;
-
-                            var action = item.closest('form').prop('action');
-
-                            // in case action is an input (see https://github.com/jquery/jquery/issues/3691)
-                            // it's definitely not a plugin/placeholder deletion
-                            if (typeof action === 'string' && action.match(/delete-plugin/)) {
-                                that.justDeletedPlugin = /delete-plugin\/(\d+)\//gi.exec(action)[1];
-                            }
-                            if (typeof action === 'string' && action.match(/clear-placeholder/)) {
-                                that.justDeletedPlaceholder = /clear-placeholder\/(\d+)\//gi.exec(action)[1];
-                            }
-                        }
                     }
                 }
 
                 if (item.is('input') || item.is('button')) {
                     that.ui.modalBody.addClass('cms-loader');
-                    var frm = item.closest('form');
+                    var frm = item[0].form;
 
                     // In Firefox with 1Password extension installed (FF 45 1password 4.5.6 at least)
                     // the item[0].click() doesn't work, which notably breaks
                     // deletion of the plugin. Workaround is that if the clicked button
                     // is the only button in the form - submit a form, otherwise
                     // click on the button
-                    if (frm.find('button, input[type="button"], input[type="submit"]').length > 1) {
+                    if (frm.querySelectorAll('button, input[type="button"], input[type="submit"]').length > 1) {
                         // we need to use native `.click()` event specifically
                         // as we are inside an iframe and magic is happening
                         item[0].click();
                     } else {
                         // have to dispatch native submit event so all the submit handlers
                         // can be fired, see #5590
-                        var evt = document.createEvent('HTMLEvents');
+                        var evt = new CustomEvent('submit', { bubbles: false, cancelable: true });
 
-                        evt.initEvent('submit', false, true);
-                        if (frm[0].dispatchEvent(evt)) {
+                        if (frm.dispatchEvent(evt)) {
                             // triggering submit event in webkit based browsers won't
                             // actually submit the form, while in Gecko-based ones it
                             // will and calling frm.submit() would throw NS_ERROR_UNEXPECTED
                             try {
-                                frm[0].submit();
-                            } catch (err) {}
+                                frm.submit();
+                            } catch {}
                         }
                     }
                 }
@@ -890,18 +880,18 @@ class Modal {
         // eslint-disable-next-line complexity
         iframe.on('load', function() {
             clearTimeout(loaderTimeout);
-            var messages;
-            var messageList;
-            var contents;
-            var body;
-            var innerTitle;
-            var bc;
+            let messages;
+            let messageList;
+            let contents;
+            let body;
+            let innerTitle;
+            let bc;
 
             // check if iframe can be accessed
             try {
                 contents = iframe.contents();
                 body = contents.find('body');
-            } catch (error) {
+            } catch {
                 CMS.API.Messages.open({
                     message: '<strong>' + CMS.config.lang.errorLoadingEditForm + '</strong>',
                     error: true,
@@ -911,6 +901,9 @@ class Modal {
                 return;
             }
 
+            // trap focus within modal
+            trap(body[0]);
+
             // check if we are redirected - should only happen after successful form submission
             const redirect = body.find('a.cms-view-new-object').attr('href');
 
@@ -919,8 +912,10 @@ class Modal {
                 return true;
             }
 
-            // If the resopnse contains the data bridge, the form was saved successfully
-            that.saved = that.saved || body.find('script#data-bridge').length;
+            // If the response contains the close-frame (and potentially the data bridge),
+            // the form was saved successfully
+            that.saved = that.saved || body.hasClass('cms-close-frame')
+                || body.find('script#django-admin-popup-response-constants').length > 0;
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
@@ -954,7 +949,8 @@ class Modal {
                 });
             }
 
-            var saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length);
+            let saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length) ||
+                body.find('script#django-admin-popup-response-constants').length > 0;
 
             // in case message didn't appear, assume that admin page is actually a success
             // istanbul ignore if
@@ -1019,22 +1015,25 @@ class Modal {
                         true
                     );
                 } else {
-                    setTimeout(function() {
-                        if (that.justDeleted && (that.justDeletedPlugin || that.justDeletedPlaceholder)) {
-                            CMS.API.StructureBoard.invalidateState(
-                                that.justDeletedPlaceholder ? 'CLEAR_PLACEHOLDER' : 'DELETE',
-                                {
-                                    plugin_id: that.justDeletedPlugin,
-                                    placeholder_id: that.justDeletedPlaceholder,
-                                    deleted: true
-                                }
-                            );
+                    // hello ckeditor
+                    Helpers.removeEventListener('modal-close.text-plugin');
+                    that.close();
+                    // Serve the data bridge:
+                    // We have a special case here cause the CMS namespace
+                    // can be either inside the current window or the parent
+                    const dataBridge = body[0].querySelector('script#data-bridge');
+
+                    if (dataBridge) {
+                        // the dataBridge is used to access plugin information from different resources
+                        // Do NOT move this!!!
+                        try {
+                            CMS.API.Helpers.dataBridge = JSON.parse(dataBridge.textContent);
+                            CMS.API.Helpers.onPluginSave();
+                        } catch {
+                            // istanbul ignore next
+                            Helpers.reloadBrowser();
                         }
-                        // hello ckeditor
-                        Helpers.removeEventListener('modal-close.text-plugin');
-                        that.close();
-                    // must be more than 100ms
-                    }, 150); // eslint-disable-line
+                    }
                 }
             } else {
                 if (that.ui.modal.hasClass('cms-modal-open')) {
@@ -1075,11 +1074,6 @@ class Modal {
                     }
                 });
 
-                // figure out if .object-tools is available
-                if (contents.find('.object-tools').length) {
-                    contents.find('#content').css('padding-top', 38); // eslint-disable-line
-                }
-
                 // this is required for IE11. we assume that when the modal is opened the user is going to interact
                 // with it. if we don't focus the body directly the next time the user clicks on a field inside
                 // the iframe the focus will be stolen by body thus requiring two clicks. this immediately focuses the
@@ -1093,7 +1087,7 @@ class Modal {
                         return;
                     }
                     iframe.trigger('focus');
-                }, 0); // eslint-disable-line
+                }, 0);
             }
 
             that._attachContentPreservingHandlers(iframe);
@@ -1190,6 +1184,7 @@ class Modal {
         this.ui.frame.empty().append(opts.html);
         this.ui.titlePrefix.text(opts.title || '');
         this.ui.titleSuffix.text(opts.subtitle || '');
+        trap(this.ui.frame[0]);
     }
 
     /**

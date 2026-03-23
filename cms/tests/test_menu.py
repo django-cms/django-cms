@@ -1,6 +1,5 @@
 import copy
 
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
@@ -32,8 +31,8 @@ from cms.test_utils.project.sampleapp.cms_menus import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_default_language_for_site
 from menus.base import NavigationNode
 from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
 from menus.models import CacheKey
@@ -60,7 +59,7 @@ class BaseMenuTest(CMSTestCase):
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {"CMSMenu": self.old_menu["CMSMenu"]}
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         activate("en")
 
     def tearDown(self):
@@ -225,6 +224,16 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         with self.settings(DEBUG=True, TEMPLATE_DEBUG=True):
             tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
             self.assertRaises(TemplateSyntaxError, tpl.render, context)
+
+    def test_show_menu_cut_inactive(self):
+        root = self.get_page(2)
+        context = self.get_context(page=root)
+        tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(len(nodes[0].children), 1)
+        self.assertEqual(len(nodes[1].children), 0)
 
     def test_show_submenu_nephews(self):
         page_2 = self.get_page(2)
@@ -541,7 +550,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(len(node.children), 0)
 
     def test_only_level_one(self):
-        site = get_current_site()
+        site = Site.objects.get_current()
         context = self.get_context()
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
@@ -810,7 +819,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page4 = self.get_page(4)
         page4.update_translations(in_navigation=True)
         page4.save()
-        menu_pool.clear(settings.SITE_ID)
+        menu_pool.clear(Site.objects.get_current().pk)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
@@ -1173,6 +1182,30 @@ class MenuTests(BaseMenuTest):
             nodes = context["children"]
             self.assertEqual(len(nodes), 0)
 
+    def test_menu_renderer_language_code_handling(self):
+        """
+        Tests that MenuRenderer correctly handles language code determination:
+        1. Uses request.LANGUAGE_CODE if available
+        2. Falls back to site's default language if LANGUAGE_CODE not set
+        """
+        site = Site.objects.get_current()
+
+        # Test with LANGUAGE_CODE set in request
+        request = self.get_request("/")
+        request.LANGUAGE_CODE = "fr"  # Set a specific language code
+        renderer = menu_pool.get_renderer(request)
+        self.assertEqual(renderer.request_language, "fr")
+
+        # Test fallback when LANGUAGE_CODE not set
+        request = self.get_request("/")
+        # Ensure request has no LANGUAGE_CODE
+        if hasattr(request, "LANGUAGE_CODE"):
+            delattr(request, "LANGUAGE_CODE")
+        renderer = menu_pool.get_renderer(request)
+        # Should fall back to site's default language
+        expected_language = get_default_language_for_site(site.pk)
+        self.assertEqual(renderer.request_language, expected_language)
+
 
 @override_settings(CMS_PERMISSION=False)
 class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
@@ -1216,7 +1249,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         """
         msg = f"root nodes: {len(a)!r} != {len(b)!r} with {a!r}, {b!r}"
         self.assertEqual(len(a), len(b), msg)
-        for n1, n2 in zip(a, b):
+        for n1, n2 in zip(a, b, strict=False):
             for attr in attrs:
                 a1 = getattr(n1, attr)
                 a2 = getattr(n2, attr)
@@ -1615,7 +1648,7 @@ class ViewPermissionMenuTests(CMSTestCase):
         self.page = create_page("page", "nav_playground.html", "en")
         self.pages = [self.page]
         self.user = self.get_standard_user()
-        self.site = get_current_site()
+        self.site = Site.objects.get_current()
 
     def get_request(self, user=None):
         attrs = {
@@ -1779,7 +1812,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         c3 = create_page("c3", template, "en", parent=b2, **kw)
         c4 = create_page("c4", template, "en", parent=b2, **kw)
         self.pages = [a, b1, c1, c2, b2, c3, c4]  # tree order
-        self.site = get_current_site()
+        self.site = Site.objects.get_current()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
         self.other = self._create_user("other", is_staff=False, is_superuser=False)

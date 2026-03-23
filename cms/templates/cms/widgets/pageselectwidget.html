@@ -1,2 +1,4 @@
 {% include 'django/forms/widgets/multiwidget.html' %}
-{{ widget.script_init|safe }}
+<div data-cms-widget-pageselect="true" hidden>
+    {{ widget.script_data|json_script }}
+</div>

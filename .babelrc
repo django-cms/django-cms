@@ -1,19 +1,23 @@
 {
     "presets": [
-        ["env", {
+        ["@babel/preset-env", {
             "modules": false
         }]
     ],
-    "plugins": ["transform-runtime"],
+    "plugins": ["@babel/plugin-transform-runtime"],
     "env": {
-        "production": {
-            "plugins": [
-                "lodash"
-            ]
-        },
+        "production": {},
         "test": {
+            "presets": [
+                ["@babel/preset-env", {
+                    "loose": true
+                }]
+            ],
             "plugins": [
-                "rewire"
+                "rewire",
+                ["babel-plugin-istanbul", {
+                    "exclude": ["**/*.spec.js", "**/libs/**", "**/addons/**"]
+                }]
             ]
         }
     }

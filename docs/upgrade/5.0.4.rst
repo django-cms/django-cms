@@ -1,0 +1,69 @@
+.. _upgrade-to-5.0.4:
+
+###################
+5.0.4 release notes
+###################
+
+*October 3, 2025*
+
+Welcome to django CMS 5.0.4!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
+features.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, and 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.0.4
+***********************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.3 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+.. warning::
+
+    Since the migrations merge the ``TreeNode`` and ``Page`` models, you should run the
+    migration in a test environment first to ensure that the migration runs
+    successfully.
+
+
+*******************
+What's new in 5.0.4
+*******************
+
+Bug Fixes:
+----------
+
+* Wrong placeholders rendered when using apphooks with own placeholders (#8343) (#8348) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 1 pull request, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!

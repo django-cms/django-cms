@@ -1,7 +1,14 @@
-import keyboard from '../keyboard';
-import $ from 'jquery';
+import { trap, untrap } from '../trap.js';
+import keyboard from '../keyboard.js';
 
-import '../jquery.trap';
+
+const queryAll = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+const query = (selector, root = document) => root?.querySelector(selector);
+const triggerPointerUp = el => { if (el) el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true })); };
+const triggerClick = el => { if (el) el.click(); };
+const setTabIndex = (elements, value) => elements.forEach(el => el.setAttribute('tabindex', value));
+const removeTabIndex = elements => elements.forEach(el => el.removeAttribute('tabindex'));
+const focusElement = el => { if (el) el.focus(); };
 
 /**
  * Binds shortcuts:
@@ -17,46 +24,48 @@ import '../jquery.trap';
 var bindPlaceholderKeys = function () {
     keyboard.setContext('placeholders');
     keyboard.bind('escape', function () {
-        $('.cms-structure .cms-dragarea').removeAttr('tabindex');
-        $('.cms-structure-content').untrap();
-        $('html').focus();
+        queryAll('.cms-structure .cms-dragarea').forEach(el => el.removeAttribute('tabindex'));
+        untrap(query('.cms-structure-content'));
+        focusElement(document.documentElement);
         keyboard.setContext('cms');
     });
 
     keyboard.bind('enter', function () {
         keyboard.setContext('plugins');
-        var area = $('.cms-dragarea:focus');
-        var plugins = area.find('.cms-dragitem');
-
-        if (!plugins.length) {
-            return;
-        }
-
-        plugins.attr('tabindex', '0');
-        area.find('.cms-dragitem:first').focus();
-        area.trap();
+        const area = document.activeElement.closest('.cms-dragarea');
+        if (!area) return;
+        const plugins = queryAll('.cms-dragitem', area);
+        if (!plugins.length) return;
+        setTabIndex(plugins, '0');
+        focusElement(plugins[0]);
+        trap(area);
         keyboard.setContext('plugins');
     });
 
     keyboard.bind(['+', 'a'], function () {
-        var area = $('.cms-dragarea:focus');
-
-        area.find('.cms-submenu-add:first').trigger('pointerup');
+        const area = document.activeElement.closest('.cms-dragarea');
+        if (!area) return;
+        const addBtn = query('.cms-submenu-add', area);
+        triggerPointerUp(addBtn);
     });
 
     keyboard.bind('x', function () {
-        var area = $('.cms-dragarea:focus');
-
-        area.find('.cms-dragbar-toggler a:visible').trigger('click');
+        const area = document.activeElement.closest('.cms-dragarea');
+        if (!area) return;
+        const toggler = query('.cms-dragbar-toggler a', area);
+        triggerClick(toggler);
     });
 
     keyboard.bind(['!', 's'], function () {
-        var area = $('.cms-dragarea:focus');
-
-        area.find('.cms-submenu-settings:first').trigger('pointerup');
+        const area = document.activeElement.closest('.cms-dragarea');
+        if (!area) return;
+        const settingsBtn = query('.cms-submenu-settings', area);
+        triggerPointerUp(settingsBtn);
         keyboard.setContext('placeholder-actions');
-        area.find('.cms-submenu-item a:first').focus();
-        area.find('.cms-dropdown-inner').trap();
+        const submenuItem = query('.cms-submenu-item a', area);
+        focusElement(submenuItem);
+        const dropdownInner = query('.cms-dropdown-inner', area);
+        trap(dropdownInner);
     });
 };
 
@@ -71,12 +80,13 @@ var bindPlaceholderKeys = function () {
 var bindPlaceholderActionKeys = function () {
     keyboard.setContext('placeholder-actions');
     keyboard.bind('escape', function () {
-        var dropdown = $('.cms-dropdown-inner:visible');
-        var area = dropdown.closest('.cms-dragarea');
-
-        area.find('.cms-submenu-settings:first').trigger('pointerup');
-        dropdown.untrap();
-        area.focus();
+        const dropdown = query('.cms-dropdown-inner');
+        if (!dropdown) return;
+        const area = dropdown.closest('.cms-dragarea');
+        const settingsBtn = query('.cms-submenu-settings', area);
+        // Helper functions for DOM operations
+        untrap(dropdown);
+        focusElement(area);
         keyboard.setContext('placeholders');
     });
 };
@@ -95,37 +105,43 @@ var bindPlaceholderActionKeys = function () {
 var bindPluginKeys = function () {
     keyboard.setContext('plugins');
     keyboard.bind('escape', function () {
-        var plugin = $('.cms-dragitem:focus');
-        var area = plugin.closest('.cms-dragarea');
-
-        $('.cms-dragitem').removeAttr('tabindex');
-        area.untrap();
-        area.focus();
+        const plugin = document.activeElement.closest('.cms-dragitem');
+        if (!plugin) return;
+        const area = plugin.closest('.cms-dragarea');
+        removeTabIndex(queryAll('.cms-dragitem'));
+        untrap(area);
+        focusElement(area);
         keyboard.setContext('placeholders');
     });
 
     keyboard.bind('e', function () {
-        var plugin = $('.cms-dragitem:focus');
-
-        plugin.find('.cms-submenu-edit').trigger('click');
+        const plugin = document.activeElement.closest('.cms-dragitem');
+        if (!plugin) return;
+        const editBtn = query('.cms-submenu-edit', plugin);
+        triggerClick(editBtn);
     });
     keyboard.bind(['+', 'a'], function () {
-        var plugin = $('.cms-dragitem:focus');
-
-        plugin.find('.cms-submenu-add:first').trigger('pointerup');
+        const plugin = document.activeElement.closest('.cms-dragitem');
+        if (!plugin) return;
+        const addBtn = query('.cms-submenu-add', plugin);
+        triggerPointerUp(addBtn);
     });
     keyboard.bind('x', function () {
-        var plugin = $('.cms-dragitem:focus');
-
-        plugin.find('.cms-dragitem-text').trigger('click');
+        const plugin = document.activeElement.closest('.cms-dragitem');
+        if (!plugin) return;
+        const textBtn = query('.cms-dragitem-text', plugin);
+        triggerClick(textBtn);
     });
     keyboard.bind(['!', 's'], function () {
-        var plugin = $('.cms-dragitem:focus');
-
-        plugin.find('.cms-submenu-settings:first').trigger('pointerup');
+        const plugin = document.activeElement.closest('.cms-dragitem');
+        if (!plugin) return;
+        const settingsBtn = query('.cms-submenu-settings', plugin);
+        triggerPointerUp(settingsBtn);
         keyboard.setContext('plugin-actions');
-        plugin.find('.cms-submenu-item a:first').focus();
-        plugin.find('.cms-dropdown-inner').trap();
+        const submenuItem = query('.cms-submenu-item a', plugin);
+        focusElement(submenuItem);
+        const dropdownInner = query('.cms-dropdown-inner', plugin);
+        trap(dropdownInner);
     });
 };
 
@@ -139,12 +155,13 @@ var bindPluginKeys = function () {
 var bindPluginActionKeys = function () {
     keyboard.setContext('plugin-actions');
     keyboard.bind('escape', function () {
-        var dropdown = $('.cms-dropdown-inner:visible');
-        var plugin = dropdown.closest('.cms-dragitem');
-
-        plugin.find('.cms-submenu-settings:first').trigger('pointerup');
-        dropdown.untrap();
-        plugin.focus();
+        const dropdown = query('.cms-dropdown-inner');
+        if (!dropdown) return;
+        const plugin = dropdown.closest('.cms-dragitem');
+        const settingsBtn = query('.cms-submenu-settings', plugin);
+        triggerPointerUp(settingsBtn);
+        untrap(dropdown);
+        focusElement(plugin);
         keyboard.setContext('plugins');
     });
 };
@@ -157,7 +174,7 @@ var bindPluginActionKeys = function () {
  * @public
  */
 export default function initPlaceholders() {
-    var data = CMS.config.lang.shortcutAreas[1].shortcuts.placeholders;
+    const data = CMS.config.lang.shortcutAreas[1].shortcuts.placeholders;
 
     bindPlaceholderKeys();
     bindPlaceholderActionKeys();
@@ -170,10 +187,10 @@ export default function initPlaceholders() {
         if (CMS.settings.mode !== 'structure') {
             return;
         }
-
-        $('.cms-structure .cms-dragarea').attr('tabindex', '0');
-        $('.cms-structure .cms-dragarea:first').focus();
-        $('.cms-structure-content').trap();
+        const dragareas = queryAll('.cms-structure .cms-dragarea');
+        setTabIndex(dragareas, '0');
+        focusElement(dragareas[0]);
+        trap(query('.cms-structure-content'));
         keyboard.setContext('placeholders');
     });
 }

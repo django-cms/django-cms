@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 
 from cms.toolbar.utils import get_object_edit_url, get_object_for_language, get_object_preview_url
-from cms.utils import get_current_site, get_language_from_request
+from cms.utils import get_language_from_request
 from cms.utils.i18n import (
     force_language,
     get_default_language_for_site,
@@ -212,11 +212,11 @@ class DefaultLanguageChanger:
         if url:
             return url
 
-        site = get_current_site()
+        site_id = page.site_id
 
-        if is_valid_site_language(lang, site_id=site.pk):
+        if is_valid_site_language(lang, site_id=site_id):
             _valid_language = True
-            _hide_untranslated = hide_untranslated(lang, site.pk)
+            _hide_untranslated = hide_untranslated(lang, site_id)
         else:
             _valid_language = False
             _hide_untranslated = False
@@ -224,7 +224,7 @@ class DefaultLanguageChanger:
         if _hide_untranslated and settings.USE_I18N:
             return '/%s/' % lang
 
-        default_language = get_default_language_for_site(site.pk)
+        default_language = get_default_language_for_site(site_id)
 
         if not _valid_language:
             # The request language is not configured for the current site.
@@ -234,7 +234,7 @@ class DefaultLanguageChanger:
                 return url
 
         if _valid_language:
-            fallbacks = get_fallback_languages(lang, site_id=site.pk) or []
+            fallbacks = get_fallback_languages(lang, site_id=site_id) or []
             fallbacks = [_lang for _lang in fallbacks if _lang in page.get_languages()]
         else:
             fallbacks = []
@@ -267,29 +267,29 @@ class DefaultLanguageChanger:
                 view = None
         if (
             hasattr(self.request, 'toolbar') and
-            self.request.toolbar.obj and
-            hasattr(self.request.toolbar.obj, "get_absolute_url")
+            self.request.toolbar.obj
         ):
             # Toolbar object
+            obj = self.request.toolbar.obj
             if self.request.toolbar.edit_mode_active:
-                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                lang_obj = get_object_for_language(obj, lang, latest=True)
                 return '' if lang_obj is None else get_object_edit_url(lang_obj, language=lang)
             if self.request.toolbar.preview_mode_active:
-                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                lang_obj = get_object_for_language(obj, lang, latest=True)
                 return '' if lang_obj is None else get_object_preview_url(lang_obj, language=lang)
-            try:
-                # First see, if object can get language-specific absolute urls (like PageContent)
-                return self.request.toolbar.obj.get_absolute_url(language=lang)
-            except (TypeError, NoReverseMatch):
-                # Object's get_absolute_url does not accept language parameter, set the language
-                with force_language(lang):
-                    try:
-                        url = self.request.toolbar.obj.get_absolute_url()
-                    except NoReverseMatch:
-                        url = None
-                if url:
-                    return url
-        elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
+            if hasattr(obj, 'get_absolute_url'):
+                try:
+                    # First see, if object can get language-specific absolute urls (like PageContent)
+                    return obj.get_absolute_url(language=lang)
+                except (TypeError, NoReverseMatch):
+                    # Object's get_absolute_url does not accept language parameter, set the language
+                    with force_language(lang):
+                        try:
+                            return obj.get_absolute_url()
+                        except NoReverseMatch:
+                            # Fall back to view
+                            pass
+        if view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
                 view_name = f"{view.namespace}:{view_name}"

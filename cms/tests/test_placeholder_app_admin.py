@@ -1,10 +1,10 @@
 from django.forms.models import model_to_dict
-from django.test.utils import override_settings
 
 from cms.api import add_plugin
 from cms.models import CMSPlugin, Placeholder, UserSettings
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 
 
 class AppAdminTestCase(CMSTestCase):
@@ -83,7 +83,7 @@ class AppAdminTest(AppAdminTestCase):
         endpoint = self._get_add_plugin_uri()
 
         with self.login_user_context(superuser):
-            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
@@ -110,7 +110,7 @@ class AppAdminTest(AppAdminTestCase):
         plugin_3 = self._add_plugin_to_placeholder(source_placeholder)
 
         with self.login_user_context(superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
@@ -140,7 +140,7 @@ class AppAdminTest(AppAdminTestCase):
         plugin_2 = self._add_plugin_to_placeholder(source_placeholder)
 
         with self.login_user_context(superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
@@ -159,7 +159,7 @@ class AppAdminTest(AppAdminTestCase):
         endpoint = self._get_add_plugin_uri('StylePlugin')
 
         with self.login_user_context(superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = {'tag_type': 'div'}
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
@@ -184,7 +184,7 @@ class AppAdminTest(AppAdminTestCase):
         plugin_2 = self._add_plugin_to_placeholder(source_placeholder, 'StylePlugin')
 
         with self.login_user_context(superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
@@ -207,7 +207,7 @@ class AppAdminTest(AppAdminTestCase):
         plugin_1 = self._add_plugin_to_placeholder(source_placeholder, 'StylePlugin')
 
         with self.login_user_context(superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
@@ -347,7 +347,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
             data = {'post': True}
 
             response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 302)
+            self.assertContains(response, '<div class="success"></div>')
             self.assertFalse(CMSPlugin.objects.filter(pk=plugin.pk).exists())
 
     def test_user_cant_delete_plugin(self):
@@ -536,7 +536,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, {'test': 0})
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
 
     def test_user_cant_clear_empty_placeholder(self):
         """
@@ -572,7 +572,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, {'test': 0})
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
             self.assertEqual(placeholder.get_plugins('en').count(), 0)
 
     def test_user_cant_clear_non_empty_placeholder(self):

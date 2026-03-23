@@ -62,9 +62,13 @@ EXPIRE_NOW = 0
 #: max caching should only be up to one year.
 MAX_EXPIRATION_TTL = 365 * 24 * 3600
 
-PLUGIN_TOOLBAR_JS = "CMS._plugins.push([\"cms-plugin-%(pk)s\", %(config)s]);\n"
 
-PLACEHOLDER_TOOLBAR_JS = "CMS._plugins.push([\"cms-placeholder-%(pk)s\", %(config)s]);"
+def _get_toolbar_js(plugin_type: str) -> str:
+    return f'<script data-cms-{plugin_type} id="cms-{plugin_type}-%(pk)s" type="application/json">%(config)s</script>'
+
+
+PLUGIN_TOOLBAR_JS = _get_toolbar_js("plugin")
+PLACEHOLDER_TOOLBAR_JS = _get_toolbar_js("placeholder")
 
 # In the permissions system we use user levels to determine
 # the depth in which the user has permissions.
@@ -80,3 +84,7 @@ SCRIPT_USERNAME = 'script'
 CMS_CONFIG_NAME = 'cms_config'
 
 MODAL_HTML_REDIRECT = '<body><a class="cms-view-new-object" target="_top" href="{url}">Redirecting...</a></body>'
+
+#: Default chunk_size for QuerySet.iterator() calls on plugin querysets.
+#: Required since Django 5.0 when prefetch_related is applied.
+PLUGIN_ITERATOR_CHUNK_SIZE = 2000

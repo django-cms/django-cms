@@ -9,6 +9,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.translation import get_language, gettext
 
+from cms.utils import get_current_site
 from cms.utils.i18n import (
     force_language,
     get_language_list,
@@ -32,7 +33,7 @@ def cut_after(node, levels, removed=None):
     if removed is not None:
         raise TypeError("menus.template_tags.cut_after() does not accept 'removed' list argument")
 
-    if levels == 0:
+    if levels <= 0:
         node.children = []
     else:
         for child in node.children:
@@ -385,18 +386,22 @@ class LanguageChooser(InclusionTag):
             return {'template': 'cms/content.html'}
         marker = MARKERS[i18n_mode]
         current_lang = get_language()
-        site = Site.objects.get_current()
         request = context['request']
+        page = getattr(request, 'current_page', None)
+        if page:
+            site_id = page.site_id
+        else:
+            site_id = get_current_site(request).pk
 
         if request.user.is_staff:
-            languages = get_language_list(site_id=site.pk)
+            languages = get_language_list(site_id=site_id)
         else:
-            languages = get_public_languages(site_id=site.pk)
+            languages = get_public_languages(site_id=site_id)
 
         languages_info = []
 
         for language in languages:
-            obj = get_language_object(language, site_id=site.pk)
+            obj = get_language_object(language, site_id=site_id)
             languages_info.append((obj['code'], marker(obj['name'], obj['code'])))
 
         context['languages'] = languages_info

@@ -1,10 +1,10 @@
 (function ($) {
     $(function() {
         function replaceQueryParam(param, newval, search) {
-            var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
-            var query = search.replace(regex, "$1").replace(/&$/, '');
+            var regex = new RegExp('([?;&])' + param + '[^&;]*[;&]?');
+            var query = search.replace(regex, '$1').replace(/&$/, '');
 
-            return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
+            return (query.length > 2 ? query + '&' : '?') + (newval ? param + '=' + newval : '');
         }
 
         $('.js-language-selector').change(function(event) {
@@ -19,8 +19,8 @@
         $('.js-language-tabs').each(function (i, e) {
             var element = $(e);
 
-            element.data('dirty', element.parents("#content-main").find(".errors, .errorlist").length > 0);
-            element.parents("#content-main").find('form input').change(function () {
+            element.data('dirty', element.parents('#content-main').find('.errors, .errorlist').length > 0);
+            element.parents('#content-main').find('form input').change(function () {
                 element.data('dirty', true);
             });
             element.find('.language_button').click(function(e) {

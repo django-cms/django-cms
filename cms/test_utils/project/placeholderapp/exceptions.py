@@ -1,5 +1,3 @@
-
-
 class PlaceholderHookException(Exception):
     """
     Simple exception to signal to the tests that a placeholder

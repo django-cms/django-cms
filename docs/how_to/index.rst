@@ -36,7 +36,7 @@ Creating new functionality
     Customise the CMS menus <14-menus>
     Create content creation wizards <15-wizards>
     Create admin for grouper models <16-grouper-admin>
-    Extend Page & Title models <18-extending_page_contents>
+    Extend Page & Page Content models <18-extending_page_contents>
     Test your extensions <19-testing>
 
 Sharing functionality

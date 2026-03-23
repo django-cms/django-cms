@@ -1,4 +1,3 @@
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 
@@ -15,6 +14,14 @@ def get_page(request):
     return request._current_page_cache
 
 
-class CurrentPageMiddleware(MiddlewareMixin):
-    def process_request(self, request):
+class CurrentPageMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         request.current_page = SimpleLazyObject(lambda: get_page(request))
+        return self.get_response(request)
+
+    async def __acall__(self, request):
+        request.current_page = SimpleLazyObject(lambda: get_page(request))
+        return await self.get_response(request)

@@ -1,0 +1,58 @@
+.. _upgrade-to-4.1.5:
+
+*******************
+4.1.5 release notes
+*******************
+
+*April 4, 2025*
+
+.. warning:: Upgrading from previous versions
+
+    django CMS 4.1 is the **first community release** of django CMS 4. Django CMS 4 introduces changes that **require** action if you are upgrading from a 3.x version. Please read the step-by-step guide to the
+    process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
+
+
+Welcome to django CMS 4.1.5!
+
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 3.2 to 5.1**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+support the latest release of each series.
+
+What's new in 4.1.5
+===================
+
+
+Bug Fixes:
+----------
+Bug Fixes:
+----------
+* Grouper models w/o must not assume language grouper (#8194) (#8195) (35521bc7f) -- Fabian Braun
+* Ensure correct placeholder retrieval for PageContent instances (#8088) -- Fabian Braun
+* Fallback page names were not escaped (#8113) (#8114) -- Fabian Braun
+* Use PageContent.changed_date for sitemap lastmod (#8125) -- Jacob Rief
+* Allow frontend editing of page title fields -- Fabian Braun
+* Detect page when getting toolbar for endpoint (#8137) (#8138) -- Fabian Braun
+* CMS_TOOLBAR_HIDE broke endpoints in django CMS 4+ (#8176) -- Fabian Braun
+* Preview did not show the redirect page (#8175) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull request)
+* Jacob Rief (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+* sourcery-ai[bot]
+
+Thanks to all contributors for their efforts!

@@ -3,7 +3,6 @@
  */
 
 import $ from 'jquery';
-import Class from 'classjs';
 
 /**
  * Tracks the changes done inside the modal form.
@@ -15,36 +14,34 @@ import Class from 'classjs';
  * @namespace CMS
  * @uses CMS.API.Helpers
  */
-var ChangeTracker = new Class({
-    initialize: function initialize(iframe) {
-        var that = this;
-
-        that.state = {
+class ChangeTracker {
+    constructor(iframe) {
+        this.state = {
             fields: new Map(),
             formChanged: false
         };
 
-        that._setupUI(iframe);
-        that._setupEvents();
-    },
+        this._setupUI(iframe);
+        this._setupEvents();
+    }
 
-    _setupUI: function _setupUI(iframe) {
+    _setupUI(iframe) {
         this.ui = {
             iframe: iframe
         };
-    },
+    }
 
-    _setupEvents: function _setupEvents() {
+    _setupEvents() {
         try {
             this.ui.iframe
                 .contents()
                 .find('.change-form form')
                 .find('input, textarea, select')
                 .on('change.cms.tracker keydown.cms.tracker', this._trackChange.bind(this));
-        } catch (e) {
+        } catch {
             // there can be cases when the iframe contents don't exist
         }
-    },
+    }
 
     /**
      * Tracks the change made on the field
@@ -53,36 +50,34 @@ var ChangeTracker = new Class({
      * @private
      * @param {$.Event} e
      */
-    _trackChange: function _trackChange(e) {
-        var that = this;
-
-        if (that.state.fields.has(e.target)) {
-            var current = that.state.fields.get(e.target);
-            var newValue = that._getValue(e.target);
+    _trackChange(e) {
+        if (this.state.fields.has(e.target)) {
+            var current = this.state.fields.get(e.target);
+            var newValue = this._getValue(e.target);
 
             if (current.originalValue === newValue) {
-                that.state.formChanged = false;
+                this.state.formChanged = false;
             }
-            that.state.fields.set(
+            this.state.fields.set(
                 e.target,
                 $.extend(current, {
                     editedValue: newValue
                 })
             );
         } else {
-            var defaultValue = that._getOriginalValue(e.target);
-            var editedValue = that._getValue(e.target);
+            var defaultValue = this._getOriginalValue(e.target);
+            var editedValue = this._getValue(e.target);
 
-            that.state.fields.set(e.target, {
+            this.state.fields.set(e.target, {
                 originalValue: defaultValue,
                 editedValue: editedValue
             });
 
             if (defaultValue !== editedValue) {
-                that.state.formChanged = true;
+                this.state.formChanged = true;
             }
         }
-    },
+    }
 
     /**
      * @function _getValue
@@ -90,7 +85,7 @@ var ChangeTracker = new Class({
      * @param {Element} target
      * @returns {String|Boolean|void}
      */
-    _getValue: function _getValue(target) {
+    _getValue(target) {
         var el = $(target);
 
         if (el.is(':checkbox') || el.is(':radio')) {
@@ -100,7 +95,7 @@ var ChangeTracker = new Class({
             return el.val();
         }
         return target.value;
-    },
+    }
 
     /**
      * @function _getOriginalValue
@@ -108,7 +103,7 @@ var ChangeTracker = new Class({
      * @param {Element} target
      * @returns {String|Boolean|void}
      */
-    _getOriginalValue: function _getOriginalValue(target) {
+    _getOriginalValue(target) {
         var el = $(target);
 
         if (el.is(':checkbox') || el.is(':radio')) {
@@ -137,16 +132,16 @@ var ChangeTracker = new Class({
         }
 
         return target.defaultValue;
-    },
+    }
 
     /**
      * @method isFormChanged
      * @public
      * @returns {Boolean}
      */
-    isFormChanged: function isFormChanged() {
+    isFormChanged() {
         return this.state.formChanged || this._isEditorChanged();
-    },
+    }
 
     /**
      * Checks if any of the CKEditor instances have been changed.
@@ -155,7 +150,7 @@ var ChangeTracker = new Class({
      * @private
      * @returns {Boolean}
      */
-    _isEditorChanged: function _isEditorChanged() {
+    _isEditorChanged() {
         var win = this.ui.iframe[0].contentWindow;
         var isEditorChanged = false;
 
@@ -167,6 +162,6 @@ var ChangeTracker = new Class({
 
         return isEditorChanged;
     }
-});
+}
 
 export default ChangeTracker;

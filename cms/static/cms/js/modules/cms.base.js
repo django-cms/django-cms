@@ -3,8 +3,10 @@
  * Multiple helpers used across all CMS features
  */
 import $ from 'jquery';
-import URL from 'urijs';
-import { once, debounce, throttle } from 'lodash';
+// switched from commonjs 'lodash' bundle to per-method ESM imports for better tree-shaking
+import once from 'lodash-es/once.js';
+import debounce from 'lodash-es/debounce.js';
+import throttle from 'lodash-es/throttle.js';
 import { showLoader, hideLoader } from './loader';
 
 var _CMS = {
@@ -88,7 +90,7 @@ export const Helpers = {
      * @param {Number} timeout=0 timeout in ms
      * @returns {void}
      */
-    // eslint-disable-next-line max-params
+
     reloadBrowser: function(url, timeout) {
         var that = this;
         // is there a parent window?
@@ -117,24 +119,45 @@ export const Helpers = {
      * @public
      */
     onPluginSave: function() {
-        var data = this.dataBridge;
-        var editedPlugin =
-            data &&
-            data.plugin_id &&
-            window.CMS._instances.some(function(plugin) {
-                return Number(plugin.options.plugin_id) === Number(data.plugin_id) && plugin.options.type === 'plugin';
-            });
-        var addedPlugin = !editedPlugin && data && data.plugin_id;
+        const data = this.dataBridge || {};
+        const action = data.action ? data.action.toUpperCase() : null;
 
-        if (editedPlugin || addedPlugin) {
-            CMS.API.StructureBoard.invalidateState(addedPlugin ? 'ADD' : 'EDIT', data);
-            return;
+        switch (action) {
+            case 'CHANGE':
+            case 'EDIT':
+                if (this._pluginExists(data.plugin_id)) {
+                    CMS.API.StructureBoard.invalidateState('EDIT', data);
+                } else {
+                    CMS.API.StructureBoard.invalidateState('ADD', data);
+                }
+                return;
+            case 'ADD':
+            case 'DELETE':
+            case 'CLEAR_PLACEHOLDER':
+                CMS.API.StructureBoard.invalidateState(action, data);
+                return;
+            default:
+                break;
         }
 
         // istanbul ignore else
         if (!this._isReloading) {
             this.reloadBrowser(null, 300); // eslint-disable-line
         }
+    },
+
+    /*
+     * Check if a plugin object existst for the given plugin id
+     *
+     * @method _pluginExists
+     * @private
+     * @param {String} pluginId
+     * @returns {Boolean}
+     */
+    _pluginExists: function(pluginId) {
+        return window.CMS._instances.some(function(plugin) {
+            return Number(plugin.options.plugin_id) === Number(pluginId) && plugin.options.type === 'plugin';
+        });
     },
 
     /**
@@ -288,18 +311,45 @@ export const Helpers = {
      * @param {Array[]} [params] array of [`param`, `value`] arrays to update the url
      * @returns {String}
      */
-    makeURL: function makeURL(url, params = []) {
-        let newUrl = new URL(URL.decode(url.replace(/&amp;/g, '&')));
+    makeURL: function makeURL(url, params) {
+        const urlParams = params || [];
+        // Decode URL and replace &amp; with &
+        const decodedUrl = decodeURIComponent(url.replace(/&amp;/g, '&'));
+        let newUrl;
+        let isAbsolute = false;
+        let hadLeadingSlash = decodedUrl.startsWith('/');
 
-        params.forEach(pair => {
-            const [key, value] = pair;
+        try {
+            // Try to parse as absolute URL
+            // eslint-disable-next-line no-undef
+            newUrl = new URL(decodedUrl);
+            isAbsolute = true;
+        } catch {
+            // If relative, use window.location.origin as base
+            // eslint-disable-next-line no-undef
+            newUrl = new URL(decodedUrl, window.location.origin);
+        }
 
-            newUrl.removeSearch(key);
-            newUrl.addSearch(key, value);
+        urlParams.forEach(function(pair) {
+            var key = pair[0];
+            var value = pair[1];
+
+            newUrl.searchParams.delete(key);
+            newUrl.searchParams.set(key, value);
         });
 
-        return newUrl
-            .toString();
+        // Return full URL if input was absolute, otherwise return relative path
+        if (isAbsolute) {
+            return newUrl.toString();
+        }
+
+        let result = newUrl.pathname + newUrl.search + newUrl.hash;
+        // Remove leading slash if original URL didn't have one
+
+        if (!hadLeadingSlash && result.startsWith('/')) {
+            result = result.substring(1);
+        }
+        return result;
     },
 
     /**
@@ -335,7 +385,7 @@ export const Helpers = {
             localStorage.setItem(mod, mod);
             localStorage.removeItem(mod);
             return true;
-        } catch (e) {
+        } catch {
             // istanbul ignore next
             return false;
         }
@@ -532,6 +582,10 @@ export const KEYS = {
     CMD_FIREFOX: 224,
     CTRL: 17
 };
+
+// Add Helpers and KEYS to _CMS for backwards compatibility with tests
+_CMS.API.Helpers = Helpers;
+_CMS.KEYS = KEYS;
 
 // shorthand for jQuery(document).ready();
 $(function() {

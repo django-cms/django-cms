@@ -1,26 +1,32 @@
+from __future__ import annotations
+
 import json
 from collections import defaultdict, deque
-from typing import Optional
+from typing import Any, Optional
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.db import models
+from django.http import HttpRequest, QueryDict
 from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
     get_language,
+    get_language_from_path,
     gettext,
     override as force_language,
 )
+from sekizai.context import SekizaiContext
+from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.models import PageContent
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.models import CMSPlugin, PageContent, Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
+def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[str] | None = None) -> str:
     label = placeholder.get_label() or ''
     help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -40,7 +46,7 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin, children=None, parents=None):
+def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> dict[str, Any]:
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
@@ -54,7 +60,7 @@ def get_plugin_toolbar_info(plugin, children=None, parents=None):
     return data
 
 
-def get_plugin_toolbar_js(plugin, children=None, parents=None):
+def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> str:
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
@@ -63,28 +69,11 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
     return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_tree_as_json(request, plugins):
-    import warnings
-
-    warnings.warn("get_plugin_tree_as_json is deprecated. Use get_plugin_tree instead.",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
-    return json.dumps(get_plugin_tree(request, plugins))
-
-
-def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
-    from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
-
-    tree_data = []
-    tree_structure = []
-    restrictions = restrictions or {}
-    root_plugins = deque()
+def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]:
+    """Creates the ``child_plugin_instances`` attribute on each plugin instance after downcasting."""
     plugin_children = defaultdict(deque)
-    toolbar = get_toolbar_from_request(request)
-    template = toolbar.templates.drag_item_template
-    get_plugin_info = get_plugin_toolbar_info
-    placeholder = plugins[0].placeholder
-    copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
-    plugins = list(downcast_plugins(plugins, select_placeholder=True))
+    root_plugins = deque()
+
     plugin_ids = frozenset(plugin.pk for plugin in plugins)
 
     for plugin in reversed(plugins):
@@ -94,11 +83,51 @@ def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
             plugin_children[plugin.parent_id].appendleft(plugin)
         else:
             root_plugins.appendleft(plugin)
+    return root_plugins
+
+
+def get_plugin_tree(
+    request: HttpRequest,
+    plugins: list[CMSPlugin],
+    restrictions: dict | None = None,
+    target_plugin: CMSPlugin | None = None,
+) -> dict[str, Any]:
+    """
+    Constructs a tree structure of CMS plugins for the toolbar.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        plugins (list[CMSPlugin]): A list of CMSPlugin instances to be organized into a tree.
+        restrictions (Optional[dict], optional): A dictionary of plugin restrictions. Defaults to None.
+        target_plugin (Optional[CMSPlugin], optional): The target plugin to render.
+            Content will only be rendered if given. Defaults to None.
+
+    Returns:
+        tuple[dict[str, Any]]: A dictionary with up to five keys:
+            - 'html': A string of rendered HTML for the plugin tree.
+            - 'plugins': A flat list of plugin information dictionaries.
+            - 'content': The rendered content of target_plugin (if given) including its children
+            - 'target_position': The position of the target_plugin (if given)
+            - 'target_placeholder_id': The placeholder id of the target_plugin (if given)
+    """
+    from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
+
+    tree_data = []
+    tree_structure = []
+    restrictions = restrictions or {}
+    toolbar = get_toolbar_from_request(request)
+    template = toolbar.templates.drag_item_template
+    get_plugin_info = get_plugin_toolbar_info
+    placeholder = plugins[0].placeholder
+    copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
+    plugins = list(downcast_plugins(plugins, select_placeholder=True))
+    root_plugins = create_child_plugin_references(plugins)
 
     def collect_plugin_data(plugin):
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
             restrictions_cache=restrictions,
+            page=placeholder.source,
         )
         plugin_info = get_plugin_info(
             plugin,
@@ -122,16 +151,59 @@ def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
             }
             tree_structure.append(template.render(context))
     tree_data.reverse()
-    return {'html': '\n'.join(tree_structure), 'plugins': tree_data}
+
+    content = {}
+    # Render the target plugin if given and all plugins are local
+    if target_plugin and all(plugin.plugin_class.is_local for plugin in plugins):
+        # Also provide the parent plugin to the context (if available)
+        downcasted = next(
+            (plugin for plugin in plugins if plugin.pk == target_plugin.pk), None
+        )
+        parent = next(
+            (plugin for plugin in plugins if plugin.pk == target_plugin.parent_id), None
+        ) if target_plugin.parent_id else None
+        content["content"] = get_plugin_content(request, downcasted, {"parent": parent})
+
+    return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}
 
 
-def get_toolbar_from_request(request):
+def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict | None = None) -> list[dict[str, Any]]:
+    if context is None:
+        context = {}
+    plugin_list = plugin if isinstance(plugin, list) else [plugin]
+    toolbar = get_toolbar_from_request(request)
+    renderer = toolbar.content_renderer
+    # Switch to edit mode despite the request originally coming from the admin
+    toolbar.edit_mode_active = True
+    renderer._placeholders_are_editable = True
+    sekizai_context = SekizaiContext({'request': request, **context})
+    try:
+        return [{
+            "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
+            "js": "".join(sekizai_context[get_varname()].get("js", [])),
+            "css": "".join(sekizai_context[get_varname()].get("css", [])),
+            "position": plugin.position,
+            "placeholder_id": plugin.placeholder_id,
+            "pluginIds": get_plugin_tree_ids(plugin),
+        } for plugin in plugin_list]
+    except Exception:
+        return []  # do not deliver content if rendering fails
+
+
+def get_plugin_tree_ids(plugin: CMSPlugin) -> list[int]:
+    plugin_ids = [plugin.pk]
+    for child in plugin.child_plugin_instances or []:
+        plugin_ids += get_plugin_tree_ids(child)
+    return plugin_ids
+
+
+def get_toolbar_from_request(request: HttpRequest):
     from .toolbar import EmptyToolbar
 
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
-def add_live_url_querystring_param(obj, url, language=None):
+def add_live_url_querystring_param(obj: models.Model, url: str, language: str | None = None) -> str:
     """
     Append a live url to a given object url using a supplied url parameter configured
     by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
@@ -156,65 +228,101 @@ def add_live_url_querystring_param(obj, url, language=None):
     return url
 
 
-def get_object_edit_url(obj: models.Model, language: str = None) -> str:
+def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
+    content_type = ContentType.objects.get_for_model(obj)
+
+    language = getattr(obj, "language", language)  # Object trumps parameter
+    if language is None:
+        language = get_language()
+
+    with force_language(language):
+        url = admin_reverse(reverse_name, args=[content_type.pk, obj.pk])
+        get_params = params.copy() if params else QueryDict(mutable=True)
+        if not get_language_from_path(url):
+            get_params["language"] = language
+        if get_params:
+            url = url + "?" + get_params.urlencode()
+    if get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED"):
+        url = add_live_url_querystring_param(obj, url, language)
+    return url
+
+
+def get_object_edit_url(obj: models.Model, language: str | None = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the edit endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
+
+    params is an optional QueryDict to be added to the URL.
     """
-    content_type = ContentType.objects.get_for_model(obj)
-
-    language = getattr(obj, "language", language)  # Object trumps parameter
-    if language is None:
-        language = get_language()
-
-    with force_language(language):
-        url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
-    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
-        url = add_live_url_querystring_param(obj, url, language)
-    return url
+    return _get_object_url("cms_placeholder_render_object_edit", obj, language, params)
 
 
-def get_object_preview_url(obj: models.Model, language: str = None) -> str:
+def get_object_preview_url(obj: models.Model, language: str | None = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the preview endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
+
+    params is an optional QueryDict to be added to the URL.
     """
-    content_type = ContentType.objects.get_for_model(obj)
-
-    language = getattr(obj, "language", language)  # Object trumps parameter
-    if language is None:
-        language = get_language()
-
-    with force_language(language):
-        url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
-    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
-        url = add_live_url_querystring_param(obj, url, language)
-    return url
+    return _get_object_url("cms_placeholder_render_object_preview", obj, language, params)
 
 
-def get_object_structure_url(obj: models.Model, language: str = None) -> str:
+def get_object_structure_url(obj: models.Model, language: str | None = None, params: QueryDict | None = None) -> str:
     """
     Returns the url of the structure endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
 
     If the object has a language property, the language parameter is ignored.
-    """
 
-    content_type = ContentType.objects.get_for_model(obj)
+    params is an optional QueryDict to be added to the URL.
+
+    """
+    return _get_object_url("cms_placeholder_render_object_structure", obj, language, params)
+
+
+def get_object_live_url(obj: models.Model, language: str | None = None, site: Site | None = None, params: QueryDict | None = None) -> str | None:
+    """
+    Returns the live url of the given object. The object must be frontend-editable
+    and registered as such with cms.
+
+    If the object has a language property, the language parameter is ignored.
+    If the object - or its grouper - has no site property, the site argument is ignored.
+    """
+    if not hasattr(obj, "get_absolute_url"):
+        return None
 
     language = getattr(obj, "language", language)  # Object trumps parameter
     if language is None:
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+        absolute_url = obj.get_absolute_url()
+        url_param = get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM")
+        if params and url_param in params:
+            params = params.copy()
+            del params[url_param]
+        if params and "?" not in absolute_url:
+            absolute_url = absolute_url + "?" + params.urlencode()
+
+    obj_site = getattr(obj, 'site', None)
+    if obj_site is None:
+        try:
+            grouper_field = apps.get_app_config('cms').cms_extension.model_groupers[obj.__class__]
+            obj_site = getattr(getattr(obj, grouper_field, None), 'site', None)
+        except KeyError:
+            pass
+    if obj_site and obj_site != site:
+        # Add domain if current and target sites are defined and different
+        absolute_url = f"//{obj_site.domain}{absolute_url}"
+
+    return absolute_url
 
 
-def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> Optional[models.Model]:
+def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> models.Model | None:
     """
     Retrieves the correct content object for the target language. The object must be frontend-editable
     and registered as such with cms.

@@ -72,7 +72,7 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             request = self.get_request()
 
-        site = get_current_site()
+        site = get_current_site(request)
         data = {
             'title': 'page 1',
             'slug': 'page_1',
@@ -381,7 +381,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             data = {'post': True}
             response = self.client.post(endpoint, data)
             # Test that the end point is valid
-            self.assertEqual(response.status_code, 302)
+            self.assertContains(response, '<div class="success"></div>')
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 
@@ -564,7 +564,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             response = self.client.post(endpoint, {'test': 0})
             # Test that the end point is valid
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 

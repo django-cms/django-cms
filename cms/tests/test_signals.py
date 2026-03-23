@@ -1,12 +1,15 @@
+import warnings
+
 from django.conf import settings
 from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.models import Page, UrlconfRevision
-from cms.signals import urls_need_reloading
+from cms.signals import move_page, urls_need_reloading
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks, signal_tester
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
 overrides = {
     'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE,
@@ -16,6 +19,19 @@ overrides = {
 
 @override_settings(**overrides)
 class SignalTests(CMSTestCase):
+    def test_move_page_signal_warns_on_connect(self):
+        def receiver(**kwargs):
+            return None
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
+            move_page.connect(receiver)
+
+        self.assertTrue(
+            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
+            "Expected deprecation warning when connecting to move_page signal.",
+        )
+
     def test_urls_need_reloading_signal_set_apphook(self):
         superuser = self.get_superuser()
 
@@ -28,7 +44,7 @@ class SignalTests(CMSTestCase):
                         "nav_playground.html",
                         "en",
                     )
-                    redirect_to = self.get_pages_admin_list_uri()
+                    redirect_to = self.get_pages_admin_list_uri(site_id=cms_page.site_id)
                     endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
                     current_revision, _ = UrlconfRevision.get_or_create_revision()
                     page_data = {

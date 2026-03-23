@@ -38,7 +38,7 @@ New Toolbar
 
 The toolbar's code has been simplified and its appearance refreshed. The
 toolbar is now a more consistent management tool for adding and changing
-objects. See :doc:`/how_to/toolbar`.
+objects. See :doc:`/how_to/13-toolbar`.
 
 .. warning:: Upgrading from previous versions
 

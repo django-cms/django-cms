@@ -50,9 +50,18 @@ def get_clean_username(user):
     return username
 
 
-def get_page_queryset(site, draft=True, published=False):
-    from cms.models import Page
+def get_page_queryset(site, draft=True, published=False):  # pragma: no cover
+    from warnings import warn
 
+    from cms.models import Page
+    from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+
+    warn(
+        "cms.utils.page.get_page_queryset is deprecated. "
+        "Use Page.objects.on_site(site) instead.",
+        RemovedInDjangoCMS60Warning,
+        stacklevel=2,
+    )
     return Page.objects.on_site(site)
 
 
@@ -94,13 +103,13 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         except NoReverseMatch:
             pass
 
-    site = get_current_site()
+    site = get_current_site(request)
     page_urls = (
         PageUrl
         .objects
         .get_for_site(site)
         .filter(path=path)
-        .select_related('page')
+        .select_related("page", "page__site")
     )
     page_urls = list(page_urls)  # force queryset evaluation to save 1 query
     try:

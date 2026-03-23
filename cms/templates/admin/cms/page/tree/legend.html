@@ -1,6 +1,6 @@
 {% load i18n cms_admin %}
 {% spaceless %}
-<div class="cms-pagetree cms-pagetree-section cms-pagetree-section-condensed cms-pagetree-legend">
+<div class="cms-pagetree cms-pagetree-section cms-pagetree-legend">
     <span class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
         <div class="js-cms-pagetree-dropdown-trigger cms-pagetree-legend-title-wrap">
             <span class="cms-icon cms-icon-info"></span>
@@ -44,6 +44,12 @@
                     <span class="cms-pagetree-dropdown-item">
                         <span class="cms-icon cms-icon-apphook"></span>
                         <span>{% trans "Apphook" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-icon cms-icon-redirect"></span>
+                        <span>{% trans "Redirect" %}</span>
                     </span>
                 </li>
             </ul>

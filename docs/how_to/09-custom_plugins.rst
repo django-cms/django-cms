@@ -272,6 +272,117 @@ another.
 See the GitHub issue `copy_relations() does not work for relations between cmsplugins
 #4143 <https://github.com/django-cms/django-cms/issues/4143>`_ for more details.
 
+
+Adding a model to an existing custom plugin
+-------------------------------------------
+
+When enhancing an existing django CMS plugin with additional functionality, you might need to
+associate a database model with the plugin. This allows the plugin to store and manage data
+persistently. However, introducing a model to an existing plugin requires careful handling to
+prevent the disappearance of existing plugin instances, as discussed in `Issue #7476`_.
+
+1. **Define the Model**:
+
+   In your application's `models.py`, define a model that inherits from `CMSPlugin`. This model
+   will store the plugin's data. To allow for automatic migration later, make sure that all model
+   fields have meaningful defaults.
+
+   .. code-block:: python
+
+       from django.db import models
+       from cms.models.pluginmodel import CMSPlugin
+
+       class MyPluginModel(CMSPlugin):
+           title = models.CharField(max_length=100, default='Default Title')  # Add defaults
+           # Add other fields as needed
+
+           def __str__(self):
+               return self.title
+
+2. **Update the Plugin Class**:
+
+   In your `cms_plugins.py`, associate the plugin with the newly created model by setting the `model` attribute.
+
+   .. code-block:: python
+
+       from cms.plugin_base import CMSPluginBase
+       from cms.plugin_pool import plugin_pool
+       from django.utils.translation import gettext_lazy as _
+       from .models import MyPluginModel
+
+       @plugin_pool.register_plugin
+       class MyPlugin(CMSPluginBase):
+           model = MyPluginModel
+           name = _("My Plugin")
+           render_template = "my_app/my_plugin_template.html"
+           # Configure other attributes as needed
+
+3. **Create Migrations**:
+
+   Generate the necessary database migrations to reflect the new model. Do not apply them yet, since
+   the migrations will need an additional script to run.
+
+   .. code-block:: bash
+
+       python manage.py makemigrations
+
+4. **Handle Existing Plugin Instances**:
+
+   After adding a model to an existing plugin, existing instances will not automatically
+   associate with the new model, leading to their disappearance in the CMS interface. To address
+   this, use a migration script to convert existing plugin instances to the new model.
+
+   This script can be added to the migration just created in step 3.
+
+.. code-block:: python
+
+    def add_model_to_plugin(apps, schema_editor):
+        """ Adds instances for the new model.
+        ATTENTION: All fields of the model must have a valid default value!"""
+
+        # Adjust the following two lines
+        model = app.get_model("my_app", "MyGreatPluginModel")  # Name of the plugin's new model class
+        plugin_type = "MyGreatPlugin"  # Name of the plugin class
+
+        CMSPlugin = apps.get_model("cms", "CMSPlugin")
+
+        plugin_instances = CMSPlugin.objects.filter(plugin_type=plugin_type)
+        for plugin_instance in plugin_instances:
+            logger.info('Creating new model instance for plugin instance %s', plugin_instance.pk)
+            obj = model()
+            obj.pk = plugin_instance.pk
+            obj.cmsplugin_ptr = plugin_instance
+            obj.plugin_type = plugin_type
+            obj.placeholder = plugin_instance.placeholder
+            obj.parent = plugin_instance.parent
+            obj.language = plugin_instance.language
+            obj.position = plugin_instance.position
+            obj.creation_date = plugin_instance.creation_date
+            obj.save()
+
+    class Migration(migrations.Migration):
+        ...
+
+        operations = [
+            ...,
+            migrations.RunPython(add_model_to_plugin),  # Add at the end of migration operations
+        ]
+
+   This script migrates existing plugin instances to the new model structure, preserving data integrity.
+
+5. **Run the migrations**:
+
+   Apply the modified migration.
+
+   .. code-block:: bash
+
+       python manage.py makemigrations
+
+   After applying migrations, thoroughly test the plugin to ensure that existing instances appear correctly
+   and that the new model functionalities work as intended.
+
+.. _Issue #7476: https://github.com/django-cms/django-cms/issues/7476
+
 Advanced
 --------
 
@@ -342,6 +453,17 @@ django-sekizai, please refer to the `django-sekizai documentation`_.
 Note that sekizai **can't** help you with the **admin-side** plugin templates - what
 follows is for your plugins' **output templates**.
 
+Inline JavaScrip code
++++++++++++++++++++++
+
+django CMS does not enforce a specific way to include JavaScript code in your plugins.
+Inline JavaScript code is a potential security risk, so it is recommended to avoid it
+where possible. Since version 4.2 django CMS itself has removed any inline JavaScript
+from its code base to allow for meaningful Content Security Policy (CSP) headers to be
+set. **It is good practice to avoid inline JavaScript in your plugins as well.**
+If your project's CSP policy does not allow inline JavaScript, inline JavaScript
+provided through Sekizai also will not be executed.
+
 Sekizai style
 +++++++++++++
 
@@ -390,45 +512,34 @@ A **bad** example:
         });
     </script>{% endaddtoblock %}
 
-.. note::
-
-    If the Plugin requires javascript code to be rendered properly, the class
-    ``'cms-execute-js-to-render'`` can be added to the script tag. This will download
-    and execute all scripts with this class, which weren't present before, when the
-    plugin is first added to the page. If the javascript code is protected from
-    prematurely executing by the EventListener for the event ``'load'`` and/or
-    ``'DOMContentLoaded'``, the following classes can be added to the script tag:
-
-    =========================================== =============================
-    Classname                                   Corresponding javascript code
-    =========================================== =============================
-    cms-trigger-event-document-DOMContentLoaded ``document.dispatchEvent(new
-                                                Event('DOMContentLoaded')``
-    cms-trigger-event-window-DOMContentLoaded   ``window.dispatchEvent(new
-                                                Event('DOMContentLoaded')``
-    cms-trigger-event-window-load               ``window.dispatchEvent(new
-                                                Event('load')``
-    =========================================== =============================
-
-    The events will be triggered once after all scripts are successfully injected into
-    the DOM.
 
 .. note::
+
+    Due to the faster way of updating content in edit mode, ``<script>`` tags do
+    not need to be marked with classes like ``cms-trigger-event-document-DOMContentLoaded``,
+    ``cms-trigger-event-window-DOMContentLoaded``, or ``cms-trigger-event-window-load`` as  in
+    earlier versions of django CMS. Each script in the Sekizai ``js`` block is now executed in
+    the order they are defined in the template. After all scripts have been loaded and executed, the
+    document's ``DOMContentLoaded``, the window's ``load`` events are triggered. The
+    ``cms-content-refresh`` jQuery event on the window is also triggered for backwards
+    compatibility.
 
     Some plugins might need to run a certain bit of javascript after a content refresh.
-    In such a case, you can use the ``cms-content-refresh`` event to take care of that,
-    by adding something like:
+    This is why after a content refresh in edit mode, the ``document.DOMContentLoaded``,
+    ``window.load`` events and -- for backward compatibility -- the ``cms-content-refresh``
+    jQuery event are triggered. We encourage to use the ``window.load`` event for your
+    plugin's javascript code that needs to be run after a content refresh. Since this events
+    is triggered both on initial load and on updates (of potentially different plugins), you
+    should make sure that running the event listener multiple times on one plugin should
+    not cause any issues.
 
-    .. code-block:: html+django
+    .. code-block:: javascript
 
-        {% if request.toolbar and request.toolbar.edit_mode_active %}
-            <script>
-            CMS.$(window).on('cms-content-refresh', function () {
-                // Here comes your code of the plugin's javascript which
-                // needs to be run after a content refresh
-            });
-            </script>
-        {% endif %}
+        window.on('load', function () {
+            // Here comes your code of the plugin's javascript which
+            // needs to be run after a content refresh
+        });
+
 
 .. _plugin-context-processors:
 
@@ -628,6 +739,166 @@ can access the parent instance using ``get_bound_plugin``:
             super().__init__(*args, **kwargs)
             if self.instance:
                 parent, parent_cls = self.instance.parent.get_bound_plugin()
+
+
+.. _plugin-model-restrictions:
+
+Restricting plugins to specific models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+Django CMS allows you to control which plugins can be used with which models through
+two complementary filtering mechanisms:
+
+Plugin-level filtering (``allowed_models``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``allowed_models`` attribute on a plugin class restricts where that plugin can be
+used. This is useful when you have a plugin that only makes sense in specific contexts.
+
+.. code-block:: python
+
+    @plugin_pool.register_plugin
+    class PageSpecificPlugin(CMSPluginBase):
+        name = "Page Only Plugin"
+        model = CMSPlugin
+        render_template = "page_specific.html"
+        allowed_models = ["cms.pagecontent"]  # Only available on CMS pages
+
+    @plugin_pool.register_plugin
+    class BlogPlugin(CMSPluginBase):
+        name = "Blog Plugin"
+        model = CMSPlugin
+        render_template = "blog.html"
+        allowed_models = ["blog.blogpost", "blog.blogcategory"]
+
+The ``allowed_models`` attribute accepts:
+
+- ``None`` (default): The plugin is available for all models with placeholders
+- A list of model identifiers in the format ``"app_label.modelname"``
+  (e.g., ``["cms.pagecontent", "myapp.mymodel"]``)
+- An empty list ``[]``: The plugin cannot be used with any model
+
+.. note::
+    Model identifiers are automatically normalized to lowercase, so
+    ``["cms.PageContent"]`` and ``["cms.pagecontent"]`` are equivalent.
+
+
+Use plugin-based restrictions (``allowed_models``) when:
+
+- You have a plugin that only works with specific model types
+- You want to prevent misuse of a plugin in inappropriate contexts
+- The plugin accesses model-specific attributes or methods (e.g., by evaluating ``plugin.placeholder.source``)
+
+
+
+Model-level filtering (``allowed_plugins``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``allowed_plugins`` attribute on a model class restricts which plugins can be added
+to placeholders on that model. This is useful when you want to limit the available
+plugins for a specific content type.
+
+.. code-block:: python
+
+    from django.db import models
+    from cms.models import PlaceholderField
+
+    class BlogPost(models.Model):
+        title = models.CharField(max_length=200)
+
+        placeholders = PlaceholderRelationField()
+
+        # Only allow specific plugins in blog posts
+        allowed_plugins = ['TextPlugin', 'LinkPlugin', 'PicturePlugin']
+
+    class LandingPage(models.Model):
+        title = models.CharField(max_length=200)
+
+        placeholders = PlaceholderRelationField()
+
+        # Restrict to layout and hero plugins
+        allowed_plugins = ['MultiColumnPlugin', 'HeroPlugin', 'CallToActionPlugin']
+
+The ``allowed_plugins`` attribute accepts:
+
+- ``None`` (default): All plugins are allowed (subject to their ``allowed_models`` filter)
+- A list of plugin class names (e.g., ``["TextPlugin", "LinkPlugin"]``)
+- An empty list ``[]``: No plugins are allowed
+
+
+Use model-level filtering (``allowed_plugins``) when:
+
+- You want to provide a curated editing experience for specific content types
+- You need to enforce content guidelines or branding requirements
+- You want to simplify the plugin selection for content editors
+
+Combined filtering
+^^^^^^^^^^^^^^^^^^
+
+When both ``allowed_models`` (on the plugin) and ``allowed_plugins`` (on the model) are
+defined, **both filters must pass** for a plugin to be available:
+
+.. code-block:: python
+
+    # Plugin definition
+    @plugin_pool.register_plugin
+    class ArticlePlugin(CMSPluginBase):
+        name = "Article Plugin"
+        model = CMSPlugin
+        render_template = "article.html"
+        allowed_models = ["blog.blogpost", "news.article"]
+
+    # Model definition
+    class BlogPost(models.Model):
+        placeholders = PlaceholderRelationField()
+        allowed_plugins = ['TextPlugin', 'ArticlePlugin', 'PicturePlugin']
+
+In this example:
+
+- ``ArticlePlugin`` will be available in ``BlogPost`` (passes both filters)
+- ``TextPlugin`` will be available in ``BlogPost`` (no model restriction on plugin,
+  listed in model's ``allowed_plugins``)
+- ``ArticlePlugin`` will **not** be available in ``cms.PageContent`` (not in plugin's
+  ``allowed_models``)
+- ``VideoPlugin`` will **not** be available in ``BlogPost`` (not in model's
+  ``allowed_plugins``)
+
+
+Example: Blog with restricted plugins
+.....................................
+
+.. code-block:: python
+
+    # models.py
+    class BlogPost(models.Model):
+        title = models.CharField(max_length=200)
+        author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+        placeholders = PlaceholderRelationField()
+
+        # Main content: rich editing tools
+        allowed_plugins = [
+            'TextPlugin',
+            'PicturePlugin',
+            'VideoPlugin',
+            'QuotePlugin',
+        ]
+
+    # cms_plugins.py
+    @plugin_pool.register_plugin
+    class QuotePlugin(CMSPluginBase):
+        name = "Quote"
+        model = QuoteModel
+        render_template = "quote.html"
+        # Only allow in blog posts and articles
+        allowed_models = ["blog.blogpost", "news.article"]
+
+.. note::
+    If a plugin name in ``allowed_plugins`` doesn't match any registered plugin,
+    or a model identifier in ``allowed_models`` doesn't correspond to any installed model,
+    they are silently ignored without raising an error.
 
 .. _extending_context_menus:
 

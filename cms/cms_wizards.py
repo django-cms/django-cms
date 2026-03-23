@@ -1,3 +1,4 @@
+from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
@@ -14,10 +15,10 @@ class CMSPageWizard(Wizard):
         if page and parent_page:
             # User is adding a page which will be a right
             # sibling to the current page.
-            has_perm = user_can_add_subpage(user, target=parent_page)
-        else:
-            has_perm = user_can_add_page(user)
-        return has_perm
+            return user_can_add_subpage(user, target=parent_page)
+        elif page:
+            return user_can_add_page(user, site=page.site)
+        return user_can_add_page(user, site=Site.objects.first())
 
     def get_success_url(self, obj, **kwargs):
         page_content = obj.pagecontent_set(manager="admin_manager").first()

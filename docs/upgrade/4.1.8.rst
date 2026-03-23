@@ -1,0 +1,12 @@
+.. _upgrade-to-4.1.8:
+
+*******************
+4.1.8 release notes
+*******************
+
+*September 25, 2025*
+
+.. warning:: Upgrading from previous versions
+
+    It is recommended to upgrade directly to django CMS 4.1.9, as version 4.1.8 contains incorrect version
+    information and is missing important fixes.

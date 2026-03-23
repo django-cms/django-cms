@@ -1,46 +1,47 @@
-var $ = require('jquery');
 
-module.exports = function addSlugHandlers(title, slug) {
-    if (!slug.length) {
+export default function addSlugHandlers(title, slug) {
+    if (!slug) {
         return;
     }
 
-    // set local variables
-    var prefill = false;
+    let prefill = false;
 
     // determine if slug is empty
-    if (slug.val().trim() === '') {
+    if (slug.value.trim() === '') {
         prefill = true;
     }
     if (window.unihandecode) {
         // eslint-disable-next-line new-cap
-        window.UNIHANDECODER = window.unihandecode.Unihan(slug.data('decoder'));
+        window.UNIHANDECODER = window.unihandecode.Unihan(slug.dataset.decoder);
     }
 
     // always bind the title > slug generation and do the validation inside for better ux
-    title.on('keyup keypress', function() {
-        var value = title.val();
-
+    function updateSlug() {
+        let value = title.value;
         // international language handling
+
         if (window.UNIHANDECODER) {
             value = window.UNIHANDECODER.decode(value);
         }
         // if slug is empty, prefill again
-        if (prefill === false && slug.val() === '') {
+        if (prefill === false && slug.value === '') {
             prefill = true;
         }
         // urlify
         // eslint-disable-next-line
-        var urlified = URLify(value, 64);
+        const urlified = URLify(value, 64);
         if (prefill) {
-            slug.val(urlified);
+            slug.value = urlified;
         }
-    });
+    }
+    title.addEventListener('keyup', updateSlug);
+    title.addEventListener('keypress', updateSlug);
     // autocall
-    title.trigger('keyup');
+    updateSlug();
 
-    // add changed data bindings to elements
-    slug.add(title).bind('change', function() {
-        $(this).data('changed', true);
-    });
-};
+    function markChanged(e) {
+        e.target.dataset.changed = 'true';
+    }
+    slug.addEventListener('change', markChanged);
+    title.addEventListener('change', markChanged);
+}

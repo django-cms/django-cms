@@ -23,6 +23,16 @@ Classes and methods
 
 ..  module:: cms.toolbar.toolbar
 
+..  autoclass:: BaseToolbar
+    :members:
+    :inherited-members:
+    :show-inheritance:
+
+..  autoclass:: CMSToolbarBase
+    :members:
+    :inherited-members:
+    :show-inheritance:
+
 ..  autoclass:: CMSToolbar
     :members:
     :inherited-members:
@@ -31,6 +41,9 @@ Classes and methods
 
 ..  module:: cms.toolbar.items
 
+..  autoclass:: FrameItem
+     :members:
+     :show-inheritance:
 ..  autoclass:: Menu
     :members:
     :inherited-members:
@@ -85,15 +98,19 @@ Classes and methods
 ..  autoclass:: ToolbarAPIMixin
     :members:
 
+..  autoclass:: BaseButton
+    :members:
+    :show-inheritance:
 ..  autoclass:: ItemSearchResult
     :members:
     :show-inheritance:
 
-..  module:: cms.toolbar_base.CMSToolbar
+..  module:: cms.toolbar_base
 
-..  autoclass:: ItemSearchResult
+..  autoclass:: CMSToolbar
     :members:
     :show-inheritance:
+
 
 
 .. _toolbar_parameters:

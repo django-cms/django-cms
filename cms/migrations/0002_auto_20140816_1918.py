@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-
-import cms.models.static_placeholder
 import cms.models.fields
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,8 +6,13 @@ import django.utils.timezone
 
 User = get_user_model()
 
-user_model_label = '%s.%s' % (User._meta.app_label, User._meta.model_name)
+user_model_label = '{}.{}'.format(User._meta.app_label, User._meta.model_name)
 user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
+
+CREATION_METHODS = (
+    ('template', 'by template'),
+    ('code', 'by code'),
+)
 
 
 class Migration(migrations.Migration):
@@ -63,7 +65,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='page',
-            unique_together=set([('publisher_is_draft', 'application_namespace'), ('reverse_id', 'site', 'publisher_is_draft')]),
+            unique_together={('publisher_is_draft', 'application_namespace'), ('reverse_id', 'site', 'publisher_is_draft')},
         ),
         migrations.AddField(
             model_name='cmsplugin',
@@ -82,7 +84,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('cmsplugin_ptr', models.OneToOneField(primary_key=True, to='cms.CMSPlugin', auto_created=True, parent_link=True, serialize=False, on_delete=models.CASCADE)),
                 ('name', models.CharField(max_length=255)),
-                ('placeholder_ref', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', slotname='clipboard', editable=False)),
+                ('placeholder_ref', models.ForeignKey(null=True, to='cms.Placeholder', editable=False, on_delete=models.SET_NULL)),
             ],
             options={
             },
@@ -95,9 +97,9 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255, default='', help_text='Descriptive name to identify this static placeholder. Not displayed to users.', blank=True, verbose_name='static placeholder name')),
                 ('code', models.CharField(max_length=255, verbose_name='placeholder code', help_text='To render the static placeholder in templates.', blank=True)),
                 ('dirty', models.BooleanField(default=False, editable=False)),
-                ('creation_method', models.CharField(max_length=20, default='code', blank=True, verbose_name='creation_method', choices=cms.models.static_placeholder.StaticPlaceholder.CREATION_METHODS)),
-                ('draft', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', verbose_name='placeholder content', related_name='static_draft', slotname=cms.models.static_placeholder.static_slotname, editable=False)),
-                ('public', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', slotname=cms.models.static_placeholder.static_slotname, related_name='static_public', editable=False)),
+                ('creation_method', models.CharField(max_length=20, default='code', blank=True, verbose_name='creation_method', choices=CREATION_METHODS)),
+                ('draft', models.ForeignKey(null=True, to='cms.Placeholder', verbose_name='placeholder content', related_name='static_draft', editable=False, on_delete=models.SET_NULL)),
+                ('public', models.ForeignKey(null=True, to='cms.Placeholder', related_name='static_public', editable=False, on_delete=models.SET_NULL)),
                 ('site', models.ForeignKey(null=True, to='sites.Site', blank=True, on_delete=models.CASCADE)),
             ],
             options={
@@ -108,7 +110,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='staticplaceholder',
-            unique_together=set([('code', 'site')]),
+            unique_together={('code', 'site')},
         ),
         migrations.CreateModel(
             name='Title',
@@ -136,7 +138,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='title',
-            unique_together=set([('language', 'page')]),
+            unique_together={('language', 'page')},
         ),
         migrations.CreateModel(
             name='UserSettings',

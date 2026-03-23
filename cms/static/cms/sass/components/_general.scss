@@ -18,6 +18,23 @@
     }
 }
 
+// Touch action utility classes
+// These replace data-touch-action attributes for CSP compliance
+.cms-touch-action-none {
+    -ms-touch-action: none;
+    touch-action: none;
+}
+
+.cms-touch-action-pan-y {
+    -ms-touch-action: pan-y;
+    touch-action: pan-y;
+}
+
+.cms-touch-action-pan-x {
+    -ms-touch-action: pan-x;
+    touch-action: pan-x;
+}
+
 // Render exceptions in edit mode
 .cms-rendering-exception {
     display: inline-block;

@@ -394,6 +394,13 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     A Boolean indication whether that plugin requires another plugin as parent or
     not.
 
+.. note::
+    For model-level and plugin-level filtering of available plugins, see
+    :ref:`plugin-model-restrictions` in the custom plugins documentation. The
+    ``allowed_models`` attribute (on plugins) and ``allowed_plugins`` attribute
+    (on models) provide fine-grained control over plugin availability beyond the
+    placeholder-level configuration described here.
+
 ``inherit``
     Placeholder name or template name + placeholder name which inherit. In the
     example, the configuration for ``base.html content`` inherits from ``content``
@@ -411,7 +418,7 @@ default
 
 A list of plugin context processors. Plugin context processors are callables
 that modify all plugins' context *before* rendering. See
-:doc:`/how_to/10-custom_plugins` for more information.
+:doc:`/how_to/09-custom_plugins` for more information.
 
 
 ..  setting:: CMS_PLUGIN_PROCESSORS
@@ -527,6 +534,9 @@ The ``default`` node defines default behaviour for all languages. You can
 overwrite the default settings with language-specific properties. For example
 we define ``hide_untranslated`` as ``False`` globally, but the English language
 overwrites this behaviour.
+
+See also :doc:`../how_to/03-multi-site` for patterns to run multiple sites and how
+per‑site language configurations are selected at runtime without a global ``SITE_ID``.
 
 Every language node needs at least a ``code`` and a ``name`` property. ``code``
 is the ISO 2 code for the language, and ``name`` is the verbose name of the
@@ -715,6 +725,17 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
                 unihandecode-1.0.0.zh.min.js
 
 More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.io/>`_.
+
+
+.. setting:: CMS_DEFAULT_IN_NAVIGATION
+
+CMS_DEFAULT_IN_NAVIGATION
+=========================
+
+default
+    ``True``
+
+Decides if a newly added page content is automatically added to the navigation.
 
 
 **************
@@ -1022,6 +1043,30 @@ Example::
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
 
 
+CMS_ENABLE_HELP
+===============
+
+default
+    ``True``
+
+This setting controls if the help menu appears in the toolbar.
+
+
+CMS_EXTRA_HELP_MENU_ITEMS
+=========================
+
+Example::
+
+    CMS_EXTRA_HELP_MENU_ITEMS = (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
+
+This setting adds to the default links of the support menu allowing project or company support links.
+
+
 CMS_TOOLBAR_ANONYMOUS_ON
 ========================
 
@@ -1129,7 +1174,7 @@ default
 
 This is the name of the plugin created in the Page Wizard when the "Content"
 field is filled in. There should be no need to change it, unless you
-**don't** use ``djangocms-text-ckeditor`` in your project.
+**don't** use `djangocms-text`` in your project.
 
 ..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
@@ -1141,9 +1186,10 @@ default
 
 This is the name of the body field in the plugin created in the Page Wizard
 when the "Content" field is filled in. There should be no need to change it,
-unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
-your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
-body field **different** than ``body``.
+unless you **don't** use `djangocms-text`` in
+your project **and** your custom plugin defined in
+:setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a body field **different** than
+``body``.
 
 .. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED
 
@@ -1161,7 +1207,7 @@ default
 .. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
 
 CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
-===============================================
+=======================================
 
 default
     ``live-url``
@@ -1194,6 +1240,7 @@ default
 This indicates to the CMS that it should redirect requests with an non-lowercase
 slug to its lowercase version if no page with that slug is found.
 
+.. setting:: CMS_CATCH_PLUGIN_500_EXCEPTION
 
 CMS_CATCH_PLUGIN_500_EXCEPTION
 ==============================
@@ -1208,6 +1255,24 @@ on public content the placeholder remains empty.
 If ``CMS_CATCH_PLUGIN_500_EXCEPTION`` is set to ``False``, viewing public
 content will cause a server error (http error code 500). This can, for example,
 be used for regular health checking.
+
+.. setting:: CMS_ALWAYS_REFRESH_CONTENT
+
+CMS_ALWAYS_REFRESH_CONTENT
+==========================
+
+default
+    ``False``
+
+.. versionadded:: 4.2
+
+If set to ``True``, the CMS will always refresh the content of the page after
+edit action, just as in django CMS 4.1 and before.
+
+Only use this setting of your custom plugins have issues with the new partial
+content refresh when editing. **If you need to set this, make sure to report an
+issue on GitHub.**
+
 
 CMS_CONFIRM_VERSION4
 ====================

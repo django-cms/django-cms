@@ -2,6 +2,7 @@ import os.path
 from importlib.machinery import SourceFileLoader
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, loader
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
@@ -11,24 +12,23 @@ from cms import constants
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.conf import get_cms_setting
 
-PATH_PREFIX = os.path.join('inner_dir', 'custom_templates')
-GOOD_PATH = os.path.join(settings.PROJECT_PATH, 'project', 'templates', PATH_PREFIX)
-BAD_PATH = os.path.join(settings.PROJECT_PATH, 'project', 'custom_templates')
+PATH_PREFIX = os.path.join("inner_dir", "custom_templates")
+GOOD_PATH = os.path.join(settings.PROJECT_PATH, "project", "templates", PATH_PREFIX)
+BAD_PATH = os.path.join(settings.PROJECT_PATH, "project", "custom_templates")
 SITE_PATH = {
-    1: os.path.join(settings.PROJECT_PATH, 'project', 'templates', PATH_PREFIX),
-    2: os.path.join(settings.PROJECT_PATH, 'project', 'templates', '%s_2' % PATH_PREFIX),
+    1: os.path.join(settings.PROJECT_PATH, "project", "templates", PATH_PREFIX),
+    2: os.path.join(settings.PROJECT_PATH, "project", "templates", "%s_2" % PATH_PREFIX),
 }
 
 
 class TemplatesConfig(CMSTestCase):
-
     def test_templates(self):
         """
         Tests that the plain CMS_TEMPLATES works as usual
         """
         original_files = [template[0] for template in settings.CMS_TEMPLATES]
-        files = [template[0] for template in get_cms_setting('TEMPLATES')]
-        if get_cms_setting('TEMPLATE_INHERITANCE'):
+        files = [template[0] for template in get_cms_setting("TEMPLATES")]
+        if get_cms_setting("TEMPLATE_INHERITANCE"):
             original_files.append(constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(len(files), 6)
         self.assertEqual(set(files), set(original_files))
@@ -38,7 +38,7 @@ class TemplatesConfig(CMSTestCase):
         """
         Test that using CMS_TEMPLATES_DIR both template list and template labels are extracted from the new directory
         """
-        config_path = os.path.join(settings.CMS_TEMPLATES_DIR, '__init__.py')
+        config_path = os.path.join(settings.CMS_TEMPLATES_DIR, "__init__.py")
         mod = None
         try:
             mod = SourceFileLoader("mod", config_path).load_module()
@@ -49,12 +49,12 @@ class TemplatesConfig(CMSTestCase):
         if mod:
             original_labels = [force_str(_(template[1])) for template in mod.TEMPLATES.items()]
             original_files = [os.path.join(PATH_PREFIX, template[0].strip()) for template in mod.TEMPLATES.items()]
-            templates = get_cms_setting('TEMPLATES')
+            templates = get_cms_setting("TEMPLATES")
             self.assertEqual(len(templates), 3)
             labels = [force_str(template[1]) for template in templates]
             files = [template[0] for template in templates]
-            if get_cms_setting('TEMPLATE_INHERITANCE'):
-                original_labels.append(force_str(_('Inherit the template of the nearest ancestor')))
+            if get_cms_setting("TEMPLATE_INHERITANCE"):
+                original_labels.append(force_str(_("Inherit the template of the nearest ancestor")))
                 original_files.append(constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(set(labels), set(original_labels))
             self.assertEqual(set(files), set(original_files))
@@ -64,7 +64,7 @@ class TemplatesConfig(CMSTestCase):
         """
         Checking that templates can be loaded by the template loader
         """
-        templates = get_cms_setting('TEMPLATES')
+        templates = get_cms_setting("TEMPLATES")
         for template in templates:
             if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
                 tpl = loader.get_template(template[0])
@@ -75,23 +75,68 @@ class TemplatesConfig(CMSTestCase):
         """
         Checking that templates can be loaded by the template loader
         """
-        templates = get_cms_setting('TEMPLATES')
+        templates = get_cms_setting("TEMPLATES")
         for template in templates:
             if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
-                self.assertTrue(template[0].find('%s/' % SITE_PATH[1]) >= -1)
+                self.assertTrue(template[0].find("%s/" % SITE_PATH[1]) >= -1)
         with self.settings(SITE_ID=2):
-            templates = get_cms_setting('TEMPLATES')
+            templates = get_cms_setting("TEMPLATES")
             for template in templates:
                 if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
-                    self.assertTrue(template[0].find('%s/' % SITE_PATH[2]) >= -1)
+                    self.assertTrue(template[0].find("%s/" % SITE_PATH[2]) >= -1)
 
     @override_settings(CMS_TEMPLATES_DIR=BAD_PATH)
     def test_custom_templates_bad_dir(self):
         """
         Checking that templates can be loaded by the template loader
         """
-        templates = get_cms_setting('TEMPLATES')
+        templates = get_cms_setting("TEMPLATES")
         for template in templates:
             if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
                 with self.assertRaises(TemplateDoesNotExist):
                     loader.get_template(template[0])
+
+    def test_accepts_custom_django_template_backend(self):
+        """
+        Test that django CMS accepts template engines that inherit from DjangoTemplates
+        """
+        custom_templates_settings = [
+            {
+                "BACKEND": "cms.test_utils.project.template_backends.CustomDjangoTemplates",
+                "DIRS": [],
+                "OPTIONS": {
+                    "context_processors": ["django.template.context_processors.request"],
+                },
+            }
+        ]
+
+        with override_settings(TEMPLATES=custom_templates_settings):
+            from cms.utils.setup import validate_settings
+
+            validate_settings()
+
+    def test_rejects_non_django_template_backend(self):
+        """
+        Test that django CMS rejects template engines that don't inherit from DjangoTemplates
+        """
+        non_django_templates_settings = [
+            {
+                "BACKEND": "cms.test_utils.project.template_backends.NonDjangoTemplates",
+                "DIRS": [],
+                "OPTIONS": {
+                    "context_processors": ["django.template.context_processors.request"],
+                },
+            }
+        ]
+
+        with override_settings(TEMPLATES=non_django_templates_settings):
+            from cms.utils.setup import validate_settings
+
+            with self.assertRaises(ImproperlyConfigured) as context:
+                validate_settings()
+
+            self.assertIn(
+                "django.template.backends.django.DjangoTemplates",
+                str(context.exception),
+                "Should reject non-Django template backends",
+            )

@@ -15,14 +15,15 @@ from django.http import (
 from django.shortcuts import render
 from django.template.defaultfilters import title
 from django.template.response import TemplateResponse
-from django.urls import Resolver404, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
-from django.utils.translation import activate, get_language_from_request
+from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
+from cms.appresolver import applications_page_check
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
@@ -83,7 +84,7 @@ def details(request, slug):
             return response
 
     # Get a Page model object from the request
-    site = get_current_site()
+    site = get_current_site(request)
     page = get_page_from_request(request, use_path=slug)
 
     if not page and not slug and not Page.objects.on_site(site).exists():
@@ -109,6 +110,7 @@ def details(request, slug):
         return _handle_no_page(request)
 
     request.current_page = page
+    request.site = site
 
     if hasattr(request, 'user') and request.user.is_staff:
         user_languages = get_language_list(site_id=site.pk)
@@ -116,10 +118,11 @@ def details(request, slug):
         user_languages = get_public_languages(site_id=site.pk)
 
     request_language = None
-    if is_language_prefix_patterns_used():
-        request_language = get_language_from_request(request, check_path=True)
+    if hasattr(request, "LANGUAGE_CODE"):
+        # use language from middleware - usually django.middleware.locale.LocaleMiddleware
+        request_language = request.LANGUAGE_CODE
     if not request_language:
-        request_language = get_default_language_for_site(get_current_site().pk)
+        request_language = get_default_language_for_site(site.pk)
 
     if not page.is_home and request_language not in user_languages:
         # The homepage is treated differently because
@@ -251,7 +254,7 @@ def render_object_structure(request, content_type_id, object_id):
 
     try:
         if issubclass(content_type.model_class(), PageContent):
-            content_type_obj = PageContent._base_manager.select_related("page").get(pk=object_id)
+            content_type_obj = PageContent._base_manager.select_related("page", "page__site").get(pk=object_id)
             request.current_page = content_type_obj.page
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -293,11 +296,12 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     try:
         if issubclass(model, PageContent):
             # An apphook might be attached to a PageContent object
-            content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
+            content_type_obj = model.admin_manager.select_related("page", "page__site").get(pk=object_id)
             request.current_page = content_type_obj.page
             if (
-                content_type_obj.page.application_urls and  # noqa: W504
-                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
+                content_type_obj.page.application_urls and
+                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks()) and
+                (not require_editable or content_type_obj.is_editable(request))
             ):
                 try:
                     # If so, try get the absolute URL and pass it to the toolbar as request_path
@@ -305,6 +309,8 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     absolute_url = content_type_obj.get_absolute_url()
                     from cms.toolbar.toolbar import CMSToolbar
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
+                    # Make page content's placeholders available, can be overwritten by apphook view
+                    request.toolbar.set_object(content_type_obj)
                     # Resolve the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
                     if view_func is not details:
@@ -317,6 +323,22 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     except ObjectDoesNotExist as err:
         raise Http404 from err
 
+    # Attempt to resolve current_page via the object's absolute URL (for apphooks)
+    if not getattr(request, "current_page", None):
+        try:
+            object_url = content_type_obj.get_absolute_url()
+        except (AttributeError, NoReverseMatch):
+            object_url = None
+
+        if object_url:
+            original_path_info = request.path_info
+            try:
+                # Temporarily patch the request object and use the appresolver
+                request.path_info = object_url
+                request.current_page = applications_page_check(request)
+            finally:
+                request.path_info = original_path_info
+
     extension = apps.get_app_config('cms').cms_extension
 
     if model not in extension.toolbar_enabled_models:
@@ -324,11 +346,11 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
+    request.site = get_current_site(request)
 
-    if request.user.is_staff and toolbar.edit_mode_active:
-        redirect = getattr(content_type_obj, "redirect", None)
-        if isinstance(redirect, str):
-            toolbar.redirect_url = redirect
+    redirect = getattr(content_type_obj, "redirect", None)
+    if isinstance(redirect, str):
+        toolbar.redirect_url = redirect
 
     if require_editable and not toolbar.object_is_editable():
         # If not editable, switch from edit to preview endpoint

@@ -1,5 +1,6 @@
 import re
 
+from django.apps import apps
 from django.utils.encoding import force_str
 from django.utils.timezone import get_current_timezone_name
 
@@ -98,9 +99,13 @@ def is_editable_model(model_class):
 
     # First check whether model_class has
     # any fields which has a relation to Placeholder
-    for field in model_class._meta.get_fields():
-        if field.related_model == Placeholder:
-            return True
+    extension = apps.get_app_config('cms').cms_extension
+    if model_class in extension.toolbar_enabled_models:
+       # Model needs to be toolbar enabled...
+       for field in model_class._meta.get_fields():
+            # ... and have a relationship with Placeholder
+            if field.related_model == Placeholder:
+                return True
 
     # Check whether model_class has an admin class
     # and whether its inherited from FrontendEditableAdminMixin
@@ -108,4 +113,4 @@ def is_editable_model(model_class):
         admin_class = admin.site._registry[model_class]
     except KeyError:
         return False
-    return isinstance(admin_class, FrontendEditableAdminMixin)
+    return isinstance(admin_class, FrontendEditableAdminMixin) and hasattr(model_class, "get_absolute_url")
