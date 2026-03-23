@@ -1070,3 +1070,49 @@ corrupted plugin trees.**
 
     Also, **do not** use ``queryset.delete()`` to remove multiple plugins at the same
     time. This will most likely damage the plugin tree.
+
+Marking plugins as slots
+------------------------
+
+.. versionadded:: 5.1
+
+You can mark a plugin as a *slot* — a structural container that is not directly editable
+by the user — by setting the :attr:`~cms.plugin_base.CMSPluginBase.is_slot` attribute to
+``True`` on the plugin class. The plugin will still render normally, but double-clicking
+it in the structure board will not open the edit dialog. Moving the plugin or adding child
+plugins are not affected.
+
+.. code-block::
+
+    from cms.plugin_base import CMSPluginBase
+    from cms.plugin_pool import plugin_pool
+
+    @plugin_pool.register_plugin
+    class SeparatorPlugin(CMSPluginBase):
+        name = "Separator"
+        render_template = "separator.html"
+        is_slot = True
+
+This is useful for plugins that have no configurable fields or that are fully managed by
+their parent plugin.
+
+Marking third-party plugins as slots
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can also mark plugins provided by third-party apps as slots without modifying
+their source code. To do so, set :attr:`~cms.plugin_base.CMSPluginBase.is_slot` on
+the plugin class in your app's ``AppConfig.ready()`` method:
+
+.. code-block::
+
+    from django.apps import AppConfig
+
+    class MyAppConfig(AppConfig):
+        name = "myapp"
+
+        def ready(self):
+            from cms.plugin_pool import plugin_pool
+
+            # Mark a third-party plugin as a slot to simplify
+            # the editor experience
+            plugin_pool.get_plugin("SomeThirdPartyPlugin").is_slot = True

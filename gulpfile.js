@@ -262,7 +262,10 @@ const testsIntegration = (done) => {
         .then(() => {
             log.info('Running Playwright integration tests...');
 
-            const playwrightProcess = spawn('npx', ['playwright', 'test'], {
+            // Allow passing specific test files via --testFiles flag
+            // e.g., gulp testsIntegration --testFiles="disable-edit.spec.js"
+            const testFiles = argv.testFiles ? argv.testFiles.split(',') : [];
+            const playwrightProcess = spawn('npx', ['playwright', 'test', ...testFiles], {
                 stdio: 'inherit',
                 shell: true,
                 env: {

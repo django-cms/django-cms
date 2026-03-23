@@ -506,13 +506,13 @@ class ContentRenderer(BaseRenderer):
             content = processor(instance, placeholder, content, context)
 
         if editable:
-            disable_edit = getattr(instance, "disable_edit", False) or getattr(plugin, "disable_edit", False)
+            is_slot = getattr(instance, "is_slot", False) or getattr(plugin, "is_slot", False)
             content = self.plugin_edit_template.format(
                 pk=instance.pk,
                 placeholder=instance.placeholder_id,
                 content=content,
                 position=instance.position,
-                disabled=' cms-edit-disabled' if disable_edit else '',
+                disabled=' cms-slot' if is_slot else '',
             )
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
             placeholder_cache.setdefault("plugins", []).append(instance)
@@ -543,13 +543,13 @@ class ContentRenderer(BaseRenderer):
             heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
             if "_last_plugin" in context:
                 # Make error message editable by double-click to open the editor for the plugin causing the exception
-                disable_edit = getattr(instance, "disable_edit", False)
+                is_slot = getattr(instance, "is_slot", False)
                 heading = self.plugin_edit_template.format(
                     pk=instance.pk,
                     placeholder=instance.placeholder_id,
                     content=heading,
                     position=instance.position,
-                    disabled=' cms-edit-disabled' if disable_edit else '',
+                    disabled=' cms-slot' if is_slot else '',
                 )
                 placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
                 placeholder_cache.setdefault("plugins", []).append(instance)

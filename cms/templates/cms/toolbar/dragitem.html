@@ -1,8 +1,8 @@
 {% load i18n l10n cms_tags %}
 
-{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins edit_disabled=plugin.get_plugin_class.edit_disabled %}
+{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins is_slot=plugin.get_plugin_class.is_slot %}
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
-    {% if edit_disabled %}cms-edit-disabled{% endif %}
+    {% if is_slot %}cms-slot{% endif %}
     {{ plugin.add_structureboard_classes|default:"" }}
     {% if not allow_children %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
@@ -10,7 +10,7 @@
     <div class="cms-dragitem cms-dragitem-handler
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% if not disabled_child %}
-            {% if not object_is_immutable and not edit_disabled %}
+            {% if not object_is_immutable and not is_slot %}
                 <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
                     <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
                 </div>
