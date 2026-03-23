@@ -508,9 +508,9 @@ class ContentRenderer(BaseRenderer):
         if editable:
             disable_edit = getattr(instance, "disable_edit", False) or getattr(plugin, "disable_edit", False)
             content = self.plugin_edit_template.format(
-                pk=instance.pk, 
-                placeholder=instance.placeholder_id, 
-                content=content, 
+                pk=instance.pk,
+                placeholder=instance.placeholder_id,
+                content=content,
                 position=instance.position,
                 disabled=' cms-edit-disabled' if disable_edit else '',
             )
