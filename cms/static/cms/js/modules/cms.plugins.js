@@ -447,7 +447,7 @@ class Plugin {
                 }
                 var name = that.options.plugin_name;
                 var id = that.options.plugin_id;
-                var disabled = $(e.currentTarget).hasClass('cms-edit-disabled');  // No tooltip for disabled plugins
+                var disabled = $(e.currentTarget).hasClass('cms-edit-disabled'); // No tooltip for disabled plugins
 
                 CMS.API.Tooltip.displayToggle(
                     (e.type === 'pointerover' || e.type === 'touchstart') && !disabled,
