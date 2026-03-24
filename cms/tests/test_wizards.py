@@ -28,7 +28,7 @@ from cms.toolbar.utils import (
 from cms.utils.conf import get_cms_setting
 from cms.utils.setup import setup_cms_apps
 from cms.utils.urlutils import admin_reverse
-from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
+from cms.wizards.forms import WizardStep1Form, WizardStep2BaseForm, step2_form_factory
 from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import (
@@ -589,7 +589,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().get_urls().filter(slug="page-2-3"))
 
-
 class TestPageWizardSubmission(CMSTestCase):
     def test_page_wizard_submission(self):
         from cms.wizards.helpers import get_entries
@@ -684,3 +683,34 @@ class TestEntryChoices(CMSTestCase):
             (cms_subpage_wizard.id, cms_subpage_wizard.title),
         ]
         self.assertListEqual(wizard_choices, expected)
+
+    def test_wizard_step1_uses_selected_site_for_root_page_entries(self):
+        site1 = Site.objects.get_current()
+        site2 = Site.objects.create(domain="second.example.com", name="Second", pk=2)
+        user = self._create_user("wizard-staff", is_staff=True, is_superuser=False)
+        self.add_permission(user, "add_page")
+        self.add_permission(user, "change_page")
+        global_permission = self.add_global_permission(user, can_add=True, can_change=True)
+        global_permission.sites.set([site1])
+
+        with self.login_user_context(user):
+            request = self.get_request()
+
+        form_site1 = WizardStep1Form(
+            wizard_page=None,
+            wizard_site=site1,
+            wizard_language="en",
+            wizard_request=request,
+        )
+        form_site2 = WizardStep1Form(
+            wizard_page=None,
+            wizard_site=site2,
+            wizard_language="en",
+            wizard_request=request,
+        )
+
+        choices_site1 = [choice[0] for choice in form_site1.fields["entry"].choices]
+        choices_site2 = [choice[0] for choice in form_site2.fields["entry"].choices]
+
+        self.assertIn(cms_page_wizard.id, choices_site1)
+        self.assertNotIn(cms_page_wizard.id, choices_site2)

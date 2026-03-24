@@ -78,6 +78,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
         self.fields['entry'].choices = entry_choices(
             user=self._request.user,
             page=self._page,
+            site=self._site,
         )
 
     def get_wizard_entries(self):
