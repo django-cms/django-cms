@@ -1,7 +1,7 @@
 import json
-from typing import Tuple
 import uuid
 import warnings
+from typing import Tuple
 from urllib.parse import parse_qsl, urlparse
 
 from django.contrib import admin
@@ -166,7 +166,7 @@ class FrontendEditableAdminMixin(BaseEditableAdminMixin):
         ]
         return url_patterns + super().get_urls()
 
-    def _get_model_admin_and_permission(self, request, obj: models.Model) -> Tuple[admin.ModelAdmin, bool]:
+    def _get_model_admin_and_permission(self, request, obj: models.Model) -> tuple[admin.ModelAdmin, bool]:
         # FrontendEditableAdminMixin needs to be added to the model's model admin class.
         # Hence, the relevant admin is the model admin itself.
         change_permission =  request.user.has_perm(f"{obj._meta.app_label}.change_{obj._meta.model_name}")
@@ -245,7 +245,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         plugin = get_object_or_404(CMSPlugin, pk=object_id)  # Returns a CMSPlugin instance
         return plugin.get_bound_plugin()  # Returns the plugin model instance of the appropriate type
 
-    def _get_model_admin_and_permission(self, request, obj: CMSPlugin) -> Tuple[admin.ModelAdmin, bool]:
+    def _get_model_admin_and_permission(self, request, obj: CMSPlugin) -> tuple[admin.ModelAdmin, bool]:
         # For BaseEditableAdminMixin: This (private) method retrieves the model admin for the plugin model
         # which is the plugin instance itself, and checks change permissions including check_source
         placeholder = obj.placeholder
