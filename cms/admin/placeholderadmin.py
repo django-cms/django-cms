@@ -1,7 +1,6 @@
 import json
 import uuid
 import warnings
-from typing import Tuple
 from urllib.parse import parse_qsl, urlparse
 
 from django.contrib import admin
