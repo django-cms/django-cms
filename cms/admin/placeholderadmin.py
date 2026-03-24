@@ -92,7 +92,7 @@ class BaseEditableAdminMixin:
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
         raw_fields = request.GET.get("edit_fields", "")
-        admin_obj = self._get_model_admin(obj)
+        admin_obj, change_permission = self._get_model_admin_and_permission(request, obj)
         allowed_fields = getattr(admin_obj, "frontend_editable_fields", [])
         fields = [field for field in raw_fields.split(",") if field in allowed_fields]
         if not fields:
@@ -101,13 +101,13 @@ class BaseEditableAdminMixin:
                 'message': _("Field %s not found") % raw_fields
             }
             return TemplateResponse(request, 'admin/cms/page/plugin/error_form.html', context)
-        if not request.user.has_perm(f"{admin_obj.model._meta.app_label}.change_{admin_obj.model._meta.model_name}"):
+        if not change_permission:
             context = {
                 'opts': opts,
                 'message': _("You do not have permission to edit this item")
             }
             return TemplateResponse(request, 'admin/cms/page/plugin/error_form.html', context)
-            # Dynamically creates the form class with only `field_name` field
+        # Dynamically creates the form class with only `field_name` field
         # enabled
         form_class = admin_obj.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
@@ -165,10 +165,11 @@ class FrontendEditableAdminMixin(BaseEditableAdminMixin):
         ]
         return url_patterns + super().get_urls()
 
-    def _get_model_admin(self, obj: models.Model) -> admin.ModelAdmin:
+    def _get_model_admin_and_permission(self, request, obj: models.Model) -> admin.ModelAdmin:
         # FrontendEditableAdminMixin needs to be added to the model's model admin class.
         # Hence, the relevant admin is the model admin itself.
-        return self
+        change_permission =  request.user.has_perm(f"{obj._meta.app_label}.change_{obj._meta.model_name}")
+        return self, change_permission
 
     def _get_object_for_single_field(self, object_id: int, language: str) -> models.Model:
         # Quick and dirty way to retrieve objects for django-hvad
@@ -243,10 +244,15 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         plugin = get_object_or_404(CMSPlugin, pk=object_id)  # Returns a CMSPlugin instance
         return plugin.get_bound_plugin()  # Returns the plugin model instance of the appropriate type
 
-    def _get_model_admin(self, obj: CMSPlugin) -> admin.ModelAdmin:
+    def _get_model_admin_and_permission(self, request, obj: CMSPlugin) -> admin.ModelAdmin:
         # For BaseEditableAdminMixin: This (private) method retrieves the model admin for the plugin model
-        # which is the plugin instance itself.
-        return obj.get_plugin_class_instance(admin=self.admin_site)
+        # which is the plugin instance itself, and checks change permissions including check_source
+        placeholder = obj.placeholder
+        has_permission = (
+            placeholder.has_change_plugin_permission(request.user, obj)
+            and placeholder.check_source(request.user)
+        )
+        return obj.get_plugin_class_instance(admin=self.admin_site), has_permission
 
     def _get_operation_language(self, request):
         # Unfortunately the ?language GET query

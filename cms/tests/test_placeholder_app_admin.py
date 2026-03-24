@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.forms.models import model_to_dict
 
 from cms.api import add_plugin
@@ -5,6 +7,7 @@ from cms.models import CMSPlugin, Placeholder, UserSettings
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
+from cms.utils.urlutils import admin_reverse
 
 
 class AppAdminTestCase(CMSTestCase):
@@ -793,3 +796,91 @@ class AppAdminPermissionsTest(AppAdminTestCase):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(target_placeholder.get_plugins('fr').count(), 0)
+
+
+class AppAdminInlineEditPermissionsTest(AppAdminTestCase):
+    """Tests that the PlaceholderAdmin's edit_field endpoint (inline editing)
+    checks plugin change permissions and runs the placeholder's check_source method."""
+
+    def setUp(self):
+        from cms.test_utils.project.pluginapp.plugins.link.cms_plugins import LinkPlugin
+
+        self._obj = self._get_example_obj()
+        self._staff_user = self.get_staff_user_with_no_permissions()
+        # LinkPlugin does not define frontend_editable_fields by default,
+        # so we patch it for these tests to enable inline editing of the "name" field.
+        self._fe_patcher = patch.object(LinkPlugin, "frontend_editable_fields", ("name",))
+        self._fe_patcher.start()
+
+    def tearDown(self):
+        self._fe_patcher.stop()
+
+    def _get_edit_field_endpoint(self, plugin):
+        return (
+            admin_reverse("cms_placeholder_edit_field", args=(plugin.pk, "en"))
+            + "?edit_fields=name"
+        )
+
+    def test_inline_edit_checks_change_plugin_permission(self):
+        """
+        Inline editing a plugin via PlaceholderAdmin's edit_field endpoint
+        requires change permission on the model attached to the placeholder
+        and change permission on the plugin model.
+        """
+        staff_user = self._staff_user
+        placeholder = self._obj.placeholder
+        plugin = self._add_plugin_to_placeholder(placeholder)
+        endpoint = self._get_edit_field_endpoint(plugin)
+
+        # Give change permission on the plugin model but NOT on the source model
+        self.add_permission(staff_user, 'change_link')
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            # Should be denied because user lacks change_example1 permission
+            self.assertContains(response, "You do not have permission to edit this item")
+
+    def test_inline_edit_allowed_with_correct_permissions(self):
+        """
+        Inline editing a plugin via PlaceholderAdmin's edit_field endpoint
+        succeeds when user has both change permission on the source model
+        and change permission on the plugin model.
+        """
+        staff_user = self._staff_user
+        placeholder = self._obj.placeholder
+        plugin = self._add_plugin_to_placeholder(placeholder)
+        endpoint = self._get_edit_field_endpoint(plugin)
+
+        # Give all required permissions
+        self.add_permission(staff_user, 'change_example1')
+        self.add_permission(staff_user, 'change_link')
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            # Should show the edit form
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, "You do not have permission to edit this item")
+
+    def test_inline_edit_calls_check_source(self):
+        """
+        Inline editing a plugin via PlaceholderAdmin's edit_field endpoint
+        runs the placeholder's check_source method to verify source-level
+        permissions.
+        """
+        staff_user = self._staff_user
+        placeholder = self._obj.placeholder
+        plugin = self._add_plugin_to_placeholder(placeholder)
+        endpoint = self._get_edit_field_endpoint(plugin)
+
+        self.add_permission(staff_user, 'change_example1')
+        self.add_permission(staff_user, 'change_link')
+
+        with self.login_user_context(staff_user):
+            with patch.object(
+                Placeholder, "check_source", return_value=False
+            ) as mock_check_source:
+                response = self.client.get(endpoint)
+                # check_source should have been called
+                mock_check_source.assert_called_once_with(staff_user)
+                # Should be denied because check_source returned False
+                self.assertContains(response, "You do not have permission to edit this item")
