@@ -809,7 +809,7 @@ class AppAdminInlineEditPermissionsTest(AppAdminTestCase):
         self._staff_user = self.get_staff_user_with_no_permissions()
         # LinkPlugin does not define frontend_editable_fields by default,
         # so we patch it for these tests to enable inline editing of the "name" field.
-        self._fe_patcher = patch.object(LinkPlugin, "frontend_editable_fields", ("name",))
+        self._fe_patcher = patch.object(LinkPlugin, "frontend_editable_fields", ("name",), create=True)
         self._fe_patcher.start()
 
     def tearDown(self):
