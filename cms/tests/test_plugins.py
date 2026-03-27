@@ -73,6 +73,18 @@ class DumbFixturePlugin(CMSPluginBase):
         return context
 
 
+class DirectProxyCMSPluginModel(CMSPlugin):
+    class Meta:
+        proxy = True
+        app_label = "test_app"
+
+
+class DirectProxyCMSPlugin(CMSPluginBase):
+    model = DirectProxyCMSPluginModel
+    name = "Direct proxy CMSPlugin"
+    render_plugin = False
+
+
 class DumbFixturePluginWithUrls(DumbFixturePlugin):
     name = DumbFixturePlugin.name + " With custom URLs."
     render_plugin = False
@@ -1063,6 +1075,65 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
 
+    def test_iterator_chunk_size_in_get_bound_plugins(self):
+        """iterator() must pass PLUGIN_ITERATOR_CHUNK_SIZE so that
+        querysets with prefetch_related (from custom managers) don't
+        crash on Django 5.0+."""
+        from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
+        from cms.utils.plugins import get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DumbFixturePlugin):
+            plugin = api.add_plugin(placeholder, DumbFixturePlugin, "en")
+            plugins = CMSPlugin.objects.filter(pk=plugin.pk)
+
+            with mock.patch(
+                "cms.utils.plugins.PLUGIN_ITERATOR_CHUNK_SIZE", 999
+            ):
+                # Patch the queryset's iterator to inspect the chunk_size kwarg
+                original_iterator = None
+
+                def patched_iterator(chunk_size=None):
+                    self.assertEqual(chunk_size, 999)
+                    return original_iterator(chunk_size=chunk_size)
+
+                qs = DumbFixturePlugin.model.objects.filter(pk__in=[plugin.pk])
+                original_iterator = qs.iterator
+
+                with mock.patch.object(
+                    DumbFixturePlugin.model.objects, "filter", return_value=qs
+                ):
+                    with mock.patch.object(qs, "iterator", side_effect=patched_iterator):
+                        list(get_bound_plugins(plugins))
+
+    def test_downcast_plugins_with_direct_cmsplugin_proxy(self):
+        from cms.utils.plugins import downcast_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DirectProxyCMSPlugin):
+            plugin = api.add_plugin(placeholder, DirectProxyCMSPlugin, "en")
+            cms_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+
+            downcasted = list(downcast_plugins([cms_plugin]))
+
+        self.assertEqual(len(downcasted), 1)
+        self.assertIsInstance(downcasted[0], DirectProxyCMSPluginModel)
+        self.assertEqual(downcasted[0].pk, plugin.pk)
+
+    def test_get_bound_plugins_with_direct_cmsplugin_proxy(self):
+        from cms.utils.plugins import get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DirectProxyCMSPlugin):
+            plugin = api.add_plugin(placeholder, DirectProxyCMSPlugin, "en")
+            cms_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+
+            bound_plugins = list(get_bound_plugins([cms_plugin]))
+
+        self.assertEqual(len(bound_plugins), 1)
+        self.assertIsInstance(bound_plugins[0], DirectProxyCMSPluginModel)
+        self.assertEqual(bound_plugins[0].pk, plugin.pk)
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):
@@ -1409,7 +1480,6 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
         )
         # Non plugins are skipped
         self.assertFalse(hasattr(NonPluginModel, "cmsplugin_ptr"))
-
 
 class UserInputValidationPluginTest(PluginsTestBaseCase):
     def test_error_response_escapes(self):
