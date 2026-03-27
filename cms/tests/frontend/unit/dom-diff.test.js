@@ -420,7 +420,7 @@ describe('DiffDOM', function() {
             // Keep references to the original DOM nodes
             var originalMeta = container.childNodes[0];
             var originalLink = container.childNodes[1];
-            var originalTitle = container.childNodes[2];
+
 
             // Build new content: link unchanged, meta changed, title removed, script added
             var wrapper = document.createElement('div');
@@ -446,10 +446,12 @@ describe('DiffDOM', function() {
             expect(container.childNodes.length).toBe(3);
             expect(container.childNodes[1]).toBe(originalLink);
 
-            // Meta was changed — must NOT be the original node
-            expect(container.childNodes[0]).not.toBe(originalMeta);
+            // Meta had its content attribute changed — with recursive diffing the
+            // outer element is reused (shallow match on tag + name attr) and the
+            // attribute is synced in place.
+            expect(container.childNodes[0]).toBe(originalMeta);
             expect(container.childNodes[0].getAttribute('content')).toBe('Updated');
-            expect(container.childNodes[0].marker).toBeUndefined(); // Custom property should not be copied
+            expect(container.childNodes[0].marker).toBe('meta'); // Custom property preserved
 
             // Title was removed
             expect(container.querySelector('title')).toBeNull();
@@ -494,6 +496,157 @@ describe('DiffDOM', function() {
             // "Remove" paragraph must be gone
             expect(container.querySelector('p:last-of-type').textContent).toBe('Keep');
             expect(container.querySelector('p:last-of-type').marker).toBe('marked');
+        });
+
+        it('does not re-execute nested scripts when outer element changes', function() {
+            // Set up container with a div wrapping a script
+            var wrapper = document.createElement('div');
+            wrapper.setAttribute('class', 'plugin');
+            var script = document.createElement('script');
+            script.textContent = 'window.__nestedScriptCounter = (window.__nestedScriptCounter || 0) + 1;';
+            wrapper.appendChild(script);
+            var p = document.createElement('p');
+            p.textContent = 'Old text';
+            wrapper.appendChild(p);
+            container.appendChild(wrapper);
+
+            // Script executed once on initial insert
+            expect(window.__nestedScriptCounter).toBe(1);
+
+            var originalScript = container.querySelector('script');
+            var originalWrapper = container.firstChild;
+
+            // Build new content: same div wrapper, same script, but paragraph text changed
+            var newOuter = document.createElement('div');
+            var newWrapper = document.createElement('div');
+            newWrapper.setAttribute('class', 'plugin');
+            var sameScript = document.createElement('script');
+            sameScript.textContent = 'window.__nestedScriptCounter = (window.__nestedScriptCounter || 0) + 1;';
+            newWrapper.appendChild(sameScript);
+            var newP = document.createElement('p');
+            newP.textContent = 'New text';
+            newWrapper.appendChild(newP);
+            newOuter.appendChild(newWrapper);
+
+            var diff = dd.diff(container, nodeToObj(newOuter));
+            dd.apply(container, diff);
+
+            // Script should NOT have re-executed — counter still 1
+            expect(window.__nestedScriptCounter).toBe(1);
+            // Script should be the exact same DOM node
+            expect(container.querySelector('script')).toBe(originalScript);
+            // Outer wrapper should be preserved (shallow match, same tag + class synced)
+            expect(container.firstChild).toBe(originalWrapper);
+            // Paragraph text should be updated
+            expect(container.querySelector('p').textContent).toBe('New text');
+
+            delete window.__nestedScriptCounter;
+        });
+
+        it('preserves outer element when only inner content changes', function() {
+            var outer = document.createElement('div');
+            outer.setAttribute('class', 'outer');
+            outer.marker = 'original-outer';
+            var inner = document.createElement('span');
+            inner.textContent = 'old';
+            outer.appendChild(inner);
+            container.appendChild(outer);
+
+            var originalOuter = container.firstChild;
+
+            // Build new content: same outer div, different inner text
+            var newRoot = document.createElement('div');
+            var newOuter = document.createElement('div');
+            newOuter.setAttribute('class', 'outer');
+            var newInner = document.createElement('span');
+            newInner.textContent = 'new';
+            newOuter.appendChild(newInner);
+            newRoot.appendChild(newOuter);
+
+            var diff = dd.diff(container, nodeToObj(newRoot));
+            dd.apply(container, diff);
+
+            // Outer element should be the same DOM node (preserved via shallow match)
+            expect(container.firstChild).toBe(originalOuter);
+            expect(container.firstChild.marker).toBe('original-outer');
+            // Inner content should be updated
+            expect(container.querySelector('span').textContent).toBe('new');
+        });
+
+        it('updates attributes on outer element while preserving it', function() {
+            var outer = document.createElement('div');
+            outer.setAttribute('class', 'old-class');
+            outer.setAttribute('data-keep', 'yes');
+            outer.marker = 'same-node';
+            var inner = document.createElement('p');
+            inner.textContent = 'content';
+            outer.appendChild(inner);
+            container.appendChild(outer);
+
+            var originalOuter = container.firstChild;
+
+            // Build new content: same div, different class, removed data-keep, added data-new
+            var newRoot = document.createElement('div');
+            var newOuter = document.createElement('div');
+            newOuter.setAttribute('class', 'new-class');
+            newOuter.setAttribute('data-new', 'added');
+            var newInner = document.createElement('p');
+            newInner.textContent = 'content';
+            newOuter.appendChild(newInner);
+            newRoot.appendChild(newOuter);
+
+            var diff = dd.diff(container, nodeToObj(newRoot));
+            dd.apply(container, diff);
+
+            // Same DOM node preserved
+            expect(container.firstChild).toBe(originalOuter);
+            expect(container.firstChild.marker).toBe('same-node');
+            // Attributes synced
+            expect(container.firstChild.getAttribute('class')).toBe('new-class');
+            expect(container.firstChild.getAttribute('data-new')).toBe('added');
+            expect(container.firstChild.getAttribute('data-keep')).toBeNull();
+        });
+
+        it('does not re-execute deeply nested scripts', function() {
+            // Three levels deep: container > div.a > div.b > script
+            var a = document.createElement('div');
+            a.setAttribute('class', 'a');
+            var b = document.createElement('div');
+            b.setAttribute('class', 'b');
+            var script = document.createElement('script');
+            script.textContent = 'window.__deepCounter = (window.__deepCounter || 0) + 1;';
+            b.appendChild(script);
+            a.appendChild(b);
+            container.appendChild(a);
+
+            expect(window.__deepCounter).toBe(1);
+            var originalScript = container.querySelector('script');
+
+            // Build new content: add a sibling to div.b, script unchanged
+            var newRoot = document.createElement('div');
+            var newA = document.createElement('div');
+            newA.setAttribute('class', 'a');
+            var newB = document.createElement('div');
+            newB.setAttribute('class', 'b');
+            var sameScript = document.createElement('script');
+            sameScript.textContent = 'window.__deepCounter = (window.__deepCounter || 0) + 1;';
+            newB.appendChild(sameScript);
+            var extra = document.createElement('p');
+            extra.textContent = 'added';
+            newB.appendChild(extra);
+            newA.appendChild(newB);
+            newRoot.appendChild(newA);
+
+            var diff = dd.diff(container, nodeToObj(newRoot));
+            dd.apply(container, diff);
+
+            // Script must not have re-executed
+            expect(window.__deepCounter).toBe(1);
+            expect(container.querySelector('script')).toBe(originalScript);
+            // New paragraph should be present
+            expect(container.querySelector('p').textContent).toBe('added');
+
+            delete window.__deepCounter;
         });
 
         it('handles SVG elements', function() {
