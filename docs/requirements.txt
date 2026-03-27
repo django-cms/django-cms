@@ -129,7 +129,7 @@ pytz==2025.2
     # via datetime
 pyyaml==6.0.3
     # via libcst
-requests==2.32.5
+requests==2.33.0
     # via
     #   sphinx
     #   sphinxcontrib-spelling
