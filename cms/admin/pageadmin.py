@@ -364,10 +364,11 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             raise PermissionDenied("No permission for page list view")
 
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            site = get_site_from_request(request)
             query_term = request.GET.get("q", "").strip("/")
 
             language_code = request.GET.get("language_code", settings.LANGUAGE_CODE)
-            matching_published_pages = self.model.objects.filter(
+            matching_published_pages = self.model.objects.on_site(site).filter(
                 Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
                 | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
                 | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)

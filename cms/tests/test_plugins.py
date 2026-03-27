@@ -73,6 +73,18 @@ class DumbFixturePlugin(CMSPluginBase):
         return context
 
 
+class DirectProxyCMSPluginModel(CMSPlugin):
+    class Meta:
+        proxy = True
+        app_label = "test_app"
+
+
+class DirectProxyCMSPlugin(CMSPluginBase):
+    model = DirectProxyCMSPluginModel
+    name = "Direct proxy CMSPlugin"
+    render_plugin = False
+
+
 class DumbFixturePluginWithUrls(DumbFixturePlugin):
     name = DumbFixturePlugin.name + " With custom URLs."
     render_plugin = False
@@ -1094,6 +1106,34 @@ class PluginsTestCase(PluginsTestBaseCase):
                     with mock.patch.object(qs, "iterator", side_effect=patched_iterator):
                         list(get_bound_plugins(plugins))
 
+    def test_downcast_plugins_with_direct_cmsplugin_proxy(self):
+        from cms.utils.plugins import downcast_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DirectProxyCMSPlugin):
+            plugin = api.add_plugin(placeholder, DirectProxyCMSPlugin, "en")
+            cms_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+
+            downcasted = list(downcast_plugins([cms_plugin]))
+
+        self.assertEqual(len(downcasted), 1)
+        self.assertIsInstance(downcasted[0], DirectProxyCMSPluginModel)
+        self.assertEqual(downcasted[0].pk, plugin.pk)
+
+    def test_get_bound_plugins_with_direct_cmsplugin_proxy(self):
+        from cms.utils.plugins import get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DirectProxyCMSPlugin):
+            plugin = api.add_plugin(placeholder, DirectProxyCMSPlugin, "en")
+            cms_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+
+            bound_plugins = list(get_bound_plugins([cms_plugin]))
+
+        self.assertEqual(len(bound_plugins), 1)
+        self.assertIsInstance(bound_plugins[0], DirectProxyCMSPluginModel)
+        self.assertEqual(bound_plugins[0].pk, plugin.pk)
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):
@@ -1440,7 +1480,6 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
         )
         # Non plugins are skipped
         self.assertFalse(hasattr(NonPluginModel, "cmsplugin_ptr"))
-
 
 class UserInputValidationPluginTest(PluginsTestBaseCase):
     def test_error_response_escapes(self):
