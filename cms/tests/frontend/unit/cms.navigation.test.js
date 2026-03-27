@@ -84,7 +84,7 @@ describe('CMS.Navigation', function () {
             nav._getWidths();
             expect(nav._widthsReady).toEqual(true);
             expect(nav.leftMostItemIndex).toEqual(0);
-            expect(nav.rightMostItemIndex).toEqual(2);
+            expect(nav.rightMostItemIndex).toEqual(nav.items.left.length - 1);
             expect(nav.items).toEqual({
                 left: [
                     { element: jasmine.any(Object), width: jasmine.any(Number) },
