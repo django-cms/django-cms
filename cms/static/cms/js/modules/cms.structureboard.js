@@ -496,6 +496,8 @@ class StructureBoard {
                 const bodyAttributes = $('<div ' + bodyAttrs + '></div>')[0].attributes;
                 const htmlAttributes = $('<div ' + htmlAttrs + '></div>')[0].attributes;
                 const newToolbar = body.find('.cms-toolbar');
+                // Capture old scripts before detaching toolbar so CMS bundles are included
+                const oldScripts = document.body.querySelectorAll('script:not([type="application/json"])');
                 const toolbar = $('.cms').add('[data-cms]').detach();
                 const title = head.filter('title');
                 const bodyElement = $('body');
@@ -531,13 +533,13 @@ class StructureBoard {
 
                 Plugin._refreshPlugins();
 
-                const scripts = $('script');
+                const newScripts = document.body.querySelectorAll('script:not([type="application/json"])');
 
-                // istanbul ignore next
-                scripts.on('load', function() {
-                    window.document.dispatchEvent(new Event('DOMContentLoaded'));
-                    window.dispatchEvent(new Event('load'));
-                });
+                that._processNewScripts(newScripts, oldScripts);
+
+                if (that.scriptReferenceCount === 0) {
+                    StructureBoard._triggerRefreshEvents();
+                }
 
                 const unhandledPlugins = bodyElement.find('template.cms-plugin');
 
