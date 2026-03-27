@@ -109,14 +109,19 @@ export class DiffDOM {
             return;
         }
 
+        // Fast path: skip entirely when nothing changed
+        if (target.innerHTML === newNode.innerHTML) {
+            return;
+        }
+
         this._syncChildren(target, newNode);
     }
 
     /**
      * Recursively sync children of an existing element with those of a new element.
      * Uses two-tier matching:
-     *   1. Exact match (outerHTML) — reuse the existing DOM node as-is.
-     *   2. Shallow match (same tag + attributes) — keep the outer element, recurse into children.
+     *   1. Exact match (node key) — reuse the existing DOM node as-is.
+     *   2. Shallow match (same tag + id) — keep the outer element, recurse into children.
      *   3. No match — clone the new node.
      * This ensures unchanged nested scripts are never re-executed, even when an
      * ancestor element has changed.
@@ -128,7 +133,7 @@ export class DiffDOM {
         const newChildren = source.childNodes ? Array.from(source.childNodes) : [];
         const existingChildren = Array.from(target.childNodes);
 
-        // Build exact-key index (outerHTML for elements, content for text/comments)
+        // Build exact-key index
         const existingByExactKey = new Map();
 
         existingChildren.forEach((child, i) => {
@@ -140,7 +145,7 @@ export class DiffDOM {
             existingByExactKey.get(key).push(i);
         });
 
-        // Build shallow-key index (tag + attributes only, for element nodes)
+        // Build shallow-key index (tag + id only, for element nodes)
         const existingByShallowKey = new Map();
 
         existingChildren.forEach((child, i) => {
@@ -200,17 +205,32 @@ export class DiffDOM {
             return newChild.cloneNode(true);
         });
 
-        // Remove existing children that have no match in the new content
-        existingChildren.forEach((child, i) => {
-            if (!usedIndices.has(i)) {
-                target.removeChild(child);
-            }
-        });
+        // Positional patching: only mutate nodes that are out of position.
+        // Nodes already in the correct spot are skipped (zero DOM mutations when unchanged).
+        let cursor = target.firstChild;
 
-        // Append in correct order (appendChild moves existing nodes without re-execution)
-        resolvedChildren.forEach(child => {
-            target.appendChild(child);
-        });
+        for (const child of resolvedChildren) {
+            if (child === cursor) {
+                // Already in the right position — advance
+                cursor = cursor.nextSibling;
+            } else {
+                // Insert/move before cursor (moves existing nodes without re-execution)
+                target.insertBefore(child, cursor);
+            }
+        }
+
+        // Remove leftover existing nodes that weren't matched.
+        // External scripts (with src) are preserved — removing them from the DOM
+        // doesn't unload their code but can break DOM queries that look for them.
+        // Inline scripts (no src) are removed since they are one-shot executables.
+        while (cursor) {
+            const next = cursor.nextSibling;
+
+            if (cursor.nodeName !== 'SCRIPT' || !cursor.getAttribute('src')) {
+                target.removeChild(cursor);
+            }
+            cursor = next;
+        }
     }
 
     /**
@@ -293,16 +313,31 @@ export class DiffDOM {
 
     /**
      * Generate a string key for a DOM node for fast equality lookup.
-     * Includes the full subtree (outerHTML) for element nodes.
+     * For leaf elements (no child elements), builds a key from tag + attributes + textContent
+     * to avoid expensive outerHTML serialization. Falls back to outerHTML for nested elements.
      * @param {Node} node
      * @returns {string}
      * @private
      */
     _nodeKey(node) {
         if (node.nodeType === Node.TEXT_NODE) {
-            return '#text:' + node.data;
+            return '#t:' + node.data;
         }
         if (node.nodeType === Node.ELEMENT_NODE) {
+            // Leaf elements (no child elements): build key from properties directly
+            if (!node.firstElementChild) {
+                let key = node.nodeName;
+
+                for (const attr of node.attributes) {
+                    key += '\0' + attr.name + '=' + attr.value;
+                }
+                // Include text content for script/style/title etc.
+                if (node.firstChild) {
+                    key += '\0' + node.textContent;
+                }
+                return key;
+            }
+            // Nested elements: fall back to full serialization
             return node.outerHTML;
         }
         return '#' + node.nodeType + ':' + (node.data || '');

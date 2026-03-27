@@ -1183,24 +1183,35 @@ class StructureBoard {
             return;
         }
 
-        // Parse new block, by creating the diff
-        // Cannot use innerHTML since this would prevent scripts to be executed.
-        const newElements = document.createElement('div');
-        const diff = dd.diff(newElements, `<div>${data[block]}</div>`);
+        // Parse new block in an inert template to avoid executing scripts while building the fragment.
+        const template = document.createElement('template');
 
-        dd.apply(newElements, diff);
+        template.innerHTML = data[block];
 
         // Collect deferred scripts to ensure firing
         this.scriptReferenceCount = 0;
 
-        for (const element of newElements.querySelectorAll(selector)) {
+        for (const element of template.content.querySelectorAll(selector)) {
             if (StructureBoard._elementPresent(current, element)) {
                 element.remove();
-            } else {
-                if (element.hasAttribute('src')) {
+            } else if (block === 'js') {
+                // Recreate script to trigger execution, as browsers don't execute scripts when
+                // inserted via innerHTML or cloned via cloneNode.
+                const newScript = document.createElement('script');
+
+                Array.from(element.attributes).forEach(attr => {
+                    newScript.setAttribute(attr.name, attr.value);
+                });
+
+                if (element.src) {
                     this.scriptReferenceCount++;
-                    element.onload = element.onerror = this._scriptLoaded.bind(this);
+                    newScript.async = false;
+                    newScript.onload = newScript.onerror = this._scriptLoaded.bind(this);
                 }
+                newScript.textContent = element.textContent;
+
+                location.appendChild(newScript);
+            } else {
                 location.appendChild(element);
             }
         }
