@@ -70,7 +70,19 @@ describe('CMS.Navigation', function () {
             expect(nav.ui.window).toHandle('orientationchange.cms.navigation');
         });
 
-        it('has initial state', function () {
+        it('defers width measurement until CSS is ready', function () {
+            // Before CSS is applied, items should be empty and indices at initial values
+            expect(nav._widthsReady).toEqual(false);
+            expect(nav.leftMostItemIndex).toEqual(0);
+            expect(nav.rightMostItemIndex).toEqual(-1);
+            expect(nav.items.left.length).toEqual(0);
+            expect(nav.items.right.length).toEqual(0);
+        });
+
+        it('has initial state after _getWidths', function () {
+            // Explicitly measure widths (simulates CSS being ready)
+            nav._getWidths();
+            expect(nav._widthsReady).toEqual(true);
             expect(nav.leftMostItemIndex).toEqual(0);
             expect(nav.rightMostItemIndex).toEqual(2);
             expect(nav.items).toEqual({
@@ -156,6 +168,8 @@ describe('CMS.Navigation', function () {
             fixture.load('toolbar.html');
             $(function () {
                 nav = new CMS.Navigation();
+                // Explicitly measure widths (test env has no real CSS)
+                nav._getWidths();
                 spyOn(nav, '_calculateAvailableWidth');
                 spyOn(nav, '_moveOutOfDropdown').and.callThrough();
                 spyOn(nav, '_moveToDropdown').and.callThrough();
