@@ -288,6 +288,76 @@ class ManagementTestCase(CMSTestCase):
         max_position = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
         self.assertEqual(max_position, 3)
 
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_delete_orphaned_plugins_keeps_positions_consecutive(self):
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="first")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="second")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="third")
+
+        self.assertEqual(
+            list(placeholder.cmsplugin_set.order_by("position").values_list("plugin_type", "position")),
+            [
+                ("TextPlugin", 1),
+                ("BogusPlugin", 2),
+                ("TextPlugin", 3),
+                ("BogusPlugin", 4),
+                ("TextPlugin", 5),
+            ],
+        )
+
+        management.call_command("cms", "delete-orphaned-plugins", interactive=False, stdout=StringIO())
+
+        self.assertEqual(
+            list(placeholder.cmsplugin_set.order_by("position").values_list("plugin_type", "position")),
+            [
+                ("TextPlugin", 1),
+                ("TextPlugin", 2),
+                ("TextPlugin", 3),
+            ],
+        )
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_delete_plugin_uses_stale_position_from_prefetched_instance(self):
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="first")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="second")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="third")
+
+        stale_plugins = list(CMSPlugin.objects.filter(plugin_type="BogusPlugin").order_by("position"))
+        self.assertEqual([plugin.position for plugin in stale_plugins], [2, 4])
+
+        placeholder.delete_plugin(stale_plugins[0])
+
+        self.assertEqual(stale_plugins[1].position, 4)
+        stale_plugins[1].refresh_from_db()
+
+        self.assertEqual(stale_plugins[1].position, 3)
+
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
         management.call_command('cms', 'uninstall', 'plugins', PLUGIN, interactive=False, stdout=out)
