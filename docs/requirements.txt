@@ -18,7 +18,7 @@ babel==2.17.0
     # via sphinx
 beautifulsoup4==4.14.3
     # via furo
-black==26.1.0
+black==26.3.1
     # via docstrfmt
 build==1.4.0
     # via pip-tools
@@ -129,7 +129,7 @@ pytz==2025.2
     # via datetime
 pyyaml==6.0.3
     # via libcst
-requests==2.32.5
+requests==2.33.0
     # via
     #   sphinx
     #   sphinxcontrib-spelling
