@@ -44,7 +44,7 @@
     "puppeteer": "^24.30.0",
     "raw-loader": "^4.0.2",
     "sass": "^1.94.0",
-    "terser-webpack-plugin": "^5.3.14",
+    "terser-webpack-plugin": "^5.4.0",
     "uuid": "^13.0.0",
     "watchpack": "^2.4.2",
     "webpack": "^5.105.0",
