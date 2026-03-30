@@ -496,6 +496,8 @@ class StructureBoard {
                 const bodyAttributes = $('<div ' + bodyAttrs + '></div>')[0].attributes;
                 const htmlAttributes = $('<div ' + htmlAttrs + '></div>')[0].attributes;
                 const newToolbar = body.find('.cms-toolbar');
+                // Capture old scripts before detaching toolbar so CMS bundles are included
+                const oldScripts = document.body.querySelectorAll('script:not([type="application/json"])');
                 const toolbar = $('.cms').add('[data-cms]').detach();
                 const title = head.filter('title');
                 const bodyElement = $('body');
@@ -531,13 +533,13 @@ class StructureBoard {
 
                 Plugin._refreshPlugins();
 
-                const scripts = $('script');
+                const newScripts = document.body.querySelectorAll('script:not([type="application/json"])');
 
-                // istanbul ignore next
-                scripts.on('load', function() {
-                    window.document.dispatchEvent(new Event('DOMContentLoaded'));
-                    window.dispatchEvent(new Event('load'));
-                });
+                that._processNewScripts(newScripts, oldScripts);
+
+                if (that.scriptReferenceCount === 0) {
+                    StructureBoard._triggerRefreshEvents();
+                }
 
                 const unhandledPlugins = bodyElement.find('template.cms-plugin');
                 console.log(unhandledPlugins);
@@ -1185,24 +1187,35 @@ class StructureBoard {
             return;
         }
 
-        // Parse new block, by creating the diff
-        // Cannot use innerHTML since this would prevent scripts to be executed.
-        const newElements = document.createElement('div');
-        const diff = dd.diff(newElements, `<div>${data[block]}</div>`);
+        // Parse new block in an inert template to avoid executing scripts while building the fragment.
+        const template = document.createElement('template');
 
-        dd.apply(newElements, diff);
+        template.innerHTML = data[block];
 
         // Collect deferred scripts to ensure firing
         this.scriptReferenceCount = 0;
 
-        for (const element of newElements.querySelectorAll(selector)) {
+        for (const element of template.content.querySelectorAll(selector)) {
             if (StructureBoard._elementPresent(current, element)) {
                 element.remove();
-            } else {
-                if (element.hasAttribute('src')) {
+            } else if (block === 'js') {
+                // Recreate script to trigger execution, as browsers don't execute scripts when
+                // inserted via innerHTML or cloned via cloneNode.
+                const newScript = document.createElement('script');
+
+                Array.from(element.attributes).forEach(attr => {
+                    newScript.setAttribute(attr.name, attr.value);
+                });
+
+                if (element.src) {
                     this.scriptReferenceCount++;
-                    element.onload = element.onerror = this._scriptLoaded.bind(this);
+                    newScript.async = false;
+                    newScript.onload = newScript.onerror = this._scriptLoaded.bind(this);
                 }
+                newScript.textContent = element.textContent;
+
+                location.appendChild(newScript);
+            } else {
                 location.appendChild(element);
             }
         }
