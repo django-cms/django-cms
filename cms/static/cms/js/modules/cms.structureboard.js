@@ -540,8 +540,10 @@ class StructureBoard {
                 });
 
                 const unhandledPlugins = bodyElement.find('template.cms-plugin');
-
+                console.log(unhandledPlugins);
                 if (unhandledPlugins.length) {
+
+                    debugger;
                     CMS.API.Messages.open({
                         message: CMS.config.lang.unhandledPageChange
                     });
