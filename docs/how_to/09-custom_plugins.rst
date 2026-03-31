@@ -1080,7 +1080,7 @@ You can mark a plugin as a *slot* — a structural container that is not directl
 by the user — by setting the :attr:`~cms.plugin_base.CMSPluginBase.is_slot` attribute to
 ``True`` on the plugin class. The plugin will still render normally, but double-clicking
 it in the structure board will not open the edit dialog. Moving the plugin or adding child
-plugins are not affected.
+plugins is not affected.
 
 .. code-block::
 
