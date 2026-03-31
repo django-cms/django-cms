@@ -1116,3 +1116,58 @@ the plugin class in your app's ``AppConfig.ready()`` method:
             # Mark a third-party plugin as a slot to simplify
             # the editor experience
             plugin_pool.get_plugin("SomeThirdPartyPlugin").is_slot = True
+
+Customising structure board appearance
+--------------------------------------
+
+.. versionadded:: 5.1
+
+You can customise the appearance of a plugin's entry in the structure board by defining
+an ``add_structureboard_classes`` method on the plugin's **model** (i.e. the
+``CMSPlugin`` subclass, not the ``CMSPluginBase`` subclass). If the method exists, its
+return value is added as CSS classes to the ``cms-draggable`` container that wraps the
+plugin in the structure board.
+
+Combined with custom CSS — for example loaded via a :ref:`custom toolbar <admin-style-customisation>` or
+admin stylesheet — this lets you visually distinguish plugins based on their state or
+configuration.
+
+A typical use case is marking deactivated or draft plugins so editors can spot them at a
+glance.
+
+.. code-block::
+
+    from django.db import models
+    from cms.models.pluginmodel import CMSPlugin
+
+    class AlertPlugin(CMSPlugin):
+        message = models.CharField(max_length=200)
+        is_active = models.BooleanField(default=True)
+
+        def add_structureboard_classes(self):
+            if not self.is_active:
+                return "cms-plugin-inactive"
+            return ""
+
+Then provide matching CSS (e.g. in a custom admin stylesheet):
+
+.. code-block:: css
+
+    /* Grey out inactive plugins in the structure board */
+    .cms-draggable.cms-plugin-inactive > .cms-dragitem {
+        opacity: 0.45;
+    }
+
+The classes are also applied to the plugin's **children**, so you can style an entire
+sub-tree. For example, to add a left border to all children of a deactivated plugin:
+
+.. code-block:: css
+
+    .cms-draggable.cms-plugin-inactive .cms-draggable {
+        border-left: 3px solid #c00;
+    }
+
+.. note::
+
+    The method is called during structure board rendering. Keep it fast — avoid database
+    queries. Use values that are already available on the model instance.
