@@ -303,6 +303,30 @@
         }
     }
 
+    // #DRAGGABLES/slots#
+    .cms-draggable.cms-slot {
+        &:has(> .cms-dragitem-expanded) {
+            background-color: $gray-lightest;
+            padding-bottom: 6px;
+            border: 2px solid $color-secondary;
+            border-radius: 5px;
+            > .cms-dragitem {
+                background-color: $gray-lightest;
+                margin-bottom: 2px;
+                border: none;
+            }
+        }
+        & > .cms-collapsable-container .cms-dragitem {
+            border-color: $gray-lightest;
+            border-inline-end: none;
+        }
+        & > .cms-dragitem {
+            background-color: $gray-lightest;
+        }
+        & > .cms-dragitem > .cms-dragitem-text {
+            color: $gray;
+        }
+    }
     // #DRAGGABLES/specific#
     .cms-draggable {
         color: $black;

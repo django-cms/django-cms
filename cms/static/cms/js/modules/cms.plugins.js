@@ -287,7 +287,9 @@ class Plugin {
 
         this.ui.draggable.data('cms', this.options);
 
-        this.ui.dragitem.on(Plugin.doubleClick, this._dblClickToEditHandler.bind(this));
+        if (!this.ui.dragitem.hasClass('cms-slot')) {
+            this.ui.dragitem.on(Plugin.doubleClick, this._dblClickToEditHandler.bind(this));
+        }
 
         // adds listener for all plugin updates
         this.ui.draggable.off('cms-plugins-update').on('cms-plugins-update', function(e, eventData) {
