@@ -371,7 +371,7 @@
             4px 4px 0 0 $color-primary;
     }
 
-    .cms-draggables:not(.cms-drag-disabled) > .cms-draggable:not(.cms-draggable-disabled) .cms-dragitem {
+    .cms-dragitem {
         cursor: move;
         @if ($structure-dragarea-use-background == 1) {
             background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABCCAAAAAB73glBAAAAAnRSTlMAAHaTzTgAAAAeSURBVHgBY7gCBgxAAGHRRoAKYOi5dNSloy4ddSkA3VChcDH0cxcAAAAASUVORK5CYII=");
@@ -380,10 +380,13 @@
             background-size: 8px 33px;
         }
     }
+    .cms-draggable-disabled > .cms-collapsable-container .cms-dragitem {
+        background-image: none;
+    }
     .cms-dragitem {
         position: relative;
         border-radius: $border-radius-normal;
-        background: $white;
+        background-color: $white;
         &:hover {
             box-shadow: inset 0 0 0 1px $gray-light;
         }

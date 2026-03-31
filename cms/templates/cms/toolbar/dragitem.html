@@ -4,7 +4,8 @@
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
     {% if is_slot %}cms-slot{% endif %}
     {{ plugin.add_structureboard_classes|default:'' }}
-    {% if not allow_children %} cms-draggable-disabled{% endif %}
+    {% if object_is_immutable %}cms-drag-disabled{% endif %}
+    {% if disable_child_plugins %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
 
     <div class="cms-dragitem cms-dragitem-handler

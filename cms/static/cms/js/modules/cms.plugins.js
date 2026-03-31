@@ -287,7 +287,7 @@ class Plugin {
 
         this.ui.draggable.data('cms', this.options);
 
-        if (!this.ui.dragitem.hasClass('cms-slot')) {
+        if (!this.ui.draggable.hasClass('cms-slot')) {
             this.ui.dragitem.on(Plugin.doubleClick, this._dblClickToEditHandler.bind(this));
         }
 

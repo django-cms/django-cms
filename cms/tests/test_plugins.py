@@ -1769,6 +1769,30 @@ class IsSlotPluginTestCase(PluginsTestBaseCase):
             self.assertTrue(slot_info["is_slot"])
             self.assertFalse(non_slot_info["is_slot"])
 
+    def test_is_slot_disables_add_form_in_toolbar_struct(self):
+        """Unit test: get_toolbar_plugin_struct disables add_form for slot plugins."""
+        from cms.utils.placeholder import get_toolbar_plugin_struct
+
+        SlotPlugin = type(
+            "SlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=True, show_add_form=True),
+        )
+        NonSlotPlugin = type(
+            "NonSlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=False, show_add_form=True),
+        )
+
+        with register_plugins(SlotPlugin, NonSlotPlugin):
+            toolbar_struct = get_toolbar_plugin_struct([SlotPlugin, NonSlotPlugin])
+
+        slot_config = next(config for config in toolbar_struct if config["value"] == "SlotPlugin")
+        non_slot_config = next(config for config in toolbar_struct if config["value"] == "NonSlotPlugin")
+
+        self.assertFalse(slot_config["add_form"])
+        self.assertTrue(non_slot_config["add_form"])
+
     def test_is_slot_content_renderer(self):
         """Integration test: content renderer adds cms-slot class when is_slot is True."""
         from django.template import RequestContext

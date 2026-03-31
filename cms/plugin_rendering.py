@@ -506,7 +506,7 @@ class ContentRenderer(BaseRenderer):
             content = processor(instance, placeholder, content, context)
 
         if editable:
-            is_slot = getattr(instance, "is_slot", False) or getattr(plugin, "is_slot", False)
+            is_slot = getattr(plugin, "is_slot", False)
             content = self.plugin_edit_template.format(
                 pk=instance.pk,
                 placeholder=instance.placeholder_id,
