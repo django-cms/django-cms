@@ -545,7 +545,7 @@ class StructureBoard {
                     CMS.API.Messages.open({
                         message: CMS.config.lang.unhandledPageChange
                     });
-                    Helpers.reloadBrowser('REFRESH_PAGE');
+                    window.location.href = CMS.config.settings.edit;
                 }
 
                 that._loadedContent = true;
