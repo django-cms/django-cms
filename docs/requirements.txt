@@ -113,7 +113,7 @@ pyenchant==3.3.0
     # via
     #   -r requirements.in
     #   sphinxcontrib-spelling
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   -r requirements.in
     #   accessible-pygments
