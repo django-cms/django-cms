@@ -10,7 +10,7 @@ from django.template import Context
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
-from django.utils.translation import override
+from django.utils.translation import get_language, override
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
@@ -365,12 +365,13 @@ class ContentRenderer(BaseRenderer):
             return ''
 
         current_page = page or self.current_page
+        language = get_language()
         placeholder_cache = self._placeholders_by_page_cache
 
         if current_page.pk not in placeholder_cache:
             # Instead of loading plugins for this one placeholder
             # try and load them for all placeholders on the page.
-            self._preload_placeholders_for_page(current_page)
+            self._preload_placeholders_for_page(current_page, language=language)
 
         try:
             placeholder = placeholder_cache[current_page.pk][slot]
@@ -382,6 +383,7 @@ class ContentRenderer(BaseRenderer):
                 placeholder,
                 context=context,
                 page=current_page,
+                language=language,
                 editable=editable,
                 use_cache=True,
                 nodelist=None,
@@ -577,7 +579,7 @@ class ContentRenderer(BaseRenderer):
         else:
             return Placeholder.objects.none()
 
-    def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
+    def _preload_placeholders_for_page(self, page, language=None, slots=None, inherit=False):
         """
         Populates the internal plugin cache of each placeholder
         in the given page if the placeholder has not been
@@ -586,6 +588,7 @@ class ContentRenderer(BaseRenderer):
         from cms.utils.plugins import assign_plugins
 
         placeholders = self._get_content_object(page, slots=slots)
+        language = language or self.request_language
 
         if inherit:
             # When the inherit flag is True,
@@ -605,7 +608,7 @@ class ContentRenderer(BaseRenderer):
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
-                if _cached_content(placeholder, self.request_language) is None]
+                if _cached_content(placeholder, language) is None]
         else:
             # cache is disabled, prefetch plugins for all
             # placeholders in the page.
@@ -616,7 +619,7 @@ class ContentRenderer(BaseRenderer):
                 request=self.request,
                 placeholders=placeholders_to_fetch,
                 template=page.get_template(),
-                lang=self.request_language,
+                lang=language,
             )
 
         parent_page = page.parent_page
@@ -630,6 +633,7 @@ class ContentRenderer(BaseRenderer):
         if parent_page and placeholders_to_inherit:
             self._preload_placeholders_for_page(
                 page=parent_page,
+                language=language,
                 slots=placeholders_to_inherit,
                 inherit=True,
             )
