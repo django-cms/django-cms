@@ -1,18 +1,22 @@
 {% load i18n l10n cms_tags %}
 
-{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins %}
-<div  class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
+{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins is_slot=plugin.get_plugin_class.is_slot %}
+<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
+    {% if is_slot %}cms-slot{% endif %}
+    {{ plugin.add_structureboard_classes|default:'' }}
     {% if object_is_immutable %}cms-drag-disabled{% endif %}
-    {% if not allow_children %} cms-draggable-disabled{% endif %}
+    {% if disable_child_plugins %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
 
     <div class="cms-dragitem cms-dragitem-handler
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% if not disabled_child %}
             {% if not object_is_immutable %}
-                <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
-                    <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
-                </div>
+                {% if not is_slot %}
+                    <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
+                        <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
+                    </div>
+                {% endif %}
                 <div class="cms-submenu-btn cms-submenu-add cms-btn
                     {% if not allow_children %} cms-btn-disabled{% endif %}">
                     {% if not allow_children %}
@@ -61,7 +65,7 @@
     </div>
 
     <div class="cms-collapsable-container cms-hidden
-        {% if allow_children %} cms-draggables{% endif %}">
+        {% if allow_children %} cms-draggables{% if object_is_immutable %} cms-drag-disabled{% endif %}{% endif %}">
         {% if plugin.child_plugin_instances %}
             {% for child in plugin.child_plugin_instances %}
                 {% include cms_toolbar.templates.drag_item_template with plugin=child disabled_child=disable_child_plugins %}
