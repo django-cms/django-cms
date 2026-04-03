@@ -905,7 +905,7 @@ class RenderPlaceholder(AsTag):
         content = renderer.render_placeholder(
             placeholder=placeholder,
             context=context,
-            language=language,
+            language=language or get_language(),
             editable=editable,
             use_cache=not nocache,
             width=width,
