@@ -109,6 +109,12 @@ export class DiffDOM {
             return;
         }
 
+        // Text nodes have no innerHTML or childNodes — handle them directly
+        if (newNode.nodeType === Node.TEXT_NODE || newNode.nodeType === Node.COMMENT_NODE) {
+            target.textContent = newNode.textContent;
+            return;
+        }
+
         // Fast path: skip entirely when nothing changed
         if (target.innerHTML === newNode.innerHTML) {
             return;
