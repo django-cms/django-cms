@@ -649,6 +649,29 @@ describe('DiffDOM', function() {
             delete window.__deepCounter;
         });
 
+        it('applies plain text string without losing content', function() {
+            // When newContent is a plain string like 'hello', DOMParser produces
+            // a text node as doc.body.firstChild. apply() must handle this and
+            // set the target's textContent rather than clearing it. (#8556 related)
+            container.innerHTML = '<p>Old</p>';
+
+            var diff = dd.diff(container, 'hello');
+            dd.apply(container, diff);
+
+            expect(container.textContent).toBe('hello');
+        });
+
+        it('applies text-node object without losing content', function() {
+            // When newContent is a #text object, _objToNode returns a text node.
+            // apply() must handle this and preserve the text.
+            container.innerHTML = '<p>Old</p>';
+
+            var diff = dd.diff(container, { nodeName: '#text', data: 'from object' });
+            dd.apply(container, diff);
+
+            expect(container.textContent).toBe('from object');
+        });
+
         it('handles SVG elements', function() {
             const svgHTML = `<div>
                 <svg width="100" height="100">
