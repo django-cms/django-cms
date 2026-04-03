@@ -287,7 +287,9 @@ class Plugin {
 
         this.ui.draggable.data('cms', this.options);
 
-        this.ui.dragitem.on(Plugin.doubleClick, this._dblClickToEditHandler.bind(this));
+        if (!this.ui.draggable.hasClass('cms-slot')) {
+            this.ui.dragitem.on(Plugin.doubleClick, this._dblClickToEditHandler.bind(this));
+        }
 
         // adds listener for all plugin updates
         this.ui.draggable.off('cms-plugins-update').on('cms-plugins-update', function(e, eventData) {
@@ -363,11 +365,12 @@ class Plugin {
     _dblClickToEditHandler(e) {
         var that = this;
         var disabled = $(e.currentTarget).closest('.cms-drag-disabled');
+        var edit_disabled = $(e.currentTarget).closest('.cms-draggable').hasClass('cms-slot');
 
         e.preventDefault();
         e.stopPropagation();
 
-        if (!disabled.length) {
+        if (!disabled.length && !edit_disabled) {
             that.editPlugin(
                 Helpers.updateUrlWithPath(that.options.urls.edit_plugin),
                 that.options.plugin_name,
@@ -407,11 +410,14 @@ class Plugin {
             });
 
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
+            // only allow editing by double-click if not disabled
+            var selector = `.cms-plugin-${this.options.plugin_id}:not(.cms-slot)`;
+
             $document
-                .off(pluginDoubleClickEvent, `.cms-plugin-${this.options.plugin_id}`)
+                .off(pluginDoubleClickEvent, selector)
                 .on(
                     pluginDoubleClickEvent,
-                    `.cms-plugin-${this.options.plugin_id}`,
+                    selector,
                     this._dblClickToEditHandler.bind(this)
                 );
         }
@@ -443,8 +449,14 @@ class Plugin {
                 }
                 var name = that.options.plugin_name;
                 var id = that.options.plugin_id;
+                var disabled = $(e.currentTarget).hasClass('cms-slot'); // No tooltip for disabled plugins
 
-                CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+                CMS.API.Tooltip.displayToggle(
+                    (e.type === 'pointerover' || e.type === 'touchstart') && !disabled,
+                    e,
+                    name,
+                    id
+                );
             });
     }
 
@@ -2023,7 +2035,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         // otherwise propagation won't work to the nested plugin
 
         e.stopPropagation();
-        const pluginContainer = $(e.target).closest('.cms-plugin');
+        const pluginContainer = $(e.target).closest('.cms-plugin:not(.cms-slot)');
         const allOptions = pluginContainer.data('cms');
 
         if (!allOptions || !allOptions.length) {
