@@ -923,7 +923,7 @@ class RenderPlaceholder(AsTag):
         content = renderer.render_placeholder(
             placeholder=placeholder,
             context=context,
-            language=kwargs.get('language'),
+            language=kwargs.get('language') or get_language(),
             editable=editable,
             use_cache=not nocache,
             width=kwargs.get('width'),
