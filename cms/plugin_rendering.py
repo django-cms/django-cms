@@ -215,7 +215,7 @@ class BaseRenderer:
 class ContentRenderer(BaseRenderer):
     plugin_edit_template = (
         '<template class="cms-plugin '
-        'cms-plugin-start cms-plugin-{pk}" data-cms-placeholder="{placeholder}"></template>{content}'
+        'cms-plugin-start cms-plugin-{pk}{disabled}" data-cms-placeholder="{placeholder}"></template>{content}'
         '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
     )
     placeholder_edit_template = (
@@ -508,8 +508,13 @@ class ContentRenderer(BaseRenderer):
             content = processor(instance, placeholder, content, context)
 
         if editable:
+            is_slot = getattr(plugin, "is_slot", False)
             content = self.plugin_edit_template.format(
-                pk=instance.pk, placeholder=instance.placeholder_id, content=content, position=instance.position
+                pk=instance.pk,
+                placeholder=instance.placeholder_id,
+                content=content,
+                position=instance.position,
+                disabled=' cms-slot' if is_slot else '',
             )
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
             placeholder_cache.setdefault("plugins", []).append(instance)
@@ -540,12 +545,13 @@ class ContentRenderer(BaseRenderer):
             heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
             if "_last_plugin" in context:
                 # Make error message editable by double-click to open the editor for the plugin causing the exception
-                instance = context["_last_plugin"]
+                is_slot = getattr(instance, "is_slot", False)
                 heading = self.plugin_edit_template.format(
                     pk=instance.pk,
                     placeholder=instance.placeholder_id,
                     content=heading,
                     position=instance.position,
+                    disabled=' cms-slot' if is_slot else '',
                 )
                 placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
                 placeholder_cache.setdefault("plugins", []).append(instance)
