@@ -10,6 +10,10 @@ permissions:
 jobs:
   new:
     name: Hello new contributor
+    if: >-
+      github.event.pull_request.author_association == 'FIRST_TIMER'
+      || github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+      || github.event.pull_request.author_association == 'NONE'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/first-interaction@v3
