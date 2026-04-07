@@ -539,6 +539,47 @@ class TestLanguageFallbacks(CMSTestCase):
             self.assertEqual(rendered_placeholder, "Hello, world!")
 
     @override_settings(
+        LANGUAGES=(
+            ('en', 'English'),
+            ('de', 'Deutsch'),
+            ('it', 'Italian'),
+            ('fr', 'French'),
+        ),
+        CMS_LANGUAGES={
+            'default': {
+                'fallbacks': ['en', 'fr'],
+                'public': True,
+                'redirect_on_fallback': False,
+                'hide_untranslated': False,
+            },
+        },
+    )
+    def test_no_redirect_on_fallback_placeholder_rendering(self):
+        """
+        When redirect_on_fallback is False and hide_untranslated is False,
+        requesting a page in a language that has no content should render
+        the placeholder content from the fallback language, not empty placeholders.
+        Regression test for issue #8556.
+        """
+        homepage = self.create_homepage(
+            "home",
+            "nav_playground.html",
+            "en",
+        )
+        homepage_ph = homepage.get_placeholders("en").get(slot="body")
+        api.add_plugin(
+            homepage_ph,
+            plugin_type="TextPlugin",
+            language="en",
+            body="English content",
+        )
+        # Request the page in Italian which has no translation;
+        # the fallback chain is ['en', 'fr'] so English content should appear.
+        response = self.client.get(homepage.get_absolute_url(language="it"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "English content")
+
+    @override_settings(
         CMS_LANGUAGES={
             'default': {
                 'fallbacks': ['en', 'fr'],

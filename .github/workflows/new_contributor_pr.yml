@@ -27,6 +27,10 @@ jobs:
             We invite you to join us on our [Discord Server](https://discord-main-channel.django-cms.org)!
 
             Welcome aboard ⛵️!
+          issue_message: |
+            Hello! Thank you for opening your first issue! 🎉
+
+            We invite you to join us on our [Discord Server](https://discord-main-channel.django-cms.org)!
   discord:
     name: Discord Notification
     runs-on: ubuntu-latest

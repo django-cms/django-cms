@@ -115,9 +115,9 @@ class CreateCMSPageForm(AddPageForm):
             parent_page = None
 
         if parent_page:
-            has_perm = user_can_add_subpage(self._user, target=parent_page)
+            has_perm = user_can_add_subpage(self._user, target=parent_page, site=self._site)
         else:
-            has_perm = user_can_add_page(self._user)
+            has_perm = user_can_add_page(self._user, site=self._site)
 
         if not has_perm:
             message = gettext('You don\'t have the permissions required to add a page.')

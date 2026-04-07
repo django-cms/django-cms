@@ -102,7 +102,7 @@ class PlaceholderToolbar(CMSToolbar):
 
         user = self.request.user
         page_pk = self.page.pk if self.page else ""
-        disabled = not list(entry_choices(user, self.page))
+        disabled = not list(entry_choices(user, self.page, site=self.current_site))
 
         url = "{url}?page={page}&language={lang}&edit".format(
             url=admin_reverse("cms_wizard_create"),
