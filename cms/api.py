@@ -133,7 +133,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 navigation_extenders=None, published=None, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
-                xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
+                xframe_options=constants.X_FRAME_OPTIONS_INHERIT, page_title=None):
     """
     Creates a :class:`cms.models.Page` instance and returns it. Also
     creates a :class:`cms.models.PageContent` instance for the specified
@@ -239,6 +239,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         language=language,
         title=title,
         menu_title=menu_title,
+        page_title=page_title,
         slug=slug,
         created_by=created_by,
         redirect=redirect,
