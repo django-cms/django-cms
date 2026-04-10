@@ -152,6 +152,7 @@ def create_page(
     position="last-child",
     overwrite_url=None,
     xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
+    page_title=None,
 ):
     """
     Creates a :class:`cms.models.Page` instance and returns it. Also
@@ -263,6 +264,7 @@ def create_page(
         language=language,
         title=title,
         menu_title=menu_title,
+        page_title=page_title,
         slug=slug,
         created_by=created_by,
         redirect=redirect,
