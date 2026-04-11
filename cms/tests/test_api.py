@@ -3,6 +3,7 @@ import sys
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
