@@ -85,6 +85,9 @@
     "build:v5": "npm run v5 -- build",
     "typecheck:v5": "npm run v5 -- typecheck",
     "test:v5": "npm run v5 -- test",
-    "test:v5:watch": "vitest --config cms/contrib/frontend_v5/vitest.config.ts"
+    "test:v5:watch": "vitest --config cms/contrib/frontend_v5/vitest.config.ts",
+    "test:v5:e2e": "playwright test --config cms/contrib/frontend_v5/playwright.config.js",
+    "test:v5:e2e:headed": "playwright test --config cms/contrib/frontend_v5/playwright.config.js --headed",
+    "test:v5:e2e:debug": "playwright test --config cms/contrib/frontend_v5/playwright.config.js --debug"
   }
 }
