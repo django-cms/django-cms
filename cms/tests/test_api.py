@@ -261,9 +261,9 @@ class PythonAPITests(CMSTestCase):
                 self.assertEqual(content.created_by, user.username)
 
                 # Slug and overwrite_url create the expected URL entry
-                self.assertTrue(page.get_urls(language="en").filter(slug="full-slug").exists())
+                self.assertTrue(page.get_urls().filter(language="en", slug="full-slug").exists())
                 self.assertTrue(
-                    page.get_urls(language="en").filter(path="full/overwrite", managed=False).exists()
+                    page.get_urls().filter(language="en", path="full/overwrite", managed=False).exists()
                 )
         finally:
             menu_pool.menus = old_menus
