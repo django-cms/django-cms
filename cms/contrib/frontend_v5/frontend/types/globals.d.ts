@@ -34,6 +34,16 @@ declare global {
      */
     function URLify(value: string, numChars?: number): string;
 
+    /**
+     * Django's i18n gettext global, loaded from the `jsi18n` view on
+     * admin pages that request it. Declared as possibly-undefined
+     * because not every admin page includes jsi18n — call sites must
+     * guard with `typeof gettext === 'function'` or `gettext?.(…)`.
+     *
+     * Source: https://docs.djangoproject.com/en/stable/topics/i18n/translation/#internationalization-in-javascript-code
+     */
+    const gettext: ((message: string) => string) | undefined;
+
     interface Window {
         unihandecode?: UnihandecodeGlobal;
         /**
@@ -65,6 +75,28 @@ declare global {
     }
 
     interface CmsGlobal {
+        /**
+         * Legacy `CMS.API` namespace — a grab-bag for public JS API
+         * methods exposed to inline scripts in templates and to
+         * third-party apps. Individual bundles attach their methods
+         * here as they're migrated (e.g. `CMS.API.changeLanguage` from
+         * admin.changeform). Shape is intentionally open-ended so
+         * future bundles can add their own methods without needing to
+         * coordinate type declarations.
+         */
+        API?: CmsApi;
+        [key: string]: unknown;
+    }
+
+    interface CmsApi {
+        /**
+         * Navigate to another language tab on the page change form.
+         * Shows a confirm() dialog if the title or slug has unsaved
+         * edits, otherwise navigates directly. Set up by the
+         * admin.changeform bundle; called from the inline template
+         * script in `admin/cms/page/change_form.html`.
+         */
+        changeLanguage?: (url: string) => void;
         [key: string]: unknown;
     }
 }

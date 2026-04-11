@@ -64,6 +64,7 @@ module.exports = function (opts) {
             'forms.slugwidget': path.join(SRC, 'bundles', 'forms.slugwidget.ts'),
             'forms.pageselectwidget': path.join(SRC, 'bundles', 'forms.pageselectwidget.ts'),
             'forms.apphookselect': path.join(SRC, 'bundles', 'forms.apphookselect.ts'),
+            'admin.changeform': path.join(SRC, 'bundles', 'admin.changeform.ts'),
         },
         output: {
             path: path.join(STATIC_OUT, CMS_VERSION),
