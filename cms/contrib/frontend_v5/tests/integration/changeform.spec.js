@@ -72,16 +72,21 @@ test.beforeAll(async ({ browser }) => {
             .catch(() => {});
     }
 
-    // We should now have at least one edit link. Extract its pagecontent id.
+    // We should now have at least one edit link. Extract its pagecontent
+    // id — which is the SECOND number in the URL, not the first. The
+    // pattern is /cms/placeholder/object/<content_type_id>/edit/<object_id>/
+    // per cms/admin/placeholderadmin.py; the object_id is what we want.
     const editLinkHref = await page
         .locator('a[href*="/cms/placeholder/object/"][href*="/edit/"]')
         .first()
         .getAttribute('href');
-    const pcMatch = editLinkHref?.match(/\/cms\/placeholder\/object\/(\d+)\//);
+    const pcMatch = editLinkHref?.match(
+        /\/cms\/placeholder\/object\/\d+\/edit\/(\d+)\//,
+    );
     if (!pcMatch) {
         await ctx.close();
         throw new Error(
-            'changeform.spec.beforeAll: could not discover a PageContent id from the page tree. Check that the testserver has the contrib app enabled and at least one CMS page exists.',
+            `changeform.spec.beforeAll: could not discover a PageContent id from the page tree. First edit link href was ${editLinkHref}. Check that the testserver has the contrib app enabled and at least one CMS page exists.`,
         );
     }
     const bootstrapPcId = pcMatch[1];

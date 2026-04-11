@@ -73,18 +73,17 @@ const test = baseTest.extend({
              * PageContent row (the first one). Returns null if no
              * pages exist.
              *
-             * The CMS page tree doesn't render standard Django admin
-             * change-form links. Instead, each row has "Edit/View"
-             * buttons pointing to
-             *   /en/admin/cms/placeholder/object/<pc_id>/edit/<N>/
-             * where <pc_id> is the PageContent id. We extract it from
-             * the first such link.
+             * The CMS page tree's "Edit/View" buttons point to
+             *   /cms/placeholder/object/<content_type_id>/edit/<object_id>/
+             * per cms/admin/placeholderadmin.py and cms/views.py
+             * (`render_object_edit`). The FIRST number is the
+             * ContentType pk, the SECOND (after /edit/) is the actual
+             * object id — in the page tree context the object IS a
+             * PageContent, so extracting the second number gives us
+             * a usable PageContent id.
              */
             async getFirstPageContentId() {
                 await page.goto(settings.pageAdminUrl);
-                // Wait for the tree to hydrate — the Edit/View links are
-                // injected after a get-tree AJAX call, not on initial
-                // HTML render.
                 await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {});
                 const editLink = page
                     .locator('a[href*="/cms/placeholder/object/"][href*="/edit/"]')
@@ -92,7 +91,11 @@ const test = baseTest.extend({
                 if ((await editLink.count()) === 0) return null;
                 const href = await editLink.getAttribute('href');
                 if (!href) return null;
-                const match = href.match(/\/cms\/placeholder\/object\/(\d+)\//);
+                // Match `object/<ct_id>/edit/<object_id>/` and return the
+                // second capture group (object_id).
+                const match = href.match(
+                    /\/cms\/placeholder\/object\/\d+\/edit\/(\d+)\//,
+                );
                 return match ? match[1] : null;
             },
 
