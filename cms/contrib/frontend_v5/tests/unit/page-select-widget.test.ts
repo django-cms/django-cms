@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { PageSelectWidget } from '../../src/modules/page-select-widget';
+import { PageSelectWidget } from '../../frontend/modules/page-select-widget';
 
 /**
  * Fixture DOM for the three-select page picker. Mirrors what Django's

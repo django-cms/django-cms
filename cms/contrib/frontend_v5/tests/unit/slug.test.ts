@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { addSlugHandlers } from '../../src/modules/slug';
+import { addSlugHandlers } from '../../frontend/modules/slug';
 
 /**
  * Test helpers.

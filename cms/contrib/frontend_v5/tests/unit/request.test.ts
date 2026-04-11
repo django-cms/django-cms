@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { del, get, getCookie, post, put, request, RequestError } from '../../src/modules/request';
+import { del, get, getCookie, post, put, request, RequestError } from '../../frontend/modules/request';
 
 /**
  * Build a Response-shaped mock without depending on the real Response

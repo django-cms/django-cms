@@ -8,7 +8,7 @@ import {
     setSetSize,
     setTreeItemRole,
     setTreeRole,
-} from '../../src/modules/tree/aria';
+} from '../../frontend/modules/tree/aria';
 
 describe('tree aria', () => {
     let el: HTMLElement;

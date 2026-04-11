@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
     initApphookSelect,
     type ApphookWidgetData,
-} from '../../src/modules/apphook-select';
+} from '../../frontend/modules/apphook-select';
 
 /**
  * Build the DOM that Django's page advanced-settings form produces.

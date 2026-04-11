@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { delegate } from '../../src/modules/events';
+import { delegate } from '../../frontend/modules/events';
 
 describe('delegate', () => {
     beforeEach(() => {

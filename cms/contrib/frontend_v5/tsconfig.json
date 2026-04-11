@@ -18,9 +18,9 @@
     "types": ["vitest/globals"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["frontend/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["frontend/**/*", "tests/**/*"],
   "exclude": ["static", "node_modules"]
 }

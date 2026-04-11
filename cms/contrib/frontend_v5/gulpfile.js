@@ -10,7 +10,7 @@
  *   build         — webpack + sass + vendor production build
  *   build:dev     — same, with sourcemaps and no minification
  *   watch         — webpack watch mode (use `sass` separately for CSS)
- *   sass          — compile src/sass/cms.*.scss → static/cms/css/<CMS_VERSION>/
+ *   sass          — compile frontend/sass/cms.*.scss → static/cms/css/<CMS_VERSION>/
  *   copy-vendor   — copy vendor assets (tom-select default CSS) into the
  *                   drop-in paths that legacy code expects (e.g.
  *                   /static/cms/js/select2/select2.css is shadowed with
@@ -99,7 +99,7 @@ const build = buildWebpack({ debug: false });
 const buildDev = buildWebpack({ debug: true });
 const watch = buildWebpack({ debug: true, watch: true });
 
-// SCSS build. Inputs are the top-level `cms.*.scss` entries in src/sass/;
+// SCSS build. Inputs are the top-level `cms.*.scss` entries in frontend/sass/;
 // partials (files prefixed with `_`) are imported by them and skipped as
 // compilation targets automatically by gulp-sass. Output lands at the
 // legacy-matching path so the drop-in contract in CLAUDE.md holds: when
@@ -108,7 +108,7 @@ const watch = buildWebpack({ debug: true, watch: true });
 function sass() {
     const debug = !!argv.debug;
     return gulp
-        .src(path.join(APP_ROOT, 'src', 'sass', '**', '*.scss'))
+        .src(path.join(APP_ROOT, 'frontend', 'sass', '**', '*.scss'))
         .pipe(gulpif(debug, sourcemaps.init()))
         .pipe(gulpSass({ outputStyle: 'expanded' }).on('error', gulpSass.logError))
         .pipe(postcss([autoprefixer()]))

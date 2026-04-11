@@ -8,7 +8,7 @@ export default defineConfig({
     root: here,
     resolve: {
         alias: {
-            '@': resolve(here, 'src'),
+            '@': resolve(here, 'frontend'),
         },
     },
     test: {
@@ -17,8 +17,7 @@ export default defineConfig({
         include: ['tests/unit/**/*.test.ts'],
         coverage: {
             provider: 'v8',
-            include: ['src/**/*.ts'],
-            exclude: ['src/spike/**'],
+            include: ['frontend/**/*.ts'],
             reporter: ['text', 'lcov'],
         },
     },

@@ -4,8 +4,8 @@ import {
     TYPEAHEAD_RESET_MS,
     type KeyContext,
     type TypeAheadBuffer,
-} from '../../src/modules/tree/keyboard-nav';
-import { TreeState } from '../../src/modules/tree/state';
+} from '../../frontend/modules/tree/keyboard-nav';
+import { TreeState } from '../../frontend/modules/tree/state';
 
 /**
  * Build a fixture tree with readable labels:

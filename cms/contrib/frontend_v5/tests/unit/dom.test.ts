@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { $, $$, addClass, closest, html, removeClass, toggleClass } from '../../src/modules/dom';
+import { $, $$, addClass, closest, html, removeClass, toggleClass } from '../../frontend/modules/dom';
 
 describe('dom', () => {
     beforeEach(() => {

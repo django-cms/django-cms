@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TreeState, type TreeNodeInit } from '../../src/modules/tree/state';
+import { TreeState, type TreeNodeInit } from '../../frontend/modules/tree/state';
 
 interface Payload {
     label: string;

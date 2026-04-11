@@ -39,7 +39,7 @@ const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const APP_ROOT = __dirname;
-const SRC = path.join(APP_ROOT, 'src');
+const SRC = path.join(APP_ROOT, 'frontend');
 // MUST mirror the legacy on-disk layout — see contract above.
 const STATIC_OUT = path.join(APP_ROOT, 'static', 'cms', 'js', 'dist');
 
