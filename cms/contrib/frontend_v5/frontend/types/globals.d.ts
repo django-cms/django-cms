@@ -48,7 +48,7 @@ declare global {
         unihandecode?: UnihandecodeGlobal;
         /**
          * Set by slug.ts after Django admin's unihandecode has been
-         * instantiated. Re-used across the session for the active locale.
+         * instantiated. Reused across the session for the active locale.
          */
         UNIHANDECODER?: UnihanDecoder;
 

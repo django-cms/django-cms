@@ -168,7 +168,7 @@ export function initApphookSelect(data: ApphookWidgetData = DEFAULT_DATA): Appho
         }
     };
 
-    // Initial pass so the DOM is consistent with the pre-selected apphook
+    // Initial pass so the DOM is consistent with the preselected apphook
     // when the form first renders (or re-renders after a validation error).
     setupNamespaces();
 
