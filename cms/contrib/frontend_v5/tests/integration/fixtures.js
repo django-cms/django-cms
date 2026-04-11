@@ -69,25 +69,30 @@ const test = baseTest.extend({
             login: () => login(page),
 
             /**
-             * Navigate to the page admin changelist and return the ID
-             * of the first page in the tree. Returns null if no pages
-             * exist — the caller is responsible for handling that case
-             * (typically: create one).
+             * Navigate to the CMS page tree and return the id of a
+             * PageContent row (the first one). Returns null if no
+             * pages exist.
+             *
+             * The CMS page tree doesn't render standard Django admin
+             * change-form links. Instead, each row has "Edit/View"
+             * buttons pointing to
+             *   /en/admin/cms/placeholder/object/<pc_id>/edit/<N>/
+             * where <pc_id> is the PageContent id. We extract it from
+             * the first such link.
              */
-            async getFirstPageId() {
+            async getFirstPageContentId() {
                 await page.goto(settings.pageAdminUrl);
-                // The page tree renders each page as a row with a link
-                // whose href contains the page id. We look for the
-                // advanced-settings or change-form link under the first
-                // row — the exact selector matches the CMS page tree
-                // template output.
-                const firstLink = page.locator(
-                    'a[href*="/cms/page/"][href*="/change/"], a[href*="/cms/page/"][href*="/advanced-settings/"]',
-                ).first();
-                if ((await firstLink.count()) === 0) return null;
-                const href = await firstLink.getAttribute('href');
+                // Wait for the tree to hydrate — the Edit/View links are
+                // injected after a get-tree AJAX call, not on initial
+                // HTML render.
+                await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {});
+                const editLink = page
+                    .locator('a[href*="/cms/placeholder/object/"][href*="/edit/"]')
+                    .first();
+                if ((await editLink.count()) === 0) return null;
+                const href = await editLink.getAttribute('href');
                 if (!href) return null;
-                const match = href.match(/\/cms\/page\/(\d+)\//);
+                const match = href.match(/\/cms\/placeholder\/object\/(\d+)\//);
                 return match ? match[1] : null;
             },
 
@@ -148,16 +153,52 @@ const test = baseTest.extend({
             },
 
             /**
-             * Navigate to the advanced settings form for a given page.
-             * This is the page that renders the admin.changeform bundle.
+             * Navigate to the PAGE admin advanced-settings form for a
+             * given page id. This is the form that loads the
+             * `admin.changeform` bundle. It has apphook config,
+             * permission inlines, and the lazy-loaded permissions
+             * summary — but NOT title/slug (those live on PageContent).
              */
-            async openAdvancedSettings(pageId) {
+            async openPageAdvanced(pageId) {
                 await page.goto(
                     `${settings.baseUrl}/en/admin/cms/page/${pageId}/advanced-settings/`,
                 );
-                // The form renders the title and slug inputs — wait for
-                // at least the title input to be ready so follow-up
-                // operations can target them immediately.
+                // Wait for anything reliable on the advanced settings
+                // form. The submit row is always present regardless of
+                // permission config.
+                await page.waitForSelector('input[name="_save"], input[name="_continue"]', {
+                    timeout: 10_000,
+                });
+            },
+
+            /**
+             * Navigate to the PageContent change form (the form with
+             * title, slug, template, meta fields). This form is where
+             * BOTH `forms.slugwidget` AND `admin.changeform` run
+             * simultaneously — the former because the PageContent
+             * form's slug field declares SlugWidget in its media, the
+             * latter because PageContentAdmin sets
+             * `change_form_template = "admin/cms/page/change_form.html"`
+             * which is the template that loads the admin.changeform
+             * bundle.
+             *
+             * The CMS page tree doesn't expose direct change-form links
+             * (it uses custom edit/view URLs into the CMS editor). So
+             * we discover a valid PageContent id from the tree's
+             * placeholder URLs and navigate directly to the admin
+             * change form at /cms/pagecontent/<id>/change/.
+             */
+            async openPageContentChange() {
+                const pcId = await this.getFirstPageContentId();
+                if (!pcId) {
+                    throw new Error(
+                        'openPageContentChange: no PageContent rows found in the tree. ' +
+                            'The beforeAll bootstrap should have created one.',
+                    );
+                }
+                await page.goto(
+                    `${settings.baseUrl}/en/admin/cms/pagecontent/${pcId}/change/`,
+                );
                 await page.waitForSelector('#id_title', { timeout: 10_000 });
             },
         };
