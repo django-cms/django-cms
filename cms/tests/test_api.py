@@ -184,6 +184,90 @@ class PythonAPITests(CMSTestCase):
         self.assertRaises(FieldError, create_page, "foo", "nav_playground.html", "en", reverse_id="foo")
         self.assertTrue(Page.objects.count(), 2)
 
+    def test_create_page_with_all_parameters(self):
+        from cms import constants
+
+        if not menu_pool.discovered:
+            menu_pool.discover_menus()
+        old_menus = menu_pool.menus
+        menu_pool.menus = {"TestMenu": TestMenu}
+
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
+        apphooks = (f"{APP_MODULE}.{APP_NAME}",)
+
+        try:
+            with self.settings(CMS_APPHOOKS=apphooks):
+                apphook_pool.clear()
+                apphook = apphook_pool.get_apphook(APP_NAME)
+
+                site = Site.objects.get_current()
+                user = get_user_model().objects.create_user(
+                    username="creator", email="creator@django-cms.org", password="creator"
+                )
+                parent = create_page("parent", "nav_playground.html", "en")
+
+                page = create_page(
+                    title="Full Page",
+                    template="nav_playground.html",
+                    language="en",
+                    menu_title="Full Menu",
+                    page_title="Full Page Title",
+                    slug="full-slug",
+                    apphook=apphook,
+                    apphook_namespace="full_ns",
+                    redirect="/redirect-target/",
+                    meta_description="A full meta description",
+                    created_by=user,
+                    parent=parent,
+                    in_navigation=True,
+                    soft_root=True,
+                    reverse_id="full_reverse",
+                    navigation_extenders="TestMenu",
+                    site=site,
+                    login_required=True,
+                    limit_visibility_in_menu=constants.VISIBILITY_USERS,
+                    position="first-child",
+                    overwrite_url="full/overwrite",
+                    xframe_options=constants.X_FRAME_OPTIONS_DENY,
+                )
+
+                # Page-level fields
+                self.assertEqual(page.parent_id, parent.pk)
+                self.assertEqual(page.reverse_id, "full_reverse")
+
+                self.assertEqual(page.navigation_extenders, "TestMenu")
+                self.assertEqual(page.get_application_urls("en"), APP_NAME)
+                self.assertEqual(page.application_namespace, "full_ns")
+                self.assertTrue(page.login_required)
+                self.assertEqual(page.site_id, site.pk)
+                self.assertEqual(page.created_by, user.username)
+                self.assertEqual(page.changed_by, user.username)
+                # first-child position: new page should come before any siblings of parent
+                self.assertEqual(parent.get_child_pages().first().pk, page.pk)
+
+                # PageContent-level fields
+                content = page.pagecontent_set.get(language="en")
+                self.assertEqual(content.title, "Full Page")
+                self.assertEqual(content.page_title, "Full Page Title")
+                self.assertEqual(content.menu_title, "Full Menu")
+                self.assertEqual(content.template, "nav_playground.html")
+                self.assertEqual(content.redirect, "/redirect-target/")
+                self.assertEqual(content.meta_description, "A full meta description")
+                self.assertTrue(content.in_navigation)
+                self.assertTrue(content.soft_root)
+                self.assertEqual(content.limit_visibility_in_menu, constants.VISIBILITY_USERS)
+                self.assertEqual(content.xframe_options, constants.X_FRAME_OPTIONS_DENY)
+                self.assertEqual(content.created_by, user.username)
+
+                # Slug and overwrite_url create the expected URL entry
+                self.assertTrue(page.get_urls().filter(language="en", slug="full-slug").exists())
+                self.assertTrue(
+                    page.get_urls().filter(language="en", path="full/overwrite", managed=False).exists()
+                )
+        finally:
+            menu_pool.menus = old_menus
+
     def test_create_page_parent_not_same_site(self):
         site = Site.objects.create(id=2, name="example-2.com", domain="example-2.com")
         home = create_page("home", "nav_playground.html", "en")
