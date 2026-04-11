@@ -1,0 +1,42 @@
+name: django CMS frontend_v5
+
+# Independent CI workflow for the cms.contrib.frontend_v5 contrib app.
+# Kept separate from frontend.yml so the legacy frontend job is unaffected
+# by anything we do in the new TypeScript stack.
+
+on:
+  pull_request:
+    paths:
+      - 'cms/contrib/frontend_v5/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/frontend-v5.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend-v5:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: '24'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm install
+
+      - name: Type-check (tsc --noEmit)
+        run: npm run typecheck:v5
+
+      - name: Unit tests (vitest)
+        run: npm run test:v5
+
+      - name: Build bundles
+        run: npm run build:v5
