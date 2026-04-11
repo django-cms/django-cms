@@ -185,6 +185,8 @@ class PythonAPITests(CMSTestCase):
         self.assertTrue(Page.objects.count(), 2)
 
     def test_create_page_with_all_parameters(self):
+        from cms import constants
+
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         old_menus = menu_pool.menus
