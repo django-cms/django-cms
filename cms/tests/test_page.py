@@ -299,6 +299,52 @@ class PagesTestCase(TransactionCMSTestCase):
             exclude_page=page1_1_2,
         )
 
+    def test_validate_url_uniqueness_escapes_html_in_error_message(self):
+        """
+        validate_url_uniqueness raises a ValidationError whose message is
+        wrapped in mark_safe so it can render an <a> link to the conflicting
+        page in the admin. Any user-controlled fragments interpolated into
+        that message MUST be HTML-escaped, otherwise a page title containing
+        markup like ``<script>...</script>`` would render unescaped wherever
+        Django renders the validation error (admin form errors, toolbar
+        notifications, ...).
+        """
+        from django.utils.safestring import SafeString
+
+        site = _get_current_site()
+        evil = "<script>alert('xss')</script>"
+
+        # Page A: the existing page that owns the conflicting slug. Its title
+        # ends up inside the <a>...</a> link in the rendered error message.
+        conflict_page = create_page(f"conflict {evil}", "nav_playground.html", "en", slug="foo")
+        # Page B: the page being validated. Its title is interpolated into
+        # the "current page" portion of the message via the `instance` kwarg.
+        current_page = create_page(f"current {evil}", "nav_playground.html", "en", slug="bar")
+
+        with self.assertRaises(ValidationError) as ctx:
+            validate_url_uniqueness(
+                site,
+                path=conflict_page.get_path("en"),
+                language="en",
+                exclude_page=current_page,
+            )
+
+        # ValidationError messages are a list; the validator only raises one.
+        rendered = ctx.exception.messages[0]
+        self.assertIsInstance(rendered, SafeString)
+
+        # The raw <script> tag must NOT survive into the safe message — neither
+        # from the conflict page's title (escaped explicitly via django.utils.html.escape)
+        # nor from the current page's title (interpolated via `instance`).
+        self.assertNotIn("<script>", rendered)
+        self.assertNotIn("</script>", rendered)
+        # Both titles should appear in their HTML-escaped form.
+        self.assertIn("&lt;script&gt;", rendered)
+        self.assertIn("&lt;/script&gt;", rendered)
+        # The legitimate <a> tag the validator builds for the admin link is
+        # still preserved (it's the only HTML the message is allowed to emit).
+        self.assertIn('<a href="', rendered)
+
     def test_details_view(self):
         """
         Test the details view
