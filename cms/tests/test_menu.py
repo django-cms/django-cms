@@ -500,15 +500,28 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_menu_cache_uses_configured_backend(self):
         cms_page = self.get_page(1)
         context = self.get_context(path=cms_page.get_absolute_url(), page=cms_page)
-        context["request"].session["cms_edit"] = False
+        request = context["request"]
+        request.session["cms_edit"] = False
 
         Template("{% load menu_tags %}{% show_menu %}").render(context)
 
-        cache_keys = CacheKey.objects.filter(language=context["request"].LANGUAGE_CODE, site=1)
+        cache_keys = CacheKey.objects.filter(
+            language=request.LANGUAGE_CODE, site=cms_page.site_id
+        )
         self.assertEqual(cache_keys.count(), 1)
         cache_key = cache_keys.get().key
         self.assertIsNone(caches["default"].get(cache_key))
         self.assertIsNotNone(caches["secondary"].get(cache_key))
+
+        menu_pool.clear(site_id=cms_page.site_id, language=request.LANGUAGE_CODE)
+
+        self.assertIsNone(caches["secondary"].get(cache_key))
+        self.assertIsNone(caches["default"].get(cache_key))
+        self.assertFalse(
+            CacheKey.objects.filter(
+                language=request.LANGUAGE_CODE, site=cms_page.site_id
+            ).exists()
+        )
 
     def test_menu_keys_duplicate_clear(self):
         """
