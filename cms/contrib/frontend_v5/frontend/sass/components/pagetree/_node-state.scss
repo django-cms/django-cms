@@ -1,0 +1,70 @@
+.cms-pagetree-node-state {
+    box-sizing: border-box;
+    display: inline-block;
+    width: $pagetree-lang-size;
+    height: $pagetree-lang-size;
+    border-radius: 100%;
+    // will change according to states
+    border: 1px solid $white;
+    background: $white;
+    vertical-align: top;
+}
+.cms-btn {
+    .cms-pagetree-node-state {
+        vertical-align: middle;
+        margin-right: 5px;
+        margin-top: -4px;
+    }
+    &:hover {
+        .cms-pagetree-node-state-dirty {
+            box-shadow: 0 0 0 1px white;
+        }
+    }
+}
+
+.cms-pagetree-node-state {
+    &-empty {
+        border-color: $gray-light;
+        background-color: $white;
+    }
+    &-unpublished,
+    &-unpublished-parent {
+        border-color: $gray-light;
+        background-color: $gray-light;
+    }
+   &-archived {
+        border-color: $gray-light;
+        background-color: $gray-lighter;
+    }
+    &-published, &-public {
+        border-color: $color-success;
+        background-color: $color-success;
+    }
+    &-draft {
+        border-color: $color-cms3;
+        background-color: $white;
+        border-width: 2px;
+    }
+    &-dirty {
+        animation: pulsate 2.5s ease-out infinite;
+        border-color: $color-cms3;
+        background-color: $color-cms3;
+    }
+    &-deletion {
+        border-color: $color-danger;
+        background-color: $color-danger;
+    }
+}
+
+// animation for publishing
+@keyframes pulsate {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}

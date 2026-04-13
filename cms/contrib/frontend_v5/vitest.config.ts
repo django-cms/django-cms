@@ -6,6 +6,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
     root: here,
+    define: {
+        // Mirror the webpack DefinePlugin constant so modules that
+        // reference `__CMS_VERSION__` at import-time work in tests.
+        __CMS_VERSION__: JSON.stringify('test-version'),
+    },
     resolve: {
         alias: {
             '@': resolve(here, 'frontend'),

@@ -191,6 +191,48 @@ const test = baseTest.extend({
              * placeholder URLs and navigate directly to the admin
              * change form at /cms/pagecontent/<id>/change/.
              */
+            /**
+             * Navigate to the CMS page tree (PageContent changelist).
+             * This is where the pagetree bundle runs. Waits for the
+             * tree's root <ul role="tree"> to be populated so tests
+             * can immediately interact with rendered rows.
+             *
+             * If `query` is passed, appends `?q=<query>` which triggers
+             * server-side filtering — the server pre-renders matching
+             * rows into the template and the JS skips loadTree().
+             */
+            async openPageTree(query = null) {
+                const url = query
+                    ? `${settings.pageAdminUrl}?q=${encodeURIComponent(query)}`
+                    : settings.pageAdminUrl;
+                await page.goto(url);
+                // Wait for the tree root to exist. In normal mode it's
+                // populated asynchronously via get_tree; in filtered mode
+                // it's server-rendered. Either way, the class marker
+                // `cms-pagetree-list` is applied by the JS enhancer.
+                await page.waitForSelector('ul[role="tree"].cms-pagetree-list', {
+                    timeout: 10_000,
+                });
+                // Wait for at least one row OR the empty-tree state.
+                await page
+                    .waitForFunction(
+                        () => {
+                            const tree = document.querySelector(
+                                'ul[role="tree"].cms-pagetree-list',
+                            );
+                            if (!tree) return false;
+                            return (
+                                tree.querySelectorAll('li[role="treeitem"]').length > 0
+                            );
+                        },
+                        { timeout: 10_000 },
+                    )
+                    .catch(() => {
+                        // Empty tree is also an acceptable end state; no
+                        // test asserts against an unrendered tree.
+                    });
+            },
+
             async openPageContentChange() {
                 const pcId = await this.getFirstPageContentId();
                 if (!pcId) {

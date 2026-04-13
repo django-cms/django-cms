@@ -64,6 +64,15 @@ module.exports = function (opts) {
             'forms.slugwidget': path.join(SRC, 'bundles', 'forms.slugwidget.ts'),
             'forms.pageselectwidget': path.join(SRC, 'bundles', 'forms.pageselectwidget.ts'),
             'forms.apphookselect': path.join(SRC, 'bundles', 'forms.apphookselect.ts'),
+            'admin.base': {
+                import: path.join(SRC, 'bundles', 'admin.base.ts'),
+                library: {
+                    name: 'CMS',
+                    type: 'window',
+                    export: 'default',
+                },
+            },
+            'admin.pagetree': path.join(SRC, 'bundles', 'admin.pagetree.ts'),
             'admin.changeform': path.join(SRC, 'bundles', 'admin.changeform.ts'),
         },
         output: {

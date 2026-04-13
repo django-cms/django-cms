@@ -1,0 +1,64 @@
+.cms-pagetree-legend {
+    position: relative;
+    text-align: end;
+    background-color: $pagetree-bg;
+    border-bottom-left-radius: $border-radius-modal;
+    border-bottom-right-radius: $border-radius-modal;
+    padding-top: 0;
+
+    .cms-icon-info {
+        color: $color-primary;
+        vertical-align: middle;
+        margin-inline-end: 5px;
+    }
+
+    .cms-pagetree-dropdown {
+        display: inline-block;
+    }
+
+    .cms-pagetree-dropdown-menu {
+        inset-block-start: auto;
+        inset-inline-end: 100%;
+        inset-block-end: 0;
+        inset-inline-start: auto;
+        margin-inline-end: 10px;
+        margin-block-end: -90px;
+        &:before {
+            inset-block-end: 96px;
+        }
+    }
+    .cms-pagetree-dropdown-item {
+        .cms-pagetree-node-state {
+            margin-inline-end: 10px;
+        }
+        .cms-icon {
+            margin-inline-end: 8px;
+        }
+        .cms-icon-home,
+        .cms-icon-sitemap,
+        .cms-icon-apphook {
+            color: $gray-light;
+        }
+    }
+
+    .cms-icon {
+        text-align: center;
+        width: 20px;
+        margin-inline-start: -2px;
+    }
+    .cms-icon-check-square {
+        color: $color-success;
+        font-size: $pagetree-icon-size - 4;
+    }
+    .cms-icon-minus-square {
+        font-size: $pagetree-icon-size - 4;
+    }
+}
+.cms-pagetree-legend-title-wrap {
+    cursor: pointer;
+}
+.cms-pagetree-legend-title {
+    color: $gray-light;
+    vertical-align: middle;
+    text-transform: uppercase;
+}

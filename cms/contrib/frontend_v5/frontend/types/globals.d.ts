@@ -26,6 +26,13 @@ interface UnihandecodeGlobal {
 
 declare global {
     /**
+     * Webpack DefinePlugin constant — string-replaced at build time
+     * with the CMS_VERSION read from cms/__init__.py. Used by
+     * currentVersionMatches() to detect stale cached settings.
+     */
+    const __CMS_VERSION__: string;
+
+    /**
      * Django admin's URL slugifier, defined in Django's urlify.js.
      * Converts free-text to a URL-safe slug, optionally capped at
      * `numChars` characters. Available on every Django admin page.
@@ -72,6 +79,11 @@ declare global {
          * being checked.
          */
         CMS?: CmsGlobal;
+
+        /** jQuery global — set by admin.base.ts if absent (decision 7). */
+        jQuery?: JQueryStatic;
+        /** jQuery shorthand alias — set by admin.base.ts if absent. */
+        $?: JQueryStatic;
     }
 
     interface CmsGlobal {
@@ -85,6 +97,64 @@ declare global {
          * coordinate type declarations.
          */
         API?: CmsApi;
+
+        /**
+         * Server-rendered config blob, populated by an inline
+         * template script BEFORE any bundle runs. Contains URLs,
+         * settings, permissions, csrf token, etc. Shape is
+         * intentionally narrow — only the fields the ported modules
+         * actually read. Wider than this is possible at runtime; use
+         * `CMS.config[key] as T` with a cast when consuming untyped
+         * keys.
+         */
+        config?: CmsConfig;
+
+        /**
+         * jQuery event-bus root — set by cms-base.ts at DOM-ready time
+         * to `$('#cms-top')`. The pub/sub event helpers hook their
+         * .on()/.trigger() calls here. Typed loosely because the
+         * jQuery type would require a bundle-wide jquery import.
+         */
+        _eventRoot?: unknown;
+
+        /**
+         * Array of plugin instances populated by cms.plugins (when
+         * ported). cms-base.ts reads it in `_pluginExists()`. Loose
+         * typing because the shape is owned by cms.plugins, not
+         * cms-base.
+         */
+        _instances?: Array<{
+            options: { plugin_id?: string | number; type?: string };
+        }>;
+
+        /** User settings persisted by setSettings/getSettings. */
+        settings?: Record<string, unknown>;
+
+        /** jQuery handle, aliased by admin.base.ts. */
+        $?: unknown;
+
+        [key: string]: unknown;
+    }
+
+    /**
+     * Narrow shape of `window.CMS.config`. Only fields that ported
+     * modules actually read. If you need a field not listed here,
+     * add it — better to type new fields than to weaken the typing.
+     */
+    interface CmsConfig {
+        /** CMS version string for currentVersionMatches() comparisons. */
+        version?: string;
+        /** User settings blob, merged into localStorage by setSettings. */
+        settings?: Record<string, unknown>;
+        /** URL map — setSettings posts to `urls.settings` when localStorage is unavailable. */
+        urls?: {
+            settings?: string;
+            [key: string]: string | undefined;
+        };
+        /** CSRF token used by legacy $.ajax calls. */
+        csrf?: string;
+        /** Initial color scheme preference — 'auto' | 'light' | 'dark'. */
+        color_scheme?: string;
         [key: string]: unknown;
     }
 
@@ -97,6 +167,44 @@ declare global {
          * script in `admin/cms/page/change_form.html`.
          */
         changeLanguage?: (url: string) => void;
+
+        /**
+         * Populated by cms-base.ts when admin.base runs. Most
+         * downstream modules attach their own methods/classes to
+         * `CMS.API` as they initialise — `Helpers` is the first such
+         * attachment.
+         */
+        Helpers?: unknown;
+
+        /**
+         * Populated by cms.structureboard (when ported). Used by
+         * cms-base.ts's `onPluginSave()` to invalidate state after
+         * a plugin save. Pass-through reference — we don't own the
+         * interface here.
+         */
+        StructureBoard?: {
+            invalidateState?: (action: string, data: unknown) => void;
+        };
+
+        /**
+         * Populated by cms-base.ts's settings-persistence helpers
+         * when a synchronous-equivalent operation is in flight. NOT
+         * used by the ported cms-base.ts (we dropped the sync-ajax
+         * fallback), but some legacy modules check this flag so we
+         * expose it as a field for compat.
+         */
+        locked?: boolean;
+
+        /**
+         * Populated by cms.messages (when ported). `onPluginSave` /
+         * `setSettings` / `getSettings` open error messages through
+         * it on failure. Optional because it's undefined until the
+         * messages module initialises.
+         */
+        Messages?: {
+            open?: (options: { message: string; error?: boolean }) => void;
+        };
+
         [key: string]: unknown;
     }
 }
