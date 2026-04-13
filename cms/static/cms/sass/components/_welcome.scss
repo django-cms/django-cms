@@ -80,6 +80,7 @@
             background-image: url('../../fonts/src/logo.svg');
             background-repeat: no-repeat;
             background-position: center center;
+            filter: invert(var(--cms-dark-mode));
             height: 35px;
             width: 200px;
             font-size: 35px;

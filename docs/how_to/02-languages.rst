@@ -119,6 +119,20 @@ Example:
 
     {% page_language_url "de" %}
 
+A common real-world example is adding these links in the ``<head>`` of your page
+template so search engines can read them as page metadata. This helps crawlers
+understand that the URLs are language alternatives of the same content, which
+improves language targeting in search results and reduces duplicate-content
+ambiguity for multilingual pages.
+
+.. code-block:: html+django
+
+    {% load cms_tags %}
+    {% for language in request.current_page.get_languages %}
+        <link rel="alternate" hreflang="{{ language }}" href="{% page_language_url language %}">
+    {% endfor %}
+
+
 ***************************************
 Configuring language-handling behaviour
 ***************************************

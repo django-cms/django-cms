@@ -18,7 +18,7 @@ babel==2.17.0
     # via sphinx
 beautifulsoup4==4.14.3
     # via furo
-black==26.1.0
+black==26.3.1
     # via docstrfmt
 build==1.4.0
     # via pip-tools
@@ -42,7 +42,7 @@ coverage==7.13.1
     #   docstrfmt
 datetime==6.0
     # via -r requirements.in
-django==4.2.28
+django==4.2.30
     # via
     #   -r requirements.in
     #   django-classy-tags
@@ -113,7 +113,7 @@ pyenchant==3.3.0
     # via
     #   -r requirements.in
     #   sphinxcontrib-spelling
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   -r requirements.in
     #   accessible-pygments
@@ -129,7 +129,7 @@ pytz==2025.2
     # via datetime
 pyyaml==6.0.3
     # via libcst
-requests==2.32.5
+requests==2.33.0
     # via
     #   sphinx
     #   sphinxcontrib-spelling

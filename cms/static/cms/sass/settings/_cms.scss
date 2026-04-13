@@ -10,6 +10,7 @@ $speed-base: 200ms;
 // COLORS
 :root {
     color-scheme: dark light;
+    --cms-dark-mode: 0;
     --dca-dark: #2d4c4d;
     --dca-light: #defcb9;
     --dca-white: light-dark(#FFF, #000);
@@ -28,6 +29,12 @@ $speed-base: 200ms;
     --dca-border-radius: 20px;
     --dca-btn-radius: 40px;
     --dca-default-spacing: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --cms-dark-mode: 1;
+    }
 }
 
 :root[data-cms-theme="4"], :root[data-cms-theme="3"] {
@@ -57,10 +64,12 @@ $speed-base: 200ms;
 
 :root[data-theme="light"] {
     color-scheme: light;
+    --cms-dark-mode: 0;
 }
 
 :root[data-theme="dark"] {
     color-scheme: dark;
+    --cms-dark-mode: 1;
 }
 
 $white: var(--dca-white);
@@ -414,4 +423,3 @@ $quicksearch-height: 40px;
 // Welcome page
 $welcome-width: 60%;
 $welcome-min-width: 320px;
-

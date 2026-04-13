@@ -1441,6 +1441,33 @@ class PageTest(PageTestBase):
             self.assertTrue("form_url" in response.context_data)
             self.assertEqual(response.context_data["form_url"], form_url)
 
+    def test_pagecontent_change_view_uses_cached_url_obj(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            content_admin = PageContentAdmin(PageContent, admin.site)
+            page1 = self.get_page()
+            content1 = self.get_pagecontent_obj(page1, "en")
+            content1.page = page1
+            page2 = self.get_page()
+            content2 = self.get_pagecontent_obj(page2, "en")
+
+            content_admin.slug(content1)
+            content_admin.overwrite_url(content1)
+
+            with self.assertNumQueries(0):
+                # Slugs and overwrite urls are cached
+                slug = content_admin.slug(content1)
+                content_admin.overwrite_url(content1)
+
+            self.assertNotEqual(slug, content_admin.slug(content2))
+
+            with self.assertNumQueries(0):
+                # Both still cached
+                content_admin.overwrite_url(content1)
+                content_admin.slug(content1)
+                content_admin.slug(content2)
+                content_admin.overwrite_url(content2)
+
     def _parse_page_tree(self, response, parser_class):
         content = response.content
         content = content.decode(response.charset)
@@ -1828,6 +1855,40 @@ class PageActionsTestCase(PageTestBase):
             redirect_url = self.get_admin_url(PageContent, "changelist") + "?language=en"
             self.assertRedirects(response, redirect_url)
             self.assertEqual(Page.objects.all().count(), 2)
+
+    def test_get_list_is_scoped_to_requested_site(self):
+        site2 = Site.objects.create(id=2, name="example-2.com", domain="example-2.com")
+        create_page(
+            "Bravo Site 1",
+            "nav_playground.html",
+            "en",
+            site=self.site,
+            slug="bravo-site-1",
+            created_by=self.admin,
+        )
+        with self.settings(CMS_LANGUAGES={2: [{"code": "en", "name": "English"}]}):
+            create_page(
+                "Bravo Site 2",
+                "nav_playground.html",
+                "en",
+                site=site2,
+                slug="bravo-site-2",
+                created_by=self.admin,
+            )
+
+            endpoint = admin_reverse("cms_page_get_list")
+            with self.login_user_context(self.admin):
+                response = self.client.get(
+                    endpoint,
+                    data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                    HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                )
+
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content.decode("utf-8"))
+        titles = {result["title"] for result in results}
+        self.assertIn("Bravo Site 1", titles)
+        self.assertNotIn("Bravo Site 2", titles)
 
     def test_actions_menu_superuser(self):
         """Test actions_menu view returns correct context for superuser"""
@@ -3650,7 +3711,6 @@ class PermissionsOnPageTest(PermissionsTestCase):
                 row for row in rows if (not row.is_global and row.permission.pk == other_permission.pk)
             )
             self.assertFalse(permission_row.can_change)
-
 
     def test_pages_not_in_admin_index(self):
         """
