@@ -311,7 +311,7 @@ class PagesTestCase(TransactionCMSTestCase):
         """
         from django.utils.safestring import SafeString
 
-        site = _get_current_site()
+        site = get_current_site()
         evil = "<script>alert('xss')</script>"
 
         # Page A: the existing page that owns the conflicting slug. Its title
