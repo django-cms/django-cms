@@ -233,6 +233,7 @@
     color: $gray;
     cursor: pointer;
     line-height: 1;
+    font-size: 12px;
 
     &::before {
         transition: transform $speed-base;
@@ -240,11 +241,6 @@
 
     &.cms-tree-toggle-open::before {
         transform: rotate(90deg);
-    }
-
-    &:hover:not(:disabled) {
-        background: $gray-lighter;
-        color: $gray-darkest;
     }
 
     &:disabled {
