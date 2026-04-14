@@ -130,15 +130,13 @@
     display: grid;
     grid-template-columns: auto auto minmax(0, 1fr) repeat(10, auto);
     align-items: center;
-    gap: $padding-base;
     width: 100%;
     box-sizing: border-box;
     // Tall enough to contain `.cms-tree-col-padding-sm` (which is
     // $pagetree-cell-inner-height + 6px) plus breathing room.
-    min-height: $pagetree-cell-inner-height + 16px;
+    min-height: $pagetree-cell-inner-height + 12px;
     padding-block: $padding-base - 2px;
-    padding-inline-end: $padding-normal;
-
+    gap: 0;
     background: $white;
     border-block-end: $pagetree-border; // 1px solid $gray-lighter
     transition: background $speed-base;
@@ -168,9 +166,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        // Don't enforce the legacy cell height — let the row's
-        // min-height drive the vertical slot.
-        height: auto;
+        .cms-hover-tooltip {
+            display: flex;
+        }
     }
     .cms-tree-col-padding-sm .cms-tree-item-wrapper {
         display: flex;
@@ -279,7 +277,9 @@
     display: flex;
     align-items: center;
     min-width: $pagetree-cell-inner-height;
-    height: $pagetree-cell-inner-height;
+    height: 100%;
+    border-inline-end: 1px solid $gray-lighter;
+    padding-inline: 2 * $padding-base;
     color: $gray-darker;
 
     a {

@@ -85,8 +85,8 @@
     .cms-btn.cms-icon {
         display: inline-block;
         box-sizing: border-box;
-        width: $pagetree-cell-inner-height + 5;
-        height: $pagetree-cell-inner-height + 5;
+        width: $pagetree-cell-inner-height + 2px;
+        height: $pagetree-cell-inner-height + 2px;
         position: relative;
         &:before {
             position: absolute;
@@ -551,9 +551,10 @@
     a {
         @extend %icon;
         font-size: $pagetree-icon-size;
-        line-height: $pagetree-icon-size;
         height: $pagetree-icon-size;
-        display: block;
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
 
         &:before {
             display: block;
