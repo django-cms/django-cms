@@ -1,3 +1,4 @@
+import django
 import json
 import sys
 import warnings
@@ -98,10 +99,20 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 class BaseCMSTestCase:
     counter = 1
 
-    def _fixture_setup(self):
-        super()._fixture_setup()
-        self.create_fixtures()
-        translation.activate("en")
+    if django.VERSION >= (5, 2):
+        @classmethod
+        def _fixture_setup(cls):
+            super()._fixture_setup()
+
+        def _callSetUp(self):
+            self.create_fixtures()
+            translation.activate("en")
+            super()._callSetUp()
+    else:
+        def _fixture_setup(self):
+            super()._fixture_setup()
+            self.create_fixtures()
+            translation.activate("en")
 
     def create_fixtures(self):
         pass
