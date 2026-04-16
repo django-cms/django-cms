@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return u.href;
             }
             return '';
-        } catch (e) {
+        } catch {
             // Malformed URLs result in blank
             return '';
         }
