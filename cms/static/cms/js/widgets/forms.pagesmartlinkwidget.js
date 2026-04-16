@@ -49,6 +49,7 @@
     $(function () {
         document.querySelectorAll('[data-cms-widget-pagesmartlinkwidget]').forEach(function (el) {
             var widget = JSON.parse(el.querySelector('script').textContent);
+    
             init(widget);
         });
     });
