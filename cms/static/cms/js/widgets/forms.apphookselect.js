@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             // Allows absolute and relative URLs; bans 'javascript:', 'data:', etc.
             const u = new URL(url, window.location.origin);
-            const allowedProtocols = ['http:', 'https:', ''];
-            // '' is for relative URLs
+            const allowedProtocols = ['http:', 'https:', ''];  // '' is for relative URLs
+
             if (allowedProtocols.includes(u.protocol)) {
                 return u.href;
             }
