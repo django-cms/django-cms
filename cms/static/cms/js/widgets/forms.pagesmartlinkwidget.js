@@ -1,56 +1,39 @@
 /*
  * Copyright https://github.com/django-cms/django-cms
- */
-
-
-// #############################################################################
-// PAGE SMART LINK WIDGET
-// cms/forms/widgets.py used for redirects in admin/cms/page/advanced-settings
-var $ = require('jquery');
-
-require('../select2/select2');
-
-/**
- * Creates a select field using jquery.select2 to filter through
- * available pages or set a custom url.
  *
- * @class PageSmartLinkWidget
- * @namespace CMS
+ * PageSmartLinkWidget — used in admin/cms/page/advanced-settings for the redirect
+ * field. Initialises Django admin's bundled Select2 (v4) on a <select> element,
+ * allowing users to either pick a matching page via AJAX autocomplete or type an
+ * arbitrary URL (captured via Select2 `tags`).
  */
-class PageSmartLinkWidget {
-    constructor(options) {
-        this.options = $.extend(true, {}, options);
-        // load functionality
-        this._setup(options);
-    }
+(function () {
+    'use strict';
 
-    /**
-     * Setup internal functions and events.
-     *
-     * @private
-     * @method _setup
-     * @param {Object} options
-     * @param {String} options.id
-     * @param {String} options.url
-     */
-    _setup(options) {
+    var $ = (window.django && window.django.jQuery) || window.jQuery;
+
+    function init(options) {
         $('#' + options.id).select2({
             placeholder: options.text,
             allowClear: true,
-            multiple: false,
+            minimumInputLength: 0,
+            tags: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+                return { id: term, text: term, newTag: true };
+            },
             ajax: {
                 url: options.url,
                 dataType: 'json',
-                data(term) {
-                    return {
-                        q: term,
-                        language_code: options.lang
-                    };
+                delay: 200,
+                data: function (params) {
+                    return { q: params.term, language_code: options.lang };
                 },
-                // default search output, will be overridden if no results map
-                results(data) {
+                processResults: function (data) {
                     return {
-                        more: false,
                         results: $.map(data, function (item) {
                             return {
                                 id: item.redirect_url,
@@ -59,38 +42,15 @@ class PageSmartLinkWidget {
                         })
                     };
                 }
-            },
-            // create fallback entry if no choices are found
-            createSearchChoice(term, data) {
-                if ($(data).filter(
-                    function () {
-                        return this.text.localeCompare(term) === 0;
-                    }).length === 0
-                ) {
-                    return {
-                        id: term,
-                        text: term
-                    };
-                }
-            },
-            // ensures initial selection is loaded
-            initSelection(element, callback) {
-                callback({
-                    id: element.val(),
-                    text: element.val()
-                });
             }
         });
     }
-}
 
-window.CMS = window.CMS || {};
-window.CMS.PageSmartLinkWidget = PageSmartLinkWidget;
+    $(function () {
+        document.querySelectorAll('[data-cms-widget-pagesmartlinkwidget]').forEach(function (el) {
+            var widget = JSON.parse(el.querySelector('script').textContent);
 
-$(function () {
-    document.querySelectorAll('[data-cms-widget-pagesmartlinkwidget]').forEach(function (el) {
-        var widget = JSON.parse(el.querySelector('script').textContent);
-
-        new PageSmartLinkWidget(widget);
+            init(widget);
+        });
     });
-});
+})();
