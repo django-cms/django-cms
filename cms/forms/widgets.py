@@ -144,10 +144,7 @@ class UserSelectAdminWidget(Select):
             self.user.is_superuser or self.user.has_perm(
                 PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))
         ):
-            # Render an "add another" link matching Django admin's
-            # RelatedFieldWidgetWrapper so it's wired up by
-            # admin/js/admin/RelatedObjectLookups.js (showRelatedObjectPopup
-            # + dismissAddRelatedObjectPopup).
+            # append + icon
             add_url = admin_reverse('cms_pageuser_add')
             output.append(format_html(
                 '<a href="{}?_popup=1" class="related-widget-wrapper-link add-related"'
