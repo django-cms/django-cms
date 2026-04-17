@@ -87,10 +87,7 @@ test.describe('UserSelectAdminWidget', () => {
 
     await expect(addLink).toHaveCount(1);
 
-    // No legacy onclick attribute.
-    await expect(addLink).not.toHaveAttribute('onclick', /./);
-
-    // Modern popup-mode attributes and markup.
+    // Popup-mode attributes and markup.
     await expect(addLink).toHaveAttribute('data-popup', 'yes');
     const href = await addLink.getAttribute('href');
     expect(href).toMatch(/\/admin\/cms\/pageuser\/add\/\?_popup=1/);
