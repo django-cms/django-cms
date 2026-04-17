@@ -92,12 +92,15 @@ class PageSmartLinkWidget(TextInput):
 
     class Media:
         css = {
-            'all': (
-                'cms/js/select2/select2.css',
-                'cms/js/select2/select2-bootstrap.css',
-            )
+            'screen': (
+                'admin/css/vendor/select2/select2.css',
+                'admin/css/autocomplete.css',
+            ),
         }
         js = (
+            'admin/js/vendor/jquery/jquery.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'admin/js/jquery.init.js',
             static_with_version('cms/js/dist/bundle.forms.pagesmartlinkwidget.min.js'),
         )
 
