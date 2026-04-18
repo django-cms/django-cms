@@ -85,6 +85,7 @@ const INTEGRATION_TESTS = [
         'changeSettings',
         'toolbar-login-apphooks',
         'permissions-enabled',
+        'userSelectAdminWidget.spec',
         {
             serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
             file: 'copy-from-language'

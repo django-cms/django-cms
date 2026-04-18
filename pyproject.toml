@@ -51,7 +51,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-admin-style = ["djangocms-admin-style>=1.2"]
+admin-style = ["djangocms-simple-admin-style"]
 
 [project.urls]
 "Homepage" = "https://www.django-cms.org/"
