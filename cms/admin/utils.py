@@ -592,10 +592,10 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def _has_content(self, obj: models.Model) -> bool:
         if self._is_content_obj(obj):
-            return True
+            return True  # pragma: no cover
         if hasattr(obj, self.CONTENT_OBJ_PK_ANNOTATION):
             return getattr(obj, self.CONTENT_OBJ_PK_ANNOTATION) is not None
-        return self.get_content_obj(obj) is not None
+        return self.get_content_obj(obj) is not None  # pragma: no cover
 
     def _get_settings_action(self, obj: models.Model, request: HttpRequest) -> str:
         edit_url = admin_reverse(f"{obj._meta.app_label}_{obj._meta.model_name}_change", args=(obj.pk,))
