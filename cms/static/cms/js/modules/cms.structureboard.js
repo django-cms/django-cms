@@ -11,7 +11,7 @@ import keyboard from './keyboard';
 import Plugin from './cms.plugins';
 import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
-import { DiffDOM, nodeToObj } from 'diff-dom';
+import { DiffDOM, nodeToObj } from './dom-diff';
 import PreventParentScroll from 'prevent-parent-scroll';
 import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
 import ls from 'local-storage';
@@ -1502,7 +1502,9 @@ class StructureBoard {
             plugin => plugin.options.placeholder_id == placeholder_id  // eslint-disable-line eqeqeq
         ) === undefined;
 
-        return lastPluginDeleted || contentData.content && this._updateContentFromDataBridge(contentData);
+        // Additionally always redraw if the last plugin was deleted.
+        // The then empty placeholders can render alternative content
+        return lastPluginDeleted || this._updateContentFromDataBridge(contentData);
     }
 
     handleClearPlaceholder(data) {

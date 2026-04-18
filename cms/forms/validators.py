@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
@@ -73,7 +74,7 @@ def validate_url_uniqueness(
     if user_language:
         change_url += f"?language={user_language}"
 
-    conflict_url = f'<a href="{change_url}" target="_blank">{str(conflict_translation.title)}</a>'
+    conflict_url = f'<a href="{change_url}" target="_blank">{escape(str(conflict_translation.title))}</a>'
 
     if exclude_page:
         message = gettext("Page %(conflict_page)s has the same url '%(url)s' as current page \"%(instance)s\".")
@@ -81,7 +82,7 @@ def validate_url_uniqueness(
         message = gettext("Page %(conflict_page)s has the same url '%(url)s' as current page.")
     message = message % {
         "conflict_page": conflict_url,
-        "url": path,
-        "instance": exclude_page.get_title(language) if exclude_page else "",
+        "url": escape(path),
+        "instance": escape(exclude_page.get_title(language)) if exclude_page else "",
     }
     raise ValidationError(mark_safe(message))
