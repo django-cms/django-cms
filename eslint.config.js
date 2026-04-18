@@ -46,6 +46,7 @@ module.exports = [
                 confirm: 'readonly',
                 prompt: 'readonly',
                 Image: 'readonly',
+                URL: 'readonly',
 
                 // jQuery
                 $: 'readonly',
