@@ -36,12 +36,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Helper: sanitize URL to prevent javascript: or other unsafe schemes
     function sanitizeUrl(url) {
         try {
-            // Allows absolute and relative URLs; bans 'javascript:', 'data:', etc.
+            // Validates the URL protocol (allows http/https; bans 'javascript:', 'data:', etc.)
+            // while preserving whether the original input was relative or absolute.
             const u = new URL(url, window.location.origin);
-            const allowedProtocols = ['http:', 'https:', '']; // '' is for relative URLs
+            const allowedProtocols = ['http:', 'https:'];
 
             if (allowedProtocols.includes(u.protocol)) {
-                return u.href;
+                // Return the original string to avoid forcing relative URLs to become absolute.
+                return url;
             }
             return '';
         } catch {
