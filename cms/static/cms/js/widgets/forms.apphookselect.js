@@ -73,12 +73,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (appCfgsAdd) {
                 const safeUrl = sanitizeUrl(apphookData.apphooks_configuration_url[opt.value]);
 
-                appCfgsAdd.setAttribute('href', safeUrl +
-                    (window.showRelatedObjectPopup ? '?_popup=1' : ''));
-                appCfgsAdd.addEventListener('click', function (ev) {
-                    ev.preventDefault();
-                    window.showAddAnotherPopup(this);
-                });
+                if (safeUrl) {
+                    appCfgsAdd.setAttribute('href', safeUrl +
+                        (window.showRelatedObjectPopup ? '?_popup=1' : ''));
+                    appCfgsAdd.addEventListener('click', function (ev) {
+                        ev.preventDefault();
+                        window.showAddAnotherPopup(this);
+                    });
+                } else {
+                    appCfgsAdd.setAttribute('href', '#');
+                }
             }
             if (appCfgsRow) {
                 appCfgsRow.classList.remove('hidden');
