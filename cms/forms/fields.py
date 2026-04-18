@@ -84,6 +84,16 @@ class PageSmartLinkField(forms.CharField):
     The widget uses an ajax request to try to find pages match. It will try to find
     case-insensitive matches amongst public and published pages on the `title`, `path`,
     `page_title`, `menu_title` fields.
+
+    .. note::
+
+        ``PageSmartLinkField`` stores its value as a plain URL string, so links
+        do not follow pages that are later moved or renamed. For dynamically
+        linking to pages, other CMS content, or external URLs, the preferred
+        approach is the ``LinkField`` provided by
+        `djangocms-link <https://github.com/django-cms/djangocms-link>`_, which
+        keeps references stable across moves and supports a configurable set of
+        link targets.
     """
     widget = PageSmartLinkWidget
     default_validators = [validate_url]
