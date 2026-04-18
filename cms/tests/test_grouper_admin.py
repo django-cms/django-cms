@@ -1,4 +1,5 @@
 import copy
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.admin import site
@@ -245,6 +246,45 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         self.assertIn("content__secret_greeting", readonly_fields)
         self.assertNotIn("content__secret_greeting", admin.prepopulated_fields)
         self.assertIn("category_name", admin.prepopulated_fields)
+
+    def test_changelist_view_does_not_call_get_content_obj(self):
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            with patch.object(self.admin, "get_content_obj", wraps=self.admin.get_content_obj) as mocked_get_content_obj:
+                response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_get_content_obj.call_count, 0)
+
+    def test_change_view_calls_get_content_obj(self):
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            with patch.object(self.admin, "get_content_obj", wraps=self.admin.get_content_obj) as mocked_get_content_obj:
+                response = self.client.get(f"{self.change_url}?language=en", follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(mocked_get_content_obj.call_count, 0)
+        self.assertTrue(any(call.args and call.args[0] == self.grouper_instance for call in mocked_get_content_obj.call_args_list))
+
+    def test_get_content_obj_caches_on_grouper_object(self):
+        content_instance = self.createContentInstance("en")
+        self.admin.language = "en"
+        self.admin.clear_content_cache()
+
+        self.assertFalse(hasattr(self.grouper_instance, "_grouper_admin_content_obj_cache"))
+
+        with self.assertNumQueries(1):
+            cached_content = self.admin.get_content_obj(self.grouper_instance)
+
+        self.assertEqual(cached_content, content_instance)
+        self.assertTrue(hasattr(self.grouper_instance, "_grouper_admin_content_obj_cache"))
+
+        with self.assertNumQueries(0):
+            cached_again = self.admin.get_content_obj(self.grouper_instance)
+
+        self.assertIs(cached_again, cached_content)
 
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):

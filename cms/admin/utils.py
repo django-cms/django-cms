@@ -265,14 +265,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     EMPTY_CONTENT_VALUE = _("Empty content")
     LC_SORTED_FIELDS = (models.CharField,)
+    CONTENT_OBJ_PK_ANNOTATION = "_content_obj_pk"
 
-    _content_cache_request_hash = None
     _content_content_type = None
 
     def __init__(self, model, admin_site):
         self._content_subquery_fields = []
-        self._content_obj_cache = {}
-        self._content_qs_cache = {}
 
         super().__init__(model, admin_site)
 
@@ -369,7 +367,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         contents = self.content_model.admin_manager.latest_content(
             **{self.grouper_field_name: OuterRef("pk"), **self.current_content_filters}
         )
-        annotation = {}
+        annotation = {
+            self.CONTENT_OBJ_PK_ANNOTATION: Subquery(contents.values("pk")[:1]),
+        }
         for field_name in self._content_subquery_fields:
             annotation[CONTENT_PREFIX + field_name] = Subquery(contents.values(field_name)[:1])
             field = self.content_model._meta.get_field(field_name)
@@ -396,9 +396,6 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def get_grouping_from_request(self, request: HttpRequest) -> None:
         """Retrieves the current grouping selectors from the request"""
-        if hash(request) != self._content_cache_request_hash:
-            self._content_cache_request_hash = hash(request)
-            self.clear_content_cache()
         for field in self.extra_grouping_fields:
             if hasattr(self, f"get_{field}_from_request"):
                 value = getattr(self, f"get_{field}_from_request")(request)
@@ -578,6 +575,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     # * Settings button that lets the user change the grouper AND the content model
     #   using one form
     def _get_view_action(self, obj: models.Model, request: HttpRequest) -> str:
+        if not is_editable_model(self.content_model):
+            return ""
+
         view_url = self.view_on_site(obj)
         if view_url:
             return self.admin_action_button(
@@ -590,13 +590,21 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             )
         return ""
 
+    def _has_content(self, obj: models.Model) -> bool:
+        if self._is_content_obj(obj):
+            return True
+        if hasattr(obj, self.CONTENT_OBJ_PK_ANNOTATION):
+            return getattr(obj, self.CONTENT_OBJ_PK_ANNOTATION) is not None
+        return self.get_content_obj(obj) is not None
+
     def _get_settings_action(self, obj: models.Model, request: HttpRequest) -> str:
         edit_url = admin_reverse(f"{obj._meta.app_label}_{obj._meta.model_name}_change", args=(obj.pk,))
         edit_url += f"?{urlencode(self.current_content_filters)}"
+        has_content = self._has_content(obj)
         return self.admin_action_button(
             url=edit_url,
-            icon="settings" if self.get_content_obj(obj) else "plus",
-            title=_("Settings") if self.get_content_obj(obj) else _("Add content"),
+            icon="settings" if has_content else "plus",
+            title=_("Settings") if has_content else _("Add content"),
             disabled=not edit_url,
             name="settings",
         )
@@ -636,11 +644,11 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         if obj is None or self._is_content_obj(obj):
             return obj
         else:
-            if obj not in self._content_obj_cache:
-                self._content_obj_cache[obj] = (
-                    self._get_content_queryset(obj).filter(**self.current_content_filters).first()
-                )
-            return self._content_obj_cache[obj]
+            if not hasattr(obj, "_grouper_admin_content_obj_cache"):
+                obj._grouper_admin_content_obj_cache = getattr(obj, self.content_related_field)(
+                    manager="admin_manager"
+                ).latest_content().filter(**self.current_content_filters).first()
+            return obj._grouper_admin_content_obj_cache
 
     def get_content_objects(self, obj: models.Model | None) -> models.QuerySet:
         if obj is None:
