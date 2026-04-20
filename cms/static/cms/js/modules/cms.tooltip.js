@@ -103,7 +103,7 @@ class Tooltip {
         var that = this;
 
         // change css and attributes
-        tooltip.css('visibility', 'visible').data('plugin_id', id || null).show().find('span').html(name);
+        tooltip.css('visibility', 'visible').data('plugin_id', id || null).show().find('span').text(name);
 
         if (this.isTouch) {
             this.position(e.originalEvent, tooltip);
