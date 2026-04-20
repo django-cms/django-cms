@@ -634,20 +634,14 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return isinstance(obj, self.content_model)
 
     def _get_content_queryset(self, obj: models.Model) -> models.QuerySet:
-        if obj not in self._content_qs_cache:
-            self._content_qs_cache[obj] = getattr(obj, self.content_related_field)(
-                manager="admin_manager"
-            ).latest_content()
-        return self._content_qs_cache[obj]
+        return getattr(obj, self.content_related_field)(manager="admin_manager").latest_content()
 
     def get_content_obj(self, obj: models.Model | None) -> models.Model | None:
         if obj is None or self._is_content_obj(obj):
             return obj
         else:
             if not hasattr(obj, "_grouper_admin_content_obj_cache"):
-                obj._grouper_admin_content_obj_cache = getattr(obj, self.content_related_field)(
-                    manager="admin_manager"
-                ).latest_content().filter(**self.current_content_filters).first()
+                obj._grouper_admin_content_obj_cache = self._get_content_queryset(obj).filter(**self.current_content_filters).first()
             return obj._grouper_admin_content_obj_cache
 
     def get_content_objects(self, obj: models.Model | None) -> models.QuerySet:
@@ -659,9 +653,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return self._get_content_queryset(obj)
 
     def clear_content_cache(self) -> None:
-        """Clear cache, e.g., for a new request"""
-        self._content_obj_cache = {}
-        self._content_qs_cache = {}
+        # Content objects are now stored in the object, no cache clear for admin class necessary
+        pass
 
     def get_grouper_obj(self, obj: models.Model) -> models.Model:
         """Get the admin object. If obj is a content object assume that the admin object
