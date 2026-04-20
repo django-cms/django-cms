@@ -1,4 +1,5 @@
 <select name="{{ widget.name }}"{% for attr, val in widget.attrs.items %}{% if val is not False %} {{ attr }}{% if val is not True %}="{{ val|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %}>
+    <option></option>
     {% if widget.value %}<option value="{{ widget.value }}" selected data-select2-tag="true">{{ widget.value }}</option>{% endif %}
 </select>
 <div data-cms-widget-pagesmartlinkwidget="true" hidden>
