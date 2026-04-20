@@ -1,0 +1,165 @@
+@use "sass:math";
+
+.cms-pagetree-dropdown {
+    position: relative;
+}
+
+.cms-pagetree-dropdown-menu {
+    display: none;
+    position: absolute;
+    inset-block-start: 30px;
+    inset-inline-end: -1px;
+    z-index: z(pagetree, dropdown);
+    min-width: $dropdown-width;
+    border: $pagetree-dropdown-border;
+    border-radius: $border-radius-normal;
+    background: $submenu-dropdown-bgcolor;
+    box-shadow: $dropdown-shadow;
+    transform: translateZ(0);
+
+    a, a:visited, a:link, a:link:visited,
+    .cms-pagetree-dropdown-item {
+        display: block;
+        color: $dropdown-link-color;
+        line-height: 1.5;
+        text-align: start;
+        padding-block: 10px;
+        padding-inline: $pagetree-dropdown-padding-horizontal;
+    }
+    a:hover,
+    a:active,
+    a:focus {
+        // to override admin styles
+        color: $dropdown-link-active-color !important;
+        background: $dropdown-link-active-bg;
+    }
+    li:first-child > a {
+        border-start-start-radius: $border-radius-normal;
+        border-start-end-radius: $border-radius-normal;
+    }
+    li:last-child > a {
+        border-end-start-radius: $border-radius-normal;
+        border-end-end-radius: $border-radius-normal;
+    }
+    .cms-pagetree-dropdown-item-disabled {
+        opacity: 0.33;
+        color: $dropdown-link-disabled-color;
+        cursor: default;
+        &:hover,
+        &:focus {
+            background: none !important;
+            color: $gray-darker !important;
+        }
+    }
+    &.cms-pagetree-dropdown-menu-condensed {
+        a,
+        .cms-pagetree-dropdown-item {
+            padding-block: 5px;
+            padding-inline: $pagetree-dropdown-padding-horizontal;
+        }
+    }
+    .active {
+        font-weight: bold;
+    }
+
+    .label {
+        display: block;
+        color: $dropdown-link-color;
+        font-size: 90%;
+        font-weight: normal;
+        line-height: 1.5;
+        text-align: start;
+        text-transform: uppercase;
+        padding-block: 7px 5px;
+        padding-inline: $pagetree-dropdown-padding-horizontal;
+        border-block-end: 1px solid $gray-lighter;
+        margin-block-end: 4px;
+    }
+
+    li {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+    p {
+        display: block;
+        overflow: hidden;
+        font-size: 12px !important;
+        text-align: start;
+        text-overflow: ellipsis;
+        margin: 0;
+        padding-block: 5px 3px !important;
+        padding-inline: $pagetree-dropdown-padding-horizontal !important;
+        strong {
+            font-size: 12px !important;
+        }
+    }
+    p + p {
+        margin-block-start: -2px;
+        padding-block-start: 0 !important;
+    }
+    p:last-child {
+        padding-block-end: 7px !important;
+    }
+
+    .cms-icon {
+        margin-inline-end: 10px;
+    }
+
+    span {
+        vertical-align: middle;
+    }
+
+    // adds arrow
+    &:before {
+        content: "";
+        position: absolute;
+        inset-inline-start: 100%;
+        z-index: z(below);
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-inline-start: math.div(-$dropdown-arrow-side, 2);
+        background-color: $submenu-dropdown-bgcolor;
+        box-shadow: $dropdown-shadow;
+        transform: rotate(45deg) translateZ(0);
+        border: $pagetree-dropdown-border
+    }
+
+    .cms-pagetree-dropdown-menu-inner {
+        margin: 0;
+        padding: 0 !important;
+        border-radius: $border-radius-normal;
+        background-color: $white;
+    }
+}
+
+.cms-pagetree-dropdown-menu-open .cms-pagetree-dropdown-menu {
+    display: block;
+}
+
+.cms-pagetree-dropdown-menu-arrow-block-start-inline-end {
+    &:before {
+        margin-block-start: -5px;
+        margin-inline-start: -24px;
+    }
+}
+
+.cms-pagetree-dropdown-menu-arrow-inline-end-block-start {
+    &:before {
+        inset-block-start: 16px;
+    }
+}
+.cms-pagetree-dropdown-menu-arrow-inline-end-block-end {
+    &:before {
+        inset-block-end: 18px;
+    }
+}
+
+.cms-pagetree-dropdown-loader {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    inset-block-end: 0;
+    border-radius: $border-radius-normal;
+}

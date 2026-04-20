@@ -6,8 +6,14 @@
     "@babel/eslint-parser": "^7.28.6",
     "@babel/plugin-transform-runtime": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
+    "@babel/preset-typescript": "^7.27.1",
     "@eslint/js": "^9.39.1",
     "@playwright/test": "^1.58.2",
+    "@types/jquery": "^3.5.32",
+    "@types/lodash-es": "^4.17.12",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "@vitest/coverage-v8": "^2.1.8",
     "autoprefixer": "^10.4.27",
     "babel-loader": "^10.1.1",
     "babel-plugin-istanbul": "^7.0.1",
@@ -29,6 +35,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "imports-loader": "^5.0.0",
     "jasmine-core": "^2.3.4",
+    "jsdom": "^25.0.1",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.1",
@@ -45,7 +52,10 @@
     "raw-loader": "^4.0.2",
     "sass": "^1.97.3",
     "terser-webpack-plugin": "^5.4.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
     "uuid": "^13.0.0",
+    "vitest": "^2.1.8",
     "watchpack": "^2.4.2",
     "webpack": "^5.105.4",
     "webpack-bundle-analyzer": "^4.10.2",
@@ -53,6 +63,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.28.6",
+    "focus-trap": "^7.6.4",
+    "jquery": "^3.7.1",
     "local-storage": "^2.0.0",
     "lodash-es": "^4.18.1"
   },
@@ -68,6 +80,14 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --debug"
+    "test:e2e:debug": "playwright test --debug",
+    "v5": "gulp --gulpfile cms/contrib/frontend_v5/gulpfile.js --cwd .",
+    "build:v5": "npm run v5 -- build",
+    "typecheck:v5": "npm run v5 -- typecheck",
+    "test:v5": "npm run v5 -- test",
+    "test:v5:watch": "vitest --config cms/contrib/frontend_v5/vitest.config.ts",
+    "test:v5:e2e": "playwright test --config cms/contrib/frontend_v5/playwright.config.js",
+    "test:v5:e2e:headed": "playwright test --config cms/contrib/frontend_v5/playwright.config.js --headed",
+    "test:v5:e2e:debug": "playwright test --config cms/contrib/frontend_v5/playwright.config.js --debug"
   }
 }
