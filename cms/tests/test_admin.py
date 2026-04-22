@@ -1,6 +1,7 @@
 import datetime
 import json
 
+import django
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
@@ -860,10 +861,16 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid parent
             response = self.client.post(self.get_admin_url(Page, 'add'), new_page_data)
-            expected_error = (
-                '<ul class="errorlist">'
-                '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
-            )
+            if django.VERSION >= (5, 2):
+                expected_error = (
+                    '<ul class="errorlist" id="id_parent_node_error">'
+                    "<li>Site doesn't match the parent's page site</li></ul>"
+                )
+            else:
+                expected_error = (
+                    '<ul class="errorlist">'
+                    '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
+                )
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
@@ -881,10 +888,16 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid parent
             response = self.client.post(self.get_admin_url(Page, 'add'), new_page_data)
-            expected_error = (
-                '<ul class="errorlist">'
-                '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
-            )
+            if django.VERSION >= (5, 2):
+                expected_error = (
+                    '<ul class="errorlist" id="id_parent_node_error">'
+                    "<li>Site doesn't match the parent's page site</li></ul>"
+                )
+            else:
+                expected_error = (
+                    '<ul class="errorlist">'
+                    '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
+                )
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
@@ -896,10 +909,20 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid slug
             response = self.client.post(self.get_admin_url(Page, 'add'), new_page_data)
-            expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
-                             'underscores or hyphens.</li></ul>'
-            if DJANGO_2_2:
-                expected_error = expected_error.replace("“", "&#39").replace("”", "&#39")
+            if django.VERSION >= (5, 2):
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Enter a valid “slug” consisting of letters, numbers, '
+                    'underscores or hyphens.</li></ul>'
+                )
+            else:
+                expected_error = (
+                    '<ul class="errorlist">'
+                    '<li>Enter a valid “slug” consisting of letters, numbers, '
+                    'underscores or hyphens.</li></ul>'
+                )
+                if DJANGO_2_2:
+                    expected_error = expected_error.replace("“", "&#39").replace("”", "&#39")
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
@@ -912,11 +935,18 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Duplicate slug / path
             response = self.client.post(self.get_admin_url(Page, 'add'), new_page_data)
-            expected_error = (
-                '<ul class="errorlist"><li>Page '
-                '<a href="{}" target="_blank">test</a> '
-                'has the same url \'test\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', page2.pk))
+            if django.VERSION >= (5, 2):
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error"><li>Page '
+                    '<a href="{}" target="_blank">test</a> '
+                    "has the same url 'test' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', page2.pk))
+            else:
+                expected_error = (
+                    '<ul class="errorlist"><li>Page '
+                    '<a href="{}" target="_blank">test</a> '
+                    "has the same url 'test' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', page2.pk))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 

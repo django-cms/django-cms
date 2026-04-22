@@ -3,6 +3,7 @@ import json
 import sys
 from unittest import skipUnless
 
+import django
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
@@ -280,11 +281,18 @@ class PageTest(PageTestBase):
 
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             new_page_id = Page.objects.only('id').latest('id').pk
-            expected_error = (
-                '<ul class="errorlist"><li>Page '
-                '<a href="{}" target="_blank">test page 1</a> '
-                'has the same url \'test-page-1\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', new_page_id))
+            if django.VERSION >= (5, 2):
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error"><li>Page '
+                    '<a href="{}" target="_blank">test page 1</a> '
+                    "has the same url 'test-page-1' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', new_page_id))
+            else:
+                expected_error = (
+                    '<ul class="errorlist"><li>Page '
+                    '<a href="{}" target="_blank">test page 1</a> '
+                    "has the same url 'test-page-1' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', new_page_id))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
@@ -305,11 +313,18 @@ class PageTest(PageTestBase):
             page_data = self.get_new_page_data(page.node.pk)
             page_data['slug'] = 'subpage'
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            expected_markup = (
-                '<ul class="errorlist">'
-                '<li>Page <a href="{}" target="_blank">subpage</a> '
-                'has the same url \'page/subpage\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', sub_page.pk))
+            if django.VERSION >= (5, 2):
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">subpage</a> '
+                    "has the same url 'page/subpage' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', sub_page.pk))
+            else:
+                expected_markup = (
+                    '<ul class="errorlist">'
+                    '<li>Page <a href="{}" target="_blank">subpage</a> '
+                    "has the same url 'page/subpage' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', sub_page.pk))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
@@ -319,11 +334,18 @@ class PageTest(PageTestBase):
             page_data = self.get_new_page_data()
             page_data['slug'] = 'child-page'
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            expected_markup = (
-                '<ul class="errorlist">'
-                '<li>Page <a href="{}" target="_blank">child-page</a> '
-                'has the same url \'child-page\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', child_page.pk))
+            if django.VERSION >= (5, 2):
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">child-page</a> '
+                    "has the same url 'child-page' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', child_page.pk))
+            else:
+                expected_markup = (
+                    '<ul class="errorlist">'
+                    '<li>Page <a href="{}" target="_blank">child-page</a> '
+                    "has the same url 'child-page' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', child_page.pk))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
@@ -333,11 +355,18 @@ class PageTest(PageTestBase):
             page_data = self.get_new_page_data()
             page_data['slug'] = 'page'
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            expected_markup = (
-                '<ul class="errorlist">'
-                '<li>Page <a href="{}" target="_blank">page</a> '
-                'has the same url \'page\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', page.pk))
+            if django.VERSION >= (5, 2):
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">page</a> '
+                    "has the same url 'page' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', page.pk))
+            else:
+                expected_markup = (
+                    '<ul class="errorlist">'
+                    '<li>Page <a href="{}" target="_blank">page</a> '
+                    "has the same url 'page' as current page.</li></ul>"
+                ).format(self.get_admin_url(Page, 'change', page.pk))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
@@ -463,14 +492,26 @@ class PageTest(PageTestBase):
             data['redirect'] = 'javascript:alert(1)'
             # Asserts users can't insert javascript call
             response = self.client.post(endpoint, data)
-            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
+            if django.VERSION >= (5, 2):
+                validation_error = (
+                    '<ul class="errorlist" id="id_redirect_error">'
+                    '<li>Enter a valid URL.</li></ul>'
+                )
+            else:
+                validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
             self.assertContains(response, validation_error, html=True)
 
         with self.login_user_context(superuser):
             data['redirect'] = '<script>alert("test")</script>'
             # Asserts users can't insert javascript call
             response = self.client.post(endpoint, data)
-            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
+            if django.VERSION >= (5, 2):
+                validation_error = (
+                    '<ul class="errorlist" id="id_redirect_error">'
+                    '<li>Enter a valid URL.</li></ul>'
+                )
+            else:
+                validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
             self.assertContains(response, validation_error, html=True)
 
     def test_moderator_edit_page_redirect(self):
@@ -1401,11 +1442,18 @@ class PageTest(PageTestBase):
         create_page('home', 'nav_playground.html', 'en', published=True)
         boo = create_page('boo', 'nav_playground.html', 'en', published=True)
         hoo = create_page('hoo', 'nav_playground.html', 'en', published=True)
-        expected_error = (
-            '<ul class="errorlist"><li>Page '
-            '<a href="{}" target="_blank">boo</a> '
-            'has the same url \'boo\' as current page "hoo".</li></ul>'
-        ).format(self.get_admin_url(Page, 'change', boo.pk))
+        if django.VERSION >= (5, 2):
+            expected_error = (
+                '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
+                '<a href="{}" target="_blank">boo</a> '
+                "has the same url 'boo' as current page \"hoo\".</li></ul>"
+            ).format(self.get_admin_url(Page, 'change', boo.pk))
+        else:
+            expected_error = (
+                '<ul class="errorlist"><li>Page '
+                '<a href="{}" target="_blank">boo</a> '
+                "has the same url 'boo' as current page \"hoo\".</li></ul>"
+            ).format(self.get_admin_url(Page, 'change', boo.pk))
 
         with self.login_user_context(superuser):
             endpoint = self.get_admin_url(Page, 'advanced', hoo.pk)
