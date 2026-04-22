@@ -1,7 +1,7 @@
 .. _upgrade-to-3.11.11:
 
 #####################
-Release notes 3.11.10
+Release notes 3.11.11
 #####################
 
 
@@ -11,23 +11,26 @@ What's new in 3.11.11
 
 Bug Fixes:
 ----------
-* Remove deprecated get_storage_class import from cms.utils (#8102) -- Fabian Braun
-* Add missing compiled French messages (#8126) -- Fabian Braun
-
+* Create the duplicate page as a sibling by @fsbraun in https://github.com/django-cms/django-cms/pull/8216
+* Fix default value for edit_fields parameter to avoid AttributeError by @fsbraun in https://github.com/django-cms/django-cms/pull/8380
+* Migrations failed for django-treebeard >= 5.0.3 by @fsbraun in https://github.com/django-cms/django-cms/pull/8487
+* XSS vulnerability in validator error message (#8576) by @fsbraun in https://github.com/django-cms/django-cms/pull/8590
+* Fix tests to pass with Django 5.2 by @protoroto in https://github.com/django-cms/django-cms/pull/8591
 
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (2 pull requests)
+* Fabian Braun (4 pull requests)
+* Leonardo Cavallucci (1 pull request)
 
 With the review help of the following contributors:
 
+* Fabian Braun 
 * Vinit Kumar
 
 Thanks to all contributors for their efforts!
-
 
 *************************
 How to upgrade to 3.11.11
