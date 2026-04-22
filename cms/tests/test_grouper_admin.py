@@ -5,7 +5,9 @@ from django.conf import settings
 from django.contrib.admin import site
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
+from django.db import connection
 from django.templatetags.static import static
+from django.test.utils import CaptureQueriesContext
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
 
@@ -337,6 +339,72 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
                 # Assert
                 self.assertContains(response, "Grouper Category")
                 self.assertContains(response, random_content[language])
+
+    def test_get_content_obj_uses_prefetch_cache(self) -> None:
+        """Iterating the admin queryset and calling ``get_content_obj`` on each grouper must
+        not issue per-row queries — the prefetch registered in ``get_queryset`` is expected
+        to populate ``_admin_prefetch_cache``, so the total query count stays constant."""
+        # Arrange: baseline + many grouper/content pairs.
+        self.createContentInstance("en")
+        for i in range(10):
+            extra = GrouperModel.objects.create(category_name=f"Grouper {i}")
+            GrouperModelContent.objects.create(
+                grouper_model=extra, language="en", secret_greeting=f"Greeting {i}"
+            )
+
+        request = self.get_request()
+        request.user = self.admin_user
+        self.admin.language = "en"
+
+        # Act: mimic what the changelist does — materialize the queryset, then look up
+        # each grouper's content object.
+        with CaptureQueriesContext(connection) as ctx:
+            groupers = list(self.admin.get_queryset(request))
+            for grouper in groupers:
+                self.assertIsNotNone(self.admin.get_content_obj(grouper))
+
+        # Assert: one query for groupers + one for the prefetch = 2.
+        # Without the prefetch we'd see 1 + N queries (12 here).
+        self.assertLessEqual(
+            len(ctx),
+            3,
+            f"Expected ≤ 3 queries for 11 groupers thanks to prefetch_related, got {len(ctx)}. "
+            f"Looks like ``get_content_obj`` is not using the prefetch cache.",
+        )
+
+    def test_changelist_view_has_no_n_plus_1(self) -> None:
+        """End-to-end regression guard: the query count of the changelist HTTP view must
+        not grow with the number of grouper instances. Protects against future n+1s
+        introduced by list_display getters, action buttons, or related hooks."""
+        # Arrange: baseline with a single grouper (from setUp) + one content object.
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            # Warm up the client/session so login-related queries don't pollute counts.
+            self.client.get(self.changelist_url + "?language=en")
+
+            with CaptureQueriesContext(connection) as baseline:
+                response = self.client.get(self.changelist_url + "?language=en")
+            self.assertEqual(response.status_code, 200)
+
+            # Act: add many more grouper/content pairs.
+            for i in range(10):
+                extra = GrouperModel.objects.create(category_name=f"Grouper {i}")
+                GrouperModelContent.objects.create(
+                    grouper_model=extra, language="en", secret_greeting=f"Greeting {i}"
+                )
+
+            with CaptureQueriesContext(connection) as scaled:
+                response = self.client.get(self.changelist_url + "?language=en")
+            self.assertEqual(response.status_code, 200)
+
+        # Assert: query count is invariant to number of rows.
+        self.assertEqual(
+            len(baseline),
+            len(scaled),
+            f"Changelist issued {len(baseline)} queries for 1 grouper but {len(scaled)} for 11. "
+            f"This suggests an n+1 has been introduced.",
+        )
 
 
 class SimpleGrouperChangeListTestCase(SimpleSetupMixin, CMSTestCase):

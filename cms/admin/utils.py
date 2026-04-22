@@ -394,7 +394,13 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         """Annotates content fields with the name "content__{field_name}" to the grouper queryset if
         for all content fields that appear in the"""
-        return super().get_queryset(request).annotate(**self._get_annotation())
+        qs = super().get_queryset(request).annotate(**self._get_annotation())
+        prefetch = models.Prefetch(
+            self.content_related_field,
+            queryset=self.content_model.admin_manager.latest_content(),
+            to_attr="_admin_prefetch_cache",
+        )
+        return qs.prefetch_related(prefetch)
 
     def get_language_from_request(self, request: HttpRequest) -> str:
         """Hook for get_language_from_request which by default uses the cms utility"""
@@ -648,12 +654,22 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def get_content_obj(self, obj: models.Model | None) -> models.Model | None:
         if obj is None or self._is_content_obj(obj):
             return obj
-        else:
-            if not hasattr(obj, "_grouper_admin_content_obj_cache"):
-                obj._grouper_admin_content_obj_cache = (
-                    self._get_content_queryset(obj).filter(**self.current_content_filters).first()
-                )
-            return obj._grouper_admin_content_obj_cache
+
+        if not hasattr(obj, "_grouper_admin_content_obj_cache"):
+            # Check prefetch cache
+            if hasattr(obj, "_admin_prefetch_cache"):
+                for content_obj in obj._admin_prefetch_cache:
+                    if all(
+                        getattr(content_obj, key, None) == value for key, value in self.current_content_filters.items()
+                    ):
+                        obj._grouper_admin_content_obj_cache = content_obj
+                        return content_obj
+                obj._grouper_admin_content_obj_cache = None  # no hit
+                return None
+            obj._grouper_admin_content_obj_cache = (
+                self._get_content_queryset(obj).filter(**self.current_content_filters).first()
+            )
+        return obj._grouper_admin_content_obj_cache
 
     def get_content_objects(self, obj: models.Model | None) -> models.QuerySet:
         if obj is None:
