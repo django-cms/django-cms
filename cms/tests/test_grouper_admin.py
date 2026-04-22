@@ -1,14 +1,15 @@
 import copy
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.conf import settings
 from django.contrib.admin import site
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
 
-from cms.admin.utils import CONTENT_PREFIX
+from cms.admin.utils import CONTENT_PREFIX, GrouperModelAdmin
 from cms.test_utils.project.sampleapp.models import (
     GrouperModel,
     GrouperModelContent,
@@ -555,6 +556,78 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         self.assertEqual(content_instance_en.secret_greeting, random_content.secret_greeting)  # unchanged
         self.assertIsNotNone(content_instance_de)  # Exists?
         self.assertEqual(content_instance_de.secret_greeting, data["content__secret_greeting"])  # Has new content
+
+
+class GrouperCanChangeContentTestCase(SetupMixin, CMSTestCase):
+    """Tests for ``GrouperModelAdmin.can_change_content`` in both the add and change case.
+
+    The sampleapp's ``GrouperAdmin`` overrides ``can_change_content``, so we call the base
+    implementation directly. ``request.user`` is a ``MagicMock`` because Django's default
+    auth backend returns no object-level permissions for non-superusers, which would make
+    the change case impossible to exercise otherwise."""
+
+    def _can_change_content(self, request, content_obj):
+        return GrouperModelAdmin.can_change_content(self.admin, request, content_obj)
+
+    def _request(self, has_perm_return=True):
+        request = self.get_request()
+        request.user = MagicMock()
+        request.user.has_perm.return_value = has_perm_return
+        return request
+
+    def test_add_case_checks_add_permission(self):
+        """Without a content object, the content model's add permission is checked."""
+        request = self._request(has_perm_return=True)
+
+        self.assertTrue(self._can_change_content(request, None))
+
+        opts = GrouperModelContent._meta
+        expected_perm = f"{opts.app_label}.{get_permission_codename('add', opts)}"
+        request.user.has_perm.assert_called_once_with(expected_perm, None)
+
+    def test_add_case_denied_without_permission(self):
+        """Without the add permission, the add case returns False."""
+        request = self._request(has_perm_return=False)
+
+        self.assertFalse(self._can_change_content(request, None))
+
+    def test_change_case_checks_change_permission(self):
+        """With a content object, the change permission is checked, passing the object for
+        object-level backends."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=True)
+
+        self.assertTrue(self._can_change_content(request, content_obj))
+
+        opts = GrouperModelContent._meta
+        expected_perm = f"{opts.app_label}.{get_permission_codename('change', opts)}"
+        request.user.has_perm.assert_called_once_with(expected_perm, content_obj)
+
+    def test_change_case_denied_without_permission(self):
+        """Without the change permission, the change case returns False."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=False)
+
+        self.assertFalse(self._can_change_content(request, content_obj))
+
+    def test_change_case_respects_is_editable(self):
+        """When the content object exposes ``is_editable`` returning False, the user cannot
+        change it even with the permission."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: False
+        request = self._request(has_perm_return=True)
+
+        self.assertFalse(self._can_change_content(request, content_obj))
+
+    def test_superuser_can_change_content_in_both_cases(self):
+        """Superusers pass the permission check for both add and change cases."""
+        request = self.get_request()
+        request.user = self.admin_user
+
+        self.assertTrue(self._can_change_content(request, None))
+
+        content_obj = self.createContentInstance("en")
+        self.assertTrue(self._can_change_content(request, content_obj))
 
 
 class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):

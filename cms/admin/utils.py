@@ -8,6 +8,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.checks import ModelAdminChecks
 from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
@@ -385,6 +386,13 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 )
         return annotation
 
+    def can_change_content(self, request, content_obj):
+        opts = self.content_model._meta
+        perm = f"{opts.app_label}.{get_permission_codename('change' if content_obj else 'add', opts)}"
+        has_permissions = request.user.has_perm(perm, content_obj)
+        is_editable = getattr(content_obj, "is_editable", lambda req: True)(request)
+        return has_permissions and is_editable
+
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         """Annotates content fields with the name "content__{field_name}" to the grouper queryset if
         for all content fields that appear in the"""
@@ -542,6 +550,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             extra_context["language_tabs"] = self.get_language_tuple(site=site)
             extra_context["language"] = language
             extra_context["filled_languages"] = filled_languages
+            extra_context["can_change_content_obj"] = self.can_change_content(request, content_instance)
             if content_instance is None:
                 subtitle = _("Add %(language)s content") % dict(language=get_language_dict(site_id=site.pk).get(self.language))
                 extra_context["subtitle"] = subtitle
