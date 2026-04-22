@@ -1,6 +1,10 @@
-{% load i18n %}
-{% include 'django/forms/widgets/select.html' %}
-<div data-cms-widget-applicationconfigselect="true" hidden>
-    {{ widget.script_data|json_script }}
+{% load i18n static %}
+<div class="related-widget-wrapper">
+    {% include 'django/forms/widgets/select.html' %}
+    <div data-cms-widget-applicationconfigselect="true" hidden>
+        {{ widget.script_data|json_script }}
+    </div>
+    <a href="" class="related-widget-wrapper-link add-related" id="add_{{ widget.name }}" title="{% trans 'Add Another' %}">
+        <img src="{% static "/admin/img/icon-addlink.svg" %}" alt="" width="24" height="24">
+    </a>
 </div>
-<a href="" class="addlink" id="add_{{ widget.name }}" title="{% trans 'Add Another' %}"></a>
