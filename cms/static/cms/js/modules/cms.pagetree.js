@@ -87,8 +87,6 @@ class PageTree {
     _setupLanguages() {
         this.ui.languagesSelect.on('change', () => {
             const newLanguage = this.ui.languagesSelect.val();
-
-            // eslint-disable-next-line no-undef
             const url = new URL(window.location.href);
 
             url.searchParams.delete('language');

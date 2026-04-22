@@ -168,7 +168,7 @@ class FrontendEditableAdminMixin(BaseEditableAdminMixin):
     def _get_model_admin_and_permission(self, request, obj: models.Model) -> tuple[admin.ModelAdmin, bool]:
         # FrontendEditableAdminMixin needs to be added to the model's model admin class.
         # Hence, the relevant admin is the model admin itself.
-        change_permission =  request.user.has_perm(f"{obj._meta.app_label}.change_{obj._meta.model_name}")
+        change_permission =  request.user.has_perm(f"{obj._meta.app_label}.change_{obj._meta.model_name}", obj=obj)
         return self, change_permission
 
     def _get_object_for_single_field(self, object_id: int, language: str) -> models.Model:
