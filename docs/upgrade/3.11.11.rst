@@ -1,0 +1,58 @@
+.. _upgrade-to-3.11.11:
+
+#####################
+Release notes 3.11.11
+#####################
+
+
+*********************
+What's new in 3.11.11
+*********************
+
+Bug Fixes:
+----------
+* Create the duplicate page as a sibling by @fsbraun in https://github.com/django-cms/django-cms/pull/8216
+* Fix default value for edit_fields parameter to avoid AttributeError by @fsbraun in https://github.com/django-cms/django-cms/pull/8380
+* Migrations failed for django-treebeard >= 5.0.3 by @fsbraun in https://github.com/django-cms/django-cms/pull/8487
+* XSS vulnerability in validator error message (#8576) by @fsbraun in https://github.com/django-cms/django-cms/pull/8590
+* Fix tests to pass with Django 5.2 by @protoroto in https://github.com/django-cms/django-cms/pull/8591
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (4 pull requests)
+* Leonardo Cavallucci (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun 
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+*************************
+How to upgrade to 3.11.11
+*************************
+
+We assume you are upgrading from django CMS 3.11.10.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.

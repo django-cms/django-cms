@@ -2,6 +2,32 @@
 Changelog
 =========
 
+3.11.11 (2026-04-22)
+====================
+
+Bug Fixes:
+----------
+* Create the duplicate page as a sibling by @fsbraun in https://github.com/django-cms/django-cms/pull/8216
+* Fix default value for edit_fields parameter to avoid AttributeError by @fsbraun in https://github.com/django-cms/django-cms/pull/8380
+* Migrations failed for django-treebeard >= 5.0.3 by @fsbraun in https://github.com/django-cms/django-cms/pull/8487
+* XSS vulnerability in validator error message (#8576) by @fsbraun in https://github.com/django-cms/django-cms/pull/8590
+* Fix tests to pass with Django 5.2 by @protoroto in https://github.com/django-cms/django-cms/pull/8591
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (4 pull requests)
+* Leonardo Cavallucci (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun 
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 3.11.10 (2025-04-05)
 ====================
 
@@ -16,11 +42,11 @@ Statistics:
 
 This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (2 pull requests)
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
 
 With the review help of the following contributors:
 
-* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
