@@ -100,9 +100,7 @@ class ChangeListActionsMixin(metaclass=forms.widgets.MediaDefiningClass):
             "sure it calls super().get_list_display."
         )  # pragma: no cover
 
-    def get_list_display(
-        self, request: HttpRequest
-    ) -> tuple[str | typing.Callable[[models.Model], str], ...]:
+    def get_list_display(self, request: HttpRequest) -> tuple[str | typing.Callable[[models.Model], str], ...]:
         list_display = super().get_list_display(request)
         return tuple(
             self.get_admin_list_actions(request) if item == "admin_list_actions" else item for item in list_display
@@ -184,7 +182,7 @@ class GrouperModelAdminChecks(ModelAdminChecks):
         `field_name` is "content__title"."""
 
         if field_name.startswith(CONTENT_PREFIX) and obj.content_model:
-            field_name = field_name[len(CONTENT_PREFIX):]
+            field_name = field_name[len(CONTENT_PREFIX) :]
             obj = copy(obj)
             obj.model = obj.content_model
         return super()._check_prepopulated_fields_value_item(obj, field_name, label)
@@ -195,7 +193,7 @@ class GrouperModelAdminChecks(ModelAdminChecks):
         """
 
         if field_name.startswith(CONTENT_PREFIX) and obj.content_model:
-            field_name = field_name[len(CONTENT_PREFIX):]
+            field_name = field_name[len(CONTENT_PREFIX) :]
             obj = copy(obj)
             obj.model = obj.content_model
         return super()._check_prepopulated_fields_key(obj, field_name, label)
@@ -552,7 +550,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             extra_context["filled_languages"] = filled_languages
             extra_context["can_change_content_obj"] = self.can_change_content(request, content_instance)
             if content_instance is None:
-                subtitle = _("Add %(language)s content") % dict(language=get_language_dict(site_id=site.pk).get(self.language))
+                subtitle = _("Add %(language)s content") % dict(
+                    language=get_language_dict(site_id=site.pk).get(self.language)
+                )
                 extra_context["subtitle"] = subtitle
 
         # TODO: Add context for other grouping fields to be shown as a dropdown
@@ -650,7 +650,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             return obj
         else:
             if not hasattr(obj, "_grouper_admin_content_obj_cache"):
-                obj._grouper_admin_content_obj_cache = self._get_content_queryset(obj).filter(**self.current_content_filters).first()
+                obj._grouper_admin_content_obj_cache = (
+                    self._get_content_queryset(obj).filter(**self.current_content_filters).first()
+                )
             return obj._grouper_admin_content_obj_cache
 
     def get_content_objects(self, obj: models.Model | None) -> models.QuerySet:
@@ -687,17 +689,21 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         This allows versioned content to be protected if needed"""
         # First, get read-only fields for grouper
         fields = super().get_readonly_fields(request, obj)
-        if hasattr(self, "can_change_content"):
-            content_obj = self.get_content_obj(obj)
-            if not self.can_change_content(request, content_obj):
-                # Only allow content object fields to be edited if user can change them
-                fields += tuple(
+        content_obj = self.get_content_obj(obj)
+        if not self.can_change_content(request, content_obj):
+            # Only allow content object fields to be edited if user can change them
+            fields = [
+                *fields,
+                *(
                     CONTENT_PREFIX + field
                     for field in self.form._content_fields
                     if field != self.grouper_field_name and field not in self.extra_grouping_fields
-                )
+                ),
+            ]
         # Ensure no read-only fields are in prepopulated_fields
-        self.prepopulated_fields = {key: value for key, value in self._prepopulated_fields.items() if key not in fields}
+        self.prepopulated_fields = {
+            key: value for key, value in self._prepopulated_fields.items() if key not in fields
+        }
         return fields
 
     def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
@@ -716,7 +722,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             else:  # pragma: no cover
                 # ... without otherwise
                 form._content_model.objects.create(**content_dict)
-        elif not hasattr(self, "can_change_content") or self.can_change_content(request, form._content_instance):
+        elif self.can_change_content(request, form._content_instance):
             # Update content instance (only if can_change_content allows it)
             for key, value in content_dict.items():
                 setattr(form._content_instance, key, value)
@@ -730,7 +736,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         grouper_search_fields = []
         for field_name in self.search_fields:
             if field_name.startswith(CONTENT_PREFIX):
-                content_search_fields.append(field_name[len(CONTENT_PREFIX):])
+                content_search_fields.append(field_name[len(CONTENT_PREFIX) :])
             else:
                 grouper_search_fields.append(field_name)
 
@@ -831,10 +837,9 @@ class _GrouperAdminFormMixin:
 
     def clean(self) -> dict:
         site = get_current_site(self._request)
-        if (
-            f"{CONTENT_PREFIX}language" in self.cleaned_data
-            and self.cleaned_data[f"{CONTENT_PREFIX}language"] not in get_language_list(site_id=site.pk)
-        ):
+        if f"{CONTENT_PREFIX}language" in self.cleaned_data and self.cleaned_data[
+            f"{CONTENT_PREFIX}language"
+        ] not in get_language_list(site_id=site.pk):
             raise ValidationError(
                 _("Invalid language %(value)s. This form cannot be processed. Try changing languages."),
                 params=dict(value=self.cleaned_data.get("language", _("<unspecified>"))),
