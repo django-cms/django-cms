@@ -2,7 +2,6 @@ import datetime
 import json
 
 import django
-
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
