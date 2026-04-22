@@ -387,9 +387,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def can_change_content(self, request, content_obj):
         opts = self.content_model._meta
         perm = f"{opts.app_label}.{get_permission_codename('change' if content_obj else 'add', opts)}"
-        has_permissions = request.user.has_perm(perm, content_obj)
-        is_editable = getattr(content_obj, "is_editable", lambda *_: True)(request)
-        return has_permissions and is_editable
+        if not request.user.has_perm(perm, content_obj):
+            return False
+        return getattr(content_obj, "is_editable", lambda *_: True)(request)
 
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         """Annotates content fields with the name "content__{field_name}" to the grouper queryset if
