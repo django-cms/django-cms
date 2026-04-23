@@ -90,7 +90,11 @@ class AbstractPagePermission(models.Model):
         _("can change permissions"), default=False, help_text=_("on page level")
     )
     can_move_page = models.BooleanField(_("can move"), default=True)
-    can_view = models.BooleanField(_("view restricted"), default=False, help_text=_("frontend view restriction"))
+    can_view = models.BooleanField(
+        _("Can view restricted pages"),
+        default=False,
+        help_text=_("Grant access to pages that are otherwise hidden from the public.")
+    )
 
     class Meta:
         abstract = True
@@ -116,8 +120,7 @@ class AbstractPagePermission(models.Model):
             raise ValidationError(message)
 
         if self.can_publish:
-            message = _("Users can't publish a page without permissions "
-                        "to change the page. Edit permissions required.")
+            message = _("To grant 'can publish' permissions, the 'can edit' permission must also be checked.")
             raise ValidationError(message)
 
         if self.can_change_advanced_settings:
@@ -195,7 +198,7 @@ class GlobalPagePermission(AbstractPagePermission):
     can_recover_page = models.BooleanField(
         verbose_name=_("can recover pages"),
         default=True,
-        help_text=_("can recover any deleted page"),
+        help_text=_("Allows the user to restore pages from the trash/delete history."),
     )
     sites = models.ManyToManyField(
         to=Site,
