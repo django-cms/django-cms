@@ -6,6 +6,15 @@ How-to guides
 These guides presuppose some familiarity with django CMS. They cover some of the same
 territory as the :doc:`/introduction/index`, but in more detail.
 
+Installation & deployment
+-------------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    Install with Docker <22-docker-installation>
+    Install manually <23-manual-installation>
+
 Using core functionality
 ------------------------
 
