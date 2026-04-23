@@ -597,7 +597,7 @@
         &:dir(rtl) {
             float: right;
         }
-        line-height: $toolbar-button-height;
+        line-height: $toolbar-button-height - 2px;
         height: $toolbar-button-height;
         font-size: $toolbar-button-font-size;
         padding: 0 $toolbar-button-padding-horizontal;

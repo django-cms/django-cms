@@ -85,6 +85,7 @@ const INTEGRATION_TESTS = [
         'changeSettings',
         'toolbar-login-apphooks',
         'permissions-enabled',
+        'userSelectAdminWidget.spec',
         {
             serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
             file: 'copy-from-language'
@@ -262,7 +263,15 @@ const testsIntegration = (done) => {
         .then(() => {
             log.info('Running Playwright integration tests...');
 
-            const playwrightProcess = spawn('npx', ['playwright', 'test'], {
+            // Allow passing specific test files via --testFiles flag
+            // e.g., gulp testsIntegration --testFiles="disable-edit.spec.js"
+            const testFiles = argv.testFiles
+                ? argv.testFiles
+                    .split(',')
+                    .map((file) => file.trim())
+                    .filter(Boolean)
+                : [];
+            const playwrightProcess = spawn('npx', ['playwright', 'test', ...testFiles], {
                 stdio: 'inherit',
                 shell: true,
                 env: {

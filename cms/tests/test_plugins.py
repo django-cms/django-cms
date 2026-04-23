@@ -73,6 +73,18 @@ class DumbFixturePlugin(CMSPluginBase):
         return context
 
 
+class DirectProxyCMSPluginModel(CMSPlugin):
+    class Meta:
+        proxy = True
+        app_label = "test_app"
+
+
+class DirectProxyCMSPlugin(CMSPluginBase):
+    model = DirectProxyCMSPluginModel
+    name = "Direct proxy CMSPlugin"
+    render_plugin = False
+
+
 class DumbFixturePluginWithUrls(DumbFixturePlugin):
     name = DumbFixturePlugin.name + " With custom URLs."
     render_plugin = False
@@ -1094,6 +1106,34 @@ class PluginsTestCase(PluginsTestBaseCase):
                     with mock.patch.object(qs, "iterator", side_effect=patched_iterator):
                         list(get_bound_plugins(plugins))
 
+    def test_downcast_plugins_with_direct_cmsplugin_proxy(self):
+        from cms.utils.plugins import downcast_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DirectProxyCMSPlugin):
+            plugin = api.add_plugin(placeholder, DirectProxyCMSPlugin, "en")
+            cms_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+
+            downcasted = list(downcast_plugins([cms_plugin]))
+
+        self.assertEqual(len(downcasted), 1)
+        self.assertIsInstance(downcasted[0], DirectProxyCMSPluginModel)
+        self.assertEqual(downcasted[0].pk, plugin.pk)
+
+    def test_get_bound_plugins_with_direct_cmsplugin_proxy(self):
+        from cms.utils.plugins import get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        with register_plugins(DirectProxyCMSPlugin):
+            plugin = api.add_plugin(placeholder, DirectProxyCMSPlugin, "en")
+            cms_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+
+            bound_plugins = list(get_bound_plugins([cms_plugin]))
+
+        self.assertEqual(len(bound_plugins), 1)
+        self.assertIsInstance(bound_plugins[0], DirectProxyCMSPluginModel)
+        self.assertEqual(bound_plugins[0].pk, plugin.pk)
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):
@@ -1441,7 +1481,6 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
         # Non plugins are skipped
         self.assertFalse(hasattr(NonPluginModel, "cmsplugin_ptr"))
 
-
 class UserInputValidationPluginTest(PluginsTestBaseCase):
     def test_error_response_escapes(self):
         language = "en"
@@ -1686,3 +1725,150 @@ class PluginPoolTestCase(CMSTestCase):
             self.assertIsInstance(example_cache, dict)
         finally:
             plugin_pool.unregister_plugin(ObjectCachePlugin)
+
+
+class IsSlotPluginTestCase(PluginsTestBaseCase):
+    """Unit and integration tests for the is_slot plugin attribute."""
+
+    def test_is_slot_default_is_false(self):
+        """Unit test: is_slot defaults to False on CMSPluginBase."""
+        self.assertFalse(CMSPluginBase.is_slot)
+
+    def test_is_slot_attribute_on_custom_plugin(self):
+        """Unit test: is_slot can be set to True on a plugin class."""
+        SlotPlugin = type(
+            "SlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=True),
+        )
+        self.assertTrue(SlotPlugin.is_slot)
+
+    def test_is_slot_in_plugin_info(self):
+        """Unit test: get_plugin_info includes is_slot value."""
+        SlotPlugin = type(
+            "SlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=True),
+        )
+        NonSlotPlugin = type(
+            "NonSlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=False),
+        )
+
+        with register_plugins(SlotPlugin, NonSlotPlugin):
+            page = api.create_page("test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").get(slot="body")
+
+            slot_plugin = api.add_plugin(placeholder, SlotPlugin, "en")
+            non_slot_plugin = api.add_plugin(placeholder, NonSlotPlugin, "en")
+
+            slot_info = slot_plugin.get_plugin_info()
+            non_slot_info = non_slot_plugin.get_plugin_info()
+
+            self.assertTrue(slot_info["is_slot"])
+            self.assertFalse(non_slot_info["is_slot"])
+
+    def test_is_slot_disables_add_form_in_toolbar_struct(self):
+        """Unit test: get_toolbar_plugin_struct disables add_form for slot plugins."""
+        from cms.utils.placeholder import get_toolbar_plugin_struct
+
+        SlotPlugin = type(
+            "SlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=True, show_add_form=True),
+        )
+        NonSlotPlugin = type(
+            "NonSlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=False, show_add_form=True),
+        )
+
+        with register_plugins(SlotPlugin, NonSlotPlugin):
+            toolbar_struct = get_toolbar_plugin_struct([SlotPlugin, NonSlotPlugin])
+
+        slot_config = next(config for config in toolbar_struct if config["value"] == "SlotPlugin")
+        non_slot_config = next(config for config in toolbar_struct if config["value"] == "NonSlotPlugin")
+
+        self.assertFalse(slot_config["add_form"])
+        self.assertTrue(non_slot_config["add_form"])
+
+    def test_is_slot_content_renderer(self):
+        """Integration test: content renderer adds cms-slot class when is_slot is True."""
+        from django.template import RequestContext
+
+        SlotPlugin = type(
+            "SlotPlugin",
+            (CMSPluginBase,),
+            dict(render_template="extra_context_plugin.html", is_slot=True),
+        )
+        NonSlotPlugin = type(
+            "NonSlotPlugin",
+            (CMSPluginBase,),
+            dict(render_template="extra_context_plugin.html", is_slot=False),
+        )
+
+        with register_plugins(SlotPlugin, NonSlotPlugin):
+            page = api.create_page("test", "nav_playground.html", "en")
+            page_content = self.get_pagecontent_obj(page)
+            page_edit_url = get_object_edit_url(page_content)
+            placeholder = page.get_placeholders("en").get(slot="body")
+
+            slot_instance = api.add_plugin(placeholder, SlotPlugin, "en")
+            non_slot_instance = api.add_plugin(placeholder, NonSlotPlugin, "en")
+
+            request = self.get_request(page_edit_url, page=page)
+            request.toolbar = CMSToolbar(request)
+            renderer = self.get_content_renderer(request=request)
+            context = RequestContext(request)
+
+            slot_output = renderer.render_plugin(slot_instance, context, placeholder, editable=True)
+            non_slot_output = renderer.render_plugin(non_slot_instance, context, placeholder, editable=True)
+
+            self.assertIn("cms-slot", slot_output)
+            self.assertNotIn("cms-slot", non_slot_output)
+
+    def test_is_slot_structure_renderer(self):
+        """Integration test: structure renderer includes is_slot in plugin toolbar JS."""
+        SlotPlugin = type(
+            "SlotPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=True),
+        )
+
+        with register_plugins(SlotPlugin):
+            page = api.create_page("test", "nav_playground.html", "en")
+            page_content = self.get_pagecontent_obj(page)
+            page_edit_url = get_object_edit_url(page_content)
+            placeholder = page.get_placeholders("en").get(slot="body")
+
+            api.add_plugin(placeholder, SlotPlugin, "en")
+
+            request = self.get_request(page_edit_url, page=page)
+            request.toolbar = CMSToolbar(request)
+            renderer = self.get_structure_renderer(request=request)
+            output = renderer.render_placeholder(placeholder, language="en", obj=page)
+
+            self.assertIn('"is_slot": true', output)
+
+    def test_is_slot_via_plugin_pool(self):
+        """Unit test: is_slot can be set on a third-party plugin via plugin_pool.get_plugin()."""
+        ThirdPartyPlugin = type(
+            "ThirdPartyPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, is_slot=False),
+        )
+
+        with register_plugins(ThirdPartyPlugin):
+            self.assertFalse(plugin_pool.get_plugin("ThirdPartyPlugin").is_slot)
+
+            # Simulate what an AppConfig.ready() method would do
+            plugin_pool.get_plugin("ThirdPartyPlugin").is_slot = True
+            self.assertTrue(plugin_pool.get_plugin("ThirdPartyPlugin").is_slot)
+
+            # Verify it affects plugin info
+            page = api.create_page("test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").get(slot="body")
+            plugin = api.add_plugin(placeholder, ThirdPartyPlugin, "en")
+            info = plugin.get_plugin_info()
+            self.assertTrue(info["is_slot"])

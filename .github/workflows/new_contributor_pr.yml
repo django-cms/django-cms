@@ -10,6 +10,10 @@ permissions:
 jobs:
   new:
     name: Hello new contributor
+    if: >-
+      github.event.pull_request.author_association == 'FIRST_TIMER'
+      || github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+      || github.event.pull_request.author_association == 'NONE'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/first-interaction@v3
@@ -23,6 +27,10 @@ jobs:
             We invite you to join us on our [Discord Server](https://discord-main-channel.django-cms.org)!
 
             Welcome aboard ⛵️!
+          issue_message: |
+            Hello! Thank you for opening your first issue! 🎉
+
+            We invite you to join us on our [Discord Server](https://discord-main-channel.django-cms.org)!
   discord:
     name: Discord Notification
     runs-on: ubuntu-latest
