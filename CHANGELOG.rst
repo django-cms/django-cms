@@ -1,4 +1,28 @@
-4.1.9 (2026-03-04)
+4.1.11 (2026-04-30)
+===================
+
+Bug Fixes:
+----------
+* Chunk size was missing for plugin queryset.iterator() (#8532) by @fsbraun in https://github.com/django-cms/django-cms/pull/8534
+* Fallback languages rendered empty (when not redirecting) by @fsbraun in https://github.com/django-cms/django-cms/pull/8559
+* Add `page_title` parameter to `cms.api.create_page` function  for branch `releases/4.1.x` by @PeterW-LWL in https://github.com/django-cms/django-cms/pull/8570
+* XSS vulnerability in validator error message (#8576) by @fsbraun in https://github.com/django-cms/django-cms/pull/8579
+* Readonly-fields of GrouperAdmin had side effects by @fsbraun in https://github.com/django-cms/django-cms/pull/8599
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.10 (2026-03-04)
 ==================
 
 Bug Fixes:
