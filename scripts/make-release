@@ -11,7 +11,7 @@
 
 set -e
 
-base_branch=develop
+base_branch=main
 upstream_source=git@github.com:django-cms/django-cms.git
 upstream_pattern='github\.com.django-cms/django-cms\.git$'
 
@@ -95,6 +95,7 @@ python -m venv .venv
 source ./.venv/bin/activate
 
 # Create copy of scripts so they are not lost when changing branches
+: "${RUNNER_TEMP:=${TMPDIR:-/tmp}}"
 cp -R "$SCRIPTS" "$RUNNER_TEMP"/.scripts
 SCRIPTS="$RUNNER_TEMP/.scripts"
 
@@ -151,7 +152,7 @@ echo -e "Preparing to create a release ${GREEN}${VERSION}${VERSUFFIX}${NORMAL} f
 echo ""
 
 status "- Cleaning the environment:"
-# first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
+# first go to ${base_branch} (default is main) and ensure we got the latest and greatest
 git clean -dfx
 git restore --staged .
 git checkout .
@@ -223,7 +224,7 @@ gulp bundle
 git rm -rf "cms/static/cms/css/${OLDVER}" "cms/static/cms/fonts/${OLDVER}" "cms/static/cms/js/dist/${OLDVER}"
 git add "cms/static/cms/css/${FULL_VERSION}" "cms/static/cms/fonts/${FULL_VERSION}" "cms/static/cms/js/dist/${FULL_VERSION}"
 git add LICENSE
-git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
+git commit cms/static LICENSE -m "${COMMIT_PREFIX}compiling new static files" --allow-empty
 
 
 status "- preparing documentation"
@@ -276,7 +277,7 @@ if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
 fi
 #
 # commit documentations
-git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
+git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py --allow-empty
 
 # update the blog post using the What's new section
 status "Pushing to repo"
@@ -294,5 +295,5 @@ echo -e "2. Commit potential changes to ${YELLOW}${BUILD_BRANCH}${NORMAL}"
 echo -e "3. ${BLUE}Please create a Pull Request${NORMAL} from ${YELLOW}${BUILD_BRANCH}${NORMAL} to ${YELLOW}${BRANCH}${NORMAL}"
 echo -e "4. When the PR is merged in target branch, execute:"
 echo .e "   ${BLUE}git tag ${TAG}; git push upstream ${TAG}"
-echo -e "5. Create a PR from ${BRANCH} to ${base_branch} then to develop when golden release is accepted"
+echo -e "5. Create a PR from ${BRANCH} to ${base_branch} then to main when golden release is accepted"
 success "Enjoy!"
