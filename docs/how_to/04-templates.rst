@@ -63,9 +63,10 @@ either setting the :setting:`CMS_TEMPLATES` or the :setting:`CMS_TEMPLATES_DIR`
 settings.
 
 You can select the template by page (and language) in the page menu of django
-CMS' toolbar. By default, a page inherits its template from its parent page.
-A root page uses the first template in :setting:`CMS_TEMPLATES` if no other
-template is explicitly set.
+CMS' toolbar. By default, a new page uses the same template as its parent page
+(this is template *assignment*, not Django ``{% extends %}`` inheritance — see
+:ref:`template_inheritance_pattern` below). A root page uses the first template in
+:setting:`CMS_TEMPLATES` if no other template is explicitly set.
 
 To work seamlessly with django CMS, **your templates should include the**
 ``{% cms_toolbar %}`` **tag right as the first item in your template's**
@@ -97,6 +98,51 @@ django CMS uses `django-sekizai <https://github.com/django-cms/django-sekizai>`_
 to manage CSS and JavaScript. To use the sekizai tags, you need to load the
 ``sekizai_tags`` template tags in your template: ``{% load sekizai_tags %}``.
 
+
+.. _template_inheritance_pattern:
+
+Template inheritance pattern
+----------------------------
+
+django CMS projects typically organize their templates into three layers, using Django's
+standard ``{% extends %}`` and ``{% block %}`` mechanics:
+
+1. **Base template** (usually ``base.html``) — the shared chrome: ``<!DOCTYPE>``,
+   ``<head>``, ``<body>``, ``{% cms_toolbar %}``, and the sekizai
+   ``{% render_block "css" %}`` / ``{% render_block "js" %}`` tags. It defines empty
+   ``{% block %}`` slots that per-page content will fill.
+2. **CMS page template** — extends ``base.html`` and fills those blocks with
+   :ttag:`placeholder` tags for page-specific content. These are the templates you list in
+   :setting:`CMS_TEMPLATES` and select in the page's *Advanced settings*.
+3. **Apphook or model template** — extends ``CMS_TEMPLATE`` (see :ref:`page_template`
+   below) and overrides blocks with application output. This way an app view inherits
+   whichever page template the current CMS page is using — including the toolbar, sekizai
+   blocks, and any surrounding layout — without hardcoding a base template path.
+
+Layers 1 and 2 are plain Django inheritance. Layer 3 is the django CMS-specific trick:
+``CMS_TEMPLATE`` is a context variable holding the current CMS page's template path, so
+``{% extends CMS_TEMPLATE %}`` re-uses whichever template the CMS is currently rendering.
+
+Where to put placeholders
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Page-specific** content (main content area, article body) → the CMS page template
+  (layer 2). Each CMS page template declares its own slot set.
+- **Site-wide** content that is identical on every page (a promotional banner shared
+  across all pages) → declare once in the base template (layer 1) so it renders
+  everywhere, or use a ``static_alias`` (see :ref:`static_aliases` below) if editors
+  should manage it centrally from Django admin.
+- **Apphook or model-specific** content → the app's template (layer 3); the placeholder
+  resolves against the current page or the toolbar object.
+
+.. warning::
+
+    If you put a :ttag:`placeholder` inside a ``{% block %}`` that a child template
+    overrides without calling ``{% block.super %}``, the placeholder disappears from the
+    rendered page. Keep shared placeholders *outside* overridable blocks, or make sure
+    children call ``{% block.super %}`` when they mean to keep the base content.
+
+
 Example
 -------
 
@@ -119,9 +165,16 @@ Here is an example of a simple template that uses placeholders:
         </footer>
     {% endblock content %}
 
-In this example, the template extends the base template, sets the title of the
-page, and defines three placeholders: "header", "main", and "footer". The
-placeholders are then rendered in the template.
+In this example the child template:
+
+- extends ``base.html`` — reusing the shared chrome without repeating it;
+- fills ``{% block title %}`` and ``{% block content %}`` — these bodies replace the
+  empty blocks of the same name in the base template;
+- declares three placeholders (``header``, ``main``, ``footer``) inside
+  ``{% block content %}`` — each becomes an editable slot in the structure board.
+
+Everything in the base template *outside* those blocks — ``<html>``, ``<head>``,
+``{% cms_toolbar %}``, the sekizai ``{% render_block %}`` tags — is inherited unchanged.
 
 The underlying base template could look like this:
 
@@ -142,6 +195,8 @@ The underlying base template could look like this:
     </html>
 
 
+
+.. _static_aliases:
 
 Static aliases
 ==============
@@ -174,9 +229,11 @@ one place.
 **Custom applications**: Templates in custom applications usually follow some
 well-defined business logic which is normally hard-coded in the template.
 However the same templates might include areas of "static" content, i.e.
-content that editors wish to manage. As the django CMS :ttag:`placeholder` tag
-only work in templates attached to the django CMS
-:class:`~cms.models.pagemodel.Page` model,
+content that editors wish to manage. The django CMS :ttag:`placeholder` tag
+works in templates attached to the django CMS
+:class:`~cms.models.pagemodel.Page` model, or in templates rendered by apphook
+views (see :ref:`using_placeholders_on_apphooked_pages`). For content areas
+that are not tied to a page or apphook,
 `djangocms-alias <https://github.com/django-cms/djangocms-alias>`_
 closes the gap by providing editors central access to such custom content areas.
 
@@ -186,13 +243,20 @@ closes the gap by providing editors central access to such custom content areas.
 CMS_TEMPLATE
 ============
 
-``CMS_TEMPLATE`` is a context variable available in the context; it contains
-the template path for CMS pages and application using apphooks, and the default
-template (i.e.: the first template in :setting:`CMS_TEMPLATES`) for non-CMS
-managed URLs.
+``CMS_TEMPLATE`` is a context variable whose value is the template path for the current
+CMS page (or apphook page), or the first template in :setting:`CMS_TEMPLATES` when the
+URL is not managed by the CMS.
 
-This is mostly useful to use it in the ``extends`` template tag in the application
-templates to get the current page template.
+**Use it as the base for any app template that should blend into CMS pages** — write
+``{% extends CMS_TEMPLATE|default:"my_default_template.html" %}`` instead of hardcoding 
+a base-template path. The app template will then pick up the toolbar, sekizai blocks, 
+and any layout the current page template provides, even if editors later switch the 
+page to a different template.
+
+Without ``CMS_TEMPLATE``, an app template with a hardcoded
+``{% extends "myproject/base.html" %}`` would always render with ``myproject/base.html``
+regardless of which page template the CMS is rendering — causing layout drift whenever
+editors change the page's template.
 
 Example: cms template
 
@@ -229,13 +293,17 @@ Example: application template
 ``CMS_TEMPLATE`` memorises the path of the cms template so the application
 template can dynamically import it.
 
-Template Inheritance in Page Content Translations
-=================================================
+Template assignment across translations and versions
+=====================================================
 
-Default Behavior (without versioning)
+This section is about which template file is *assigned* to a page content, not about
+Django's ``{% extends %}`` / ``{% block %}`` inheritance (see
+:ref:`template_inheritance_pattern` for that).
+
+Default behavior (without versioning)
 -------------------------------------
 
-In django CMS (version 4 and above), when creating page content translations, all content is immediately 
+In django CMS (version 4 and above), when creating page content translations, all content is immediately
 published. When creating a translation of an existing page, the template from the original page content is 
 copied to the new translation. This behavior can be seen in the `create_translation` method. The template 
 is explicitly copied from the original page content to ensure consistent layout across languages.
