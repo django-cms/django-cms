@@ -667,11 +667,11 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             content_obj = self.get_content_obj(obj)
             if not self.can_change_content(request, content_obj):
                 # Only allow content object fields to be edited if user can change them
-                fields += tuple(
+                fields = [*fields,  *(
                     CONTENT_PREFIX + field
                     for field in self.form._content_fields
                     if field != self.grouper_field_name and field not in self.extra_grouping_fields
-                )
+                )]
         return fields
 
     def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
