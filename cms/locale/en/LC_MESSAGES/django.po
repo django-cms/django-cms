@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 19:56+0000\n"
+"POT-Creation-Date: 2026-04-24 17:06+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -542,6 +542,11 @@ msgstr ""
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Page %(conflict_page)s has the same url '%(url)s' as current page."
+
+#, fuzzy
+#| msgid "Add Another"
+msgid "Add another"
+msgstr "Add Another"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
