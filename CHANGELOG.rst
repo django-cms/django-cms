@@ -48,6 +48,7 @@ This release includes 5 pull requests, and was created with the help of the foll
 
 With the review help of the following contributors:
 
+* Github Release Action
 
 Thanks to all contributors for their efforts!
 
