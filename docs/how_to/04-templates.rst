@@ -121,7 +121,7 @@ standard ``{% extends %}`` and ``{% block %}`` mechanics:
 
 Layers 1 and 2 are plain Django inheritance. Layer 3 is the django CMS-specific trick:
 ``CMS_TEMPLATE`` is a context variable holding the current CMS page's template path, so
-``{% extends CMS_TEMPLATE %}`` re-uses whichever template the CMS is currently rendering.
+``{% extends CMS_TEMPLATE %}`` reuses whichever template the CMS is currently rendering.
 
 Where to put placeholders
 ~~~~~~~~~~~~~~~~~~~~~~~~~
