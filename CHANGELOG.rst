@@ -1,3 +1,19 @@
+Bug Fixes:
+----------
+* Readonly-fields of GrouperAdmin had side effects (#8599) (be4a67cd6) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 4.1.9 (2026-03-04)
 ==================
 
