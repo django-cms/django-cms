@@ -153,10 +153,11 @@ def _get_descendants_for_publish_helper(page, language):
     for descendant in descendants:
         desc_content = descendant.get_admin_content(language)
         if desc_content:
+            descendant_url = descendant.get_absolute_url(language=language)
             descendant_list.append({
                 "id": descendant.pk,
                 "title": desc_content.title or descendant.get_slug(language) or _("Untitled"),
-                "url": descendant.get_absolute_url(language=language) if descendant.get_absolute_url(language=language) else None,
+                "url": descendant_url if descendant_url else None,
                 "indicator": desc_content.content_indicator(),
                 "depth": descendant.depth - page.depth,
             })

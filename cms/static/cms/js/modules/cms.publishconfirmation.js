@@ -2,6 +2,8 @@
  * Copyright https://github.com/divio/django-cms
  */
 
+/* global gettext */
+
 import $ from 'jquery';
 import Modal from './cms.modal';
 import { showLoader, hideLoader } from './loader';
@@ -95,7 +97,7 @@ class PublishConfirmation {
         }
         
         if (!pageInfo.pageId && !pageInfo.pageContentId && !pageInfo.apiUrl) {
-            this._showError(_('Missing page information for publish confirmation'));
+            this._showError(gettext('Missing page information for publish confirmation'));
             if (this.options.debug) {
                 console.error('[PublishConfirmation] Missing page information');
             }
@@ -109,7 +111,7 @@ class PublishConfirmation {
         }
 
         if (!apiUrl) {
-            this._showError(_('Could not build API URL for publish confirmation'));
+            this._showError(gettext('Could not build API URL for publish confirmation'));
             return;
         }
 
@@ -302,7 +304,7 @@ class PublishConfirmation {
 
         modal.open({
             html: dialogHtml,
-            title: _('Publish Confirmation'),
+            title: gettext('Publish Confirmation'),
             width: 600,
             height: 500,
         });
@@ -321,34 +323,34 @@ class PublishConfirmation {
         var that = this;
         var html = '<div class="cms-publish-confirmation">';
         
-        html += '<div class="cms-publish-confirmation-header" style="padding: 20px; border-bottom: 1px solid var(--border-color);">';
-        html += '<h3 style="margin: 0 0 10px 0; font-size: 18px;">' + _('Publish Confirmation') + '</h3>';
-        html += '<p style="margin: 0;">' + _('Publishing page:') + ' <strong>' + this._escapeHtml(data.page_title) + '</strong></p>';
+        html += '<div class="cms-publish-confirmation-header">';
+        html += '<h3>' + gettext('Publish Confirmation') + '</h3>';
+        html += '<p>' + gettext('Publishing page:') + ' <strong>' + this._escapeHtml(data.page_title) + '</strong></p>';
         html += '</div>';
 
         if (data.has_descendants && data.descendants && data.descendants.length > 0) {
-            html += '<div class="cms-publish-confirmation-descendants" style="padding: 20px; max-height: 300px; overflow-y: auto;">';
-            html += '<h4 style="margin: 0 0 15px 0; font-size: 14px;">' + _('Select child pages to publish (optional):') + '</h4>';
+            html += '<div class="cms-publish-confirmation-descendants">';
+            html += '<h4>' + gettext('Select child pages to publish (optional):') + '</h4>';
             
-            html += '<div class="cms-publish-confirmation-select-all" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">';
-            html += '<label style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">';
-            html += '<input type="checkbox" id="id_select_all_descendants" class="js-cms-publish-select-all" style="cursor: pointer;">';
-            html += '<span>' + _('Select all') + '</span>';
+            html += '<div class="cms-publish-confirmation-select-all">';
+            html += '<label>';
+            html += '<input type="checkbox" id="id_select_all_descendants" class="js-cms-publish-select-all">';
+            html += '<span>' + gettext('Select all') + '</span>';
             html += '</label>';
             html += '</div>';
 
-            html += '<ul class="cms-publish-confirmation-list" style="list-style: none; margin: 0; padding: 0;">';
+            html += '<ul class="cms-publish-confirmation-list">';
             
             data.descendants.forEach(function(descendant) {
-                var indentStyle = descendant.depth > 1 ? 'padding-left: ' + (descendant.depth * 20) + 'px;' : '';
+                var indentClass = descendant.depth > 1 ? ' cms-publish-confirmation-item-indent-' + descendant.depth : '';
                 var indicatorClass = descendant.indicator ? 'cms-pagetree-node-state cms-pagetree-node-state-' + descendant.indicator : '';
                 
-                html += '<li class="cms-publish-confirmation-item" style="' + indentStyle + 'margin-bottom: 8px;">';
-                html += '<label style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">';
-                html += '<input type="checkbox" name="descendant_ids" value="' + descendant.id + '" class="js-cms-publish-descendant-checkbox" style="cursor: pointer;" data-indicator="' + (descendant.indicator || '') + '">';
-                html += '<span class="cms-publish-confirmation-title" style="flex: 1;">' + that._escapeHtml(descendant.title) + '</span>';
+                html += '<li class="cms-publish-confirmation-item' + indentClass + '">';
+                html += '<label>';
+                html += '<input type="checkbox" name="descendant_ids" value="' + descendant.id + '" class="js-cms-publish-descendant-checkbox" data-indicator="' + (descendant.indicator || '') + '">';
+                html += '<span class="cms-publish-confirmation-title">' + that._escapeHtml(descendant.title) + '</span>';
                 if (indicatorClass) {
-                    html += '<span class="cms-publish-confirmation-indicator ' + indicatorClass + '" style="display: inline-block; width: 12px; height: 12px; border-radius: 50%;"></span>';
+                    html += '<span class="cms-publish-confirmation-indicator ' + indicatorClass + '"></span>';
                 }
                 html += '</label>';
                 html += '</li>';
@@ -357,14 +359,14 @@ class PublishConfirmation {
             html += '</ul>';
             html += '</div>';
         } else {
-            html += '<div class="cms-publish-confirmation-no-descendants" style="padding: 40px 20px; text-align: center; color: var(--body-quiet-color);">';
-            html += '<p style="margin: 0;">' + _('This page has no child pages.') + '</p>';
+            html += '<div class="cms-publish-confirmation-no-descendants">';
+            html += '<p>' + gettext('This page has no child pages.') + '</p>';
             html += '</div>';
         }
 
-        html += '<div class="cms-publish-confirmation-footer" style="padding: 20px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; justify-content: flex-end;">';
-        html += '<button type="button" class="cms-btn cms-btn-action js-cms-publish-confirm" style="padding: 8px 16px; cursor: pointer;">' + _('Confirm Publish') + '</button>';
-        html += '<button type="button" class="cms-btn js-cms-publish-cancel" style="padding: 8px 16px; cursor: pointer;">' + _('Cancel') + '</button>';
+        html += '<div class="cms-publish-confirmation-footer">';
+        html += '<button type="button" class="cms-btn cms-btn-action js-cms-publish-confirm">' + gettext('Confirm Publish') + '</button>';
+        html += '<button type="button" class="cms-btn js-cms-publish-cancel">' + gettext('Cancel') + '</button>';
         html += '</div>';
 
         html += '</div>';
@@ -428,6 +430,7 @@ class PublishConfirmation {
         if (this.options.debug) {
             console.log('[PublishConfirmation] Executing publish with selected IDs:', selectedDescendantIds);
             console.log('[PublishConfirmation] Original href:', originalHref);
+            console.log('[PublishConfirmation] Original onclick:', originalOnClick);
         }
 
         if (selectedDescendantIds.length > 0) {
@@ -446,9 +449,41 @@ class PublishConfirmation {
         } else if (originalHref && originalHref !== '#') {
             Helpers._getWindow().location.href = originalBtn.attr('href');
         } else if (originalOnClick) {
-            originalBtn[0].click();
+            this._executeOnClick(originalBtn);
         } else if (originalBtn.hasClass('cms-form-post-method')) {
             this._submitWithPostMethod(originalBtn, selectedDescendantIds);
+        }
+    }
+
+    /**
+     * Execute the onclick handler directly without re-triggering event listeners
+     * @method _executeOnClick
+     * @private
+     * @param {jQuery} btn
+     */
+    _executeOnClick(btn) {
+        var that = this;
+        var originalOnClick = btn.attr('onclick');
+        
+        if (this.options.debug) {
+            console.log('[PublishConfirmation] Executing onclick directly:', originalOnClick);
+        }
+
+        if (typeof btn[0].onclick === 'function') {
+            if (this.options.debug) {
+                console.log('[PublishConfirmation] onclick is a function, executing directly');
+            }
+            btn[0].onclick.call(btn[0]);
+        } else if (originalOnClick) {
+            if (this.options.debug) {
+                console.log('[PublishConfirmation] onclick is a string, using eval');
+            }
+            try {
+                eval(originalOnClick);
+            } catch (e) {
+                console.error('[PublishConfirmation] Error executing onclick:', e);
+                this._showError(gettext('Error executing publish action'));
+            }
         }
     }
 

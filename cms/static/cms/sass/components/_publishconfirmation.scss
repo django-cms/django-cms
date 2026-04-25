@@ -1,0 +1,231 @@
+//##############################################################################
+// PUBLISH CONFIRMATION DIALOG
+//
+// Styles for the publish confirmation dialog that shows when publishing
+// a page with child pages.
+//##############################################################################
+
+.cms-publish-confirmation {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-size: 14px;
+    line-height: 1.5;
+
+    // Header
+    .cms-publish-confirmation-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--dca-gray-lighter);
+        flex-shrink: 0;
+
+        h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dca-black);
+        }
+
+        p {
+            margin: 0;
+            color: var(--dca-gray);
+
+            strong {
+                color: var(--dca-black);
+            }
+        }
+    }
+
+    // Descendants list
+    .cms-publish-confirmation-descendants {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+
+        h4 {
+            margin: 0 0 16px 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dca-black);
+        }
+    }
+
+    // Select all
+    .cms-publish-confirmation-select-all {
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--dca-gray-lighter);
+
+        label {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dca-black);
+
+            input[type="checkbox"] {
+                cursor: pointer;
+                width: 16px;
+                height: 16px;
+            }
+
+            span {
+                font-weight: bold;
+            }
+        }
+    }
+
+    // List
+    .cms-publish-confirmation-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    // List item
+    .cms-publish-confirmation-item {
+        margin-bottom: 8px;
+
+        &.cms-publish-confirmation-item-indent-2 {
+            padding-left: 20px;
+        }
+
+        &.cms-publish-confirmation-item-indent-3 {
+            padding-left: 40px;
+        }
+
+        &.cms-publish-confirmation-item-indent-4 {
+            padding-left: 60px;
+        }
+
+        label {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 6px 8px;
+            border-radius: 4px;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: var(--dca-gray-lightest);
+            }
+
+            input[type="checkbox"] {
+                cursor: pointer;
+                width: 16px;
+                height: 16px;
+                flex-shrink: 0;
+            }
+
+            .cms-publish-confirmation-title {
+                flex: 1;
+                color: var(--dca-black);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .cms-publish-confirmation-indicator {
+                flex-shrink: 0;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    // No descendants
+    .cms-publish-confirmation-no-descendants {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        color: var(--dca-gray);
+
+        p {
+            margin: 0;
+            text-align: center;
+        }
+    }
+
+    // Footer
+    .cms-publish-confirmation-footer {
+        padding: 16px 20px;
+        border-top: 1px solid var(--dca-gray-lighter);
+        flex-shrink: 0;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+
+        .cms-btn {
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+
+            &.cms-btn-action {
+                background-color: var(--dca-action-bg);
+                color: var(--dca-action-text);
+                border: none;
+                border-radius: var(--dca-btn-radius);
+                font-weight: bold;
+                transition: filter 0.15s ease;
+
+                &:hover {
+                    filter: brightness(0.9);
+                }
+            }
+
+            &:not(.cms-btn-action) {
+                background-color: var(--dca-gray-lightest);
+                color: var(--dca-black);
+                border: 1px solid var(--dca-gray-lighter);
+                border-radius: var(--dca-btn-radius);
+                transition: background-color 0.15s ease;
+
+                &:hover {
+                    background-color: var(--dca-gray-lighter);
+                }
+            }
+        }
+    }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .cms-publish-confirmation {
+        .cms-publish-confirmation-item {
+            label {
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.05);
+                }
+            }
+        }
+
+        .cms-publish-confirmation-footer {
+            .cms-btn:not(.cms-btn-action) {
+                background-color: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.1);
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
+            }
+        }
+    }
+}
+
+// CMS theme 3 and 4 support
+:root[data-cms-theme="3"],
+:root[data-cms-theme="4"] {
+    .cms-publish-confirmation {
+        .cms-publish-confirmation-item {
+            label {
+                &:hover {
+                    background-color: var(--dca-gray-lightest);
+                }
+            }
+        }
+    }
+}
