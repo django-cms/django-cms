@@ -134,6 +134,44 @@ class PageDeleteMessageMixin:
         return to_delete, model_count, perms_needed, protected
 
 
+def _get_descendants_for_publish_helper(page, language):
+    """
+    Helper function to get all descendant pages for a given page and language.
+    Returns a dictionary with page info and descendant pages list.
+    """
+    descendants = page.get_descendant_pages().prefetch_related(
+        Prefetch(
+            "pagecontent_set",
+            to_attr="filtered_translations",
+            queryset=PageContent.admin_manager.get_queryset().latest_content(),
+        ),
+    )
+
+    page_content = page.get_admin_content(language)
+
+    descendant_list = []
+    for descendant in descendants:
+        desc_content = descendant.get_admin_content(language)
+        if desc_content:
+            descendant_list.append({
+                "id": descendant.pk,
+                "title": desc_content.title or descendant.get_slug(language) or _("Untitled"),
+                "url": descendant.get_absolute_url(language=language) if descendant.get_absolute_url(language=language) else None,
+                "indicator": desc_content.content_indicator(),
+                "depth": descendant.depth - page.depth,
+            })
+
+    response_data = {
+        "page_id": page.pk,
+        "page_title": page_content.title if page_content else page.get_slug(language) or _("Untitled"),
+        "language": language,
+        "descendants": descendant_list,
+        "has_descendants": len(descendant_list) > 0,
+    }
+
+    return response_data
+
+
 @admin.register(Page)
 class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     actions_menu_template = "admin/cms/page/tree/actions_dropdown.html"
@@ -378,35 +416,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         site = page.site
         language = request.GET.get("language") or get_site_language_from_request(request, site_id=site.pk)
 
-        descendants = page.get_descendant_pages().prefetch_related(
-            Prefetch(
-                "pagecontent_set",
-                to_attr="filtered_translations",
-                queryset=PageContent.admin_manager.get_queryset().latest_content(),
-            ),
-        )
-
-        page_content = page.get_admin_content(language)
-
-        descendant_list = []
-        for descendant in descendants:
-            desc_content = descendant.get_admin_content(language)
-            if desc_content:
-                descendant_list.append({
-                    "id": descendant.pk,
-                    "title": desc_content.title or descendant.get_slug(language) or _("Untitled"),
-                    "url": descendant.get_absolute_url(language=language) if desc_content.get_absolute_url(language=language) else None,
-                    "indicator": desc_content.content_indicator(),
-                    "depth": descendant.depth - page.depth,
-                })
-
-        response_data = {
-            "page_id": page.pk,
-            "page_title": page_content.title if page_content else page.get_slug(language) or _("Untitled"),
-            "language": language,
-            "descendants": descendant_list,
-            "has_descendants": len(descendant_list) > 0,
-        }
+        response_data = _get_descendants_for_publish_helper(page, language)
 
         return HttpResponse(
             json.dumps(response_data, ensure_ascii=False),
@@ -1469,35 +1479,8 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         page = page_content.page
         language = page_content.language
-        site = page.site
 
-        descendants = page.get_descendant_pages().prefetch_related(
-            Prefetch(
-                "pagecontent_set",
-                to_attr="filtered_translations",
-                queryset=PageContent.admin_manager.get_queryset().latest_content(),
-            ),
-        )
-
-        descendant_list = []
-        for descendant in descendants:
-            desc_content = descendant.get_admin_content(language)
-            if desc_content:
-                descendant_list.append({
-                    "id": descendant.pk,
-                    "title": desc_content.title or descendant.get_slug(language) or _("Untitled"),
-                    "url": descendant.get_absolute_url(language=language) if desc_content.get_absolute_url(language=language) else None,
-                    "indicator": desc_content.content_indicator(),
-                    "depth": descendant.depth - page.depth,
-                })
-
-        response_data = {
-            "page_id": page.pk,
-            "page_title": page_content.title or page.get_slug(language) or _("Untitled"),
-            "language": language,
-            "descendants": descendant_list,
-            "has_descendants": len(descendant_list) > 0,
-        }
+        response_data = _get_descendants_for_publish_helper(page, language)
 
         return HttpResponse(
             json.dumps(response_data, ensure_ascii=False),

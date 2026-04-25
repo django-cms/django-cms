@@ -22,11 +22,16 @@ class PublishConfirmation {
             pageId: null,
             pageContentId: null,
             language: null,
+            debug: false,
         }, options);
 
         this.click = 'click.cms.publishconfirmation';
         this._setupUI();
         this._events();
+        
+        if (this.options.debug) {
+            console.log('[PublishConfirmation] Initialized with selector:', this.options.publishBtnSelector);
+        }
     }
 
     /**
@@ -51,7 +56,16 @@ class PublishConfirmation {
         this.ui.document.on(this.click, this.options.publishBtnSelector, function(e) {
             var btn = $(this);
             
+            if (that.options.debug) {
+                console.log('[PublishConfirmation] Button clicked:', btn);
+                console.log('[PublishConfirmation] Button href:', btn.attr('href'));
+                console.log('[PublishConfirmation] Button classes:', btn.attr('class'));
+            }
+            
             if (btn.hasClass('cms-btn-disabled')) {
+                if (that.options.debug) {
+                    console.log('[PublishConfirmation] Button is disabled, skipping');
+                }
                 return false;
             }
 
@@ -60,6 +74,10 @@ class PublishConfirmation {
             
             that._handlePublishClick(btn);
         });
+
+        if (this.options.debug) {
+            console.log('[PublishConfirmation] Events bound to document for selector:', this.options.publishBtnSelector);
+        }
     }
 
     /**
@@ -72,12 +90,28 @@ class PublishConfirmation {
         var that = this;
         var pageInfo = this._extractPageInfo(btn);
         
+        if (this.options.debug) {
+            console.log('[PublishConfirmation] Extracted page info:', pageInfo);
+        }
+        
         if (!pageInfo.pageId && !pageInfo.pageContentId && !pageInfo.apiUrl) {
             this._showError(_('Missing page information for publish confirmation'));
+            if (this.options.debug) {
+                console.error('[PublishConfirmation] Missing page information');
+            }
             return;
         }
 
         var apiUrl = pageInfo.apiUrl || this._buildApiUrl(pageInfo);
+        
+        if (this.options.debug) {
+            console.log('[PublishConfirmation] API URL:', apiUrl);
+        }
+
+        if (!apiUrl) {
+            this._showError(_('Could not build API URL for publish confirmation'));
+            return;
+        }
 
         showLoader();
         
@@ -88,10 +122,16 @@ class PublishConfirmation {
         })
         .done(function(response) {
             hideLoader();
+            if (that.options.debug) {
+                console.log('[PublishConfirmation] API response:', response);
+            }
             that._showConfirmationDialog(response, btn);
         })
         .fail(function(jqXHR) {
             hideLoader();
+            if (that.options.debug) {
+                console.error('[PublishConfirmation] API request failed:', jqXHR);
+            }
             CMS.API.Messages.open({
                 message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                 error: true
@@ -112,28 +152,39 @@ class PublishConfirmation {
             pageContentId: this.options.pageContentId || btn.data('page-content-id'),
             apiUrl: this.options.apiUrl || btn.data('api-url'),
             language: this.options.language || btn.data('language'),
+            adminBase: null,
         };
 
-        if (!pageInfo.pageId && !pageInfo.pageContentId) {
-            var urlInfo = this._extractFromUrl(btn.attr('href'));
-            if (urlInfo.pageId) {
+        var btnHref = btn.attr('href');
+        if (btnHref && btnHref !== '#') {
+            var urlInfo = this._extractFromUrl(btnHref);
+            if (urlInfo.pageId && !pageInfo.pageId) {
                 pageInfo.pageId = urlInfo.pageId;
+            }
+            if (urlInfo.pageContentId && !pageInfo.pageContentId) {
+                pageInfo.pageContentId = urlInfo.pageContentId;
             }
             if (urlInfo.language && !pageInfo.language) {
                 pageInfo.language = urlInfo.language;
+            }
+            if (urlInfo.adminBase) {
+                pageInfo.adminBase = urlInfo.adminBase;
             }
         }
 
         if (!pageInfo.pageId && !pageInfo.pageContentId) {
             var currentUrlInfo = this._extractFromUrl(window.location.pathname);
-            if (currentUrlInfo.pageId) {
+            if (currentUrlInfo.pageId && !pageInfo.pageId) {
                 pageInfo.pageId = currentUrlInfo.pageId;
             }
-            if (currentUrlInfo.pageContentId) {
+            if (currentUrlInfo.pageContentId && !pageInfo.pageContentId) {
                 pageInfo.pageContentId = currentUrlInfo.pageContentId;
             }
             if (currentUrlInfo.language && !pageInfo.language) {
                 pageInfo.language = currentUrlInfo.language;
+            }
+            if (currentUrlInfo.adminBase && !pageInfo.adminBase) {
+                pageInfo.adminBase = currentUrlInfo.adminBase;
             }
         }
 
@@ -141,10 +192,10 @@ class PublishConfirmation {
     }
 
     /**
-     * Extract page ID and language from URL
+     * Extract page ID, language, and admin base from URL
      * URL patterns:
-     * - /en/admin/cms/page/33/en/publish/  -> pageId: 33, language: en
-     * - /admin/cms/pagecontent/123/change/ -> pageContentId: 123
+     * - /en/admin/cms/page/33/en/publish/  -> pageId: 33, language: en (after page ID), adminBase: /en/admin/
+     * - /admin/cms/pagecontent/123/change/ -> pageContentId: 123, adminBase: /admin/
      * @method _extractFromUrl
      * @private
      * @param {String} url
@@ -155,10 +206,16 @@ class PublishConfirmation {
             pageId: null,
             pageContentId: null,
             language: null,
+            adminBase: null,
         };
 
         if (!url) {
             return result;
+        }
+
+        var adminMatch = url.match(/^(.+\/admin\/)/);
+        if (adminMatch) {
+            result.adminBase = adminMatch[1];
         }
 
         var pageContentMatch = url.match(/\/pagecontent\/(\d+)/);
@@ -169,13 +226,21 @@ class PublishConfirmation {
         var pageMatch = url.match(/\/page\/(\d+)/);
         if (pageMatch) {
             result.pageId = parseInt(pageMatch[1], 10);
+            
+            var afterPageId = url.substring(url.indexOf('/page/' + result.pageId) + ('/page/' + result.pageId).length);
+            var langAfterPageMatch = afterPageId.match(/^\/([a-z]{2}(-[a-z]{2})?)\//);
+            if (langAfterPageMatch) {
+                result.language = langAfterPageMatch[1].toLowerCase();
+            }
         }
 
-        var langMatch = url.match(/\/([a-z]{2}(-[a-z]{2})?)\//);
-        if (langMatch && langMatch[1].length >= 2) {
-            var lang = langMatch[1].toLowerCase();
-            if (lang !== 'admin' && lang !== 'cms') {
-                result.language = lang;
+        if (!result.language) {
+            var langMatch = url.match(/\/([a-z]{2}(-[a-z]{2})?)\//);
+            if (langMatch && langMatch[1].length >= 2) {
+                var lang = langMatch[1].toLowerCase();
+                if (lang !== 'admin' && lang !== 'cms') {
+                    result.language = lang;
+                }
             }
         }
 
@@ -190,9 +255,15 @@ class PublishConfirmation {
      * @returns {String}
      */
     _buildApiUrl(pageInfo) {
-        var baseUrl = window.location.pathname;
-        var adminMatch = baseUrl.match(/^(.+\/admin\/)/);
-        var adminBase = adminMatch ? adminMatch[1] : '/admin/';
+        var adminBase;
+        
+        if (pageInfo.adminBase) {
+            adminBase = pageInfo.adminBase;
+        } else {
+            var baseUrl = window.location.pathname;
+            var adminMatch = baseUrl.match(/^(.+\/admin\/)/);
+            adminBase = adminMatch ? adminMatch[1] : '/admin/';
+        }
         
         var apiUrl;
 
@@ -353,6 +424,11 @@ class PublishConfirmation {
         var originalHref = originalBtn.attr('href');
         var originalOnClick = originalBtn.attr('onclick');
         var hasDataRel = originalBtn.data('rel');
+
+        if (this.options.debug) {
+            console.log('[PublishConfirmation] Executing publish with selected IDs:', selectedDescendantIds);
+            console.log('[PublishConfirmation] Original href:', originalHref);
+        }
 
         if (selectedDescendantIds.length > 0) {
             var publishUrl = this._appendDescendantsToUrl(originalHref, selectedDescendantIds);
