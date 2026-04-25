@@ -223,6 +223,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             pat(r"^([0-9]+)/dialog/copy/$", self.get_copy_dialog),  # copy dialog
             pat(r"^([0-9]+)/permissions/$", self.get_permissions),
             pat(r"^(?P<object_id>[0-9]+)/set-home/$", self.set_home),
+            pat(r"^(?P<object_id>[0-9]+)/get-descendants-for-publish/$", self.get_descendants_for_publish_by_page),
         ]
 
         if plugin_pool.registered_plugins:
@@ -354,6 +355,63 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             # As a result, fire the apphook reload signal to reload the url patterns.
             set_restart_trigger()
         return HttpResponse("ok")
+
+    def get_descendants_for_publish_by_page(self, request, object_id):
+        """
+        Get all descendant pages for a given page, used in publish confirmation dialog.
+        Accepts Page ID and language (from query string), returns JSON data with descendant pages list.
+        """
+        page = self.get_object(request, object_id=object_id)
+
+        if not self.has_change_permission(request, obj=page):
+            return HttpResponseForbidden(_("You do not have permission to publish this page"))
+
+        if page is None:
+            raise Http404(
+                _("%(name)s object with primary key %(key)r does not exist.")
+                % {
+                    "name": force_str(self.opts.verbose_name),
+                    "key": escape(object_id),
+                }
+            )
+
+        site = page.site
+        language = request.GET.get("language") or get_site_language_from_request(request, site_id=site.pk)
+
+        descendants = page.get_descendant_pages().prefetch_related(
+            Prefetch(
+                "pagecontent_set",
+                to_attr="filtered_translations",
+                queryset=PageContent.admin_manager.get_queryset().latest_content(),
+            ),
+        )
+
+        page_content = page.get_admin_content(language)
+
+        descendant_list = []
+        for descendant in descendants:
+            desc_content = descendant.get_admin_content(language)
+            if desc_content:
+                descendant_list.append({
+                    "id": descendant.pk,
+                    "title": desc_content.title or descendant.get_slug(language) or _("Untitled"),
+                    "url": descendant.get_absolute_url(language=language) if desc_content.get_absolute_url(language=language) else None,
+                    "indicator": desc_content.content_indicator(),
+                    "depth": descendant.depth - page.depth,
+                })
+
+        response_data = {
+            "page_id": page.pk,
+            "page_title": page_content.title if page_content else page.get_slug(language) or _("Untitled"),
+            "language": language,
+            "descendants": descendant_list,
+            "has_descendants": len(descendant_list) > 0,
+        }
+
+        return HttpResponse(
+            json.dumps(response_data, ensure_ascii=False),
+            content_type="application/json",
+        )
 
     def get_list(self, request):
         """
@@ -808,6 +866,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             pat(r"^([0-9]+)/copy-language/$", self.copy_language),
             pat(r"^([0-9]+)/change-navigation/$", self.change_innavigation),
             pat(r"^([0-9]+)/change-template/$", self.change_template),
+            pat(r"^([0-9]+)/get-descendants-for-publish/$", self.get_descendants_for_publish),
         ]
         return url_patterns + super().get_urls()
 
@@ -1394,6 +1453,56 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         else:
             for page in root_pages:
                 yield render_page_row(page)
+
+    def get_descendants_for_publish(self, request, object_id):
+        """
+        Get all descendant pages for a given page content, used in publish confirmation dialog.
+        Returns JSON data with descendant pages list.
+        """
+        page_content = self.get_object(request, object_id=object_id)
+
+        if not self.has_change_permission(request, obj=page_content):
+            return HttpResponseForbidden(_("You do not have permission to publish this page"))
+
+        if page_content is None:
+            raise self._get_404_exception(object_id)
+
+        page = page_content.page
+        language = page_content.language
+        site = page.site
+
+        descendants = page.get_descendant_pages().prefetch_related(
+            Prefetch(
+                "pagecontent_set",
+                to_attr="filtered_translations",
+                queryset=PageContent.admin_manager.get_queryset().latest_content(),
+            ),
+        )
+
+        descendant_list = []
+        for descendant in descendants:
+            desc_content = descendant.get_admin_content(language)
+            if desc_content:
+                descendant_list.append({
+                    "id": descendant.pk,
+                    "title": desc_content.title or descendant.get_slug(language) or _("Untitled"),
+                    "url": descendant.get_absolute_url(language=language) if desc_content.get_absolute_url(language=language) else None,
+                    "indicator": desc_content.content_indicator(),
+                    "depth": descendant.depth - page.depth,
+                })
+
+        response_data = {
+            "page_id": page.pk,
+            "page_title": page_content.title or page.get_slug(language) or _("Untitled"),
+            "language": language,
+            "descendants": descendant_list,
+            "has_descendants": len(descendant_list) > 0,
+        }
+
+        return HttpResponse(
+            json.dumps(response_data, ensure_ascii=False),
+            content_type="application/json",
+        )
 
     # Indicators in the page tree
     @property

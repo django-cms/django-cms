@@ -1,0 +1,51 @@
+{% load i18n %}
+<div class="cms-publish-confirmation">
+    <div class="cms-publish-confirmation-header">
+        <h3>{% trans "Publish Confirmation" %}</h3>
+        <p class="cms-publish-confirmation-page">
+            {% trans "Publishing page:" %} <strong>{{ page_title }}</strong>
+        </p>
+    </div>
+
+    {% if has_descendants %}
+    <div class="cms-publish-confirmation-descendants">
+        <h4>{% trans "Select child pages to publish (optional):" %}</h4>
+        <div class="cms-publish-confirmation-select-all">
+            <label>
+                <input type="checkbox" id="id_select_all_descendants" class="js-cms-publish-select-all">
+                {% trans "Select all" %}
+            </label>
+        </div>
+        <ul class="cms-publish-confirmation-list">
+            {% for descendant in descendants %}
+            <li class="cms-publish-confirmation-item{% if descendant.depth > 1 %} cms-publish-confirmation-item-indent-{{ descendant.depth }}{% endif %}">
+                <label>
+                    <input type="checkbox" 
+                           name="descendant_ids" 
+                           value="{{ descendant.id }}" 
+                           class="js-cms-publish-descendant-checkbox"
+                           data-indicator="{{ descendant.indicator }}">
+                    <span class="cms-publish-confirmation-title">{{ descendant.title }}</span>
+                    {% if descendant.indicator %}
+                    <span class="cms-publish-confirmation-indicator cms-pagetree-node-state cms-pagetree-node-state-{{ descendant.indicator }}"></span>
+                    {% endif %}
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <div class="cms-publish-confirmation-no-descendants">
+        <p>{% trans "This page has no child pages." %}</p>
+    </div>
+    {% endif %}
+
+    <div class="cms-publish-confirmation-footer">
+        <button type="button" class="cms-btn cms-btn-action js-cms-publish-confirm">
+            {% trans "Confirm Publish" %}
+        </button>
+        <button type="button" class="cms-btn js-cms-publish-cancel">
+            {% trans "Cancel" %}
+        </button>
+    </div>
+</div>

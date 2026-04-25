@@ -18,6 +18,7 @@ import Plugin from './modules/cms.plugins';
 import StructureBoard from './modules/cms.structureboard';
 import Toolbar from './modules/cms.toolbar';
 import Tooltip from './modules/cms.tooltip';
+import PublishConfirmation from './modules/cms.publishconfirmation';
 
 // CMS by this time should be a global that has `_plugins` property
 const CMS = window.CMS || {};
@@ -33,6 +34,7 @@ CMS.Plugin = Plugin;
 CMS.StructureBoard = StructureBoard;
 CMS.Toolbar = Toolbar;
 CMS.Tooltip = Tooltip;
+CMS.PublishConfirmation = PublishConfirmation;
 
 CMS.API = {
     Helpers
@@ -63,6 +65,7 @@ CMS.$(function () {
     CMS.API.Tooltip = new CMS.Tooltip();
     CMS.API.Toolbar = new CMS.Toolbar();
     CMS.API.Sideframe = new CMS.Sideframe();
+    CMS.API.PublishConfirmation = new CMS.PublishConfirmation();
 
     CMS.Plugin._initializeTree();
 });
