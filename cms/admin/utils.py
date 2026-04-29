@@ -697,6 +697,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     for field in self.form._content_fields
                     if field != self.grouper_field_name and field not in self.extra_grouping_fields
                 )
+            ]
         return fields
 
     def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
