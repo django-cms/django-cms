@@ -32,13 +32,33 @@
  * - HTML5 native drag-and-drop. Playwright can't synthesise it, iOS
  *   Safari won't fire `dragstart` from touch — see CLAUDE.md decision
  *   5. Pointer events are the only path that works everywhere.
- * - Cross-container drop groups. Single-container for now; each
- *   screen (pagetree, structureboard) has one tree.
+ *
+ * Multi-container support
+ * ───────────────────────
+ * The `containers` option accepts more than one tree root. With a
+ * single entry the behaviour matches the original pagetree contract.
+ * With multiple entries (the structureboard plugin tree case), drops
+ * may span containers — `updateProspective` walks rows across all
+ * registered containers in document order to pick the drop target.
+ * The clone and marker attach to the shared `host` (defaults to the
+ * first container's parentElement).
  */
 
 export interface TreeDragOptions {
-    /** The tree's scrolling container. Usually the `ul[role="tree"]`. */
-    container: HTMLElement;
+    /**
+     * The tree roots that participate in this drag session. Pass one
+     * for a single-tree screen (pagetree); pass several to enable
+     * cross-container drop (structureboard plugin tree).
+     */
+    containers: HTMLElement[];
+
+    /**
+     * Where the drag clone and drop-marker get attached during a
+     * drag. Defaults to `containers[0].parentElement`. Pass a
+     * higher-up wrapper when multiple containers don't share a parent
+     * (e.g. plugin tree's `.cms-structure-content` scroller).
+     */
+    host?: HTMLElement;
 
     /**
      * Selector for the drag handle element within a row. PointerDown
@@ -144,10 +164,9 @@ const DEFAULTS = {
 };
 
 export default class TreeDrag {
-    private readonly opts: Required<
-        Omit<TreeDragOptions, 'canDrag' | 'canDropAsChild' | 'onDrop'>
-    > &
-        Pick<TreeDragOptions, 'canDrag' | 'canDropAsChild' | 'onDrop'>;
+    private readonly opts: Omit<TreeDragOptions, 'dragThreshold'> & {
+        dragThreshold: number;
+    };
 
     private state: DragState | null = null;
     private readonly teardowns: Array<() => void> = [];
@@ -158,10 +177,25 @@ export default class TreeDrag {
             ...options,
         };
 
+        if (this.opts.containers.length === 0) {
+            throw new Error('TreeDrag: at least one container is required.');
+        }
+
         const onPointerDown = (e: PointerEvent) => this.onPointerDown(e);
-        this.opts.container.addEventListener('pointerdown', onPointerDown);
-        this.teardowns.push(() =>
-            this.opts.container.removeEventListener('pointerdown', onPointerDown),
+        for (const c of this.opts.containers) {
+            c.addEventListener('pointerdown', onPointerDown);
+            this.teardowns.push(() =>
+                c.removeEventListener('pointerdown', onPointerDown),
+            );
+        }
+    }
+
+    /** The element clones / markers attach to during drag. */
+    private get host(): HTMLElement {
+        return (
+            this.opts.host ??
+            this.opts.containers[0]!.parentElement ??
+            document.body
         );
     }
 
@@ -274,23 +308,22 @@ export default class TreeDrag {
         this.state.active = true;
         this.state.clone = this.buildClone(this.state.item);
         this.state.marker = this.buildMarker();
-        // Attach BOTH the clone and the marker to the tree container's
-        // parent (same scope as the real tree `<ul>`), not to the
-        // tree `<ul>` itself. A `<div>` child inside a `<ul>` is
-        // invalid HTML and some browsers handle it by reparenting or
-        // by opening an anonymous list-item box — which visibly
-        // expands the tree when dragging starts.
+        // Attach BOTH the clone and the marker to the shared host
+        // (NOT inside any tree `<ul>`). A `<div>` child inside a
+        // `<ul>` is invalid HTML and some browsers handle it by
+        // reparenting or by opening an anonymous list-item box —
+        // which visibly expands the tree when dragging starts.
         //
-        // The parent-of-ul is the `.cms-pagetree-jstree` wrapper:
-        // it shares the ancestor chain (`.cms-pagetree-root ...`,
-        // `.cms-pagetree-container ...`) so all scoped selectors
-        // still apply, and it's a normal block-level div so a
-        // child `<div>` is perfectly valid there.
-        const host =
-            this.opts.container.parentElement ?? document.body;
-        host.appendChild(this.state.clone);
-        host.appendChild(this.state.marker);
-        this.opts.container.classList.add('cms-pagetree-dragging');
+        // For pagetree the host is the `.cms-pagetree-jstree` wrapper
+        // (parent of the single tree `<ul>`); for the structureboard
+        // plugin tree it's the `.cms-structure-content` scroller
+        // (which contains all participating `.cms-draggables` lists).
+        // Both share the ancestor chain, so scoped selectors apply.
+        this.host.appendChild(this.state.clone);
+        this.host.appendChild(this.state.marker);
+        for (const c of this.opts.containers) {
+            c.classList.add('cms-pagetree-dragging');
+        }
         // Mark the source item so CSS can gray it out in place.
         this.state.item.classList.add('cms-tree-dragging-item');
         document.body.style.userSelect = 'none';
@@ -303,7 +336,9 @@ export default class TreeDrag {
         if (s.clone) s.clone.remove();
         if (s.marker) s.marker.remove();
         this.clearDropTargetHighlight();
-        this.opts.container.classList.remove('cms-pagetree-dragging');
+        for (const c of this.opts.containers) {
+            c.classList.remove('cms-pagetree-dragging');
+        }
         this.state.item.classList.remove('cms-tree-dragging-item');
         document.body.style.userSelect = '';
         this.state = null;
@@ -393,16 +428,22 @@ export default class TreeDrag {
         if (!this.state) return;
 
         const item = this.state.item;
-        const rows = Array.from(
-            this.opts.container.querySelectorAll<HTMLElement>(
-                this.opts.rowSelector,
-            ),
-        ).filter((row) => {
-            const li = row.closest<HTMLElement>(this.opts.itemSelector);
-            if (!li) return false;
-            if (li === item || item.contains(li)) return false;
-            return row.getBoundingClientRect().height > 0;
-        });
+        // Gather rows from every participating container. Order
+        // within each container is preserved; container order in the
+        // page determines overall iteration order. For both pagetree
+        // (one container) and the plugin tree (containers stacked
+        // vertically inside `.cms-structure-content`), document order
+        // matches visual order.
+        const rows: HTMLElement[] = [];
+        for (const c of this.opts.containers) {
+            for (const row of c.querySelectorAll<HTMLElement>(this.opts.rowSelector)) {
+                const li = row.closest<HTMLElement>(this.opts.itemSelector);
+                if (!li) continue;
+                if (li === item || item.contains(li)) continue;
+                if (row.getBoundingClientRect().height <= 0) continue;
+                rows.push(row);
+            }
+        }
 
         // Pass 1 — is the cursor inside the middle 50% of any row?
         // That's the classic "drop as child of this row" hit, rendered
@@ -571,7 +612,7 @@ export default class TreeDrag {
             return;
         }
 
-        // Line marker — position relative to the container.
+        // Line marker — position relative to the marker's offset parent.
         //   Left = (depth - 1) * depthPx - triangle cap width
         //   Top  = below visualRef (line-after) or above (line-before)
         //
@@ -580,14 +621,17 @@ export default class TreeDrag {
         // line start back by that so the leading cap sits in the
         // indent gutter. Line height is 4px.
         //
-        // Positioning reference is the marker's offset parent (the
-        // tree container's parent div, NOT the tree `<ul>` itself).
-        // Compute coordinates relative to that host's bounding rect.
+        // Width and indent reference is the *container that owns the
+        // visualRef row* — for multi-container layouts (plugin tree)
+        // each draggables list may have a different left edge.
         const TRIANGLE_PX = 10;
         const LINE_HEIGHT_PX = 4;
-        const host = this.state.marker.offsetParent as HTMLElement | null;
-        const hostRect = (host ?? this.opts.container).getBoundingClientRect();
-        const treeRect = this.opts.container.getBoundingClientRect();
+        const offsetHost = this.state.marker.offsetParent as HTMLElement | null;
+        const hostRect = (offsetHost ?? this.host).getBoundingClientRect();
+        const owningContainer =
+            this.opts.containers.find((c) => c.contains(p.visualRef)) ??
+            this.opts.containers[0]!;
+        const treeRect = owningContainer.getBoundingClientRect();
         const rowRect = p.visualRef.getBoundingClientRect();
         // Left: tree's own left + depth offset - triangle width
         const leftOffset =
@@ -608,11 +652,11 @@ export default class TreeDrag {
     }
 
     private clearDropTargetHighlight(): void {
-        const highlighted = this.opts.container.querySelectorAll<HTMLElement>(
-            '.cms-tree-drop-target',
-        );
-        for (const el of Array.from(highlighted)) {
-            el.classList.remove('cms-tree-drop-target');
+        for (const c of this.opts.containers) {
+            const highlighted = c.querySelectorAll<HTMLElement>('.cms-tree-drop-target');
+            for (const el of Array.from(highlighted)) {
+                el.classList.remove('cms-tree-drop-target');
+            }
         }
     }
 
@@ -621,7 +665,16 @@ export default class TreeDrag {
     // ────────────────────────────────────────────────────────────
 
     private maybeAutoScroll(e: PointerEvent): void {
-        const scroller = this.findScrollParent(this.opts.container);
+        // Find the nearest scroller for the container under the cursor
+        // (or the first container as a fallback). For pagetree there's
+        // only one container; for the plugin tree the scroller is
+        // typically a shared ancestor and the first container's
+        // findScrollParent walks up to it.
+        const target = (e.target instanceof Element ? e.target : null) as Element | null;
+        const containerUnderCursor =
+            this.opts.containers.find((c) => target && c.contains(target)) ??
+            this.opts.containers[0]!;
+        const scroller = this.findScrollParent(containerUnderCursor);
         if (!scroller) return;
         const rect = scroller.getBoundingClientRect();
         const EDGE = 40;

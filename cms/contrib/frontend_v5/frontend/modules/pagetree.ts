@@ -706,7 +706,7 @@ export default class PageTree {
         // already installed.
         if (this.treeDrag) return;
         this.treeDrag = new TreeDrag({
-            container: this.treeRoot,
+            containers: [this.treeRoot],
             handleSelector: '.cms-tree-handle',
             itemSelector: 'li[role="treeitem"]',
             rowSelector: '.cms-tree-row',
