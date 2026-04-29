@@ -67,13 +67,13 @@ export interface ModalOptions {
 }
 
 export interface ModalOpenOptions {
-    url?: string;
-    html?: string | HTMLElement;
-    title?: string;
-    subtitle?: string;
-    breadcrumbs?: Array<{ title: string; url: string }>;
-    width?: number;
-    height?: number;
+    url?: string | undefined;
+    html?: string | HTMLElement | undefined;
+    title?: string | undefined;
+    subtitle?: string | undefined;
+    breadcrumbs?: Array<{ title: string; url: string }> | undefined;
+    width?: number | undefined;
+    height?: number | undefined;
 }
 
 interface ModalUi {

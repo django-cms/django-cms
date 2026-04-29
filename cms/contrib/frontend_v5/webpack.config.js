@@ -74,6 +74,17 @@ module.exports = function (opts) {
             },
             'admin.pagetree': path.join(SRC, 'bundles', 'admin.pagetree.ts'),
             'admin.changeform': path.join(SRC, 'bundles', 'admin.changeform.ts'),
+            // Drop-in replacement for legacy `bundle.toolbar.min.js` —
+            // wires every ported toolbar-bundle module onto window.CMS
+            // and instantiates them in the same order.
+            toolbar: {
+                import: path.join(SRC, 'bundles', 'admin.toolbar.ts'),
+                library: {
+                    name: 'CMS',
+                    type: 'window',
+                    export: 'default',
+                },
+            },
         },
         output: {
             path: path.join(STATIC_OUT, CMS_VERSION),
