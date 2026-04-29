@@ -49,7 +49,14 @@ test.beforeAll(async ({ browser }) => {
     // to render against. Reuses the same wizard flow as the other
     // contrib specs.
     await page.goto(settings.pageAdminUrl);
-    await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {});
+    // The contrib pagetree async-loads rows via get-tree/. Wait for
+    // either an edit link OR network idle (empty tree).
+    await page
+        .waitForSelector(
+            'a[href*="/cms/placeholder/object/"][href*="/edit/"]',
+            { timeout: 8_000 },
+        )
+        .catch(() => {});
     const hasRows = await page
         .locator('a[href*="/cms/placeholder/object/"][href*="/edit/"]')
         .count();
@@ -77,6 +84,12 @@ test.beforeAll(async ({ browser }) => {
     // the live ContentType pk + PageContent pk; both vary across
     // installs, so we capture the URL verbatim.
     await page.goto(settings.pageAdminUrl);
+    await page
+        .waitForSelector(
+            'a[href*="/cms/placeholder/object/"][href*="/edit/"]',
+            { timeout: 10_000 },
+        )
+        .catch(() => {});
     const editLink = page
         .locator('a[href*="/cms/placeholder/object/"][href*="/edit/"]')
         .first();
@@ -120,15 +133,22 @@ test.describe('structureboard — toolbar render', () => {
 });
 
 test.describe('structureboard — mode toggle', () => {
-    test('toolbar mode switcher renders both structure and content buttons', async ({
+    test('toolbar mode switcher renders at least one button', async ({
         authenticatedPage: page,
     }) => {
         await openEditablePage(page);
-        // Mode switcher anchors live inside `.cms-toolbar-item-cms-mode-switcher`.
+        // Some legacy templates render two toggle buttons (one per
+        // mode); newer ones render a single combined toggle. Assert
+        // the switcher wrapper is visible and contains at least one
+        // anchor.
+        await expect(
+            page.locator('.cms-toolbar-item-cms-mode-switcher'),
+        ).toBeVisible();
         const switcherButtons = page.locator(
             '.cms-toolbar-item-cms-mode-switcher a.cms-btn',
         );
-        await expect(switcherButtons).toHaveCount(2);
+        const count = await switcherButtons.count();
+        expect(count).toBeGreaterThan(0);
     });
 
     test('clicking the structure mode button flips the html class', async ({
@@ -163,10 +183,15 @@ test.describe('structureboard — mode toggle', () => {
             .first()
             .evaluate((el) => el.classList.contains('cms-btn-disabled'));
         test.skip(disabled, 'mode switcher disabled');
-        // Click structure first, then content.
-        await buttons.nth(0).click();
+        // Click first button to enter structure mode.
+        await buttons.first().click();
         await expect(page.locator('html')).toHaveClass(/cms-structure-mode-structure/);
-        await buttons.nth(1).click();
+        // Single-toggle templates use the SAME button to flip back;
+        // two-button templates have a second button. Click whichever
+        // is available.
+        const count = await buttons.count();
+        const target = count >= 2 ? buttons.nth(1) : buttons.first();
+        await target.click();
         await expect(page.locator('html')).toHaveClass(/cms-structure-mode-content/);
     });
 
@@ -246,14 +271,16 @@ test.describe('structureboard — runtime surface', () => {
 // ────────────────────────────────────────────────────────────────────
 
 test.describe('structureboard — cross-tab sync', () => {
-    test('localStorage cms-structure write triggers a storage event in the live page', async ({
+    test('localStorage cms-structure write fires storage event on a sibling tab', async ({
         authenticatedPage: page,
     }) => {
         await openEditablePage(page);
-        // Listen for the storage event on the LIVE page side.
+
+        // Listen for the storage event on the LIVE page (the
+        // "receiving" tab).
         const storageFiredPromise = page.evaluate(() => {
             return new Promise((resolve) => {
-                const handler = (e) => {
+                const handler = (/** @type {StorageEvent} */ e) => {
                     if (e.key === 'cms-structure') {
                         window.removeEventListener('storage', handler);
                         resolve(e.newValue);
@@ -268,22 +295,17 @@ test.describe('structureboard — cross-tab sync', () => {
             });
         });
 
-        // Open a second context (acts as the "other tab"), navigate to
-        // the same admin (so localStorage origin matches), then write.
-        const ctx2 = await page.context().browser().newContext();
-        const page2 = await ctx2.newPage();
-        await page2.goto(settings.adminUrl);
-        await page2.waitForSelector('input[name="username"]', { timeout: 10_000 });
-        await page2.fill('input[name="username"]', settings.credentials.username);
-        await page2.fill('input[name="password"]', settings.credentials.password);
-        await page2.click('input[type="submit"]');
-        await page2.waitForURL(/\/admin\//, { timeout: 10_000 });
-        // Open the same page so it shares the origin / pathname.
+        // Open a SECOND tab in the SAME browser context (so cookies
+        // + localStorage origin match). Cross-context tabs in
+        // Playwright are isolated and won't share storage events.
+        const ctx = page.context();
+        const page2 = await ctx.newPage();
         const url = testPageEditUrl && testPageEditUrl.startsWith('http')
             ? testPageEditUrl
             : `${settings.baseUrl}${testPageEditUrl}`;
         await page2.goto(url);
         await page2.waitForLoadState('domcontentloaded');
+
         // Write the cms-structure key from page2 — this fires a
         // `storage` event in page (different tab, same origin).
         const pathname = await page.evaluate(() => window.location.pathname);
@@ -296,8 +318,9 @@ test.describe('structureboard — cross-tab sync', () => {
             },
             pathname,
         );
+
         const value = await storageFiredPromise;
-        await ctx2.close();
+        await page2.close();
         expect(value).not.toBeNull();
         expect(String(value)).toContain('EDIT');
     });
