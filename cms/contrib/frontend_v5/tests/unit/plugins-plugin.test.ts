@@ -293,9 +293,21 @@ describe('Plugin — placeholder dragbar wiring', () => {
         delete (window as { CMS?: CmsGlobal }).CMS;
     });
 
-    it('toggler link toggles the title expanded class', () => {
+    it('toggler link expands/collapses every collapsable child + flips title', () => {
         fakePlaceholder(2);
         const dragbar = fakeDragbar(2);
+        // Add a collapsable child so expandAll/collapseAll have something
+        // to flip — without one, both helpers are no-ops (matches legacy).
+        const dragarea = dragbar.closest('.cms-dragarea')!;
+        const draggables = dragarea.querySelector('.cms-draggables')!;
+        draggables.innerHTML = `
+            <div class="cms-draggable cms-draggable-101">
+                <div class="cms-dragitem cms-dragitem-collapsable">
+                    <div class="cms-dragitem-text">child</div>
+                </div>
+                <div class="cms-collapsable-container cms-hidden"></div>
+            </div>
+        `;
         const p = new Plugin('cms-placeholder-2', {
             type: 'placeholder',
             placeholder_id: 2,
@@ -305,11 +317,16 @@ describe('Plugin — placeholder dragbar wiring', () => {
         const togglerLink = dragbar.querySelector<HTMLAnchorElement>(
             '.cms-dragbar-toggler a',
         )!;
+        const child = document.querySelector<HTMLElement>(
+            '.cms-draggable-101 .cms-dragitem',
+        )!;
         expect(title.classList.contains('cms-dragbar-title-expanded')).toBe(false);
         togglerLink.click();
         expect(title.classList.contains('cms-dragbar-title-expanded')).toBe(true);
+        expect(child.classList.contains('cms-dragitem-expanded')).toBe(true);
         togglerLink.click();
         expect(title.classList.contains('cms-dragbar-title-expanded')).toBe(false);
+        expect(child.classList.contains('cms-dragitem-expanded')).toBe(false);
     });
 
     it('restores expanded state from CMS.settings.dragbars', () => {

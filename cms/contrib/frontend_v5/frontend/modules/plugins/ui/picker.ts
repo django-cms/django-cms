@@ -131,7 +131,7 @@ export function setupAddPluginModal(
                 return;
             }
 
-            modal ??= initModal(plugin, nav);
+            modal ??= initModal(plugin, nav, signal);
             if (!modal) return;
 
             const picker = findSibling(nav, '.cms-plugin-picker');
@@ -150,7 +150,7 @@ export function setupAddPluginModal(
             // Re-bind action handlers on the clone (cloneNode doesn't
             // copy listeners). Quicksearch is wired in initModal via
             // modal-loaded.
-            wireDelegateOnClone(plugin, nav, decorated);
+            wireDelegateOnClone(plugin, nav, decorated, signal);
 
             modal.open({
                 title: getAddPluginHelpTitle(plugin),
@@ -196,6 +196,7 @@ export function setupAddPluginModal(
 function initModal(
     plugin: PluginCallable,
     nav: HTMLElement,
+    signal?: AbortSignal,
 ): ModalHandle | null {
     const Modal = getModalConstructor();
     if (!Modal) return null;
@@ -235,7 +236,7 @@ function initModal(
             '.cms-modal-markup .cms-plugin-picker',
         );
         if (!picker) return;
-        setupQuickSearch(plugin, nav, picker);
+        setupQuickSearch(plugin, nav, picker, signal);
         // Focus the input only when the user opened with a mouse.
         // Touch opens deliberately skip focus to avoid popping the
         // on-screen keyboard.
@@ -248,6 +249,12 @@ function initModal(
     Helpers.addEventListener('modal-loaded', onLoaded);
     Helpers.addEventListener('modal-closed', onClosed);
     Helpers.addEventListener('modal-shown', onShown);
+    // Detach the modal-bus listeners when the per-instance signal aborts.
+    signal?.addEventListener('abort', () => {
+        Helpers.removeEventListener('modal-loaded', onLoaded);
+        Helpers.removeEventListener('modal-closed', onClosed);
+        Helpers.removeEventListener('modal-shown', onShown);
+    });
 
     return modal;
 }
@@ -303,15 +310,13 @@ export function getPossibleChildClasses(
         });
     }
 
-    // Wire the action click on every `<a>` so the result behaves
-    // identically whether it's used in-place or after being moved
-    // into a modal.
-    for (const item of items) {
-        item.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => {
-            link.addEventListener('click', (e) => delegateAction(plugin, nav, e));
-        });
-    }
-
+    // Click handlers are bound by `wireDelegateOnClone` after these
+    // nodes are appended into the modal-cloned picker — binding here
+    // would double-fire delegateAction (legacy got away with it
+    // because jQuery's `clone(true,true)` would have duplicated only
+    // pre-existing handlers on the clone, not on these freshly-parsed
+    // template items). The fast-path consumer reads href/text
+    // directly and never dispatches click on these items.
     return items;
 }
 
@@ -380,6 +385,7 @@ export function setupQuickSearch(
     plugin: PluginCallable,
     nav: HTMLElement,
     picker: HTMLElement,
+    signal?: AbortSignal,
 ): void {
     void plugin;
     void nav;
@@ -387,6 +393,8 @@ export function setupQuickSearch(
         ':scope > .cms-quicksearch input',
     );
     if (!input) return;
+
+    const opts = signal ? { signal } : undefined;
 
     const filterHandler = debounce(() => {
         const currentPicker = input.closest<HTMLElement>('.cms-plugin-picker') ?? picker;
@@ -405,8 +413,8 @@ export function setupQuickSearch(
         link?.click();
     }, PICK_DEBOUNCE_MS);
 
-    input.addEventListener('keyup', filterHandler);
-    input.addEventListener('keyup', enterHandler);
+    input.addEventListener('keyup', filterHandler, opts);
+    input.addEventListener('keyup', enterHandler, opts);
 }
 
 /**
@@ -555,11 +563,17 @@ function wireDelegateOnClone(
     plugin: PluginCallable,
     nav: HTMLElement,
     clone: HTMLElement,
+    signal?: AbortSignal,
 ): void {
+    const opts = signal ? { signal } : undefined;
     clone
         .querySelectorAll<HTMLAnchorElement>('.cms-submenu-item a')
         .forEach((link) => {
-            link.addEventListener('click', (e) => delegateAction(plugin, nav, e));
+            link.addEventListener(
+                'click',
+                (e) => delegateAction(plugin, nav, e),
+                opts,
+            );
         });
 }
 

@@ -11,6 +11,7 @@
 
 import { getCmsSettings } from '../cms-globals';
 import type { PluginInstance } from '../types';
+import { collapseAll, expandAll } from './collapse';
 
 export interface PlaceholderUi {
     dragbar: HTMLElement | null;
@@ -81,7 +82,9 @@ export function setupPlaceholderEvents(
         title.classList.add(expandedClass);
     }
 
-    // Wire the toggler links.
+    // Wire the toggler links: clicking expands/collapses every
+    // collapsable item under this placeholder, mirroring legacy
+    // `_expandAll` / `_collapseAll`.
     togglerLinks.forEach((link) => {
         link.addEventListener(
             'click',
@@ -89,12 +92,9 @@ export function setupPlaceholderEvents(
                 e.preventDefault();
                 if (!title) return;
                 if (title.classList.contains(expandedClass)) {
-                    // Full expand/collapse logic lands in ui/collapse.ts
-                    // (sub-phase 2f). For now toggle the indicator
-                    // class — collapsing children is deferred.
-                    title.classList.remove(expandedClass);
+                    collapseAll(plugin, title);
                 } else {
-                    title.classList.add(expandedClass);
+                    expandAll(plugin, title);
                 }
             },
             opts,

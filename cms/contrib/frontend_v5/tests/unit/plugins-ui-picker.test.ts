@@ -352,6 +352,64 @@ describe('picker — setupAddPluginModal: multi-choice', () => {
         expect(html.querySelectorAll('.cms-submenu-item').length).toBeGreaterThan(0);
     });
 
+    it('inserts an add-plugin placeholder into the dragarea on modal-loaded', async () => {
+        const { Helpers } = await import('../../frontend/modules/cms-base');
+        class FakeModal {
+            open() {
+                /* noop — we'll fire modal-loaded ourselves */
+            }
+        }
+        (window as unknown as {
+            CMS: { Modal: typeof FakeModal; config: { lang: { addPluginPlaceholder: string } } };
+        }).CMS = {
+            Modal: FakeModal,
+            config: { lang: { addPluginPlaceholder: 'Drop here' } },
+        };
+        const { trigger } = fixture();
+        const plugin = makePlugin();
+        setupAddPluginModal(plugin, trigger);
+        trigger.dispatchEvent(new Event('pointerup', { bubbles: true }));
+        // Find the modal instance the picker just constructed (only one was created).
+        // Track via the dispatch mechanism — pretend the modal we instantiated
+        // is the payload's instance.
+        // The picker keeps a closed-over reference; we can't get it directly.
+        // Instead, dispatch with the actual modal instance — the picker
+        // tracks by identity. Find the most-recently constructed FakeModal
+        // by stashing it from the constructor.
+        // Easier path: dispatch with `instance: any` and rely on
+        // identity-check failing → no placeholder. To verify the loaded
+        // path we need a wired instance. Use a constructor side-effect:
+        let captured: FakeModal | null = null;
+        class CapturingModal extends FakeModal {
+            constructor() {
+                super();
+                captured = this;
+            }
+        }
+        (window as unknown as { CMS: { Modal: typeof CapturingModal } }).CMS.Modal =
+            CapturingModal;
+        // Re-arm: open another picker via a fresh trigger.
+        const trigger2 = document.querySelector<HTMLElement>('#trigger');
+        // The previous setupAddPluginModal cached `modal` — open again with
+        // a new instance via fresh wiring.
+        const trigger3 = document.createElement('button');
+        trigger3.className = 'cms-submenu-add';
+        trigger3.id = 't3';
+        trigger.parentElement?.appendChild(trigger3);
+        const plugin2 = makePlugin();
+        setupAddPluginModal(plugin2, trigger3);
+        trigger3.dispatchEvent(new Event('pointerup', { bubbles: true }));
+        expect(captured).not.toBeNull();
+        // No placeholder yet.
+        expect(document.querySelectorAll('.cms-add-plugin-placeholder').length).toBe(0);
+        // Fire modal-loaded with the matching instance.
+        Helpers.dispatchEvent('modal-loaded', { instance: captured });
+        const placeholders = document.querySelectorAll('.cms-add-plugin-placeholder');
+        expect(placeholders.length).toBe(1);
+        expect(placeholders[0]?.textContent).toBe('Drop here');
+        void trigger2;
+    });
+
     it('falls through to no-op (no error, no addPlugin call) when CMS.Modal is missing', () => {
         const { trigger } = fixture();
         const plugin = makePlugin();

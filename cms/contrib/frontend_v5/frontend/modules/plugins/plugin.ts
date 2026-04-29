@@ -51,6 +51,7 @@ import {
 } from './api';
 import {
     ensurePluginDataArray,
+    getPlaceholderData,
     getPluginData,
     pushPluginData,
     setPlaceholderData,
@@ -71,7 +72,6 @@ import {
     notifySuccess,
     showLoader,
     withLock,
-    type ModalHandle,
 } from './mutations';
 import {
     addInstance,
@@ -363,9 +363,7 @@ export class Plugin implements PluginInstance {
                 );
                 const pasted = matches[matches.length - 1];
                 if (!pasted) return;
-                const newPlaceholderId = parseDragareaId(
-                    pasted.closest('.cms-dragarea'),
-                );
+                const newPlaceholderId = resolveNewPlaceholderId(pasted);
                 if (newPlaceholderId === undefined) return;
                 const parentDraggable = pasted.parentElement?.closest<HTMLElement>(
                     '.cms-draggable',
@@ -527,7 +525,10 @@ export class Plugin implements PluginInstance {
             return false;
         }
 
-        const clipboardData = getPluginData(clipboard)?.[0];
+        // Clipboard draggables carry the placeholder shape (single
+        // object), written via setPlaceholderData in
+        // _setPluginStructureEvents. Read with the matching helper.
+        const clipboardData = getPlaceholderData(clipboard);
         if (!clipboardData) return false;
 
         const bounds = this.options.plugin_restriction ?? [];
@@ -777,13 +778,16 @@ export class Plugin implements PluginInstance {
 
     /**
      * Insert a clone of the clipboard draggable into this plugin's
-     * `.cms-draggables` container, then dispatch a
-     * `cms-paste-plugin-update` event so structureboard's listener
-     * (or the per-instance listener in `_setPluginStructureEvents`)
-     * picks it up and turns it into a `movePlugin` call.
+     * `.cms-draggables` container, then call the *source* (clipboard)
+     * plugin's `movePlugin` with `move_a_copy=true`.
      *
-     * Mirrors legacy `pastePlugin`. The HTTP request happens *after*
-     * structureboard processes the DOM event — we don't fire it here.
+     * Legacy used jQuery `.clone(true, true)` to copy the source's
+     * `cms-paste-plugin-update` listener onto the clone, then
+     * dispatched the event on the clone — `that` inside the listener
+     * was always the source plugin instance. Native `cloneNode(true)`
+     * doesn't carry listeners, so we look up the source instance
+     * directly and call `movePlugin` ourselves. Same semantics, no
+     * intermediate event.
      */
     pastePlugin(): void {
         const clipboard = getClipboardDraggable();
@@ -791,21 +795,69 @@ export class Plugin implements PluginInstance {
         if (!clipboard || !draggables) return;
         const id = parseDraggableId(clipboard);
         if (id === undefined) return;
+        const sourceInstance = findPluginById(id) as Plugin | undefined;
+        if (!sourceInstance) return;
 
         const clone = clipboard.cloneNode(true) as HTMLElement;
         draggables.appendChild(clone);
+
+        // Mirror the source's options onto the clone's data store so
+        // that consumers reading `data('cms')` see the correct
+        // descriptor on the new node.
+        setPlaceholderData(clone, sourceInstance.options);
 
         const sb = getStructureBoard();
         if (this.options.plugin_id !== undefined && this.options.plugin_id !== null) {
             sb?.actualizePluginCollapseStatus?.(this.options.plugin_id);
         }
-        const detail = { id };
+        // Notify structureboard that DOM changed (legacy hook).
         draggables.dispatchEvent(
-            new CustomEvent('cms-structure-update', { detail, bubbles: true }),
+            new CustomEvent('cms-structure-update', {
+                detail: { id },
+                bubbles: true,
+            }),
         );
-        clone.dispatchEvent(
-            new CustomEvent('cms-paste-plugin-update', { detail, bubbles: true }),
+
+        // Re-derive new placement from the live DOM and call
+        // movePlugin on the *source* instance.
+        const newPlaceholderId = parseDragareaId(
+            clone.closest<HTMLElement>('.cms-dragarea'),
         );
+        if (newPlaceholderId === undefined) return;
+        const parentDraggable = clone.parentElement?.closest<HTMLElement>(
+            '.cms-draggable',
+        );
+        const parentId =
+            parentDraggable !== null && parentDraggable !== undefined
+                ? parseDraggableId(parentDraggable)
+                : undefined;
+
+        const data: PluginOptions & {
+            target?: number | string;
+            parent?: number | string;
+            move_a_copy?: boolean;
+        } = {
+            ...sourceInstance.options,
+            target: newPlaceholderId,
+            move_a_copy: true,
+        };
+        if (parentId !== undefined) data.parent = parentId;
+
+        // Persist the new parent's expanded state (legacy did this).
+        const settings = getCmsConfig().settings as
+            | { states?: Array<number | string> }
+            | undefined;
+        if (settings && parentId !== undefined) {
+            if (!Array.isArray(settings.states)) settings.states = [];
+            settings.states.push(parentId);
+            try {
+                Helpers.setSettings(settings as Record<string, unknown>);
+            } catch {
+                /* localStorage unavailable */
+            }
+        }
+
+        void sourceInstance.movePlugin(data);
     }
 
     /**
@@ -829,10 +881,13 @@ export class Plugin implements PluginInstance {
             const dragitem = matches[matches.length - 1];
             if (!dragitem) return;
 
-            // Resolve new placeholder by walking up to the nearest
-            // dragarea + reading its id from the class.
-            const dragarea = dragitem.closest<HTMLElement>('.cms-dragarea');
-            const newPlaceholderId = parseDragareaId(dragarea);
+            // Resolve new placeholder by walking up to the OUTERMOST
+            // `.cms-draggables` ancestor and reading the dragbar that
+            // immediately precedes it. Mirrors legacy
+            // `dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first()`.
+            // This is more robust than `closest('.cms-dragarea')` for
+            // mid-transit nodes whose nearest `.cms-dragarea` is stale.
+            const newPlaceholderId = resolveNewPlaceholderId(dragitem);
             if (newPlaceholderId === undefined) return;
 
             // Resolve new parent by walking up to the closest
@@ -860,7 +915,13 @@ export class Plugin implements PluginInstance {
                 }
             }
 
-            const targetPosition = this.options.position;
+            // Position must come from the live DOM after
+            // `updatePluginPositions` refresh — find the moving
+            // instance and read its updated `options.position`. For
+            // paste flows where `opts !== this.options`, this reaches
+            // the *source* instance whose options we just refreshed.
+            const updatedInstance = findPluginById(pluginId);
+            const targetPosition = updatedInstance?.options.position;
 
             showLoader();
             try {
@@ -1016,6 +1077,46 @@ function parseDraggableId(el: Element | null): number | undefined {
     if (!el) return undefined;
     for (const cls of Array.from(el.classList)) {
         const match = /^cms-draggable-(\d+)$/.exec(cls);
+        if (match && match[1]) return Number(match[1]);
+    }
+    return undefined;
+}
+
+/**
+ * Resolve the placeholder id for a moved/pasted draggable by walking
+ * up to the outermost `.cms-draggables` ancestor and reading the
+ * dragbar that immediately precedes it. Mirrors legacy
+ * `dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first()`.
+ *
+ * The closest ancestor `.cms-dragarea` may be stale during a
+ * mid-transit move — this walk follows the path the drag controller
+ * actually established.
+ */
+function resolveNewPlaceholderId(dragitem: HTMLElement): number | undefined {
+    let outermost: HTMLElement | null = null;
+    let walker: HTMLElement | null = dragitem.parentElement;
+    while (walker) {
+        if (walker.classList.contains('cms-draggables')) {
+            outermost = walker;
+        }
+        walker = walker.parentElement;
+    }
+    if (!outermost) return undefined;
+    let prev = outermost.previousElementSibling;
+    while (prev) {
+        if (prev.classList.contains('cms-dragbar')) {
+            return parsePlaceholderId(prev);
+        }
+        prev = prev.previousElementSibling;
+    }
+    // Fallback: parse from the surrounding cms-dragarea.
+    return parseDragareaId(outermost.closest('.cms-dragarea'));
+}
+
+function parsePlaceholderId(el: Element | null): number | undefined {
+    if (!el) return undefined;
+    for (const cls of Array.from(el.classList)) {
+        const match = /^cms-(?:dragbar|dragarea)-(\d+)$/.exec(cls);
         if (match && match[1]) return Number(match[1]);
     }
     return undefined;

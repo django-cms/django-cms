@@ -31,7 +31,10 @@ import {
     setInstances,
 } from './registry';
 import type { PluginDescriptor, PluginOptions } from './types';
-import { initializeGlobalHandlers } from './ui/global-handlers';
+import {
+    initializeGlobalHandlers,
+    updateClipboard,
+} from './ui/global-handlers';
 
 /**
  * Scan the document for plugin descriptor scripts and create one

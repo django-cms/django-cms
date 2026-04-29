@@ -24,7 +24,6 @@
 import { getCmsConfig, getStructureBoard } from '../cms-globals';
 import type { PluginInstance } from '../types';
 import { isExpandMode } from './global-handlers';
-import { isMultiPlugin } from './setup';
 
 /**
  * Wire content-mode events for a plugin onto each container element.
@@ -84,28 +83,12 @@ export function setupContentEvents(
         );
     }
 
-    // dblclick-to-edit: skipped when the wrapper holds multiple
-    // plugins (ambiguous which to edit). We bind on the document so a
-    // single delegated listener covers every wrapper that matches the
-    // plugin's class — handles dynamically inserted plugins with the
-    // same id.
-    const skipDblClick = containers.some(isMultiPlugin);
-    if (skipDblClick) return;
-
-    const pluginId = plugin.options.plugin_id;
-    if (pluginId === undefined || pluginId === null) return;
-    const selector = `.cms-plugin-${pluginId}:not(.cms-slot)`;
-
-    document.addEventListener(
-        'dblclick',
-        (e) => {
-            const start = e.target as Element | null;
-            const match = start?.closest(selector);
-            if (!match) return;
-            tryEditPlugin(plugin, match, e);
-        },
-        opts,
-    );
+    // dblclick-to-edit is wired once per page in
+    // `ui/global-handlers.ts::initializeGlobalHandlers` — a single
+    // delegated listener walks `.cms-plugin-<id>` on the dblclick
+    // target, resolves the matching instance via the registry, and
+    // calls `editPlugin`. Per-instance binding is unnecessary and
+    // would scale to N listeners on document with N plugins.
 }
 
 /**
@@ -114,7 +97,7 @@ export function setupContentEvents(
  * a `.cms-slot`. Caller resolves `target` (delegated handlers walk
  * `e.target.closest(selector)`; direct handlers pass `e.currentTarget`).
  */
-function tryEditPlugin(plugin: PluginInstance, target: Element, e: Event): void {
+export function tryEditPlugin(plugin: PluginInstance, target: Element, e: Event): void {
     const disabled = target.closest('.cms-drag-disabled');
     const editDisabled = target
         .closest('.cms-draggable')
