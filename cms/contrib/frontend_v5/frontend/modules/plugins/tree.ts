@@ -201,6 +201,41 @@ export function updateRegistry(plugins: PluginOptions[]): void {
 }
 
 /**
+ * Drop a plugin id from both `CMS._plugins` and `CMS._instances`.
+ * Used by structureboard's DELETE / CLEAR handlers after the DOM
+ * removal step. Number-coercion handles the legacy mix of string /
+ * number ids in rendered descriptors.
+ *
+ * Returns the count of registry entries removed (descriptors +
+ * instances) — useful for tests; callers usually don't read it.
+ */
+export function removeFromRegistries(pluginId: number | string): number {
+    let removed = 0;
+    const target = Number(pluginId);
+    const id = `cms-plugin-${pluginId}`;
+
+    const descriptors = getPluginsRegistry();
+    for (let i = descriptors.length - 1; i >= 0; i -= 1) {
+        if (descriptors[i]?.[0] === id) {
+            descriptors.splice(i, 1);
+            removed += 1;
+        }
+    }
+
+    const instances = getInstancesRegistry();
+    for (let i = instances.length - 1; i >= 0; i -= 1) {
+        const opts = instances[i]?.options;
+        if (opts && opts.plugin_id !== undefined && opts.plugin_id !== null) {
+            if (Number(opts.plugin_id) === target) {
+                instances.splice(i, 1);
+                removed += 1;
+            }
+        }
+    }
+    return removed;
+}
+
+/**
  * Re-export the legacy `_getPluginById` shape — `findPluginById`
  * lives in the registry but legacy callers (structureboard) read
  * `CMS.Plugin._getPluginById`. Wired in `bundles/admin.toolbar.ts`

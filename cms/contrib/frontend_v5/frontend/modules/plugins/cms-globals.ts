@@ -34,11 +34,21 @@ import type {
 export interface PluginsCmsConfig {
     csrf?: string;
     lang?: Record<string, string>;
-    request?: { language?: string };
+    request?: { language?: string; toolbar?: string; pk?: number | string; model?: string };
     clipboard?: { id?: number | string };
+    /**
+     * Top-level mode flag — `'draft'` for editable pages, `'live'` for
+     * read-only views. Distinct from `settings.mode` which toggles
+     * between `'structure'` and `'edit'` views of the same draft page.
+     */
+    mode?: string;
     settings?: {
         mode?: string;
         legacy_mode?: boolean;
+        /** URL the structureboard fetches for structure-mode rendering. */
+        structure?: string;
+        /** URL the structureboard fetches for edit-mode rendering. */
+        edit?: string;
     };
     [key: string]: unknown;
 }
@@ -72,9 +82,10 @@ export interface StructureBoardApi {
 /** Surface of `window.CMS.Modal` (constructor). */
 export type ModalConstructor = new (options?: Record<string, unknown>) => unknown;
 
-/** Surface of `window.CMS.API.Messages.open`. */
+/** Surface of `window.CMS.API.Messages.open` / `.close`. */
 export interface MessagesApi {
     open(options: { message: string; error?: boolean; delay?: number }): void;
+    close?(): void;
 }
 
 /** Surface of `window.CMS.API.Tooltip` consumed by plugins. */
@@ -94,6 +105,13 @@ export interface ClipboardApi {
 
 /** Surface of `window.CMS.API.Toolbar` consumed by plugins (loose). */
 export interface ToolbarApi {
+    /**
+     * Replace the toolbar's rendered markup with a fresh version
+     * (typically clipped from the content-mode response). Called by
+     * structureboard's `refreshContent` after a content swap so the
+     * toolbar reflects the updated state.
+     */
+    _refreshMarkup?(newToolbar: Element): void;
     [key: string]: unknown;
 }
 

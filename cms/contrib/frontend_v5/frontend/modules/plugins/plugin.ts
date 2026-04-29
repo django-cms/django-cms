@@ -101,6 +101,11 @@ import { setupSettingsMenu } from './ui/menu';
 import { setupAddPluginModal } from './ui/picker';
 import { setupPlaceholderEvents, type PlaceholderUi } from './ui/placeholder';
 import { setupContainer } from './ui/setup';
+import {
+    parseDragareaId,
+    parseDragbarId,
+    parseDraggableId,
+} from '../structureboard/parsers/ids';
 
 void Helpers; // keep the import side-effect-free; Helpers is consumed by callers.
 
@@ -1073,15 +1078,6 @@ export class Plugin implements PluginInstance {
 // Helpers
 // ────────────────────────────────────────────────────────────────────
 
-function parseDraggableId(el: Element | null): number | undefined {
-    if (!el) return undefined;
-    for (const cls of Array.from(el.classList)) {
-        const match = /^cms-draggable-(\d+)$/.exec(cls);
-        if (match && match[1]) return Number(match[1]);
-    }
-    return undefined;
-}
-
 /**
  * Resolve the placeholder id for a moved/pasted draggable by walking
  * up to the outermost `.cms-draggables` ancestor and reading the
@@ -1105,30 +1101,12 @@ function resolveNewPlaceholderId(dragitem: HTMLElement): number | undefined {
     let prev = outermost.previousElementSibling;
     while (prev) {
         if (prev.classList.contains('cms-dragbar')) {
-            return parsePlaceholderId(prev);
+            return parseDragbarId(prev);
         }
         prev = prev.previousElementSibling;
     }
     // Fallback: parse from the surrounding cms-dragarea.
     return parseDragareaId(outermost.closest('.cms-dragarea'));
-}
-
-function parsePlaceholderId(el: Element | null): number | undefined {
-    if (!el) return undefined;
-    for (const cls of Array.from(el.classList)) {
-        const match = /^cms-(?:dragbar|dragarea)-(\d+)$/.exec(cls);
-        if (match && match[1]) return Number(match[1]);
-    }
-    return undefined;
-}
-
-function parseDragareaId(el: Element | null): number | undefined {
-    if (!el) return undefined;
-    for (const cls of Array.from(el.classList)) {
-        const match = /^cms-dragarea-(\d+)$/.exec(cls);
-        if (match && match[1]) return Number(match[1]);
-    }
-    return undefined;
 }
 
 function disablePaste(item: HTMLElement, tooltipSelector: string): void {
