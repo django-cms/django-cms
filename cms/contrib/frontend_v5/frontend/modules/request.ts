@@ -8,11 +8,20 @@
  *
  * Design decisions:
  *
- *   1. CSRF goes in the `X-CSRFToken` header, read from a cookie
- *      (default name "csrftoken"). Django's middleware accepts both
- *      header and body; header is cleaner because callers don't need to
- *      merge a token field into the payload, and it works uniformly for
- *      JSON, FormData, and URLSearchParams.
+ *   1. CSRF goes in the `X-CSRFToken` header. Resolution order:
+ *        a. caller-supplied header (`headers['X-CSRFToken']`)
+ *        b. caller-supplied `opts.csrfToken`
+ *        c. `window.CMS.config.csrf` — the server-rendered token. This
+ *           is the preferred source: it works even when cookies are
+ *           disabled in the browser (Safari ITP, privacy modes) and
+ *           it's the same token django-cms's templates ship to legacy
+ *           bundles.
+ *        d. cookie (default name "csrftoken") — fallback for callers
+ *           that reuse this module on non-CMS pages.
+ *      Django's middleware accepts both header and body; header is
+ *      cleaner because callers don't need to merge a token field into
+ *      the payload, and it works uniformly for JSON, FormData, and
+ *      URLSearchParams.
  *
  *   2. Plain object bodies auto-serialise to JSON with the right
  *      Content-Type. FormData and URLSearchParams pass through unchanged
@@ -57,11 +66,43 @@ export interface RequestOptions {
     headers?: Record<string, string>;
     /** Abort signal forwarded to fetch. */
     signal?: AbortSignal;
-    /** Cookie name for CSRF token lookup. Defaults to "csrftoken". */
+    /**
+     * Explicit CSRF token to send. Overrides every other source —
+     * useful for tests and for callers that already have the token
+     * in hand. When omitted, the resolver falls back to
+     * `window.CMS.config.csrf`, then to the cookie named
+     * `csrfCookieName`.
+     */
+    csrfToken?: string;
+    /**
+     * Cookie name to read the CSRF token from when neither
+     * `opts.csrfToken` nor `window.CMS.config.csrf` is set. Defaults
+     * to "csrftoken".
+     */
     csrfCookieName?: string;
 }
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE']);
+
+/**
+ * Resolve the CSRF token to send with an unsafe-method request.
+ *
+ * Order:
+ *   1. `opts.csrfToken` — explicit override
+ *   2. `window.CMS.config.csrf` — server-rendered, reliable when
+ *      cookies are disabled
+ *   3. cookie named `opts.csrfCookieName ?? 'csrftoken'`
+ *
+ * Returns `null` if no token can be found; the caller decides whether
+ * to bail or proceed without one (Django will reject the request).
+ */
+function resolveCsrfToken(opts: RequestOptions): string | null {
+    if (opts.csrfToken) return opts.csrfToken;
+    const fromConfig = window.CMS?.config?.csrf;
+    if (typeof fromConfig === 'string' && fromConfig.length > 0) return fromConfig;
+    const cookieName = opts.csrfCookieName ?? 'csrftoken';
+    return getCookie(cookieName);
+}
 
 /**
  * Read a cookie value by name. Returns the URL-decoded value, or null
@@ -117,8 +158,7 @@ export async function request<T = unknown>(
 
     const upperMethod = method.toUpperCase();
     if (!SAFE_METHODS.has(upperMethod) && !('X-CSRFToken' in headers)) {
-        const cookieName = opts.csrfCookieName ?? 'csrftoken';
-        const token = getCookie(cookieName);
+        const token = resolveCsrfToken(opts);
         if (token) headers['X-CSRFToken'] = token;
     }
 

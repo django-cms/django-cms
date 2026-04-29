@@ -220,6 +220,56 @@ describe('request', () => {
             expect(init.headers['X-CSRFToken']).toBe('caller-value');
         });
 
+        it('prefers opts.csrfToken over CMS.config and the cookie', async () => {
+            document.cookie = 'csrftoken=cookie-value';
+            window.CMS = { config: { csrf: 'config-value' } } as CmsGlobal;
+            fetchMock.mockResolvedValueOnce(mockResponse({ contentType: 'application/json', body: '{}' }));
+            await post('/api/', {}, { csrfToken: 'opts-value' });
+            const init = fetchMock.mock.calls[0]![1];
+            expect(init.headers['X-CSRFToken']).toBe('opts-value');
+            delete (window as { CMS?: CmsGlobal }).CMS;
+        });
+
+        it('prefers CMS.config.csrf over the cookie', async () => {
+            document.cookie = 'csrftoken=cookie-value';
+            window.CMS = { config: { csrf: 'config-value' } } as CmsGlobal;
+            fetchMock.mockResolvedValueOnce(mockResponse({ contentType: 'application/json', body: '{}' }));
+            await post('/api/', {});
+            const init = fetchMock.mock.calls[0]![1];
+            expect(init.headers['X-CSRFToken']).toBe('config-value');
+            delete (window as { CMS?: CmsGlobal }).CMS;
+        });
+
+        it('falls back to the cookie when CMS.config.csrf is missing', async () => {
+            document.cookie = 'csrftoken=cookie-value';
+            window.CMS = { config: {} } as CmsGlobal;
+            fetchMock.mockResolvedValueOnce(mockResponse({ contentType: 'application/json', body: '{}' }));
+            await post('/api/', {});
+            const init = fetchMock.mock.calls[0]![1];
+            expect(init.headers['X-CSRFToken']).toBe('cookie-value');
+            delete (window as { CMS?: CmsGlobal }).CMS;
+        });
+
+        it('uses CMS.config.csrf even when cookies are unavailable', async () => {
+            // Don't set a cookie. Cookies-disabled scenario.
+            window.CMS = { config: { csrf: 'config-only' } } as CmsGlobal;
+            fetchMock.mockResolvedValueOnce(mockResponse({ contentType: 'application/json', body: '{}' }));
+            await post('/api/', {});
+            const init = fetchMock.mock.calls[0]![1];
+            expect(init.headers['X-CSRFToken']).toBe('config-only');
+            delete (window as { CMS?: CmsGlobal }).CMS;
+        });
+
+        it('treats an empty CMS.config.csrf as "missing" and falls back to cookie', async () => {
+            document.cookie = 'csrftoken=cookie-value';
+            window.CMS = { config: { csrf: '' } } as CmsGlobal;
+            fetchMock.mockResolvedValueOnce(mockResponse({ contentType: 'application/json', body: '{}' }));
+            await post('/api/', {});
+            const init = fetchMock.mock.calls[0]![1];
+            expect(init.headers['X-CSRFToken']).toBe('cookie-value');
+            delete (window as { CMS?: CmsGlobal }).CMS;
+        });
+
         it('adds X-CSRFToken to PUT and DELETE', async () => {
             document.cookie = 'csrftoken=tk';
             fetchMock.mockResolvedValue(mockResponse({ status: 204 }));

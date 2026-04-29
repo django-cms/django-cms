@@ -52,25 +52,36 @@ const CMS: CmsGlobal = ((typeof window !== 'undefined' ? window.CMS : undefined)
 CMS.API = { ...(CMS.API ?? {}), Helpers };
 (CMS as { KEYS?: typeof KEYS }).KEYS = KEYS;
 
-// Lazy `CMS.$` — only triggers a jQuery load if something reads it.
-// The first read returns the loadCmsJquery() promise; once it resolves,
-// the property replaces itself with the jQuery instance so later reads
-// are synchronous.
-Object.defineProperty(CMS, '$', {
-    configurable: true,
-    enumerable: true,
-    get() {
-        return loadCmsJquery().then((jq) => {
-            Object.defineProperty(CMS, '$', {
-                value: jq,
-                writable: true,
-                configurable: true,
-                enumerable: true,
+// `CMS.$` resolution. Django admin pages always have `django.jQuery`
+// loaded by `jquery.init.js` before our bundle runs, so the common
+// case is a direct sync assignment — no Promise, no getter ceremony,
+// `CMS.$('selector')` works from the first call.
+//
+// The lazy getter only kicks in on pages that don't ship django.jQuery
+// (rare — typically only off-admin embeds). On first access it
+// dynamic-imports the jQuery chunk and replaces the property with the
+// resolved instance so later reads are synchronous.
+const fromDjango = window.django?.jQuery;
+
+if (fromDjango) {
+    (CMS as { $?: JQueryStatic }).$ = fromDjango;
+} else {
+    Object.defineProperty(CMS, '$', {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return loadCmsJquery().then((jq) => {
+                Object.defineProperty(CMS, '$', {
+                    value: jq,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true,
+                });
+                return jq;
             });
-            return jq;
-        });
-    },
-});
+        },
+    });
+}
 
 if (typeof window !== 'undefined') {
     window.CMS = CMS;
