@@ -21,10 +21,14 @@
  */
 
 import { Helpers } from '../cms-base';
-import { getCmsConfig } from '../plugins/cms-globals';
+import {
+    getCmsConfig,
+    getInstancesRegistry,
+} from '../plugins/cms-globals';
 import {
     refreshPlugins,
 } from '../plugins/tree';
+import type { Plugin } from '../plugins/plugin';
 import {
     actualizePlaceholders,
     actualizePluginCollapseStatus,
@@ -407,9 +411,25 @@ export class StructureBoard {
             this.ui.content.innerHTML = newStructure.innerHTML;
         }
 
-        // Re-bind: per-instance setup, actualize placeholders, drag.
+        // Re-bind structure-mode events. Mirrors legacy `_loadStructure`:
+        // we DON'T call `refreshPlugins()` here because that wires
+        // *content* events for plugins; structure mode needs each
+        // plugin's `_setPluginStructureEvents` (drag handle, dropdown
+        // wiring, add-plugin trigger) plus `_collapsables`. Placeholders
+        // re-run their `_setPlaceholder` setup so the placeholder-level
+        // submenu re-binds.
         actualizePlaceholders();
-        refreshPlugins();
+        const instances = getInstancesRegistry();
+        for (const instance of instances) {
+            if (instance.options.type !== 'placeholder') continue;
+            (instance as Plugin)._setPlaceholder();
+        }
+        for (const instance of instances) {
+            if (instance.options.type !== 'plugin') continue;
+            const plugin = instance as Plugin;
+            plugin._setPluginStructureEvents();
+            plugin._collapsables();
+        }
         initializeDragItemsStates();
         this.dnd = setupStructureBoardDnd();
 

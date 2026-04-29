@@ -169,7 +169,13 @@ export function showSettingsMenu(
 
     if (!panel) return;
 
-    panel.style.display = '';
+    // The legacy `.cms-submenu-dropdown-settings` SCSS rule sets
+    // `display: none` and there is no class-driven override that
+    // shows it — the legacy code relied on jQuery `.show()` setting
+    // `style.display = 'block'` inline. Setting `''` would leave the
+    // CSS rule in effect and the dropdown stays hidden. Same fix as
+    // `structureboard/ui/mode.ts::showBoard`.
+    panel.style.display = 'block';
     panel.removeAttribute('hidden');
 
     // Positioning

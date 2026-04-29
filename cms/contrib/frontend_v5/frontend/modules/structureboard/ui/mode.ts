@@ -171,7 +171,13 @@ export function showBoard(ctx: ModeContext, init: boolean): void {
     ctx.html.classList.remove('cms-structure-mode-content');
     ctx.html.classList.add('cms-structure-mode-structure');
 
-    ctx.container.style.display = '';
+    // The legacy `.cms-structure` SCSS rule sets `display: none` and
+    // there is no `.cms-structure-mode-structure` override that flips
+    // it to block — the legacy code relied on jQuery `.show()` setting
+    // `style.display = 'block'` inline. We must do the same: setting
+    // `''` would leave the CSS rule in effect and the board stays
+    // hidden.
+    ctx.container.style.display = 'block';
 
     if (!init) {
         makeCondensed(ctx);

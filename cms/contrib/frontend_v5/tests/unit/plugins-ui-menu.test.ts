@@ -94,7 +94,7 @@ describe('settings menu — toggle', () => {
         expect(trigger.classList.contains('cms-btn-active')).toBe(false);
         trigger.dispatchEvent(new Event('pointerup', { bubbles: true }));
         expect(trigger.classList.contains('cms-btn-active')).toBe(true);
-        expect(dropdown.style.display).toBe('');
+        expect(dropdown.style.display).toBe('block');
     });
 
     it('second pointerup closes the dropdown', () => {
