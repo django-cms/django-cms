@@ -1,11 +1,16 @@
 import copy
+from unittest.mock import MagicMock, patch
 
 from django.contrib.admin import site
+from django.contrib.auth import get_permission_codename
+from django.contrib.sites.models import Site
+from django.db import connection
 from django.templatetags.static import static
+from django.test.utils import CaptureQueriesContext
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
 
-from cms.admin.utils import CONTENT_PREFIX
+from cms.admin.utils import CONTENT_PREFIX, GrouperModelAdmin
 from cms.test_utils.project.sampleapp.models import (
     GrouperModel,
     GrouperModelContent,
@@ -226,6 +231,45 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         # Assert
         self.assertEqual(len(check_results), 4)  # No errors
 
+    def test_changelist_view_does_not_call_get_content_obj(self):
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            with patch.object(self.admin, "get_content_obj", wraps=self.admin.get_content_obj) as mocked_get_content_obj:
+                response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_get_content_obj.call_count, 0)
+
+    def test_change_view_calls_get_content_obj(self):
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            with patch.object(self.admin, "get_content_obj", wraps=self.admin.get_content_obj) as mocked_get_content_obj:
+                response = self.client.get(f"{self.change_url}?language=en", follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(mocked_get_content_obj.call_count, 0)
+        self.assertTrue(any(call.args and call.args[0] == self.grouper_instance for call in mocked_get_content_obj.call_args_list))
+
+    def test_get_content_obj_caches_on_grouper_object(self):
+        content_instance = self.createContentInstance("en")
+        self.admin.language = "en"
+        self.admin.clear_content_cache()
+
+        self.assertFalse(hasattr(self.grouper_instance, "_grouper_admin_content_obj_cache"))
+
+        with self.assertNumQueries(1):
+            cached_content = self.admin.get_content_obj(self.grouper_instance)
+
+        self.assertEqual(cached_content, content_instance)
+        self.assertTrue(hasattr(self.grouper_instance, "_grouper_admin_content_obj_cache"))
+
+        with self.assertNumQueries(0):
+            cached_again = self.admin.get_content_obj(self.grouper_instance)
+
+        self.assertIs(cached_again, cached_content)
+
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
     def test_language_selector(self):
@@ -274,6 +318,72 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
                 # Assert
                 self.assertContains(response, "Grouper Category")
                 self.assertContains(response, random_content[language])
+
+    def test_get_content_obj_uses_prefetch_cache(self) -> None:
+        """Iterating the admin queryset and calling ``get_content_obj`` on each grouper must
+        not issue per-row queries — the prefetch registered in ``get_queryset`` is expected
+        to populate ``_admin_prefetch_cache``, so the total query count stays constant."""
+        # Arrange: baseline + many grouper/content pairs.
+        self.createContentInstance("en")
+        for i in range(10):
+            extra = GrouperModel.objects.create(category_name=f"Grouper {i}")
+            GrouperModelContent.objects.create(
+                grouper_model=extra, language="en", secret_greeting=f"Greeting {i}"
+            )
+
+        request = self.get_request()
+        request.user = self.admin_user
+        self.admin.language = "en"
+
+        # Act: mimic what the changelist does — materialize the queryset, then look up
+        # each grouper's content object.
+        with CaptureQueriesContext(connection) as ctx:
+            groupers = list(self.admin.get_queryset(request))
+            for grouper in groupers:
+                self.assertIsNotNone(self.admin.get_content_obj(grouper))
+
+        # Assert: one query for groupers + one for the prefetch = 2.
+        # Without the prefetch we'd see 1 + N queries (12 here).
+        self.assertLessEqual(
+            len(ctx),
+            3,
+            f"Expected ≤ 3 queries for 11 groupers thanks to prefetch_related, got {len(ctx)}. "
+            f"Looks like ``get_content_obj`` is not using the prefetch cache.",
+        )
+
+    def test_changelist_view_has_no_n_plus_1(self) -> None:
+        """End-to-end regression guard: the query count of the changelist HTTP view must
+        not grow with the number of grouper instances. Protects against future n+1s
+        introduced by list_display getters, action buttons, or related hooks."""
+        # Arrange: baseline with a single grouper (from setUp) + one content object.
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            # Warm up the client/session so login-related queries don't pollute counts.
+            self.client.get(self.changelist_url + "?language=en")
+
+            with CaptureQueriesContext(connection) as baseline:
+                response = self.client.get(self.changelist_url + "?language=en")
+            self.assertEqual(response.status_code, 200)
+
+            # Act: add many more grouper/content pairs.
+            for i in range(10):
+                extra = GrouperModel.objects.create(category_name=f"Grouper {i}")
+                GrouperModelContent.objects.create(
+                    grouper_model=extra, language="en", secret_greeting=f"Greeting {i}"
+                )
+
+            with CaptureQueriesContext(connection) as scaled:
+                response = self.client.get(self.changelist_url + "?language=en")
+            self.assertEqual(response.status_code, 200)
+
+        # Assert: query count is invariant to number of rows.
+        self.assertEqual(
+            len(baseline),
+            len(scaled),
+            f"Changelist issued {len(baseline)} queries for 1 grouper but {len(scaled)} for 11. "
+            f"This suggests an n+1 has been introduced.",
+        )
 
 
 class SimpleGrouperChangeListTestCase(SimpleSetupMixin, CMSTestCase):
@@ -484,6 +594,78 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         self.assertEqual(content_instance_en.secret_greeting, random_content.secret_greeting)  # unchanged
         self.assertIsNotNone(content_instance_de)  # Exists?
         self.assertEqual(content_instance_de.secret_greeting, data["content__secret_greeting"])  # Has new content
+
+
+class GrouperCanChangeContentTestCase(SetupMixin, CMSTestCase):
+    """Tests for ``GrouperModelAdmin.can_change_content`` in both the add and change case.
+
+    The sampleapp's ``GrouperAdmin`` overrides ``can_change_content``, so we call the base
+    implementation directly. ``request.user`` is a ``MagicMock`` because Django's default
+    auth backend returns no object-level permissions for non-superusers, which would make
+    the change case impossible to exercise otherwise."""
+
+    def _can_change_content(self, request, content_obj):
+        return GrouperModelAdmin.can_change_content(self.admin, request, content_obj)
+
+    def _request(self, has_perm_return=True):
+        request = self.get_request()
+        request.user = MagicMock()
+        request.user.has_perm.return_value = has_perm_return
+        return request
+
+    def test_add_case_checks_add_permission(self):
+        """Without a content object, the content model's add permission is checked."""
+        request = self._request(has_perm_return=True)
+
+        self.assertTrue(self._can_change_content(request, None))
+
+        opts = GrouperModelContent._meta
+        expected_perm = f"{opts.app_label}.{get_permission_codename('add', opts)}"
+        request.user.has_perm.assert_called_once_with(expected_perm, None)
+
+    def test_add_case_denied_without_permission(self):
+        """Without the add permission, the add case returns False."""
+        request = self._request(has_perm_return=False)
+
+        self.assertFalse(self._can_change_content(request, None))
+
+    def test_change_case_checks_change_permission(self):
+        """With a content object, the change permission is checked, passing the object for
+        object-level backends."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=True)
+
+        self.assertTrue(self._can_change_content(request, content_obj))
+
+        opts = GrouperModelContent._meta
+        expected_perm = f"{opts.app_label}.{get_permission_codename('change', opts)}"
+        request.user.has_perm.assert_called_once_with(expected_perm, content_obj)
+
+    def test_change_case_denied_without_permission(self):
+        """Without the change permission, the change case returns False."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=False)
+
+        self.assertFalse(self._can_change_content(request, content_obj))
+
+    def test_change_case_respects_is_editable(self):
+        """When the content object exposes ``is_editable`` returning False, the user cannot
+        change it even with the permission."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: False
+        request = self._request(has_perm_return=True)
+
+        self.assertFalse(self._can_change_content(request, content_obj))
+
+    def test_superuser_can_change_content_in_both_cases(self):
+        """Superusers pass the permission check for both add and change cases."""
+        request = self.get_request()
+        request.user = self.admin_user
+
+        self.assertTrue(self._can_change_content(request, None))
+
+        content_obj = self.createContentInstance("en")
+        self.assertTrue(self._can_change_content(request, content_obj))
 
 
 class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
