@@ -123,7 +123,15 @@ module.exports = function (opts) {
                 : [
                       new TerserPlugin({
                           terserOptions: {
-                              compress: { drop_console: true },
+                              compress: {
+                                  // Drop noisy dev levels but keep
+                                  // `console.warn` / `console.error` —
+                                  // they're used for intentional
+                                  // diagnostics (e.g. cms-jquery's
+                                  // lazy-load warning) and need to
+                                  // survive minification.
+                                  drop_console: ['log', 'info', 'debug', 'trace'],
+                              },
                               format: { comments: false },
                           },
                           extractComments: false,

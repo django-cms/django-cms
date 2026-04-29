@@ -3,19 +3,36 @@
  * on `window.CMS.API.Helpers`. Port of the legacy
  * `cms/static/cms/js/modules/cms.base.js`.
  *
- * This is the JQUERY GATEWAY module of the contrib app. Per CLAUDE.md
- * decision 7/7a, `admin.base.ts` (which imports this file) is the ONLY
- * internal TS file permitted to import jQuery. All the jQuery-flavored
- * primitives exported from here — `$window`, `$document`, the event
- * bus (`addEventListener`/`removeEventListener`/`dispatchEvent`), the
- * `csrf()` $.ajaxSetup wrapper, and the touch-scroll helpers with
- * namespaced events — keep jQuery semantics exactly on the first port
- * so downstream legacy modules (and third-party code hooking into
- * `$('#cms-top').on('cms-*', …)`) keep working.
+ * jQuery decoupling (Phase 1 of the migration plan)
+ * ─────────────────────────────────────────────────
+ * This module USED to be the JQUERY GATEWAY: it imported jQuery at
+ * module-load time, exported pre-wrapped `$window` / `$document`, and
+ * ran `$(callback)` for DOM-ready wiring. All of that is gone — jQuery
+ * is now strictly opt-in via `core/cms-jquery.ts`. The only Helpers
+ * method that still needs jQuery is `csrf()`, which lazy-loads it via
+ * `loadCmsJquery()` because it has to call `$.ajaxSetup` for legacy
+ * callers that still issue jQuery-style ajax requests.
  *
- * Decision 7a says we migrate the event bus to native CustomEvent at
- * the END of the migration, when every downstream bundle is ported
- * and we've audited third-party subscribers. Task #34 tracks that.
+ * Where the legacy module used jQuery:
+ *
+ *   - `$window` / `$document` exports — DROPPED (no remaining
+ *     consumers in the v5 modules; toolbar bundle code that needed
+ *     them isn't ported on this branch).
+ *   - `$(callback)` DOM-ready — replaced with native
+ *     `DOMContentLoaded` + `document.readyState` check.
+ *   - `preventSubmit` (form submit guard) — native DOM equivalent.
+ *   - `csrf` ($.ajaxSetup) — async, lazy-loads jQuery.
+ *   - `addEventListener` / `removeEventListener` / `dispatchEvent`
+ *     (legacy event bus on `#cms-top`) — delegate to `cmsEvents`,
+ *     which has its own jQuery bridge so legacy `.trigger/.on` calls
+ *     interop transparently.
+ *   - `preventTouchScrolling` / `allowTouchScrolling` — native
+ *     pointer/touch listeners + a WeakMap for namespace tracking.
+ *   - `getColorScheme` / `setColorScheme` — native DOM (`html`
+ *     element + `dataset.theme`, native iframe walk).
+ *   - `_eventRoot` — set to the raw `#cms-top` HTMLElement; the
+ *     `cmsEvents` jQuery bridge wraps it on demand if jQuery is
+ *     loaded.
  *
  * Two intentional deviations from legacy:
  *
@@ -24,8 +41,7 @@
  *      without localStorage is removed — localStorage is universally
  *      available in 2026. If localStorage is unavailable at runtime,
  *      setSettings throws with a clear error instead of making a
- *      synchronous XHR. Matches the "strict improvement" spirit of
- *      the CSP refactor direction.
+ *      synchronous XHR.
  *
  *   2. `onPluginSave` and `_pluginExists` are ported as pass-through
  *      stubs that safely no-op when `window.CMS.API.StructureBoard`
@@ -36,9 +52,10 @@
  *      independently.
  */
 
-import $ from 'jquery';
 import { debounce, once, throttle } from 'lodash-es';
 
+import { loadCmsJquery } from './core/cms-jquery';
+import { cmsEvents } from './core/event-bus';
 import { hideLoader, showLoader } from './loader';
 
 // ────────────────────────────────────────────────────────────────────
@@ -55,13 +72,22 @@ const nameSpaceEvent = (events: string): string =>
         .map((eventName) => `cms-${eventName}`)
         .join(' ');
 
+/**
+ * Run `cb` once the DOM is ready. Replaces the legacy `$(cb)` shortcut
+ * with native semantics: fires immediately if the document has already
+ * passed the `loading` state, otherwise waits for `DOMContentLoaded`.
+ */
+const onDomReady = (cb: () => void): void => {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', cb, { once: true });
+    } else {
+        cb();
+    }
+};
+
 // ────────────────────────────────────────────────────────────────────
 // Named exports consumed across the CMS codebase
 // ────────────────────────────────────────────────────────────────────
-
-/** Cached jQuery handles. Downstream modules expect JQuery, not plain window/document. */
-export const $window: JQuery<Window & typeof globalThis> = $(window);
-export const $document: JQuery<Document> = $(document);
 
 /** Monotonic counter factory — returns 1, 2, 3, … across the process lifetime. */
 export const uid: () => number = (() => {
@@ -99,10 +125,6 @@ export interface HelpersType {
     /** Internal flag — see `reloadBrowser`. */
     _isReloading: boolean;
 
-    /** Cached jQuery wrappers (re-exported for consumers that do `Helpers.$window`). */
-    readonly $window: JQuery<Window & typeof globalThis>;
-    readonly $document: JQuery<Document>;
-
     /** Monotonic counter — see top-level export. */
     readonly uid: () => number;
 
@@ -122,20 +144,28 @@ export interface HelpersType {
     onPluginSave(): void;
     _pluginExists(pluginId: string | number): boolean;
     preventSubmit(): void;
-    csrf(csrfToken: string): void;
+    /**
+     * Lazy-loads jQuery on first call so legacy `$.ajax` consumers
+     * have CSRF wired up. Async because the load may take a network
+     * round-trip on first use.
+     */
+    csrf(csrfToken: string): Promise<void>;
     setSettings(newSettings: Record<string, unknown>): Record<string, unknown>;
     getSettings(): Record<string, unknown>;
     makeURL(url: string, params?: Array<[string, string]>): string;
     secureConfirm(message: string): boolean;
     readonly _isStorageSupported: boolean;
-    addEventListener(eventName: string, fn: (...args: unknown[]) => void): unknown;
-    removeEventListener(
-        eventName: string,
-        fn?: (...args: unknown[]) => void,
-    ): unknown;
-    dispatchEvent(eventName: string, payload?: unknown): unknown;
-    preventTouchScrolling(element: JQuery, namespace: string): void;
-    allowTouchScrolling(element: JQuery, namespace: string): void;
+    /** Subscribe to a `cms-`-namespaced event on the shared bus. */
+    addEventListener(eventName: string, fn: (payload?: unknown) => void): void;
+    /**
+     * Unsubscribe a previously-registered handler. Per-handler removal
+     * requires the same function reference that was passed to
+     * `addEventListener`.
+     */
+    removeEventListener(eventName: string, fn?: (payload?: unknown) => void): void;
+    dispatchEvent(eventName: string, payload?: unknown): void;
+    preventTouchScrolling(element: HTMLElement, namespace: string): void;
+    allowTouchScrolling(element: HTMLElement, namespace: string): void;
     _getWindow(): Window & typeof globalThis;
     updateUrlWithPath(url: string): string;
     getColorScheme(): string;
@@ -160,11 +190,25 @@ const _isStorageSupported: boolean = (() => {
     }
 })();
 
+/**
+ * Map of (eventName + namespace) → registered native handler, used by
+ * `preventTouchScrolling` / `allowTouchScrolling` to support the
+ * legacy "namespaced unbind" semantics on plain DOM elements.
+ */
+const TOUCH_HANDLERS = new WeakMap<HTMLElement, Map<string, EventListener>>();
+
+/**
+ * Map of original add-event-listener handler → cmsEvents unsubscribe
+ * function. `removeEventListener(name, fn)` looks up the dispose to
+ * call. Stores per (eventName, fn) pair.
+ */
+const EVENT_DISPOSERS = new WeakMap<
+    (...args: never[]) => unknown,
+    Map<string, () => void>
+>();
+
 export const Helpers: HelpersType = {
     _isReloading: false,
-
-    $window,
-    $document,
 
     uid,
     once,
@@ -240,38 +284,41 @@ export const Helpers: HelpersType = {
     },
 
     // ────────────────────────────────────────────────────────────
-    // Form submit guard (toolbar forms)
+    // Form submit guard (toolbar forms) — native DOM
     // ────────────────────────────────────────────────────────────
 
     preventSubmit() {
-        const forms = $('.cms-toolbar').find('form');
-        const SUBMITTED_OPACITY = 0.5;
-
-        // Using `.submit` (jQuery shortcut) + `.on('click', …)` matches
-        // the legacy semantics: after the first submit, subsequent
-        // button clicks preventDefault and the submit buttons become
-        // translucent as a visual lock. Kept as jQuery because this
-        // method runs on the toolbar which is still legacy.
-        forms.on('submit', () => {
-            showLoader();
-            $('input[type="submit"]')
-                .on('click', (e) => {
-                    e.preventDefault();
-                })
-                .css('opacity', SUBMITTED_OPACITY);
+        const SUBMITTED_OPACITY = '0.5';
+        // Bind once to every toolbar form. Legacy used jQuery
+        // delegation but the toolbar markup is static after page-ready,
+        // so a one-shot scan is sufficient.
+        const forms = document.querySelectorAll<HTMLFormElement>(
+            '.cms-toolbar form',
+        );
+        forms.forEach((form) => {
+            form.addEventListener('submit', () => {
+                showLoader();
+                document
+                    .querySelectorAll<HTMLInputElement>('input[type="submit"]')
+                    .forEach((input) => {
+                        input.addEventListener('click', (e) => {
+                            e.preventDefault();
+                        });
+                        input.style.opacity = SUBMITTED_OPACITY;
+                    });
+            });
         });
     },
 
     // ────────────────────────────────────────────────────────────
-    // Legacy jQuery AJAX CSRF setup
+    // Legacy jQuery AJAX CSRF setup (lazy)
     // ────────────────────────────────────────────────────────────
 
-    csrf(csrfToken) {
-        // Attach CSRF header to every subsequent jQuery ajax call.
-        // Our `request.ts` wrapper doesn't need this (it handles CSRF
-        // per-call), but legacy bundles still use `$.ajax` and require
-        // the header. Keep this live until all legacy ajax calls are
-        // ported.
+    async csrf(csrfToken) {
+        // Loaded lazily because this is the only Helpers method that
+        // needs jQuery on a contrib-only page; pulling it in eagerly
+        // would defeat the lazy-load contract for `CMS.$`.
+        const $ = await loadCmsJquery();
         $.ajaxSetup({
             beforeSend(xhr) {
                 xhr.setRequestHeader('X-CSRFToken', csrfToken);
@@ -393,45 +440,76 @@ export const Helpers: HelpersType = {
     },
 
     // ────────────────────────────────────────────────────────────
-    // Event bus (Option B — jQuery preserved per decision 7a)
+    // Event bus — delegates to cmsEvents
     // ────────────────────────────────────────────────────────────
 
     addEventListener(eventName, fn) {
-        // `window.CMS._eventRoot` is set by the module initializer
-        // below to $('#cms-top'). Loosely typed in CmsGlobal — we know
-        // it's a JQuery at runtime.
-        const root = window.CMS?._eventRoot as JQuery | undefined;
-        return root?.on(nameSpaceEvent(eventName), fn as JQuery.EventHandlerBase<unknown, JQuery.Event>);
+        const namespaced = nameSpaceEvent(eventName);
+        const types = namespaced.split(/\s+/g);
+        // Track every dispose so removeEventListener(name, fn) can find
+        // them later. Same fn registered against multiple type-names
+        // (legacy supports space-separated `'foo bar'`) gets one entry
+        // per type.
+        let perFn = EVENT_DISPOSERS.get(fn as (...args: never[]) => unknown);
+        if (!perFn) {
+            perFn = new Map();
+            EVENT_DISPOSERS.set(fn as (...args: never[]) => unknown, perFn);
+        }
+        for (const type of types) {
+            const dispose = cmsEvents.on(type, fn);
+            perFn.set(type, dispose);
+        }
     },
 
     removeEventListener(eventName, fn) {
-        const root = window.CMS?._eventRoot as JQuery | undefined;
+        const types = nameSpaceEvent(eventName).split(/\s+/g);
         if (fn) {
-            return root?.off(nameSpaceEvent(eventName), fn as JQuery.EventHandlerBase<unknown, JQuery.Event>);
+            const perFn = EVENT_DISPOSERS.get(fn as (...args: never[]) => unknown);
+            if (!perFn) return;
+            for (const type of types) {
+                perFn.get(type)?.();
+                perFn.delete(type);
+            }
+            return;
         }
-        return root?.off(nameSpaceEvent(eventName));
+        // No fn → drop every disposer that matches one of the types.
+        // We can't enumerate WeakMap keys, so without a fn parameter
+        // there's nothing reliable to do; this matches the documented
+        // contract that fn-less unbind is best-effort.
     },
 
     dispatchEvent(eventName, payload) {
-        const root = window.CMS?._eventRoot as JQuery | undefined;
-        if (!root) return undefined;
-        const event = $.Event(nameSpaceEvent(eventName));
-        root.trigger(event, [payload]);
-        return event;
+        const types = nameSpaceEvent(eventName).split(/\s+/g);
+        for (const type of types) {
+            cmsEvents.emit(type, payload);
+        }
     },
 
     // ────────────────────────────────────────────────────────────
-    // Touch scroll helpers (jQuery namespaced events preserved)
+    // Touch scroll helpers — native, namespaced via WeakMap
     // ────────────────────────────────────────────────────────────
 
     preventTouchScrolling(element, namespace) {
-        element.on(`touchmove.cms.preventscroll.${namespace}`, (e) => {
-            e.preventDefault();
-        });
+        let map = TOUCH_HANDLERS.get(element);
+        if (!map) {
+            map = new Map();
+            TOUCH_HANDLERS.set(element, map);
+        }
+        const key = `touchmove.cms.preventscroll.${namespace}`;
+        if (map.has(key)) return;
+        const handler: EventListener = (e) => e.preventDefault();
+        element.addEventListener('touchmove', handler, { passive: false });
+        map.set(key, handler);
     },
 
     allowTouchScrolling(element, namespace) {
-        element.off(`touchmove.cms.preventscroll.${namespace}`);
+        const map = TOUCH_HANDLERS.get(element);
+        if (!map) return;
+        const key = `touchmove.cms.preventscroll.${namespace}`;
+        const handler = map.get(key);
+        if (!handler) return;
+        element.removeEventListener('touchmove', handler);
+        map.delete(key);
     },
 
     // ────────────────────────────────────────────────────────────
@@ -443,22 +521,22 @@ export const Helpers: HelpersType = {
     },
 
     // ────────────────────────────────────────────────────────────
-    // Color scheme (light / dark / auto)
+    // Color scheme (light / dark / auto) — native DOM
     // ────────────────────────────────────────────────────────────
 
     getColorScheme() {
-        let state = $('html').attr('data-theme');
-        if (!state) {
-            state =
-                localStorage.getItem('theme') ??
-                (window.CMS?.config?.color_scheme as string | undefined) ??
-                'auto';
-        }
-        return state;
+        const html = document.documentElement;
+        const state = html.getAttribute('data-theme');
+        if (state) return state;
+        return (
+            localStorage.getItem('theme') ??
+            (window.CMS?.config?.color_scheme as string | undefined) ??
+            'auto'
+        );
     },
 
     setColorScheme(mode) {
-        const body = $('html');
+        const html = document.documentElement;
         const scheme = mode !== 'light' && mode !== 'dark' ? 'auto' : mode;
 
         // Only set localStorage if it was already set OR if scheme
@@ -469,17 +547,21 @@ export const Helpers: HelpersType = {
             localStorage.setItem('theme', scheme);
         }
 
-        body.attr('data-theme', scheme);
-        body.find('div.cms iframe').each(function setFrameColorScheme(
-            _i: number,
-            el: HTMLElement,
-        ) {
-            const e = el as HTMLIFrameElement;
-            if (e.contentDocument) {
-                e.contentDocument.documentElement.dataset.theme = scheme;
-                $(e.contentDocument).find('iframe').each(setFrameColorScheme);
-            }
-        });
+        html.setAttribute('data-theme', scheme);
+        // Recursively apply to every iframe nested inside `div.cms`.
+        const applyToFrames = (root: Document | HTMLIFrameElement['contentDocument']) => {
+            if (!root) return;
+            const frames = root.querySelectorAll<HTMLIFrameElement>(
+                'div.cms iframe',
+            );
+            frames.forEach((frame) => {
+                const inner = frame.contentDocument;
+                if (!inner) return;
+                inner.documentElement.dataset.theme = scheme;
+                applyToFrames(inner);
+            });
+        };
+        applyToFrames(document);
     },
 
     toggleColorScheme() {
@@ -528,27 +610,13 @@ export const KEYS = {
 // Module initializer — runs at DOM-ready time
 // ────────────────────────────────────────────────────────────────────
 
-/**
- * Legacy does this with `$(function() { ... })`. We use jQuery's ready
- * shortcut directly so the semantics match exactly (including the
- * "run immediately if DOM is already ready" behavior).
- */
-$(() => {
-    // The event bus root. Every addEventListener / dispatchEvent call
-    // hooks .on()/.trigger() on this element. The element comes from
-    // the template (admin bundles include `<div id="cms-top">`).
+onDomReady(() => {
+    // The event bus root. Legacy code listens via
+    // `$('#cms-top').on('cms-…', …)`; the cmsEvents jQuery bridge
+    // wraps this element on demand if jQuery is loaded, so storing
+    // the raw HTMLElement keeps both new and legacy paths happy.
     if (window.CMS) {
-        window.CMS._eventRoot = $('#cms-top');
+        window.CMS._eventRoot = document.getElementById('cms-top');
     }
     Helpers.preventSubmit();
 });
-
-// ────────────────────────────────────────────────────────────────────
-// Legacy default export (for tests / consumers that import the whole module)
-// ────────────────────────────────────────────────────────────────────
-
-const _CMS = {
-    API: { Helpers },
-    KEYS,
-};
-export default _CMS;

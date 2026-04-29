@@ -5,52 +5,75 @@
  * bundle's job is to set up the `window.CMS` public API surface that
  * every other admin bundle depends on:
  *
- *   - `window.CMS.$` — jQuery (internal TS code MUST NOT import
- *     jquery directly; this file is the only permitted import site
- *     per CLAUDE.md decision 7).
+ *   - `window.CMS.$` — jQuery, lazy-loaded on first access. The
+ *     property starts as a getter that returns `Promise<JQueryStatic>`
+ *     from `loadCmsJquery()`; once the promise resolves the property
+ *     replaces itself with the resolved instance, so subsequent
+ *     accesses are synchronous (`CMS.$('selector')` works).
+ *
+ *     Strategy: jQuery is OPTIONAL. If nothing on the page reads
+ *     `CMS.$`, jQuery never loads. This bundle does NOT import
+ *     jquery directly — webpack code-splits the lazy `import('jquery')`
+ *     in `core/cms-jquery.ts` into `bundle.cms.jquery.min.js`.
+ *
  *   - `window.CMS.API.Helpers` — the grab-bag of cross-feature
- *     helpers ported in `modules/cms-base.ts`.
+ *     helpers ported in `modules/cms-base.ts`. None of those helpers
+ *     touch jQuery at module-load time; the only jQuery user
+ *     (`Helpers.csrf`) is async and lazy-loads jQuery itself.
+ *
  *   - `window.CMS.KEYS` — legacy key-code lookup.
  *
  * Merges into an existing `window.CMS` without clobbering — if
  * another bundle (e.g. admin.changeform) has already set
  * `window.CMS.API.changeLanguage`, it survives the merge.
  *
- * Also aliases `window.$` / `window.jQuery` if no other jQuery is
- * loaded on the page, so third-party code that expects `$` as a
- * page-level global finds it. This is load-bearing for legacy CMS
- * plugins and some admin templates.
+ * `window.$` / `window.jQuery` are NEVER assigned by this bundle.
+ * Third-party code that depends on those globals must bring its own
+ * jQuery (Django admin's `django.jQuery` is the canonical source).
+ *
+ * Webpack contract
+ * ────────────────
+ * `webpack.config.js` declares `library: { name: 'CMS', type: 'window',
+ * export: 'default' }` for this entry, so the default export below is
+ * what webpack assigns to `window.CMS` at the end of bundle execution.
+ * We also assign manually inside the if-block so the merge with any
+ * pre-existing `window.CMS` happens BEFORE the library mechanism runs;
+ * because the default export is the same object reference, webpack's
+ * assignment afterwards is idempotent.
  */
 
-import $ from 'jquery';
-
 import { Helpers, KEYS } from '../modules/cms-base';
+import { loadCmsJquery } from '../modules/core/cms-jquery';
 
-const CMS = {
-    $,
-    API: { Helpers },
-    KEYS,
-};
+// Reuse an existing `window.CMS` (created by an earlier-loaded bundle)
+// so we don't clobber API attachments like `CMS.API.changeLanguage`.
+const CMS: CmsGlobal = ((typeof window !== 'undefined' ? window.CMS : undefined) ?? {}) as CmsGlobal;
 
-// Merge into an existing window.CMS (created by an earlier-loaded
-// bundle, e.g. admin.changeform's pre-init stub) without clobbering.
-// Legacy uses `CMS.$.extend(window.CMS || {}, CMS)` for the same
-// semantics — deep-merge-into-existing-or-create. $.extend is the
-// right tool because it preserves references inside window.CMS.API
-// (like CMS.API.changeLanguage).
+CMS.API = { ...(CMS.API ?? {}), Helpers };
+(CMS as { KEYS?: typeof KEYS }).KEYS = KEYS;
+
+// Lazy `CMS.$` — only triggers a jQuery load if something reads it.
+// The first read returns the loadCmsJquery() promise; once it resolves,
+// the property replaces itself with the jQuery instance so later reads
+// are synchronous.
+Object.defineProperty(CMS, '$', {
+    configurable: true,
+    enumerable: true,
+    get() {
+        return loadCmsJquery().then((jq) => {
+            Object.defineProperty(CMS, '$', {
+                value: jq,
+                writable: true,
+                configurable: true,
+                enumerable: true,
+            });
+            return jq;
+        });
+    },
+});
+
 if (typeof window !== 'undefined') {
-    window.CMS = $.extend(window.CMS ?? {}, CMS) as CmsGlobal;
-}
-
-// Make sure jQuery is available on the page as `$` and `jQuery` IF
-// nothing else has claimed those names. Django admin's own
-// `jquery.init.js` releases them via `$.noConflict(true)` to a
-// namespaced `django.jQuery`, so after that script runs, bare `$` /
-// `jQuery` are free. Our assignment fills the gap, which is what
-// legacy plugins assume is available.
-if (typeof window !== 'undefined' && !window.jQuery) {
-    window.$ = $;
-    window.jQuery = $;
+    window.CMS = CMS;
 }
 
 export default CMS;

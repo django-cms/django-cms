@@ -149,10 +149,11 @@ export default class PageTree {
             this.loadTree();
         }
 
-        // CSRF for any future POST requests (phases 4b+)
-        if (config.csrf) {
-            Helpers.csrf(config.csrf);
-        }
+        // CSRF: pagetree's POSTs use the native `request.ts` wrapper,
+        // which reads the token per-call from the cookie. We
+        // intentionally do NOT call `Helpers.csrf()` here — that would
+        // lazy-load the jQuery chunk just to set up `$.ajaxSetup`,
+        // and nothing on the pagetree page makes jQuery ajax calls.
     }
 
     // ────────────────────────────────────────────────────────────
