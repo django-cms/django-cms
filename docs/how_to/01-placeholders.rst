@@ -32,13 +32,105 @@ one or more placeholders.
     ``PlaceholderField("slot_name")`` needs to be changed into a
     ``PlaceholderRelationField`` (available since django CMS 4.x).
 
-Get started
------------
+Two ways to render model placeholders
+-------------------------------------
 
-You need to define a :class:`~cms.models.fields.PlaceholderRelationField` on the model
-you would like to use:
+A quick glossary:
 
-.. code-block::
+- A **slot** is the string name that identifies a placeholder in a template
+  (for example ``"content"``). Slot names are also used by :setting:`CMS_PLACEHOLDER_CONF`
+  to configure which plugins can be inserted.
+- A **placeholder** is the per-instance container (a
+  :class:`~cms.models.placeholdermodel.Placeholder` object) that holds the plugins for a
+  given slot on a given model instance.
+- The **structure board** is django CMS's frontend editor view where editors add, remove
+  and reorder plugins.
+
+django CMS offers two template tags for placeholders on your own models:
+
+- :ttag:`placeholder` — *declares and renders* in one step. The same template is both what
+  your view renders and what django CMS scans to discover slot names for the structure
+  board.
+- :ttag:`render_placeholder` — *only renders* a placeholder instance that the model exposes
+  as a property (typically via :func:`~cms.utils.placeholder.get_placeholder_from_slot`).
+  Because this tag does not declare its slot, the model also needs a separate
+  declaration-only template for the structure board to discover the slots.
+
+**Prefer Approach 1 for new models.** Use Approach 2 only when you're integrating with
+code that already uses :ttag:`render_placeholder`, or when you want each placeholder
+exposed as a named model property.
+
+Both approaches share the same :class:`~cms.models.fields.PlaceholderRelationField` and the
+toolbar integration described in :ref:`toolbar_object` below.
+
+
+Approach 1: Using ``{% placeholder %}``
+---------------------------------------
+
+Step 1 — Add a :class:`~cms.models.fields.PlaceholderRelationField` and a
+``get_template()`` method pointing to the template you'll create in Step 2. This is the
+template your view will render and that django CMS will scan for slot declarations:
+
+.. code-block:: python
+
+    from django.db import models
+    from cms.models.fields import PlaceholderRelationField
+
+    class MyModel(models.Model):
+        # your fields
+        placeholders = PlaceholderRelationField()
+
+        def get_template(self):
+            return "my_app/my_model_template.html"
+
+Step 2 — Create that template. It declares the slots your model owns with the
+:ttag:`placeholder` tag, alongside any other markup you need — the same tags are used both
+to declare the slots (so django CMS can list them in the structure board) and to render
+their content:
+
+.. code-block:: html+django
+
+    {# templates/my_app/my_model_template.html #}
+    {% load cms_tags %}
+    <h1>{{ object.title }}</h1>
+    <main>
+        {% placeholder "content" %}
+    </main>
+    <aside>
+        {% placeholder "sidebar" %}
+    </aside>
+
+Step 3 — In your view, register the model instance on the toolbar (see
+:ref:`toolbar_object`) and render the same template. Setting the toolbar object is what
+tells the :ttag:`placeholder` tag which object's placeholders to resolve against:
+
+.. code-block:: python
+
+    from django.shortcuts import get_object_or_404, render
+
+    def my_model_detail(request, id):
+        obj = get_object_or_404(MyModel, id=id)
+        request.toolbar.set_object(obj)
+        return render(request, "my_app/my_model_template.html", {"object": obj})
+
+Load the view with the frontend editor active to add plugins to each slot — see
+*Adding content to a placeholder* below.
+
+
+Approach 2: Using ``{% render_placeholder %}``
+----------------------------------------------
+
+In this approach the model exposes a :class:`~cms.models.placeholdermodel.Placeholder`
+instance per slot, and the user-facing template passes that instance to
+:ttag:`render_placeholder`. Because :ttag:`render_placeholder` does not declare its slot,
+the model also needs a **separate declaration-only template**. Unlike Approach 1, the
+template registered with ``get_template()`` is *not* the one your view renders.
+
+Step 1 — Add the :class:`~cms.models.fields.PlaceholderRelationField`, a cached-property
+accessor for each slot, and a ``get_template()`` pointing to the declaration-only template
+you'll create in Step 2:
+
+.. code-block:: python
 
     from django.db import models
     from django.utils.functional import cached_property
@@ -49,89 +141,79 @@ you would like to use:
         # your fields
         placeholders = PlaceholderRelationField()
 
-        @cached_property
-        def my_placeholder(self):
-            return get_placeholder_from_slot(self.placeholders, "slot_name")
-
-        # your methods
-
-The :class:`~cms.models.fields.PlaceholderRelationField` can reference more than one
-field. It is customary to add (cached) properties to the model referring to specific
-placeholders. The utility function
-:func:`~cms.utils.placeholder.get_placeholder_from_slot` retrieves a placeholder object
-based on its slot name.
-
-The ``slot`` is used in templates, to determine where the placeholder's plugins should
-appear in the page, and in the placeholder configuration :setting:`CMS_PLACEHOLDER_CONF`,
-which determines which plugins may be inserted into this placeholder.
-
-.. note::
-
-    If you add a PlaceholderRelationField to an existing model, you'll be able to see
-    the placeholder in the frontend editor only after saving the relevant instance.
-
-
-I18N Placeholders
-~~~~~~~~~~~~~~~~~
-
-Placeholders and plugins within them support multiple languages out of the box.
-
-If you need other fields translated as well, django CMS has support for django-hvad_. If
-you use a ``TranslatableModel`` model be sure to **not** include the placeholder fields
-amongst the translated fields:
-
-.. code-block::
-
-    class MultilingualExample1(TranslatableModel):
-        translations = TranslatedFields(
-            title=models.CharField('title', max_length=255),
-            description=models.CharField('description', max_length=255),
-        )
-        placeholders = PlaceholderRelationField()
+        def get_template(self):
+            return "my_app/my_model_structure.html"
 
         @cached_property
-        def my_placeholder(self):
-            return get_placeholder_from_slot(self.placeholders, "slot_name")
+        def content_placeholder(self):
+            return get_placeholder_from_slot(self.placeholders, "content")
 
-        def __str__(self):
-            return self.title
+        @cached_property
+        def sidebar_placeholder(self):
+            return get_placeholder_from_slot(self.placeholders, "sidebar")
 
-Templates
-~~~~~~~~~
+:func:`~cms.utils.placeholder.get_placeholder_from_slot` retrieves — or, if needed,
+creates — the placeholder object for the given slot name. Add one cached property per slot.
 
-To render the placeholder in a template you use the :ttag:`render_placeholder` tag from
-the :mod:`~cms.templatetags.cms_tags` template tag library:
+Step 2 — Create the declaration-only template. This file is never rendered to the visitor;
+django CMS only scans it for :ttag:`placeholder` tags to discover which slots the model
+owns. Other markup in it is ignored:
 
 .. code-block:: html+django
 
+    {# templates/my_app/my_model_structure.html #}
     {% load cms_tags %}
+    {% placeholder "content" %}
+    {% placeholder "sidebar" %}
 
-    {% render_placeholder mymodel_instance.my_placeholder "640" %}
+Step 3 — Create the user-facing template. Pass each placeholder instance from Step 1 to
+:ttag:`render_placeholder`:
 
-The :ttag:`render_placeholder` tag takes the following parameters:
+.. code-block:: html+django
 
-- :class:`~cms.models.fields.PlaceholderField` instance
-- ``width`` parameter for context sensitive plugins (optional)
-- ``language`` keyword plus ``language-code`` string to render content in the specified
-  language (optional)
+    {# templates/my_app/my_model_template.html #}
+    {% load cms_tags %}
+    <h1>{{ object.title }}</h1>
+    <main>
+        {% render_placeholder object.content_placeholder %}
+    </main>
+    <aside>
+        {% render_placeholder object.sidebar_placeholder %}
+    </aside>
 
-The view in which you render your placeholder field must return the :class:`request
-<django.http.HttpRequest>` object in the context. The frontend editing and preview
-endpoints require a view to render an object. This method takes the request and the
-object as parameter (see example below: ``render_my_model``).
+See :ttag:`render_placeholder` for optional parameters (``width``, ``language``, ``as``).
+
+Step 4 — In your view, register the model instance on the toolbar (see
+:ref:`toolbar_object`) and render the user-facing template:
+
+.. code-block:: python
+
+    from django.shortcuts import get_object_or_404, render
+
+    def my_model_detail(request, id):
+        obj = get_object_or_404(MyModel, id=id)
+        request.toolbar.set_object(obj)
+        return render(request, "my_app/my_model_template.html", {"object": obj})
+
+Load the view with the frontend editor active to add plugins to each slot — see
+*Adding content to a placeholder* below.
+
+
+.. _toolbar_object:
 
 Setting and getting the placeholder-enabled object from the toolbar
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
 
-The toolbar provides two important methods for managing the object associated with placeholder editing.
-These methods are essential for enabling the toolbar's Edit and Preview buttons when working
-with models that contain placeholders.
+The toolbar provides two methods for managing the object associated with placeholder
+editing. These are essential for enabling the toolbar's Edit and Preview buttons, and — in
+Approach 1 — for resolving :ttag:`placeholder` tags against your model.
 
 **set_object(obj)**
     Associates a Django model instance with the toolbar. This method only sets the object if
     one hasn't already been set. The object is typically a model instance that contains
     placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any
-    other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
+    other model that supports editable placeholders through a
+    :class:`~cms.models.fields.PlaceholderRelationField`.
 
     The associated object is used by other toolbar methods to generate appropriate URLs for
     editing, preview, and structure modes.
@@ -142,7 +224,7 @@ with models that contain placeholders.
     ``set_object()``.
 
 Usage in Views
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 If the object has a user-facing view it typically is identical to the preview and
 editing endpoints, but has to get the object from the URL (e.g., by its primary key).
@@ -201,7 +283,7 @@ You can also retrieve the object from the toolbar in your views using the ``get_
             return MyModelDetailView.as_view()(request, pk=my_model.pk)
 
 Usage in Templates
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 You can also access the toolbar object directly in templates:
 
@@ -293,8 +375,8 @@ Adding content to a placeholder
 -------------------------------
 
 Placeholders can be edited from the frontend by visiting the page displaying your model
-(where you put the :ttag:`render_placeholder` tag), then appending ``?toolbar_on`` to the
-page's URL.
+(where you put the :ttag:`placeholder` or :ttag:`render_placeholder` tag), then appending
+``?toolbar_on`` to the page's URL.
 
 This will make the frontend editor top banner appear (and if necessary will require you
 to login).
@@ -343,4 +425,4 @@ For example, if there is a ``UserProfile`` model that contains a
                 return True
         return False
 
-.. _django-hvad: https://github.com/kristianoellegaard/django-hvad
+.. _django-parler: https://github.com/django-parler/django-parler
