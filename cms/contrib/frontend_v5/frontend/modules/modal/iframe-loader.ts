@@ -244,7 +244,11 @@ function handleIframeLoad(
     }
 
     if (ctx.modal.classList.contains('cms-modal-open')) {
-        ctx.modal.style.display = '';
+        // Same `display: none` CSS rule trap as `.cms-structure` and
+        // `.cms-submenu-dropdown-settings`: setting `''` would let
+        // the rule win and hide the modal we just opened. Mirror
+        // jQuery `.show()` and force `'block'`.
+        ctx.modal.style.display = 'block';
     }
     iframe.style.display = '';
 

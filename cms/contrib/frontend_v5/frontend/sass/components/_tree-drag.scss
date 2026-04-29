@@ -1,0 +1,78 @@
+/*
+ * Shared visuals for the TreeDrag controller
+ * (frontend/modules/tree/drag.ts).
+ *
+ * Used by BOTH pagetree and the structureboard plugin tree so the two
+ * drag surfaces look identical:
+ *   - drop target row highlight       → `.cms-tree-drop-target`
+ *   - drop line marker with caps      → `.cms-tree-drop-marker`
+ *   - drag clone outline / shadow     → `.cms-tree-drag-clone`
+ *   - dimmed source row in pagetree   → `.cms-tree-dragging-item`
+ *
+ * The structureboard's source-class is `.cms-draggable-is-dragging`
+ * (legacy), styled by the existing `_structureboard.scss` — no rule
+ * needed here for that.
+ *
+ * Imported from:
+ *   - components/pagetree/_tree-new-dom.scss  (pagetree bundle)
+ *   - cms.toolbar.scss                        (toolbar bundle, served
+ *                                              alongside the structureboard)
+ *
+ * Keep selectors un-scoped so they apply on either surface. Use
+ * !important on the row background only — pagetree's striped row colours
+ * and the structureboard's column backgrounds otherwise win on
+ * specificity.
+ */
+
+.cms-tree-drop-target {
+    background: color-mix(in srgb, $color-primary 15%, $white) !important;
+    outline: 2px solid $color-primary;
+    outline-offset: -2px;
+}
+
+// Pagetree only — the structureboard uses `.cms-draggable-is-dragging`
+// which is already styled in the legacy `_structureboard.scss`. Kept
+// here (rather than back inside _tree-new-dom.scss) so both source-row
+// styles live next to each other for future maintainers.
+.cms-pagetree-list li.cms-tree-dragging-item {
+    opacity: 0.35;
+    filter: saturate(0.4);
+    pointer-events: none;
+}
+
+// Drop line marker — sibling drops.
+//
+// JS sets position/left/top/width/height inline; rules here paint the
+// line and triangle end caps.
+.cms-tree-drop-marker {
+    background: $color-primary;
+    border-radius: 2px;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 0;
+        height: 0;
+        border-block: 7px solid transparent;
+        transform: translateY(-50%);
+    }
+    &::before {
+        inset-inline-start: -1px;
+        border-inline-start: 10px solid $color-primary;
+    }
+    &::after {
+        inset-inline-end: -1px;
+        border-inline-end: 10px solid $color-primary;
+    }
+}
+
+// Drag clone — pagetree style. The structureboard's clone uses the
+// legacy `.cms-draggable-is-dragging` styling so the rule below only
+// fires on pagetree clones.
+.cms-tree-drag-clone {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    outline: 2px solid $color-primary;
+    outline-offset: -2px;
+}

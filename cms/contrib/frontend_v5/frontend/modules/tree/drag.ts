@@ -101,6 +101,26 @@ export interface TreeDragOptions {
      * module before onDrop fires.
      */
     onDrop: (result: TreeDropResult) => void | Promise<void>;
+
+    /**
+     * Customise the drag clone. Receives the dragged item; should
+     * return an element to attach to `host`. The default implementation
+     * wraps the cloned `rowSelector` element in a
+     * `<ul class="cms-pagetree-list cms-tree-drag-clone">` shell — the
+     * pagetree's CSS scoping requires it. The structureboard adapter
+     * passes its own renderer because legacy structureboard SCSS
+     * scopes rules differently and a different shell is needed.
+     */
+    cloneRenderer?: (item: HTMLElement) => HTMLElement;
+
+    /**
+     * Class added to the dragged source `<li>` for the lifetime of the
+     * drag. Defaults to `cms-tree-dragging-item` (matches pagetree
+     * SCSS). The structureboard adapter passes `cms-draggable-is-
+     * dragging` so the legacy structureboard SCSS picks up the source
+     * styling without any new CSS.
+     */
+    sourceClass?: string;
 }
 
 /** What the caller receives when a drop is committed. */
@@ -324,8 +344,14 @@ export default class TreeDrag {
         for (const c of this.opts.containers) {
             c.classList.add('cms-pagetree-dragging');
         }
-        // Mark the source item so CSS can gray it out in place.
-        this.state.item.classList.add('cms-tree-dragging-item');
+        // Mark the source item so CSS can style it in place. Default
+        // `cms-tree-dragging-item` matches the pagetree SCSS; the
+        // structureboard adapter overrides to the legacy
+        // `cms-draggable-is-dragging` class which the legacy SCSS
+        // already styles.
+        this.state.item.classList.add(
+            this.opts.sourceClass ?? 'cms-tree-dragging-item',
+        );
         document.body.style.userSelect = 'none';
     }
 
@@ -339,7 +365,9 @@ export default class TreeDrag {
         for (const c of this.opts.containers) {
             c.classList.remove('cms-pagetree-dragging');
         }
-        this.state.item.classList.remove('cms-tree-dragging-item');
+        this.state.item.classList.remove(
+            this.opts.sourceClass ?? 'cms-tree-dragging-item',
+        );
         document.body.style.userSelect = '';
         this.state = null;
     }
@@ -349,6 +377,12 @@ export default class TreeDrag {
     // ────────────────────────────────────────────────────────────
 
     private buildClone(item: HTMLElement): HTMLElement {
+        // If the caller provided a custom renderer (structureboard does),
+        // use it. The renderer is responsible for setting position/
+        // z-index/etc inline. Pagetree falls through to the default.
+        if (this.opts.cloneRenderer) {
+            return this.opts.cloneRenderer(item);
+        }
         // Clone the visible row inside a minimal <ul class="cms-pagetree
         // -list"><li role="treeitem"> shell, so the scoped selectors
         // in the pagetree CSS (most rules are rooted at `.cms-pagetree
@@ -616,7 +650,7 @@ export default class TreeDrag {
         //   Left = (depth - 1) * depthPx - triangle cap width
         //   Top  = below visualRef (line-after) or above (line-before)
         //
-        // Must match the CSS triangle metrics in _tree-new-dom.scss:
+        // Must match the CSS triangle metrics in components/_tree-drag.scss:
         // the triangles use a 10px horizontal border, so we pull the
         // line start back by that so the leading cap sits in the
         // indent gutter. Line height is 4px.
@@ -697,3 +731,4 @@ export default class TreeDrag {
         return document.scrollingElement as HTMLElement | null;
     }
 }
+

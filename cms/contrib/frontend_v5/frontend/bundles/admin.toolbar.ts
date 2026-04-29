@@ -11,7 +11,7 @@
  *      Messages, Tooltip, Toolbar, Sideframe} in the same order as
  *      legacy, then call Plugin tree initialisation.
  *
- * `_initializeTree` is the canonical add path for new Plugin
+ * `initializeTree` is the canonical add path for new Plugin
  * instances — see `frontend/modules/plugins/tree.ts`.
  *
  * IMPORTANT — drop-in contract
@@ -59,17 +59,18 @@ interface ToolbarBundleGlobals {
     StructureBoard: typeof StructureBoard;
     Toolbar: typeof Toolbar;
     Tooltip: typeof Tooltip;
+    KEYS?: typeof KEYS;
+    keyboard?: typeof keyboard;
+    trap?: typeof trap;
+    untrap?: typeof untrap;
+    API?: Record<string, unknown>;
+    _plugins?: unknown[];
 }
 
 const cms = (window.CMS = window.CMS ?? {}) as Record<string, unknown> &
-    ToolbarBundleGlobals & {
-        API?: Record<string, unknown>;
-        KEYS?: typeof KEYS;
-        keyboard?: typeof keyboard;
-        _plugins?: unknown[];
-    };
+    ToolbarBundleGlobals;
 
-cms._plugins = (cms._plugins ?? []) as unknown[];
+cms._plugins = cms._plugins ?? [];
 
 cms.Messages = Messages;
 cms.ChangeTracker = ChangeTracker;
@@ -88,16 +89,22 @@ cms.KEYS = KEYS;
 cms.keyboard = keyboard;
 
 // Trap/untrap exposed for legacy plugins that still call them directly.
-(cms as unknown as { trap?: typeof trap; untrap?: typeof untrap }).trap = trap;
-(
-    cms as unknown as { trap?: typeof trap; untrap?: typeof untrap }
-).untrap = untrap;
+cms.trap = trap;
+cms.untrap = untrap;
 
 // ────────────────────────────────────────────────────────────────────
 // Boot — instantiate APIs in the same order as legacy toolbar.js
 // ────────────────────────────────────────────────────────────────────
 
+let booted = false;
+
 function boot(): void {
+    // HMR or stray re-imports can re-evaluate the module — skipping
+    // here prevents double-instantiation of API.{Toolbar,…} and the
+    // duplicate DOM listener registrations that follow.
+    if (booted) return;
+    booted = true;
+
     const cmsAny = cms as Record<string, unknown> & {
         config?: Record<string, unknown>;
         settings?: Record<string, unknown>;
@@ -172,6 +179,98 @@ function safeInstantiate<T>(name: string, factory: () => T): T | undefined {
         return undefined;
     }
 }
+
+/**
+ * Inject `cms.toolbar.css` next to whichever script loaded us. Drop-in
+ * mode means the legacy bundle path `…/cms/js/dist/<version>/bundle.
+ * toolbar.min.js` hosts us; the CSS sibling lives at `…/cms/css/<
+ * version>/cms.toolbar.css`.
+ *
+ * URL resolution (most precise first):
+ *   1. `document.currentScript.src` — the exact script that's running
+ *      this code right now, even when multiple `bundle.toolbar*.js`
+ *      tags coexist (e.g. legacy + contrib during deployment).
+ *   2. `__webpack_public_path__` — the path webpack hard-codes at
+ *      build time (`/static/cms/js/dist/<CMS_VERSION>/`). Always
+ *      defined, so this is the reliable fallback even on pages that
+ *      load the bundle dynamically (no matching `<script>`).
+ *   3. As a last resort, scan `<script[src]>` for a matching tag.
+ *
+ * Idempotent — early-out on `data-cms-toolbar-css` to survive double-
+ * load (the toolbar bundle is included on most admin pages).
+ */
+function ensureToolbarStylesheet(): void {
+    if (document.querySelector('link[data-cms-toolbar-css]')) return;
+
+    const cssHref = resolveToolbarCssHref();
+    if (!cssHref) {
+        // eslint-disable-next-line no-console
+        console.warn(
+            '[cms] Could not resolve cms.toolbar.css URL — drag visuals on ' +
+                'the structureboard may not render.',
+        );
+        return;
+    }
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = cssHref;
+    link.dataset.cmsToolbarCss = '';
+    link.addEventListener('error', () => {
+        // eslint-disable-next-line no-console
+        console.warn(
+            `[cms] Failed to load ${cssHref} — drag visuals on the ` +
+                'structureboard may not render. Check STATIC_URL and the ' +
+                "contrib app's static files.",
+        );
+    });
+    document.head.appendChild(link);
+}
+
+const TOOLBAR_BUNDLE_RE = /\/cms\/js\/dist\/([^/]+)\/bundle\.toolbar(?:\.min)?\.js/;
+
+function resolveToolbarCssHref(): string | null {
+    // (1) document.currentScript — only set during initial classic-script
+    // execution (i.e. exactly when this module runs). For module/async
+    // loads it's null, so we fall through.
+    const current = document.currentScript as HTMLScriptElement | null;
+    if (current?.src && TOOLBAR_BUNDLE_RE.test(current.src)) {
+        return toolbarCssFromScriptSrc(current.src);
+    }
+
+    // (2) __webpack_public_path__ — webpack inlines the configured
+    // publicPath at build time. Format: `/static/cms/js/dist/<v>/`.
+    // The `declare` keeps this typesafe without polluting the global
+    // scope; webpack rewrites the symbol on bundle.
+    const publicPath: string | undefined =
+        typeof __webpack_public_path__ === 'string'
+            ? __webpack_public_path__
+            : undefined;
+    if (publicPath) {
+        const match = /\/cms\/js\/dist\/([^/]+)\/?$/.exec(publicPath);
+        if (match) return `${publicPath.replace(/\/cms\/js\/dist\/.*$/, '')}/cms/css/${match[1]}/cms.toolbar.css`;
+    }
+
+    // (3) Last-resort scan. Picks the first matching script — only
+    // hit if (1) and (2) both miss, which in practice means a hand-
+    // rolled embed.
+    for (const s of Array.from(document.querySelectorAll('script[src]'))) {
+        const src = (s as HTMLScriptElement).src;
+        if (TOOLBAR_BUNDLE_RE.test(src)) return toolbarCssFromScriptSrc(src);
+    }
+    return null;
+}
+
+function toolbarCssFromScriptSrc(src: string): string {
+    return src.replace(
+        /\/cms\/js\/dist\/([^/]+)\/bundle\.toolbar(?:\.min)?\.js.*$/,
+        '/cms/css/$1/cms.toolbar.css',
+    );
+}
+
+declare const __webpack_public_path__: string;
+
+ensureToolbarStylesheet();
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot, { once: true });

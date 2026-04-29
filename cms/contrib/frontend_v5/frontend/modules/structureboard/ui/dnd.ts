@@ -58,6 +58,44 @@ import {
 } from '../parsers/ids';
 
 /**
+ * Build the drag clone for the structureboard. Cloning the
+ * `.cms-draggable` directly (rather than wrapping in a `<ul>` shell
+ * like the pagetree does) keeps the clone styled by the existing
+ * legacy `_structureboard.scss` rules — `.cms-structure
+ * .cms-draggable .cms-dragitem`, the `cms-draggable-is-dragging`
+ * orange highlight, and the `ui-sortable-helper.cms-draggable
+ * .cms-submenu-btn { display: none }` rule that hides the submenu
+ * trigger.
+ *
+ * Children list (`.cms-draggables`) is stripped — the clone shows
+ * only the row of the plugin being dragged, matching the pagetree
+ * UX where the floating clone is just the dragged page row, not its
+ * subtree.
+ */
+function buildStructureBoardClone(item: HTMLElement): HTMLElement {
+    const rect = item.getBoundingClientRect();
+    const clone = item.cloneNode(true) as HTMLElement;
+    // Drop nested children so the floating clone is just the
+    // dragged item's row, like the pagetree.
+    clone
+        .querySelectorAll<HTMLElement>('.cms-draggables')
+        .forEach((el) => el.remove());
+    // Pull legacy classes the structureboard SCSS already styles. We
+    // keep the source's existing class list (e.g. `cms-draggable-X`)
+    // and add the dragging + helper hooks.
+    clone.classList.add('cms-draggable-is-dragging', 'ui-sortable-helper');
+    // Disable interaction on the clone (it's a visual proxy only).
+    clone.style.cssText = [
+        'position: fixed',
+        'pointer-events: none',
+        'z-index: 9999',
+        'opacity: 0.85',
+        `width: ${rect.width}px`,
+    ].join(';');
+    return clone;
+}
+
+/**
  * Selector for participating drop containers. Mirrors the legacy
  * `ui.sortables` filter — clipboard's `.cms-draggables` is included
  * (so users can drag FROM clipboard); only `.cms-drag-disabled`
@@ -325,6 +363,14 @@ export function setupStructureBoardDnd(
             canDrag,
             canDropAsChild,
             onDrop,
+            // Use legacy structureboard SCSS classes for the visual
+            // feedback — the source item flips to
+            // `.cms-draggable-is-dragging` (orange highlight from
+            // `_structureboard.scss`) and the clone wears
+            // `cms-draggable-is-dragging ui-sortable-helper` so the
+            // legacy "hide submenu/children on the clone" rules apply.
+            sourceClass: 'cms-draggable-is-dragging',
+            cloneRenderer: buildStructureBoardClone,
         };
         if (opts.host) treeOpts.host = opts.host;
         drag = new TreeDrag(treeOpts);

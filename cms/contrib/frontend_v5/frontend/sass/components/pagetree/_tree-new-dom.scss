@@ -296,82 +296,11 @@
 }
 
 // ────────────────────────────────────────────────────────────
-// Drop target (middle-50% of a row during drag)
+// Drag visuals (drop target / line marker / clone / dragging source)
+// live in the shared `components/_tree-drag.scss` partial — see the
+// import in `components/pagetree/_all.scss`. They are reused by the
+// structureboard via the toolbar bundle.
 // ────────────────────────────────────────────────────────────
-.cms-tree-row.cms-tree-drop-target {
-    background: color-mix(in srgb, $color-primary 15%, $white) !important;
-    outline: 2px solid $color-primary;
-    outline-offset: -2px;
-}
-
-// ────────────────────────────────────────────────────────────
-// Dragging source — gray-out the item being moved and its subtree
-// ────────────────────────────────────────────────────────────
-//
-// The TreeDrag controller adds `.cms-tree-dragging-item` to the
-// source <li> for the duration of the drag. The whole subtree is
-// dimmed so the user can still see WHERE the item came from while
-// making it obvious it's not part of the tree's current state.
-.cms-pagetree-list li.cms-tree-dragging-item {
-    opacity: 0.35;
-    filter: saturate(0.4);
-    pointer-events: none;
-}
-
-// ────────────────────────────────────────────────────────────
-// Drop line marker (sibling drops)
-// ────────────────────────────────────────────────────────────
-//
-// The TreeDrag controller (frontend/modules/tree/drag.ts) renders a
-// single `.cms-tree-drop-marker` element during drag. Its vertical
-// position and horizontal left-offset are set inline by the JS —
-// the styles here only paint the line and its triangle end caps.
-//
-// Positioning invariants:
-//   - position: absolute (inside the container, which TreeDrag sets
-//     as the offset parent via the existing tree root styling)
-//   - left: inline px offset = (depth - 1) * depthPx
-//   - right: 0
-//   - top:  inline px offset within the container scroll space
-//   - height: 2px
-.cms-tree-drop-marker {
-    background: $color-primary;
-    border-radius: 2px;
-
-    &::before,
-    &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        width: 0;
-        height: 0;
-        border-block: 7px solid transparent;
-        transform: translateY(-50%);
-    }
-    &::before {
-        inset-inline-start: -1px;
-        border-inline-start: 10px solid $color-primary;
-    }
-    &::after {
-        inset-inline-end: -1px;
-        border-inline-end: 10px solid $color-primary;
-    }
-}
-
-// ────────────────────────────────────────────────────────────
-// Drag clone — the element that follows the cursor
-// ────────────────────────────────────────────────────────────
-//
-// TreeDrag clones the dragged row inside a `<ul class="cms-pagetree-
-// list cms-tree-drag-clone">` shell so the regular row styles
-// cascade to the clone. The JS sets the inline fixed-position
-// left/top + width. Only a drop-shadow + outline here to signal
-// "this is what you're dragging".
-.cms-tree-drag-clone {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-    outline: 2px solid $color-primary;
-    outline-offset: -2px;
-}
 
 // ────────────────────────────────────────────────────────────
 // Filtered mode — flat match list, no toggles, no handles
