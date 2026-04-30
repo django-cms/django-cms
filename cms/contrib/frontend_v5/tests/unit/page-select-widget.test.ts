@@ -66,7 +66,7 @@ describe('PageSelectWidget', () => {
         it('hides the add button', () => {
             new PageSelectWidget({ name: 'page' });
             const addBtn = document.getElementById('add_id_page') as HTMLElement;
-            expect(addBtn.style.display).toBe('none');
+            expect(addBtn.classList.contains('cms-hidden')).toBe(true);
         });
 
         it('is a no-op when any of the three selects is missing', () => {

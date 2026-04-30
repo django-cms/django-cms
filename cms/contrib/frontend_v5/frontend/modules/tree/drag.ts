@@ -634,14 +634,14 @@ export default class TreeDrag {
         this.clearDropTargetHighlight();
 
         if (!p) {
-            this.state.marker.style.display = 'none';
+            this.state.marker.classList.remove('cms-tree-drop-marker--active');
             return;
         }
 
         if (p.visualMode === 'highlight') {
             // Row-highlight drop (cursor in middle 50% of a row).
             // The marker div is not used; instead a class on the row.
-            this.state.marker.style.display = 'none';
+            this.state.marker.classList.remove('cms-tree-drop-marker--active');
             p.visualRef.classList.add('cms-tree-drop-target');
             return;
         }
@@ -677,7 +677,7 @@ export default class TreeDrag {
         const top = baseY - hostRect.top - LINE_HEIGHT_PX / 2;
 
         const m = this.state.marker;
-        m.style.display = 'block';
+        m.classList.add('cms-tree-drop-marker--active');
         m.style.left = `${leftOffset}px`;
         m.style.width = `${treeRect.width - (p.depth - 1) * this.opts.depthPx + TRIANGLE_PX * 2}px`;
         m.style.right = '';

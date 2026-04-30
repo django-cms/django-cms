@@ -101,9 +101,9 @@ function setupSingleNav(
         open = false;
         cmdPressed = false;
         for (const li of lists) li.classList.remove(HOVER_CLASS);
-        nav.querySelectorAll<HTMLElement>('ul ul').forEach((ul) => {
-            ul.style.display = 'none';
-        });
+        // The legacy `.cms-toolbar-item-navigation li ul { display: none }`
+        // rule already hides every submenu once its parent loses HOVER_CLASS,
+        // so we don't need to clear inline display here.
         nav.querySelectorAll<HTMLLIElement>(':scope > li').forEach(
             (topLi) => {
                 if (topMouseEnterHandlers.has(topLi)) {
@@ -220,9 +220,8 @@ function setupSingleNav(
         }
 
         li.classList.add(HOVER_CLASS);
-        // Show direct-child <ul> (submenu)
-        const directChildUl = li.querySelector<HTMLUListElement>(':scope > ul');
-        if (directChildUl) directChildUl.style.display = '';
+        // The HOVER_CLASS toggle drives submenu visibility via the
+        // legacy `.cms-toolbar-item-navigation-hover ul` cascade.
         opts.longMenus?.recompute();
 
         if (!isTouchingTopLevelMenu) {
@@ -295,26 +294,13 @@ function setupSingleNav(
             (hasChildren && !isKeyup) ||
             (hasChildren && isEnter)
         ) {
-            const sub = li.querySelector<HTMLUListElement>(':scope > ul');
-            if (sub) sub.style.display = '';
             for (const p of parents) p.classList.add(HOVER_CLASS);
             opts.longMenus?.recompute();
         } else if (!isKeyup) {
-            nav.querySelectorAll<HTMLElement>('ul ul').forEach((ul) => {
-                ul.style.display = 'none';
-            });
             opts.longMenus?.recompute();
         }
-        // Hide stale submenus on siblings.
-        const siblings = Array.from(
-            (li.parentElement?.children ?? []) as HTMLCollectionOf<HTMLElement>,
-        );
-        for (const sib of siblings) {
-            if (sib === li) continue;
-            sib.querySelectorAll<HTMLElement>(':scope > ul').forEach((ul) => {
-                ul.style.display = 'none';
-            });
-        }
+        // The cascade already hides sibling submenus once we removed
+        // HOVER_CLASS from the previous siblings above.
     };
     for (const li of lists) {
         li.addEventListener('pointerover', onLiPointerOrKey);

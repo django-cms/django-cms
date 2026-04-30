@@ -36,7 +36,7 @@ export function startDrag(opts: DragOptions): DragHandle | null {
     const startX = opts.pointerEvent.pageX;
     const startY = opts.pointerEvent.pageY;
 
-    opts.shim.style.display = 'block';
+    opts.shim.classList.add('cms-modal-shim--active');
     document.body.style.touchAction = 'none';
 
     const onMove = (e: PointerEvent): void => {
@@ -53,7 +53,7 @@ export function startDrag(opts: DragOptions): DragHandle | null {
         opts.body.removeEventListener('pointermove', onMove);
         opts.body.removeEventListener('pointerup', onUp);
         opts.body.removeEventListener('pointercancel', onUp);
-        opts.shim.style.display = 'none';
+        opts.shim.classList.remove('cms-modal-shim--active');
         document.body.style.touchAction = '';
     }
 
@@ -92,7 +92,7 @@ export function startResize(opts: ResizeOptions): ResizeHandle | null {
     const startX = opts.pointerEvent.pageX;
     const startY = opts.pointerEvent.pageY;
 
-    opts.shim.style.display = 'block';
+    opts.shim.classList.add('cms-modal-shim--active');
     document.body.style.touchAction = 'none';
 
     const onMove = (e: PointerEvent): void => {
@@ -121,7 +121,7 @@ export function startResize(opts: ResizeOptions): ResizeHandle | null {
         opts.body.removeEventListener('pointermove', onMove);
         opts.body.removeEventListener('pointerup', onUp);
         opts.body.removeEventListener('pointercancel', onUp);
-        opts.shim.style.display = 'none';
+        opts.shim.classList.remove('cms-modal-shim--active');
         document.body.style.touchAction = '';
     }
 

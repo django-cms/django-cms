@@ -85,7 +85,7 @@ export class Tooltip {
         if (!tooltip) return;
 
         tooltip.style.visibility = 'visible';
-        tooltip.style.display = '';
+        tooltip.classList.remove('cms-hidden');
         if (pluginId !== undefined && pluginId !== null) {
             tooltip.dataset.pluginId = String(pluginId);
         } else {
@@ -112,7 +112,7 @@ export class Tooltip {
     hide(): void {
         if (!this.domElem) return;
         this.domElem.style.visibility = 'hidden';
-        this.domElem.style.display = 'none';
+        this.domElem.classList.add('cms-hidden');
         this.detachMouseMove();
     }
 
@@ -216,7 +216,7 @@ function pickTooltip(isTouch: boolean): HTMLElement | null {
     );
     for (const el of Array.from(candidates)) {
         el.style.visibility = 'hidden';
-        el.style.display = 'none';
+        el.classList.add('cms-hidden');
     }
     const selector = isTouch ? '.cms-tooltip-touch' : '.cms-tooltip';
     return document.querySelector<HTMLElement>(selector);

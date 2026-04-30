@@ -169,13 +169,10 @@ export function showSettingsMenu(
 
     if (!panel) return;
 
-    // The legacy `.cms-submenu-dropdown-settings` SCSS rule sets
-    // `display: none` and there is no class-driven override that
-    // shows it — the legacy code relied on jQuery `.show()` setting
-    // `style.display = 'block'` inline. Setting `''` would leave the
-    // CSS rule in effect and the dropdown stays hidden. Same fix as
-    // `structureboard/ui/mode.ts::showBoard`.
-    panel.style.display = 'block';
+    // Legacy `.cms-submenu-dropdown-settings` hides via `display: none`.
+    // The `--open` modifier (components/_visibility.scss) wins on
+    // specificity and reveals the panel.
+    panel.classList.add('cms-submenu-dropdown-settings--open');
     panel.removeAttribute('hidden');
 
     // Positioning
@@ -219,16 +216,18 @@ export function hideSettingsMenu(navEl?: HTMLElement | null): void {
         .querySelectorAll<HTMLElement>('.cms-z-index-9999')
         .forEach((el) => el.classList.remove('cms-z-index-9999'));
 
-    // Hide the dropdown + quicksearch siblings.
+    // Hide the dropdown + quicksearch siblings. Removing the `--open`
+    // modifier on the panel restores the base `display: none` rule;
+    // `.cms-quicksearch` has its own base hide rule so no extra class
+    // is needed.
     const root = nav.parentElement;
     if (root) {
         root.querySelectorAll<HTMLElement>('.cms-submenu-dropdown').forEach(
             (el) => {
-                el.style.display = 'none';
+                el.classList.remove('cms-submenu-dropdown-settings--open');
             },
         );
         root.querySelectorAll<HTMLElement>('.cms-quicksearch').forEach((el) => {
-            el.style.display = 'none';
             const input = el.querySelector<HTMLInputElement>('input');
             if (input) {
                 input.value = '';

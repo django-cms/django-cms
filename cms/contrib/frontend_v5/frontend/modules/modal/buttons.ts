@@ -53,6 +53,9 @@ export function renderButtons(opts: ButtonsOptions): void {
     const form = doc.querySelector<HTMLFormElement>('form');
 
     // Hide the iframe's submit row so we don't show two button strips.
+    // Inline `display: none` rather than `.cms-hidden` because we're
+    // operating on the iframe's contentDocument — contrib CSS lives in
+    // the parent doc and doesn't apply here.
     doc.querySelectorAll<HTMLElement>('.submit-row').forEach((el) => {
         el.style.display = 'none';
     });
@@ -156,7 +159,7 @@ export function renderButtons(opts: ButtonsOptions): void {
                                 '.cms-modal-frame iframe',
                             )
                             .forEach((f) => {
-                                f.style.display = 'none';
+                                f.classList.add('cms-hidden');
                             });
                         opts.setSaved(true);
                     }

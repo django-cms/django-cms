@@ -180,11 +180,11 @@ export class Navigation {
     }
 
     private showDropdown(): void {
-        if (this.ui.trigger) this.ui.trigger.style.display = 'list-item';
+        this.ui.trigger?.classList.add('cms-toolbar-more--visible');
     }
 
     private hideDropdown(): void {
-        if (this.ui.trigger) this.ui.trigger.style.display = 'none';
+        this.ui.trigger?.classList.remove('cms-toolbar-more--visible');
     }
 
     private handleResize(): void {

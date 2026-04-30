@@ -48,10 +48,9 @@ export class PageSelectWidget {
 
         // The legacy widget hides the "add new" button unconditionally. We
         // preserve this so the page-picker doesn't sprout a stray button
-        // when dropped into the contrib app.
-        if (addBtn) {
-            addBtn.style.display = 'none';
-        }
+        // when dropped into the contrib app. `.cms-hidden` is defined in
+        // `cms.base.css` which is loaded on every CMS admin page.
+        addBtn?.classList.add('cms-hidden');
 
         // If any of the three selects is missing the widget is incomplete
         // (e.g. rendered under a non-standard template) — bail out silently.

@@ -68,7 +68,7 @@ describe('Tooltip — show()', () => {
         t.show(makeMouseEvent(100, 100), 'My Plugin', 7);
         const tt = document.querySelector<HTMLElement>('.cms-tooltip')!;
         expect(tt.style.visibility).toBe('visible');
-        expect(tt.style.display).toBe('');
+        expect(tt.classList.contains('cms-hidden')).toBe(false);
         expect(tt.querySelector('span')!.textContent).toBe('My Plugin');
         expect(tt.dataset.pluginId).toBe('7');
         t.destroy();
@@ -132,7 +132,7 @@ describe('Tooltip — hide()', () => {
         t.hide();
         const tt = document.querySelector<HTMLElement>('.cms-tooltip')!;
         expect(tt.style.visibility).toBe('hidden');
-        expect(tt.style.display).toBe('none');
+        expect(tt.classList.contains('cms-hidden')).toBe(true);
     });
 
     it('detaches the mousemove listener', () => {

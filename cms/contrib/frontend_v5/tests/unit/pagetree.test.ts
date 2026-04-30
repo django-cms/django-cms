@@ -289,13 +289,13 @@ describe('PageTree', () => {
             const childUl = document.querySelector<HTMLUListElement>(
                 'li[data-id="1"] > ul',
             );
-            expect(childUl!.style.display).not.toBe('none');
+            expect(childUl!.classList.contains('cms-tree-collapsed')).toBe(false);
 
             // Collapse
             toggle!.click();
             await flush();
             expect(toggle!.classList.contains('cms-tree-toggle-open')).toBe(false);
-            expect(childUl!.style.display).toBe('none');
+            expect(childUl!.classList.contains('cms-tree-collapsed')).toBe(true);
 
             const node1 = document.querySelector<HTMLLIElement>('li[data-id="1"]');
             expect(node1!.getAttribute('aria-expanded')).toBe('false');
@@ -874,10 +874,18 @@ describe('PageTree', () => {
             )!;
 
             trigger.click();
-            expect(container.style.display).toBe('block');
+            expect(
+                container.classList.contains(
+                    'cms-pagetree-header-filter-container--open',
+                ),
+            ).toBe(true);
 
             trigger.click();
-            expect(container.style.display).not.toBe('block');
+            expect(
+                container.classList.contains(
+                    'cms-pagetree-header-filter-container--open',
+                ),
+            ).toBe(false);
         });
 
         it('closes the filter on close button click', async () => {
@@ -896,9 +904,17 @@ describe('PageTree', () => {
             )!;
 
             trigger.click();
-            expect(container.style.display).toBe('block');
+            expect(
+                container.classList.contains(
+                    'cms-pagetree-header-filter-container--open',
+                ),
+            ).toBe(true);
             close.click();
-            expect(container.style.display).not.toBe('block');
+            expect(
+                container.classList.contains(
+                    'cms-pagetree-header-filter-container--open',
+                ),
+            ).toBe(false);
         });
 
         it('closes the filter on outside click', async () => {
@@ -916,10 +932,18 @@ describe('PageTree', () => {
             trigger.click();
             // Let the deferred document click listener attach
             await flush(1);
-            expect(container.style.display).toBe('block');
+            expect(
+                container.classList.contains(
+                    'cms-pagetree-header-filter-container--open',
+                ),
+            ).toBe(true);
 
             document.body.click();
-            expect(container.style.display).not.toBe('block');
+            expect(
+                container.classList.contains(
+                    'cms-pagetree-header-filter-container--open',
+                ),
+            ).toBe(false);
         });
 
         it('adds active class when the search field is focused', async () => {

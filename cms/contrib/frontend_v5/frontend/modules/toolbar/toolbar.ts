@@ -316,12 +316,12 @@ export class Toolbar {
         this._show({ duration: 0 });
 
         if (publishHolder) {
-            publishHolder.style.display = 'none';
+            publishHolder.classList.add('cms-hidden');
             publishHolder.dataset.cmsHidden = 'true';
         }
         if (document.querySelector('.cms-btn-publish-active')) {
             if (publishHolder) {
-                publishHolder.style.display = '';
+                publishHolder.classList.remove('cms-hidden');
                 delete publishHolder.dataset.cmsHidden;
             }
             window.dispatchEvent(new Event('resize'));
@@ -433,7 +433,7 @@ function hideDropdownIfRequired(publishBtn: HTMLElement): void {
     const allItems = dropdown.querySelectorAll('li');
     const hidden = dropdown.querySelectorAll('li[data-cms-hidden]');
     if (allItems.length > 0 && allItems.length === hidden.length) {
-        dropdown.style.display = 'none';
+        dropdown.classList.add('cms-hidden');
         dropdown.dataset.cmsHidden = 'true';
     }
 }

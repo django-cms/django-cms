@@ -198,7 +198,7 @@ function sendPostRequest(
         (formToken?.value ?? '') ||
         ((window.CMS?.config as { csrf?: string } | undefined)?.csrf ?? '');
     const form = win.document.createElement('form');
-    form.style.display = 'none';
+    form.classList.add('cms-hidden');
     form.action = anchor.getAttribute('href') ?? '';
     form.method = 'POST';
     const input = win.document.createElement('input');

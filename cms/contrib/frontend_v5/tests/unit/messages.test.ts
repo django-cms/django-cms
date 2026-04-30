@@ -53,7 +53,7 @@ describe('Messages — open()', () => {
         const m = new Messages();
         m.open({ message: 'hi' });
         const el = document.querySelector<HTMLElement>('.cms-messages')!;
-        expect(el.style.display).not.toBe('none');
+        expect(el.classList.contains('cms-hidden')).toBe(false);
     });
 
     it('toggles cms-messages-error class based on the error flag', () => {
@@ -107,7 +107,7 @@ describe('Messages — open()', () => {
         const closeBtn = document.querySelector<HTMLElement>(
             '.cms-messages-close',
         )!;
-        expect(closeBtn.style.display).toBe('');
+        expect(closeBtn.classList.contains('cms-hidden')).toBe(false);
         // Run forward; nothing should auto-close.
         vi.advanceTimersByTime(10_000);
         const el = document.querySelector<HTMLElement>('.cms-messages')!;
@@ -121,7 +121,7 @@ describe('Messages — open()', () => {
         const closeBtn = document.querySelector<HTMLElement>(
             '.cms-messages-close',
         )!;
-        expect(closeBtn.style.display).toBe('');
+        expect(closeBtn.classList.contains('cms-hidden')).toBe(false);
         vi.advanceTimersByTime(10_000);
         const el = document.querySelector<HTMLElement>('.cms-messages')!;
         expect(el.style.opacity).toBe('');
@@ -189,7 +189,7 @@ describe('Messages — close()', () => {
         const el = document.querySelector<HTMLElement>('.cms-messages')!;
         expect(el.style.opacity).toBe('0');
         vi.advanceTimersByTime(100);
-        expect(el.style.display).toBe('none');
+        expect(el.classList.contains('cms-hidden')).toBe(true);
     });
 
     it('is safe to call when no message is open', () => {

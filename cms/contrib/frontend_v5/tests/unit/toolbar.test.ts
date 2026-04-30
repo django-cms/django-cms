@@ -73,7 +73,7 @@ describe('Toolbar — construction', () => {
             '.cms-btn-publish',
         )!;
         const holder = publish.parentElement!;
-        expect(holder.style.display).toBe('none');
+        expect(holder.classList.contains('cms-hidden')).toBe(true);
         expect(holder.dataset.cmsHidden).toBe('true');
     });
 

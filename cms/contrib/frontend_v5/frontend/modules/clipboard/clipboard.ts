@@ -367,12 +367,12 @@ export class Clipboard {
             li.querySelectorAll<HTMLElement>(
                 '.cms-submenu-item-paste-tooltip',
             ).forEach((t) => {
-                t.style.display = 'none';
+                t.classList.remove('cms-submenu-item-paste-tooltip--visible');
             });
             li.querySelectorAll<HTMLElement>(
                 '.cms-submenu-item-paste-tooltip-empty',
             ).forEach((t) => {
-                t.style.display = 'block';
+                t.classList.add('cms-submenu-item-paste-tooltip-empty--visible');
             });
         });
 

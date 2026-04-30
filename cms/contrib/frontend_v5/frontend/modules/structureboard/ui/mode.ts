@@ -171,13 +171,10 @@ export function showBoard(ctx: ModeContext, init: boolean): void {
     ctx.html.classList.remove('cms-structure-mode-content');
     ctx.html.classList.add('cms-structure-mode-structure');
 
-    // The legacy `.cms-structure` SCSS rule sets `display: none` and
-    // there is no `.cms-structure-mode-structure` override that flips
-    // it to block — the legacy code relied on jQuery `.show()` setting
-    // `style.display = 'block'` inline. We must do the same: setting
-    // `''` would leave the CSS rule in effect and the board stays
-    // hidden.
-    ctx.container.style.display = 'block';
+    // The legacy `.cms-structure` rule hides with `display: none`. The
+    // contrib `.cms-structure--open` modifier (in components/_visibility.scss)
+    // wins on specificity and reveals the board.
+    ctx.container.classList.add('cms-structure--open');
 
     if (!init) {
         makeCondensed(ctx);
@@ -191,7 +188,7 @@ export function showBoard(ctx: ModeContext, init: boolean): void {
 
 /** Hide the structure container + trigger a window resize. */
 export function hideBoard(ctx: ModeContext): void {
-    ctx.container.style.display = 'none';
+    ctx.container.classList.remove('cms-structure--open');
     ctx.win.dispatchEvent(new Event('resize'));
 }
 

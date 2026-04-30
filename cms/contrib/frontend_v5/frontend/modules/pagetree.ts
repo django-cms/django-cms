@@ -403,7 +403,9 @@ export default class PageTree {
 
         const closeFilter = () => {
             if (!filterContainer) return;
-            filterContainer.style.display = '';
+            filterContainer.classList.remove(
+                'cms-pagetree-header-filter-container--open',
+            );
             if (!searchField || document.activeElement !== searchField) {
                 header.classList.remove(filterActiveCls);
             }
@@ -412,7 +414,9 @@ export default class PageTree {
         };
         const openFilter = () => {
             if (!filterContainer) return;
-            filterContainer.style.display = 'block';
+            filterContainer.classList.add(
+                'cms-pagetree-header-filter-container--open',
+            );
             header.classList.add(filterActiveCls);
             filterActive = true;
             // Defer so the opening click itself doesn't immediately
@@ -1061,12 +1065,10 @@ export default class PageTree {
             await this.loadChildren(li, nodeId);
         }
 
-        // Show children
+        // Show children — `.cms-tree-collapsed` rule already drives
+        // display, no inline override needed.
         const ul = li.querySelector<HTMLUListElement>(':scope > ul');
-        if (ul) {
-            ul.classList.remove('cms-tree-collapsed');
-            ul.style.display = '';
-        }
+        ul?.classList.remove('cms-tree-collapsed');
     }
 
     private collapseNode(li: HTMLLIElement): void {
@@ -1082,10 +1084,7 @@ export default class PageTree {
         }
 
         const childUl = li.querySelector<HTMLUListElement>(':scope > ul');
-        if (childUl) {
-            childUl.classList.add('cms-tree-collapsed');
-            childUl.style.display = 'none';
-        }
+        childUl?.classList.add('cms-tree-collapsed');
 
         this.removeNodeId(nodeId);
     }

@@ -123,9 +123,9 @@ describe('Modal — close()', () => {
         m.close();
         const modal =
             document.querySelector<HTMLElement>('.cms-modal')!;
-        // After modalDuration / 2 = 100ms, display is set to none.
+        // After modalDuration / 2 = 100ms, the --open modifier is removed.
         vi.advanceTimersByTime(100);
-        expect(modal.style.display).toBe('none');
+        expect(modal.classList.contains('cms-modal--open')).toBe(false);
     });
 
     it('clears the iframe holder on close', () => {

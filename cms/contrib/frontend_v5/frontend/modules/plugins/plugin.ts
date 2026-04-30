@@ -621,6 +621,9 @@ export class Plugin implements PluginInstance {
                 const form = document.createElement('form');
                 form.method = 'post';
                 form.action = url;
+                // Inline `display: none` — this form is appended to the
+                // iframe's contentDocument body, where contrib CSS is
+                // unavailable.
                 form.style.display = 'none';
                 const csrfInput = document.createElement('input');
                 csrfInput.type = 'hidden';
@@ -1116,7 +1119,7 @@ function disablePaste(item: HTMLElement, tooltipSelector: string): void {
         a.setAttribute('aria-disabled', 'true');
     });
     const tooltip = item.querySelector<HTMLElement>(tooltipSelector);
-    if (tooltip) tooltip.style.display = 'block';
+    tooltip?.classList.add('cms-submenu-item-paste-tooltip--visible');
 }
 
 function mergeOptions(input: Partial<PluginOptions>): PluginOptions {

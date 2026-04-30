@@ -89,7 +89,7 @@ export class Sideframe {
 
         this.bindEvents();
 
-        if (this.ui.dimmer) this.ui.dimmer.style.display = '';
+        this.ui.dimmer?.classList.add('cms-sideframe-dimmer--open');
         this.ui.frame.classList.add('cms-loader');
 
         showLoader();
@@ -102,7 +102,7 @@ export class Sideframe {
     }
 
     close(): void {
-        if (this.ui.dimmer) this.ui.dimmer.style.display = 'none';
+        this.ui.dimmer?.classList.remove('cms-sideframe-dimmer--open');
 
         const settings = (window.CMS?.settings ?? {}) as {
             sideframe?: { url: string | null; hidden: boolean };
@@ -186,7 +186,7 @@ export class Sideframe {
         const iframe = document.createElement('iframe');
         iframe.src = url;
         iframe.frameBorder = '0';
-        iframe.style.display = 'none';
+        iframe.classList.add('cms-hidden');
 
         iframe.addEventListener('load', () =>
             this.handleIframeLoad(iframe),
@@ -252,7 +252,7 @@ export class Sideframe {
         body.classList.add('cms-admin', 'cms-admin-sideframe');
 
         this.ui.frame.classList.remove('cms-loader');
-        iframe.style.display = '';
+        iframe.classList.remove('cms-hidden');
 
         if ((getCmsConfig() as { debug?: boolean }).debug) {
             body.classList.add('cms-debug');
@@ -293,7 +293,7 @@ export class Sideframe {
     }
 
     private show(animate: boolean | undefined): void {
-        this.ui.sideframe.style.display = '';
+        this.ui.sideframe.classList.add('cms-sideframe--open');
         const targetWidth = '95%';
 
         if (animate) {
@@ -332,7 +332,7 @@ export class Sideframe {
         this.ui.sideframe.style.width = '0';
 
         setTimeout(() => {
-            this.ui.sideframe.style.display = 'none';
+            this.ui.sideframe.classList.remove('cms-sideframe--open');
             this.ui.sideframe.style.transition = '';
         }, duration);
 

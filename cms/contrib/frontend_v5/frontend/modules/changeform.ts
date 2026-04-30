@@ -89,7 +89,7 @@ export function initChangeForm(): ChangeFormHandle {
         document.querySelectorAll<HTMLInputElement>('input[type="hidden"]'),
     )) {
         const row = input.closest<HTMLElement>('.form-row');
-        if (row) row.style.display = 'none';
+        row?.classList.add('cms-hidden');
     }
 
     // ---- Language tab click handlers ----

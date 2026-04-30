@@ -205,7 +205,7 @@ describe('picker — filterPluginsList', () => {
         const visibleHrefs = items
             .filter(
                 (el) =>
-                    el.style.display !== 'none' &&
+                    !el.classList.contains('cms-hidden') &&
                     !el.classList.contains('cms-submenu-item-title'),
             )
             .map((el) => el.textContent?.trim());
@@ -216,7 +216,7 @@ describe('picker — filterPluginsList', () => {
         document.body.innerHTML = `
             <div class="cms-plugin-picker">
                 <div class="cms-submenu-item"><a>Text</a></div>
-                <div class="cms-submenu-item" style="display:none"><a>Hidden</a></div>
+                <div class="cms-submenu-item cms-hidden"><a>Hidden</a></div>
             </div>
         `;
         const list = document.querySelector<HTMLElement>('.cms-plugin-picker')!;
@@ -224,7 +224,7 @@ describe('picker — filterPluginsList', () => {
         const items = Array.from(
             list.querySelectorAll<HTMLElement>('.cms-submenu-item'),
         );
-        expect(items.every((el) => el.style.display === '')).toBe(true);
+        expect(items.every((el) => !el.classList.contains('cms-hidden'))).toBe(true);
     });
 
     it('hides the "most used" rows during a search', () => {
@@ -238,11 +238,11 @@ describe('picker — filterPluginsList', () => {
         const list = document.querySelector<HTMLElement>('.cms-plugin-picker')!;
         filterPluginsList(list, 'text');
         const mostUsed = list.querySelector<HTMLElement>('[data-cms-most-used]');
-        expect(mostUsed?.style.display).toBe('none');
+        expect(mostUsed?.classList.contains('cms-hidden')).toBe(true);
         const allItems = Array.from(
             list.querySelectorAll<HTMLElement>('.cms-submenu-item:not([data-cms-most-used])'),
         );
-        const visible = allItems.filter((el) => el.style.display !== 'none');
+        const visible = allItems.filter((el) => !el.classList.contains('cms-hidden'));
         expect(visible.map((el) => el.textContent?.trim())).toEqual(['Text Plugin']);
     });
 
@@ -260,8 +260,8 @@ describe('picker — filterPluginsList', () => {
         const titles = Array.from(
             list.querySelectorAll<HTMLElement>('.cms-submenu-item-title'),
         );
-        expect(titles[0]?.style.display).toBe('none');
-        expect(titles[1]?.style.display).toBe('');
+        expect(titles[0]?.classList.contains('cms-hidden')).toBe(true);
+        expect(titles[1]?.classList.contains('cms-hidden')).toBe(false);
     });
 });
 
@@ -450,7 +450,7 @@ describe('picker — setupQuickSearch', () => {
             picker.querySelectorAll<HTMLElement>('.cms-submenu-item'),
         );
         const visible = items
-            .filter((el) => el.style.display !== 'none')
+            .filter((el) => !el.classList.contains('cms-hidden'))
             .map((el) => el.textContent?.trim());
         expect(visible).toEqual(['Picture Plugin']);
     });

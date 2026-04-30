@@ -124,7 +124,7 @@ export class Messages {
             '.cms-messages-close',
         );
         if (closeBtn) {
-            closeBtn.style.display = 'none';
+            closeBtn.classList.add('cms-hidden');
             this.closeListenerCleanup?.();
             const onClose = (): void => this.close();
             closeBtn.addEventListener('click', onClose);
@@ -135,7 +135,7 @@ export class Messages {
         // Pre-position above the toolbar (off-screen for direction
         // animations), then show.
         messages.style.top = `${-messageHeight}px`;
-        messages.style.display = '';
+        messages.classList.remove('cms-hidden');
 
         // Direction-specific positioning.
         switch (dir) {
@@ -174,7 +174,7 @@ export class Messages {
         const shouldAutoClose =
             delay > 0 && opts.message.length <= this.options.messageLength;
         if (!shouldAutoClose) {
-            if (closeBtn) closeBtn.style.display = '';
+            closeBtn?.classList.remove('cms-hidden');
         } else {
             this.timer = setTimeout(() => this.close(), delay);
         }
@@ -188,7 +188,7 @@ export class Messages {
         messages.style.transition = `opacity ${duration}ms`;
         messages.style.opacity = '0';
         setTimeout(() => {
-            messages.style.display = 'none';
+            messages.classList.add('cms-hidden');
             messages.style.opacity = '';
             messages.style.transition = '';
         }, duration);

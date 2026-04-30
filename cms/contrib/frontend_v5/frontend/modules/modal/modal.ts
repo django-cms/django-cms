@@ -133,19 +133,15 @@ export class Modal {
 
         Helpers.dispatchEvent('modal-load', { instance: this });
 
-        if (this.ui.resize) {
-            this.ui.resize.style.display = this.options.resizable ? '' : 'none';
-        }
-        if (this.ui.minimizeButton) {
-            this.ui.minimizeButton.style.display = this.options.minimizable
-                ? ''
-                : 'none';
-        }
-        if (this.ui.maximizeButton) {
-            this.ui.maximizeButton.style.display = this.options.maximizable
-                ? ''
-                : 'none';
-        }
+        this.ui.resize?.classList.toggle('cms-hidden', !this.options.resizable);
+        this.ui.minimizeButton?.classList.toggle(
+            'cms-hidden',
+            !this.options.minimizable,
+        );
+        this.ui.maximizeButton?.classList.toggle(
+            'cms-hidden',
+            !this.options.maximizable,
+        );
 
         const position = this.calculateNewPosition(opts);
 
@@ -513,7 +509,7 @@ export class Modal {
         this.ui.modal.classList.remove('cms-modal-open');
 
         setTimeout(() => {
-            this.ui.modal.style.display = 'none';
+            this.ui.modal.classList.remove('cms-modal--open');
         }, duration);
 
         // Reset minimize/maximize.

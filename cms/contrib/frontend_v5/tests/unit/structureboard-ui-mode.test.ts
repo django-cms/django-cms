@@ -118,7 +118,7 @@ describe('mode — show', () => {
         await show(ctx);
         order.push('after');
         expect(order).toEqual(['load', 'after']);
-        expect(ctx.container.style.display).not.toBe('none');
+        expect(ctx.container.classList.contains('cms-structure--open')).toBe(true);
     });
 
     it('flips html classes from content to structure mode', async () => {
@@ -188,9 +188,9 @@ describe('mode — hide', () => {
 
     it('hides the structure container after loadContent resolves', async () => {
         const ctx = buildContext();
-        ctx.container.style.display = '';
+        ctx.container.classList.add('cms-structure--open');
         await hide(ctx);
-        expect(ctx.container.style.display).toBe('none');
+        expect(ctx.container.classList.contains('cms-structure--open')).toBe(false);
     });
 
     it('marks the second mode link as active', async () => {
@@ -241,9 +241,9 @@ describe('mode — showBoard', () => {
 describe('mode — hideBoard', () => {
     it('hides the container', () => {
         const ctx = buildContext();
-        ctx.container.style.display = '';
+        ctx.container.classList.add('cms-structure--open');
         hideBoard(ctx);
-        expect(ctx.container.style.display).toBe('none');
+        expect(ctx.container.classList.contains('cms-structure--open')).toBe(false);
     });
 
     it('triggers window resize', () => {

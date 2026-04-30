@@ -110,7 +110,7 @@ describe('Sideframe — close()', () => {
         s.close();
         // close uses duration / 2 = 25
         vi.advanceTimersByTime(30);
-        expect(s.ui.sideframe.style.display).toBe('none');
+        expect(s.ui.sideframe.classList.contains('cms-sideframe--open')).toBe(false);
     });
 
     it('clicking the close button closes the sideframe', () => {

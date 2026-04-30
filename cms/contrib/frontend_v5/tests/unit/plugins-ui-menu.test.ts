@@ -94,7 +94,9 @@ describe('settings menu — toggle', () => {
         expect(trigger.classList.contains('cms-btn-active')).toBe(false);
         trigger.dispatchEvent(new Event('pointerup', { bubbles: true }));
         expect(trigger.classList.contains('cms-btn-active')).toBe(true);
-        expect(dropdown.style.display).toBe('block');
+        expect(
+            dropdown.classList.contains('cms-submenu-dropdown-settings--open'),
+        ).toBe(true);
     });
 
     it('second pointerup closes the dropdown', () => {
@@ -103,7 +105,9 @@ describe('settings menu — toggle', () => {
         trigger.dispatchEvent(new Event('pointerup', { bubbles: true }));
         trigger.dispatchEvent(new Event('pointerup', { bubbles: true }));
         expect(trigger.classList.contains('cms-btn-active')).toBe(false);
-        expect(dropdown.style.display).toBe('none');
+        expect(
+            dropdown.classList.contains('cms-submenu-dropdown-settings--open'),
+        ).toBe(false);
     });
 
     it('opening a second menu hides the first', () => {
@@ -182,8 +186,12 @@ describe('settings menu — hideSettingsMenu', () => {
 
         hideSettingsMenu(trigger);
         expect(trigger.classList.contains('cms-btn-active')).toBe(false);
-        expect(dropdown.style.display).toBe('none');
-        expect(quicksearch.style.display).toBe('none');
+        expect(
+            dropdown.classList.contains('cms-submenu-dropdown-settings--open'),
+        ).toBe(false);
+        // Quicksearch visibility is governed by the legacy
+        // `.cms-quicksearch { display: none }` rule once the parent panel
+        // loses its `--open` modifier — no inline state to assert in jsdom.
         expect(input.value).toBe('');
     });
 
@@ -274,6 +282,8 @@ describe('settings menu — action delegation', () => {
         Object.defineProperty(e, 'target', { value: action });
         delegateAction(p, trigger, e);
         expect(trigger.classList.contains('cms-btn-active')).toBe(false);
-        expect(dropdown.style.display).toBe('none');
+        expect(
+            dropdown.classList.contains('cms-submenu-dropdown-settings--open'),
+        ).toBe(false);
     });
 });

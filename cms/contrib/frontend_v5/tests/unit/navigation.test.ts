@@ -124,7 +124,9 @@ describe('Navigation — overflow handling', () => {
         vi.advanceTimersByTime(60);
         vi.useRealTimers();
         // Trigger should be hidden when everything fits.
-        expect(n.ui.trigger?.style.display).toBe('none');
+        expect(
+            n.ui.trigger?.classList.contains('cms-toolbar-more--visible'),
+        ).toBe(false);
     });
 
     it('moves rightmost left items to dropdown when too narrow', () => {
@@ -157,7 +159,9 @@ describe('Navigation — overflow handling', () => {
         )!;
         expect(dropdown.children.length).toBeGreaterThan(0);
         // Trigger should be visible.
-        expect(n.ui.trigger?.style.display).toBe('list-item');
+        expect(
+            n.ui.trigger?.classList.contains('cms-toolbar-more--visible'),
+        ).toBe(true);
     });
 });
 

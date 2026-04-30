@@ -157,8 +157,8 @@ describe('initChangeForm', () => {
 
             const visibleRow = document.querySelector<HTMLElement>('.visible-row')!;
             const hiddenRow = document.querySelector<HTMLElement>('.hidden-row')!;
-            expect(visibleRow.style.display).toBe('');
-            expect(hiddenRow.style.display).toBe('none');
+            expect(visibleRow.classList.contains('cms-hidden')).toBe(false);
+            expect(hiddenRow.classList.contains('cms-hidden')).toBe(true);
         });
 
         it('does not crash on a hidden input without a .form-row ancestor', () => {

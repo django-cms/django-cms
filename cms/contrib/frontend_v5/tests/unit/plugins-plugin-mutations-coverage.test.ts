@@ -148,7 +148,11 @@ describe('Plugin._checkIfPasteAllowed — restriction branch', () => {
         const tooltip = document.querySelector(
             '.cms-submenu-item-paste-tooltip-restricted',
         ) as HTMLElement;
-        expect(tooltip.style.display).toBe('block');
+        expect(
+            tooltip.classList.contains(
+                'cms-submenu-item-paste-tooltip--visible',
+            ),
+        ).toBe(true);
     });
 
     it('allows paste when clipboard type matches restriction', () => {

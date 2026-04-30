@@ -592,17 +592,15 @@ function debounce<A extends unknown[]>(
 }
 
 function show(el: HTMLElement): void {
-    el.style.display = '';
+    el.classList.remove('cms-hidden');
 }
 
 function hide(el: HTMLElement): void {
-    el.style.display = 'none';
+    el.classList.add('cms-hidden');
 }
 
 function isVisible(el: HTMLElement): boolean {
-    if (el.style.display === 'none') return false;
-    // jsdom doesn't compute layout, so fall back to inline style.
-    return true;
+    return !el.classList.contains('cms-hidden');
 }
 
 /**
