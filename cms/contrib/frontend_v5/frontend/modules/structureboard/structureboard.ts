@@ -431,7 +431,14 @@ export class StructureBoard {
             plugin._collapsables();
         }
         initializeDragItemsStates();
-        this.dnd = setupStructureBoardDnd();
+        // Mount the drag clone + drop marker on the shared
+        // `.cms-structure-content` scroller. Without an explicit host,
+        // TreeDrag falls back to `containers[0].parentElement`, which is
+        // the FIRST `.cms-dragarea` placeholder — the marker is then
+        // clipped/mispositioned for any drop in the other placeholders.
+        this.dnd = setupStructureBoardDnd(
+            this.ui.content ? { host: this.ui.content } : {},
+        );
 
         this._loadedStructure = true;
         this.ui.win.dispatchEvent(new Event('resize'));

@@ -67,6 +67,16 @@ export interface TreeDragOptions {
      */
     handleSelector: string;
 
+    /**
+     * Pointerdown is ignored when the event target (or any ancestor
+     * up to the handle) matches this selector. Mirrors legacy jQuery-
+     * UI sortable's `cancel` option — default excludes interactive
+     * elements so clicking a link/button inside the handle does NOT
+     * create drag state, fire `e.preventDefault()`, or risk a
+     * jitter-activated drag tagging the source with `sourceClass`.
+     */
+    cancelSelector?: string;
+
     /** Selector for a tree node (li). */
     itemSelector: string;
 
@@ -197,11 +207,21 @@ interface ProspectiveDrop {
 
 const DEFAULTS = {
     dragThreshold: 4,
+    // Same default exclusion set as jQuery UI sortable, plus `a` and
+    // `[data-rel]` so dropdown/menu links inside the handle don't
+    // initiate drag state. The structureboard's submenu buttons and
+    // anchors all sit inside `.cms-dragitem` (the handle), so without
+    // this guard a click on "Highlight" / "Edit" / etc. would create
+    // drag state, call `e.preventDefault()` (which suppresses the
+    // click on touch devices), and any pointer jitter would activate
+    // the drag and add `cms-draggable-is-dragging` to the source.
+    cancelSelector: 'input,textarea,button,select,option,a,[data-rel]',
 };
 
 export default class TreeDrag {
-    private readonly opts: Omit<TreeDragOptions, 'dragThreshold'> & {
+    private readonly opts: Omit<TreeDragOptions, 'dragThreshold' | 'cancelSelector'> & {
         dragThreshold: number;
+        cancelSelector: string;
     };
 
     private state: DragState | null = null;
@@ -210,6 +230,7 @@ export default class TreeDrag {
     constructor(options: TreeDragOptions) {
         this.opts = {
             dragThreshold: DEFAULTS.dragThreshold,
+            cancelSelector: DEFAULTS.cancelSelector,
             ...options,
         };
 
@@ -251,6 +272,16 @@ export default class TreeDrag {
 
         const handle = e.target.closest(this.opts.handleSelector);
         if (!handle) return;
+        // Skip pointerdown on interactive elements inside the handle —
+        // those clicks must reach the action's click handler (open
+        // settings, fire highlight, navigate). Mirrors jQuery-UI
+        // sortable's `cancel` option.
+        if (
+            this.opts.cancelSelector &&
+            e.target.closest(this.opts.cancelSelector)
+        ) {
+            return;
+        }
         const item = handle.closest<HTMLElement>(this.opts.itemSelector);
         if (!item) return;
         if (this.opts.canDrag && !this.opts.canDrag(item)) return;
@@ -444,11 +475,15 @@ export default class TreeDrag {
         const marker = document.createElement('div');
         marker.className = 'cms-tree-drop-marker';
         marker.setAttribute('aria-hidden', 'true');
+        // Visibility is owned by the SCSS rule pair (`.cms-tree-drop-marker`
+        // hides, `.cms-tree-drop-marker--active` shows). Do NOT set
+        // `display` inline here — an inline declaration beats class
+        // selectors, so the `--active` class would never be able to
+        // un-hide the marker.
         marker.style.cssText = [
             'position: absolute',
             'pointer-events: none',
             'z-index: 10',
-            'display: none',
         ].join(';');
         return marker;
     }
@@ -521,8 +556,7 @@ export default class TreeDrag {
                     reference: li,
                     anchor: li,
                     visualRef: row,
-                    depth:
-                        Number(li.getAttribute('aria-level') ?? '1') + 1,
+                    depth: this.itemDepth(li) + 1,
                     visualMode: 'highlight',
                 };
                 return;
@@ -558,7 +592,7 @@ export default class TreeDrag {
                 reference: li,
                 anchor: li,
                 visualRef: belowRow,
-                depth: Number(li.getAttribute('aria-level') ?? '1'),
+                depth: this.itemDepth(li),
                 visualMode: 'line-before',
             };
             return;
@@ -576,7 +610,7 @@ export default class TreeDrag {
         //   - left of aboveLeft → OUTDENT by one level per full depthPx
         //     step, walking the ancestor chain.
         const aboveLi = aboveRow!.closest<HTMLElement>(this.opts.itemSelector)!;
-        const aboveDepth = Number(aboveLi.getAttribute('aria-level') ?? '1');
+        const aboveDepth = this.itemDepth(aboveLi);
         const aboveLeft = aboveRow!.getBoundingClientRect().left;
 
         const canIndentToChild =
@@ -606,10 +640,8 @@ export default class TreeDrag {
         // the tree has ended at this point in visual order and any
         // depth from 1 (root) up to aboveDepth is valid.
         const minDepth = belowRow
-            ? Number(
-                belowRow
-                    .closest<HTMLElement>(this.opts.itemSelector)
-                    ?.getAttribute('aria-level') ?? '1',
+            ? this.itemDepth(
+                belowRow.closest<HTMLElement>(this.opts.itemSelector)!,
             )
             : 1;
 
@@ -624,8 +656,7 @@ export default class TreeDrag {
         // Walk up from aboveLi to the ancestor at desiredDepth.
         let anchor: HTMLElement | null = aboveLi;
         while (anchor) {
-            const lvl = Number(anchor.getAttribute('aria-level') ?? '1');
-            if (lvl === desiredDepth) break;
+            if (this.itemDepth(anchor) === desiredDepth) break;
             const parent: HTMLElement | null = anchor.parentElement;
             anchor =
                 parent?.closest<HTMLElement>(this.opts.itemSelector) ?? null;
@@ -713,6 +744,29 @@ export default class TreeDrag {
                 el.classList.remove('cms-tree-drop-target');
             }
         }
+    }
+
+    /**
+     * Depth of `li` in the tree, 1-based. Prefers `aria-level` (set by
+     * the pagetree's accessible markup). Falls back to counting
+     * `itemSelector`-matching ancestors up to (but not including) any
+     * registered container — works for the structureboard's plugin
+     * tree, where `.cms-draggable` rows nest inside
+     * `.cms-collapsable-container > .cms-draggables` but no
+     * `aria-level` is rendered.
+     */
+    private itemDepth(li: HTMLElement): number {
+        const aria = Number(li.getAttribute('aria-level'));
+        if (aria > 0) return aria;
+        let depth = 1;
+        let cursor: HTMLElement | null = li.parentElement;
+        const containers = this.opts.containers;
+        while (cursor) {
+            if (containers.includes(cursor)) break;
+            if (cursor.matches?.(this.opts.itemSelector)) depth++;
+            cursor = cursor.parentElement;
+        }
+        return depth;
     }
 
     // ────────────────────────────────────────────────────────────

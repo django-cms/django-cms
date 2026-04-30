@@ -246,7 +246,7 @@ export function canDropAsChild(target: HTMLElement, item: HTMLElement): boolean 
  *     live DOM.
  */
 export function onDrop(result: TreeDropResult): void {
-    const { item, kind, reference } = result;
+    const { item, kind, reference, anchor } = result;
     const fromClipboard = item.closest('.cms-clipboard-containers') !== null;
     const originalContainer = item.closest<HTMLElement>('.cms-draggables');
 
@@ -274,12 +274,18 @@ export function onDrop(result: TreeDropResult): void {
             }
         }
     } else if (kind === 'sibling-before') {
-        targetList = reference.parentElement as HTMLElement | null;
-        insertBefore = reference;
+        // Sibling placement uses `anchor`, not `reference`. For outdent
+        // drops anchor is the ancestor at the chosen depth (see
+        // tree/drag.ts::updateProspective); reference still points at
+        // the visually-nearest row, which would re-introduce the dragged
+        // item at the wrong depth and ignore the indent picked by the
+        // user. Mirrors pagetree's `onTreeDrop` (pagetree.ts:746).
+        targetList = anchor.parentElement as HTMLElement | null;
+        insertBefore = anchor;
     } else {
-        // sibling-after
-        targetList = reference.parentElement as HTMLElement | null;
-        insertBefore = reference.nextElementSibling;
+        // sibling-after — same anchor-vs-reference reasoning.
+        targetList = anchor.parentElement as HTMLElement | null;
+        insertBefore = anchor.nextElementSibling;
     }
 
     if (!targetList) return;

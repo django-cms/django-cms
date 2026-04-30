@@ -45,9 +45,13 @@
 // JS sets position/left/top/width/height inline; rules here paint the
 // line and triangle end caps. Hidden by default; the controller adds
 // `.cms-tree-drop-marker--active` while a line drop is being targeted.
-.cms-tree-drop-marker {
+// `div.` prefix raises specificity to (0,1,1) so this rule beats the
+// `.cms-reset div { background: none }` reset, which otherwise wipes
+// the line bar (the triangle borders are unaffected by that reset, so
+// only the bar disappears — exactly the symptom we hit).
+div.cms-tree-drop-marker {
     display: none;
-    background: $color-primary;
+    background-color: $color-primary;
     border-radius: 2px;
 
     &::before,

@@ -342,12 +342,20 @@ export class Plugin implements PluginInstance {
 
         // Drag controller fires `cms-plugins-update` on the draggable
         // when a drop commits — translate to a movePlugin call.
+        //
+        // The dispatched `detail` is `{ id, previousParentPluginId? }`
+        // (see structureboard/ui/dnd.ts::onDrop). It is NOT a plugin
+        // options object — passing it through as `opts` would shadow
+        // `this.options` with a payload that has no `plugin_id` /
+        // `urls`, and `movePlugin` would silently early-return at the
+        // `if (pluginId === undefined) return;` guard. The listener is
+        // bound to *this* draggable, so `this.options` is already the
+        // right state to read; call without args.
         draggable.addEventListener(
             'cms-plugins-update',
             (e) => {
                 e.stopPropagation();
-                const detail = (e as CustomEvent).detail;
-                this.movePlugin(detail as PluginOptions | undefined);
+                void this.movePlugin();
             },
             opts,
         );
