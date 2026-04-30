@@ -425,7 +425,7 @@ export class Plugin implements PluginInstance {
                     return;
                 }
                 const sb = getStructureBoard();
-                if (!sb?.ui?.container?.hasClass('cms-structure-condensed')) return;
+                if (!sb?.ui?.container?.classList.contains('cms-structure-condensed')) return;
                 if (sb.dragging) return;
                 highlightPluginContent(pluginId, {
                     successTimeout: 0,
@@ -438,7 +438,7 @@ export class Plugin implements PluginInstance {
             'mouseleave',
             (e) => {
                 const sb = getStructureBoard();
-                if (!sb?.ui?.container?.hasClass('cms-structure-condensed')) return;
+                if (!sb?.ui?.container?.classList.contains('cms-structure-condensed')) return;
                 e.stopPropagation();
                 removeHighlightPluginContent(pluginId);
             },

@@ -70,7 +70,7 @@ export interface StructureBoardApi {
     _loadedStructure?: boolean;
     _loadedContent?: boolean;
     dragging?: boolean;
-    ui?: { container?: { hasClass(className: string): boolean } };
+    ui?: { container?: HTMLElement | null };
     invalidateState?(action: PluginMutationAction, data: unknown): void;
     _showAndHighlightPlugin?(timeout: number, ignoreErrors: boolean): unknown;
     getId?(el: unknown): number | string | undefined;
