@@ -1,0 +1,87 @@
+/* This patch file contains all :dir(rtl) selectors for browsers that do not support it yet */
+/* Once, sufficiently many users have browsers that support `:dir()`, this file can be removed */
+
+/* component: toolbar */
+
+.cms-toolbar {
+    .cms-toolbar-item {
+        float: right;
+    }
+}
+
+.cms-toolbar-item-navigation {
+    li, li a {
+        float: right;
+    }
+    .cms-toolbar-item-navigation-children > a span .cms-icon {
+        transform: rotate(0deg);
+    }
+}
+
+.cms-toolbar-more .cms-toolbar-item-cms-mode-switcher a {
+    float: right !important;
+}
+
+.cms-messages .cms-messages-close {
+    float: left;
+}
+
+.cms-toolbar-item-buttons a {
+    float: right;
+}
+
+
+/* component: modal */
+
+.cms-modal-item-buttons {
+    float: left;
+}
+
+.cms-modal-item-buttons-left {
+    float: right;
+}
+
+.cms-modal-resize {
+    cursor: ne-resize;
+    span {
+        transform: scale(-1,1) translate(2px, 0);  // flip drag triangle
+    }
+}
+
+
+/* component: structureboard */
+
+.cms-structure {
+    .cms-dragitem-collapsable:before {
+        transform: rotate(0deg);
+    }
+    .cms-dragitem-expanded:before {
+        transform: rotate(-90deg);
+    }
+}
+
+
+/* component: tree */
+
+.cms-pagetree-section {
+    h2 {
+        float: right;
+    }
+
+}
+
+.cms-tree-col, .cms-tree-reload, .cms-tree-filters {
+    float: left;
+}
+
+.cms-tree-search {
+    float: right;
+}
+
+.jstree-django-cms .jstree-ocl {
+    float: right;
+}
+
+.jstree-anchor {
+    background-position: calc(100% - 2px) center;
+}

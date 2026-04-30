@@ -1,0 +1,313 @@
+//##############################################################################
+// PAGETREE — NEW DOM OVERRIDES
+//
+// The contrib pagetree renders nested <ul role="tree"> / <li role="treeitem">
+// instead of the legacy <table>. The legacy `_tree.scss` selectors targeting
+// `.cms-pagetree-jstree`, `.jstree-*`, and jstree grid cells are inert here.
+// This file fills the gap with the minimum CSS the new structure needs.
+//
+// Design rules:
+//   - Backgrounds live ONLY on .cms-tree-row. The tree root, the <li>, and
+//     the <ul role="group"> are transparent. Only the visible row paints.
+//   - Borders between rows live on .cms-tree-row (`border-block-end`).
+//     The <li> / <ul> do not carry borders.
+//   - Indentation is implemented as `padding-left` on the row itself (set by
+//     the JS enhancer), so the row's background extends across the full
+//     indented area.
+//   - The drag handle is a real <span class="cms-tree-handle"> element, not
+//     a pseudo, so SortableJS can attach to it (rows are not draggable as
+//     a whole — that would let the user drag by clicking title text).
+//     Visually it reuses the legacy `tree-li-drag.gif` asset, which is
+//     served by the legacy `cms` staticfiles app — the contrib app doesn't
+//     need to ship its own copy.
+//##############################################################################
+
+// ────────────────────────────────────────────────────────────
+// Dropdown anchor-arrow
+// ────────────────────────────────────────────────────────────
+//
+// The legacy arrow is a rotated square that straddles the menu's
+// right edge with z-index: -1 so the inside half hides behind the
+// menu background and only the outside tip shows. That trick fails
+// when the menu creates a new stacking context (`translateZ(0)`),
+// and even when we force z-index to 1 the rotated square's
+// box-shadow bleeds INSIDE the menu, leaving a visible halo on the
+// interior side.
+//
+// Replace the pseudo with a pure border-triangle: no background,
+// no internal bleed, and a drop-shadow filter that follows the
+// actual visible pixels (so the shadow only appears around the
+// triangle tip, not a phantom rectangle).
+.cms-pagetree-dropdown-menu {
+    overflow: visible !important;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset-inline-start: 100%;
+        inset-block-start: 13px;
+        width: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+        background: transparent !important;
+        border: 0;
+        border-block: 8px solid transparent;
+        border-inline-start: 8px solid $white;
+        transform: none;
+        box-shadow: none;
+        filter: drop-shadow(2px 0 2px color-mix(in srgb, $black 20%, transparent));
+        z-index: 1;
+    }
+}
+
+// Per-row dropdowns sit inside a `.cms-tree-col` grid cell whose
+// vertical centering puts the trigger 5px higher than the main-nav
+// trigger (which is absolute-positioned in the section header).
+// Raise the arrow to match.
+.cms-tree-col .cms-pagetree-dropdown-menu::before {
+    inset-block-start: 8px;
+}
+
+// ────────────────────────────────────────────────────────────
+// List reset — kill default browser and admin-style ul styling
+// ────────────────────────────────────────────────────────────
+// !important beats legacy `_tree.scss` rules targeting `.cms-pagetree ul`
+// plus djangocms-admin-style's global ul list-style. The tree root has
+// zero padding; nested groups carry the indentation.
+.cms-pagetree-list,
+.cms-pagetree-list ul,
+.cms-pagetree-list ul[role="group"] {
+    list-style: none !important;
+    margin: 0 !important;
+}
+
+.cms-pagetree-list {
+    padding: 0 !important;
+}
+
+// Nested subtree: shift child rows inward via padding on the <ul>
+// itself. This keeps each row's background box flush with the shifted
+// list edge — the indented space is OUTSIDE any row, so hover /
+// border / drop-target styling visually starts at the indent boundary.
+.cms-pagetree-list ul[role="group"] {
+    padding-inline-start: 24px !important;
+    padding-block: 0 !important;
+    padding-inline-end: 0 !important;
+}
+
+.cms-pagetree-list {
+    position: relative; // offset parent for the absolutely-positioned
+                        // drop marker rendered by TreeDrag
+    display: block;
+    width: 100%;
+    font-size: $font-size-normal;
+    color: $gray-darkest;
+    background: transparent;
+
+    li[role="treeitem"] {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        list-style: none;
+
+        &::marker {
+            content: none;
+        }
+    }
+}
+
+// ────────────────────────────────────────────────────────────
+// Row: grid layout + the ONLY place that paints a background
+// ────────────────────────────────────────────────────────────
+// Column order (JS enhancer, pagetree.ts buildRow()):
+//   1. .cms-tree-handle      — drag affordance (skipped in filtered mode)
+//   2. .cms-tree-toggle      — caret / disabled dot
+//   3. .cms-tree-title       — page title text (flex)
+//   4. .cms-tree-col.*       — data-col cells (view, lang, menu, options, …)
+.cms-tree-row {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) repeat(10, auto);
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    // Tall enough to contain `.cms-tree-col-padding-sm` (which is
+    // $pagetree-cell-inner-height + 6px) plus breathing room.
+    min-height: $pagetree-cell-inner-height + 12px;
+    padding-block: $padding-base - 2px;
+    gap: 0;
+    background: $white;
+    border-block-end: $pagetree-border; // 1px solid $gray-lighter
+    transition: background $speed-base;
+
+    &:hover {
+        background: $gray-lightest;
+    }
+
+    // Neutralise the legacy negative margin on `.cms-tree-col-padding-sm`.
+    // It was designed for the legacy <table> row where the cell
+    // needed to overflow into adjacent cells. In the new CSS-grid
+    // row that negative margin pulls the cell above the row's top
+    // edge, clipping visually.
+    //
+    // Also re-center its content: the server renders the options
+    // column as
+    //   .cms-tree-col-padding-sm
+    //     > .cms-tree-item-wrapper  (display: table-row)
+    //       > .cms-tree-item         (display: table-cell, v-align middle)
+    // which only vertically centers inside an actual `display: table`.
+    // Our nested-<ul> row has no table context, so the table-cell
+    // falls back to block flow and sits flush with the top. Flex
+    // centering replicates the intended alignment.
+    .cms-tree-col-padding-sm {
+        margin-block-start: 0;
+        margin-inline-start: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .cms-hover-tooltip {
+            display: flex;
+        }
+    }
+    .cms-tree-col-padding-sm .cms-tree-item-wrapper {
+        display: flex;
+        align-items: center;
+    }
+    .cms-tree-col-padding-sm .cms-tree-item-wrapper .cms-tree-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.cms-pagetree-list li[role="treeitem"][aria-selected="true"] > .cms-tree-row {
+    background: color-mix(in srgb, $color-primary 15%, $white);
+}
+
+// ────────────────────────────────────────────────────────────
+// Drag handle — legacy visual, new element
+// ────────────────────────────────────────────────────────────
+// The legacy pagetree painted a grip icon as a background-image on
+// the <li>. We keep the same image but apply it to a span element so
+// SortableJS has something concrete to use as its drag handle.
+.cms-tree-handle {
+    width: 12px;
+    height: $pagetree-cell-inner-height;
+    cursor: grab;
+    background-image: url('../../img/pagetree/tree-li-drag.gif');
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0.5;
+    transition: opacity $speed-base;
+
+    &:active {
+        cursor: grabbing;
+        opacity: 1;
+    }
+}
+
+.cms-tree-row:hover .cms-tree-handle {
+    opacity: 1;
+}
+
+// ────────────────────────────────────────────────────────────
+// Toggle caret (expand / collapse)
+// ────────────────────────────────────────────────────────────
+//
+// The toggle is a `<button class="cms-tree-toggle cms-icon cms-icon-
+// arrow-right">`. The iconfont glyph is painted via `::before` on
+// `cms-icon-*`, pointing RIGHT by default; the `cms-tree-toggle-open`
+// modifier rotates it 90° so it points DOWN for expanded nodes.
+// This mirrors the legacy jstree-ocl pattern in `_tree.scss`.
+.cms-tree-toggle {
+    width: $pagetree-cell-inner-height;
+    height: $pagetree-cell-inner-height;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: $border-radius-normal;
+    color: $gray;
+    cursor: pointer;
+    line-height: 1;
+    font-size: 12px;
+
+    &::before {
+        transition: transform $speed-base;
+    }
+
+    &.cms-tree-toggle-open::before {
+        transform: rotate(90deg);
+    }
+
+    &:disabled {
+        cursor: default;
+        // Hide the glyph on leaves (no children to toggle).
+        &::before {
+            visibility: hidden;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid $color-primary;
+        outline-offset: 2px;
+    }
+}
+
+// ────────────────────────────────────────────────────────────
+// Title + data columns
+// ────────────────────────────────────────────────────────────
+.cms-tree-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    color: $gray-darkest;
+}
+
+.cms-tree-row .cms-tree-col {
+    display: flex;
+    align-items: center;
+    min-width: $pagetree-cell-inner-height;
+    height: 100%;
+    border-inline-end: 1px solid $gray-lighter;
+    padding-inline: 2 * $padding-base;
+    color: $gray-darker;
+
+    a {
+        color: inherit;
+        text-decoration: none;
+
+        &:hover {
+            color: $color-primary;
+        }
+    }
+}
+
+// ────────────────────────────────────────────────────────────
+// Collapsed subtrees + drag-reveal
+// ────────────────────────────────────────────────────────────
+.cms-pagetree-list ul[role="group"].cms-tree-collapsed {
+    display: none;
+}
+
+// ────────────────────────────────────────────────────────────
+// Drag visuals (drop target / line marker / clone / dragging source)
+// live in the shared `components/_tree-drag.scss` partial — see the
+// import in `components/pagetree/_all.scss`. They are reused by the
+// structureboard via the toolbar bundle.
+// ────────────────────────────────────────────────────────────
+
+// ────────────────────────────────────────────────────────────
+// Filtered mode — flat match list, no toggles, no handles
+// ────────────────────────────────────────────────────────────
+.cms-pagetree-root.filtered {
+    .cms-tree-toggle,
+    .cms-tree-handle {
+        visibility: hidden;
+    }
+}
