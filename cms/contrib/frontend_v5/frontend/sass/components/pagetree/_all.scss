@@ -3,5 +3,4 @@
 @import 'node-state';
 @import 'legend';
 @import 'tree-new-dom';
-// Drag visuals shared with the structureboard (see also cms.toolbar.scss).
-@import '../tree-drag';
+// Drag visuals shipped via cms.base.css (see cms.base.scss).

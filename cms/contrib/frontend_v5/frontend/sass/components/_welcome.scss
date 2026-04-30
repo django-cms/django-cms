@@ -1,0 +1,134 @@
+//##############################################################################
+// #WELCOME
+//
+// Shown when there is no page available
+.cms-welcome-bg {
+    // specific admin background color
+    background: $gray-lightest;
+}
+.cms-welcome {
+    color: $gray-darker;
+    width: $welcome-width;
+    min-width: $welcome-min-width;
+    margin: 0 auto;
+
+    a {
+        color: $color-primary;
+        &:hover,
+        &:active,
+        &:focus {
+            text-decoration: underline;
+        }
+    }
+
+    .cms-hidden {
+        display: none;
+    }
+
+    // header area
+    .cms-welcome-header {
+        text-align: center;
+        h2, p {
+            text-align: center;
+        }
+        h2 {
+            padding-bottom: 30px;
+        }
+        padding-bottom: $padding-normal;
+    }
+
+    h1 {
+        color: $gray-light;
+        font-size: 22px;
+        font-weight: 200;
+        text-align: center;
+        padding: 40px 0 15px;
+        border-bottom: 1px solid $gray-lighter;
+        .cms-icon {
+            color: $color-success;
+        }
+    }
+
+    h2 {
+        font-size: $font-size-large;
+        font-weight: bold;
+        padding-bottom: 10px;
+    }
+
+    p.lead {
+        font-size: $font-size-large;
+        font-weight: 200;
+        margin-bottom: $padding-large + 10px;
+    }
+
+    a.cms-btn-action {
+        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border);
+        padding: $padding-normal $padding-large;
+        font-size: $font-size-normal;
+        font-weight: bold;
+        &:hover {
+            text-decoration: none;
+            cursor: pointer;
+        }
+    }
+
+    .cms-welcome-logo {
+        &,
+        &:hover,
+        &:focus {
+            display: inline-block;
+            background-image: url('../../fonts/src/logo.svg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            filter: invert(var(--cms-dark-mode));
+            height: 35px;
+            width: 200px;
+            font-size: 35px;
+            text-decoration: none;
+            margin: 50px auto 10px;
+        }
+    }
+
+    .cms-welcome-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+    }
+    // section area
+    .cms-welcome-section {
+        display: inline-block;
+        box-shadow: 0 0 5px $gray-lighter;
+        padding: $padding-large;
+        margin-top: 30px;
+        margin-bottom: $padding-large;
+        background: $white;
+        p + h2 {
+            padding-top: $padding-large;
+        }
+        p {
+            padding: 2 * $padding-base 0;
+        }
+        li {
+            list-style-type: disc;
+            margin-inline-start: 1.1em;
+        }
+    }
+
+    // footer area
+    .cms-welcome-links {
+        text-align: center;
+        padding: 10px 5px;
+        margin: 0 0 15px;
+        border-bottom: 1px solid $gray-lighter;
+        a {
+            padding: 0 5px;
+        }
+    }
+
+    .cms-welcome-notes {
+        font-size: $font-size-small;
+        line-height: 16px;
+        color: $gray-light;
+        padding: 5px 10px;
+    }
+}

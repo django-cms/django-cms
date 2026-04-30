@@ -43,8 +43,10 @@
 // Drop line marker — sibling drops.
 //
 // JS sets position/left/top/width/height inline; rules here paint the
-// line and triangle end caps.
+// line and triangle end caps. Hidden by default; the controller adds
+// `.cms-tree-drop-marker--active` while a line drop is being targeted.
 .cms-tree-drop-marker {
+    display: none;
     background: $color-primary;
     border-radius: 2px;
 
@@ -66,6 +68,9 @@
         inset-inline-end: -1px;
         border-inline-end: 10px solid $color-primary;
     }
+}
+.cms-tree-drop-marker.cms-tree-drop-marker--active {
+    display: block;
 }
 
 // Drag clone — pagetree style. The structureboard's clone uses the

@@ -265,6 +265,12 @@
 }
 .cms-pagetree-header-filter-container {
     display: none;
+
+    // BEM modifier toggled by frontend/modules/pagetree.ts.
+    &.cms-pagetree-header-filter-container--open {
+        display: block;
+    }
+
     overflow: auto;
     position: absolute;
     inset-inline-start:0;
