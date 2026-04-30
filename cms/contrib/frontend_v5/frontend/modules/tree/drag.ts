@@ -121,6 +121,22 @@ export interface TreeDragOptions {
      * styling without any new CSS.
      */
     sourceClass?: string;
+
+    /**
+     * Lifecycle hook fired once the pointer crosses `dragThreshold`
+     * and the clone/marker get mounted. Use it to flip global flags
+     * other code consults (legacy `StructureBoard.dragging`) so
+     * unrelated UI (e.g. shift-hover highlight) can suppress itself
+     * during a drag.
+     */
+    onDragStart?: (item: HTMLElement) => void;
+
+    /**
+     * Lifecycle hook fired exactly once on drag teardown — pointerup,
+     * cancel, or escape. Always pairs with a prior `onDragStart`. Use
+     * it to clear the same global flags that `onDragStart` set.
+     */
+    onDragEnd?: () => void;
 }
 
 /** What the caller receives when a drop is committed. */
@@ -353,10 +369,12 @@ export default class TreeDrag {
             this.opts.sourceClass ?? 'cms-tree-dragging-item',
         );
         document.body.style.userSelect = 'none';
+        this.opts.onDragStart?.(this.state.item);
     }
 
     private endDrag(): void {
         if (!this.state) return;
+        const wasActive = this.state.active;
         const s = this.state as DragState & { cleanup?: () => void };
         s.cleanup?.();
         if (s.clone) s.clone.remove();
@@ -370,6 +388,9 @@ export default class TreeDrag {
         );
         document.body.style.userSelect = '';
         this.state = null;
+        // Only pair with onDragStart — sub-threshold pointerdowns that
+        // never activated must not call onDragEnd.
+        if (wasActive) this.opts.onDragEnd?.();
     }
 
     // ────────────────────────────────────────────────────────────

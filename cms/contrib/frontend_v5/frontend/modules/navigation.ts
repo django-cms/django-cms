@@ -160,9 +160,16 @@ export class Navigation {
             (s, i) => s + i.width,
             0,
         );
-        this.items.moreButtonWidth = this.ui.trigger
-            ? outerWidthNoMargins(this.ui.trigger)
-            : 0;
+        // The trigger is `display: none` in steady state (showAll() above
+        // hides it), so measuring it directly returns 0 and the overflow
+        // math doesn't reserve any horizontal space — items end up
+        // covered by the right toolbar before the dropdown kicks in.
+        // Reveal it for the measurement, then restore the hidden state.
+        if (this.ui.trigger) {
+            this.ui.trigger.classList.add('cms-toolbar-more--visible');
+            this.items.moreButtonWidth = outerWidthNoMargins(this.ui.trigger);
+            this.ui.trigger.classList.remove('cms-toolbar-more--visible');
+        }
 
         this.rightMostItemIndex = this.items.left.length - 1;
         this.leftMostItemIndex = 0;

@@ -43,6 +43,55 @@ describe('highlight — highlightPluginContent', () => {
         expect(document.querySelector('.cms-plugin-overlay-42')).toBeNull();
     });
 
+    it('ignores elements that have only the cms-plugin-<id> class without cms-plugin', () => {
+        // Stray markup carrying a `cms-plugin-<id>`-shaped token but
+        // not the `cms-plugin` parent class must NOT trigger an
+        // overlay. Mirrors the legacy `cms.structureboard.js`
+        // convention of using the compound `.cms-plugin.cms-plugin-<id>`.
+        document.body.innerHTML = `<div class="cms-plugin-55"></div>`;
+        highlightPluginContent(55, { successTimeout: 0 });
+        expect(document.querySelector('.cms-plugin-overlay-55')).toBeNull();
+    });
+
+    it('skips <template> markers when bracketed plugin content is unprocessed', () => {
+        // Before `processTemplateGroup` runs, a plugin's only DOM
+        // representation is a pair of `<template class="cms-plugin
+        // cms-plugin-<id> cms-plugin-start/end">` markers anchored at
+        // (0, 0). If those slip into the bbox, the overlay stretches
+        // from the top-left of the page across the whole content area
+        // — which lands on top of the structure board in condensed
+        // mode and looks like a stray drag preview.
+        // Stub getBoundingClientRect so templates report (1px tall,
+        // origin) — a real-browser quirk we want to defend against.
+        const realRect = HTMLElement.prototype.getBoundingClientRect;
+        Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
+            configurable: true,
+            value: function () {
+                if (this.tagName === 'TEMPLATE') {
+                    return { left: 0, top: 0, width: 0, height: 1, right: 0, bottom: 1, x: 0, y: 0, toJSON: () => ({}) };
+                }
+                return { left: 500, top: 300, width: 200, height: 100, right: 700, bottom: 400, x: 500, y: 300, toJSON: () => ({}) };
+            },
+        });
+
+        document.body.innerHTML = `
+            <template class="cms-plugin cms-plugin-77 cms-plugin-start"></template>
+            <div class="cms-plugin cms-plugin-77">content</div>
+            <template class="cms-plugin cms-plugin-77 cms-plugin-end"></template>
+        `;
+        highlightPluginContent(77, { successTimeout: 0 });
+        const overlay = document.querySelector<HTMLElement>('.cms-plugin-overlay-77');
+        expect(overlay).not.toBeNull();
+        // Overlay should be anchored at (500, 300), not (0, 0).
+        expect(overlay!.style.left).toBe('500px');
+        expect(overlay!.style.top).toBe('300px');
+
+        Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
+            configurable: true,
+            value: realRect,
+        });
+    });
+
     it('marks see-through and prominent classes when requested', () => {
         document.body.innerHTML = `<div class="cms-plugin cms-plugin-7"></div>`;
         highlightPluginContent(7, {

@@ -40,8 +40,21 @@ export function highlightPluginContent(
         prominent?: boolean;
     } = {},
 ): void {
+    // Compound `:not(template).cms-plugin.cms-plugin-<id>` mirrors
+    // legacy `cms.structureboard.js` (lines 1094, 1110, 1161, 1505).
+    // The `:not(template)` is load-bearing: the un-unwrapped `<template
+    // class="cms-plugin cms-plugin-<id> cms-plugin-start">` markers
+    // also match the compound class selector, but their bounding rect
+    // can be reported as a small non-zero value in some browsers
+    // (the rect-zero filter below isn't a guaranteed catch). Excluding
+    // them up-front keeps the bbox tied to real rendered content and
+    // prevents the overlay from latching onto the (0,0)-anchored
+    // template, which otherwise stretches the highlight across the
+    // viewport and lands on top of the structure board.
     const nodes = Array.from(
-        document.querySelectorAll<HTMLElement>(`.cms-plugin-${pluginId}`),
+        document.querySelectorAll<HTMLElement>(
+            `:not(template).cms-plugin.cms-plugin-${pluginId}`,
+        ),
     );
     if (nodes.length === 0) return;
 

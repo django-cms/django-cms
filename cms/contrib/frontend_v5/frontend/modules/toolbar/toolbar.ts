@@ -40,6 +40,7 @@ import {
     type LongMenusController,
 } from './long-menus';
 import { setupMenus, type MenusHandle } from './menus';
+import { Navigation } from '../navigation';
 
 const TOOLBAR_OFFSCREEN_OFFSET = 10; // hides box-shadow during animate-in
 const LONG_MENUS_THROTTLE_MS = 10;
@@ -67,6 +68,7 @@ export class Toolbar {
 
     private menusHandle: MenusHandle | null = null;
     private longMenus: LongMenusController | null = null;
+    private navigation: Navigation | null = null;
     private buttonCleanups: Array<() => void> = [];
     private windowCleanups: Array<() => void> = [];
     public lockToolbar = false;
@@ -88,6 +90,14 @@ export class Toolbar {
             this.bindEvents();
             this.ui.toolbar.dataset.cmsReady = 'true';
         }
+
+        // Overflow controller for the `.cms-toolbar-more` dropdown —
+        // mirrors `cms.toolbar.js:69`. Triggering an initial resize
+        // forces the lazy width measurement (Navigation only listens
+        // for resize/load/orientationchange and won't measure if
+        // construction happens after `load` has fired).
+        this.navigation = new Navigation();
+        window.dispatchEvent(new Event('resize'));
 
         this.runInitialStates();
     }
@@ -179,6 +189,12 @@ export class Toolbar {
         this.teardownEvents();
         this.setupUi();
         this.bindEvents();
+
+        // Re-instantiate Navigation against the new markup — mirrors
+        // `cms.toolbar.js:768`. teardownEvents() above already disposed
+        // the previous instance.
+        this.navigation = new Navigation();
+        window.dispatchEvent(new Event('resize'));
 
         // Notify clipboard if it's around (legacy did this verbatim).
         const clipboard = (window.CMS?.API as { Clipboard?: unknown })
@@ -295,6 +311,8 @@ export class Toolbar {
         this.menusHandle = null;
         this.longMenus?.destroy();
         this.longMenus = null;
+        this.navigation?.destroy();
+        this.navigation = null;
         for (const c of this.buttonCleanups) c();
         this.buttonCleanups = [];
         for (const c of this.windowCleanups) c();

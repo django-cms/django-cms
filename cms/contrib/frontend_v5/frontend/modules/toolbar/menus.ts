@@ -101,9 +101,15 @@ function setupSingleNav(
         open = false;
         cmdPressed = false;
         for (const li of lists) li.classList.remove(HOVER_CLASS);
-        // The legacy `.cms-toolbar-item-navigation li ul { display: none }`
-        // rule already hides every submenu once its parent loses HOVER_CLASS,
-        // so we don't need to clear inline display here.
+        // Mirror legacy `lists.find('ul ul').hide()` — jQuery's `.find()`
+        // scopes descendant combinators to the search root, so the outer
+        // `ul` of `ul ul` must itself be inside an `<li>` of `lists`.
+        // Without that scoping, `nav.querySelectorAll('ul ul')` matches
+        // the top-level dropdown UL too (its `<ul>` ancestor is the nav
+        // root UL) and stamps `display: none` onto it.
+        nav.querySelectorAll<HTMLElement>('li ul ul').forEach((ul) => {
+            ul.style.display = 'none';
+        });
         nav.querySelectorAll<HTMLLIElement>(':scope > li').forEach(
             (topLi) => {
                 if (topMouseEnterHandlers.has(topLi)) {
@@ -220,8 +226,9 @@ function setupSingleNav(
         }
 
         li.classList.add(HOVER_CLASS);
-        // The HOVER_CLASS toggle drives submenu visibility via the
-        // legacy `.cms-toolbar-item-navigation-hover ul` cascade.
+        // Show direct-child <ul> (submenu)
+        const directChildUl = li.querySelector<HTMLUListElement>(':scope > ul');
+        if (directChildUl) directChildUl.style.display = '';
         opts.longMenus?.recompute();
 
         if (!isTouchingTopLevelMenu) {
@@ -265,6 +272,14 @@ function setupSingleNav(
         // Find the closest <li> within this nav
         const li = target?.closest<HTMLElement>('li');
         if (!li || !nav.contains(li)) return;
+        // Match legacy `lists.on(event, 'li', …)` delegated semantics:
+        // jQuery's `'li'` selector filters to DESCENDANT lis, so the
+        // handler never fires on a top-level menu item — that prevents
+        // hovering a top-level menu from opening it without a click.
+        // Once a dropdown is open the hover handler runs against its
+        // nested lis (which all have an `<li>` ancestor) and switches
+        // sub-menu state to follow the cursor.
+        if (!li.parentElement?.closest('li')) return;
 
         const parents = closestAndAncestors(
             li,
@@ -283,7 +298,17 @@ function setupSingleNav(
         ) {
             return;
         }
-        for (const sib of lists) sib.classList.remove(HOVER_CLASS);
+        // Mirror legacy `lists.find('li').removeClass(hover)` — that
+        // jQuery call only matches `<li>` *descendants* of an `<li>` in
+        // `lists`, i.e. nested submenu items. Top-level `<li>`s keep
+        // their hover state, so the dropdown's cascade rule
+        // (`.cms-toolbar-item-navigation-hover ul { display: block }`)
+        // doesn't briefly flip to `display: none` between the wipe and
+        // the parents-add below — that transition was the cause of the
+        // dropdown disappearing as the cursor entered it.
+        for (const nested of nav.querySelectorAll<HTMLElement>('li li')) {
+            nested.classList.remove(HOVER_CLASS);
+        }
         li.classList.add(HOVER_CLASS);
 
         const isKeyup = ev.type === 'keyup';
@@ -294,13 +319,29 @@ function setupSingleNav(
             (hasChildren && !isKeyup) ||
             (hasChildren && isEnter)
         ) {
+            const sub = li.querySelector<HTMLUListElement>(':scope > ul');
+            if (sub) sub.style.display = '';
             for (const p of parents) p.classList.add(HOVER_CLASS);
             opts.longMenus?.recompute();
         } else if (!isKeyup) {
+            // See `reset()` — `'li ul ul'` mirrors jQuery's scoped
+            // `lists.find('ul ul')`, excluding the top-level dropdown
+            // UL whose only `<ul>` ancestor is the nav root.
+            nav.querySelectorAll<HTMLElement>('li ul ul').forEach((ul) => {
+                ul.style.display = 'none';
+            });
             opts.longMenus?.recompute();
         }
-        // The cascade already hides sibling submenus once we removed
-        // HOVER_CLASS from the previous siblings above.
+        // Hide stale submenus on siblings.
+        const siblings = Array.from(
+            (li.parentElement?.children ?? []) as HTMLCollectionOf<HTMLElement>,
+        );
+        for (const sib of siblings) {
+            if (sib === li) continue;
+            sib.querySelectorAll<HTMLElement>(':scope > ul').forEach((ul) => {
+                ul.style.display = 'none';
+            });
+        }
     };
     for (const li of lists) {
         li.addEventListener('pointerover', onLiPointerOrKey);
@@ -313,12 +354,19 @@ function setupSingleNav(
         });
     }
 
-    // ── Pointer-leave on submenus → unhover sibling lis
+    // ── Pointer-leave on submenus → unhover NESTED lis only.
+    // Legacy `lists.find('li').removeClass(hover)` matches only LIs
+    // *nested inside* another LI, so leaving the dropdown collapses
+    // inner submenu state but the top-level item keeps HOVER and the
+    // dropdown stays open. Wiping every LI here would close the
+    // dropdown the moment the cursor crosses the UL boundary.
     const submenuUls = Array.from(
         nav.querySelectorAll<HTMLUListElement>('li > ul'),
     );
     const onPointerLeave = (): void => {
-        for (const li of lists) li.classList.remove(HOVER_CLASS);
+        for (const nested of nav.querySelectorAll<HTMLElement>('li li')) {
+            nested.classList.remove(HOVER_CLASS);
+        }
     };
     for (const ul of submenuUls) {
         ul.addEventListener('pointerleave', onPointerLeave);

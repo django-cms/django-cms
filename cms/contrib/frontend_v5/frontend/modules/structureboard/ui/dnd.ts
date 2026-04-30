@@ -46,7 +46,7 @@ import TreeDrag, {
     type TreeDragOptions,
     type TreeDropResult,
 } from '../../tree/drag';
-import { getCmsLocked } from '../../plugins/cms-globals';
+import { getCmsLocked, getStructureBoard } from '../../plugins/cms-globals';
 import { getPlaceholderData, getPluginData } from '../../plugins/cms-data';
 import {
     actualizePlaceholders,
@@ -363,6 +363,20 @@ export function setupStructureBoardDnd(
             canDrag,
             canDropAsChild,
             onDrop,
+            // Mirror legacy `cms.structureboard.js::start/beforeStop`:
+            // flip `StructureBoard.dragging` so unrelated UI consults
+            // it. Plugin's shift-hover highlight (plugins/plugin.ts)
+            // checks `sb.dragging` to suppress overlays mid-drag —
+            // without these hooks, hover crosstalk paints highlight
+            // overlays while a plugin is being dragged.
+            onDragStart: () => {
+                const sb = getStructureBoard();
+                if (sb) sb.dragging = true;
+            },
+            onDragEnd: () => {
+                const sb = getStructureBoard();
+                if (sb) sb.dragging = false;
+            },
             // Use legacy structureboard SCSS classes for the visual
             // feedback — the source item flips to
             // `.cms-draggable-is-dragging` (orange highlight from

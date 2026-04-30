@@ -38,6 +38,7 @@ import { Modal } from '../modules/modal/modal';
 import { Navigation } from '../modules/navigation';
 import { Plugin } from '../modules/plugins/plugin';
 import { initializeTree } from '../modules/plugins/tree';
+import { initShortcuts } from '../modules/shortcuts';
 import { Sideframe } from '../modules/sideframe';
 import { StructureBoard } from '../modules/structureboard/structureboard';
 import { Toolbar } from '../modules/toolbar/toolbar';
@@ -143,6 +144,11 @@ function boot(): void {
     // StructureBoard reads `.cms-toolbar`; Toolbar runs initial states
     // that may dispatch messages; Sideframe restores from settings.
     const api = cmsAny.API;
+
+    // Help-modal trigger (`?` and `.cms-show-shortcuts`) — must run
+    // before the API constructors so the shared `Modal` instance the
+    // shortcuts module creates doesn't race with Clipboard's modal.
+    safeInstantiate('Shortcuts', () => initShortcuts());
 
     api.Clipboard = safeInstantiate('Clipboard', () => new Clipboard());
     api.StructureBoard = safeInstantiate(

@@ -4,24 +4,34 @@ import { setupMenus } from '../../frontend/modules/toolbar/menus';
 const HOVER = 'cms-toolbar-item-navigation-hover';
 
 function setupDom(): HTMLElement {
+    // Mirror the legacy template: `.cms-toolbar-item-navigation` is the
+    // `<ul>` itself (see cms/templates/cms/toolbar/toolbar.html), not a
+    // `<div>` wrapping a `<ul>`. Top-level `Menu` items render with
+    // `sub_level=False` (cms/toolbar/items.py:330) — i.e. WITHOUT the
+    // `cms-toolbar-item-navigation-children` class. Only nested
+    // `SubMenu` items carry it.
     document.body.innerHTML = `
         <div class="cms-toolbar">
-            <div class="cms-toolbar-item-navigation">
-                <ul>
-                    <li class="cms-toolbar-item-navigation-children">
-                        <a href="#">Page</a>
-                        <ul>
-                            <li><a href="/edit/">Edit</a></li>
-                            <li class="cms-toolbar-item-navigation-disabled">
-                                <a href="/disabled/">Disabled</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="/quick/">Quick</a>
-                    </li>
-                </ul>
-            </div>
+            <ul class="cms-toolbar-item cms-toolbar-item-navigation">
+                <li>
+                    <a href="#">Page</a>
+                    <ul>
+                        <li><a href="/edit/">Edit</a></li>
+                        <li class="cms-toolbar-item-navigation-children">
+                            <a href="#">Templates</a>
+                            <ul>
+                                <li><a href="/t/">T1</a></li>
+                            </ul>
+                        </li>
+                        <li class="cms-toolbar-item-navigation-disabled">
+                            <a href="/disabled/">Disabled</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/quick/">Quick</a>
+                </li>
+            </ul>
         </div>
     `;
     return document.querySelector<HTMLElement>('.cms-toolbar')!;
@@ -42,7 +52,7 @@ describe('setupMenus — basic interaction', () => {
         const onTopLevelClick = vi.fn();
         const handle = setupMenus({ toolbar, onTopLevelClick });
         const li = toolbar.querySelector<HTMLElement>(
-            '.cms-toolbar-item-navigation-children',
+            '.cms-toolbar-item-navigation > li:first-child',
         )!;
         li.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(li.classList.contains(HOVER)).toBe(true);
@@ -58,7 +68,7 @@ describe('setupMenus — basic interaction', () => {
             onTopLevelClick: () => {},
         });
         const li = toolbar.querySelector<HTMLElement>(
-            '.cms-toolbar-item-navigation-children',
+            '.cms-toolbar-item-navigation > li:first-child',
         )!;
         li.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(li.classList.contains(HOVER)).toBe(true);
@@ -76,7 +86,7 @@ describe('setupMenus — basic interaction', () => {
             onTopLevelClick: () => {},
         });
         const li = toolbar.querySelector<HTMLElement>(
-            '.cms-toolbar-item-navigation-children',
+            '.cms-toolbar-item-navigation > li:first-child',
         )!;
         li.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(li.classList.contains(HOVER)).toBe(true);
@@ -92,7 +102,7 @@ describe('setupMenus — basic interaction', () => {
         const onTopLevelClick = vi.fn();
         const handle = setupMenus({ toolbar, onTopLevelClick });
         const anchor = toolbar.querySelector<HTMLAnchorElement>(
-            '.cms-toolbar-item-navigation > ul > li:nth-child(2) > a',
+            '.cms-toolbar-item-navigation > li:nth-child(2) > a',
         )!;
         anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(onTopLevelClick).toHaveBeenCalledWith(anchor);
@@ -120,7 +130,7 @@ describe('setupMenus — basic interaction', () => {
             onTopLevelClick: () => {},
         });
         const li = toolbar.querySelector<HTMLElement>(
-            '.cms-toolbar-item-navigation-children',
+            '.cms-toolbar-item-navigation > li:first-child',
         )!;
         li.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         handle.destroy();
@@ -128,6 +138,97 @@ describe('setupMenus — basic interaction', () => {
         // Now a fresh outside click should not toggle it back on.
         document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(li.classList.contains(HOVER)).toBe(false);
+    });
+});
+
+describe('setupMenus — cursor into dropdown keeps it open', () => {
+    it('pointerover on the dropdown UL itself does not remove top-level HOVER', () => {
+        const toolbar = setupDom();
+        const handle = setupMenus({
+            toolbar,
+            onTopLevelClick: () => {},
+        });
+        const topLi = toolbar.querySelector<HTMLElement>(
+            '.cms-toolbar-item-navigation > li:first-child',
+        )!;
+        topLi.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        expect(topLi.classList.contains(HOVER)).toBe(true);
+
+        const submenuUl = topLi.querySelector<HTMLElement>(':scope > ul')!;
+        // Simulate cursor entering the dropdown UL itself (not a nested li).
+        submenuUl.dispatchEvent(
+            new Event('pointerover', { bubbles: true }),
+        );
+        expect(topLi.classList.contains(HOVER)).toBe(true);
+        handle.destroy();
+    });
+
+    it('pointerover on a nested li keeps top-level HOVER and adds nested HOVER', () => {
+        const toolbar = setupDom();
+        const handle = setupMenus({
+            toolbar,
+            onTopLevelClick: () => {},
+        });
+        const topLi = toolbar.querySelector<HTMLElement>(
+            '.cms-toolbar-item-navigation > li:first-child',
+        )!;
+        topLi.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        expect(topLi.classList.contains(HOVER)).toBe(true);
+
+        const nestedLi = topLi.querySelector<HTMLElement>(
+            ':scope > ul > li:first-child',
+        )!;
+        nestedLi.dispatchEvent(
+            new Event('pointerover', { bubbles: true }),
+        );
+        expect(topLi.classList.contains(HOVER)).toBe(true);
+        expect(nestedLi.classList.contains(HOVER)).toBe(true);
+        handle.destroy();
+    });
+
+    it('hovering a leaf nested-li does NOT hide the dropdown UL itself', () => {
+        const toolbar = setupDom();
+        const handle = setupMenus({
+            toolbar,
+            onTopLevelClick: () => {},
+        });
+        const topLi = toolbar.querySelector<HTMLElement>(
+            '.cms-toolbar-item-navigation > li:first-child',
+        )!;
+        topLi.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        const submenuUl = topLi.querySelector<HTMLElement>(':scope > ul')!;
+        // Sanity: the click handler removed any inline display.
+        expect(submenuUl.style.display).toBe('');
+
+        const nestedLi = topLi.querySelector<HTMLElement>(
+            ':scope > ul > li:first-child',
+        )!;
+        // Hovering Edit (a leaf) — must not stamp `display: none` onto
+        // the dropdown UL via the `nav.querySelectorAll('ul ul')` wipe.
+        nestedLi.dispatchEvent(
+            new Event('pointerover', { bubbles: true }),
+        );
+        expect(submenuUl.style.display).not.toBe('none');
+        expect(topLi.classList.contains(HOVER)).toBe(true);
+        handle.destroy();
+    });
+
+    it('pointerout from anchor inside top-level li does not close dropdown', () => {
+        const toolbar = setupDom();
+        const handle = setupMenus({
+            toolbar,
+            onTopLevelClick: () => {},
+        });
+        const topLi = toolbar.querySelector<HTMLElement>(
+            '.cms-toolbar-item-navigation > li:first-child',
+        )!;
+        topLi.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        const anchor = topLi.querySelector<HTMLElement>(':scope > a')!;
+        anchor.dispatchEvent(
+            new Event('pointerout', { bubbles: true }),
+        );
+        expect(topLi.classList.contains(HOVER)).toBe(true);
+        handle.destroy();
     });
 });
 
@@ -145,7 +246,7 @@ describe('setupMenus — long-menus integration', () => {
             },
         });
         const li = toolbar.querySelector<HTMLElement>(
-            '.cms-toolbar-item-navigation-children',
+            '.cms-toolbar-item-navigation > li:first-child',
         )!;
         li.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(recompute).toHaveBeenCalled();
