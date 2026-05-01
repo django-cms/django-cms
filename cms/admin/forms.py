@@ -682,8 +682,7 @@ class ChangePageForm(BasePageContentForm):
             **data,
         )
         from cms.models.pagemodel import _lock_tree_roots
-        _lock_tree_roots(page)
-
+ 
         page.update_urls(
             self._language,
             path=page_path,
