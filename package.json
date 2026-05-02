@@ -45,7 +45,7 @@
     "raw-loader": "^4.0.2",
     "sass": "^1.97.3",
     "terser-webpack-plugin": "^5.4.0",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "watchpack": "^2.4.2",
     "webpack": "^5.105.4",
     "webpack-bundle-analyzer": "^4.10.2",
