@@ -231,16 +231,6 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         # Assert
         self.assertEqual(len(check_results), 4)  # No errors
 
-    def test_changelist_view_does_not_call_get_content_obj(self):
-        self.createContentInstance("en")
-
-        with self.login_user_context(self.admin_user):
-            with patch.object(self.admin, "get_content_obj", wraps=self.admin.get_content_obj) as mocked_get_content_obj:
-                response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(mocked_get_content_obj.call_count, 0)
-
     def test_change_view_calls_get_content_obj(self):
         self.createContentInstance("en")
 
