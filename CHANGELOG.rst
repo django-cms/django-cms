@@ -1,3 +1,19 @@
+Bug Fixes:
+----------
+* deadlock could happen on moving large pagesubtrees (#8529) (#8610) (0a84dbfa9) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 5.0.6 (2026-02-22)
 ==================
 

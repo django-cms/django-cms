@@ -1,0 +1,84 @@
+.. _upgrade-to-5.0.7:
+
+###################
+5.0.7 release notes
+###################
+
+*February 22, 2026*
+
+Welcome to django CMS 5.0.6!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
+features.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, 5.2, and 6.0**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.0.7
+***********************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.3 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+.. warning::
+
+    Since the migrations merge the ``TreeNode`` and ``Page`` models, you should run the
+    migration in a test environment first to ensure that the migration runs
+    successfully.
+
+
+*******************
+What's new in 5.0.7
+*******************
+
+
+Features:
+---------
+* Add button for django CMS chat (#8478) (8c383c9e6) -- Fabian Braun
+* Preserve GET params when switching to preview or edit mode (#8444) (#8446) (9bcfb0871) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Fix ApphookReloadMiddleware not handling new language variants #2 (#8401) (#8412) (4fc76cff0) -- Fabian Braun
+* Improved UX for external placeholders (e.g., static aliases) (#8416) (#8435) (19f8c9dcf) -- Fabian Braun
+* Migrations failed for django-treebeard >= 5.0.3 (#8485) (a5f73980a) -- Fabian Braun
+* Save fallback for includes when scanning for placeholders (#8405) (#8407) (3afd42bf7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8402) (1e8a3f9c7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8410) (15cebb33c) -- Fabian Braun
+* get_permissions failed for missing global permissions (#8468) (#8469) (132736417) -- Fabian Braun
+* make-changelog script (#8492) (e4751d605) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes       15 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (10 pull requests)
+
+With the review help of the following contributors:
+
+* Django CMS Release
+* Moritz Pietzschke
+* Vinit Kumar
+* [Aaditya1273]
+
+Thanks to all contributors for their efforts!
