@@ -1,16 +1,35 @@
+5.0.7 (2026-05-05)
+==================
+
 Bug Fixes:
 ----------
-* deadlock could happen on moving large pagesubtrees (#8529) (#8610) (0a84dbfa9) -- Fabian Braun
+
+* Keep GET params when toggling structure mode by @petrklus in https://github.com/django-cms/django-cms/pull/8497
+* slug and overwrite_url caching failed in read-only change_views (#8507) by @fsbraun in https://github.com/django-cms/django-cms/pull/8509
+* Add missing pin icon for external placeholders by @fsbraun in https://github.com/django-cms/django-cms/pull/8520
+* Chunk size was missing for plugin queryset.iterator() (#8532) by @fsbraun in https://github.com/django-cms/django-cms/pull/8533
+* Proxy models of `CMSPlugin` were not downcasted correctly (#8539) by @fsbraun in https://github.com/django-cms/django-cms/pull/8541
+* Inline editing could circumvent permissions (#8542) by @fsbraun in https://github.com/django-cms/django-cms/pull/8553
+* Fallback languages rendered empty (when not redirecting) by @fsbraun in https://github.com/django-cms/django-cms/pull/8558
+* DiffDOM sometimes left garbled head section by @fsbraun in https://github.com/django-cms/django-cms/pull/8562
+* Add `page_title` parameter to `cms.api.create_page` function (#8567) by @fsbraun in https://github.com/django-cms/django-cms/pull/8572
+* XSS vulnerability in validator error message (#8576) by @fsbraun in https://github.com/django-cms/django-cms/pull/8580
+* Deleting a non-local plugin did not refresh the screen (#8582) by @fsbraun in https://github.com/django-cms/django-cms/pull/8586
+* Compatibility shim for Page.objects.order_by used non-existing fields by @fsbraun in https://github.com/django-cms/django-cms/pull/8598
+* Convert value to string in ApplicationConfigSelect. (#8594) by @fsbraun in https://github.com/django-cms/django-cms/pull/8601
+* Migrations with a custom user model caused a Programming error (#8606) by @fsbraun in https://github.com/django-cms/django-cms/pull/8608
+* deadlock could happen on moving large pagesubtrees (#8529) by @fsbraun in https://github.com/django-cms/django-cms/pull/8610
 
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 15 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
+* Fabian Braun (15 pull request)
 
 With the review help of the following contributors:
 
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
