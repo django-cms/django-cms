@@ -14,7 +14,7 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
 from django.utils.timezone import now
-from django.utils.translation import override as force_language
+from django.utils.translation import activate, override as force_language
 
 from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_page_content
@@ -37,7 +37,7 @@ APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
 MENU_MODULE = "cms.test_utils.project.sampleapp.cms_menus"
 
 
-class ApphooksTestCase(CMSTestCase):
+class BaseApphooksTestCase(CMSTestCase):
     def setUp(self):
         clear_app_resolvers()
         clear_url_caches()
@@ -106,6 +106,8 @@ class ApphooksTestCase(CMSTestCase):
 
         return contents
 
+
+class AppHookTestCase(BaseApphooksTestCase):
     @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
     def test_check_url_config(self):
         """
