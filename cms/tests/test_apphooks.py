@@ -107,7 +107,7 @@ class BaseApphooksTestCase(CMSTestCase):
         return contents
 
 
-class AppHookTestCase(BaseApphooksTestCase):
+class ApphooksTestCase(BaseApphooksTestCase):
     @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
     def test_check_url_config(self):
         """
