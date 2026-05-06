@@ -19,6 +19,7 @@ Bug Fixes:
 * Convert value to string in ApplicationConfigSelect. (#8594) by @fsbraun in https://github.com/django-cms/django-cms/pull/8601
 * Migrations with a custom user model caused a Programming error (#8606) by @fsbraun in https://github.com/django-cms/django-cms/pull/8608
 * deadlock could happen on moving large pagesubtrees (#8529) by @fsbraun in https://github.com/django-cms/django-cms/pull/8610
+* resolve empty page_title in frontend edit mode for apphooks (#8449) by @fsbraun in https://github.com/django-cms/django-cms/pull/8617
 
 Statistics:
 -----------
