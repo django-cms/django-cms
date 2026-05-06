@@ -33,6 +33,25 @@ document.addEventListener('DOMContentLoaded', function () {
         return select ? select.options[select.selectedIndex] : null;
     }
 
+    // Helper: sanitize URL to prevent javascript: or other unsafe schemes
+    function sanitizeUrl(url) {
+        try {
+            // Validates the URL protocol (allows http/https; bans 'javascript:', 'data:', etc.)
+            // while preserving whether the original input was relative or absolute.
+            const u = new URL(url, window.location.origin);
+            const allowedProtocols = ['http:', 'https:'];
+
+            if (allowedProtocols.includes(u.protocol)) {
+                // Return the original string to avoid forcing relative URLs to become absolute.
+                return url;
+            }
+            return '';
+        } catch {
+            // Malformed URLs result in blank
+            return '';
+        }
+    }
+
     // Shows / hides namespace / config selection widgets depending on the user input
     // eslint-disable-next-line complexity
     function setupNamespaces() {
@@ -52,12 +71,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 appCfgs.appendChild(option);
             }
             if (appCfgsAdd) {
-                appCfgsAdd.setAttribute('href', apphookData.apphooks_configuration_url[opt.value] +
-                    (window.showRelatedObjectPopup ? '?_popup=1' : ''));
-                appCfgsAdd.addEventListener('click', function (ev) {
-                    ev.preventDefault();
-                    window.showAddAnotherPopup(this);
-                });
+                const safeUrl = sanitizeUrl(apphookData.apphooks_configuration_url[opt.value]);
+
+                if (safeUrl) {
+                    appCfgsAdd.setAttribute('href', safeUrl +
+                        (window.showRelatedObjectPopup ? '?_popup=1' : ''));
+                    appCfgsAdd.addEventListener('click', function (ev) {
+                        ev.preventDefault();
+                        window.showAddAnotherPopup(this);
+                    });
+                } else {
+                    appCfgsAdd.setAttribute('href', '#');
+                }
             }
             if (appCfgsRow) {
                 appCfgsRow.classList.remove('hidden');

@@ -1,10 +1,12 @@
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
+from django.templatetags.static import static
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils.encoding import force_str
-from django.utils.html import escape
+from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext as _
 
 from cms.forms.utils import get_page_choices, get_site_choices
 from cms.models import Page, PageUser
@@ -90,12 +92,15 @@ class PageSmartLinkWidget(TextInput):
 
     class Media:
         css = {
-            'all': (
-                'cms/js/select2/select2.css',
-                'cms/js/select2/select2-bootstrap.css',
-            )
+            'screen': (
+                'admin/css/vendor/select2/select2.css',
+                'admin/css/autocomplete.css',
+            ),
         }
         js = (
+            'admin/js/vendor/jquery/jquery.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'admin/js/jquery.init.js',
             static_with_version('cms/js/dist/bundle.forms.pagesmartlinkwidget.min.js'),
         )
 
@@ -141,10 +146,16 @@ class UserSelectAdminWidget(Select):
         ):
             # append + icon
             add_url = admin_reverse('cms_pageuser_add')
-            output.append(
-                '<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' %
-                (add_url, name)
-            )
+            output.append(format_html(
+                '<a href="{}?_popup=1" class="related-widget-wrapper-link add-related"'
+                ' id="add_id_{}" data-popup="yes" title="{}">'
+                '<img src="{}" alt="{}" width="20" height="20"></a>',
+                add_url,
+                name,
+                _('Add another'),
+                static('admin/img/icon-addlink.svg'),
+                _('Add'),
+            ))
         return mark_safe(''.join(output))
 
 
@@ -228,7 +239,8 @@ class ApplicationConfigSelect(Select):
         return {
             "apphooks_configuration": configs,
             "apphooks_configuration_url": urls,
-            "apphooks_configuration_value": value,
+            "apphooks_configuration_value": str(value) if value is not None else "",
+            # apphook_configuration_value needs to correspond to correspond to str(config.pk)
         }
 
     def get_context(self, name, value, attrs):

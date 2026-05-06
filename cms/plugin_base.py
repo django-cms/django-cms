@@ -243,14 +243,13 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Disables *dragging* of child plugins in structure mode.
     disable_child_plugins = False
 
-    #: Disables *editing* of this plugin in structure mode. Useful for plugins which, for example, are managed by
-    #: their parent plugins.
+    #: Marks this plugin as a *slot* — a structural container that is not directly editable by the user.
     #:
-    #: If editing is disabled, the plugin will be rendered in structure mode normally, but double-clicking on it will
+    #: If ``True``, the plugin will be rendered in structure mode normally, but double-clicking on it will
     #: not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
     #:
     #: Moving or adding child plugins are not affected.
-    disable_edit = False
+    is_slot = False
 
     #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which have no
     #: fields to fill, or which have valid default values for *all* fields.

@@ -153,35 +153,42 @@ follows:
 - ``index_view`` at ``/hello/world/``
 - ``archive_view`` at ``/hello/world/archive/``
 
-Using page placeholders on an apphooked page
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _using_placeholders_on_apphooked_pages:
+
+Using placeholders on an apphooked page
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 5.1
 
 Even though the URL routing is delegated to your application, the *page* still exists and can
-carry content in its placeholders.
+carry content in its placeholders. The :ttag:`placeholder` template tag can therefore be used
+in your apphook's templates.
 
-If you want an "app landing page" that editors can manage (for example, intro text above the app
-output), render the page's placeholders in your application template.
+By default (when the apphook view does not call ``request.toolbar.set_object()``), the
+:ttag:`placeholder` tag resolves against the current page's
+:class:`~cms.models.contentmodels.PageContent`, exactly as it would on a regular CMS page —
+including ``inherit`` walking up the page tree.
 
 For example, in the template used by your app's view:
 
 .. code-block:: html+django
 
-        {% load cms_tags %}
-        {% block content %}
-            {% placeholder "content" %}
-            {# application output below #}
-        {% endblock %}
+    {% load cms_tags %}
+    {% block content %}
+        {% placeholder "content" %}
+        {# application output below #}
+    {% endblock %}
 
 This works because django CMS sets ``request.current_page`` for apphook requests.
 
 .. note::
 
-        If your apphook view calls ``request.toolbar.set_object(some_model_instance)``, placeholder
-        editing/rendering will apply to that object (for example if it uses
-        :class:`~cms.models.fields.PlaceholderRelationField`). If you want to edit the page's
-        placeholders instead, avoid overriding the toolbar object.
+    If your apphook view calls ``request.toolbar.set_object(some_model_instance)`` with
+    an instance of a model that uses
+    :class:`~cms.models.fields.PlaceholderRelationField`, the :ttag:`placeholder` tag
+    will instead resolve against that object's placeholders (and ``inherit`` has no
+    effect in this case). Set the toolbar object only when you want editors to work on
+    that custom model rather than on the page.
 
 Sub-pages of an apphooked page
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

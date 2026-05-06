@@ -10,6 +10,7 @@ from django.db import models
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
+from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -369,9 +370,11 @@ def get_bound_plugins(plugins):
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
         plugin_ids.append(plugin.pk)
-        base_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
+        plugin_model = get_plugin_model(plugin.plugin_type)
+        base_model = plugin_model._meta.concrete_model  # Collect all base models
         if base_model is CMSPlugin:
-            plugin_lookup[plugin.pk] = plugin  # No downcast needed
+            plugin.__class__ = plugin_model  # In case it's a proxy model
+            plugin_lookup[plugin.pk] = plugin  # Otherwise, no downcast needed
         else:
             plugin_types_map[base_model].append(plugin.pk)
 
@@ -379,7 +382,7 @@ def get_bound_plugins(plugins):
         plugin_queryset = base_model.objects.filter(pk__in=pks)
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_queryset.iterator():
+        for instance in plugin_queryset.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
             model = get_plugin_model(instance.plugin_type)  # Get original class
             instance.__class__ = model  # Cast to correct model (including proxies)
             plugin_lookup[instance.pk] = instance
@@ -423,14 +426,16 @@ def downcast_plugins(
     for plugin in plugins:
         # Keep track of the plugin ids we've received
         try:
-            base_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
+            plugin_model = get_plugin_model(plugin.plugin_type)
+            base_model = plugin_model._meta.concrete_model  # Collect all base models
         except KeyError:
             # Plugin not available
             logger.error(f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info())
             continue
         plugin_ids.append(plugin.pk)
         if base_model is CMSPlugin:
-            plugin_lookup[plugin.pk] = plugin  # No downcast needed
+            plugin.__class__ = plugin_model  # In case it is a proxy model
+            plugin_lookup[plugin.pk] = plugin  # otherwise, no downcast needed
         else:
             plugin_types_map[base_model].append(plugin.pk)
 
@@ -446,7 +451,7 @@ def downcast_plugins(
 
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs.iterator():
+        for instance in plugin_qs.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
             cls = get_plugin_class(instance.plugin_type)  # Plugin class
             instance.__class__ = cls.model  # Cast to original model (including proxies)
             plugin_lookup[instance.pk] = instance

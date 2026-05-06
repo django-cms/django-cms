@@ -167,7 +167,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, obj=None, page=None):
                 "value": plugin.value,
                 "name": names.get(plugin.value, plugin.name),
                 "module": modules.get(plugin.value, plugin.module),
-                "add_form": plugin.show_add_form and not plugin.disable_edit,
+                "add_form": plugin.show_add_form and not plugin.is_slot,
             }
         )
     return sorted(main_list, key=operator.itemgetter("module"))
