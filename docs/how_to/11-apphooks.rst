@@ -219,20 +219,21 @@ Inference cannot work in some cases, in which the lookup falls back to ``None``:
 - views that return a fully-rendered ``HttpResponse`` (for example via the
   ``render()`` shortcut)
 
-For these cases, declare the template explicitly on the apphook class::
+For these cases, override :meth:`~cms.app_base.CMSApp.get_root_template` on the
+apphook class. The override receives the same ``page`` and ``language`` arguments
+as :meth:`~cms.app_base.CMSApp.get_urls`, so the returned template can vary per
+page or language::
 
     class MyApphook(CMSApp):
         name = _("My Apphook")
-        _root_template = "myapp/home.html"
 
         def get_urls(self, page=None, language=None, **kwargs):
             return ["myapp.urls"]
 
-If the template depends on the page, language, or other request-time state,
-override :meth:`~cms.app_base.CMSApp.get_root_template` instead — it receives the
-same ``page`` and ``language`` arguments as ``get_urls``.
+        def get_root_template(self, page=None, language=None, **kwargs):
+            return "myapp/home.html"
 
-Make sure that the template you declare here matches the one your root view
+Make sure that the template you return here matches the one your root view
 actually renders, otherwise the placeholders shown in the structure board will
 diverge from those rendered on the page.
 

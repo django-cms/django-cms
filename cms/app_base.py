@@ -12,8 +12,6 @@ class CMSApp:
     _urls = []
     #: list of menu classes: example: ``_menus = [MyAppMenu]``
     _menus = []
-    #: Root template cache for structure board
-    _root_template = None
     #: Human-readable name of the apphook (required). This name will be displayed
     #: on the admin site.
     name = None
@@ -127,14 +125,11 @@ class CMSApp:
         Best-effort: walks the urlconfs from :meth:`get_urls` to locate the
         pattern matching the empty path and returns ``template_name`` from its
         view class (CBVs) or callback (FBVs that expose it). Returns ``None``
-        for views that compute the template dynamically — set
-        :attr:`_root_template` explicitly to override.
+        for views that compute the template dynamically — override this method
+        to return the template name in that case.
 
         :return: template name or None
         """
-        if self._root_template is not None:
-            return self._root_template
-
         from django.urls import URLPattern, URLResolver, get_resolver
 
         def find_root(patterns):
@@ -160,14 +155,11 @@ class CMSApp:
             callback = pattern.callback
             view_class = getattr(callback, 'view_class', None)
             view_initkwargs = getattr(callback, 'view_initkwargs', None) or {}
-            template = (
+            return (
                 view_initkwargs.get('template_name')
                 or getattr(view_class, 'template_name', None)
                 or getattr(callback, 'template_name', None)
             )
-            if template:
-                self._root_template = template
-            return template
 
         return None
 

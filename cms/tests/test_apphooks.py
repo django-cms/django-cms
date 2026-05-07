@@ -185,13 +185,14 @@ class ApphooksTestCase(BaseApphooksTestCase):
         )
         page_content = page.pagecontent_set.get(language='en')
 
-        # SampleApp's root view is a function-based view, so without an
-        # explicit override get_root_template returns None and PageContent
+        # SampleApp's root view is a function-based view, so without a custom
+        # get_root_template override the lookup returns None and PageContent
         # falls back to the page's configured template.
         self.assertEqual(page_content.get_template(), 'nav_playground.html')
 
         sample_app = apphook_pool.get_apphook(APP_NAME)
-        sample_app._root_template = 'apphook/from_root_view.html'
+        original = sample_app.get_root_template
+        sample_app.get_root_template = lambda **kwargs: 'apphook/from_root_view.html'
         try:
             del page_content._template_cache
             self.assertEqual(
@@ -199,7 +200,7 @@ class ApphooksTestCase(BaseApphooksTestCase):
                 'apphook/from_root_view.html',
             )
         finally:
-            sample_app._root_template = None
+            sample_app.get_root_template = original
 
         self.apphook_clear()
 
@@ -1408,15 +1409,14 @@ class GetRootTemplateTests(SimpleTestCase):
 
         self.assertIsNone(self._make_app(urlconf).get_root_template())
 
-    def test_explicit_root_template_short_circuits_lookup(self):
-        class HomeView(TemplateView):
-            template_name = 'apphook/auto.html'
-
-        urlconf = _register_root_template_urlconf([path('', HomeView.as_view())])
-
+    def test_subclass_can_override_get_root_template(self):
+        # The advertised escape hatch when inference doesn't fit: override
+        # the method on the apphook subclass.
         class _App(CMSApp):
-            _urls = [urlconf]
-            _root_template = 'apphook/manual.html'
+            _urls = []
+
+            def get_root_template(self, page=None, language=None, **kwargs):
+                return 'apphook/manual.html'
 
         self.assertEqual(_App().get_root_template(), 'apphook/manual.html')
 
@@ -1460,19 +1460,30 @@ class GetRootTemplateTests(SimpleTestCase):
 
         self.assertIsNone(self._make_app(urlconf).get_root_template())
 
-    def test_inferred_template_is_cached_on_instance(self):
-        class HomeView(TemplateView):
-            template_name = 'apphook/cached.html'
+    def test_inferred_template_is_not_cached(self):
+        # Inferred templates must NOT be cached on the apphook instance:
+        # apphook instances are shared singletons, and apphooks like
+        # VariableUrlsApp return different urlconfs depending on page/language.
+        # Caching the first inferred template would lock it in for every
+        # subsequent (possibly differently-routed) call.
+        class HomeOne(TemplateView):
+            template_name = 'apphook/one.html'
 
-        urlconf = _register_root_template_urlconf([path('', HomeView.as_view())])
-        app = self._make_app(urlconf)
+        class HomeTwo(TemplateView):
+            template_name = 'apphook/two.html'
 
-        self.assertEqual(app.get_root_template(), 'apphook/cached.html')
+        urlconf_one = _register_root_template_urlconf([path('', HomeOne.as_view())])
+        urlconf_two = _register_root_template_urlconf([path('', HomeTwo.as_view())])
 
-        # If the lookup ran a second time, it would now find no urlconfs and
-        # return None; the cached value should be returned instead.
-        app.get_urls = lambda *args, **kwargs: []
-        self.assertEqual(app.get_root_template(), 'apphook/cached.html')
+        urlconfs = iter([urlconf_one, urlconf_two])
+
+        class _App(CMSApp):
+            def get_urls(self, page=None, language=None, **kwargs):
+                return [next(urlconfs)]
+
+        app = _App()
+        self.assertEqual(app.get_root_template(), 'apphook/one.html')
+        self.assertEqual(app.get_root_template(), 'apphook/two.html')
 
     def test_invalid_urlconf_string_returns_none(self):
         # A urlconf that fails to import shouldn't crash the lookup.
