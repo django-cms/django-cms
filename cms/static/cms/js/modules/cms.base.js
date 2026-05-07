@@ -451,14 +451,14 @@ export const Helpers = {
         // any URL params present in the url parameter should be of higher priority        
         const paramsFromUrl = new URLSearchParams(fullUrl.search);
 
-        const excluded_params  = ['cms_path'];
+        const excludedParams  = ['cms_path'];
         for (const [key] of paramsFromUrl.entries()) {
-            excluded_params.push(key);
+            excludedParams.push(key);
         }        
 
         // remove any conflicts
         const params = new URLSearchParams(win.location.search);
-        for (const key of excluded_params) {
+        for (const key of excludedParams) {
             params.delete(key);
         }
 
