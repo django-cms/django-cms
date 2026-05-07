@@ -829,7 +829,8 @@ describe('cms.base.js', function() {
                     }
                 });
 
-                expect(CMS.API.Helpers.updateUrlWithPath('/')).toEqual('/?cms_path=%2Fde%2F%3Flanguage%3Den&language=en');
+                expect(CMS.API.Helpers.updateUrlWithPath('/'))
+                    .toEqual('/?cms_path=%2Fde%2F%3Flanguage%3Den&language=en');
             });
         });
 

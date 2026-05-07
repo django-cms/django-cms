@@ -21,7 +21,7 @@ module.exports = {
     },
     plugins: ['compat'],
     settings: {
-        polyfills: ['document-currentscript']
+        polyfills: ['document-currentscript', 'URLSearchParams']
     },
     rules: {
         // Possible Errors
