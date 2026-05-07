@@ -12,6 +12,8 @@ class CMSApp:
     _urls = []
     #: list of menu classes: example: ``_menus = [MyAppMenu]``
     _menus = []
+    #: Root template cache for structure board
+    _root_template = None
     #: Human-readable name of the apphook (required). This name will be displayed
     #: on the admin site.
     name = None
@@ -104,7 +106,7 @@ class CMSApp:
         By default, it returns the urls assigned to :py:attr:`CMSApp._urls`
 
         The method accepts page, language and generic keyword arguments:
-        you can customize this function to return different list of menu classes
+        you can customize this function to return different urlconfs
         according to the given arguments.
 
         This method **must** return a non-empty list of urlconfs,
@@ -115,6 +117,59 @@ class CMSApp:
         :return: list of urlconfs strings
         """
         return self._urls
+
+    def get_root_template(self, page=None, language=None, **kwargs):
+        """
+        .. versionadded:: 5.1
+
+        Returns the template name used by the apphook's root view.
+
+        Best-effort: walks the urlconfs from :meth:`get_urls` to locate the
+        pattern matching the empty path and returns ``template_name`` from its
+        view class (CBVs) or callback (FBVs that expose it). Returns ``None``
+        for views that compute the template dynamically — set
+        :attr:`_root_template` explicitly to override.
+
+        :return: template name or None
+        """
+        if self._root_template is not None:
+            return self._root_template
+
+        from django.urls import URLPattern, URLResolver, get_resolver
+
+        def find_root(patterns):
+            for p in patterns:
+                if p.pattern.match('') is None:
+                    continue
+                if isinstance(p, URLResolver):
+                    inner = find_root(p.url_patterns)
+                    if inner is not None:
+                        return inner
+                elif isinstance(p, URLPattern):
+                    return p
+            return None
+
+        for urlconf in self.get_urls(page=page, language=language, **kwargs):
+            try:
+                resolver = get_resolver(urlconf)
+                pattern = find_root(resolver.url_patterns)
+            except Exception:
+                continue
+            if pattern is None:
+                continue
+            callback = pattern.callback
+            view_class = getattr(callback, 'view_class', None)
+            view_initkwargs = getattr(callback, 'view_initkwargs', None) or {}
+            template = (
+                view_initkwargs.get('template_name')
+                or getattr(view_class, 'template_name', None)
+                or getattr(callback, 'template_name', None)
+            )
+            if template:
+                self._root_template = template
+            return template
+
+        return None
 
 
 class CMSAppConfig:

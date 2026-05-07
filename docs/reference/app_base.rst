@@ -19,6 +19,18 @@ App Hooks
 
         list of menu classes: example: ``_menus = [MyAppMenu]``
 
+    .. attribute:: _root_template
+
+        .. versionadded:: 5.1
+
+        Template name used by the apphook's root view, consulted by the
+        structure board when rendering placeholders on an apphooked page.
+        If left as ``None`` (the default), :meth:`get_root_template` will
+        try to infer it from the root URL pattern. Set this explicitly
+        when inference is not possible — for example, when the root view
+        is a function-based view, or selects its template at runtime.
+        Example: ``_root_template = "myapp/home.html"``.
+
 
 **********
 App Config
