@@ -194,8 +194,8 @@ Telling the structure board which template the root view uses
 .............................................................
 
 When a content editor opens the structure board on an apphooked page, django CMS
-needs to know *which* template the apphook's root view renders should it be different
-to the page's template. This is so it can show the placeholders declared in that template. 
+needs to know *which* template the apphook's root view renders, should it be different
+from the page's template. This is so it can show the placeholders declared in that template. 
 The rendered template is provided by :meth:`~cms.app_base.CMSApp.get_root_template`.
 
 By default, ``get_root_template`` inspects the URL pattern matching the empty
