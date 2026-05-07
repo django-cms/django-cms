@@ -9,6 +9,7 @@
 # Niklas Jerva <niklas.jerva@gmail.com>, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2025
 # Klaus Dahlén, 2025
+# Teemu Gratschev <teemu.gratschev@gmail.com>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-30 19:36+0100\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Klaus Dahlén, 2025\n"
+"Last-Translator: Teemu Gratschev <teemu.gratschev@gmail.com>, 2026\n"
 "Language-Team: Finnish (https://app.transifex.com/divio/teams/58664/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -252,7 +253,7 @@ msgstr "Muuta oikeuksia"
 
 #: admin/pageadmin.py:355
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "Tätä sivua ei voi valita etusivuksi."
 
 #: admin/pageadmin.py:502 admin/pageadmin.py:990
 #, python-format
@@ -275,6 +276,8 @@ msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
+"Virhe! Liittämäsi sivu ei ole käännetty millekään kohdesivustolle "
+"määritetyistä kielistä."
 
 #: admin/pageadmin.py:698
 msgid "You do not have permission to edit this page"
@@ -516,7 +519,7 @@ msgstr ""
 
 #: cms_toolbars.py:80
 msgid "What's new"
-msgstr ""
+msgstr "Uutta"
 
 #: cms_toolbars.py:100 templates/cms/wizards/create.html:5
 #: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5

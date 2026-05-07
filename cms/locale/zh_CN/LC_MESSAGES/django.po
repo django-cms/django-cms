@@ -5,7 +5,7 @@
 # Translators:
 # 华鹏 刘 <lhp.n.reg@gmail.com>, 2023
 # Aosp T, 2023
-# Florian Delizy <florian.delizy@gmail.com>, 2023
+# da27e4edd0c28b0ec121570dac46e169_947ca9c, 2023
 # Scott Jiang, 2023
 # libingchao <popil1987@126.com>, 2025
 # spaceoi <zhangzhaoyu@gmail.com>, 2025
