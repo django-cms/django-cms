@@ -5,7 +5,7 @@ from django.contrib.admin import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.sites.models import Site
-from django.db import OperationalError
+from django.db import OperationalError, ProgrammingError
 from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import (
@@ -58,12 +58,12 @@ class PagePermissionInlineAdmin(TabularInline):
 
         # Given a fresh django-cms install and a django settings with the
         # CMS_RAW_ID_USERS = CMS_PERMISSION = True
-        # django throws an OperationalError when running
-        # ./manage migrate
-        # because auth_user doesn't exists yet
+        # django throws an OperationalError (sqlite) or ProgrammingError
+        # (postgres) when running ./manage migrate because the user table
+        # doesn't exist yet.
         try:
             threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
+        except (OperationalError, ProgrammingError):
             threshold = False
 
         return ['user'] if threshold else []
@@ -138,7 +138,7 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
         threshold = get_cms_setting('RAW_ID_USERS')
         try:
             threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
+        except (OperationalError, ProgrammingError):
             threshold = False
         filter_copy = deepcopy(self.list_filter)
         if threshold:
@@ -164,12 +164,12 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
 
         # Given a fresh django-cms install and a django settings with the
         # CMS_RAW_ID_USERS = CMS_PERMISSION = True
-        # django throws an OperationalError when running
-        # ./manage migrate
-        # because auth_user doesn't exists yet
+        # django throws an OperationalError (sqlite) or ProgrammingError
+        # (postgres) when running ./manage migrate because the user table
+        # doesn't exist yet.
         try:
             threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
+        except (OperationalError, ProgrammingError):
             threshold = False
 
         return ['user'] if threshold else []

@@ -1,6 +1,10 @@
+from unittest.mock import patch
+
 from django.contrib.sites.models import Site
+from django.db import OperationalError, ProgrammingError
 from django.test.utils import override_settings
 
+from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import assign_user_to_page, create_page
 from cms.cache.permissions import (
     clear_user_permission_cache,
@@ -111,3 +115,44 @@ class PermissionCacheTests(CMSTestCase):
         with self.assertWarns(RemovedInDjangoCMS51Warning) as w:
             self.assertFalse(has_page_permission(self.user_normal, page_b, "publish"))
         self.assertEqual(str(w.warning), message)
+
+@override_settings(CMS_PERMISSION=True, CMS_RAW_ID_USERS=1)
+class PermissionAdminMigrationSafetyTests(CMSTestCase):
+    """
+    Regression tests for the case where the user table does not yet exist
+    (e.g. during ``migrate`` on a fresh install with a custom user model).
+
+    Counting users then raises ``OperationalError`` on sqlite or
+    ``ProgrammingError`` on postgres. Both must be swallowed so that the
+    admin classes can still be imported and registered during migrations.
+    """
+
+    def _patched_user_model(self, exc):
+        class _BrokenManager:
+            def count(self):
+                raise exc
+
+        class _BrokenUserModel:
+            objects = _BrokenManager()
+
+        return patch(
+            'cms.admin.permissionadmin.get_user_model',
+            return_value=_BrokenUserModel,
+        )
+
+    def test_inline_raw_id_fields_swallows_db_errors(self):
+        for exc in (OperationalError("no such table"), ProgrammingError("relation does not exist")):
+            with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, [])
+
+    def test_global_admin_raw_id_fields_swallows_db_errors(self):
+        for exc in (OperationalError("no such table"), ProgrammingError("relation does not exist")):
+            with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, [])
+
+    def test_global_admin_get_list_filter_swallows_db_errors(self):
+        admin_instance = GlobalPagePermissionAdmin(GlobalPagePermission, admin_site=None)
+        for exc in (OperationalError("no such table"), ProgrammingError("relation does not exist")):
+            with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
+                # Falls back to the unfiltered list_filter (still includes 'user')
+                self.assertIn('user', admin_instance.get_list_filter(request=None))

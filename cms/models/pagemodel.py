@@ -4,7 +4,7 @@ from os.path import join
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.db import IntegrityError, models
+from django.db import IntegrityError, connection, models
 from django.db.models import F, Prefetch, Q
 from django.db.models.base import ModelState
 from django.db.models.constraints import UniqueConstraint
@@ -26,6 +26,16 @@ from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
 logger = getLogger(__name__)
+
+
+def _lock_tree_roots(*pages):
+    # Serializes concurrent URL path updates by taking a row-level lock on the
+    # tree root(s) of the given pages, which prevents deadlocks on cms_pageurl.
+    # Locks are acquired in pk order to avoid deadlocks between the locks
+    # themselves when two roots are involved.
+    assert connection.in_atomic_block, "_lock_tree_roots requires an active transaction"
+    pks = sorted({page.get_root().pk for page in pages})
+    list(Page.objects.filter(pk__in=pks).order_by("pk").select_for_update())
 
 
 class AdminCacheDict(dict):
@@ -238,8 +248,11 @@ class Page(MP_Node):
                 site=self.site_id,
             )
         except self.__class__.DoesNotExist:
+            _lock_tree_roots(self)
             old_home_tree = []
         else:
+            _lock_tree_roots(self, old_home)
+
             old_home.update(
                 is_home=False,
                 changed_by=changed_by,
@@ -417,8 +430,9 @@ class Page(MP_Node):
         self.update(parent=self.parent)
         self.refresh_from_db(fields=("path", "depth"))
 
-        # Update the urls for the page being moved
-        # and is descendants.
+        # Update the urls for the page being moved and its descendants.
+        _lock_tree_roots(self)
+
         languages = self.urls.values_list("language", flat=True)
 
         for language in languages:
