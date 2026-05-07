@@ -240,7 +240,7 @@ class PageContent(models.Model):
             self._placeholder_slot_cache = (self._placeholder_slot_cache,)
         return self._placeholder_slot_cache
 
-    def get_template(self):
+    def get_template(self, app_hooks=True):
         """
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise.
@@ -256,7 +256,7 @@ class PageContent(models.Model):
         if not get_cms_setting("TEMPLATES"):
             return ""
 
-        if self.page.application_urls:
+        if app_hooks and self.page.application_urls:
             from cms.apphook_pool import apphook_pool
 
             apphook = apphook_pool.get_apphook(self.page.application_urls)
