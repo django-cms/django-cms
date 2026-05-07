@@ -18,8 +18,9 @@
  *
  *   - `window.CMS.API.Helpers` — the grab-bag of cross-feature
  *     helpers ported in `modules/cms-base.ts`. None of those helpers
- *     touch jQuery at module-load time; the only jQuery user
- *     (`Helpers.csrf`) is async and lazy-loads jQuery itself.
+ *     touch jQuery at all; `Helpers.csrf` (the only legacy jQuery
+ *     consumer) was dropped — v5 modules use the native `request.ts`
+ *     wrapper for CSRF.
  *
  *   - `window.CMS.KEYS` — legacy key-code lookup.
  *

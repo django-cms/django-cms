@@ -8,10 +8,8 @@
  * This module USED to be the JQUERY GATEWAY: it imported jQuery at
  * module-load time, exported pre-wrapped `$window` / `$document`, and
  * ran `$(callback)` for DOM-ready wiring. All of that is gone — jQuery
- * is now strictly opt-in via `core/cms-jquery.ts`. The only Helpers
- * method that still needs jQuery is `csrf()`, which lazy-loads it via
- * `loadCmsJquery()` because it has to call `$.ajaxSetup` for legacy
- * callers that still issue jQuery-style ajax requests.
+ * is now strictly opt-in via `core/cms-jquery.ts`, and this file has
+ * no jQuery dependency at all.
  *
  * Where the legacy module used jQuery:
  *
@@ -21,7 +19,10 @@
  *   - `$(callback)` DOM-ready — replaced with native
  *     `DOMContentLoaded` + `document.readyState` check.
  *   - `preventSubmit` (form submit guard) — native DOM equivalent.
- *   - `csrf` ($.ajaxSetup) — async, lazy-loads jQuery.
+ *   - `csrf` ($.ajaxSetup) — DROPPED. v5 modules use the native
+ *     `request.ts` wrapper (per-call cookie read); no v5 caller
+ *     invoked `Helpers.csrf()`. If a future ported bundle needs
+ *     jQuery-ajax CSRF, it can call `$.ajaxSetup` itself.
  *   - `addEventListener` / `removeEventListener` / `dispatchEvent`
  *     (legacy event bus on `#cms-top`) — delegate to `cmsEvents`,
  *     which has its own jQuery bridge so legacy `.trigger/.on` calls
@@ -54,7 +55,6 @@
 
 import { debounce, once, throttle } from 'lodash-es';
 
-import { loadCmsJquery } from './core/cms-jquery';
 import { cmsEvents } from './core/event-bus';
 import { hideLoader, showLoader } from './loader';
 
@@ -144,12 +144,6 @@ export interface HelpersType {
     onPluginSave(): void;
     _pluginExists(pluginId: string | number): boolean;
     preventSubmit(): void;
-    /**
-     * Lazy-loads jQuery on first call so legacy `$.ajax` consumers
-     * have CSRF wired up. Async because the load may take a network
-     * round-trip on first use.
-     */
-    csrf(csrfToken: string): Promise<void>;
     setSettings(newSettings: Record<string, unknown>): Record<string, unknown>;
     getSettings(): Record<string, unknown>;
     makeURL(url: string, params?: Array<[string, string]>): string;
@@ -307,22 +301,6 @@ export const Helpers: HelpersType = {
                         input.style.opacity = SUBMITTED_OPACITY;
                     });
             });
-        });
-    },
-
-    // ────────────────────────────────────────────────────────────
-    // Legacy jQuery AJAX CSRF setup (lazy)
-    // ────────────────────────────────────────────────────────────
-
-    async csrf(csrfToken) {
-        // Loaded lazily because this is the only Helpers method that
-        // needs jQuery on a contrib-only page; pulling it in eagerly
-        // would defeat the lazy-load contract for `CMS.$`.
-        const $ = await loadCmsJquery();
-        $.ajaxSetup({
-            beforeSend(xhr) {
-                xhr.setRequestHeader('X-CSRFToken', csrfToken);
-            },
         });
     },
 
