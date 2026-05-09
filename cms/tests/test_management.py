@@ -2,6 +2,8 @@ import sys
 from io import StringIO
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
@@ -18,6 +20,9 @@ from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks
+from cms.toolbar.toolbar import CMSToolbar
+from cms.utils import get_current_site
+from cms.utils.conf import get_cms_setting
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
@@ -230,6 +235,18 @@ class ManagementTestCase(CMSTestCase):
         placeholder.add_plugin(bogus_plugin)
         add_plugin(placeholder, TextPlugin, "en", body="en body")
 
+        # Test detached placeholders case
+        content_type = ContentType.objects.get_for_model(User) # Use an existing model
+        obj = User.objects.create(username="test_delete_orphaned")
+        ph_detached = Placeholder.objects.create(slot="test_detached", content_type=content_type, object_id=obj.pk)
+        pl_detached = add_plugin(ph_detached, TextPlugin, "en", body="en body")
+        obj.delete() # Now ph_detached is detached
+
+        # Test model class not existing
+        bogus_ct = ContentType.objects.create(app_label="bogus", model="bogus")
+        ph_bogus = Placeholder.objects.create(slot="test_bogus", content_type=bogus_ct, object_id=1)
+        pl_bogus = add_plugin(ph_bogus, TextPlugin, "en", body="en body")
+
         report = plugin_report()
 
         # there should be reports for three plugin types
@@ -238,26 +255,10 @@ class ManagementTestCase(CMSTestCase):
             3)
 
         # check the bogus plugin
-        bogus_plugins_report = report[0]
-        self.assertEqual(
-            len(bogus_plugins_report["instances"]),
-            1)
-
-        # check the link plugin
-        link_plugins_report = report[1]
-        self.assertEqual(
-            len(link_plugins_report["instances"]),
-            1)
-
-        # check the text plugins
-        text_plugins_report = report[2]
-        self.assertEqual(
-            len(text_plugins_report["instances"]),
-            3)
-
-        self.assertEqual(
-            len(text_plugins_report["unsaved_instances"]),
-            1)
+        for plugin in report:
+            if plugin["type"] == "BogusPlugin":
+                self.assertEqual(len(plugin["instances"]), 1)
+                self.assertFalse(plugin["model"])
 
         out = StringIO()
         management.call_command('cms', 'delete-orphaned-plugins', interactive=False, stdout=out)
@@ -287,6 +288,20 @@ class ManagementTestCase(CMSTestCase):
         # No gaps in plugin tree
         max_position = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
         self.assertEqual(max_position, 3)
+
+        self.assertEqual(CMSPlugin.objects.all().count(), 3)
+
+        # Then both detached placeholders and their plugins should be gone
+        self.assertFalse(Placeholder.objects.filter(pk=ph_detached.pk).exists())
+        self.assertFalse(Placeholder.objects.filter(pk=ph_bogus.pk).exists())
+        self.assertFalse(CMSPlugin.objects.filter(pk=pl_detached.pk).exists())
+        self.assertFalse(CMSPlugin.objects.filter(pk=pl_bogus.pk).exists())
+
+        # check stdout
+        output = out.getvalue()
+        self.assertIn("1 uninstalled plugins", output)
+        self.assertIn("1 plugins with unsaved instances", output)
+        self.assertIn("2 detached placeholders", output)
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_delete_orphaned_plugins_keeps_positions_consecutive(self):
