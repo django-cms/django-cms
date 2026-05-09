@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Exists, OuterRef
 
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models.placeholdermodel import Placeholder
@@ -12,6 +13,41 @@ class DeleteOrphanedPluginsCommand(SubcommandsCommand):
                    'but don\'t, and ones for which a corresponding plugin model can no '
                    'longer be found')
     command_name = 'delete-orphaned-plugins'
+
+    def get_detached_placeholders(self):
+        detached_placeholder_ids = []
+        content_types = list(
+            Placeholder.objects.exclude(content_type_id__isnull=True)
+            .values_list('content_type_id', flat=True)
+            .distinct()
+        )
+        content_type_map = ContentType.objects.in_bulk(content_types)
+
+        for content_type_id in content_types:
+            content_type = content_type_map.get(content_type_id)
+            model_class = content_type.model_class() if content_type else None
+
+            if model_class is None:
+                detached_placeholder_ids.extend(
+                    Placeholder.objects.filter(content_type_id=content_type_id)
+                    .values_list('id', flat=True)
+                )
+                continue
+
+            detached_placeholder_ids.extend(
+                Placeholder.objects.filter(
+                    content_type_id=content_type_id,
+                    object_id__isnull=False,
+                )
+                .annotate(
+                    object_exists=Exists(
+                        model_class._default_manager.filter(pk=OuterRef('object_id'))
+                    )
+                )
+                .filter(object_exists=False)
+                .values_list('id', flat=True)
+            )
+        return detached_placeholder_ids
 
     def handle(self, *args, **options):
         """
@@ -34,26 +70,7 @@ class DeleteOrphanedPluginsCommand(SubcommandsCommand):
             for instance in plugin['unsaved_instances']:
                 unsaved_instance_ids.append(instance.pk)
 
-        detached_placeholder_ids = []
-        content_types = Placeholder.objects.exclude(content_type_id__isnull=True).values_list('content_type_id', flat=True).distinct()
-        for content_type_id in content_types:
-            try:
-                content_type = ContentType.objects.get(id=content_type_id)
-                model_class = content_type.model_class()
-            except ContentType.DoesNotExist:
-                model_class = None
-
-            if model_class is None:
-                placeholders = Placeholder.objects.filter(content_type_id=content_type_id)
-                detached_placeholder_ids.extend(placeholders.values_list('id', flat=True))
-            else:
-                placeholders = Placeholder.objects.filter(content_type_id=content_type_id).exclude(object_id__isnull=True)
-                object_ids = set(placeholders.values_list('object_id', flat=True))
-                existing_object_ids = set(model_class.objects.filter(pk__in=object_ids).values_list('pk', flat=True))
-                missing_object_ids = object_ids - existing_object_ids
-                if missing_object_ids:
-                    detached_placeholders = placeholders.filter(object_id__in=missing_object_ids)
-                    detached_placeholder_ids.extend(detached_placeholders.values_list('id', flat=True))
+        detached_placeholder_ids = self.get_detached_placeholders()
 
         if options.get('interactive'):
             confirm = input("""
