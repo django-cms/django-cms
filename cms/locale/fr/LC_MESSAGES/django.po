@@ -11,7 +11,7 @@
 # Sylvain Chiron <chironsylvain@orange.fr>, 2023
 # Frédéric Roland, 2023
 # Adrien Delhorme, 2025
-# Florian Delizy <florian.delizy@gmail.com>, 2025
+# da27e4edd0c28b0ec121570dac46e169_947ca9c, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2025
 # Robin Durner, 2025
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2025
