@@ -950,6 +950,33 @@ default
 Cache expiration (in seconds) for view and other permissions.
 
 
+..  setting:: CMS_MENU_CACHE_BACKEND
+
+CMS_MENU_CACHE_BACKEND
+======================
+
+default
+    ``'default'``
+
+The Django cache alias used for the menu tree cache.
+Set this to route menu cache entries to a dedicated backend.
+
+Example::
+
+    CMS_MENU_CACHE_BACKEND = 'menu'
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': '127.0.0.1:11211',
+        },
+        'menu': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/django_menu_cache',
+        },
+    }
+
+
 ..  setting:: CMS_CACHE_PREFIX
 
 CMS_CACHE_PREFIX

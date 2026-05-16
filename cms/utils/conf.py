@@ -4,6 +4,7 @@ from typing import Any
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
@@ -64,6 +65,7 @@ DEFAULTS = {
     'PAGE_CACHE': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
+    'MENU_CACHE_BACKEND': 'default',
     'CACHE_PREFIX': f'cms_{__version__}_',
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
@@ -115,6 +117,10 @@ def get_cache_durations():
         'content': 60,
         'permissions': 60 * 60,
     })
+
+
+def get_menu_cache():
+    return caches[get_cms_setting('MENU_CACHE_BACKEND')]
 
 
 @default('CMS_MEDIA_ROOT')

@@ -3,7 +3,6 @@ from logging import getLogger
 
 from django.contrib import messages
 from django.contrib.sites.models import Site
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
@@ -13,7 +12,7 @@ from django.utils.translation import (
 )
 
 from cms.utils import get_current_site
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_cms_setting, get_menu_cache
 from cms.utils.i18n import (
     get_default_language_for_site,
 )
@@ -163,7 +162,7 @@ class MenuRenderer:
         """
         key = self.cache_key
 
-        cached_nodes = cache.get(key, None)
+        cached_nodes = get_menu_cache().get(key, None)
 
         if cached_nodes and self.is_cached:
             # Only use the cache if the key is present in the database.
@@ -193,7 +192,7 @@ class MenuRenderer:
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
-        cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
+        get_menu_cache().set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
 
         if not self.is_cached:
             # No need to invalidate the internal lookup cache,
@@ -354,7 +353,7 @@ class MenuPool:
         to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
 
         if to_be_deleted:
-            cache.delete_many(to_be_deleted)
+            get_menu_cache().delete_many(to_be_deleted)
             cache_keys.delete()
 
     def register_menu(self, menu_cls):
