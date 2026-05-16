@@ -239,7 +239,8 @@ class ApplicationConfigSelect(Select):
         return {
             "apphooks_configuration": configs,
             "apphooks_configuration_url": urls,
-            "apphooks_configuration_value": value,
+            "apphooks_configuration_value": str(value) if value is not None else "",
+            # apphook_configuration_value needs to correspond to correspond to str(config.pk)
         }
 
     def get_context(self, name, value, attrs):

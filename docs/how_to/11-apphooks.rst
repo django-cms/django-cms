@@ -153,35 +153,89 @@ follows:
 - ``index_view`` at ``/hello/world/``
 - ``archive_view`` at ``/hello/world/archive/``
 
-Using page placeholders on an apphooked page
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _using_placeholders_on_apphooked_pages:
+
+Using placeholders on an apphooked page
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 5.1
 
 Even though the URL routing is delegated to your application, the *page* still exists and can
-carry content in its placeholders.
+carry content in its placeholders. The :ttag:`placeholder` template tag can therefore be used
+in your apphook's templates.
 
-If you want an "app landing page" that editors can manage (for example, intro text above the app
-output), render the page's placeholders in your application template.
+By default (when the apphook view does not call ``request.toolbar.set_object()``), the
+:ttag:`placeholder` tag resolves against the current page's
+:class:`~cms.models.contentmodels.PageContent`, exactly as it would on a regular CMS page —
+including ``inherit`` walking up the page tree.
 
 For example, in the template used by your app's view:
 
 .. code-block:: html+django
 
-        {% load cms_tags %}
-        {% block content %}
-            {% placeholder "content" %}
-            {# application output below #}
-        {% endblock %}
+    {% load cms_tags %}
+    {% block content %}
+        {% placeholder "content" %}
+        {# application output below #}
+    {% endblock %}
 
 This works because django CMS sets ``request.current_page`` for apphook requests.
 
 .. note::
 
-        If your apphook view calls ``request.toolbar.set_object(some_model_instance)``, placeholder
-        editing/rendering will apply to that object (for example if it uses
-        :class:`~cms.models.fields.PlaceholderRelationField`). If you want to edit the page's
-        placeholders instead, avoid overriding the toolbar object.
+    If your apphook view calls ``request.toolbar.set_object(some_model_instance)`` with
+    an instance of a model that uses
+    :class:`~cms.models.fields.PlaceholderRelationField`, the :ttag:`placeholder` tag
+    will instead resolve against that object's placeholders (and ``inherit`` has no
+    effect in this case). Set the toolbar object only when you want editors to work on
+    that custom model rather than on the page.
+
+Telling the structure board which template the root view uses
+.............................................................
+
+When a content editor opens the structure board on an apphooked page, django CMS
+needs to know *which* template the apphook's root view renders, should it be different
+from the page's template. This is so it can show the placeholders declared in that template. 
+The rendered template is provided by :meth:`~cms.app_base.CMSApp.get_root_template`.
+
+By default, ``get_root_template`` inspects the URL pattern matching the empty
+path inside :meth:`~cms.app_base.CMSApp.get_urls` and reads its ``template_name``.
+This works automatically for class-based views in either of these forms::
+
+    # template_name set on the class
+    class HomeView(TemplateView):
+        template_name = "myapp/home.html"
+
+    urlpatterns = [path("", HomeView.as_view())]
+
+    # or passed as an as_view() keyword argument
+    urlpatterns = [path("", TemplateView.as_view(template_name="myapp/home.html"))]
+
+Inference cannot work in some cases, in which the lookup falls back to ``None``:
+
+- function-based views — the template name lives inside the view body, not on
+  the callable
+- views that select their template at runtime
+- views that return a fully-rendered ``HttpResponse`` (for example via the
+  ``render()`` shortcut)
+
+For these cases, override :meth:`~cms.app_base.CMSApp.get_root_template` on the
+apphook class. The override receives the same ``page`` and ``language`` arguments
+as :meth:`~cms.app_base.CMSApp.get_urls`, so the returned template can vary per
+page or language::
+
+    class MyApphook(CMSApp):
+        name = _("My Apphook")
+
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["myapp.urls"]
+
+        def get_root_template(self, page=None, language=None, **kwargs):
+            return "myapp/home.html"
+
+Make sure that the template you return here matches the one your root view
+actually renders, otherwise the placeholders shown in the structure board will
+diverge from those rendered on the page.
 
 Sub-pages of an apphooked page
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
