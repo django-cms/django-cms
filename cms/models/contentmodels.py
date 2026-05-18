@@ -240,16 +240,31 @@ class PageContent(models.Model):
             self._placeholder_slot_cache = (self._placeholder_slot_cache,)
         return self._placeholder_slot_cache
 
-    def get_template(self):
+    def get_template(self, app_hooks=True):
         """
         get the template of this page if defined or if closer parent if
-        defined or DEFAULT_PAGE_TEMPLATE otherwise
+        defined or DEFAULT_PAGE_TEMPLATE otherwise.
+
+        If the page has an apphook assigned and its root view exposes a
+        template, that template wins — it's what the apphook actually renders
+        at the page URL, so the structure board's placeholder layout must
+        match it.
         """
         if hasattr(self, "_template_cache"):
             return self._template_cache
 
         if not get_cms_setting("TEMPLATES"):
             return ""
+
+        if app_hooks and self.page.application_urls:
+            from cms.apphook_pool import apphook_pool
+
+            apphook = apphook_pool.get_apphook(self.page.application_urls)
+            if apphook is not None:
+                apphook_template = apphook.get_root_template(page=self.page, language=self.language)
+                if apphook_template:
+                    self._template_cache = apphook_template
+                    return self._template_cache
 
         if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
             self._template_cache = self.template or self.template_choices[0][0]

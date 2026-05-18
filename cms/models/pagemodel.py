@@ -983,7 +983,7 @@ class Page(MP_Node):
     def get_template(self, language=None, fallback=True, force_reload=False):
         content = self.get_content_obj(language, fallback, force_reload)
         if content:
-            return content.get_template()
+            return content.get_template(app_hooks=False)
         return get_cms_setting("TEMPLATES")[0][0] if get_cms_setting("TEMPLATES") else ""
 
     def get_template_name(self):
