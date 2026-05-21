@@ -60,6 +60,30 @@ class WizardCreateView(SessionWizardView):
             context['wizard_entry'] = self.get_selected_entry()
         return context
 
+    def get_form_list(self):
+        """
+        Resolve the wizard's form list.
+
+        Step ``'1'`` is declared with a placeholder ``Form`` because the real
+        form depends on the entry chosen in step ``'0'``. Once step 0 has been
+        completed, the real form is built and substituted here. Doing the
+        substitution in ``get_form_list`` -- instead of mutating the shared
+        ``self.form_list`` -- keeps the swap visible to django-formtools 2.6+,
+        which caches ``get_form_list`` results.
+        """
+        form_list = super().get_form_list()
+        # ``_building_step_2`` guards against infinite recursion: building the
+        # step-2 form needs step 0's cleaned data, which itself resolves the
+        # form list again.
+        if '1' in form_list and not getattr(self, '_building_step_2', False):
+            self._building_step_2 = True
+            try:
+                if self.get_cleaned_data_for_step('0') is not None:
+                    form_list['1'] = self.get_step_2_form()
+            finally:
+                self._building_step_2 = False
+        return form_list
+
     def get_form(self, step=None, data=None, files=None):
         if step is None:
             step = self.steps.current
@@ -71,9 +95,6 @@ class WizardCreateView(SessionWizardView):
             self.page_pk = data.get(page_key, None)
         else:
             self.page_pk = None
-
-        if self.is_second_step(step):
-            self.form_list[step] = self.get_step_2_form(step, data, files)
         return super().get_form(step, data, files)
 
     def get_form_kwargs(self, step=None):
