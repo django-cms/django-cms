@@ -1,7 +1,12 @@
-.. _tutorials:
+.. _introduction:
 
-Tutorials
-=========
+Introduction (legacy tutorial)
+==============================
+
+.. note::
+
+   A rewritten, shorter tutorial lives at :ref:`tutorials`. This page
+   is kept temporarily so external links do not break.
 
 The pages in this section of the documentation are aimed at the newcomer to django CMS.
 They're designed to help you get started quickly, and show how easy it is to work with

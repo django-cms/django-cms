@@ -147,17 +147,17 @@ You will need to add the following to its list of ``INSTALLED_APPS``:
 - `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django
   CMS's page tree structures.
 
-django CMS also installs `django CMS admin style
-<https://github.com/django-cms/djangocms-admin-style>`_. This provides some styling that
-helps make django CMS administration components easier to work with. Technically it's an
-optional component and does not need to be enabled in your project, but it's strongly
-recommended for a more consistent user experience.
+django CMS also installs `djangocms-simple-admin-style
+<https://github.com/fsbraun/djangocms-simple-admin-style>`_. This provides some styling
+that helps make django CMS administration components easier to work with. Technically
+it's an optional component and does not need to be enabled in your project, but it's
+strongly recommended for a more consistent user experience.
 
 In the ``INSTALLED_APPS``, **before** ``django.contrib.admin``, add:
 
 .. code-block::
 
-    "djangocms_admin_style",
+    "djangocms_simple_admin_style",
 
 Language settings
 +++++++++++++++++
