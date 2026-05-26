@@ -52,7 +52,8 @@ What you will build
 
 By the end of chapter 5 your project will contain:
 
-- an ``About`` page and a ``Home`` page authored in the CMS toolbar,
+- an ``About`` page and a ``Home`` page authored in django CMS' frontend editing 
+  interface,
 - a custom plugin called *Coffee card* that editors can drop into any
   placeholder,
 - a ``coffeeshop`` Django app exposing a catalogue at ``/menu/``, mounted

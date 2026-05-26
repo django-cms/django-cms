@@ -5,7 +5,9 @@
 A custom plugin
 ===============
 
-Built-in plugins (Text, Image, etc.) only get you so far. In this
+django CMS does not come with built-in plguins. We have been using plugins 
+(Text, Image, etc.) provided by packages such as djangocms-text or 
+djangocms-frontend. Standardized plugins only get you so far. In this
 chapter you will create a *Coffee card* plugin: a small reusable
 component editors can drop into any placeholder to show one of your
 coffees, with a name, an origin, and a price.

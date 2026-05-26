@@ -6,7 +6,7 @@ Your first page
 ===============
 
 You will create a CMS page, drop a text plugin onto it, and publish it.
-No code in this chapter — only the toolbar.
+No code in this chapter — only the django CMS frontend editing interface.
 
 Goal
 ----
@@ -46,10 +46,13 @@ ends in ``/about/``.
 The page is using the default template, which exposes a single
 *placeholder* called ``Content`` in the middle of the page.
 
-#. Click into the ``Content`` placeholder.
-#. Choose **Add plugin** → **Text**.
+#. Click into the toggle on the top right of the page to open the structure board.
+#. The structure board will show the page's single placeholder, called ``Content``. Click the
+   the **plus button** next to it to add a plugin.
+
+#. The plugin selector appears. Choose **Text**.
 #. Type a heading and a short paragraph in the rich-text editor.
-#. Click the green check to save the plugin.
+#. Click **Save** to commit changes to the page.
 
 The page now shows your text.
 
@@ -69,8 +72,7 @@ The page now shows your text.
 So far the page only exists in *draft*. Anonymous visitors cannot see
 it.
 
-#. In the toolbar, click **Publish page changes** (or use the *Page*
-   menu → **Publish page**).
+#. In the toolbar, on the right side click **Publish **.
 #. Open ``http://localhost:8000/about/`` in a private browser window or
    different browser where you are not logged in.
 
@@ -91,10 +93,11 @@ redirects to the only page that exists. Let us make that explicit.
 
 #. In the toolbar, click **Create** → **New page**.
 #. Title: ``Home``. Click **Create**.
-#. In the toolbar, open **Page** → **Advanced settings…**
-#. Check the **Soft root** box if visible, and more importantly, open
-   the **Page** menu and choose **Set as home**.
-#. **Publish** the page.
+#. In the toolbar's first menu (labelled "example.com") open **Pages...**.
+#. The page tree opens. Click the **three dots** next to the Home new page and choose
+   **Set as home**.
+#. **Publish** the page (either through the toolbar as before, or by clicking on the circle
+   next to the page in the page tree).
 
 .. note::
 

@@ -6,7 +6,7 @@ Templates and placeholders
 ==========================
 
 So far the CMS rendered your pages using the default template that ships
-with the quickstart project. In this chapter you will write your own
+with the djangocms-frontend package. In this chapter you will write your own
 template with two placeholders so editors can manage a header strip
 *and* a body, and you will pick which template a page uses from the
 toolbar.
@@ -36,7 +36,6 @@ it by setting, in ``settings.py``:
         },
     ]
 
-(If you used the quickstart, this is already in place.)
 
 2. Add a base template
 ----------------------
@@ -154,7 +153,7 @@ A reusable region with ``static_alias``
 
 If you want a region whose content is *the same on every page* (a
 footer, for example), use ``{% static_alias %}`` instead of
-``{% placeholder %}``. It looks identical to editors, but the content
+``{% placeholder %}``. It works similar for editors, but the content
 is stored once and reused everywhere:
 
 .. code-block:: html+django
