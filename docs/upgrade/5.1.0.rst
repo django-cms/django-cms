@@ -1,8 +1,8 @@
 .. _upgrade-to-5.1.0:
 
-###################
+#####################
 5.1.0a1 release notes
-###################
+#####################
 
 *February 14, 2026*
 
@@ -217,7 +217,7 @@ API
 ---------------------
 
 * ``StaticPlaceholder`` has been removed from ``cms.models`` and ``cms.admin``.
-Use `static aliases <https://github.com/django-cms/djangocms-alias>`_ instead.
+  Use `static aliases <https://github.com/django-cms/djangocms-alias>`_ instead.
 
 * This implies that ``cms.plugin_rendering`` does not accept static placeholders any more.
 
@@ -227,7 +227,7 @@ Placeholders
 ------------
 
 * ``PlaceholderField`` has been removed from ``cms.fields``. Use :class:`~cms.models.fields.PlaceholderRelationField` in conjunction with
-:meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see :ref:`placeholders_outside_cms`).
+  :meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see :ref:`placeholders_outside_cms`).
 
 * ``PlaceholderAdminMixin`` has been removed from ``cms.admin``. It is not needed anymore and can be safely removed from your code.
 

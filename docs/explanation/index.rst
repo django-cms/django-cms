@@ -27,7 +27,6 @@ explore how that philosophy is reflected throughout the CMS.
    apphooks
    publishing
    multiple_languages
-   i18n
    permissions
    menu_system
    frontend-integration

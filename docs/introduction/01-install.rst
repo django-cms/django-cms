@@ -411,7 +411,7 @@ This is worth explaining in a little detail:
 - ``{% load cms_tags sekizai_tags %}`` loads the template tag libraries we use in the
   template.
 - ``{% page_attribute "page_title" %}`` extracts the page's ``page_title``
-  :ref:`attribute <page_attribute>`.
+  :ttag:`attribute <page_attribute>`.
 - ``{% render_block "css" %}`` and ``{% render_block "js" %}`` are Sekizai template tags
   that load blocks of HTML defined by Django applications. django CMS defines blocks for
   CSS and JavaScript, and requires these two tags. We recommended placing ``{%
@@ -475,7 +475,7 @@ For deployment, you need to configure suitable media file serving. **For develop
 purposes only**, the following will work in your ``urls.py``:
 
 .. code-block:: python
-    :emphasize-lines: 1,2,6
+    :emphasize-lines: 1,2,4
 
     from django.conf import settings
     from django.conf.urls.static import static

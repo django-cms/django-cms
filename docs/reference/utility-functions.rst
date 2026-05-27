@@ -44,21 +44,31 @@ Plugins
 *******
 
 .. module:: cms.utils.plugins
+   :no-index:
 
 .. autofunction:: get_plugins
+   :no-index:
 
 .. autofunction:: assign_plugins
+   :no-index:
 
 .. autofunction:: has_reached_plugin_limit
+   :no-index:
 
 .. autofunction:: get_plugin_class
+   :no-index:
 
 .. autofunction:: get_plugin_model
+   :no-index:
 
 .. autofunction:: get_plugins_as_layered_tree
+   :no-index:
 
 .. autofunction:: copy_plugins_to_placeholder
+   :no-index:
 
 .. autofunction:: downcast_plugins
+   :no-index:
 
 .. autofunction:: get_bound_plugins
+   :no-index:
