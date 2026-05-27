@@ -80,7 +80,6 @@ The per-language options that matter most are:
 The setting can be configured per site (for multi-site projects),
 with a ``default`` block providing fall-through values.
 
-----
 
 .. _determining_language_preference:
 
