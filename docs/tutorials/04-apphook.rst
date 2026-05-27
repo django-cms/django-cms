@@ -136,7 +136,22 @@ Create ``coffeeshop/cms_apps.py``:
         def get_urls(self, page=None, language=None, **kwargs):
             return ["coffeeshop.urls"]
 
+``app_name`` is the URL namespace the apphook installs into. Because
+``coffeeshop/urls.py`` also declares ``app_name = "coffeeshop"`` and
+gives the list view ``name="list"``, you can reverse it from anywhere
+in the project as ``{% url "coffeeshop:list" %}`` — even though the
+URL itself is decided by whichever CMS page you attach the apphook to.
+
 Restart ``runserver`` (apphooks are loaded at startup).
+
+.. tip::
+
+   If you find yourself attaching, moving, or removing apphooks while
+   you work, add ``cms.middleware.utils.ApphookReloadMiddleware`` at
+   the **top** of ``MIDDLEWARE`` in ``settings.py``. The CMS then
+   reloads the URL conf in-process when an apphook changes, and you no
+   longer need to restart ``runserver`` for each edit. (The
+   ``djangocms`` quickstart already includes it.)
 
 4. Attach the apphook to a page
 -------------------------------

@@ -67,12 +67,19 @@ Create ``templates/base.html``:
     </body>
     </html>
 
-Two things to notice:
+A few things to notice:
 
 - ``{% placeholder "Name" %}`` is what creates a placeholder. The name
   is what editors see in the toolbar.
 - ``{% cms_toolbar %}`` is required for the toolbar to render — without
   it, you cannot edit.
+- ``{% render_block "css" %}`` and ``{% render_block "js" %}`` come
+  from `django-sekizai <https://django-sekizai.readthedocs.io>`_.
+  Plugins ship their own CSS and JavaScript; when several plugins on
+  the same page need the same asset, sekizai collects them so each
+  block is rendered exactly once, in the right place in the document.
+  Every django CMS template needs the ``"css"`` block in ``<head>``
+  and the ``"js"`` block just before ``</body>``.
 
 For everything ``{% placeholder %}`` accepts, see
 :doc:`/reference/placeholders`. For the conceptual story, see

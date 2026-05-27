@@ -72,7 +72,7 @@ The page now shows your text.
 So far the page only exists in *draft*. Anonymous visitors cannot see
 it.
 
-#. In the toolbar, on the right side click **Publish **.
+#. In the toolbar, on the right side click **Publish**.
 #. Open ``http://localhost:8000/about/`` in a private browser window or
    different browser where you are not logged in.
 
