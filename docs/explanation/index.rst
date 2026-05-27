@@ -21,6 +21,8 @@ explore how that philosophy is reflected throughout the CMS.
    :maxdepth: 1
 
    philosophy
+   composition
+   content_objects
    plugins
    apphooks
    publishing

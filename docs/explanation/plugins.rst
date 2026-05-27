@@ -5,6 +5,9 @@ Plugins
 
 .. seealso::
 
+    - :ref:`How django CMS is composed <composition>` — where plugins
+      fit alongside pages and apphooks, including the plugin-vs-apphook
+      decision aid.
     - :ref:`Plugins how-to guide <custom-plugins>`
 
 CMS Plugins are reusable content publishers that can be inserted into django CMS pages
