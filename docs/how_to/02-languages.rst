@@ -7,7 +7,7 @@ How to serve multiple languages
 If you used `django CMS quickstart <https://github.com/django-cms/django-cms-quickstart>`_ to start your project, you'll find
 that it's already set up for serving multilingual content. Our :ref:`installation guide <install-django-cms-tutorial>` also does the same.
 
-This guide specifically describes the steps required to enable multilingual support, in case you need to it manually.
+This guide specifically describes the steps required to enable multilingual support, in case you need to do it manually.
 
 
 .. _multilingual_urls:
