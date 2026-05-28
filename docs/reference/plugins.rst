@@ -25,7 +25,7 @@ Plugins
         See also: :meth:`render_plugin` , :meth:`render_template`
 
   .. attribute:: allowed_models
-        :no-index:
+        :noindex:
 
         A list of model identifiers (in the format ``"app_label.modelname"``) that
         restricts where this plugin can be used. If ``None`` (default), the plugin
