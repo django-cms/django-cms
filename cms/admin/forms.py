@@ -519,6 +519,27 @@ class DuplicatePageForm(AddPageForm):
     )
 
 
+def url_is_locked(page_content):
+    """Return whether ``page_content``'s URL is shared with a published
+    (publicly visible) version of the same page and language.
+
+    With a versioning package installed the slug and path live on the
+    (unversioned) :class:`~cms.models.pagemodel.PageUrl` and are therefore
+    shared across all versions of a page. Editing the slug of a draft would
+    silently change the URL of the already published version. Without versioning
+    the content being edited *is* the public version, so the URL is never
+    locked.
+    """
+    if page_content is None or page_content.pk is None:
+        return False
+    public_pk = (
+        PageContent.objects.filter(page=page_content.page_id, language=page_content.language)
+        .values_list("pk", flat=True)
+        .first()
+    )
+    return public_pk is not None and public_pk != page_content.pk
+
+
 class ChangePageForm(BasePageContentForm):
     overwrite_url = forms.CharField(
         label=_("Overwrite URL"),
@@ -601,6 +622,19 @@ class ChangePageForm(BasePageContentForm):
         if not self.url_obj.managed:
             self.fields["overwrite_url"].initial = self.url_obj.path
 
+        if self._url_is_locked:
+            # The URL is shared with a published version of this page (only
+            # possible with a versioning package installed). Changing the slug
+            # or overwrite URL would silently change the live URL, so drop those
+            # fields from the editable form. PageContentAdmin renders them as
+            # read-only instead (see PageContentAdmin.get_readonly_fields()).
+            self.fields.pop("slug", None)
+            self.fields.pop("overwrite_url", None)
+
+    @cached_property
+    def _url_is_locked(self):
+        return url_is_locked(self.instance)
+
     @cached_property
     def _language(self):
         return self.instance.language
@@ -614,6 +648,10 @@ class ChangePageForm(BasePageContentForm):
             return data
 
         page = self.instance.page
+
+        if self._url_is_locked:
+            # The slug and overwrite URL are read-only; the URL must not change.
+            return data
 
         if page.is_home:
             data["path"] = ""
@@ -683,16 +721,21 @@ class ChangePageForm(BasePageContentForm):
             changed_date=timezone.now(),
             **data,
         )
-        page.update_urls(
-            self._language,
-            path=page_path,
-            slug=page_slug,
-            managed=not bool(page_overwrite_url),
-        )
-        page._update_url_path_recursive(self._language)
+        from cms.models.pagemodel import _lock_tree_roots
+
+        if not self._url_is_locked:
+            # When the URL is shared with a published version the slug/path must
+            # not change, so the (read-only) URL fields are ignored on save.
+            page.update_urls(
+                self._language,
+                path=page_path,
+                slug=page_slug,
+                managed=not bool(page_overwrite_url),
+            )
+            page._update_url_path_recursive(self._language)
         page.clear_cache(menu=True)
 
-        if page.application_urls and "slug" in self.changed_data:
+        if not self._url_is_locked and page.application_urls and "slug" in self.changed_data:
             # Connects the apphook restart handler to the request finished signal
             set_restart_trigger()
         send_post_page_operation(
