@@ -530,12 +530,11 @@ def url_is_locked(page_content):
     """
     if page_content is None or page_content.pk is None:
         return False
-    public_pk = (
+    return (
         PageContent.objects.filter(page=page_content.page_id, language=page_content.language)
         .values_list("pk", flat=True)
-        .first()
+        .exclude(pk=page_content.pk).exists()
     )
-    return public_pk is not None and public_pk != page_content.pk
 
 
 class ChangePageForm(BasePageContentForm):
