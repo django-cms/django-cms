@@ -517,7 +517,7 @@ class DuplicatePageForm(AddPageForm):
     )
 
 
-def url_is_locked(page_content):
+def url_is_locked(page_content: PageContent) -> bool:
     """Return whether ``page_content``'s URL is shared with a published
     (publicly visible) version of the same page and language.
 

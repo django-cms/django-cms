@@ -34,6 +34,8 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
+from django.utils.functional import lazy
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _, gettext_lazy
@@ -85,6 +87,10 @@ from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.urlutils import admin_reverse
 
 require_POST = method_decorator(require_POST)
+
+# Lazily-evaluated format_html so translatable admin labels containing markup are
+# resolved at render time (and in the active language), not at import time.
+format_html_lazy = lazy(format_html, str)
 
 
 class PageDeleteMessageMixin:
@@ -850,7 +856,11 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return readonly_fields
 
     @admin.display(
-        description=gettext_lazy("Slug (to change it, first unpublish the currently published version of this page)")
+        description=format_html_lazy(
+            '{} <small class="help">{}</small>',
+            gettext_lazy("Slug"),
+            gettext_lazy("(to change it, first unpublish the currently published version of this page)"),
+        )
     )
     def slug(self, obj):
         # For read-only views: Get slug from the page content object
@@ -859,8 +869,10 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return obj._url_obj.slug
 
     @admin.display(
-        description=gettext_lazy(
-            "Overwrite URL (to change it, first unpublish the currently published version of this page)"
+        description=format_html_lazy(
+            '{} <small class="help">{}</small>',
+            gettext_lazy("Overwrite URL"),
+            gettext_lazy("(to change it, first unpublish the currently published version of this page)"),
         )
     )
     def overwrite_url(self, obj):
