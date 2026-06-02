@@ -25,6 +25,7 @@ explore how that philosophy is reflected throughout the CMS.
    content_objects
    plugins
    apphooks
+   request_lifecycle
    publishing
    multiple_languages
    permissions

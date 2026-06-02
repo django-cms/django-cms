@@ -22,8 +22,6 @@ For the internals of each piece, follow the cross-links:
 - :doc:`publishing`
 - :doc:`menu_system`
 
-----
-
 The three building blocks
 -------------------------
 
@@ -57,8 +55,6 @@ The three building blocks
 The content object is the **unit of editable content**. The plugin is
 the **unit of composition inside it**. The apphook is **how other
 content joins the page tree**.
-
-----
 
 How they fit together
 ---------------------

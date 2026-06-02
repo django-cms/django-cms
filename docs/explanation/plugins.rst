@@ -124,3 +124,35 @@ the CMS are:
 - ``search_fields``
 - ``show_full_result_count``
 - ``view_on_site``
+
+Beyond Python plugins: djangocms-frontend
+-----------------------------------------------
+
+Every plugin described so far requires a Python class — a
+``CMSPluginBase`` subclass, and usually a model.
+`djangocms-frontend <https://github.com/django-cms/djangocms-frontend>`_
+offers two lighter-weight paths to a plugin, both translated into full
+django CMS plugins under the hood:
+
+**Template components.** Write a Django template, place it in a
+``cms_components`` directory inside one of your apps, and
+djangocms-frontend auto-detects it at startup. Fields are declared in
+the template itself — no Python file is needed.
+
+**Custom components.** Write a Python class (subclassing
+``CMSFrontendComponent``) in a ``cms_components.py`` file, declare its
+fields as Django form field attributes, and register it with the
+``@components.register`` decorator. This gives you full control over
+the add and change forms — fieldsets, custom validation, mixins —
+while still avoiding the boilerplate of a full ``CMSPluginBase``
+subclass.
+
+Both paths are framework-agnostic (the built-in components and mixins
+that ship with djangocms-frontend target Bootstrap 5, but you are not
+tied to it). Their trade-off is scope: template components cannot
+contain Python code at all, and custom components cannot add methods
+to the plugin or model class. When you need that full control, a
+``CMSPluginBase`` subclass is the right tool.
+
+For step-by-step tutorials and examples, see the `djangocms-frontend
+documentation <https://djangocms-frontend.readthedocs.io>`_.

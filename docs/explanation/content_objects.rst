@@ -15,8 +15,6 @@ table, the pattern looks like one extra hop. It is. The hop is what
 makes multilingual content, versioning, and editorial workflows
 composable rather than baked into the page model.
 
-----
-
 The two parts
 -------------
 
