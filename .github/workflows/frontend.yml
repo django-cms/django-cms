@@ -19,11 +19,17 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm install
-    - name: Install Chrome for Testing and export its path
+    - name: Resolve Chrome binary and export its path
       run: |
-        rm -rf ~/.cache/puppeteer/chrome
-        CHROME_BIN="$(npx puppeteer browsers install chrome --format '{{path}}' | tail -n1)"
-        echo "Installed Chrome at: $CHROME_BIN"
+        # Prefer the Chrome that ships preinstalled on the runner image.
+        CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium-browser || true)"
+        # Fall back to downloading Chrome for Testing via puppeteer.
+        if [ -z "$CHROME_BIN" ]; then
+          rm -rf ~/.cache/puppeteer/chrome
+          npx puppeteer browsers install chrome
+          CHROME_BIN="$(node -e "console.log(require('puppeteer').executablePath())")"
+        fi
+        echo "Using Chrome at: $CHROME_BIN"
         test -x "$CHROME_BIN"
         echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
     - run: npm install -g gulp@latest
