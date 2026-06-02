@@ -19,6 +19,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm install
+    - run: rm -rf ~/.cache/puppeteer/chrome
     - run: npx puppeteer browsers install chrome
     - run: npm install -g gulp@latest
     - run: gulp unitTest
