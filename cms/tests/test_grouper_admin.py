@@ -240,15 +240,29 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
             "content__secret_greeting": ["category_name"],
             "category_name": ["content__secret_greeting"],
         }
-        admin._prepopulated_fields = admin.prepopulated_fields
 
         # Act
         readonly_fields = admin.get_readonly_fields(None)
+        prepopulated = admin.get_prepopulated_fields(None)
 
         # Assert
         self.assertIn("content__secret_greeting", readonly_fields)
-        self.assertNotIn("content__secret_greeting", admin.prepopulated_fields)
-        self.assertIn("category_name", admin.prepopulated_fields)
+        self.assertNotIn("content__secret_greeting", prepopulated)
+        self.assertIn("category_name", prepopulated)
+        # The class attribute is not mutated by get_readonly_fields/get_prepopulated_fields.
+        self.assertIn("content__secret_greeting", admin.prepopulated_fields)
+
+    def test_prepopulated_fields_respects_class_attribute_after_init(self):
+        """``cls.prepopulated_fields`` set after the admin is instantiated is honored."""
+        # Arrange
+        admin = copy.copy(self.admin)
+        admin.prepopulated_fields = {"category_name": ["content__secret_greeting"]}
+
+        # Act
+        prepopulated = admin.get_prepopulated_fields(None)
+
+        # Assert: no shadow instance attribute hides the class-level value.
+        self.assertEqual(prepopulated, {"category_name": ["content__secret_greeting"]})
 
     def test_changelist_view_does_not_call_get_content_obj(self):
         self.createContentInstance("en")

@@ -304,9 +304,6 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 dict(),
             )
 
-        # Store prepopulated fields to be used in get_readonly_fields
-        self._prepopulated_fields = self.prepopulated_fields
-
         # Generate accessor functions for content model fields
         content_field_names = modelform_factory(self.content_model, fields="__all__").base_fields.keys()
         for content_field in content_field_names:
@@ -716,11 +713,21 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     if field != self.grouper_field_name and field not in self.extra_grouping_fields
                 ),
             ]
-        # Ensure no read-only fields are in prepopulated_fields
-        self.prepopulated_fields = {
-            key: value for key, value in self._prepopulated_fields.items() if key not in fields
-        }
         return fields
+
+    def get_prepopulated_fields(self, request: HttpRequest, obj: models.Model | None = None) -> dict:
+        """Drop prepopulated entries whose key is read-only.
+
+        ``AdminForm`` looks up every prepopulated key in the rendered form, so an entry
+        keyed on a field that ``get_readonly_fields`` returns would raise ``KeyError``.
+        Filter dynamically against the class attribute so subclasses can keep declaring
+        ``prepopulated_fields`` the normal way.
+        """
+        prepopulated_fields = super().get_prepopulated_fields(request, obj)
+        if not prepopulated_fields:
+            return prepopulated_fields
+        readonly = set(self.get_readonly_fields(request, obj))
+        return {key: value for key, value in prepopulated_fields.items() if key not in readonly}
 
     def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
         """Save/create both grouper and content object"""
