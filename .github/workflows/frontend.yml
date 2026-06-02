@@ -19,8 +19,13 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm install
-    - run: rm -rf ~/.cache/puppeteer/chrome
-    - run: npx puppeteer browsers install chrome
+    - name: Install Chrome for Testing and export its path
+      run: |
+        rm -rf ~/.cache/puppeteer/chrome
+        CHROME_BIN="$(npx puppeteer browsers install chrome --format '{{path}}' | tail -n1)"
+        echo "Installed Chrome at: $CHROME_BIN"
+        test -x "$CHROME_BIN"
+        echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
     - run: npm install -g gulp@latest
     - run: gulp unitTest
     - run: gulp lint
