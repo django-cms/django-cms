@@ -3,17 +3,27 @@
 Content objects: the grouper / content pattern
 ==============================================
 
-Every editable thing in django CMS — a page, an alias, a versioned
-blog post — is stored as **two cooperating objects**: a *grouper* that
-holds the long-lived identity, and one or more *content* rows that
-hold the editable state. This split is the foundation of how django
-CMS 4 handles translations, versions, drafts, and any other "many
-flavours of the same thing" concern.
+Suppose you are building a site that needs pages in three languages,
+with draft/publish workflow, and a blog that inherits the same
+behaviour. In a typical Django project you would model each concern
+separately — translation tables, version fields, publish flags — and
+wire them together by hand.
+
+django CMS solves this once, at the architecture level. **Every
+editable thing is a content object** — a page, an alias, a blog post,
+a product listing. Each is stored as two cooperating objects: a
+*grouper* that holds the long-lived identity (what it is, where it
+lives in the tree), and one or more *content* rows that hold the
+editable state (the title, the body, the template — per language, per
+version). Versioning, translations, and permissions plug into this
+split through contracts. Your model gets them without the CMS needing
+to know what your model is.
 
 If you have only ever used Django models that put everything in one
 table, the pattern looks like one extra hop. It is. The hop is what
-makes multilingual content, versioning, and editorial workflows
-composable rather than baked into the page model.
+makes the CMS treat your blog post and a CMS page as the same kind of
+thing — both get the draft/publish toolbar, both get translated through
+the same mechanism, both participate in the same permission model.
 
 The two parts
 -------------

@@ -1,12 +1,20 @@
 Philosophy
 ==========
 
-django CMS is a **framework for building content-managed sites**, not a
-ready-made site you fill with content. Think of it as a box of LEGO
-bricks rather than a model-car kit: the kit gives you one car, while
-the bricks give you the parts and the rules for combining them. A few
-of those parts ship in the box; the rest you bring yourself or pick
-from a wide ecosystem of add-ons.
+django CMS gives **editors** a toolbar on the live site where they
+compose pages from reusable components — drag a hero image into place,
+drop in a card grid, reorder the sections. It gives **developers**
+standard Django — models, views, templates, URL patterns — and plugs
+their work into that editing surface. And it gives **designers** full
+control over templates and CSS, unconstrained by an admin theme or a
+fixed set of layout options. Each role owns its surface; the CMS
+connects them without any one needing to understand the internals of
+the others.
+
+Think of it as a box of LEGO bricks rather than a model-car kit: the
+kit gives you one car, while the bricks give you the parts and the
+rules for combining them. A few of those parts ship in the box; the
+rest you bring yourself or pick from a wide ecosystem of add-ons.
 
 Everything else on this page follows from that single idea.
 
