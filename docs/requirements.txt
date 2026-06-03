@@ -79,7 +79,7 @@ furo==2025.12.19
     # via -r requirements.in
 h11==0.16.0
     # via uvicorn
-idna==3.11
+idna==3.15
     # via
     #   anyio
     #   requests
@@ -198,7 +198,7 @@ typing-extensions==4.15.0
     #   exceptiongroup
     #   starlette
     #   uvicorn
-urllib3==2.6.3
+urllib3==2.7.0
     # via requests
 uvicorn==0.40.0
     # via sphinx-autobuild
