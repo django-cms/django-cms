@@ -97,7 +97,7 @@ The CMS menu is a *template tag*. Edit ``templates/base.html`` to
 import it and use it inside the header.
 
 .. code-block:: html+django
-    :emphasize-lines: 1,4,9-19
+    :emphasize-lines: 1,7,13-18
 
     {% load cms_tags sekizai_tags menu_tags static %}
     <!doctype html>
