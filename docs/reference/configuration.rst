@@ -955,6 +955,8 @@ Cache expiration (in seconds) for view and other permissions.
 CMS_MENU_CACHE_BACKEND
 ======================
 
+.. versionadded:: 5.1
+
 default
     ``'default'``
 
