@@ -1,4 +1,4 @@
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit, urlunsplit
 
 from django.apps import apps
 from django.conf import settings
@@ -15,7 +15,13 @@ from django.http import (
 from django.shortcuts import render
 from django.template.defaultfilters import title
 from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, Resolver404, resolve, reverse
+from django.urls import (
+    NoReverseMatch,
+    Resolver404,
+    get_script_prefix,
+    resolve,
+    reverse,
+)
 from django.utils.cache import patch_cache_control
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
@@ -225,14 +231,46 @@ def details(request, slug):
     return render_pagecontent(request, content)
 
 
+def _get_login_redirect_url(request, redirect_to):
+    """Return a safe redirect target for the toolbar login view.
+
+    The ``next`` parameter is fully controlled by the client, so it must never
+    be trusted as-is (CWE-601, open redirect). A target is only accepted when
+
+    * it stays on the current host and uses an allowed scheme, and
+    * its path can be resolved against the project's URL configuration, i.e. it
+      actually points at a view served by this site.
+
+    Anything else falls back to the CMS root. The returned URL is rebuilt from
+    the validated, host-less components, so neither the scheme nor the host
+    supplied by the client is ever echoed back into the redirect.
+    """
+    fallback = reverse("pages-root")
+    if not redirect_to or not url_has_allowed_host_and_scheme(
+        url=redirect_to, allowed_hosts={request.get_host()}
+    ):
+        return fallback
+
+    parts = urlsplit(redirect_to)
+    # ``resolve()`` expects a path relative to the URL configuration, i.e.
+    # without the (optional) script prefix that the client-supplied URL carries.
+    path = parts.path
+    script_prefix = get_script_prefix()
+    if script_prefix != "/" and path.startswith(script_prefix):
+        path = "/" + path[len(script_prefix):]
+
+    try:
+        resolve(path)
+    except Resolver404:
+        return fallback
+
+    # Rebuild the redirect from the validated path only; drop scheme and host.
+    return urlunsplit(("", "", quote(parts.path), parts.query, parts.fragment))
+
+
 @require_POST
 def login(request):
-    redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
-
-    if not url_has_allowed_host_and_scheme(url=redirect_to, allowed_hosts=request.get_host()):
-        redirect_to = reverse("pages-root")
-    else:
-        redirect_to = quote(redirect_to)
+    redirect_to = _get_login_redirect_url(request, request.GET.get(REDIRECT_FIELD_NAME))
 
     if request.user.is_authenticated:
         return HttpResponseRedirect(redirect_to)
@@ -242,7 +280,9 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user_cache)
     else:
-        redirect_to += '?cms_toolbar_login_error=1'
+        # Append the error flag, preserving any query string already present.
+        separator = '&' if urlsplit(redirect_to).query else '?'
+        redirect_to += f'{separator}cms_toolbar_login_error=1'
     return HttpResponseRedirect(redirect_to)
 
 
