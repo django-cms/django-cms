@@ -63,6 +63,23 @@ class TreeFieldParityTests(SimpleTestCase):
         )
         self.assertIs(get_tree_base(), expected)
 
+    def test_queryset_is_treebeard_free_in_mptree_mode(self):
+        # The page queryset must not inherit from treebeard when the mptree
+        # backend is active -- otherwise treebeard would be imported.
+        import os
+
+        from cms.models.query import PageQuerySet
+
+        mro_modules = {base.__module__ for base in PageQuerySet.__mro__}
+        if os.environ.get("CMS_TREE_BACKEND") == "mptree":
+            self.assertNotIn("treebeard.mp_tree", mro_modules)
+        else:
+            self.assertIn("treebeard.mp_tree", mro_modules)
+        # The manager is backend-agnostic (never treebeard) in either mode.
+        from cms.models import Page
+
+        self.assertNotIn("treebeard", type(Page.objects).__module__)
+
 
 class PageTreeBackendTests(CMSTestCase):
     """Runs under the active backend; identical assertions must hold for both."""
@@ -168,6 +185,26 @@ class PageTreeBackendTests(CMSTestCase):
             list(root.get_child_pages().values_list("pk", flat=True)),
             [c.pk, a.pk, b.pk],  # preserved, NOT [a, b, c]
         )
+
+    def test_bulk_queryset_delete_updates_numchild(self):
+        # Bulk Page.objects.filter(...).delete() must keep the surviving
+        # parent's numchild correct (treebeard does this; the mptree branch
+        # must too). Descendants are removed via parent FK CASCADE.
+        root = create_page("root", TEMPLATE, "en")
+        a = create_page("a", TEMPLATE, "en", parent=root)
+        create_page("b", TEMPLATE, "en", parent=root)
+        create_page("a_child", TEMPLATE, "en", parent=a)
+
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 2)
+
+        # delete `a` (and its subtree) via a bulk queryset delete
+        Page.objects.filter(pk=a.pk).delete()
+
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+        self.assertEqual(root.get_child_pages().count(), 1)
+        self.assertFalse(Page.objects.filter(pk=a.pk).exists())
 
     def test_root_nodes_and_fix_tree(self):
         r1 = create_page("r1", TEMPLATE, "en")

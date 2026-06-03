@@ -24,6 +24,12 @@ The module ships three things:
 The path encoding is byte-for-byte compatible with treebeard's defaults
 (base-36 alphabet, ``steplen=4``, no separators), so existing ``path`` values
 remain valid in either direction.
+
+A future redesign that removes sibling renumbering and the depth/width ceilings
+("fractional ordering") is sketched in the **PHASE 2 DESIGN NOTE** at the bottom
+of this module. It is intentionally *not* implemented: it requires a one-time
+migration and ends treebeard byte-compatibility, so it is a deliberate later
+step, not part of this drop-in backend.
 """
 
 from collections import defaultdict
@@ -559,27 +565,153 @@ class MaterializedPathMixin(models.Model):
         return result
 
 
-def get_tree_base():
+def get_tree_backend():
     """
-    Return the base class for the page tree, chosen by the ``CMS_TREE_BACKEND``
-    setting (``"treebeard"`` -- the default -- or ``"mptree"``).
+    The active page-tree backend: ``"treebeard"`` (default) or ``"mptree"``,
+    from the ``CMS_TREE_BACKEND`` setting. An env var of the same name overrides
+    the setting only when the setting is not explicitly defined, which keeps the
+    backends swappable in CI / subprocess tests without touching the settings
+    module. Resolved at import time, so a change requires a process restart --
+    but no migration, because both backends declare identical fields.
 
-    An env var of the same name overrides the setting only when the setting is
-    not explicitly defined; this keeps the byte-for-byte-compatible backends
-    swappable in CI / subprocess tests without touching the settings module.
-    Selection happens at import time, so a change requires a process restart --
-    but no database migration, because both backends declare identical fields.
+    ``treebeard`` is imported lazily (only by the selectors below, only when this
+    returns ``"treebeard"``), so the ``mptree`` backend never imports it.
     """
     import os
 
     from django.conf import settings
 
-    backend = getattr(settings, "CMS_TREE_BACKEND", None) or os.environ.get(
+    return getattr(settings, "CMS_TREE_BACKEND", None) or os.environ.get(
         "CMS_TREE_BACKEND", "treebeard"
     )
-    if backend == "mptree":
+
+
+def get_tree_base():
+    """Base model class for ``Page`` -- treebeard's ``MP_Node`` or our mixin."""
+    if get_tree_backend() == "mptree":
         return MaterializedPathMixin
 
     from treebeard.mp_tree import MP_Node
 
     return MP_Node
+
+
+def get_queryset_base():
+    """
+    Base class for ``PageQuerySet``. Treebeard mode keeps ``MP_NodeQuerySet``
+    (its only contribution is a tree-fixup ``delete``); mptree mode uses a plain
+    Django ``QuerySet`` so treebeard is not imported at all.
+    """
+    if get_tree_backend() == "mptree":
+        return models.QuerySet
+
+    from treebeard.mp_tree import MP_NodeQuerySet
+
+    return MP_NodeQuerySet
+
+
+# ======================================================================
+# PHASE 2 DESIGN NOTE -- FRACTIONAL ORDERING
+# ======================================================================
+#
+# Status: NOT IMPLEMENTED. Deliberate future step. Requires a one-time data
+# migration and ends treebeard byte-compatibility (so it cannot be hot-swapped
+# back to treebeard). Captured here so the design isn't lost.
+#
+# ----------------------------------------------------------------------
+# Why
+# ----------------------------------------------------------------------
+# This backend stores sibling order as contiguous base-36 steps inside `path`.
+# Two consequences follow from that single choice:
+#
+#   * Inserting/reordering in the middle of a sibling group renumbers the
+#     following siblings -- `_layout()` rewrites O(width) subtrees. (Benchmarked:
+#     a first-child move into a 2000-wide group is ~840 ms, on par with
+#     treebeard, because both renumber.) The `last-child` fast path is a single
+#     statement; only mid-inserts pay this.
+#   * Fixed `steplen=4` + `path <= 255` caps the tree at ~63 levels deep and
+#     36^4 (~1.6M) siblings per node.
+#
+# Fractional ordering removes BOTH by separating "structure" from "order" into
+# two explicit source-of-truth columns and demoting `path` to a pure read cache.
+#
+# ----------------------------------------------------------------------
+# Model
+# ----------------------------------------------------------------------
+#   class FractionalTreeMixin(models.Model):
+#       # --- source of truth ---
+#       parent   = FK("self", null=True, on_delete=CASCADE, related_name="children")
+#       position = CharField(max_length=255)   # fractional / LexoRank key, e.g.
+#                                               # "a0", "a0V", "a1"; sibling-local
+#       # --- derived read cache (rebuildable from parent_id + position) ---
+#       path      = TextField()                 # SEP-joined ancestor position keys
+#       path_hash = CharField(max_length=40, unique=True)   # sha1(path); see below
+#       depth     = PositiveIntegerField()
+#       numchild  = PositiveIntegerField(default=0)
+#
+#       class Meta:
+#           constraints = [UniqueConstraint(fields=["parent", "position"])]
+#           indexes = [Index(fields=["path_hash"])]  # + a prefix index for LIKE
+#
+# `(parent_id, position)` is the complete, minimal source of truth. `path`,
+# `depth`, `numchild` are ALL recomputable from it; `path` exists only so reads
+# stay indexed prefix scans (`path__startswith`) instead of recursion.
+#
+# Fractional key invariant: for any two sibling keys A < B there is always a key
+# strictly between them (densely-ordered strings -- append a digit when A and B
+# are adjacent). So `key_between(A, B)` lets you place/insert/reorder a node by
+# touching ONLY that node.
+#
+# ----------------------------------------------------------------------
+# Operation semantics (the payoff)
+# ----------------------------------------------------------------------
+#   * Insert between A and B: position = key_between(A.position, B.position);
+#     path = parent.path + SEP + position. ONE row. Siblings untouched -- no
+#     renumber, no `_layout`, no parking. The O(width) mid-insert -> ~O(1).
+#   * Reorder within siblings: recompute only the moved node's position between
+#     its new neighbours, then one `_reprefix` of its own subtree.
+#   * Move to a new parent: parent_id + a new position among the new siblings +
+#     one set-based subtree `_reprefix` -- same single statement as today.
+#   * Reads: unchanged. `path__startswith(prefix + SEP)` for strict descendants
+#     (the separator makes prefix matching unambiguous), `order_by("path")` for
+#     DFS order. `position` must not contain SEP.
+#
+# ----------------------------------------------------------------------
+# Gains
+# ----------------------------------------------------------------------
+#   * No sibling renumbering, ever -> mid-insert/reorder are single-node; the
+#     per-sibling loop (and any CTE written to speed it) becomes unnecessary.
+#   * No ceilings: variable-length path removes the ~63-level depth cap and the
+#     siblings-per-node cap.
+#   * Concurrency: concurrent inserts at different spots compute different keys
+#     with no shared "max+1" counter and no sibling-row locks; same-spot inserts
+#     collide only on the (parent, position) unique constraint and retry. This is
+#     the real write-concurrency win over treebeard.
+#
+# ----------------------------------------------------------------------
+# Costs / things to get right
+# ----------------------------------------------------------------------
+#   * `path` is effectively unbounded (fractional keys grow under adversarial
+#     repeated-between inserts) -> TextField. MySQL cannot put a UNIQUE index on
+#     a long/text column (767/3072-byte limit), so uniqueness lives on a
+#     `path_hash` (sha1) column, with a prefix index on `path` for LIKE.
+#   * One-time migration + end of treebeard byte-compat: backfill `position` from
+#     each node's current sibling (path-step) order, then recompute every `path`
+#     in the SEP encoding. After this, hot-swapping BACK to treebeard is no
+#     longer possible.
+#   * Own `key_between(a, b)`: ~100 lines, pure Python, no dependency (base-N
+#     midpoint, append a digit when neighbours are adjacent). It is the
+#     correctness core -- test it hard (adjacent keys, empty bounds, long chains).
+#   * Occasional key renormalisation: if a hot spot grows keys long, a rare
+#     maintenance pass reassigns short keys to a parent's children (same class as
+#     `rebuild()`, off the hot path).
+#
+# ----------------------------------------------------------------------
+# Net
+# ----------------------------------------------------------------------
+# parent_id = structure, position = order, path = indexed read cache (with depth
+# /numchild), all caches rebuildable from the first two. Deletes the renumber
+# problem and the depth/width ceilings; strongest concurrency story. Cost: one
+# irreversible migration, a TextField path + hash for MySQL uniqueness, and
+# owning key generation. Reads are unchanged.
+# ======================================================================
