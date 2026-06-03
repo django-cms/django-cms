@@ -1,6 +1,6 @@
 import warnings
 
-from treebeard.mp_tree import MP_NodeQuerySet
+from treebeard.mp_tree import MP_Node, MP_NodeQuerySet
 
 from cms.exceptions import NoHomeFound
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
@@ -10,6 +10,14 @@ class PageQuerySet(MP_NodeQuerySet):
 
     node_warning = ("As of django CMS 5.0 the Page model does not have a node property anymore. "
                     "Use the related fields directly.")
+
+    def delete(self, *args, **kwargs):
+        # With the dependency-free (mptree) backend the Page model is not an
+        # MP_Node, so treebeard's tree-fixup delete would fail. That backend
+        # maintains the tree itself, so a plain Django delete is correct.
+        if not issubclass(self.model, MP_Node):
+            return super(MP_NodeQuerySet, self).delete(*args, **kwargs)
+        return super().delete(*args, **kwargs)
 
     def get_descendants(self, parent=None):
         if parent is None:

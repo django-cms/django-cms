@@ -14,7 +14,6 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.timezone import now
 from django.utils.translation import get_language, gettext_lazy as _, override as force_language
-from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.models.managers import PageManager, PageUrlManager
@@ -22,6 +21,7 @@ from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
+from cms.utils.mptree import get_tree_base
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
@@ -44,6 +44,8 @@ class AdminCacheDict(dict):
     def __setitem__(self, key, value):
         raise ValueError("Do not set individual items in the admin cache dict. Use the clear_cache method instead.")
 
+
+MP_Node = get_tree_base()
 
 class Page(MP_Node):
     """
