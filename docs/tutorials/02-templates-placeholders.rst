@@ -169,7 +169,8 @@ is stored once and reused everywhere:
         {% static_alias "site_footer" %}
     </footer>
 
-Add that to ``base.html`` if you like. The full mechanics live in
+Add that to ``base.html`` if you like. Do not forget to add ``{% load djangocms_alias_tags %}`` at the 
+top of the file to let Django know about the static alias tag. The full mechanics live in
 :doc:`/how_to/04-templates`.
 
 Going further
