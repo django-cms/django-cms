@@ -1246,6 +1246,53 @@ class MenuTests(BaseMenuTest):
         expected_language = get_default_language_for_site(site.pk)
         self.assertEqual(renderer.request_language, expected_language)
 
+    def test_cmsnavigationnode_attr(self):
+        """
+        Test population of the attr object of the CMSNavigationNode from pages
+        """
+        page_defaults = {
+            "template": "nav_playground.html",
+            "language": "en",
+        }
+        home = create_page("Normal Page", in_navigation=True, reverse_id="normal-page", **page_defaults)
+        home.set_as_homepage()
+        create_page("Redirected Page", in_navigation=True, reverse_id="redirected-page", redirect='https://redirect.example.com', **page_defaults)
+
+        request = self.get_request("/en/")
+        context = Context()
+        context["request"] = request
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+
+        expected_normal_attr = {
+            "is_page": True,
+            "soft_root": False,
+            "redirect_url": None,
+            "auth_required": False,
+            "reverse_id": "normal-page",
+            "is_home": True,
+            "visible_for_authenticated": True,
+            "visible_for_anonymous": True,
+            "navigation_extenders": [],
+        }
+
+        expected_redirect_attr = {
+            "is_page": True,
+            "soft_root": False,
+            "redirect_url": "https://redirect.example.com",
+            "auth_required": False,
+            "reverse_id": "redirected-page",
+            "is_home": False,
+            "visible_for_authenticated": True,
+            "visible_for_anonymous": True,
+            "navigation_extenders": [],
+        }
+
+        self.assertEqual(2, len(nodes))
+        self.assertEqual(expected_normal_attr, nodes[0].attr)
+        self.assertEqual(expected_redirect_attr, nodes[1].attr)
+
 
 @override_settings(CMS_PERMISSION=False)
 class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):

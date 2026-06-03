@@ -184,6 +184,7 @@ class CMSMenu(Menu):
         attr = {
             "is_page": True,
             "soft_root": page_content.soft_root,
+            "redirect_url": page_content.redirect,
             "auth_required": page.login_required,
             "reverse_id": page.reverse_id,
             "is_home": page.is_home,
@@ -287,6 +288,7 @@ class CMSMenu(Menu):
                 "limit_visibility_in_menu",
                 "soft_root",
                 "in_navigation",
+                "redirect",
                 "page__site_id",
                 "page__parent_id",
                 "page__is_home",
