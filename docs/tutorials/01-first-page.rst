@@ -48,7 +48,7 @@ The page is using the default template, which exposes a single
 
 #. Click into the toggle on the top right of the page to open the structure board.
 #. The structure board will show the page's single placeholder, called ``Content``. Click the
-   the **plus button** next to it to add a plugin.
+   **plus button** next to it to add a plugin.
 
 #. The plugin selector appears. Choose **Text**.
 #. Type a heading and a short paragraph in the rich-text editor.
