@@ -23,6 +23,7 @@ from django.urls import (
     reverse,
 )
 from django.utils.cache import patch_cache_control
+from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django.utils.translation import activate
@@ -264,8 +265,12 @@ def _get_login_redirect_url(request, redirect_to):
     except Resolver404:
         return fallback
 
-    # Rebuild the redirect from the validated path only; drop scheme and host.
-    return urlunsplit(("", "", quote(parts.path), parts.query, parts.fragment))
+    # Rebuild the redirect from the validated components only, dropping the
+    # client-supplied scheme and host. ``parts.path`` keeps the script prefix
+    # (the browser needs it); only the copy passed to ``resolve()`` had it
+    # stripped. ``iri_to_uri`` encodes unsafe characters without
+    # double-encoding an already percent-encoded path.
+    return iri_to_uri(urlunsplit(("", "", parts.path, parts.query, parts.fragment)))
 
 
 @require_POST
@@ -280,9 +285,11 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user_cache)
     else:
-        # Append the error flag, preserving any query string already present.
-        separator = '&' if urlsplit(redirect_to).query else '?'
-        redirect_to += f'{separator}cms_toolbar_login_error=1'
+        # Add the error flag to the query component so it is preserved next to
+        # any existing parameters and stays ahead of a possible fragment.
+        parts = urlsplit(redirect_to)
+        query = f'{parts.query}&cms_toolbar_login_error=1' if parts.query else 'cms_toolbar_login_error=1'
+        redirect_to = urlunsplit((parts.scheme, parts.netloc, parts.path, query, parts.fragment))
     return HttpResponseRedirect(redirect_to)
 
 
