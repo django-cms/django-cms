@@ -160,7 +160,7 @@ A reusable region with ``static_alias``
 
 If you want a region whose content is *the same on every page* (a
 footer, for example), use ``{% static_alias %}`` instead of
-``{% placeholder %}``. It works similar for editors, but the content
+``{% placeholder %}``. It works similarly for editors, but the content
 is stored once and reused everywhere:
 
 .. code-block:: html+django
