@@ -253,7 +253,7 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         self.assertIn("content__secret_greeting", admin.prepopulated_fields)
 
     def test_prepopulated_fields_respects_class_attribute_after_init(self):
-        """``cls.prepopulated_fields`` set after the admin is instantiated is honored."""
+        """``prepopulated_fields`` set after the admin is instantiated is honored."""
         # Arrange
         admin = copy.copy(self.admin)
         admin.prepopulated_fields = {"category_name": ["content__secret_greeting"]}
