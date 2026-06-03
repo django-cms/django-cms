@@ -5,7 +5,7 @@
 A custom plugin
 ===============
 
-django CMS does not come with built-in plguins. We have been using plugins 
+django CMS does not come with built-in plugins. We have been using plugins 
 (Text, Image, etc.) provided by packages such as djangocms-text or 
 djangocms-frontend. Standardized plugins only get you so far. In this
 chapter you will create a *Coffee card* plugin: a small reusable
