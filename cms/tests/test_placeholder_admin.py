@@ -412,3 +412,77 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertFalse(user_settings.clipboard.get_plugins("en").exists())
+
+    def test_copy_plugin_to_clipboard_requires_add_permission(self):
+        """Copying a plugin to the clipboard must check add permission for the
+        plugin type.
+
+        A staff user who is missing the plugin's add permission must not be
+        able to copy it into their own clipboard, even when the plugin lives
+        in a placeholder they would otherwise be allowed to read.
+        """
+        # No plugin permissions at all: cannot add a LinkPlugin anywhere.
+        user = self._create_user("editor", is_staff=True, is_superuser=False)
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=user,
+            clipboard=Placeholder.objects.create(),
+        )
+        user_settings.clipboard.source = user_settings
+        user_settings.clipboard.save()
+
+        source_placeholder = Placeholder.objects.create(slot="source")
+        source_plugin = add_plugin(
+            source_placeholder,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+        endpoint = self.get_copy_plugin_uri(source_plugin)
+        with self.login_user_context(user):
+            data = {
+                "source_language": "en",
+                "source_placeholder_id": source_placeholder.pk,
+                "source_plugin_id": source_plugin.pk,
+                "target_language": "en",
+                "target_placeholder_id": user_settings.clipboard.pk,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(user_settings.clipboard.get_plugins("en").exists())
+
+    def test_copy_placeholder_to_clipboard_requires_add_permission(self):
+        """Copying a whole placeholder to the clipboard must check add
+        permission for the contained plugin types as well."""
+        # No plugin permissions at all: cannot add a LinkPlugin anywhere.
+        user = self._create_user("editor", is_staff=True, is_superuser=False)
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=user,
+            clipboard=Placeholder.objects.create(),
+        )
+        user_settings.clipboard.source = user_settings
+        user_settings.clipboard.save()
+
+        source_placeholder = Placeholder.objects.create(slot="source")
+        add_plugin(
+            source_placeholder,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+        endpoint = self.get_copy_placeholder_uri(source_placeholder)
+        with self.login_user_context(user):
+            data = {
+                "source_language": "en",
+                "source_placeholder_id": source_placeholder.pk,
+                "target_language": "en",
+                "target_placeholder_id": user_settings.clipboard.pk,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(user_settings.clipboard.get_plugins("en").exists())
