@@ -142,7 +142,7 @@ The philosophy above leads to several practical outcomes:
   integration points (plugins, apphooks, content objects) are
   narrow and explicit.
 - Long-term maintenance and upgrades are easier to manage, because
-  the small core changes slowly and add-ons can be swapped.
+  the small core changes slowly and add-ons can usually be swapped.
 - Editors gain flexible content tools **without being exposed to
   application complexity** they do not need.
 

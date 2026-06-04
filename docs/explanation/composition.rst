@@ -178,7 +178,8 @@ the same model and template; they do not share data.
 URL (``/events/``) renders its placeholders normally; URLs *below*
 (``/events/2026-summit/``) are handed to the apphook. Child CMS
 pages under an apphooked page are *not* reliably reachable, because
-the apphook owns that URL space.
+the apphook owns that URL space. The URLs might resolve to the app hook
+instead of a child page, and the child page might not be reached at all. 
 
 **The same Django app mounted on several pages.** Each mount point is
 independent. If editors should configure each mount differently
