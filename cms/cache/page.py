@@ -25,10 +25,9 @@ def _page_cache_key(request, vary_on=None):
     The language is determined following django-cms's language resolution order.
 
     ``vary_on`` is an optional iterable of header names declared by plugins via
-    ``get_vary_cache_on()``. When given, the request's values for those headers
+    ``get_vary_cache_on()``. The request's values for those headers
     are folded into the key so that responses varying on those headers are
-    cached separately per value (instead of the first variant being served to
-    everyone).
+    cached separately per value.
     """
     if hasattr(request, "LANGUAGE_CODE"):
         language = request.LANGUAGE_CODE
@@ -43,8 +42,7 @@ def _page_cache_key(request, vary_on=None):
     )
     if settings.USE_TZ:
         cache_key += ".%s" % get_timezone_name()
-    if vary_on:
-        cache_key += ".%s" % _vary_on_hash(request, vary_on)
+    cache_key += ".%s" % _vary_on_hash(request, vary_on or [])
     return cache_key
 
 
