@@ -72,7 +72,8 @@ the domain modelling to your apps.
 This is a common source of "why doesn't it just…" questions, and the
 answer is always the same: because every project's notion of a blog,
 a product, or a team is slightly different, and the CMS would rather
-host *your* model cleanly than impose *its* model badly.
+host *your* model cleanly than impose *its* model in a way not optimal 
+for you.
 
 Having said that, the django CMS ecosystem includes many reusable add-ons
 such as djangocms-stories for blogs and news.

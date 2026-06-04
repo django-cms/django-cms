@@ -90,7 +90,8 @@ one of four states.
     may be useful later and can be reverted to draft.
 
 Each new draft increments a version number, giving a complete history
-of changes.
+of changes over all historically created versions including archived, 
+and unpublished ones.
 
 .. image:: /images/version-states.png
     :align: center
