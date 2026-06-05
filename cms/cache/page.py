@@ -19,10 +19,15 @@ from cms.utils.helpers import get_timezone_name
 from cms.utils.i18n import get_default_language_for_site
 
 
-def _page_cache_key(request):
+def _page_cache_key(request, vary_on=None):
     """
     Generate a cache key based on the request path and language.
     The language is determined following django-cms's language resolution order.
+
+    ``vary_on`` is an optional iterable of header names declared by plugins via
+    ``get_vary_cache_on()``. The request's values for those headers
+    are folded into the key so that responses varying on those headers are
+    cached separately per value.
     """
     if hasattr(request, "LANGUAGE_CODE"):
         language = request.LANGUAGE_CODE
@@ -37,7 +42,29 @@ def _page_cache_key(request):
     )
     if settings.USE_TZ:
         cache_key += ".%s" % get_timezone_name()
+    cache_key += ".%s" % _vary_on_hash(request, vary_on or [])
     return cache_key
+
+
+def _vary_on_hash(request, vary_on):
+    """Hash of the request's values for the given (plugin-declared) headers."""
+    ctx = hashlib.sha1()
+    for header in sorted(header.lower() for header in vary_on):
+        # Mirror Django's translation of header names to ``request.META`` keys.
+        meta_key = "HTTP_" + header.upper().replace("-", "_")
+        value = request.META.get(meta_key, "")
+        ctx.update(("%s=%s&" % (header, iri_to_uri(value))).encode("utf-8"))
+    return ctx.hexdigest()
+
+
+def _page_vary_headers_cache_key(request):
+    """Key under which the list of plugin-declared vary headers is stored.
+
+    The list cannot be known on a cache read until the page is rendered, so it
+    is persisted on write and looked up first on read (mirroring Django's
+    ``learn_cache_key`` / ``get_cache_key`` two-step approach).
+    """
+    return _page_cache_key(request) + ".vary-on"
 
 
 def set_page_cache(response):
@@ -80,16 +107,25 @@ def set_page_cache(response):
 
         if ttl > 0:
             # Adds expiration, etc. to headers
+            vary_on = sorted(vary_cache_on_set)
             patch_response_headers(response, cache_timeout=ttl)
-            patch_vary_headers(response, sorted(vary_cache_on_set))
+            patch_vary_headers(response, vary_on)
 
             version = _get_cache_version()
             # We also store the absolute expiration timestamp to avoid
             # recomputing it on cache-reads.
             expires_datetime = timestamp + timedelta(seconds=ttl)
             response_headers = get_response_headers(response)
+            # Persist the list of plugin-declared vary headers so the read path
+            # can rebuild the same (header-value aware) content key.
             cache.set(
-                _page_cache_key(request),
+                _page_vary_headers_cache_key(request),
+                vary_on,
+                ttl,
+                version=version,
+            )
+            cache.set(
+                _page_cache_key(request, vary_on),
                 (
                     response.content,
                     response_headers,
@@ -106,7 +142,11 @@ def set_page_cache(response):
 def get_page_cache(request):
     from django.core.cache import cache
 
-    return cache.get(_page_cache_key(request), version=_get_cache_version())
+    version = _get_cache_version()
+    # First resolve which headers (if any) the cached page varies on, then
+    # build the content key from this request's values for those headers.
+    vary_on = cache.get(_page_vary_headers_cache_key(request), version=version)
+    return cache.get(_page_cache_key(request, vary_on), version=version)
 
 
 def get_xframe_cache(page):
