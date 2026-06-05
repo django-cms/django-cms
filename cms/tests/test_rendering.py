@@ -371,6 +371,19 @@ class RenderingTestCase(CMSTestCase):
             r = self.render(self.test_page4, template=t)
         self.assertEqual(r, self.test_data4['extra'])
 
+    def test_placeholder_extra_context_template_specific(self):
+        """Template-specific CMS_PLACEHOLDER_CONF keys must be respected (regression #8649)."""
+        t = '{% load cms_tags %}{% placeholder "extra_context" %}'
+        template_specific_conf = {
+            'extra_context.html extra_context': self.test_data4['placeholderconf']['extra_context'],
+        }
+        r = self.render(self.test_page4, template=t)
+        self.assertEqual(r, self.test_data4['no_extra'])
+        cache.clear()
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=template_specific_conf):
+            r = self.render(self.test_page4, template=t)
+        self.assertEqual(r, self.test_data4['extra'])
+
     def test_placeholder_or(self):
         """
         Tests the {% placeholder %} templatetag.

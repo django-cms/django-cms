@@ -23,6 +23,7 @@ Features:
 
 Bug Fixes:
 ----------
+* Template-specific ``CMS_PLACEHOLDER_CONF`` keys were ignored when rendering page placeholders (#8649) -- Ralph Mueller
 * get_permissions failed for missing global permissions (#8468) (65d84a929) -- Fabian Braun
 * Create page wizard not available on empty install (#8463) -- Fabian Braun
 * Make Placeholder.add_plugin() set plugin.instance to self (#8442) (#8447) -- Jasper Bok
