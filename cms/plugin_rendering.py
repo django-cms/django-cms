@@ -446,6 +446,7 @@ class ContentRenderer(BaseRenderer):
             content = self.render_placeholder(
                 placeholder,
                 context=context,
+                page=current_page,
                 language=language,
                 editable=editable,
                 use_cache=True,
