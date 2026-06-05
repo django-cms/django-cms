@@ -47,6 +47,7 @@ from cms.utils.i18n import (
     is_language_prefix_patterns_used,
 )
 from cms.utils.page import get_page_from_request
+from cms.utils.page_permissions import user_can_view_page
 from cms.utils.placeholder import get_declared_placeholders_for_obj, get_placeholder_conf
 
 
@@ -255,6 +256,12 @@ def render_object_structure(request, content_type_id, object_id):
         if issubclass(content_type.model_class(), PageContent):
             content_type_obj = PageContent._base_manager.select_related("page").get(pk=object_id)
             request.current_page = content_type_obj.page
+            # Enforce the same page-view permission as the edit and preview
+            # endpoints (which check it via render_page()). Without this, a
+            # staff user who cannot view a restricted page could still read its
+            # plugin structure through this endpoint.
+            if not user_can_view_page(request.user, content_type_obj.page):
+                raise Http404
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist as err:
