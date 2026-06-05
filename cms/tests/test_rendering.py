@@ -384,6 +384,18 @@ class RenderingTestCase(CMSTestCase):
             r = self.render(self.test_page4, template=t)
         self.assertEqual(r, self.test_data4['extra'])
 
+    def test_placeholder_extra_context_template_specific_takes_precedence(self):
+        """Template-specific CMS_PLACEHOLDER_CONF key takes precedence over generic slot key."""
+        t = '{% load cms_tags %}{% placeholder "extra_context" %}'
+        combined_conf = {
+            'extra_context': {'extra_context': {'extra_var': 'generic var'}},
+            'extra_context.html extra_context': self.test_data4['placeholderconf']['extra_context'],
+        }
+        cache.clear()
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=combined_conf):
+            r = self.render(self.test_page4, template=t)
+        self.assertEqual(r, self.test_data4['extra'])  # template-specific wins, not 'generic var'
+
     def test_placeholder_or(self):
         """
         Tests the {% placeholder %} templatetag.
