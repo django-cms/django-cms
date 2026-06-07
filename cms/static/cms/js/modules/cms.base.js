@@ -447,7 +447,23 @@ export const Helpers = {
         var win = this._getWindow();
         var path = win.location.pathname + win.location.search;
 
-        return this.makeURL(url, [['cms_path', path]]);
+        const fullUrl = new URL(url, win.location.origin);
+        // any URL params present in the url parameter should be of higher priority
+        const paramsFromUrl = new URLSearchParams(fullUrl.search);
+        const excludedParams = ['cms_path'];
+
+        for (const [key] of paramsFromUrl.entries()) {
+            excludedParams.push(key);
+        }
+
+        // remove any conflicts
+        const params = new URLSearchParams(win.location.search);
+
+        for (const key of excludedParams) {
+            params.delete(key);
+        }
+
+        return this.makeURL(url, [['cms_path', path], ...params.entries()]);
     },
 
     /**
