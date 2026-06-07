@@ -718,8 +718,6 @@ class ChangePageForm(BasePageContentForm):
             changed_date=timezone.now(),
             **data,
         )
-        from cms.models.pagemodel import _lock_tree_roots
-
         if not self._url_is_locked:
             # When the URL is shared with a published version the slug/path must
             # not change, so the (read-only) URL fields are ignored on save.
