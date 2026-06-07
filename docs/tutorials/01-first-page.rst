@@ -11,12 +11,13 @@ No code in this chapter — only the django CMS frontend editing interface.
 Goal
 ----
 
-At the end of this chapter, opening ``http://localhost:8000/about/`` in
-a private browser window (logged out) shows a page with a heading and a
-paragraph that you wrote.
+At the end of this chapter, opening ``http://localhost:8000/`` in a
+private browser window (logged out) shows a *Home* page, and
+``http://localhost:8000/about/`` shows a second *About* page — each with
+a heading and a paragraph that you wrote.
 
-1. Create a page
-----------------
+1. Create your first page
+-------------------------
 
 You should be logged in as the superuser created during install. The
 django CMS toolbar is visible at the top of the screen.
@@ -29,27 +30,39 @@ django CMS toolbar is visible at the top of the screen.
       :align: center
       :width: 600
 
-#. Choose **New page** and click **Next**. Set the title to ``About``
-   and click **Create**.
+#. Choose **New page** and click **Next**. Set the title to ``Home``.
+   Leave the **Content** field empty — we will add the content from the
+   structure board in the next step. Click **Create**.
 
    .. image:: images/create_page_with_django_cms2.png
       :alt: the New page form with a title typed in
       :align: center
       :width: 600
 
-You are now on the new page in *edit mode*. The URL in your address bar
-ends in ``/about/``.
+You are now on the new page in *edit mode*. The address bar shows an
+internal editing URL (something like
+``/admin/cms/placeholder/object/…/edit/…``) rather than the page's own
+address — that is normal while you are editing.
+
+.. note::
+
+   The **first page you create automatically becomes the site's
+   homepage**, so it is served at the site root
+   (``http://localhost:8000/``) regardless of its slug. You can change
+   which page is the homepage later from **Pages...** → the page's
+   **three dots** → **Set as home**.
 
 2. Add some content
 -------------------
 
 The page is using the default template, which exposes a single
-*placeholder* called ``Content`` in the middle of the page.
+*placeholder* called ``Page Content`` in the middle of the page.
 
-#. Click into the toggle on the top right of the page to open the structure board.
-#. The structure board will show the page's single placeholder, called ``Content``. Click the
-   **plus button** next to it to add a plugin.
-
+#. Click the toggle on the top right of the page to open the structure
+   board.
+#. The structure board shows the page's single placeholder, called
+   ``Page Content``. Click the **plus button** next to it to add a
+   plugin.
 #. The plugin selector appears. Choose **Text**.
 #. Type a heading and a short paragraph in the rich-text editor.
 #. Click **Save** to commit changes to the page.
@@ -58,8 +71,8 @@ The page now shows your text.
 
 .. note::
 
-   **Screenshot suggested:** the empty ``Content`` placeholder in edit
-   mode, with the *Add plugin* picker open and "Text" highlighted.
+   **Screenshot suggested:** the empty ``Page Content`` placeholder in
+   edit mode, with the *Add plugin* picker open and "Text" highlighted.
 
 .. note::
 
@@ -73,10 +86,10 @@ So far the page only exists in *draft*. Anonymous visitors cannot see
 it.
 
 #. In the toolbar, on the right side click **Publish**.
-#. Open ``http://localhost:8000/about/`` in a private browser window or
+#. Open ``http://localhost:8000/`` in a private browser window or a
    different browser where you are not logged in.
 
-You should see your About page. If you see a 404 instead, you forgot
+You should see your Home page. If you see a 404 instead, you forgot
 the publish step.
 
 .. note::
@@ -85,27 +98,29 @@ the publish step.
    mode (toolbar visible, dashed placeholder outline) and the same page
    viewed anonymously (no toolbar, clean rendering).
 
-4. Create a second page and set it as the home page
----------------------------------------------------
+4. Create a second page
+-----------------------
 
-Right now there is no homepage. Visiting ``http://localhost:8000/``
-redirects to the only page that exists. Let us make that explicit.
+Now add a second page that lives at its own URL.
 
 #. In the toolbar, click **Create** → **New page**.
-#. Title: ``Home``. Click **Create**.
-#. In the toolbar's first menu (labelled "example.com") open **Pages...**.
-#. The page tree opens. Click the **three dots** next to the Home new page and choose
-   **Set as home**.
-#. **Publish** the page (either through the toolbar as before, or by clicking on the circle
-   next to the page in the page tree).
+#. Set the title to ``About`` and leave the **Content** field empty.
+   Click **Create**.
+#. Add a **Text** plugin to its ``Page Content`` placeholder, just as
+   you did for the home page, and write a heading and a paragraph.
+#. **Publish** the page.
+
+Because the homepage already exists, this second page is served at its
+own slug. Open ``http://localhost:8000/about/`` in a private window —
+you should see your About page.
 
 .. note::
 
-   **Screenshot suggested:** the toolbar's *Page* menu open, showing the
-   *Set as home* item.
+   **Screenshot suggested:** the page tree (**Pages...**) showing both
+   *Home* (marked as the homepage) and *About*.
 
 Now ``http://localhost:8000/`` serves the *Home* page, and
-``/about/`` continues to serve the About page.
+``/about/`` serves the About page.
 
 What just happened
 ------------------

@@ -93,8 +93,8 @@ static files via Django's staticfiles app. During development with
 2. Render the navigation from CMS pages
 ---------------------------------------
 
-The CMS menu is a *template tag*. Edit ``templates/base.html`` to
-import it and use it inside the header.
+The CMS menu is a *template tag*. Edit ``coffeesite/templates/base.html``
+to import it and use it inside the header.
 
 .. code-block:: html+django
     :emphasize-lines: 1,7,13-18

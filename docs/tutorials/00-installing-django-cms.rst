@@ -117,8 +117,8 @@ Want to install by hand?
 
 If you'd rather see every line of settings that the ``djangocms``
 shortcut writes for you, work through
-:doc:`/introduction/01-install` ("Installing django CMS") instead.
-You will arrive at the same place; the rest of this tutorial works
-identically with either install path.
+:doc:`/how_to/23-manual-installation` ("Install django CMS manually")
+instead. You will arrive at the same place; the rest of this tutorial
+works identically with either install path.
 
 In the next chapter you will create your first CMS page.

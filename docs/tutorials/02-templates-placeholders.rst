@@ -5,11 +5,12 @@
 Templates and placeholders
 ==========================
 
-So far the CMS rendered your pages using the default template that ships
-with the djangocms-frontend package. In this chapter you will write your own
-template with two placeholders so editors can manage a header strip
-*and* a body, and you will pick which template a page uses from the
-toolbar.
+So far the CMS rendered your pages using the project's default
+``base.html``, which simply extends a template from djangocms-frontend
+and exposes a single ``Page Content`` placeholder. In this chapter you
+will replace that base template with your own, defining two placeholders
+— ``Header`` and ``Body`` — so editors can manage a header strip *and* a
+body separately.
 
 Goal
 ----
@@ -18,29 +19,45 @@ At the end of this chapter, the homepage uses a template you wrote and
 exposes two placeholders: ``Header`` and ``Body``. Editors can place
 plugins into either one.
 
-1. Create a templates directory
+1. Find the project's base template
+-----------------------------------
+
+The ``djangocms`` command already created a base template for you and
+told both Django and the CMS about it:
+
+- The template lives at ``coffeesite/templates/base.html``.
+- ``settings.py`` already points ``TEMPLATES`` → ``DIRS`` at
+  ``coffeesite/templates``, so Django finds it. You do **not** need to
+  create a new directory or edit ``DIRS``.
+- ``settings.py`` already registers it for the CMS:
+
+  .. code-block:: python
+
+      CMS_TEMPLATES = [
+          ("base.html", "Standard"),
+      ]
+
+  The second entry of each tuple is the human-readable label shown in
+  the toolbar. Rename ``"Standard"`` to something like
+  ``"Coffee Roaster — base"`` if you like; there is no need to add a new
+  entry.
+
+Open ``coffeesite/templates/base.html``. Out of the box it is a two-line
+stub that extends a template from djangocms-frontend — that is where the
+single ``Page Content`` placeholder from the previous chapter comes
+from:
+
+.. code-block:: html+django
+
+    {# Replace this with your base template #}
+    {% extends "bootstrap5/base.html" %}
+
+We will replace this stub with our own markup.
+
+2. Write your own base template
 -------------------------------
 
-In your project, create a ``templates/`` directory at the project root
-if one does not already exist. Make sure Django is configured to find
-it by setting, in ``settings.py``:
-
-.. code-block:: python
-
-    TEMPLATES = [
-        {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [BASE_DIR / "templates"],
-            "APP_DIRS": True,
-            # ...
-        },
-    ]
-
-
-2. Add a base template
-----------------------
-
-Create ``templates/base.html``:
+Replace the contents of ``coffeesite/templates/base.html`` with:
 
 .. code-block:: html+django
 
@@ -85,43 +102,29 @@ For everything ``{% placeholder %}`` accepts, see
 :doc:`/reference/placeholders`. For the conceptual story, see
 :doc:`/explanation/plugins`.
 
-3. Register the template with the CMS
--------------------------------------
+3. Reload the page
+------------------
 
-The CMS only offers templates it knows about. Tell it about
-``base.html`` by adding to ``settings.py``:
+The home page already uses ``base.html``, so there is no template to
+switch — your new markup takes effect as soon as the file is saved.
 
-.. code-block:: python
+#. Reload the *Home* page in your browser in edit mode.
+#. You will see two empty placeholders labelled ``Header`` and ``Body``.
 
-    CMS_TEMPLATES = [
-        ("base.html", "Coffee Roaster — base"),
-    ]
-
-The second entry of each tuple is the human-readable label that appears
-in the toolbar.
-
-4. Switch the homepage to the new template
-------------------------------------------
-
-Restart ``runserver`` so the new setting is picked up, then in your
-browser:
-
-#. Open the *Home* page.
-#. In the toolbar, open **Page** → **Templates** → choose
-   *Coffee Roaster — base*.
-#. The page reloads, now using your template.
-
-You will see two empty placeholders labelled ``Header`` and ``Body``.
+If the new placeholders do not appear, restart ``runserver`` and reload
+the page.
 
 .. note::
 
-   **Screenshot suggested:** the toolbar's *Page → Templates* submenu
-   open, with *Coffee Roaster — base* in the list.
+   The text you added to ``Page Content`` in the previous chapter is
+   still stored, but it no longer appears: the new template does not
+   include a ``Page Content`` placeholder, so its plugins are not
+   rendered.
 
 .. note::
 
    **Screenshot suggested:** the homepage in edit mode immediately after
-   the template switch — two empty placeholders with the labels
+   editing the template — two empty placeholders with the labels
    ``Header`` and ``Body`` visible above their outlines.
 
 5. Fill the placeholders
@@ -134,7 +137,7 @@ You will see two empty placeholders labelled ``Header`` and ``Body``.
 #. **Publish** the page.
 
 Visit the homepage in a private window. You should see a header strip
-above the body content, both editable.
+above the body content.
 
 .. note::
 
