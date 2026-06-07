@@ -115,6 +115,12 @@ fi
 OLDVER=$(python -c "import cms; print(cms.__version__)" )
 
 git fetch --all --tags --quiet
+# Deepen a shallow checkout (e.g. actions/checkout default depth 1), otherwise
+# `git log <tag>..` in make-changelog is truncated at the shallow boundary and
+# silently drops PRs from the changelog and statistics.
+if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
+    git fetch --unshallow --quiet
+fi
 if [ -z "$(git tag -l "${OLDVER}")" ]; then
     error "Can not find tag for version ${OLDVER} aborting ..."
     exit 1
