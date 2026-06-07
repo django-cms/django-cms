@@ -4,9 +4,9 @@
 5.0.8 release notes
 ###################
 
-*May 5, 2026*
+*June 8, 2026*
 
-Welcome to django CMS 5.0.7!
+Welcome to django CMS 5.0.8!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you'll want to be aware of when upgrading from
