@@ -1,3 +1,6 @@
+5.0.7 (2026-06-08)
+==================
+
 Bug Fixes:
 ----------
 * Enforce authorization on structure, move and clipboard endpoints (#8644) (#8645) (7642a98ab) -- Fabian Braun
