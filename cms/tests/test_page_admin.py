@@ -1,7 +1,9 @@
 import datetime
 import json
 import sys
+from contextlib import contextmanager
 from unittest import skipUnless
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib import admin
@@ -17,6 +19,7 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
+from cms.admin.forms import ChangePageForm
 from cms.admin.pageadmin import PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.appresolver import clear_app_resolvers
@@ -1194,6 +1197,88 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
             self.assertContains(response, expected, html=True)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_slug_readonly_when_url_locked(self):
+        # When the page URL is shared with a published version (only possible
+        # with a versioning package installed), the slug and overwrite URL are
+        # rendered read-only: they are dropped from the editable form and shown
+        # as static text by PageContentAdmin instead.
+        superuser = self.get_superuser()
+        cms_page = create_page("page", "nav_playground.html", "en")
+        endpoint = self.get_page_change_uri("en", cms_page)
+
+        with self.login_user_context(superuser), self._url_locked():
+            response = self.client.get(endpoint)
+
+            self.assertEqual(response.status_code, 200)
+            adminform = response.context["adminform"]
+            # Rendered read-only by the admin (so no editable form field) ...
+            self.assertIn("slug", adminform.readonly_fields)
+            self.assertIn("overwrite_url", adminform.readonly_fields)
+            self.assertNotIn("slug", adminform.form.fields)
+            self.assertNotIn("overwrite_url", adminform.form.fields)
+            # ... while still displaying the current value ...
+            self.assertContains(response, "page")
+            # ... and explaining in the label how to make it editable.
+            self.assertContains(response, "first unpublish the currently published version")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_slug_editable_when_url_not_locked(self):
+        # Without a published version sharing the URL (the default in core
+        # django-CMS) the slug stays editable.
+        superuser = self.get_superuser()
+        cms_page = create_page("page", "nav_playground.html", "en")
+        endpoint = self.get_page_change_uri("en", cms_page)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+
+            self.assertEqual(response.status_code, 200)
+            adminform = response.context["adminform"]
+            self.assertNotIn("slug", adminform.readonly_fields)
+            self.assertIn("slug", adminform.form.fields)
+            self.assertIn("overwrite_url", adminform.form.fields)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_locked_url_unchanged_on_save(self):
+        # A locked URL must not change even if a different slug is posted, but
+        # other (non-URL) page content fields are still saved.
+        superuser = self.get_superuser()
+        cms_page = create_page("page", "nav_playground.html", "en")
+        translation = cms_page.get_content_obj("en", fallback=False)
+        changelist = self.get_pages_admin_list_uri()
+        endpoint = self.get_page_change_uri("en", cms_page)
+
+        with self.login_user_context(superuser):
+            page_data = {
+                "title": "A new title",
+                "slug": "a-changed-slug",
+                "overwrite_url": "",
+                "template": translation.template,
+            }
+            with self._url_locked():
+                response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, changelist)
+
+        # The slug/path are untouched ...
+        self.assertEqual(cms_page.get_slug("en"), "page")
+        self.assertFalse(cms_page.urls.filter(slug="a-changed-slug").exists())
+        # ... while other content fields were saved.
+        translation.refresh_from_db()
+        self.assertEqual(translation.title, "A new title")
+
+    @staticmethod
+    @contextmanager
+    def _url_locked():
+        # Simulate a shared, published page URL (as a versioning package would
+        # produce) without versioning installed. The helper is imported into
+        # both the forms and the pageadmin namespaces, so both must be patched.
+        with (
+            patch("cms.admin.forms.url_is_locked", return_value=True),
+            patch("cms.admin.pageadmin.url_is_locked", return_value=True),
+        ):
+            yield
 
     @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):
