@@ -1,3 +1,29 @@
+Bug Fixes:
+----------
+* Enforce authorization on structure, move and clipboard endpoints (#8644) (#8645) (7642a98ab) -- Fabian Braun
+* GrouperModelAdmin shadowed prepopulated_fields class attribute (#8636) (#8639) (1b164a488) -- Fabian Braun
+* Honour plugin-declared Vary headers in the page cache key (#8646) (#8647) (d5dc1efa1) -- Fabian Braun
+* Missing redirect_url in CMSNavigationNode.attr (#8625) (f975cace5) -- Venelin Stoykov
+* Release script dropped changes (#8655) (23df299bd) -- Fabian Braun
+* Slugs of published pages could be changed (#8640) (#8654) (9fed876a0) -- Fabian Braun
+* template-specific CMS_PLACEHOLDER_CONF keys ignored when rendering page placeholders (#8652) (c7424f7f2) -- Ralph
+
+Statistics:
+-----------
+
+This release includes 11 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+* Ralph (1 pull request)
+* Venelin Stoykov (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 5.0.7 (2026-05-05)
 ==================
 
