@@ -447,6 +447,7 @@ class ContentRenderer(BaseRenderer):
                 placeholder,
                 context=context,
                 language=language,
+                page=current_page,
                 editable=editable,
                 use_cache=True,
                 nodelist=None,
