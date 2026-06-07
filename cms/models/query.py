@@ -90,4 +90,4 @@ class PageQuerySet(MP_NodeQuerySet):
                 modified.append(f[6:])
             else:
                 modified.append(f)
-        return super().order_by(*fieldnames)
+        return super().order_by(*modified)

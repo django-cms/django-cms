@@ -5,193 +5,24 @@
 Installing django CMS
 =====================
 
-The setup is incredibly simple, and in this django CMS tutorial, we’ll take you through
-the first five steps to help get you started.
+Get django CMS running in 5 minutes with these commands.
 
-What you need to get started
-----------------------------
+Requirements
+------------
 
-First of all, you don’t need to be a senior developer or have prior experience as a
-developer with Django or Python to create your first django CMS demo website. In fact,
-one of the added benefits of django CMS is that it offers a powerful yet easy to use
-interface for most common tasks of setting up a web site. You can focus on any specific
-needs of your project.
+- Python 3.10 or later
+- A terminal/command prompt
 
-Before we begin the django CMS tutorial, you will need to know that there are several
-ways to install django CMS for free.
+Quick installation
+------------------
 
-1. You can either set up a project on `Divio Cloud <https://www.divio.com>`_, which is
-   fast and useful for people without a technical background and a good starting point
-   to experience the CMS User Interface.
-2. As another option, you can set up the project `using docker
-   <https://www.django-cms.org/en/blog/2021/01/19/how-you-spin-up-a-django-cms-project-in-less-than-5-minutes/>`_.
-   It is a good way for a developer locally without an external vendor and we use this
-   option in this django CMS demo.
-3. The last option to install is creating a django CMS project manually into a local
-   virtual environment by running the ``djangocms`` command. This will create a new
-   Django project set up for running django CMS based on a django CMS-specific project
-   template. See :ref:`Installing django CMS by hand <install-django-cms-by-hand>` for
-   details. This option is a good way for developers that want to install everything by
-   hand to understand better, have full control, or want to add to an existing Django
-   project.
-
-In this tutorial we will cover both options 2 and 3, including the explanation what
-exactly needs to happen when you add django CMS to a Django project.
-
-.. _install-with-quickstarter:
-
-Production-ready: django CMS quickstart
----------------------------------------
-
-The django CMS quickstart project is a template for a Docker-based production-ready
-setup. Especially if you know your way around Docker, you will be able to quickly set up
-a project that is ready for deployment.
-
-If you just want to test a project locally without Docker, you can :ref:`install django
-CMS by hand in a few steps <install-django-cms-by-hand>`.
-
-Setup Docker (Step 1)
-~~~~~~~~~~~~~~~~~~~~~
-
-Install docker from `here <https://docs.docker.com/get-docker/>`_. If you have not used
-docker in the past, please read `this introduction on docker
-<https://docs.docker.com/get-started/>`_.
-
-Run the demo project in docker (Step 2)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Info: The `demo project
-<https://github.com/django-cms/django-cms-quickstart/tree/support/cms-4.1.x>`_ is a
-minimal Django project with some additional requirements in the ``requirements.txt``.
-
-For more details see its Open the terminal application on your computer and go to a safe
-folder (i.e. ``cd ~/Projects``), then
+Open a terminal and run:
 
 .. code-block:: bash
 
-    git clone git@github.com:django-cms/django-cms-quickstart.git
-
-    cd django-cms-quickstart
-    docker compose build web
-    docker compose up -d database_default
-    docker compose run web python manage.py migrate
-    docker compose run web python manage.py createsuperuser
-    docker compose up -d
-
-During the installation process, you will be prompted to enter your email address and
-set a username and password. Open your browser and insert
-``http://localhost:8000/admin`` there you should be invited to login and continue with
-Step 3: create your first page
-
-Create your first page (Step 3)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- Once you login you can press Create on the top right.
-- Then you will see a pop-up window where the “New page” is marked blue.
-- Press New Page and select Next.
-
-.. image:: /introduction/images/create_page_with_django_cms1.png
-    :alt: create a page with django cms
-    :width: 400
-    :align: center
-
-After selecting Next, you will add in your title and some basic text content for the new
-page, click Create.
-
-.. image:: /introduction/images/create_page_with_django_cms2.png
-    :alt: create a page with django cms
-    :width: 400
-    :align: center
-
-Here is your newly created page.
-
-Publish your first page (Step 4)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The page we just created is just a draft and needs to be published once you finish. As
-an editor, only you can see and edit your drafts, other visitors to your site will only
-see your published pages.
-
-Press "Publish"
-
-.. image:: images/django_cms_demo_page.png
-    :alt: publish a page with django cms
-    :width: 400
-    :align: center
-
-To edit the page, you can switch back into editing mode using the "Edit" button, and
-return to the published version of the page using the "view published" button.
-
-In the editing mode, you can double-click on the paragraph of the text to change it, add
-formatting, and save it again. Any changes that are made after publishing are saved to a
-draft and will not be visible until you re-publish.
-
-Congratulations, you now have installed django CMS and created your first page.
-
-If you need to log in at any time, append ``?toolbar_on`` to the URL and hit Return.
-This will enable the toolbar, from where you can log in and manage your website.
-
-.. _install-django-cms-by-hand:
-
-Installing django CMS by hand
------------------------------
-
-If you are looking for a typical installation using Docker look at the
-:ref:`quickstarter section of this documentation <install-with-quickstarter>`.
-
-If you prefer to do things manually, this how-to guide will take you through the
-process. It is simple, quick, and transparent. If you know Django, you will recognize
-how django CMS is set up like a typical Django project.
-
-.. note::
-
-    You can also use this guide to help you install django CMS as part of an existing
-    project. However, the guide assumes that you are starting with a blank project, so
-    you will need to adapt the steps below appropriately as required.
-
-This document assumes you have some basic familiarity with Python and Django. After
-you've integrated django CMS into your project, you should be able to follow the
-:doc:`/introduction/index` for an introduction to developing with django CMS.
-
-Install the django CMS package (Step 1)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Check the :ref:`Python/Django requirements <requirements>` for this version of django
-CMS.
-
-django CMS also has other requirements, which it lists as dependencies in its
-``setup.py``.
-
-.. important::
-
-    We strongly recommend doing all of the following steps in a `virtual environment
-    <https://docs.python.org/3/library/venv.html>`_. You ought to know how to create,
-    activate and dispose of virtual environments. If you don't, you can use the steps
-    below to get started, but you are advised to take a few minutes to learn the basics
-    of using virtual environments before proceeding further.
-
-    .. code-block:: bash
-
-        python3 -m venv .venv  # create a virtualenv
-        source .venv/bin/activate  # activate it
-        pip install --upgrade pip  # Upgrade pip
-
-Then:
-
-.. code-block::
-
+    python3 -m venv .venv
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
     pip install django-cms
-
-to install the release candidate version of django CMS. It will also install its
-dependencies including Django.
-
-Create a new django CMS project (Step 2)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Create a new django CMS project:
-
-.. code-block::
-
     djangocms myproject
 
 This is a shortcut command for creating a new Django project with the right project
@@ -281,13 +112,11 @@ the project folder and then spinning up the development server:
     cd myproject
     python -m manage runserver
 
-You can visit your project's web site by pointing your browser to ``localhost:8000``.
+Visit http://127.0.0.1:8000 and log in with the superuser credentials you just
+created.
 
-Use the newly created superuser's credentials to authenticate and create your first
-page!
-
-Adding django CMS to an existing Django project
------------------------------------------------
+Create your first page
+----------------------
 
 django CMS is nothing more than a powerful set of Django apps. Hence you can add django
 CMS to any Django project. It will require some settings to be modified, however.
@@ -318,19 +147,13 @@ You will need to add the following to its list of ``INSTALLED_APPS``:
 - `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django
   CMS's page tree structures.
 
-django CMS optionally provides `django CMS admin style
-<https://github.com/django-cms/djangocms-admin-style>`_. This contains some styling that
+django CMS also installs `django CMS admin style
+<https://github.com/django-cms/djangocms-admin-style>`_. This provides some styling that
 helps make django CMS administration components easier to work with. Technically it's an
-optional component and does not need to be enabled in your project, but it's
+optional component and does not need to be enabled in your project, but it's strongly
 recommended for a more consistent user experience.
 
-If you want to use it, add ``djangocms-admin-style`` to your project requirements, and
-install it using pip:
-.. code-block::
-
-    pip install djangocms-admin-style
-
-Then, in the ``INSTALLED_APPS``, **before** ``django.contrib.admin``, add:
+In the ``INSTALLED_APPS``, **before** ``django.contrib.admin``, add:
 
 .. code-block::
 
@@ -856,13 +679,13 @@ These and other plugins are described in more detail in :ref:`commonly-used-plug
 Next steps
 ----------
 
-If this is your first django CMS project, read through the
-`user guide <https://user-guide.django-cms.org>`_  for a walk-through of some basics.
+- Continue with :doc:`02-templates_placeholders` to customize your templates
+- Read the `User Guide <https://user-guide.django-cms.org>`_ for a walk-through of the CMS interface
+- See :doc:`/how_to/22-docker-installation` for a production-ready Docker setup
+- See :doc:`/how_to/23-manual-installation` for detailed manual configuration
 
-The :ref:`tutorials for developers <tutorials>` will help you understand how to approach
-django CMS as a developer. Note that the tutorials assume you have installed the CMS
-using the django CMS quickstart project, but with a little adaptation you'll be able to
-use it as a basis.
+.. tip::
 
-To deploy your django CMS project on a production web server, please refer to the
-:doc:`Django deployment documentation <django:howto/deployment/index>`.
+    If you need to log in at any time, append ``?toolbar_on`` to the URL and hit
+    Return. This will enable the toolbar, from where you can log in and manage
+    your website.
