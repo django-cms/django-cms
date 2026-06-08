@@ -68,20 +68,15 @@ if [ ! -d .git ] || [ ! -d "cms" ]; then
     exit 1
 fi
 
-# setup commit
-git config --local user.email "info@django-cms.org"
-git config --local user.name "Github Release Action"
-
-# check that git is configured for commit
-if ! git config user.name >/dev/null || ! git config user.email >/dev/null; then
-    error "Git must be configured for commit, please run the following commands first:"
-    echo ""
-    echo 'git config --local user.email "you@example.com"'
-    echo 'git config --local user.name "Your Name"'
-    echo ""
-    echo "or use --global to configure your git for all repo by default"
-    exit 1
-fi
+# Identity for the automated release commits. Exported as environment
+# variables (rather than written with `git config`) so the release process
+# never mutates the local git configuration of the repo it runs in, while
+# still guaranteeing an identity is available for commits (e.g. on a fresh CI
+# checkout). The bot name is excluded from the changelog contributor stats.
+export GIT_AUTHOR_NAME="Github Release Action"
+export GIT_AUTHOR_EMAIL="info@django-cms.org"
+export GIT_COMMITTER_NAME="Github Release Action"
+export GIT_COMMITTER_EMAIL="info@django-cms.org"
 
 origin=$(git remote -v | grep push | grep origin | awk '{print $2}')
 
