@@ -39,6 +39,19 @@ if ! command -v gulp; then
 fi
 
 status "- Installing transifex cli and gettext"
-( cd "$SCRIPTS" && curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash &>/dev/null )
-sudo apt-get -qq install gettext &>/dev/null
+# Install tx into $SCRIPTS (make-release invokes "$SCRIPTS/tx"). Do NOT silence
+# this: the upstream installer's last step is `./tx -v`, so a failed download
+# surfaces only as a bare exit 127 ("command not found") with no clue why.
+( cd "$SCRIPTS" && curl -fsSL https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash )
+# Fail loudly here rather than much later at the first tx call.
+[ -x "$SCRIPTS/tx" ] || { error "transifex cli (tx) was not installed to $SCRIPTS"; exit 1; }
+
+# gettext provides msgfmt/msgmerge for compilemessages. apt-get needs sudo,
+# unless the job already runs as root (e.g. in a container), where sudo may be
+# absent and would itself fail with exit 127.
+if command -v sudo >/dev/null; then
+    sudo apt-get -qq install gettext
+else
+    apt-get -qq install gettext
+fi
 
