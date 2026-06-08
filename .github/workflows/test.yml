@@ -22,10 +22,9 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
-          django-5.0.txt,
-          django-5.1.txt,
           django-5.2.txt,
           django-6.0.txt,
+          django-6.1.txt
         ]
         # On nightly runs, test all postgres versions. On push/PR, only test latest.
         postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["16"]') }}
@@ -36,15 +35,15 @@ jobs:
           # Python 3.14 only works with Django 5.2+
           - python-version: '3.14'
             requirements-file: django-4.2.txt
-          - python-version: '3.14'
-            requirements-file: django-5.0.txt
-          - python-version: '3.14'
-            requirements-file: django-5.1.txt
           # Python 3.10 and 3.11 only supported until Django 5.2
           - python-version: '3.10'
             requirements-file: django-6.0.txt
           - python-version: '3.11'
             requirements-file: django-6.0.txt
+          - python-version: '3.10'
+            requirements-file: django-6.1.txt
+          - python-version: '3.11'
+            requirements-file: django-6.1.txt
 
     services:
       postgres:
@@ -96,10 +95,9 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
-          django-5.0.txt,
-          django-5.1.txt,
           django-5.2.txt,
           django-6.0.txt,
+          django-6.1.txt
         ]
         # On nightly runs, test all mysql versions. On push/PR, only test latest.
         mysql-version: ${{ github.event_name == 'schedule' && fromJSON('["8.4", "9.5"]') || fromJSON('["8.4"]') }}
@@ -110,15 +108,15 @@ jobs:
           # Python 3.14 only works with Django 5.2+
           - python-version: '3.14'
             requirements-file: django-4.2.txt
-          - python-version: '3.14'
-            requirements-file: django-5.0.txt
-          - python-version: '3.14'
-            requirements-file: django-5.1.txt
           # Python 3.10 and 3.11 only supported until Django 5.2
           - python-version: '3.10'
             requirements-file: django-6.0.txt
           - python-version: '3.11'
             requirements-file: django-6.0.txt
+          - python-version: '3.10'
+            requirements-file: django-6.1.txt
+          - python-version: '3.11'
+            requirements-file: django-6.1.txt
 
     services:
       mysql:
@@ -169,11 +167,10 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         requirements-file: [
           django-4.2.txt,
-          django-5.0.txt,
-          django-5.1.txt,
           django-5.2.txt,
           django-6.0.txt,
-        ]
+          django-6.1.txt,
+          ]
         os: [
           ubuntu-latest,
         ]
@@ -181,15 +178,15 @@ jobs:
           # Python 3.14 only works with Django 5.2+
           - python-version: '3.14'
             requirements-file: django-4.2.txt
-          - python-version: '3.14'
-            requirements-file: django-5.0.txt
-          - python-version: '3.14'
-            requirements-file: django-5.1.txt
           # Python 3.10 and 3.11 only supported until Django 5.2
           - python-version: '3.10'
             requirements-file: django-6.0.txt
           - python-version: '3.11'
             requirements-file: django-6.0.txt
+          - python-version: '3.10'
+            requirements-file: django-6.1.txt
+          - python-version: '3.11'
+            requirements-file: django-6.1.txt
 
     steps:
     - uses: actions/checkout@v6
