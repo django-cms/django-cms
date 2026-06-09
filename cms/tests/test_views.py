@@ -536,3 +536,73 @@ class EndpointTests(CMSTestCase):
 
             response = self.client.get(structure_endpoint_url)
             self.assertContains(response, "<strong>Text</strong>")
+
+
+class EndpointPermissionTests(CMSTestCase):
+    """Security tests for the object render endpoints (edit/preview/structure).
+
+    The structure endpoint must enforce the same page-view permission as the
+    edit and preview endpoints, which deny access to staff users that cannot
+    view a restricted page.
+    """
+
+    def setUp(self) -> None:
+        from cms.api import add_plugin, assign_user_to_page
+
+        self.page = create_page("restricted", "simple.html", "en")
+        self.page_content = self.page.get_content_obj("en")
+        placeholder = self.page_content.get_placeholders().first()
+        # Secret content that must not leak to unauthorized staff users.
+        add_plugin(
+            placeholder,
+            "LinkPlugin",
+            "en",
+            name="SuperSecretLinkName",
+            external_link="https://secret.example.com",
+        )
+        # Restrict the page to view: granting view to the superuser turns the
+        # page into a view-restricted page for everybody else.
+        assign_user_to_page(self.page, self.get_superuser(), can_view=True)
+        self.content_type = ContentType.objects.get_for_model(PageContent)
+
+    def _endpoint(self, name):
+        return admin_reverse(name, args=(self.content_type.id, self.page_content.pk))
+
+    def test_edit_and_preview_endpoints_deny_view_restricted_page(self):
+        """Baseline: edit and preview already deny access via render_page()."""
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            for name in (
+                "cms_placeholder_render_object_edit",
+                "cms_placeholder_render_object_preview",
+            ):
+                response = self.client.get(self._endpoint(name))
+                self.assertEqual(
+                    response.status_code,
+                    404,
+                    msg=f"{name} leaked a view-restricted page (status {response.status_code})",
+                )
+
+    def test_structure_endpoint_denies_view_restricted_page(self):
+        """The structure endpoint must not render a page the user cannot view."""
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            response = self.client.get(
+                self._endpoint("cms_placeholder_render_object_structure")
+            )
+        self.assertEqual(
+            response.status_code,
+            404,
+            msg="structure endpoint leaked a view-restricted page",
+        )
+        self.assertNotContains(
+            response, "SuperSecretLinkName", status_code=404
+        )
+
+    def test_structure_endpoint_allows_permitted_user(self):
+        """A user who may view the page still gets the structure board."""
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(
+                self._endpoint("cms_placeholder_render_object_structure")
+            )
+        self.assertContains(response, "SuperSecretLinkName")
