@@ -41,7 +41,7 @@ from cms.utils.plugins import get_plugin_restrictions
 logger = logging.getLogger(__name__)
 
 
-def _unpack_plugins(parent_plugin: CMSPlugin) -> Generator[CMSPlugin, None, None]:
+def _unpack_plugins(parent_plugin: CMSPlugin) -> Generator[CMSPlugin]:
     yield parent_plugin
     for plugin in parent_plugin.child_plugin_instances or []:
         yield from _unpack_plugins(plugin)
@@ -623,7 +623,7 @@ class ContentRenderer(BaseRenderer):
         context,
         editable: bool = False,
         template: str | None = None,
-    ) -> Generator[SafeText | str, None, None]:
+    ) -> Generator[SafeText | str]:
         plugins = self.get_plugins_to_render(
             placeholder=placeholder,
             template=template,
