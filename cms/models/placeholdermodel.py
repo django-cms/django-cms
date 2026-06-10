@@ -783,10 +783,8 @@ class Placeholder(models.Model):
             )
         cursor.execute(park_sql, [base, self.pk, language])
 
-        # Phase 2: shift the whole parked band back down to a dense 1..n. Every row of the group
-        # was parked, so an unconditional shift by ``base`` is enough.
-        unpark_sql = (
-            f"UPDATE {table} SET position = position - %s "
-            "WHERE placeholder_id=%s AND language=%s"
-        )
-        cursor.execute(unpark_sql, [base, self.pk, language])
+        # Phase 2: shift the whole parked band back down to a dense 1..n. Every row of the group was
+        # parked, so an unconditional shift by ``base`` is enough — a plain update with no window
+        # function, so it needs no raw SQL. It runs on the same write connection, hence inside the
+        # caller's transaction, right after the park above.
+        self.get_plugins(language).update(position=models.F("position") - base)
