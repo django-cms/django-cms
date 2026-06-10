@@ -39,7 +39,7 @@ def default(name):
             return wrapped()
 
         update_wrapper(wrapper, wrapped)
-        return wrapped
+        return wrapper
 
     return decorator
 
