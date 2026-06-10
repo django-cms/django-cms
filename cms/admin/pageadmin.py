@@ -1256,7 +1256,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
     def delete_view(self, request, object_id, extra_context=None):
         page_content = self.get_object(request, object_id=object_id)
-        page = page_content.page
+        page = page_content.page if page_content is not None else None
 
         if not self.has_delete_translation_permission(request, page_content.language, page):
             return HttpResponseForbidden(_("You do not have permission to delete this page"))

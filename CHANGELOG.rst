@@ -1,3 +1,37 @@
+5.0.8 (2026-06-09)
+==================
+
+Bug Fixes:
+----------
+* Enforce authorization on structure, move and clipboard endpoints (#8644) (#8645) (7642a98ab) -- Fabian Braun
+* GrouperModelAdmin shadowed prepopulated_fields class attribute (#8636) (#8639) (1b164a488) -- Fabian Braun
+* Honour plugin-declared Vary headers in the page cache key (#8646) (#8647) (d5dc1efa1) -- Fabian Braun
+* Missing redirect_url in CMSNavigationNode.attr (#8625) (f975cace5) -- Venelin Stoykov
+* Release script dropped changes (#8655) (23df299bd) -- Fabian Braun
+* Slugs of published pages could be changed (#8640) (#8654) (9fed876a0) -- Fabian Braun
+* Transifex upload script failed (#8656) (936a620ef) -- Fabian Braun
+* template-specific CMS_PLACEHOLDER_CONF keys ignored when rendering page placeholders (#8652) (c7424f7f2) -- Ralph
+* Correct lookup prefix and register length lookup in PermissionTuple.allow_list()
+* Use loop variable instead of queryset in user_can_delete_page placeholder check
+* Return 404 instead of 500 for missing objects in delete_view and edit_title_fields
+* Use target language for position shift and cache clearing in _paste_placeholder
+
+Statistics:
+-----------
+
+This release includes 14 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (8 pull requests)
+* Ralph (1 pull request)
+* Venelin Stoykov (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 5.0.7 (2026-05-05)
 ==================
 

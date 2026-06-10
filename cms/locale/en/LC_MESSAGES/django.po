@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-21 17:54+0000\n"
+"POT-Creation-Date: 2026-06-08 10:53+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -52,13 +52,11 @@ msgstr "menu visibility"
 msgid "limit when this page is visible in the menu"
 msgstr "limit when this page is visible in the menu"
 
-#, fuzzy
-#| msgid "Options"
 msgid "X Frame Options"
-msgstr "Options"
+msgstr "X Frame Options"
 
 msgid "Whether this page can be embedded in other pages or websites."
-msgstr ""
+msgstr "Whether this page can be embedded in other pages or websites."
 
 msgid "URL options"
 msgstr "URL options"
@@ -67,7 +65,7 @@ msgid "Menu options"
 msgstr "Menu options"
 
 msgid "Headers"
-msgstr ""
+msgstr "Headers"
 
 msgid "Application"
 msgstr "Application"
@@ -97,6 +95,8 @@ msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"You cannot have two pages with the same slug at the same page level. Please "
+"alter the slug of one of the pages before trying to move again."
 
 msgid "Yes"
 msgstr "Yes"
@@ -178,10 +178,8 @@ msgstr "Parent plugin placeholder must be same as placeholder!"
 msgid "Plugin position must be greater than %(position)d"
 msgstr "Plugin position must be greater than %(position)d"
 
-#, fuzzy
-#| msgid "Add Translation"
 msgid "Translations"
-msgstr "Add Translation"
+msgstr "Translations"
 
 msgid "Advanced Settings"
 msgstr "Advanced Settings"
@@ -193,10 +191,8 @@ msgstr "The page is not eligible to be home."
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s object with primary key %(key)r does not exist."
 
-#, fuzzy
-#| msgid "Error:"
 msgid "error"
-msgstr "Error:"
+msgstr "error"
 
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
@@ -216,6 +212,11 @@ msgstr ""
 msgid "You do not have permission to edit this page"
 msgstr "You do not have permission to edit this page"
 
+msgid ""
+"(to change it, first unpublish the currently published version of this page)"
+msgstr ""
+"(to change it, first unpublish the currently published version of this page)"
+
 msgid "Add Page Copy"
 msgstr "Add Page Copy"
 
@@ -231,17 +232,15 @@ msgstr "Database error"
 msgid "Template not valid"
 msgstr "Template not valid"
 
-#, fuzzy
-#| msgid "placeholder content"
 msgid "Placeholder selection not valid"
-msgstr "placeholder content"
+msgstr "Placeholder selection not valid"
 
 msgid "The template was successfully changed"
 msgstr "The template was successfully changed"
 
 #, python-format
 msgid "Placeholder '%s' does not exist in target language"
-msgstr ""
+msgstr "Placeholder '%s' does not exist in target language"
 
 msgid "You do not have permission to copy these plugins."
 msgstr "You do not have permission to copy these plugins."
@@ -480,10 +479,8 @@ msgstr "Advanced settings"
 msgid "Templates"
 msgstr "Templates"
 
-#, fuzzy
-#| msgid "Placeholder"
 msgid "Placeholders"
-msgstr "Placeholder"
+msgstr "Placeholders"
 
 msgid "Hide in navigation"
 msgstr "Hide in navigation"
@@ -706,13 +703,13 @@ msgstr ""
 "to this page"
 
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "Mark this page as a page type"
 
 msgid "pages"
 msgstr "pages"
 
 msgid "No available title"
-msgstr ""
+msgstr "No available title"
 
 msgid "slug"
 msgstr "slug"
@@ -812,25 +809,17 @@ msgstr "slot"
 msgid "width"
 msgstr "width"
 
-#, fuzzy
-#| msgid "Edit model"
 msgid "Edit object"
-msgstr "Edit model"
+msgstr "Edit object"
 
-#, fuzzy
-#| msgid "This is a static placeholder"
 msgid "This is an external placeholder"
-msgstr "This is a static placeholder"
+msgstr "This is an external placeholder"
 
-#, fuzzy
-#| msgid "Add plugin"
 msgid "plugin"
-msgstr "Add plugin"
+msgstr "plugin"
 
-#, fuzzy
-#| msgid "Add plugin"
 msgid "plugins"
-msgstr "Add plugin"
+msgstr "plugins"
 
 msgid "<Empty>"
 msgstr "<Empty>"
@@ -988,15 +977,17 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
 
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Yes, I’m sure"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "No, take me back"
 
 msgid "Summary"
-msgstr ""
+msgstr "Summary"
 
 msgid "User"
 msgstr "User"
@@ -1189,7 +1180,7 @@ msgid "Permissions"
 msgstr "Permissions"
 
 msgid "inherited"
-msgstr ""
+msgstr "inherited"
 
 msgid "This page has no preview!"
 msgstr "This page has no preview!"
@@ -1371,35 +1362,25 @@ msgstr "Minimize"
 msgid "Maximize"
 msgstr "Maximize"
 
-#, fuzzy
-#| msgid "placeholder code"
 msgid "Placeholder not editable"
-msgstr "placeholder code"
+msgstr "Placeholder not editable"
 
 msgid "Drop a plugin here"
 msgstr "Drop a plugin here"
 
-#, fuzzy
-#| msgid "Welcome to django CMS"
 msgid "Welcome to your new django CMS installation!"
-msgstr "Welcome to django CMS"
+msgstr "Welcome to your new django CMS installation!"
 
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "Version %(cms_version)s"
 
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "Let’s build something great together!"
 
 msgid "Please log in"
 msgstr "Please log in"
 
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
-#| "add\">Add the first page</a> to the system to continue.\n"
-#| "                    "
 msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your "
@@ -1407,9 +1388,9 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
-"add\">Add the first page</a> to the system to continue.\n"
-"                    "
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your "
+"first page</a>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1428,6 +1409,21 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Help Funding</h2>\n"
+"                    <p>\n"
+"                        Your funding directly benefits the product, mainly "
+"through the\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-"
+"program/\">django CMS Fellowship Program</a>!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        A quick way for yourself or your organisation to "
+"donate is on\n"
+"                        <a href=\"https://github.com/sponsors/django-"
+"cms\">Github Sponsors</a>.\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1444,6 +1440,19 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Join Us</h2>\n"
+"                    <p>\n"
+"                        The django CMS Association is a non-profit "
+"organisation that funds and steers the development of\n"
+"                        django CMS.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        You can <a href=\"https://www.django-cms.org/en/"
+"memberships/\">join both as an individual or as an\n"
+"                        organisation</a>.\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1461,6 +1470,20 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Contribute</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"contribute/\">Contribute code:</a> fix a bug or\n"
+"                            implement a new feature!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"volunteering-opportunities/\">Volunteer:</a>\n"
+"                            We offer fun and efficient team work!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"repositories-plugins/\">Open-source your work:</a>\n"
+"                            Make the ecosystem strong.</li>\n"
+"                    </ul>\n"
+"                "
 
 msgid "Installation Notes"
 msgstr "Installation Notes"
@@ -1471,13 +1494,11 @@ msgstr "Support"
 msgid "Documentation"
 msgstr "Documentation"
 
-#, fuzzy
-#| msgid "User (page)"
 msgid "User guide"
-msgstr "User (page)"
+msgstr "User guide"
 
 msgid "Give back"
-msgstr ""
+msgstr "Give back"
 
 msgid ""
 "\n"
@@ -1626,10 +1647,8 @@ msgstr "Sample App 2"
 msgid "Sample App 3"
 msgstr "Sample App 2"
 
-#, fuzzy
-#| msgid "Sample App with config"
 msgid "Sample App Without Landing Page"
-msgstr "Sample App with config"
+msgstr "Sample App Without Landing Page"
 
 msgid "Namespaced App"
 msgstr "Namespaced App"
@@ -1699,10 +1718,8 @@ msgstr "Add plugin to placeholder \"%(placeholder_label)s\""
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Add plugin to %(plugin_name)s"
 
-#, fuzzy
-#| msgid "placeholder"
 msgid "Single placeholder"
-msgstr "placeholder"
+msgstr "Single placeholder"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - your user account was created."
@@ -1741,86 +1758,3 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
-
-#~ msgid "Title"
-#~ msgstr "Title"
-
-#~ msgid "Soft root"
-#~ msgstr "Soft root"
-
-#~ msgid "Redirect"
-#~ msgstr "Redirect"
-
-#, python-format
-#~ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-#~ msgstr "The %(name)s \"%(obj)s\" was deleted successfully."
-
-#~ msgid "Alias"
-#~ msgstr "Alias"
-
-#~ msgid "Create Alias"
-#~ msgstr "Create Alias"
-
-#, python-format
-#~ msgid ""
-#~ "This is an alias reference, you can edit the content only on the <a "
-#~ "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-#~ msgstr ""
-#~ "This is an alias reference, you can edit the content only on the <a "
-#~ "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-
-#~ msgid "Edit this Page"
-#~ msgstr "Edit this Page"
-
-#~ msgid "overwrite the title (html title tag)"
-#~ msgstr "overwrite the title (html title tag)"
-
-#~ msgid "overwrite the title in the menu"
-#~ msgstr "overwrite the title in the menu"
-
-#~ msgid "description"
-#~ msgstr "description"
-
-#~ msgid "The text displayed in search engines."
-#~ msgstr "The text displayed in search engines."
-
-#~ msgid "Installation successful!"
-#~ msgstr "Installation successful!"
-
-#~ msgid "Add your first page"
-#~ msgstr "Add your first page"
-
-#, python-format
-#~ msgid ""
-#~ "\n"
-#~ "                    Welcome to django CMS version "
-#~ "<strong>%(cms_version)s</strong>.\n"
-#~ "                "
-#~ msgstr ""
-#~ "\n"
-#~ "                    Welcome to django CMS version "
-#~ "<strong>%(cms_version)s</strong>.\n"
-#~ "                "
-
-#, python-format
-#~ msgid ""
-#~ "\n"
-#~ "                        JavaScript seems to be disabled so please\n"
-#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
-#~ "add\">add a page</a> manually.\n"
-#~ "                    "
-#~ msgstr ""
-#~ "\n"
-#~ "                        JavaScript seems to be disabled so please\n"
-#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
-#~ "add\">add a page</a> manually.\n"
-#~ "                    "
-
-#~ msgid "You do not have permission to change a page's navigation status"
-#~ msgstr "You do not have permission to change a page's navigation status"
-
-#~ msgid "You cannot change this page's navigation status"
-#~ msgstr "You cannot change this page's navigation status"
-
-#~ msgid "Slug must not be empty."
-#~ msgstr "Slug must not be empty."

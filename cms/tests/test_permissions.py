@@ -11,7 +11,17 @@ from cms.cache.permissions import (
     get_permission_cache,
     set_permission_cache,
 )
-from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
+from cms.models import Page
+from cms.models.permissionmodels import (
+    ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_CHILDREN,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
+    PermissionTuple,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.page_permissions import (
@@ -156,3 +166,50 @@ class PermissionAdminMigrationSafetyTests(CMSTestCase):
             with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
                 # Falls back to the unfiltered list_filter (still includes 'user')
                 self.assertIn('user', admin_instance.get_list_filter(request=None))
+
+
+class PermissionTupleTests(CMSTestCase):
+    """
+    Regression tests for ``PermissionTuple.allow_list()`` building invalid
+    lookups (``page____path__length``) for ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS and ACCESS_PAGE_AND_CHILDREN (#8661).
+    """
+
+    def setUp(self):
+        self.root = create_page("root", "nav_playground.html", "en")
+        self.child = create_page("child", "nav_playground.html", "en", parent=self.root)
+        self.grandchild = create_page("grandchild", "nav_playground.html", "en", parent=self.child)
+        self.sibling = create_page("sibling", "nav_playground.html", "en")
+
+    def test_allow_list_scopes(self):
+        cases = (
+            (ACCESS_PAGE, {self.root}),
+            (ACCESS_CHILDREN, {self.child}),
+            (ACCESS_PAGE_AND_CHILDREN, {self.root, self.child}),
+            (ACCESS_DESCENDANTS, {self.child, self.grandchild}),
+            (ACCESS_PAGE_AND_DESCENDANTS, {self.root, self.child, self.grandchild}),
+        )
+        for grant_on, expected in cases:
+            with self.subTest(grant_on=grant_on):
+                perm = PermissionTuple((grant_on, self.root.path))
+                allowed = Page.objects.filter(perm.allow_list())
+                self.assertEqual(set(allowed), expected)
+
+    def test_allow_list_matches_contains(self):
+        pages = list(Page.objects.all())
+        grants = (ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
+                  ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS)
+        for grant_on in grants:
+            with self.subTest(grant_on=grant_on):
+                perm = PermissionTuple((grant_on, self.root.path))
+                expected = {page.pk for page in pages if perm.contains(page.path)}
+                allowed = Page.objects.filter(perm.allow_list()).values_list("pk", flat=True)
+                self.assertEqual(set(allowed), expected)
+
+    def test_allow_list_with_related_field_prefix(self):
+        user = self._create_user("perm-user", is_staff=True)
+        for page in (self.root, self.child, self.grandchild, self.sibling):
+            PagePermission.objects.create(page=page, user=user, grant_on=ACCESS_PAGE)
+        perm = PermissionTuple((ACCESS_PAGE_AND_CHILDREN, self.root.path))
+        matched = PagePermission.objects.filter(perm.allow_list("page"))
+        self.assertEqual({pp.page_id for pp in matched}, {self.root.pk, self.child.pk})

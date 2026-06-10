@@ -187,7 +187,7 @@ class CMSMenu(Menu):
             # Fallback to all configured public languages for the current site.
             self.languages = get_public_languages(site_pk)
 
-    def select_lang(self, page_contents: Iterable[PageContent]) -> Generator[PageContent, None, None]:
+    def select_lang(self, page_contents: Iterable[PageContent]) -> Generator[PageContent]:
         """Generator that returns only those page content objects passed that contain the first language
         present in the languages list."""
         lang_index = len(self.languages)
