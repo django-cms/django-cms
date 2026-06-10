@@ -958,7 +958,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             start_positions={target_language: target_position},
         )
         new_plugin_ids = (new.pk for new in new_plugins)
-        target_placeholder.clear_cache(plugin.language)
+        target_placeholder.clear_cache(target_language)
 
         new_plugins = (
             CMSPlugin
