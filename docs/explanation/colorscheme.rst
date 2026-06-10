@@ -10,7 +10,7 @@ Color schemes (light/dark) with django CMS
     and the responsibility of the site developer.
 
     The admin interfaces will only reflect the described behavior if the package
-    ``djangocms-simple-admin-style`` is installed (version 3.2 or later). If it is not
+    ``djangocms-simple-admin-style`` is installed. If it is not
     installed, the admin interface is managed by your underlying Django installation,
     which usually uses the browser's color scheme.
 
