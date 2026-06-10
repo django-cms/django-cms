@@ -11,15 +11,17 @@ becomes the entry point of the app.
 
 In this chapter you will:
 
-- add a ``Coffee`` model with a list view to the ``coffeeshop`` app,
-- create an apphook that exposes the list view,
+- add a ``Coffee`` model with list and detail views to the
+  ``coffeeshop`` app,
+- create an apphook that exposes those views,
 - attach the apphook to a new CMS page at ``/menu/``.
 
 Goal
 ----
 
 At the end of this chapter, ``http://localhost:8000/menu/`` is served
-by your ``coffeeshop`` views (not by a CMS placeholder). Editors can
+by your ``coffeeshop`` views (not by a CMS placeholder), and each
+coffee links to its own detail page below ``/menu/``. Editors can
 move the page in the page tree like any other page, and the app moves
 with it.
 
@@ -117,7 +119,63 @@ A URL conf for the app at ``coffeeshop/urls.py``:
 Do **not** add this to your project's main ``urls.py``. The apphook
 will do that for us.
 
-3. The apphook
+3. A detail view
+----------------
+
+Each coffee should get a page of its own. Add a ``DetailView`` next to
+the list view in ``coffeeshop/views.py``:
+
+.. code-block:: python
+
+    from django.views.generic import DetailView, ListView
+    from coffeeshop.models import Coffee
+
+
+    class CoffeeListView(ListView):
+        model = Coffee
+        template_name = "coffeeshop/coffee_list.html"
+        context_object_name = "coffees"
+
+
+    class CoffeeDetailView(DetailView):
+        model = Coffee
+        template_name = "coffeeshop/coffee_detail.html"
+        context_object_name = "coffee"
+
+Create its template at
+``coffeeshop/templates/coffeeshop/coffee_detail.html``:
+
+.. code-block:: html+django
+
+    {% extends "base.html" %}
+
+    {% block content %}
+        <h1>{{ coffee.name }}</h1>
+        <p>{{ coffee.origin }} · ${{ coffee.price }}</p>
+        <p>{{ coffee.description }}</p>
+        <p><a href="{% url 'coffeeshop:list' %}">Back to all coffees</a></p>
+    {% endblock %}
+
+Route it in ``coffeeshop/urls.py``:
+
+.. code-block:: python
+
+    from coffeeshop.views import CoffeeDetailView, CoffeeListView
+
+    urlpatterns = [
+        path("", CoffeeListView.as_view(), name="list"),
+        path("<int:pk>/", CoffeeDetailView.as_view(), name="detail"),
+    ]
+
+Finally, make each coffee in the list link to its detail page. In
+``coffeeshop/templates/coffeeshop/coffee_list.html``, change the name
+line to:
+
+.. code-block:: html+django
+
+    <h2><a href="{% url 'coffeeshop:detail' coffee.pk %}">{{ coffee.name }}</a></h2>
+
+4. The apphook
 --------------
 
 Create ``coffeeshop/cms_apps.py``:
@@ -153,7 +211,7 @@ Restart ``runserver`` (apphooks are loaded at startup).
    longer need to restart ``runserver`` for each edit. (The
    ``djangocms`` quickstart already includes it.)
 
-4. Attach the apphook to a page
+5. Attach the apphook to a page
 -------------------------------
 
 In the toolbar:
@@ -170,7 +228,9 @@ In the toolbar:
    *Application* dropdown open and *Coffee shop catalogue* selected.
 
 Visit ``http://localhost:8000/menu/`` — you should see your coffee
-list, rendered by ``CoffeeListView`` extending ``base.html``.
+list, rendered by ``CoffeeListView`` extending ``base.html``. Click a
+coffee's name: its detail page is served at a URL like ``/menu/2/``,
+below the page's URL.
 
 .. note::
 
@@ -189,7 +249,9 @@ You attached a Django app to a CMS page. The CMS:
 - prepends that page's URL to your app's ``urlpatterns``,
 - hands every request below that page to your views.
 
-That is why URL changes in the toolbar move the app with them.
+That is why URL changes in the toolbar move the app with them — and
+why ``get_urls`` returns a whole URL conf rather than a single view:
+the list *and* every detail page below it follow the page together.
 
 .. important::
 

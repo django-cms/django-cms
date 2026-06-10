@@ -127,7 +127,7 @@ the page.
    editing the template — two empty placeholders with the labels
    ``Header`` and ``Body`` visible above their outlines.
 
-5. Fill the placeholders
+4. Fill the placeholders
 ------------------------
 
 #. Drop a **Text** plugin into ``Header`` and type the site name —

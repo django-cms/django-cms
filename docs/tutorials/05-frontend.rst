@@ -114,7 +114,7 @@ to import it and use it inside the header.
         <header class="site-header">
             <a href="/"><strong>Coffee Roaster</strong></a>
             <nav class="site-nav">
-                {% show_menu 0 1 100 100 %}
+                <ul>{% show_menu 0 1 100 100 %}</ul>
             </nav>
         </header>
 
@@ -132,8 +132,10 @@ The four numbers on ``{% show_menu %}`` control how deep and how many
 levels the menu shows. Defaults are sane. The full list of menu tags
 is in :doc:`/reference/navigation`.
 
-The default ``menu/menu.html`` template renders the menu as a nested
-``<ul>``. The CSS above styles the top level into a horizontal bar.
+The default ``menu/menu.html`` template renders ``<li>`` items — only
+nested levels bring their own ``<ul>`` — so you provide the outer
+``<ul>`` yourself, as in the snippet above. The CSS above styles the
+top level into a horizontal bar.
 
 3. Drop the placeholder ``Header``
 ----------------------------------
@@ -150,16 +152,17 @@ see:
 - styled coffee cards on the homepage,
 - the catalogue at ``/menu/`` inheriting the same chrome.
 
-.. note::
+.. image:: images/final-homepage.png
+   :alt: the final homepage in an anonymous browser — dark header with
+         site name and horizontal nav, styled coffee cards below
+   :align: center
+   :width: 600
 
-   **Screenshot suggested:** the final homepage in an anonymous browser
-   — dark header with site name and horizontal nav, styled coffee
-   cards below.
-
-.. note::
-
-   **Screenshot suggested:** ``/menu/`` in the same anonymous browser,
-   showing the catalogue inheriting the header and styling.
+.. image:: images/final-menu.png
+   :alt: the /menu/ page in the same anonymous browser, showing the
+         catalogue inheriting the header and styling
+   :align: center
+   :width: 600
 
 If the menu shows pages you wanted hidden, mark them as **not in
 navigation** in **Page** → **Advanced settings** → *Menu*.
