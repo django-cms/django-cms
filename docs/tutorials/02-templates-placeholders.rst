@@ -121,11 +121,13 @@ the page.
    include a ``Page Content`` placeholder, so its plugins are not
    rendered.
 
-.. note::
-
-   **Screenshot suggested:** the homepage in edit mode immediately after
-   editing the template — two empty placeholders with the labels
-   ``Header`` and ``Body`` visible above their outlines.
+.. image:: images/empty-placeholders.png
+   :class: screenshot
+   :alt: the page in edit mode immediately after editing the template —
+         the structure board shows two empty placeholders labelled
+         Header and Body
+   :align: center
+   :width: 600
 
 4. Fill the placeholders
 ------------------------
@@ -139,10 +141,12 @@ the page.
 Visit the homepage in a private window. You should see a header strip
 above the body content.
 
-.. note::
-
-   **Screenshot suggested:** the final homepage with the site-name
-   header strip on top and the welcome paragraph below.
+.. image:: images/header-and-body.png
+   :class: screenshot
+   :alt: the homepage with the site-name header strip on top and the
+         welcome paragraph below
+   :align: center
+   :width: 600
 
 What just happened
 ------------------

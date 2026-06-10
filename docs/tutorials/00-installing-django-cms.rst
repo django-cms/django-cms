@@ -74,6 +74,7 @@ django CMS welcome page with the toolbar across the top. Log in with
 the superuser credentials you created during the install.
 
 .. image:: images/it-works-cms.jpg
+   :class: screenshot
    :alt: the django CMS welcome screen with the toolbar at the top
    :align: center
    :width: 600

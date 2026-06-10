@@ -153,12 +153,19 @@ see:
 - the catalogue at ``/menu/`` inheriting the same chrome.
 
 .. image:: images/final-homepage.png
+   :class: screenshot
    :alt: the final homepage in an anonymous browser — dark header with
          site name and horizontal nav, styled coffee cards below
    :align: center
    :width: 600
 
+The catalogue at ``/menu/`` gets the same treatment without any extra
+work: it is served by your apphook view, but its template extends
+``base.html``, so the new header, navigation and stylesheet apply
+there too:
+
 .. image:: images/final-menu.png
+   :class: screenshot
    :alt: the /menu/ page in the same anonymous browser, showing the
          catalogue inheriting the header and styling
    :align: center

@@ -125,25 +125,34 @@ In your browser, open the homepage in edit mode:
    (``Ethiopia``), and a price (``18.50``). Save.
 #. The card renders in place.
 
-.. note::
+.. image:: images/coffee-card-picker.png
+   :class: screenshot
+   :alt: the Add plugin picker open on the Body placeholder, filtered
+         to show the new Coffee card entry
+   :align: center
+   :width: 600
 
-   **Screenshot suggested:** the *Add plugin* picker open in the
-   ``Body`` placeholder, scrolled or filtered to show the new
-   *Coffee card* entry.
+Choosing *Coffee card* opens the plugin's editing form. You did not
+write this form — the CMS generated it from the three fields on your
+``CoffeeCard`` model, the same way the Django admin builds forms from
+a ``ModelAdmin``:
 
-.. note::
-
-   **Screenshot suggested:** the Coffee card form open over the page
-   with all three fields filled in.
+.. image:: images/coffee-card-form.png
+   :class: screenshot
+   :alt: the Coffee card form open over the page with all three fields
+         filled in
+   :align: center
+   :width: 600
 
 Drop a second card in. Drag to reorder. **Publish** the page when you
 are happy.
 
-.. note::
-
-   **Screenshot suggested:** the published homepage in a private window,
-   showing two rendered coffee cards stacked in the ``Body``
-   placeholder.
+.. image:: images/coffee-cards-published.png
+   :class: screenshot
+   :alt: the published homepage in a private window, showing two
+         rendered coffee cards stacked in the Body placeholder
+   :align: center
+   :width: 600
 
 You now have a custom component that any editor can reuse across the
 site.

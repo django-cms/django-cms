@@ -222,20 +222,24 @@ In the toolbar:
 #. Save.
 #. **Publish** the page.
 
-.. note::
-
-   **Screenshot suggested:** the *Advanced settings* dialog with the
-   *Application* dropdown open and *Coffee shop catalogue* selected.
+.. image:: images/advanced-settings-application.png
+   :class: screenshot
+   :alt: the Advanced settings form with Coffee shop catalogue selected
+         in the Application dropdown
+   :align: center
+   :width: 600
 
 Visit ``http://localhost:8000/menu/`` — you should see your coffee
 list, rendered by ``CoffeeListView`` extending ``base.html``. Click a
 coffee's name: its detail page is served at a URL like ``/menu/2/``,
 below the page's URL.
 
-.. note::
-
-   **Screenshot suggested:** ``/menu/`` rendered, listing the coffees
-   you added in the admin, still inside the site's CMS template chrome.
+.. image:: images/menu-unstyled.png
+   :class: screenshot
+   :alt: /menu/ rendered, listing the coffees added in the admin —
+         unstyled for now, that changes in the next chapter
+   :align: center
+   :width: 600
 
 You can rename the page slug, move the page in the tree, or translate
 it; the URL of the apphook follows the page.

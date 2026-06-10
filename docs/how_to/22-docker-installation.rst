@@ -58,7 +58,7 @@ Once logged in:
 3. Add a title and content, then click **Create**
 4. Press **Publish** to make the page visible
 
-.. image:: /introduction/images/create_page_with_django_cms1.png
+.. image:: /tutorials/images/create_page_with_django_cms1.png
     :alt: Create a page wizard
     :width: 400
     :align: center

@@ -26,6 +26,7 @@ django CMS toolbar is visible at the top of the screen.
    you want to create.
 
    .. image:: images/create_page_with_django_cms1.png
+      :class: screenshot
       :alt: the Create wizard with "New page" selected
       :align: center
       :width: 600
@@ -35,6 +36,7 @@ django CMS toolbar is visible at the top of the screen.
    structure board in the next step. Click **Create**.
 
    .. image:: images/create_page_with_django_cms2.png
+      :class: screenshot
       :alt: the New page form with a title typed in
       :align: center
       :width: 600
@@ -69,15 +71,13 @@ The page is using the default template, which exposes a single
 
 The page now shows your text.
 
-.. note::
+.. image:: images/add-text-plugin.png
+   :class: screenshot
+   :alt: the structure board open with the empty Page Content
+         placeholder and the Add plugin picker filtered to "Text"
+   :align: center
+   :width: 600
 
-   **Screenshot suggested:** the empty ``Page Content`` placeholder in
-   edit mode, with the *Add plugin* picker open and "Text" highlighted.
-
-.. note::
-
-   **Screenshot suggested:** the rich-text editor open over the page,
-   showing a heading and a paragraph being typed.
 
 3. Publish the page
 -------------------
@@ -92,11 +92,13 @@ it.
 You should see your Home page. If you see a 404 instead, you forgot
 the publish step.
 
-.. note::
-
-   **Screenshot suggested:** side-by-side comparison of the page in edit
-   mode (toolbar visible, dashed placeholder outline) and the same page
-   viewed anonymously (no toolbar, clean rendering).
+.. image:: images/edit-vs-published.png
+   :class: screenshot
+   :alt: side-by-side comparison of the page in edit mode (toolbar
+         visible) and the same page viewed anonymously (no toolbar,
+         clean rendering)
+   :align: center
+   :width: 600
 
 4. Create a second page
 -----------------------
@@ -114,10 +116,12 @@ Because the homepage already exists, this second page is served at its
 own slug. Open ``http://localhost:8000/about/`` in a private window —
 you should see your About page.
 
-.. note::
-
-   **Screenshot suggested:** the page tree (**Pages...**) showing both
-   *Home* (marked as the homepage) and *About*.
+.. image:: images/page-tree.png
+   :class: screenshot
+   :alt: the page tree showing both Home (marked as the homepage with a
+         house icon) and About
+   :align: center
+   :width: 600
 
 Now ``http://localhost:8000/`` serves the *Home* page, and
 ``/about/`` serves the About page.
