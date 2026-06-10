@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
 from django.forms.models import model_to_dict
@@ -127,6 +129,105 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(source_placeholder.get_plugins("en").filter(pk=source_plugin.pk).exists())
         self.assertTrue(user_settings.clipboard.get_plugins("en").filter(plugin_type="PlaceholderPlugin").exists())
+
+    def _create_clipboard_with_placeholder(self, user, language="en"):
+        """Puts a PlaceholderPlugin with one LinkPlugin (``language``) on the
+        user's clipboard, as "Copy all" does, and returns the PlaceholderPlugin."""
+        user_settings = UserSettings.objects.create(
+            language=language,
+            user=user,
+            clipboard=Placeholder.objects.create(slot="clipboard"),
+        )
+        placeholder_plugin = add_plugin(user_settings.clipboard, "PlaceholderPlugin", language)
+        add_plugin(
+            placeholder_plugin.placeholder_ref,
+            "LinkPlugin",
+            language,
+            name="Pasted Link",
+            external_link="https://www.django-cms.org",
+        )
+        return placeholder_plugin
+
+    def test_paste_placeholder_shifts_positions_of_target_language(self):
+        """
+        Pasting a placeholder from the clipboard shifts the positions of the
+        existing plugins in the *target* language, even when the clipboard
+        content was copied in a different language.
+
+        Regression test for issue 09: ``_paste_placeholder`` computed the
+        position offset from the clipboard plugin's language instead of the
+        target language. With existing plugins only in the target language,
+        no shift happened and the pasted plugins collided with the existing
+        positions (IntegrityError on the placeholder/language/position
+        unique constraint).
+        """
+        superuser = self.get_superuser()
+        # Clipboard content was copied while working in "en".
+        placeholder_plugin = self._create_clipboard_with_placeholder(superuser, language="en")
+        # The paste target already holds two "de" plugins (positions 1 and 2).
+        target_placeholder = Placeholder.objects.create(slot="target")
+        for name in ("Existing 1", "Existing 2"):
+            add_plugin(
+                target_placeholder,
+                "LinkPlugin",
+                "de",
+                name=name,
+                external_link="https://www.django-cms.org",
+            )
+
+        endpoint = self.get_move_plugin_uri(placeholder_plugin, language="de")
+        with self.login_user_context(superuser):
+            data = {
+                "plugin_id": placeholder_plugin.pk,
+                "placeholder_id": target_placeholder.pk,
+                "move_a_copy": "true",
+                "target_language": "de",
+                "target_position": 1,  # paste before the existing plugins
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        plugins = list(target_placeholder.get_plugins("de").order_by("position"))
+        self.assertEqual(len(plugins), 3)
+        positions = [plugin.position for plugin in plugins]
+        self.assertEqual(len(set(positions)), len(positions), f"Plugin positions collide: {positions}")
+        # The pasted plugin sits before the pre-existing plugins.
+        names = [plugin.get_bound_plugin().name for plugin in plugins]
+        self.assertEqual(names, ["Pasted Link", "Existing 1", "Existing 2"])
+
+    def test_paste_placeholder_clears_cache_of_target_language(self):
+        """
+        Pasting a placeholder from the clipboard invalidates the target
+        placeholder's cache for the *target* language.
+
+        Regression test for issue 09: ``_paste_placeholder`` cleared the
+        cache for the clipboard plugin's language, so the target language
+        kept serving stale content.
+        """
+        superuser = self.get_superuser()
+        # Clipboard content was copied while working in "en", pasted into "de".
+        placeholder_plugin = self._create_clipboard_with_placeholder(superuser, language="en")
+        target_placeholder = Placeholder.objects.create(slot="target")
+
+        endpoint = self.get_move_plugin_uri(placeholder_plugin, language="de")
+        with self.login_user_context(superuser):
+            data = {
+                "plugin_id": placeholder_plugin.pk,
+                "placeholder_id": target_placeholder.pk,
+                "move_a_copy": "true",
+                "target_language": "de",
+                "target_position": 1,
+            }
+            with patch.object(Placeholder, "clear_cache", autospec=True) as mocked_clear_cache:
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        cleared_languages = [
+            call.args[1]
+            for call in mocked_clear_cache.call_args_list
+            if call.args[0] == target_placeholder
+        ]
+        self.assertEqual(cleared_languages, ["de"])
 
     def test_edit_plugin_endpoint(self):
         """
