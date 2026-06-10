@@ -7,7 +7,7 @@ The django CMS quickstart project is a Docker-based production-ready setup. If
 you know your way around Docker, you will be able to quickly set up a project
 that is ready for deployment.
 
-For a simpler local setup without Docker, see :doc:`/introduction/01-install`.
+For a simpler local setup without Docker, see :doc:`/tutorials/00-installing-django-cms`.
 
 Prerequisites
 -------------
@@ -66,5 +66,5 @@ Once logged in:
 Next steps
 ----------
 
-- Continue with the :doc:`/introduction/index` to learn django CMS development
+- Continue with the :doc:`/tutorials/index` to learn django CMS development
 - See :doc:`/how_to/23-manual-installation` to understand the configuration in detail
