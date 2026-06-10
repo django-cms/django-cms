@@ -916,7 +916,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             target_placeholder=target_placeholder,
         )
 
-        target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
+        target_last_plugin = target_placeholder.get_last_plugin(target_language)
 
         if target_last_plugin:
             target_offset = target_last_plugin.position + len(plugins)
@@ -933,7 +933,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             start_positions={target_language: target_position},
         )
         new_plugin_ids = (new.pk for new in new_plugins)
-        target_placeholder.clear_cache(plugin.language)
+        target_placeholder.clear_cache(target_language)
 
         new_plugins = (
             CMSPlugin
