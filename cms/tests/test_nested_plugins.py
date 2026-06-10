@@ -1144,6 +1144,77 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(moved.placeholder_id, target.pk)
         self.assertEqual(moved.position, 2)
 
+    def test_delete_plugins_multiple_blocks(self):
+        """``delete_plugins`` removes several non-adjacent plugins and recompacts the placeholder."""
+        placeholder = Placeholder(slot="slot")
+        placeholder.save()
+        plugins = [add_plugin(placeholder, "TextPlugin", "en", body=str(i)) for i in range(6)]
+
+        # Delete the 2nd and 4th plugins (positions 2 and 4).
+        placeholder.delete_plugins([plugins[1].cmsplugin_ptr, plugins[3].cmsplugin_ptr])
+
+        remaining = list(placeholder.get_plugins("en").order_by("position").values_list("pk", "position"))
+        self.assertEqual(
+            remaining,
+            [(plugins[0].pk, 1), (plugins[2].pk, 2), (plugins[4].pk, 3), (plugins[5].pk, 4)],
+        )
+
+    def test_delete_plugins_with_descendants_and_overlap(self):
+        """Passing a parent and one of its descendants deletes the whole subtree once, no error."""
+        placeholder = Placeholder(slot="slot")
+        placeholder.save()
+        before = add_plugin(placeholder, "TextPlugin", "en", body="before")
+        parent = add_plugin(placeholder, "TextPlugin", "en", body="parent")
+        child1 = add_plugin(placeholder, "TextPlugin", "en", target=parent, body="c1")
+        add_plugin(placeholder, "TextPlugin", "en", target=parent, body="c2")
+        after = add_plugin(placeholder, "TextPlugin", "en", body="after")
+
+        # Overlapping selection: the parent and one of its children. The whole subtree is removed
+        # exactly once and the remaining plugins are recompacted.
+        placeholder.delete_plugins([parent.cmsplugin_ptr, child1.cmsplugin_ptr])
+
+        remaining = list(placeholder.get_plugins("en").order_by("position").values_list("pk", "position"))
+        self.assertEqual(remaining, [(before.pk, 1), (after.pk, 2)])
+
+    def test_delete_plugins_cross_language(self):
+        """``delete_plugins`` recompacts each affected language and leaves untouched ones alone."""
+        placeholder = Placeholder(slot="slot")
+        placeholder.save()
+        en = [add_plugin(placeholder, "TextPlugin", "en", body=f"en{i}") for i in range(4)]
+        de = [add_plugin(placeholder, "TextPlugin", "de", body=f"de{i}") for i in range(4)]
+        for _i in range(3):
+            add_plugin(placeholder, "TextPlugin", "it", body="it")
+
+        # One plugin from each of two languages, in a single call.
+        placeholder.delete_plugins([en[1].cmsplugin_ptr, de[0].cmsplugin_ptr])
+
+        for language in ("en", "de"):
+            self.assertEqual(
+                list(placeholder.get_plugins(language).order_by("position").values_list("position", flat=True)),
+                [1, 2, 3],
+            )
+        # The untouched language is intact.
+        self.assertEqual(
+            list(placeholder.get_plugins("it").order_by("position").values_list("position", flat=True)),
+            [1, 2, 3],
+        )
+
+    def test_delete_plugins_trailing_and_empty(self):
+        """Deleting the trailing plugins leaves a dense placeholder; empty input is a no-op."""
+        placeholder = Placeholder(slot="slot")
+        placeholder.save()
+        plugins = [add_plugin(placeholder, "TextPlugin", "en", body=str(i)) for i in range(4)]
+
+        placeholder.delete_plugins([])  # no-op
+        self.assertEqual(placeholder.get_plugins("en").count(), 4)
+
+        # Delete the last two (trailing): no gap is opened, the rest stays dense.
+        placeholder.delete_plugins([plugins[2].cmsplugin_ptr, plugins[3].cmsplugin_ptr])
+        self.assertEqual(
+            list(placeholder.get_plugins("en").order_by("position").values_list("position", flat=True)),
+            [1, 2],
+        )
+
     def test_recalculate_plugin_positions_empty_placeholder(self):
         """
         Test to verify that recalculating plugin positions on an empty placeholder

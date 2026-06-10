@@ -1,4 +1,5 @@
 import warnings
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
@@ -610,36 +611,65 @@ class Placeholder(models.Model):
         self._recalculate_plugin_positions(plugin.language, base=source_last_position)
         target_placeholder._recalculate_plugin_positions(plugin.language, base=target_base)
 
-    def delete_plugin(self, instance):
+    def delete_plugin(self, instance: "CMSPlugin") -> None:
         """
         .. versionadded:: 4.0
 
         Removes a plugin and its descendants from the placeholder and database.
+        This method **must** be used to preserver plugin tree consistency.
+        Do not use plugin.delete() or queryset.delete()
 
-        :param instance: Plugin to add. It's position parameter needs to be set.
+        :param instance: Plugin to remove. Its position needs to be set.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
         """
         with transaction.atomic():
-            # We're using raw sql - make the whole operation atomic
-            stats = self.get_plugins(language=instance.language).aggregate(  # 1st hit: count + max position
+            stats = self.get_plugins(language=instance.language).aggregate(  # count + max position
                 count=models.Count("pk"), max_position=models.Max("position")
             )
-            plugins = stats["count"]
-            descendants = instance._get_descendants_ids()  # 2nd hit: Get descendant ids
-            to_delete = [instance.pk] + descendants  # Instance plus descendants pk
-            self.cmsplugin_set.filter(pk__in=to_delete).delete()  # 3rd hit: Delete all plugins in one query
+            descendants = instance._get_descendants_ids()  # descendant ids
+            self.cmsplugin_set.filter(pk__in=[instance.pk] + descendants).delete()  # delete in one query
 
-            last_position = instance.position + len(descendants)  # Last position of deleted plugins
-            if last_position < plugins:
-                # Close the gap in the plugin tree. The shift lifts the remaining plugins by
-                # ``plugins``, so the old maximum plus that offset is a valid parking bound and the
-                # squash needs no extra MAX/COUNT query.
-                self._shift_plugin_positions(
-                    instance.language,
-                    start=instance.position,
-                    offset=plugins,
+            last_position = instance.position + len(descendants)  # last position of the deleted block
+            if last_position < stats["count"]:
+                # The deleted block was not the trailing one, so it left a gap. The squash closes
+                # gaps of any size, so no shift is needed; the pre-deletion maximum (positions only
+                # shrink on delete) is a valid parking bound, so it needs no extra MAX/COUNT query.
+                self._recalculate_plugin_positions(instance.language, base=stats["max_position"])
+
+    def delete_plugins(self, instances: Iterable["CMSPlugin"]) -> None:
+        """
+        .. versionadded:: 5.1
+
+        Removes several plugins and their descendants from the placeholder and database in a single
+        delete, then re-compacts the positions of each affected language once. Prefer this over
+        repeated :meth:`delete_plugin` calls when removing a batch of plugins.
+
+        The plugins must belong to this placeholder. Overlapping selections are fine: passing a
+        plugin together with one of its descendants simply deletes each row once.
+
+        :param instances: Iterable of plugins to remove.
+        :type instances: iterable of :class:`cms.models.pluginmodel.CMSPlugin` instances
+        """
+        with transaction.atomic():
+            to_delete = set()
+            languages = set()
+            for instance in instances:
+                to_delete.add(instance.pk)
+                to_delete.update(instance._get_descendants_ids())
+                languages.add(instance.language)
+            if not to_delete:
+                return
+            self.cmsplugin_set.filter(pk__in=to_delete).delete()
+
+            # The deleted plugins may have left gaps in several blocks; re-compact each affected
+            # language, but only when a gap was actually opened. Positions are unique and >= 1, so a
+            # language is already dense exactly when its maximum equals its plugin count.
+            for language in languages:
+                stats = self.get_plugins(language=language).aggregate(
+                    count=models.Count("pk"), max_position=models.Max("position")
                 )
-                self._recalculate_plugin_positions(instance.language, base=stats["max_position"] + plugins)
+                if stats["count"] and stats["max_position"] > stats["count"]:
+                    self._recalculate_plugin_positions(language, base=stats["max_position"])
 
     def get_last_plugin(self, language):
         return self.get_plugins(language).last()
