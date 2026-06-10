@@ -760,33 +760,33 @@ class Placeholder(models.Model):
         if db_vendor in ("sqlite", "postgresql"):
             # Phase 1: park each row at (its rank) + base using a window function.
             park_sql = (
-                "UPDATE {0} "
+                f"UPDATE {table} "
                 "SET position = subquery.new_pos + %s "
                 "FROM ("
                 "  SELECT id, ROW_NUMBER() OVER (ORDER BY position, id) AS new_pos "
-                "  FROM {0} WHERE placeholder_id=%s AND language=%s "
+                f"  FROM {table} WHERE placeholder_id=%s AND language=%s "
                 ") subquery "
-                "WHERE {0}.id=subquery.id"
-            ).format(table)
+                f"WHERE {table}.id=subquery.id"
+            )
         else:  # mysql, oracle
             # Phase 1: park each row at (its rank) + base. ``t`` is a snapshot of the current
             # positions, so the rank is computed independently of the rows already parked.
             # Positions are unique within a (placeholder, language) group, so counting the rows
             # strictly below each row yields a stable rank.
             park_sql = (
-                "UPDATE {0} "
+                f"UPDATE {table} "
                 "SET position = %s + ("
-                "SELECT COUNT(*)+1 FROM (SELECT * FROM {0}) t "
-                "WHERE placeholder_id={0}.placeholder_id AND language={0}.language "
-                "AND {0}.position > t.position"
+                f"SELECT COUNT(*)+1 FROM (SELECT * FROM {table}) t "
+                f"WHERE placeholder_id={table}.placeholder_id AND language={table}.language "
+                f"AND {table}.position > t.position"
                 ") WHERE placeholder_id=%s AND language=%s"
-            ).format(table)
+            )
         cursor.execute(park_sql, [base, self.pk, language])
 
         # Phase 2: shift the whole parked band back down to a dense 1..n. Every row of the group
         # was parked, so an unconditional shift by ``base`` is enough.
         unpark_sql = (
-            "UPDATE {0} SET position = position - %s "
+            f"UPDATE {table} SET position = position - %s "
             "WHERE placeholder_id=%s AND language=%s"
-        ).format(table)
+        )
         cursor.execute(unpark_sql, [base, self.pk, language])
