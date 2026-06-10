@@ -54,6 +54,40 @@ version. The fields display explanatory help text describing how to make them
 editable again, and locked URLs are no longer updated on save even if different
 slug data is posted (#8654).
 
+Security Fixes
+--------------
+
+This release fixes two security issues. We recommend that all users upgrade as
+soon as possible.
+
+* **Missing authorization on structure, move and clipboard endpoints (#8644).**
+  The placeholder structure, plugin move, and clipboard endpoints did not
+  consistently enforce permission checks. This could allow users without the
+  required permissions to read or manipulate plugins on a page. Authorization is
+  now enforced on these endpoints.
+* **Plugin-declared Vary headers ignored in the page cache key (#8646).**
+  The page cache key did not honour ``Vary`` headers declared by plugins. As a
+  result cached responses could be served to requests that should have received
+  a different, varied response (for example content that varies by cookie or
+  other request headers). Plugin-declared ``Vary`` headers are now included in
+  the cache key.
+
+Many thanks to the security researchers who responsibly reported these issues:
+`@mauriceng98 <https://github.com/mauriceng98>`_,
+`@lzhou1110 <https://github.com/lzhou1110>`_,
+`@Zyy0530 <https://github.com/Zyy0530>`_,
+`@Str1ckl4nd <https://github.com/Str1ckl4nd>`_, and
+`@7thParkk <https://github.com/7thParkk>`_.
+
+.. note::
+
+   As ever, we remind our users and contributors that all security reports,
+   patches and concerns be addressed only to our security team by email, at
+   `security@django-cms.org <mailto:security@django-cms.org>`_. Please do not
+   report security issues on the public issue tracker or any mailing list. See
+   our `security policy <https://github.com/django-cms/django-cms/blob/main/SECURITY.md>`_
+   for details.
+
 Bug Fixes:
 ----------
 * Enforce authorization on structure, move and clipboard endpoints (#8644) (#8645) (7642a98ab) -- Fabian Braun
