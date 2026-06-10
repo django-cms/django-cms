@@ -1022,6 +1022,128 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         for i, plugin in enumerate(plugins, start=1):
             self.assertEqual(plugin.position, i)
 
+    def test_recalculate_plugin_positions_with_gap_and_reversed_order(self):
+        """Regression test for GitHub issue #8665.
+
+        When the position sequence contains a gap, the old single-statement compaction could
+        assign a position that another, not-yet-processed row still held, raising an
+        ``IntegrityError`` (duplicate position) mid-statement. The order in which rows are
+        processed — and therefore whether it failed — depended on the query plan.
+
+        This builds the deterministic worst case: a gap at position 1 with positions that
+        strictly *decrease* as the id increases. A naive row-by-row compaction in id order then
+        tries to write a position that a higher-id row still occupies (e.g. the first row, at
+        position n+1, is compacted to n, which the second row still holds). The two-phase
+        park-then-unpark recalculation must complete without error and produce a dense 1..n.
+        """
+        placeholder = Placeholder(slot="some_slot")
+        placeholder.save()
+
+        n = 6
+        # Positions n+1, n, ..., 2 assigned in ascending-id order: a gap at position 1 and a
+        # descending position/id correlation. Keep a second language with its own gap to make
+        # sure the recalculation is scoped to the requested language only.
+        created = []
+        for i in range(n):
+            created.append(
+                CMSPlugin.objects.create(
+                    plugin_type=str(i),
+                    placeholder=placeholder,
+                    language="en",
+                    position=n + 1 - i,  # n+1, n, ..., 2
+                    parent=None,
+                )
+            )
+        it_plugin = CMSPlugin.objects.create(
+            plugin_type="it", placeholder=placeholder, language="it", position=5, parent=None
+        )
+
+        # Must not raise IntegrityError, regardless of backend / row-processing order.
+        placeholder._recalculate_plugin_positions("en")
+
+        positions = list(
+            placeholder.get_plugins("en").order_by("position").values_list("position", flat=True)
+        )
+        # Dense 1..n, no negative leftovers from the parking phase, no duplicates.
+        self.assertEqual(positions, list(range(1, n + 1)))
+
+        # Order is preserved: the row originally at the smallest position ends up first.
+        ordered_ids = list(
+            placeholder.get_plugins("en").order_by("position").values_list("pk", flat=True)
+        )
+        self.assertEqual(ordered_ids, [p.pk for p in reversed(created)])
+
+        # The other language was left untouched.
+        it_plugin.refresh_from_db()
+        self.assertEqual(it_plugin.position, 5)
+
+    def test_move_plugin_heals_preexisting_gap(self):
+        """Regression test for GitHub issue #8665 via the move path.
+
+        ``move_plugin`` shifts plugins (temporarily into negative positions) and then calls
+        ``_recalculate_plugin_positions``. If the placeholder already contains a gap — e.g. because
+        third-party code deleted a plugin with a plain ``plugin.delete()`` instead of
+        ``placeholder.delete_plugin()`` — the recalculation must still compact to a dense ``1..n``
+        rather than raising an ``IntegrityError``.
+        """
+        placeholder = Placeholder(slot="some_slot")
+        placeholder.save()
+
+        plugins = [add_plugin(placeholder, "TextPlugin", "en", body=f"plugin {i}") for i in range(5)]
+
+        # Simulate a third-party plain delete that leaves a gap (no position recalculation).
+        CMSPlugin.objects.filter(pk=plugins[1].pk).delete()
+        gappy = list(
+            placeholder.get_plugins("en").order_by("position").values_list("position", flat=True)
+        )
+        self.assertEqual(gappy, [1, 3, 4, 5])  # gap at position 2
+
+        # Move the last remaining plugin to the top. Must not raise and must compact the gap away.
+        placeholder.move_plugin(plugins[4].cmsplugin_ptr, target_position=1)
+
+        positions = list(
+            placeholder.get_plugins("en").order_by("position").values_list("position", flat=True)
+        )
+        self.assertEqual(positions, [1, 2, 3, 4])
+
+    def test_move_to_placeholder_heals_preexisting_gap(self):
+        """Regression test for GitHub issue #8665 via the cross-placeholder move path.
+
+        Moving a plugin to another placeholder reassigns it and recalculates positions in *both*
+        placeholders. If either one already contains a gap (e.g. from a third-party plain
+        ``plugin.delete()``), the recalculation must still compact both to a dense ``1..n`` instead
+        of raising an ``IntegrityError``.
+        """
+        source = Placeholder(slot="source")
+        source.save()
+        target = Placeholder(slot="target")
+        target.save()
+
+        source_plugins = [add_plugin(source, "TextPlugin", "en", body=f"s{i}") for i in range(5)]
+        target_plugins = [add_plugin(target, "TextPlugin", "en", body=f"t{i}") for i in range(5)]
+
+        # Simulate third-party plain deletes that leave gaps in both placeholders.
+        CMSPlugin.objects.filter(pk=source_plugins[1].pk).delete()
+        CMSPlugin.objects.filter(pk=target_plugins[3].pk).delete()
+
+        moved = source_plugins[4].cmsplugin_ptr
+        moved.refresh_from_db()
+        # Must not raise and must leave both placeholders dense.
+        source.move_plugin(moved, target_position=2, target_placeholder=target)
+
+        source_positions = list(
+            source.get_plugins("en").order_by("position").values_list("position", flat=True)
+        )
+        target_positions = list(
+            target.get_plugins("en").order_by("position").values_list("position", flat=True)
+        )
+        self.assertEqual(source_positions, [1, 2, 3])  # 5 created, 1 deleted, 1 moved out
+        self.assertEqual(target_positions, [1, 2, 3, 4, 5])  # 5 created, 1 deleted, 1 moved in, healed
+        # The moved plugin landed at the requested target position.
+        moved.refresh_from_db()
+        self.assertEqual(moved.placeholder_id, target.pk)
+        self.assertEqual(moved.position, 2)
+
     def test_recalculate_plugin_positions_empty_placeholder(self):
         """
         Test to verify that recalculating plugin positions on an empty placeholder
