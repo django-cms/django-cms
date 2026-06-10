@@ -1,7 +1,7 @@
 import warnings
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group, get_user_model
 from django.db.models import signals
 from django.db.models.signals import pre_migrate
 from django.dispatch import Signal, receiver
@@ -36,6 +36,9 @@ from cms.signals.permissions import (
 )
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
+
+
+User = get_user_model()
 
 
 @receiver(pre_migrate)

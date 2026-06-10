@@ -176,7 +176,7 @@ def user_can_delete_page(user, page, site=None):
 
     placeholders = _get_all_placeholders(page)
     for placeholder in placeholders:
-        if not placeholder.has_delete_plugins_permission(user, [placeholders.source.language]):
+        if not placeholder.has_delete_plugins_permission(user, [placeholder.source.language]):
             return False
     return True
 

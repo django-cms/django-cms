@@ -11,6 +11,10 @@ Bug Fixes:
 * Slugs of published pages could be changed (#8640) (#8654) (9fed876a0) -- Fabian Braun
 * Transifex upload script failed (#8656) (936a620ef) -- Fabian Braun
 * template-specific CMS_PLACEHOLDER_CONF keys ignored when rendering page placeholders (#8652) (c7424f7f2) -- Ralph
+* Correct lookup prefix and register length lookup in PermissionTuple.allow_list()
+* Use loop variable instead of queryset in user_can_delete_page placeholder check
+* Return 404 instead of 500 for missing objects in delete_view and edit_title_fields
+* Use target language for position shift and cache clearing in _paste_placeholder
 
 Statistics:
 -----------

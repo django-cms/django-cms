@@ -237,13 +237,13 @@ class PermissionTuple(tuple):
         if grant_on == ACCESS_PAGE:
             return Q(**{f"{filter}path": path})
         elif grant_on == ACCESS_CHILDREN:
-            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length": len(path) + steplen})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}path__length": len(path) + steplen})
         elif grant_on == ACCESS_DESCENDANTS:
-            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__gt": len(path)})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}path__length__gt": len(path)})
         elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
             return Q(**{f"{filter}path__startswith": path})
         elif grant_on == ACCESS_PAGE_AND_CHILDREN:
-            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}path__length__lte": len(path) + steplen})
         return Q()
 
 
