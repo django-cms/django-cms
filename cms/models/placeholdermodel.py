@@ -613,7 +613,7 @@ class Placeholder(models.Model):
         .. versionadded:: 4.0
 
         Removes a plugin and its descendants from the placeholder and database.
-        This method **must** be used to preserver plugin tree consistency.
+        This method **must** be used to preserve plugin tree consistency.
         Do not use plugin.delete() or queryset.delete()
 
         :param instance: Plugin to remove. Its position needs to be set.
