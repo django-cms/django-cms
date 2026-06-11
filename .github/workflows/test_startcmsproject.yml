@@ -20,6 +20,12 @@ jobs:
         os: [
           ubuntu-latest,
         ]
+        mode: [traditional, headless, hybrid]
+        switches:
+          - name: all-on
+            flags: "--stories --versioning --moderation --alias"
+          - name: all-off
+            flags: "--no-stories --no-versioning --no-moderation --no-alias"
 
     steps:
     - uses: actions/checkout@v6
@@ -28,7 +34,7 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Create project from template
+    - name: Create project from template (${{ matrix.mode }} / ${{ matrix.switches.name }})
       run: |
         sudo apt install gettext gcc -y
         python -m venv .venv
@@ -36,4 +42,50 @@ jobs:
         python -m pip install --upgrade pip
         pip install Django~=${{ matrix.django-version }}
         pip install -e .
-        djangocms mysite --noinput
+        djangocms mysite --noinput --mode ${{ matrix.mode }} ${{ matrix.switches.flags }}
+    - name: Verify requirements.in reflects the selected options
+      env:
+        MODE: ${{ matrix.mode }}
+        SWITCHES: ${{ matrix.switches.name }}
+      run: |
+        set -euo pipefail
+        req=mysite/requirements.in
+        if [ ! -f "$req" ]; then
+          echo "FAIL: $req not found"
+          exit 1
+        fi
+        echo "----- $req -----"
+        cat "$req"
+        echo "----------------"
+
+        # A package is "present" if a requirement line starts with its name
+        # (hyphens and underscores treated as equivalent), optionally followed
+        # by a version specifier, extras or marker.
+        is_present() {
+          local pattern
+          pattern="$(printf '%s' "$1" | sed 's/[-_]/[-_]/g')"
+          grep -Eiq "^${pattern}([^a-z0-9].*)?$" "$req"
+        }
+
+        # assert <package> <yes|no>
+        assert() {
+          local pkg="$1" expected="$2" present=no
+          is_present "$pkg" && present=yes
+          if [ "$present" = "$expected" ]; then
+            echo "OK: $pkg present=$present (expected $expected)"
+          else
+            echo "FAIL: $pkg present=$present but expected $expected"
+            exit 1
+          fi
+        }
+
+        # headless and hybrid modes pull in the REST API package
+        if [ "$MODE" = traditional ]; then rest=no; else rest=yes; fi
+        # the optional add-ons are all enabled for all-on, disabled for all-off
+        if [ "$SWITCHES" = all-on ]; then opt=yes; else opt=no; fi
+
+        assert djangocms_rest "$rest"
+        assert djangocms_stories "$opt"
+        assert djangocms_alias "$opt"
+        assert djangocms_moderation "$opt"
+        assert djangocms_versioning "$opt"
