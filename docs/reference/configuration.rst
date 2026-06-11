@@ -430,7 +430,7 @@ default
     ``[]``
 
 A list of plugin processors. Plugin processors are callables that modify all
-plugins' output *after* rendering. See :doc:`/how_to/09-custom_plugins`
+plugins' output *after* rendering. See :doc:`/how_to/10-custom_plugins`
 for more information.
 
 ..  setting:: CMS_APPHOOKS
