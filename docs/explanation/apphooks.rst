@@ -3,6 +3,12 @@
 Application hooks ("apphooks")
 ==============================
 
+.. seealso::
+
+  - :ref:`How django CMS is composed <composition>` — where apphooks
+    fit alongside pages and plugins, including the plugin-vs-apphook
+    decision aid.
+
 An *Application Hook* (usually simply *apphook*) attaches a Django application's URL tree to a
 django CMS page.
 

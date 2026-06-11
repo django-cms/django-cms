@@ -28,7 +28,7 @@ If you are looking for editor or administrator documentation, see the
 ----
 
 🧭 Choose your path
-------------------
+--------------------
 
 .. grid:: 2
    :gutter: 3
@@ -64,7 +64,7 @@ If you are looking for editor or administrator documentation, see the
 ----
 
 ✨ Why django CMS?
------------------
+-------------------
 
 django CMS is a mature, open-source content management system built on
 Django. It is designed for projects that require flexibility, long-term
@@ -134,6 +134,8 @@ This documentation refers to django CMS version |release|.
 django CMS follows Django’s
 `long-term support (LTS) policy <https://www.djangoproject.com/download/#supported-versions>`_
 and provides aligned LTS releases.
+
+.. _lts:
 
 Current LTS versions
 ++++++++++++++++++++
