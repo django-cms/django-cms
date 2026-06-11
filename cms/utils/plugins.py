@@ -6,7 +6,7 @@ from copy import deepcopy
 from itertools import starmap
 from operator import itemgetter
 
-from django.db import models
+from django.db import models, transaction
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
@@ -239,6 +239,7 @@ def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_l
             new_plugin.save()
 
 
+@transaction.atomic
 def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin=None, start_positions=None):
     """Copies an iterable of plugins to a placeholder
 
