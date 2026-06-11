@@ -1,4 +1,5 @@
 import warnings
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -481,18 +482,20 @@ class Placeholder(models.Model):
 
         if needs_shift:
             # shift to the right
+            shift_offset = last_position - instance.position + 2  # behind last_position plus one to shift back
             self._shift_plugin_positions(
                 instance.language,
                 start=instance.position,
-                offset=last_position - instance.position + 2,  # behind last_position plus one to shift back
+                offset=shift_offset,
             )
 
         instance.save()
 
         if needs_shift:
-            # The plugin tree was shifted to the right to make space,
-            # now squash all plugins in the tree to close any holes.
-            self._recalculate_plugin_positions(instance.language)
+            # The plugin tree was shifted to the right to make space, now squash all plugins in the
+            # tree to close any holes. The shift moved the former last plugin to its highest
+            # possible position, which is the parking offset the squash needs.
+            self._recalculate_plugin_positions(instance.language, base=last_position + shift_offset)
         return instance
 
     def move_plugin(self, plugin, target_position, target_placeholder=None, target_plugin=None):
@@ -523,134 +526,147 @@ class Placeholder(models.Model):
             )
 
         target_tree = self.get_plugins(plugin.language)
-        last_plugin = self.get_last_plugin(plugin.language)
+        last_position = self.get_last_plugin_position(plugin.language)  # only the position is needed
         source_plugin_desc_count = plugin._get_descendants_count()
         # Attn: The following line assumes that all children and grand-children have consecutive positions!
         source_plugin_range = (plugin.position, plugin.position + source_plugin_desc_count)
 
+        # A single shift is enough to establish the final ordering: the moved block is left in
+        # place while everything it has to jump over is pushed a full tree-length out of the way.
+        # That already yields the correct *relative* order (the only thing the renumbering below
+        # depends on, since it sorts by position); the previous, complementary second shift only
+        # changed the absolute — and partly negative — intermediate values without affecting that
+        # order, so it was redundant. ``_recalculate_plugin_positions`` is order-independent and
+        # collision-free for any intermediate state (positive, negative or gapped), so it closes
+        # the resulting hole regardless. See GitHub issue #8665.
         if target_position < plugin.position:
-            # Moving left
-            # Make a big hole on the right side of the current plugin's position
-            # by shifting all right nodes further to the right, excluding the current plugin
-            # but including the target plugin and its descendants.
-            (target_tree.filter(position__gte=target_position).exclude(position__range=source_plugin_range)).update(
-                position=(models.F("position") + last_plugin.position)
-            )
-
-            # Make a big hole on the left side of the current plugin's position
-            # by shifting all right nodes further the right, including the current plugin
-            # and its descendants.
-            target_tree.filter(position__lte=source_plugin_range[1]).update(
-                position=models.F("position") - last_plugin.position
+            # Moving left: push everything from the target position onwards (except the moved
+            # block) far to the right. The block then sorts immediately after position
+            # ``target_position - 1``, i.e. it lands at ``target_position``.
+            target_tree.filter(position__gte=target_position).exclude(position__range=source_plugin_range).update(
+                position=models.F("position") + last_position
             )
         else:
-            # Moving right
-            # Make a big hole on the left side of the target position,
-            # by shifting all left nodes further to the left, excluding the current plugin
-            # but including the target plugin and its descendants.
-            # Left node in the common case is target_position but if the current plugin
-            # has descendants then left node is the closest node to the right side of the
-            # last descendant.
-            (
-                target_tree.filter(position__lte=target_position + source_plugin_desc_count).exclude(
-                    position__range=source_plugin_range
-                )
-            ).update(position=(models.F("position") - last_plugin.position))
-
-            # Make a big hole on the right side of the current plugin's position
-            # by shifting all right nodes further the right, including the current plugin
-            # and its descendants.
-            target_tree.filter(position__gte=plugin.position).update(
-                position=models.F("position") + last_plugin.position
-            )
+            # Moving right: mirror image — push everything up to the end of the target region
+            # (except the moved block) far to the left. The block then sorts immediately after
+            # them. The right edge of that region is ``target_position`` in the common case, but
+            # the closest node to the right of the moved block's last descendant if it has any.
+            target_tree.filter(position__lte=target_position + source_plugin_desc_count).exclude(
+                position__range=source_plugin_range
+            ).update(position=models.F("position") - last_position)
 
         if plugin.parent != target_plugin:
             # Plugin is being moved to another tree (under another parent)
             # OR plugin is being moved to the root (no parent)
             plugin.update(parent=target_plugin)
-        # The plugin tree was shifted to the right to make space,
-        # Squash all plugin positions in the tree to close any holes.
-        self._recalculate_plugin_positions(plugin.language)
+        # The plugin tree was shifted to make space; squash all plugin positions to close any holes.
+        # The left shift adds ``last_position`` to positions that are at most ``last_position``, so no
+        # position can exceed twice that — a safe parking offset (the right shift only subtracts, so
+        # it cannot exceed it either).
+        self._recalculate_plugin_positions(plugin.language, base=2 * last_position)
 
     def _move_plugin_to_placeholder(self, plugin, target_position, target_placeholder, target_plugin=None):
-        source_last_plugin = self.get_last_plugin(plugin.language)
-        target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
+        from cms.models.pluginmodel import CMSPlugin
 
-        plugin_descendants = plugin.get_descendants()
-        if target_last_plugin:
-            source_length = source_last_plugin.position
-            target_length = target_last_plugin.position
-            plugins_to_move_count = 1 + len(plugin_descendants)  # parent plus descendants
+        # Only the last positions are needed (for the parking bounds), not the whole rows.
+        source_last_position = self.get_last_plugin_position(plugin.language)
+        target_last_position = target_placeholder.get_last_plugin_position(plugin.language)
 
-            source_offset = (
-                max(
-                    # far enough to shift behind current last source position
-                    source_length,
-                    # far enough to be shifted behind last target position plus no. of moved plugins
-                    target_length + plugins_to_move_count,
-                )
-                - plugin.position
-                + 1
-            )
+        # Fetch the descendant ids once and reuse them for both the count and the bulk update; calling
+        # ``get_descendants()`` and then ``len()`` on it would run the descendant query twice.
+        descendant_ids = plugin._get_descendants_ids()
+        plugins_to_move_count = 1 + len(descendant_ids)  # parent plus descendants
 
-            # move target position counter to at least behind
-            target_offset = max(
-                # far enough to shift behind current last target position
-                target_length - target_position + 1,
-                # far enough to leave enough space to move back
-                plugin.position + source_offset - target_position + plugins_to_move_count + 1,
-            )
-            target_placeholder._shift_plugin_positions(
-                plugin.language,
-                start=target_position,
-                offset=target_offset,
-            )
+        if target_last_position is not None:
+            # Open a gap at ``target_position`` by shifting the target's tail (positions >=
+            # target_position) far above its last position. A large offset keeps the shift
+            # collision-free — the shifted band is disjoint from every current position, so it cannot
+            # transiently duplicate one whatever order the rows are processed in (see #8665). The
+            # block drops into the freed gap and the target squash below pulls everything back to a
+            # dense ``1..n``, also healing any pre-existing gaps in the target.
+            park_offset = target_last_position + plugins_to_move_count
+            target_placeholder._shift_plugin_positions(plugin.language, start=target_position, offset=park_offset)
+            block_position = target_position
+            # Highest position the target now holds (the shifted tail's top); a valid parking bound.
+            target_base = target_last_position + park_offset
         else:
-            # moving to empty placeholder:
-            # Move out (remaining) plugins right behind last source position to be able to recalculate
-            source_offset = source_last_plugin.position
+            # Empty target: the block simply becomes positions 1..plugins_to_move_count.
+            block_position = 1
+            target_base = plugins_to_move_count
 
-        # Shift all plugins whose position is greater than or equal to
-        # the plugin being moved. This includes the plugin itself.
-        # This is to create enough space in-between for the squashing
-        # to work without conflicts.
-        self._shift_plugin_positions(
-            plugin.language,
-            start=plugin.position,
-            offset=source_offset,
-        )
-
-        plugin.update(parent=target_plugin, placeholder=target_placeholder)
+        # Move the block (parent and descendants) into the gap. The block is contiguous in the source,
+        # so a single uniform shift preserves its internal order; moving only the block leaves a plain
+        # gap in the source that the source squash below closes.
+        moved_position = models.F("position") + (block_position - plugin.position)
+        plugin.update(parent=target_plugin, placeholder=target_placeholder, position=moved_position)
         # TODO: More efficient is to do raw sql update
-        plugin_descendants.update(placeholder=target_placeholder)
-        self._recalculate_plugin_positions(plugin.language)
-        target_placeholder._recalculate_plugin_positions(plugin.language)
+        CMSPlugin.objects.filter(pk__in=descendant_ids).update(placeholder=target_placeholder, position=moved_position)
 
-    def delete_plugin(self, instance):
+        # Squash both placeholders back to a dense 1..n: the source to close the hole the block left,
+        # the target to seat the block at ``target_position`` and heal any gaps. Both maxima are known
+        # (source can only have shrunk; target is the shifted tail's top), so neither needs a query.
+        self._recalculate_plugin_positions(plugin.language, base=source_last_position)
+        target_placeholder._recalculate_plugin_positions(plugin.language, base=target_base)
+
+    def delete_plugin(self, instance: "CMSPlugin") -> None:
         """
         .. versionadded:: 4.0
 
         Removes a plugin and its descendants from the placeholder and database.
+        This method **must** be used to preserver plugin tree consistency.
+        Do not use plugin.delete() or queryset.delete()
 
-        :param instance: Plugin to add. It's position parameter needs to be set.
+        :param instance: Plugin to remove. Its position needs to be set.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
         """
         with transaction.atomic():
-            # We're using raw sql - make the whole operation atomic
-            plugins = self.get_plugins(language=instance.language).count()  # 1st hit: Count plugins
-            descendants = instance._get_descendants_ids()  # 2nd hit: Get descendant ids
-            to_delete = [instance.pk] + descendants  # Instance plus descendants pk
-            self.cmsplugin_set.filter(pk__in=to_delete).delete()  # 3rd hit: Delete all plugins in one query
+            stats = self.get_plugins(language=instance.language).aggregate(  # count + max position
+                count=models.Count("pk"), max_position=models.Max("position")
+            )
+            descendants = instance._get_descendants_ids()  # descendant ids
+            self.cmsplugin_set.filter(pk__in=[instance.pk] + descendants).delete()  # delete in one query
 
-            last_position = instance.position + len(descendants)  # Last position of deleted plugins
-            if last_position < plugins:
-                # Close the gap in the plugin tree (2 hits)
-                self._shift_plugin_positions(
-                    instance.language,
-                    start=instance.position,
-                    offset=plugins,
+            last_position = instance.position + len(descendants)  # last position of the deleted block
+            if last_position < stats["count"]:
+                # The deleted block was not the trailing one, so it left a gap. The squash closes
+                # gaps of any size, so no shift is needed; the pre-deletion maximum (positions only
+                # shrink on delete) is a valid parking bound, so it needs no extra MAX/COUNT query.
+                self._recalculate_plugin_positions(instance.language, base=stats["max_position"])
+
+    def delete_plugins(self, instances: Iterable["CMSPlugin"]) -> None:
+        """
+        .. versionadded:: 5.1
+
+        Removes several plugins and their descendants from the placeholder and database in a single
+        delete, then re-compacts the positions of each affected language once. Prefer this over
+        repeated :meth:`delete_plugin` calls when removing a batch of plugins.
+
+        The plugins must belong to this placeholder. Overlapping selections are fine: passing a
+        plugin together with one of its descendants simply deletes each row once.
+
+        :param instances: Iterable of plugins to remove.
+        :type instances: iterable of :class:`cms.models.pluginmodel.CMSPlugin` instances
+        """
+        with transaction.atomic():
+            to_delete = set()
+            languages = set()
+            for instance in instances:
+                to_delete.add(instance.pk)
+                to_delete.update(instance._get_descendants_ids())
+                languages.add(instance.language)
+            if not to_delete:
+                return
+            self.cmsplugin_set.filter(pk__in=to_delete).delete()
+
+            # The deleted plugins may have left gaps in several blocks; re-compact each affected
+            # language, but only when a gap was actually opened. Positions are unique and >= 1, so a
+            # language is already dense exactly when its maximum equals its plugin count.
+            for language in languages:
+                stats = self.get_plugins(language=language).aggregate(
+                    count=models.Count("pk"), max_position=models.Max("position")
                 )
-                self._recalculate_plugin_positions(instance.language)
+                if stats["count"] and stats["max_position"] > stats["count"]:
+                    self._recalculate_plugin_positions(language, base=stats["max_position"])
 
     def get_last_plugin(self, language):
         return self.get_plugins(language).last()
@@ -700,11 +716,44 @@ class Placeholder(models.Model):
 
         self.get_plugins(language).filter(position__gte=start).update(position=models.F("position") + offset)
 
-    def _recalculate_plugin_positions(self, language):
-        """Closes gaps in the plugin tree by re-calculating the positions of all plugins.
-        IMPORTANT: This method requires any gap to be large enough to be able to
-        contain all missing plugin positions. Ensure to have shifted out plugins after the
-        gaps far enough using the ``_shift_plugin_positions`` method."""
+    def _recalculate_plugin_positions(self, language, base=None):
+        """Closes gaps in the plugin tree by re-calculating the positions of all plugins of this
+        placeholder/language back to a dense ``1..n`` sequence, ordered by the current ``position``
+        (ties broken by ``id``).
+
+        :param base: Optional pre-computed parking offset. It only has to be an **upper bound**: any
+            value ``>=`` both the largest current ``position`` in the group and the number of plugins
+            in it is safe. Callers that just shifted by a known amount already know the resulting
+            maximum position and can pass it to skip the ``SELECT MAX(position), COUNT(*)`` round
+            trip. When ``None`` (default) it is queried.
+
+        The two phases below must run as a unit, so callers are expected to wrap the operation in a
+        transaction (``add_plugin``, ``move_plugin``, ``delete_plugin`` and
+        ``copy_plugins_to_placeholder`` all do, as do the atomic admin views). The compaction runs as
+        two block moves:
+
+        1. *Park*: every plugin of the group is moved to its final rank ``1..n`` shifted up by
+           ``base`` into a band ``[base + 1 .. base + n]`` that lies strictly **above** every current
+           position (``base >= max(position)``). Because the whole target band is above all existing
+           positions, no target can equal the position another, not-yet-moved row still holds, so the
+           statement cannot collide on the ``(placeholder, language, position)`` unique constraint —
+           whatever order the database processes the rows in.
+        2. *Unpark*: the parked band is shifted back down to ``1..n``. ``base`` is also kept ``>= n``,
+           so the source band ``[base + 1 .. base + n]`` and the target ``1..n`` are disjoint and this
+           statement cannot collide either.
+
+        Because neither phase can self-collide regardless of the database's row-processing order or
+        of any pre-existing gaps, this is safe under *any* starting state (including the negative or
+        far-shifted intermediate positions ``move_plugin`` produces) and turns a successful
+        recalculation into a self-heal of existing gaps. Previously the compaction ran as a single
+        statement that could intermittently raise an ``IntegrityError`` (duplicate position) on
+        PostgreSQL/SQLite — and likewise on MySQL/Oracle — whenever the position sequence contained a
+        gap. See GitHub issue #8665.
+
+        .. note::
+            The intermediate positions reach at most ``max(position) + n``. ``position`` is a signed
+            ``SmallIntegerField``, so this stays safe well beyond any realistic plugin count.
+        """
 
         from cms.models.pluginmodel import (
             CMSPlugin,
@@ -714,40 +763,55 @@ class Placeholder(models.Model):
 
         cursor = _get_database_cursor("write")
         db_vendor = _get_database_vendor("write")
+        table = connection.ops.quote_name(CMSPlugin._meta.db_table)
+
+        if db_vendor not in ("sqlite", "postgresql", "mysql", "oracle"):
+            raise RuntimeError(f"{connection.vendor} is not supported by django-cms")
+
+        # ``base`` puts the parking band [base + 1 .. base + n] strictly above every current
+        # position (so phase 1 cannot collide) while staying >= n (so phase 2's source band and
+        # the 1..n target are disjoint and it cannot collide either). When the caller did not supply
+        # an upper bound, query the maximum position and plugin count to derive the tightest one.
+        if base is None:
+            cursor.execute(
+                f"SELECT COALESCE(MAX(position), 0), COUNT(*) FROM {table} "
+                "WHERE placeholder_id=%s AND language=%s",
+                [self.pk, language],
+            )
+            max_position, count = cursor.fetchone()
+            if not count:
+                # Nothing to recalculate (empty placeholder for this language).
+                return
+            base = max(max_position, count)
 
         if db_vendor in ("sqlite", "postgresql"):
-            sql = (
-                "UPDATE {0} "
-                "SET position = subquery.new_pos "
+            # Phase 1: park each row at (its rank) + base using a window function.
+            park_sql = (
+                f"UPDATE {table} "
+                "SET position = subquery.new_pos + %s "
                 "FROM ("
-                "  SELECT  ID, ROW_NUMBER() OVER (ORDER BY position, id) AS new_pos "
-                "  FROM {0} WHERE placeholder_id=%s AND language=%s "
+                "  SELECT id, ROW_NUMBER() OVER (ORDER BY position, id) AS new_pos "
+                f"  FROM {table} WHERE placeholder_id=%s AND language=%s "
                 ") subquery "
-                "WHERE {0}.id=subquery.id"
+                f"WHERE {table}.id=subquery.id"
             )
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
-        elif db_vendor == "mysql":
-            sql = (
-                "UPDATE {0} "
-                "SET position = ("
-                "SELECT COUNT(*)+1 FROM (SELECT * FROM {0}) t "
-                "WHERE placeholder_id={0}.placeholder_id AND language={0}.language "
-                "AND {0}.position > t.position"
+        else:  # mysql, oracle
+            # Phase 1: park each row at (its rank) + base. ``t`` is a snapshot of the current
+            # positions, so the rank is computed independently of the rows already parked.
+            # Positions are unique within a (placeholder, language) group, so counting the rows
+            # strictly below each row yields a stable rank.
+            park_sql = (
+                f"UPDATE {table} "
+                "SET position = %s + ("
+                f"SELECT COUNT(*)+1 FROM (SELECT * FROM {table}) t "
+                f"WHERE placeholder_id={table}.placeholder_id AND language={table}.language "
+                f"AND {table}.position > t.position"
                 ") WHERE placeholder_id=%s AND language=%s"
             )
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
-        elif db_vendor == "oracle":
-            sql = (
-                "UPDATE {0} "
-                "SET position = ("
-                "SELECT COUNT(*)+1 FROM (SELECT * FROM {0}) t "
-                "WHERE placeholder_id={0}.placeholder_id AND language={0}.language "
-                "AND {0}.position > t.position"
-                ") WHERE placeholder_id=%s AND language=%s"
-            )
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
-        else:
-            raise RuntimeError(f"{connection.vendor} is not supported by django-cms")
+        cursor.execute(park_sql, [base, self.pk, language])
+
+        # Phase 2: shift the whole parked band back down to a dense 1..n. Every row of the group was
+        # parked, so an unconditional shift by ``base`` is enough — a plain update with no window
+        # function, so it needs no raw SQL. It runs on the same write connection, hence inside the
+        # caller's transaction, right after the park above.
+        self.get_plugins(language).update(position=models.F("position") - base)
