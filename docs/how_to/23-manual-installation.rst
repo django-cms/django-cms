@@ -123,6 +123,21 @@ Add django CMS to an existing project
 To add django CMS to an existing Django project, you need to install dependencies
 and modify ``settings.py`` and ``urls.py``.
 
+.. tip::
+
+    Most of the steps below can be done for you by running the ``djangocms``
+    command with ``.`` as the project name from your project directory::
+
+        djangocms .
+
+    It reads your settings module from ``manage.py`` and updates
+    ``INSTALLED_APPS``, the middleware, the template context processors,
+    ``urls.py`` and the required django CMS settings, then offers to install the
+    missing packages and run the migrations. See the :ref:`djangocms-command`
+    reference for the available options (such as ``--mode``). As these are
+    automated, best-effort edits, review the changes afterwards. The rest of
+    this section describes how to perform the same steps by hand.
+
 Install required packages
 =========================
 

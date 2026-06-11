@@ -26,6 +26,13 @@ API, such as `djangocms-rest <https://github.com/django-cms/djangocms-rest>`_.
     ``urls.py`` and settings accordingly, so the manual steps below are only
     needed when converting an existing project.
 
+    You can also add django CMS to an **existing** project in headless mode by
+    running ``djangocms . --mode headless`` in the project directory. This adds
+    ``djangocms_rest`` and ``rest_framework`` (Django REST framework) to
+    ``INSTALLED_APPS``, wires the REST API into ``urls.py``, and — because no
+    templates are used — configures :setting:`CMS_PLACEHOLDERS` instead of
+    :setting:`CMS_TEMPLATES`. See :ref:`djangocms-command` for details.
+
 To run django CMS in headless mode, you simply remove the catch-all URL pattern
 from your project's ``urls.py`` file and replace it by an API endpoint:
 

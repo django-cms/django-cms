@@ -74,6 +74,49 @@ without a project name (or pass ``--interactive``)::
 
     djangocms
 
+Adding django CMS to an existing project
+----------------------------------------
+
+If you pass ``.`` as the project name, the command does **not** clone the
+project template. Instead it adds django CMS to the existing Django project in
+the current directory::
+
+    djangocms . --mode hybrid --no-versioning
+
+The project's settings module is read from ``manage.py``, and the following
+files are updated:
+
+* the settings module (``DJANGO_SETTINGS_MODULE``): the django CMS apps are
+  added to ``INSTALLED_APPS`` — the core apps plus those selected by the flags
+  (for example ``--versioning`` adds ``djangocms_versioning``). In ``headless``
+  and ``hybrid`` mode the REST API apps ``djangocms_rest`` and
+  ``rest_framework`` (Django REST framework) are added as well. The django CMS
+  middleware (including Django's ``LocaleMiddleware``) and template context
+  processors are added, and a small block of django CMS settings (such as
+  ``LANGUAGES``) is appended if missing. In ``traditional`` and ``hybrid`` mode
+  this includes ``CMS_TEMPLATES``; in ``headless`` mode it includes
+  ``CMS_PLACEHOLDERS`` instead (see :ref:`headless_mode`);
+* the project's ``urls.py`` (resolved from ``ROOT_URLCONF``): the django CMS
+  and/or REST API url patterns are added according to the selected ``--mode``.
+
+In ``traditional`` and ``hybrid`` mode, if the project has no template directory
+yet, a ``templates`` directory is created, registered in ``TEMPLATES['DIRS']``
+and seeded with a minimal base template. In ``headless`` mode no template
+directory is created.
+
+Finally, the command lists the required packages and asks whether to install
+them. If you agree (or run with ``--noinput``), it installs them, runs the
+database migrations and then ``cms check`` to validate the installation. If you
+decline, it prints the commands to run later instead. Existing entries are never
+duplicated, so it is safe to run again.
+
+The exact apps, middleware, context processors, settings and url patterns to add
+— and the conditions under which each applies (based on ``--mode`` and the
+feature flags) — are described by a JSON rules file. Like the project template,
+it is fetched from the `cms-template <https://github.com/django-cms/cms-template>`_
+repository (the branch matching your installed django CMS version); a copy
+bundled with django CMS is used as an offline fallback.
+
 .. note::
 
     The ``--stories``, ``--mode``, ``--versioning``, ``--moderation`` and
