@@ -14,6 +14,74 @@ command::
     python manage.py cms
 
 
+******************
+Creating a project
+******************
+
+.. _djangocms-command:
+
+``djangocms``
+=============
+
+The ``djangocms`` command creates a new django CMS project directory structure
+for the given project name. It is available as a standalone executable once
+django CMS is installed and can also be invoked as ``python -m cms``::
+
+    djangocms <project_name> [directory]
+
+It clones the official `cms-template
+<https://github.com/django-cms/cms-template>`_ matching your installed django
+CMS version, installs the project requirements, runs the initial migrations,
+creates a superuser and checks the installation.
+
+It accepts the following options:
+
+* ``--interactive``: ask for the project name and for any option not given on
+  the command line. Interactive mode is also entered automatically when no
+  project name is given (unless ``--noinput`` is used).
+* ``--noinput`` / ``--no-input``: do not prompt for any input. A superuser
+  created this way will not be able to log in until given a valid password.
+* ``--username``: the login for the superuser to be created.
+* ``--email``: the email for the superuser to be created.
+* ``--stories``: add a component library (`djangocms-stories
+  <https://github.com/django-cms/djangocms-stories>`_) to the project. Off by
+  default.
+* ``--mode {traditional,headless,hybrid}``: select the CMS mode (see
+  :ref:`headless_mode`). Defaults to ``traditional``.
+
+  * ``traditional``: django CMS serves the content as HTML pages.
+  * ``headless``: django CMS serves the content only through an API; the HTML
+    page tree is not published.
+  * ``hybrid``: django CMS serves **both** HTML pages and the content through
+    an API.
+* ``--versioning`` / ``--no-versioning``: add content versioning
+  (`djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_)
+  to the project. On by default.
+* ``--moderation`` / ``--no-moderation``: add content moderation
+  (`djangocms-moderation <https://github.com/django-cms/djangocms-moderation>`_)
+  to the project. Off by default. Moderation builds on top of versioning, so it
+  cannot be combined with ``--no-versioning``.
+* ``--alias`` / ``--no-alias``: add reusable aliases (`djangocms-alias
+  <https://github.com/django-cms/djangocms-alias>`_) to the project. On by
+  default.
+
+Example::
+
+    djangocms my_project --mode headless --no-versioning --stories
+
+To be guided through the available options interactively, run the command
+without a project name (or pass ``--interactive``)::
+
+    djangocms
+
+.. note::
+
+    The ``--stories``, ``--mode``, ``--versioning``, ``--moderation`` and
+    ``--alias`` options are evaluated by the project template. They require
+    version 5.1 or later of the `cms-template
+    <https://github.com/django-cms/cms-template>`_ to support them.
+
+
 **********************
 Informational commands
 **********************
@@ -169,7 +237,7 @@ Maintenance and repair
 ``fix-tree``
 ============
 
-Occasionally, the page tree can become corrupted. Typical symptoms include problems 
+Occasionally, the page tree can become corrupted. Typical symptoms include problems
 when trying to copy or delete pages.
 
 This command will fix small corruptions by rebuilding the tree.
@@ -177,4 +245,3 @@ This command will fix small corruptions by rebuilding the tree.
 .. versionadded:: 4.0
 
     Since django CMS Version 4 this command does not affect the plugin tree.
-    

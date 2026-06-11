@@ -14,6 +14,18 @@ django CMS does not publish the html page tree. To retrieve content in headless
 mode you will need an application that serves the content from the CMS via an
 API, such as `djangocms-rest <https://github.com/django-cms/djangocms-rest>`_.
 
+.. note::
+
+    When starting a new project with the :ref:`djangocms-command` command, you
+    can scaffold it directly in the mode you want using the ``--mode`` option::
+
+        djangocms my_project --mode headless
+
+    Valid values are ``traditional`` (the default), ``headless`` and
+    ``hybrid``. The project template uses this to pre-configure the project's
+    ``urls.py`` and settings accordingly, so the manual steps below are only
+    needed when converting an existing project.
+
 To run django CMS in headless mode, you simply remove the catch-all URL pattern
 from your project's ``urls.py`` file and replace it by an API endpoint:
 
