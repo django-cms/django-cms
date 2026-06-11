@@ -452,6 +452,49 @@ class CacheTestCase(CMSTestCase):
                     response = self.client.get(page1_url)
                 self.assertEqual(response.status_code, 200)
 
+    def test_page_cache_varies_on_plugin_vary_headers(self):
+        """The page cache must honour headers declared by plugins through
+        get_vary_cache_on().
+
+        Otherwise the variant cached for the first visitor is served to every
+        subsequent visitor regardless of their header values, leaking
+        request-specific content across users (and allowing cache poisoning).
+        """
+        try:
+            plugin_pool.register_plugin(VaryCacheOnPlugin)
+        except PluginAlreadyRegistered:
+            pass
+        self.addCleanup(plugin_pool.unregister_plugin, VaryCacheOnPlugin)
+
+        # Ensure that we're testing the CMS page cache, not Django's MW cache.
+        exclude = [
+            "django.middleware.cache.UpdateCacheMiddleware",
+            "django.middleware.cache.FetchFromCacheMiddleware",
+        ]
+        overrides = {
+            "MIDDLEWARE": [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        }
+        with self.settings(**overrides):
+            self.assertTrue(get_cms_setting("PAGE_CACHE"))
+
+            page = create_page("vary page", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").filter(slot="body")[0]
+            # This plugin varies its output on the "Country-Code" header.
+            add_plugin(placeholder, "VaryCacheOnPlugin", "en")
+            url = page.get_absolute_url()
+
+            # First anonymous visitor primes the cache with their header value.
+            response_us = self.client.get(url, headers={"country-code": "US"})
+            self.assertEqual(response_us.status_code, 200)
+            self.assertContains(response_us, "$$$US$$$")
+
+            # A second visitor with a different header value must not be served
+            # the first visitor's cached variant.
+            response_fr = self.client.get(url, headers={"country-code": "FR"})
+            self.assertEqual(response_fr.status_code, 200)
+            self.assertContains(response_fr, "$$$FR$$$")
+            self.assertNotContains(response_fr, "$$$US$$$")
+
     def test_no_page_cache_on_toolbar_edit(self):
         with self.settings(CMS_PAGE_CACHE=True):
             superuser = self.get_superuser()

@@ -173,7 +173,6 @@ additional packages commonly used in django CMS projects.
    :maxdepth: 2
    :hidden:
 
-   introduction/index
    tutorials/index
    explanation/index
    how_to/index

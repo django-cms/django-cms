@@ -364,6 +364,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         pass
 
     @xframe_options_sameorigin
+    @transaction.atomic
     def add_plugin(self, request):
         """
         Shows the add plugin form and saves it on POST.
@@ -508,8 +509,20 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             language=source_language,
         )
         old_plugins = [source_plugin] + list(source_plugin.get_descendants())
+        source_placeholder = source_plugin.placeholder
 
         if not self.has_copy_plugins_permission(request, old_plugins):
+            message = _('You do not have permission to copy these plugins.')
+            raise PermissionDenied(message)
+
+        # Check source-side permission as well: copying reads the source
+        # plugins, so a user without access to the source placeholder must not
+        # be able to exfiltrate its content into their clipboard.
+        if not source_placeholder.has_add_plugins_permission(request.user, old_plugins):
+            message = _('You do not have permission to copy these plugins.')
+            raise PermissionDenied(message)
+
+        if not source_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
             raise PermissionDenied(message)
 
@@ -535,6 +548,17 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         old_plugins = source_placeholder.get_plugins_list(language=source_language)
 
         if not self.has_copy_plugins_permission(request, old_plugins):
+            message = _('You do not have permission to copy this placeholder.')
+            raise PermissionDenied(message)
+
+        # Check source-side permission as well: copying reads the source
+        # plugins, so a user without access to the source placeholder must not
+        # be able to exfiltrate its content into their clipboard.
+        if not source_placeholder.has_add_plugins_permission(request.user, old_plugins):
+            message = _('You do not have permission to copy this placeholder.')
+            raise PermissionDenied(message)
+
+        if not source_placeholder.check_source(request.user):
             message = _('You do not have permission to copy this placeholder.')
             raise PermissionDenied(message)
 
@@ -626,6 +650,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         return new_plugins
 
     @xframe_options_sameorigin
+    @transaction.atomic
     def edit_plugin(self, request, plugin_id):
         try:
             plugin_id = int(plugin_id)
@@ -736,6 +761,24 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             target_parent = plugin.parent
         else:
             target_parent = None
+
+        # Reparenting an existing plugin under itself or one of its own
+        # descendants would create a cycle in the plugin tree. The recursive
+        # descendant/ancestor queries would then loop indefinitely, stalling
+        # request handling (denial of service). Reject such moves.
+        # (Copies and cut-to-clipboard create new plugins, so they are safe.)
+        if (
+            target_parent
+            and not move_a_copy
+            and not move_to_clipboard
+            and (
+                target_parent.pk == plugin.pk
+                or target_parent.pk in plugin._get_descendants_ids()
+            )
+        ):
+            return HttpResponseBadRequest(
+                "A plugin cannot be moved inside itself or one of its descendants."
+            )
 
         old_parent = None
         fetch_tree = True
@@ -875,7 +918,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             target_placeholder=target_placeholder,
         )
 
-        target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
+        target_last_plugin = target_placeholder.get_last_plugin(target_language)
 
         if target_last_plugin:
             target_offset = target_last_plugin.position + len(plugins)
@@ -892,7 +935,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             start_positions={target_language: target_position},
         )
         new_plugin_ids = (new.pk for new in new_plugins)
-        target_placeholder.clear_cache(plugin.language)
+        target_placeholder.clear_cache(target_language)
 
         new_plugins = (
             CMSPlugin

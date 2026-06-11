@@ -104,6 +104,10 @@ See also the how-to guide for details and more examples:
 Minor features
 ==============
 
+* Placeholder objects now have a :meth:`~cms.models.placeholdermodel.Placeholder.delete_plugins`
+  method which efficiently bulk-deletes multiple plugins from the placeholder. It takes an iterable
+  of plugin objects as a parameter.
+
 * Async support: User middleware and apphook registration support async setups
   and now let you run django CMS using asgi. Database access is avoided when
   registering apphook URLs to make them async-safe.

@@ -155,7 +155,7 @@ Add to ``INSTALLED_APPS`` (order matters):
 
     INSTALLED_APPS = [
         # Add before django.contrib.admin for admin styling (optional)
-        # "djangocms_admin_style",
+        "djangocms_simple_admin_style",
 
         "django.contrib.admin",
         "django.contrib.auth",
