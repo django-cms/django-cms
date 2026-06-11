@@ -411,7 +411,7 @@ This is worth explaining in a little detail:
 - ``{% load cms_tags sekizai_tags %}`` loads the template tag libraries we use in the
   template.
 - ``{% page_attribute "page_title" %}`` extracts the page's ``page_title``
-  :ttag:`attribute <page_attribute>`.
+  :ref:`attribute <page_attribute>`.
 - ``{% render_block "css" %}`` and ``{% render_block "js" %}`` are Sekizai template tags
   that load blocks of HTML defined by Django applications. django CMS defines blocks for
   CSS and JavaScript, and requires these two tags. We recommended placing ``{%
