@@ -1,7 +1,8 @@
 import warnings
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.db.models import signals
 from django.db.models.signals import pre_migrate
 from django.dispatch import Signal, receiver
@@ -110,6 +111,7 @@ post_placeholder_operation.connect(log_placeholder_operations)
 
 if get_cms_setting("PERMISSION"):
     # only if permissions are in use
+    User = get_user_model()
     signals.pre_save.connect(pre_save_user, sender=User, dispatch_uid="cms_pre_save_user")
     signals.post_save.connect(post_save_user, sender=User, dispatch_uid="cms_post_save_user")
     signals.pre_delete.connect(pre_delete_user, sender=User, dispatch_uid="cms_pre_delete_user")
@@ -120,7 +122,7 @@ if get_cms_setting("PERMISSION"):
 
     signals.pre_save.connect(pre_save_group, sender=Group, dispatch_uid="cms_pre_save_group")
     signals.post_save.connect(post_save_user_group, sender=Group, dispatch_uid="cms_post_save_group")
-    signals.pre_delete.connect(pre_delete_group, sender=Group, dispatch_uid="cms_post_save_group")
+    signals.pre_delete.connect(pre_delete_group, sender=Group, dispatch_uid="cms_pre_delete_group")
 
     signals.pre_save.connect(pre_save_group, sender=PageUserGroup, dispatch_uid="cms_pre_save_pageusergroup")
     signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup, dispatch_uid="cms_pre_delete_pageusergroup")
