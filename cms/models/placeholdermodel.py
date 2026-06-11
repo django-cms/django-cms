@@ -608,7 +608,7 @@ class Placeholder(models.Model):
         self._recalculate_plugin_positions(plugin.language, base=source_last_position)
         target_placeholder._recalculate_plugin_positions(plugin.language, base=target_base)
 
-    def delete_plugin(self, instance: "CMSPlugin") -> None:
+    def delete_plugin(self, instance):
         """
         .. versionadded:: 4.0
 
@@ -633,7 +633,7 @@ class Placeholder(models.Model):
                 # shrink on delete) is a valid parking bound, so it needs no extra MAX/COUNT query.
                 self._recalculate_plugin_positions(instance.language, base=stats["max_position"])
 
-    def delete_plugins(self, instances: Iterable["CMSPlugin"]) -> None:
+    def delete_plugins(self, instances):
         """
         .. versionadded:: 5.1
 
