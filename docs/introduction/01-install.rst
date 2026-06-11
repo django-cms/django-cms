@@ -475,7 +475,7 @@ For deployment, you need to configure suitable media file serving. **For develop
 purposes only**, the following will work in your ``urls.py``:
 
 .. code-block:: python
-    :emphasize-lines: 1,2,4
+    :emphasize-lines: 1,2,6
 
     from django.conf import settings
     from django.conf.urls.static import static
