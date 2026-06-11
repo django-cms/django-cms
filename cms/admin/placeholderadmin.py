@@ -364,6 +364,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         pass
 
     @xframe_options_sameorigin
+    @transaction.atomic
     def add_plugin(self, request):
         """
         Shows the add plugin form and saves it on POST.
@@ -649,6 +650,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         return new_plugins
 
     @xframe_options_sameorigin
+    @transaction.atomic
     def edit_plugin(self, request, plugin_id):
         try:
             plugin_id = int(plugin_id)
