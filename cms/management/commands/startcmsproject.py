@@ -392,6 +392,13 @@ Enjoy!
 
         rules = self.load_install_rules()
 
+        # Emit any warnings whose condition matches (e.g. an option that no
+        # longer has an effect). These are defined by the rules file so they can
+        # be added/updated without changing django CMS.
+        for warning in rules.get("warnings", []):
+            if self._rule_applies(warning.get("when"), options):
+                self.stderr.write(self.style.WARNING(warning["message"]))
+
         self.stdout.write(self.HEADING(f"Add django CMS {cms_version} to {settings_module}"))
 
         # --- settings.py ---------------------------------------------------
