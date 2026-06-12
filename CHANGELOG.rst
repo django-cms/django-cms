@@ -23,6 +23,7 @@ Features:
 
 Bug Fixes:
 ----------
+* Some page permissions created invalid filter strings (#8662) (01d168f89) -- Fabian Braun
 * get_permissions failed for missing global permissions (#8468) (65d84a929) -- Fabian Braun
 * Create page wizard not available on empty install (#8463) -- Fabian Braun
 * Make Placeholder.add_plugin() set plugin.instance to self (#8442) (#8447) -- Jasper Bok
