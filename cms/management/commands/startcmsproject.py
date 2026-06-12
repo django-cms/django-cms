@@ -209,7 +209,7 @@ Enjoy!
                     self.stderr.write(
                         self.style.ERROR(
                             "To automatically install requirements for your new django CMS "
-                            "project use this command in an virtual environment."
+                            "project use this command in a virtual environment."
                         )
                     )
                     raise CommandError("Requirements not installed")
@@ -452,13 +452,17 @@ Enjoy!
         url = self.get_install_rules_url()
         try:
             with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 (https URL)
-                return json.loads(response.read().decode("utf-8"))
+                rules = json.loads(response.read().decode("utf-8"))
         except (urllib.error.URLError, OSError, ValueError) as exc:
             self.stderr.write(
                 self.style.WARNING(f"Could not fetch installation rules from {url} ({exc}); using bundled defaults.")
             )
             bundled = os.path.join(os.path.dirname(__file__), self.INSTALL_RULES_FILENAME)
-            return json.loads(self._read(bundled))
+            rules = json.loads(self._read(bundled))
+        if not isinstance(rules, dict):
+            raise CommandError("Invalid installation rules: expected a JSON object.")
+        # Metadata keys such as "$schema" or "comment" carry no rules.
+        return {key: value for key, value in rules.items() if not key.startswith("$")}
 
     @staticmethod
     def _rule_applies(when, options):
@@ -542,7 +546,15 @@ Enjoy!
         self._write(os.path.join(templates_dir, base_template), rule.get("base_template_content", ""))
         created_paths = [dir_name + "/", os.path.join(dir_name, base_template)]
 
-        text, added_dirs = self._insert_into_list(text, "DIRS", [f'BASE_DIR / "{dir_name}"'], quote=False)
+        # Settings created before Django 3.1 define BASE_DIR with os.path
+        # instead of pathlib, where the ``/`` operator does not work.
+        if re.search(r"(?m)^BASE_DIR\s*=\s*Path\(", text):
+            entry = f'BASE_DIR / "{dir_name}"'
+        else:
+            entry = f'os.path.join(BASE_DIR, "{dir_name}")'
+            if not re.search(r"(?m)^import os\b", text):
+                text = "import os\n" + text
+        text, added_dirs = self._insert_into_list(text, "DIRS", [entry], quote=False)
         return text, added_dirs, created_paths
 
     def _append_cms_settings(self, text, settings_rules, options):
@@ -717,6 +729,9 @@ Enjoy!
         """Offer to install the missing packages, then migrate and check."""
         packages = ["django-cms"]
         for app in apps:
+            # Sub-apps like "djangocms_frontend.contrib.grid" ship with their
+            # top-level package.
+            app = app.split(".", 1)[0]
             if app in packages_map:
                 packages.append(packages_map[app])
             elif app.startswith("djangocms"):
@@ -747,9 +762,20 @@ Enjoy!
         self.stdout.write(self.HEADING("Check installation"))
         self.run_management_command(["cms", "check"])
 
+        message = f"django CMS {cms_version} added to your project"
+        separator = "*" * len(message)
+        self.stdout.write(self.HEADING(f"{separator}\n{message}\n{separator}"))
         self.stdout.write(
-            "\nReview the changes to your settings and urls, then start the server "
-            "with 'python -m manage runserver'."
+            f"""
+Review the automated changes to your settings and urls, then
+start the development server:
+$ {self.style.SUCCESS("python -m manage runserver")}
+
+Learn more at https://docs.django-cms.org/
+Join the django CMS Discord Server at https://discord-main-channel.django-cms.org
+
+Enjoy!
+"""
         )
 
     def install_packages(self, packages):

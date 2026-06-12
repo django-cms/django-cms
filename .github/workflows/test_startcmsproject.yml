@@ -1,6 +1,14 @@
 name: djangocms mysite test
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - 'cms/management/**'
+      - 'cms/__main__.py'
+      - 'pyproject.toml'
+      - 'MANIFEST.in'
+      - 'setup.py'
+      - '.github/workflows/test_startcmsproject.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -89,3 +97,69 @@ jobs:
         assert djangocms_alias "$opt"
         assert djangocms_moderation "$opt"
         assert djangocms_versioning "$opt"
+
+  add-to-existing-project:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [traditional, headless, hybrid]
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+    - name: Add django CMS to a plain Django project (${{ matrix.mode }})
+      run: |
+        set -euo pipefail
+        python -m venv .venv
+        source ./.venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -e .
+        django-admin startproject demo
+        cd demo
+        djangocms . --noinput --mode ${{ matrix.mode }}
+    - name: Verify settings and urls
+      env:
+        MODE: ${{ matrix.mode }}
+      run: |
+        set -euo pipefail
+        settings=demo/demo/settings.py
+        urls=demo/demo/urls.py
+        echo "----- $settings -----"; cat "$settings"
+        echo "----- $urls -----"; cat "$urls"
+
+        grep -q '"cms",' "$settings"
+        grep -q '"djangocms_frontend.contrib.grid",' "$settings"
+        grep -q 'cms.middleware.toolbar.ToolbarMiddleware' "$settings"
+        grep -q 'sekizai.context_processors.sekizai' "$settings"
+        if [ "$MODE" = headless ]; then
+          grep -q 'CMS_PLACEHOLDERS' "$settings"
+          ! grep -q 'CMS_TEMPLATES' "$settings"
+          grep -q 'djangocms_rest.urls' "$urls"
+          ! grep -q 'include("cms.urls")' "$urls"
+          [ ! -d demo/templates ]
+        else
+          grep -q 'CMS_TEMPLATES' "$settings"
+          ! grep -q 'CMS_PLACEHOLDERS' "$settings"
+          grep -q 'include("cms.urls")' "$urls"
+          test -f demo/templates/cms-base.html
+        fi
+        if [ "$MODE" = traditional ]; then
+          ! grep -q 'djangocms_rest' "$settings"
+        else
+          grep -q '"djangocms_rest",' "$settings"
+        fi
+        echo "OK"
+    - name: Verify a second run makes no further changes
+      run: |
+        set -euo pipefail
+        source ./.venv/bin/activate
+        cd demo
+        cp demo/settings.py /tmp/settings.before
+        cp demo/urls.py /tmp/urls.before
+        djangocms . --noinput --mode ${{ matrix.mode }}
+        diff /tmp/settings.before demo/settings.py
+        diff /tmp/urls.before demo/urls.py

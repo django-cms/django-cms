@@ -79,7 +79,8 @@ Adding django CMS to an existing project
 
 If you pass ``.`` as the project name, the command does **not** clone the
 project template. Instead it adds django CMS to the existing Django project in
-the current directory::
+the current directory (see :ref:`add_to_existing_project` for a step-by-step
+guide)::
 
     djangocms . --mode hybrid --no-versioning
 
@@ -109,6 +110,10 @@ them. If you agree (or run with ``--noinput``), it installs them, runs the
 database migrations and then ``cms check`` to validate the installation. If you
 decline, it prints the commands to run later instead. Existing entries are never
 duplicated, so it is safe to run again.
+
+Unlike when creating a new project, no superuser is created (the ``--username``
+and ``--email`` options have no effect); use your project's existing accounts
+or run ``python -m manage createsuperuser``.
 
 The exact apps, middleware, context processors, settings and url patterns to add
 — and the conditions under which each applies (based on ``--mode`` and the

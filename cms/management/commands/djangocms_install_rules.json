@@ -1,5 +1,5 @@
 {
-    "comment": "Rules used by `djangocms .` to add django CMS to an existing project. Fetched from the cms-template repository (branch matching the installed django CMS major.minor), with this file as the bundled fallback. Each `when` condition may contain a `flag` (truthy command option) and/or a `mode` (list of matching --mode values). For installed_apps and middleware a rule may also carry a `before` or `after` anchor (an existing entry) for positional insertion; otherwise items are appended.",
+    "comment": "Rules used by `djangocms .` to add django CMS to an existing project. Fetched from the cms-template repository (branch matching the installed django CMS major.minor), with this file as the bundled fallback. Top-level keys starting with `$` (such as `$schema`) and this comment are ignored. Each `when` condition may contain a `flag` (truthy command option) and/or a `mode` (list of matching --mode values). For installed_apps and middleware a rule may also carry a `before` or `after` anchor (an existing entry) for positional insertion; otherwise items are appended.",
     "installed_apps": [
         {"items": ["djangocms_simple_admin_style"], "before": "django.contrib.admin"},
         {
@@ -12,6 +12,21 @@
                 "filer",
                 "easy_thumbnails",
                 "djangocms_frontend",
+                "djangocms_frontend.contrib.accordion",
+                "djangocms_frontend.contrib.alert",
+                "djangocms_frontend.contrib.badge",
+                "djangocms_frontend.contrib.card",
+                "djangocms_frontend.contrib.carousel",
+                "djangocms_frontend.contrib.collapse",
+                "djangocms_frontend.contrib.content",
+                "djangocms_frontend.contrib.grid",
+                "djangocms_frontend.contrib.image",
+                "djangocms_frontend.contrib.jumbotron",
+                "djangocms_frontend.contrib.link",
+                "djangocms_frontend.contrib.listgroup",
+                "djangocms_frontend.contrib.media",
+                "djangocms_frontend.contrib.tabs",
+                "djangocms_frontend.contrib.utilities",
                 "djangocms_text",
                 "djangocms_link"
             ]
@@ -59,12 +74,15 @@
         {"pattern": "path(\"\", include(\"cms.urls\"))", "when": {"mode": ["traditional", "hybrid"]}}
     ],
     "packages": {
-        "filer": "django-filer"
+        "filer": "django-filer",
+        "rest_framework": "djangorestframework",
+        "taggit": "django-taggit",
+        "taggit_autosuggest": "django-taggit-autosuggest"
     },
     "template_dir": {
         "path": "templates",
         "base_template": "cms-base.html",
-        "base_template_content": "{% extends \"bootstrap5/base.html\" %}{# Replace this with your CMS base template1 #}\n",
+        "base_template_content": "{% extends \"bootstrap5/base.html\" %}{# Replace this with your CMS base template #}\n",
         "when": {"mode": ["traditional", "hybrid"]}
     }
 }

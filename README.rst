@@ -53,15 +53,25 @@ Start with the demo link above.
 Installation & Quickstart
 =========================
 
-Get a working setup by following the official guide (recommended).
-If you already have a Django project, you can still use the same steps and integrate django CMS incrementally.
+Create a fully configured django CMS project with a single command:
 
 .. code-block:: console
 
     python -m pip install django-cms
+    djangocms mysite
+    cd mysite
+    python -m manage runserver
+
+The ``djangocms`` command clones the official project template, installs the
+requirements, runs the migrations and creates a superuser for you. Run it
+without arguments to be guided through the available options (such as the
+headless mode) interactively.
+
+Already have a Django project? Run ``djangocms .`` in its root directory to
+add django CMS to it.
 
 Next, follow the official installation guide and tutorials:
-`Installation <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_
+`Installation <https://docs.django-cms.org/en/latest/tutorials/00-installing-django-cms.html>`_
 
 Using Docker? Check out our `django-cms-quickstart project <https://github.com/django-cms/django-cms-quickstart>`_.
 
