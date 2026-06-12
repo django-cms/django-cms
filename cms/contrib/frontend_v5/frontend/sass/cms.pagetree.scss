@@ -1,0 +1,34 @@
+@charset "utf-8";
+/*!
+ * django-cms — contrib/frontend_v5 pagetree stylesheet
+ *
+ * Compiles to static/cms/css/<CMS_VERSION>/cms.pagetree.css and, when
+ * cms.contrib.frontend_v5 is listed before cms in INSTALLED_APPS, shadows
+ * the legacy cms.pagetree.css at the same URL (see CLAUDE.md decision 1).
+ *
+ * Structure mirrors the legacy entry point:
+ *   - settings/mixins bootstrap
+ *   - iconography (legacy-verbatim)
+ *   - button (legacy-verbatim, scoped inside .cms-pagetree-wrapper)
+ *   - pagetree/all — forked partials + new-DOM overrides
+ *   - tooltip (legacy-verbatim)
+ *
+ * The `pagetree/_tree-new-dom.scss` partial, pulled in via
+ * `components/pagetree/all`, contains CSS-grid row layout for the new
+ * nested-<ul> / <li role="treeitem"> DOM — the legacy selectors stay
+ * (and are mostly inert) so per-cell classes like `.cms-tree-item-lang`,
+ * `.cms-tree-item-menu`, `.cms-tree-item-preview`, etc. inherit their
+ * existing styling.
+ */
+
+$pagetree: true;
+
+@import "settings/all";
+@import "mixins/all";
+
+@import "components/iconography";
+.cms-pagetree-wrapper {
+    @import "components/button";
+}
+@import "components/pagetree/all";
+@import "components/tooltip";

@@ -56,3 +56,4 @@ webpack-stats.json
 /playwright/.cache/
 .better_test.db
 .vscode/
+cms/contrib/frontend_v5/static

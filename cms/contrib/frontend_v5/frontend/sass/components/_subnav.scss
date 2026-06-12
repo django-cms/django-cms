@@ -1,0 +1,256 @@
+//##############################################################################
+// SUBNAV
+@use "sass:math";
+
+.cms-submenu-btn {
+    @include icon(menu);
+    display: block;
+    position: absolute;
+    inset-inline-end: $submenu-right;
+    width: $submenu-icon-area-size;
+    height: $submenu-icon-area-size;
+    cursor: pointer;
+    top: 50%;
+    margin-top: math.div(-$submenu-icon-area-size, 2);
+    &:before {
+        @extend %icon;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: math.div(-$icon-size, 2) - 1;
+        margin-top: math.div(-$icon-size, 2) - 1;
+        color: $submenu-icon-color;
+    }
+
+    .cms-hover-tooltip {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+}
+.cms-submenu-btn {
+    margin-right: 2px;
+    background-color: transparent;
+    &:active,
+    &.cms-btn-active {
+        color: $btn-default-color !important;
+        filter: brightness(0.9);
+    }
+}
+.cms-submenu-settings {
+    border: none;
+}
+
+.cms-submenu-edit {
+    @include icon(edit);
+    inset-inline-end: $submenu-right * 3 + $submenu-icon-area-size * 2;
+}
+.cms-submenu-edit-obj {
+    @include icon(edit);
+    inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
+}
+.cms-submenu-add {
+    @include icon(plus);
+    inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
+}
+.cms-submenu-edit,
+.cms-submenu-edit-obj,
+.cms-submenu-add {
+    &:before {
+        margin-left: math.div(-$icon-size, 2);
+        margin-top: math.div(-$icon-size, 2);
+        font-size: $icon-size;
+    }
+}
+
+.cms-submenu-lang {
+    position: absolute;
+    top: 50%;
+    height: $line-height-normal;
+    margin-top: math.div(-$line-height-normal, 2);
+    line-height: $line-height-normal - 2px;
+    right: 10px;
+    padding: 0 5px;
+    border: 1px solid $gray-lighter;
+    border-radius: $dropdown-border-radius;
+}
+.cms-structure-content .cms-submenu-lang {
+    display: none;
+}
+
+.cms-submenu-dropdown-top {
+    top: $structure-dragbar-height + $structure-dragarea-space;
+}
+.cms-submenu-dropdown-bottom {
+    bottom: $structure-dragbar-height + $structure-dragarea-space;
+}
+
+// TODO this will be cms-submenu-dropdown (or rather cms-dropdown) in future
+.cms-submenu-dropdown-settings {
+    display: none;
+
+    // BEM modifier toggled by frontend/modules/plugins/ui/menu.ts.
+    &.cms-submenu-dropdown-settings--open {
+        display: block;
+    }
+
+    position: absolute;
+    z-index: z(structure, content, dropdown);
+    min-width: $dropdown-width;
+    background: $submenu-dropdown-bgcolor;
+    border: $submenu-dropdown-border;
+    border-radius: $dropdown-border-radius;
+    box-shadow: $dropdown-shadow;
+    inset-inline-end: $submenu-right * 2 + $submenu-icon-area-size;
+    transform: translateZ(0);
+
+    .cms-submenu-item {
+        a {
+            position: relative;
+            display: block;
+            font-size: $submenu-item-font-size;
+            text-align: start;
+            padding: 0 $submenu-item-padding-horizontal;
+            line-height: $dropdown-item-height;
+            min-height: $dropdown-item-height;
+            padding-inline-start: $dropdown-item-icon-space;
+            color: $submenu-item-color;
+            &:hover,
+            &:focus {
+                color: $submenu-item-hover-color;
+                background: $color-primary;
+            }
+            &[data-rel],
+            &[data-cms-icon] {
+                &:before {
+                    @extend %icon;
+                    position: absolute;
+                    inset-inline-start: $dropdown-item-icon-position;
+                    top: 0;
+                    height: $dropdown-item-height;
+                    line-height: $dropdown-item-height
+                }
+            }
+            &[data-cms-icon=view] {
+                @include icon(view);
+            }
+            &[data-cms-icon=edit] {
+                @include icon(edit);
+            }
+            &[data-cms-icon=edit-new] {
+                @include icon(edit-new);
+            }
+            &[data-cms-icon=publish] {
+                @include icon(publish);
+            }
+            &[data-cms-icon=copy] {
+                @include icon(copy);
+            }
+            &[data-cms-icon=paste] {
+                @include icon(paste);
+            }
+            &[data-cms-icon=cut] {
+                @include icon(cut);
+            }
+            &[data-cms-icon=bin] {
+                @include icon(bin);
+            }
+            &[data-cms-icon=alias] {
+                @include icon(alias);
+            }
+            &[data-cms-icon=highlight] {
+                @include icon(highlight);
+            }
+        }
+        &:first-child a:hover,
+        &:first-child a:focus {
+            border-radius: $dropdown-border-radius $dropdown-border-radius 0 0;
+        }
+        &:last-child a:hover,
+        &:last-child a:focus {
+            border-radius: 0 0 $dropdown-border-radius $dropdown-border-radius;
+        }
+    }
+    .cms-submenu-item-paste-tooltip {
+        display: none;
+    }
+    // BEM modifiers toggled by frontend/modules/{clipboard,plugins}/. The
+    // doubled selector pushes specificity to (0,3,0) so it beats the
+    // (0,2,0) hide rule above without source-order coupling.
+    .cms-submenu-item-paste-tooltip.cms-submenu-item-paste-tooltip--visible,
+    .cms-submenu-item-paste-tooltip-empty.cms-submenu-item-paste-tooltip-empty--visible {
+        display: block;
+    }
+    .cms-submenu-item-disabled {
+        position: relative;
+        a {
+            &,
+            &:hover,
+            &:focus {
+                cursor: default !important;
+                opacity: 0.33;
+                color: $submenu-item-color !important;
+                background: none !important;
+                box-shadow: none;
+            }
+        }
+        .cms-submenu-item-paste-tooltip {
+            cursor: default;
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+    }
+    &:before {
+        z-index: z(below);
+        position: absolute;
+        content: '';
+        inset-inline-start: 100%;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-inline-start: math.div(-$dropdown-arrow-side, 2);
+        transform: rotate(45deg);
+        background-color: $submenu-dropdown-bgcolor;
+        border: $submenu-dropdown-border;
+        box-shadow: $dropdown-shadow;
+    }
+
+    &.cms-submenu-dropdown-top {
+        // TODO importants can be removed
+        // after new "add plugin" is in place
+        top: 0 !important;
+        &:before {
+            top: $dropdown-arrow-position !important;
+        }
+    }
+    &.cms-submenu-dropdown-bottom {
+        bottom: 0 !important;
+        &:before {
+            bottom: $dropdown-arrow-position !important;
+        }
+    }
+
+    .cms-dropdown-inner {
+        z-index: 1;
+        background-color: $white;
+        border-radius: $dropdown-border-radius;
+    }
+
+}
+.cms-dragbar .cms-submenu-dropdown-settings {
+    &.cms-submenu-dropdown-top:before {
+        top: $dropdown-arrow-position - 4px !important;
+    }
+    &.cms-submenu-dropdown-bottom:before {
+        bottom: 12px !important;
+        bottom: $dropdown-arrow-position - 4px !important;
+    }
+}
+
+.cms-z-index-9999 {
+    z-index: 9999 !important;
+}

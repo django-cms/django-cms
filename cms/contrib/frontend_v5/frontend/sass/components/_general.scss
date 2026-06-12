@@ -1,0 +1,82 @@
+// #############################################################################
+// GENERAL
+
+// general styling
+.cms {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: z(base);
+    width: 100%;
+}
+
+// Utility class for "JS hides a normally-visible element" — toggled
+// from a few modules (e.g. modal control buttons, toolbar publish
+// holder, picker search filter). `!important` so the utility wins
+// against any per-element display value the surrounding component
+// might set.
+.cms-hidden {
+    display: none !important;
+}
+
+// other styles that might be used by components across the components
+.cms-prevent-scrolling {
+    overflow: hidden !important;
+    body {
+        overflow: hidden !important;
+    }
+}
+
+// Touch action utility classes
+// These replace data-touch-action attributes for CSP compliance
+.cms-touch-action-none {
+    -ms-touch-action: none;
+    touch-action: none;
+}
+
+.cms-touch-action-pan-y {
+    -ms-touch-action: pan-y;
+    touch-action: pan-y;
+}
+
+.cms-touch-action-pan-x {
+    -ms-touch-action: pan-x;
+    touch-action: pan-x;
+}
+
+// Render exceptions in edit mode
+.cms-rendering-exception {
+    display: inline-block;
+    border: none;
+    background: #ffc;
+    padding: 0.6em 1.3em;
+    min-height: 2em;
+    width: 100%;
+    vertical-align: middle;
+
+    .cms-rendering-exception-title {
+        font-weight: bold;
+        color: darkred;
+        &:not(.cms-plugin) {
+            cursor: not-allowed;
+        }
+    }
+    header#summary {
+        h1, pre {
+            display: none;
+        }
+    }
+
+    main#info {
+        font-size: 0.8rem;
+        h2 {
+            font-size: 1.6rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+        }
+        h4 {
+            font-size: 1rem;
+        }
+    }
+}

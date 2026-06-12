@@ -1,0 +1,46 @@
+//##############################################################################
+// CONTENT
+
+cms-plugin.cms-plugin-text-node {
+    display: inline;
+}
+
+// #PLACEHOLDER
+.cms-placeholder {
+    overflow: hidden;
+    height: 0;
+}
+
+.cms-render-model-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    &,
+    img {
+        position: relative;
+        max-width: none;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: url("../../img/toolbar/render_model_icon.png") no-repeat;
+    }
+}
+
+.cms-render-model-add {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    &,
+    img {
+        position: relative;
+        max-width: none;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: url("../../img/toolbar/render_model_add.png") no-repeat;
+    }
+}

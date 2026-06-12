@@ -1,0 +1,176 @@
+//##############################################################################
+// TOOLTIP
+@use "sass:math";
+
+.cms-hover-tooltip {
+    position: relative;
+    z-index: z(hovertooltip);
+}
+.cms-btn-active .cms-hover-tooltip {
+    &:before,
+    &:after {
+        opacity: 0 !important;
+        transition-delay: 0s !important;
+    }
+}
+
+/* Base styles for the entire tooltip */
+.cms-hover-tooltip:before,
+.cms-hover-tooltip:after {
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out,
+        visibility 0.2s ease-in-out,
+        transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24);
+    transform: translate3d(0, 0, 0);
+}
+
+.cms-hover-tooltip-delay:hover:before,
+.cms-hover-tooltip-delay:hover:after,
+.cms-hover-tooltip-delay:focus:before,
+.cms-hover-tooltip-delay:focus:after {
+    transition: opacity 0.2s ease-in-out 1.5s,
+        visibility 0.2s ease-in-out 1.5s,
+        transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24) 1.5s;
+}
+
+/* Show the entire tooltip on hover and focus */
+.cms-hover-tooltip:focus {
+    outline: none;
+}
+
+.cms-hover-tooltip:hover:before,
+.cms-hover-tooltip:hover:after,
+.cms-hover-tooltip:focus:before,
+.cms-hover-tooltip:focus:after {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Base styles for the tooltip's directional arrow */
+.cms-hover-tooltip:before {
+    content: "";
+    z-index: 2;
+    border: $hover-tooltip-arrow-height solid transparent;
+    background: transparent;
+}
+
+/* Base styles for the tooltip's content area */
+.cms-hover-tooltip:after {
+    content: attr(data-cms-tooltip);
+    z-index: 1;
+    color: $white !important;
+    font-size: $font-size-normal - 2px;
+    font-weight: normal;
+    line-height: 1.2;
+    text-align: center;
+    width: $hover-tooltip-width;
+    padding: $hover-tooltip-padding;
+    background-color: $hover-tooltip-bgcolor;
+    white-space: normal
+}
+
+.cms-hover-tooltip:before,
+.cms-hover-tooltip:after {
+    bottom: 100%;
+    left: 50%;
+}
+
+.cms-hover-tooltip:before {
+    margin-bottom: -$hover-tooltip-arrow-height * 2;
+    margin-left: -$hover-tooltip-arrow-height;
+    border-top-color: $hover-tooltip-bgcolor;
+}
+
+.cms-hover-tooltip:after {
+    margin-left: math.div(-$hover-tooltip-width, 2);
+}
+
+.cms-hover-tooltip:hover:before,
+.cms-hover-tooltip:hover:after,
+.cms-hover-tooltip:focus:before,
+.cms-hover-tooltip:focus:after {
+    transform: translateY(-$hover-tooltip-arrow-height * 2);
+}
+
+/* Left */
+.cms-hover-tooltip-left:before,
+.cms-hover-tooltip-left:after {
+    right: 100%;
+    bottom: 50%;
+    left: auto;
+    transform: translateY(50%);
+}
+
+.cms-hover-tooltip-left:before {
+    margin-left: 0;
+    margin-right: -$hover-tooltip-arrow-height * 2;
+    margin-bottom: 0;
+    border-top-color: transparent;
+    border-left-color: $hover-tooltip-bgcolor;
+}
+
+.cms-hover-tooltip-left:hover:before,
+.cms-hover-tooltip-left:hover:after,
+.cms-hover-tooltip-left:focus:before,
+.cms-hover-tooltip-left:focus:after {
+    transform: translateX(-$hover-tooltip-arrow-height * 2) translateY(50%);
+}
+
+/* Bottom */
+.cms-hover-tooltip-bottom:before,
+.cms-hover-tooltip-bottom:after {
+    top: 100%;
+    bottom: auto;
+    left: 50%;
+}
+
+.cms-hover-tooltip-bottom:before {
+    margin-top: -$hover-tooltip-arrow-height * 2;
+    margin-bottom: 0;
+    border-top-color: transparent;
+    border-bottom-color: $hover-tooltip-bgcolor;
+}
+
+.cms-hover-tooltip-bottom:hover:before,
+.cms-hover-tooltip-bottom:hover:after,
+.cms-hover-tooltip-bottom:focus:before,
+.cms-hover-tooltip-bottom:focus:after {
+    transform: translateY($hover-tooltip-arrow-height * 2);
+}
+
+/* Right */
+.cms-hover-tooltip-right:before,
+.cms-hover-tooltip-right:after {
+    bottom: 50%;
+    left: 100%;
+}
+
+.cms-hover-tooltip-right:before {
+    margin-bottom: 0;
+    margin-left: -$hover-tooltip-arrow-height * 2;
+    border-top-color: transparent;
+    border-right-color: $hover-tooltip-bgcolor;
+}
+
+.cms-hover-tooltip-right:hover:before,
+.cms-hover-tooltip-right:hover:after,
+.cms-hover-tooltip-right:focus:before,
+.cms-hover-tooltip-right:focus:after {
+    transform: translateX($hover-tooltip-arrow-height * 2) translateY(50%);
+}
+
+/* Move directional arrows down a bit for left/right tooltips */
+.cms-hover-tooltip-left:before,
+.cms-hover-tooltip-right:before {
+    transform: translateY(50%);
+}
+
+/* Vertically center tooltip content for left/right tooltips */
+.cms-hover-tooltip-left:after,
+.cms-hover-tooltip-right:after {
+    margin-left: 0;
+    transform: translateY(50%);
+}

@@ -132,6 +132,20 @@ if __name__ == "__main__":
         "sekizai",
     ] + PLUGIN_APPS
 
+    # Allow opting-in to contrib apps (e.g. cms.contrib.frontend_v5) for
+    # integration tests. Env var is a comma-separated list of dotted
+    # module paths. Each gets inserted BEFORE `cms` in INSTALLED_APPS so
+    # its static files and templates shadow legacy ones via Django app
+    # ordering — the same mechanism used in production deployments that
+    # opt into a contrib app. Empty/unset env var = no change.
+    _contrib_apps = [
+        app.strip()
+        for app in os.environ.get("CMS_TEST_CONTRIB_APPS", "").split(",")
+        if app.strip()
+    ]
+    for _contrib_app in _contrib_apps:
+        INSTALLED_APPS.insert(INSTALLED_APPS.index("cms"), _contrib_app)
+
     MIGRATION_MODULES = {
         "auth": None,
         "admin": None,
