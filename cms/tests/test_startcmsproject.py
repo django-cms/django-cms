@@ -247,6 +247,12 @@ class PackageDerivationTests(SimpleTestCase):
             ["django-cms", "django-filer", "djangocms-frontend", "djangorestframework", "djangocms-rest"],
         )
 
+    def test_install_packages_rejects_unexpected_characters(self):
+        command = make_command()
+        for bad in ["django-cms; rm -rf /", "pkg==1.0", "foo bar", "evil$(whoami)", "a/b"]:
+            with self.assertRaises(CommandError):
+                command.install_packages([bad])
+
 
 class AddToExistingProjectTests(SimpleTestCase):
     """Run ``djangocms .`` against a synthetic ``django-admin startproject`` layout."""

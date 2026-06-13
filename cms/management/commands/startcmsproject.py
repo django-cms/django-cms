@@ -816,8 +816,14 @@ Enjoy!
 """
         )
 
+    # Package names may only contain letters, digits, underscores and minus signs.
+    SAFE_PACKAGE_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+
     def install_packages(self, packages):
         """pip install the given packages (guarded to a virtual environment)."""
+        unsafe = [pkg for pkg in packages if not self.SAFE_PACKAGE_RE.match(pkg)]
+        if unsafe:
+            raise CommandError("Refusing to install packages with unexpected characters: " + ", ".join(unsafe))
         if not (self.running_in_venv() or os.environ.get("DJANGOCMS_ALLOW_PIP_INSTALL", "False") == "True"):
             self.stderr.write(
                 self.style.ERROR(
