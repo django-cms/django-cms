@@ -181,6 +181,30 @@ class EditingHelperTests(SimpleTestCase):
         # Already present: unchanged
         self.assertEqual(Command._ensure_include_import(text), text)
 
+    def test_insert_import_after_existing_imports(self):
+        text = "from pathlib import Path\nimport sys\n\nBASE_DIR = Path()\n"
+        result = Command._insert_import(text, "import os")
+        self.assertEqual(result, "from pathlib import Path\nimport sys\nimport os\n\nBASE_DIR = Path()\n")
+
+    def test_insert_import_skips_module_preamble(self):
+        # Without existing imports, the statement must not land before the
+        # shebang, encoding comment, docstring or __future__ imports.
+        text = (
+            "#!/usr/bin/env python\n"
+            "# -*- coding: utf-8 -*-\n"
+            '"""Module docstring.\n\nspanning lines.\n"""\n'
+            "from __future__ import annotations\n\n"
+            "BASE_DIR = 1\n"
+        )
+        result = Command._insert_import(text, "import os")
+        self.assertIn("from __future__ import annotations\nimport os\n", result)
+        self.assertTrue(result.startswith("#!/usr/bin/env python\n"))
+
+    def test_insert_import_after_single_line_docstring(self):
+        text = '"""Settings."""\nBASE_DIR = 1\n'
+        result = Command._insert_import(text, "import os")
+        self.assertEqual(result, '"""Settings."""\nimport os\nBASE_DIR = 1\n')
+
     def test_get_settings_module_and_urlconf(self):
         command = make_command()
         with tempfile.TemporaryDirectory() as tmp:

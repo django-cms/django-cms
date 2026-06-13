@@ -560,7 +560,7 @@ Enjoy!
         else:
             entry = f'os.path.join(BASE_DIR, "{dir_name}")'
             if not re.search(r"(?m)^import os\b", text):
-                text = "import os\n" + text
+                text = self._insert_import(text, "import os")
         text, added_dirs = self._insert_into_list(text, "DIRS", [entry], quote=False)
         return text, added_dirs, created_paths
 
@@ -656,17 +656,47 @@ Enjoy!
             text = text[: match.end()] + prefix + new_line + text[match.end():]
         return text, [item]
 
-    @staticmethod
-    def _ensure_include_import(text):
+    @classmethod
+    def _ensure_include_import(cls, text):
         """Make sure ``include`` is importable from ``django.urls`` in urls.py."""
         if re.search(r"(?m)^\s*from django\.urls import .*\binclude\b", text):
             return text
+        return cls._insert_import(text, "from django.urls import include")
+
+    @staticmethod
+    def _insert_import(text, statement):
+        """Insert an import ``statement`` at a safe top-level position.
+
+        Inserts after the last existing top-level ``import``/``from`` line so the
+        statement never lands before a shebang, encoding comment, module
+        docstring, or ``from __future__`` imports (which must stay at the top).
+        If the module has no imports yet, the statement is placed after any
+        shebang, encoding declaration, and module docstring.
+        """
         lines = text.splitlines(keepends=True)
         insert_at = 0
         for i, line in enumerate(lines):
             if line.startswith(("import ", "from ")):
                 insert_at = i + 1
-        lines.insert(insert_at, "from django.urls import include\n")
+        if insert_at == 0:
+            # No imports found: skip over shebang, encoding comment and docstring.
+            if insert_at < len(lines) and lines[insert_at].startswith("#!"):
+                insert_at += 1
+            if insert_at < len(lines) and re.match(r"#.*coding[:=]", lines[insert_at]):
+                insert_at += 1
+            match = re.match(r'\s*(?P<quote>"""|\'\'\')', lines[insert_at]) if insert_at < len(lines) else None
+            if match:
+                quote = match.group("quote")
+                # Single-line docstring (opening and closing quotes on one line).
+                if lines[insert_at].count(quote) >= 2:
+                    insert_at += 1
+                else:
+                    insert_at += 1
+                    while insert_at < len(lines) and quote not in lines[insert_at]:
+                        insert_at += 1
+                    if insert_at < len(lines):
+                        insert_at += 1
+        lines.insert(insert_at, statement + "\n")
         return "".join(lines)
 
     @staticmethod
