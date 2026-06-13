@@ -58,7 +58,7 @@ Create a fully configured django CMS project with a single command:
 .. code-block:: console
 
     python -m pip install django-cms
-    djangocms mysite
+    djangocms mysite --interactive
     cd mysite
     python -m manage runserver
 
