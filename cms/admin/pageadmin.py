@@ -676,13 +676,14 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(request, object_id=page_id)
-        translation = page.get_admin_content(language)
+
+        if page is None:
+            raise self._get_404_exception(page_id)
 
         if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(_("You do not have permission to edit this page"))
 
-        if page is None:
-            raise self._get_404_exception(page_id)
+        translation = page.get_admin_content(language)
 
         if not translation:
             raise Http404("No translation matches requested language.")
@@ -1242,13 +1243,14 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
     def delete_view(self, request, object_id, extra_context=None):
         page_content = self.get_object(request, object_id=object_id)
+
+        if page_content is None:
+            raise self._get_404_exception(object_id)
+
         page = page_content.page
 
         if not self.has_delete_translation_permission(request, page_content.language, page):
             return HttpResponseForbidden(_("You do not have permission to delete this page"))
-
-        if page is None:
-            raise self._get_404_exception(object_id)
 
         if not len(list(page.get_languages())) > 1:
             return HttpResponseBadRequest("There only exists one translation for this page")

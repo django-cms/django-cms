@@ -40,7 +40,7 @@ def _get_all_placeholders(page, language=None):
     page_contents = PageContent.admin_manager.filter(page=page)
     if language:
         page_contents = page_contents.filter(language=language)
-    content_type = ContentType.objects.get_for_model(Placeholder)
+    content_type = ContentType.objects.get_for_model(PageContent)
     return Placeholder.objects.filter(
         content_type=content_type,
         object_id__in=page_contents.values_list('pk', flat=True)
@@ -186,7 +186,7 @@ def user_can_delete_page(user, page, site=None):
 
     placeholders = _get_all_placeholders(page)
     for placeholder in placeholders:
-        if not placeholder.has_delete_plugins_permission(user, [placeholders.source.language]):
+        if not placeholder.has_delete_plugins_permission(user, [placeholder.source.language]):
             return False
     return True
 
