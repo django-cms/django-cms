@@ -43,9 +43,6 @@ It accepts the following options:
   created this way will not be able to log in until given a valid password.
 * ``--username``: the login for the superuser to be created.
 * ``--email``: the email for the superuser to be created.
-* ``--stories``: add a component library (`djangocms-stories
-  <https://github.com/django-cms/djangocms-stories>`_) to the project. Off by
-  default.
 * ``--mode {traditional,headless,hybrid}``: select the CMS mode (see
   :ref:`headless_mode`). Defaults to ``traditional``.
 
@@ -64,6 +61,9 @@ It accepts the following options:
 * ``--alias`` / ``--no-alias``: add reusable aliases (`djangocms-alias
   <https://github.com/django-cms/djangocms-alias>`_) to the project. On by
   default.
+* ``--stories`` / ``--no-stories``: add the stories component library
+  (`djangocms-stories <https://github.com/django-cms/djangocms-stories>`_) to
+  the project. Off by default.
 
 Example::
 

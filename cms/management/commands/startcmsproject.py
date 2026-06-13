@@ -18,7 +18,7 @@ from django.core.management.utils import get_random_secret_key
 from cms import __version__ as cms_version
 
 
-class Command(TemplateCommand):
+class Command(TemplateCommand):  # pragma: nocover
     help = (
         "Creates a django CMS project directory structure for the given project "
         "name in the current directory or optionally in the given directory."
