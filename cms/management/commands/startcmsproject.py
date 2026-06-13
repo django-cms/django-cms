@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -196,7 +197,7 @@ Enjoy!
             if os.path.isfile(requirements):
                 if self.running_in_venv() or os.environ.get("DJANGOCMS_ALLOW_PIP_INSTALL", "False") == "True":
                     self.stdout.write(self.HEADING(f"Install requirements in {requirements}"))
-                    self.write_command(f'python -m pip install -r "{requirements}"')
+                    self.write_command(f"python -m pip install -r {shlex.quote(requirements)}")
                     result = subprocess.run(
                         [sys.executable, "-m", "pip", "install", "-r", requirements],
                         capture_output=True, check=False,
@@ -786,7 +787,7 @@ Enjoy!
 
         if not install:
             self.stdout.write("Skipped. Install them later, then run the migrations and check:")
-            self.write_command("  python -m pip install " + " ".join(packages))
+            self.write_command("  python -m pip install " + " ".join(shlex.quote(p) for p in packages))
             self.write_command("  python -m manage migrate")
             self.write_command("  python -m manage cms check")
             return
@@ -824,10 +825,10 @@ Enjoy!
                     "Activate one, or set DJANGOCMS_ALLOW_PIP_INSTALL=True, and install manually:"
                 )
             )
-            self.write_command("  python -m pip install " + " ".join(packages))
+            self.write_command("  python -m pip install " + " ".join(shlex.quote(p) for p in packages))
             raise CommandError("Packages not installed")
         self.stdout.write(self.HEADING("Install packages"))
-        self.write_command("python -m pip install " + " ".join(packages))
+        self.write_command("python -m pip install " + " ".join(shlex.quote(p) for p in packages))
         result = subprocess.run([sys.executable, "-m", "pip", "install", *packages], check=False)
         if result.returncode:
             raise CommandError("Failed to install the required packages.")
