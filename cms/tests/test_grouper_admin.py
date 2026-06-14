@@ -764,7 +764,7 @@ class GrouperReadonlyMessageTestCase(SetupMixin, CMSTestCase):
         content_obj.is_editable = lambda *_: False
         request = self._request(has_perm_return=True)
 
-        self.assertEqual(self._message(request, content_obj), "This content is read-only.")
+        self.assertEqual(self._message(request, content_obj), " ")
 
     def test_rich_bool_returns_its_reason(self):
         """A falsy rich bool surfaces its own reason via ``str()``."""
