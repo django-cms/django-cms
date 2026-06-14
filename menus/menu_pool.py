@@ -193,7 +193,7 @@ class MenuRenderer:
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
-        chache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
+        cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
 
         if not self.is_cached:
             # No need to invalidate the internal lookup cache,
