@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             name="can_change_permissions",
             field=models.BooleanField(
                 default=False,
-                help_text=_("Allows granting and revoking permissions for this page."),
+                help_text=_("Allows granting and revoking permissions for this page covered by this permission."),
                 verbose_name=_("can change permissions"),
             ),
         ),
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             name="can_change_permissions",
             field=models.BooleanField(
                 default=False,
-                help_text=_("Allows granting and revoking permissions for this page."),
+                help_text=_("Allows granting and revoking permissions for this page covered by this permission."),
                 verbose_name=_("can change permissions"),
             ),
         ),

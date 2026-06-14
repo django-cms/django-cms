@@ -117,6 +117,8 @@ They include:
 * *Can change advanced settings*
 * *Can change permissions*
 * *Can move*
+* *Can view restricted pages* — granting view access also restricts the page, so that only
+  users or groups with view access can see it on the frontend
 
 .. _important:
 
