@@ -1,7 +1,14 @@
 #!/usr/bin/env python
+import argparse
+import json
 import os
+import re
+import shlex
+import shutil
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 
 from django.core.checks.security.base import SECRET_KEY_INSECURE_PREFIX
 from django.core.management import CommandError
@@ -11,7 +18,7 @@ from django.core.management.utils import get_random_secret_key
 from cms import __version__ as cms_version
 
 
-class Command(TemplateCommand):
+class Command(TemplateCommand):  # pragma: no cover
     help = (
         "Creates a django CMS project directory structure for the given project "
         "name in the current directory or optionally in the given directory."
@@ -28,8 +35,45 @@ class Command(TemplateCommand):
         self.HEADING = lambda text: "\n" + self.style.SQL_FIELD(text)
         self.COMMAND = self.style.HTTP_SUCCESS
 
+    # Effective defaults for the project options. The arguments themselves
+    # default to ``None`` so that ``--interactive`` can tell apart an option
+    # that was given on the command line from one that needs to be asked for.
+    OPTION_DEFAULTS = {
+        "mode": "traditional",
+        "versioning": True,
+        "moderation": False,
+        "alias": True,
+        "stories": False,
+    }
+
+    # The rules for installing django CMS into an *existing* project (name ".")
+    # live in a JSON file that is fetched from the cms-template repository (the
+    # branch matching the installed django CMS major.minor), with the file
+    # bundled next to this command serving as the offline fallback.
+    INSTALL_RULES_FILENAME = "djangocms_install_rules.json"
+
+    def get_install_rules_url(self):
+        return (
+            "https://raw.githubusercontent.com/django-cms/cms-template/"
+            f"{self.major_minor}/{self.INSTALL_RULES_FILENAME}"
+        )
+
+    def create_parser(self, *args, **kwargs):
+        parser = super().create_parser(*args, **kwargs)
+        # Allow running with no arguments at all: a missing project name drops
+        # into interactive mode instead of erroring out. handle() still reports
+        # a missing name when input is suppressed with --noinput.
+        parser.missing_args_message = None
+        return parser
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
+        # Make the project name optional so it can be asked for in interactive
+        # mode; a missing name is reported by handle() otherwise.
+        for action in parser._actions:
+            if action.dest == "name":
+                action.nargs = "?"
+                break
         parser.add_argument(
             "--noinput",
             "--no-input",
@@ -42,10 +86,51 @@ class Command(TemplateCommand):
             ),
         )
         parser.add_argument(
+            "--interactive",
+            action="store_true",
+            dest="prompt",
+            default=False,
+            help=(
+                "Ask for the project name and any option not given on the command line. "
+                "Interactive mode is also entered automatically when no project name is "
+                "given (unless --noinput is used)."
+            ),
+        )
+        parser.add_argument(
             "--username",
             help="Specifies the login for the superuser to be created",
         )
         parser.add_argument("--email", help="Specifies the email for the superuser to be created")
+        parser.add_argument(
+            "--stories",
+            action=argparse.BooleanOptionalAction,
+            default=None,
+            help="Adds the stories component library (djangocms-stories) to the project (default: off)",
+        )
+        parser.add_argument(
+            "--mode",
+            choices=("traditional", "headless", "hybrid"),
+            default=None,
+            help="Selects the CMS mode: traditional, headless or hybrid (default: traditional).",
+        )
+        parser.add_argument(
+            "--versioning",
+            action=argparse.BooleanOptionalAction,
+            default=None,
+            help="Adds content versioning (djangocms-versioning) to the project (default: on).",
+        )
+        parser.add_argument(
+            "--moderation",
+            action=argparse.BooleanOptionalAction,
+            default=None,
+            help="Adds content moderation (djangocms-moderation) to the project (default: off).",
+        )
+        parser.add_argument(
+            "--alias",
+            action=argparse.BooleanOptionalAction,
+            default=None,
+            help="Adds reusable aliases (djangocms-alias) to the project (default: on).",
+        )
 
     def get_default_template(self):
         return f"https://github.com/django-cms/cms-template/archive/{self.major_minor}.tar.gz"
@@ -112,7 +197,7 @@ Enjoy!
             if os.path.isfile(requirements):
                 if self.running_in_venv() or os.environ.get("DJANGOCMS_ALLOW_PIP_INSTALL", "False") == "True":
                     self.stdout.write(self.HEADING(f"Install requirements in {requirements}"))
-                    self.write_command(f'python -m pip install -r "{requirements}"')
+                    self.write_command(f"python -m pip install -r {shlex.quote(requirements)}")
                     result = subprocess.run(
                         [sys.executable, "-m", "pip", "install", "-r", requirements],
                         capture_output=True, check=False,
@@ -125,7 +210,7 @@ Enjoy!
                     self.stderr.write(
                         self.style.ERROR(
                             "To automatically install requirements for your new django CMS "
-                            "project use this command in an virtual environment."
+                            "project use this command in a virtual environment."
                         )
                     )
                     raise CommandError("Requirements not installed")
@@ -150,10 +235,92 @@ Enjoy!
             template = self.get_default_template()
         return super().handle_template(template, subdir)
 
+    def ask(self, label, default=None):
+        suffix = f" [{default}]" if default not in (None, "") else ""
+        return input(f"{label}{suffix}: ").strip() or default
+
+    def ask_choice(self, label, choices, default):
+        while True:
+            value = self.ask(f"{label} ({'/'.join(choices)})", default)
+            if value in choices:
+                return value
+            self.stderr.write(self.style.ERROR(f"Please choose one of: {', '.join(choices)}"))
+
+    def ask_bool(self, label, default):
+        while True:
+            value = self.ask(f"{label} (yes/no)", "yes" if default else "no").lower()
+            if value in ("y", "yes", "true", "1", "on"):
+                return True
+            if value in ("n", "no", "false", "0", "off"):
+                return False
+            self.stderr.write(self.style.ERROR("Please answer yes or no."))
+
+    def prompt_for_options(self, name, options):
+        """Ask for the project name and any option still unset (``None``)."""
+        self.stdout.write(self.HEADING(f"Create django CMS {cms_version} project"))
+        if not name:
+            while not name:
+                name = self.ask("Project name")
+                if not name:
+                    self.stderr.write(self.style.ERROR("A project name is required."))
+        if options.get("mode") is None:
+            options["mode"] = self.ask_choice(
+                "CMS mode", ("traditional", "headless", "hybrid"), self.OPTION_DEFAULTS["mode"]
+            )
+        if options.get("versioning") is None:
+            options["versioning"] = self.ask_bool("Enable content versioning", self.OPTION_DEFAULTS["versioning"])
+        if options.get("moderation") is None:
+            # Moderation builds on top of versioning, so only offer it when
+            # versioning is enabled; otherwise it stays off.
+            options["moderation"] = (
+                self.ask_bool("Enable content moderation", self.OPTION_DEFAULTS["moderation"])
+                if options["versioning"]
+                else False
+            )
+        if options.get("alias") is None:
+            options["alias"] = self.ask_bool("Add reusable aliases", self.OPTION_DEFAULTS["alias"])
+        if options.get("stories") is None:
+            options["stories"] = self.ask_bool("Add the stories component library", self.OPTION_DEFAULTS["stories"])
+        return name
+
     def handle(self, **options):
         # Capture target and name for postprocessing
-        name = options.pop("name")
+        name = options.pop("name", None)
         directory = options.pop("directory", None)
+
+        # Interactively ask for the project name and any option not provided.
+        # Prompting is enabled explicitly via --interactive, or implicitly when
+        # no project name was given (unless input is suppressed with --noinput).
+        prompt = options.pop("prompt", False) or (not name and options.get("interactive", True))
+        if prompt:
+            name = self.prompt_for_options(name, options)
+
+        # Fill in the effective defaults for any option not given (and not
+        # asked for interactively).
+        for key, value in self.OPTION_DEFAULTS.items():
+            if options.get(key) is None:
+                options[key] = value
+
+        if not name:
+            raise CommandError(self.missing_args_message)
+
+        # Content moderation builds on top of content versioning.
+        if options["moderation"] and not options["versioning"]:
+            raise CommandError("--moderation requires versioning; remove --no-versioning or drop --moderation.")
+
+        # A project name of "." means: add django CMS to the existing project in
+        # the current directory instead of cloning the project template.
+        if name == ".":
+            self.add_to_existing_project(options)
+            return
+
+        # Render requirements.in as a template too (django-admin only renders
+        # files matching --extension or listed in --name by default); it
+        # contains template variables for the selected options.
+        options.setdefault("files", [])
+        if "requirements.in" not in options["files"]:
+            options["files"] = options["files"] + ["requirements.in"]
+
         # Create a random SECRET_KEY to put it in the main settings.
         options["secret_key"] = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
 
@@ -165,13 +332,519 @@ Enjoy!
             command += f' --directory "{directory}"'
         self.write_command(command)
 
-        # Run startproject command
-        super().handle(
-            "project", name, directory, cms_version=cms_version, cms_docs_version=self.major_minor, **options
-        )
-
         if directory is None:
             top_dir = os.path.join(os.getcwd(), name)
         else:
             top_dir = os.path.abspath(os.path.expanduser(directory))
-        self.postprocess(top_dir, options)
+        # Only a directory created by this run may be cleaned up on failure;
+        # an existing target (django-admin renders into it) is left untouched.
+        created_dir = directory is None and not os.path.exists(top_dir)
+        original_cwd = os.getcwd()
+
+        try:
+            # Run startproject command
+            super().handle(
+                "project", name, directory, cms_version=cms_version, cms_docs_version=self.major_minor, **options
+            )
+            self.postprocess(top_dir, options)
+        except BaseException:
+            # Remove the partially created project if the command fails or is
+            # interrupted (e.g. Ctrl-C), but only when we created the directory.
+            if created_dir and os.path.isdir(top_dir):
+                os.chdir(original_cwd)
+                self.stderr.write(self.style.WARNING(f"Removing partially created project at {top_dir}"))
+                shutil.rmtree(top_dir, ignore_errors=True)
+            raise
+
+    # ----------------------------------------------------------------------
+    # Installing django CMS into an existing project ("djangocms .")
+    # ----------------------------------------------------------------------
+
+    def add_to_existing_project(self, options):
+        """Add django CMS to the existing Django project in the current directory.
+
+        The project's settings module is read from ``manage.py``; INSTALLED_APPS,
+        MIDDLEWARE and the template context processors are updated according to
+        the rules (and the given flags), and the project's ``urls.py`` (from
+        ``ROOT_URLCONF``) is wired up for the selected mode.
+        """
+        cwd = os.getcwd()
+        manage_py = os.path.join(cwd, "manage.py")
+        if not os.path.isfile(manage_py):
+            raise CommandError("Cannot add django CMS: no manage.py found in the current directory.")
+
+        settings_module = self.get_settings_module(manage_py)
+        settings_file = self.module_to_path(settings_module)
+        if not settings_file:
+            raise CommandError(f"Cannot locate the settings file for '{settings_module}'.")
+
+        # Make sure the user understands these are automated, best-effort edits
+        # to their own project files before anything is changed.
+        self.stdout.write(self.HEADING(f"Add django CMS {cms_version} to an existing project"))
+        self.stdout.write(
+            f"This will make automated changes to {os.path.relpath(settings_file, cwd)} and your\n"
+            "project's urls, and may create a templates directory. These edits are best-effort\n"
+            "and must be reviewed afterwards, so make sure your project is under version control\n"
+            "(or backed up) to inspect the changes."
+        )
+        if options.get("interactive", True) and not self.ask_bool("Continue", True):
+            self.stdout.write("Aborted; no changes made.")
+            return
+
+        rules = self.load_install_rules()
+
+        # Emit any warnings whose condition matches (e.g. an option that no
+        # longer has an effect). These are defined by the rules file so they can
+        # be added/updated without changing django CMS.
+        for warning in rules.get("warnings", []):
+            if self._rule_applies(warning.get("when"), options):
+                self.stderr.write(self.style.WARNING(warning["message"]))
+
+        self.stdout.write(self.HEADING(f"Add django CMS {cms_version} to {settings_module}"))
+
+        # --- settings.py ---------------------------------------------------
+        text = self._read(settings_file)
+
+        # Apps to add from the rules, honouring each rule's condition (a flag
+        # and/or the selected mode). Rules with a `before`/`after` anchor are
+        # positioned relative to an existing entry; the rest are appended.
+        text, apps, added_apps = self._apply_list_rules(
+            text, "INSTALLED_APPS", rules.get("installed_apps", []), options
+        )
+        text, _, added_mw = self._apply_list_rules(text, "MIDDLEWARE", rules.get("middleware", []), options)
+
+        context_processors = []
+        for rule in rules.get("context_processors", []):
+            if self._rule_applies(rule.get("when"), options):
+                context_processors += rule["items"]
+        text, added_cp = self._insert_into_list(text, "context_processors", context_processors)
+
+        text, added_dirs, created_paths = self._ensure_template_dir(text, cwd, rules.get("template_dir"), options)
+        text, added_settings = self._append_cms_settings(text, rules.get("settings", []), options)
+        self._write(settings_file, text)
+
+        self.stdout.write(f"Updated {os.path.relpath(settings_file, cwd)}")
+        for app in added_apps:
+            self.stdout.write(f"  + INSTALLED_APPS: {app}")
+        for mw in added_mw:
+            self.stdout.write(f"  + MIDDLEWARE: {mw}")
+        for cp in added_cp:
+            self.stdout.write(f"  + context_processors: {cp}")
+        for entry in added_dirs:
+            self.stdout.write(f"  + TEMPLATES DIRS: {entry}")
+        for setting in added_settings:
+            self.stdout.write(f"  + {setting}")
+        for path in created_paths:
+            self.stdout.write(f"  + created {path}")
+
+        # --- urls.py -------------------------------------------------------
+        urls_module = self.get_urlconf(text, settings_module)
+        urls_file = self.module_to_path(urls_module)
+        if urls_file:
+            added_urls = self.update_urls(urls_file, options, rules.get("urls", []))
+            self.stdout.write(f"Updated {os.path.relpath(urls_file, cwd)}")
+            for url in added_urls:
+                self.stdout.write(f"  + urlpatterns: {url}")
+        else:
+            self.stderr.write(
+                self.style.WARNING(
+                    f"Could not locate the urls file for '{urls_module}'. "
+                    "Please add the django CMS urls manually."
+                )
+            )
+
+        self._finish_existing_project(apps, rules.get("packages", {}), options)
+
+    def load_install_rules(self):
+        """Fetch the install rules from GitHub, falling back to the bundled file."""
+        url = self.get_install_rules_url()
+        try:
+            with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 (https URL)
+                rules = json.loads(response.read().decode("utf-8"))
+        except (urllib.error.URLError, OSError, ValueError) as exc:
+            self.stderr.write(
+                self.style.WARNING(f"Could not fetch installation rules from {url} ({exc}); using bundled defaults.")
+            )
+            bundled = os.path.join(os.path.dirname(__file__), self.INSTALL_RULES_FILENAME)
+            rules = json.loads(self._read(bundled))
+        if not isinstance(rules, dict):
+            raise CommandError("Invalid installation rules: expected a JSON object.")
+        # Metadata keys such as "$schema" or "comment" carry no rules.
+        return {key: value for key, value in rules.items() if not key.startswith("$")}
+
+    @staticmethod
+    def _rule_applies(when, options):
+        """Evaluate a rule condition against the command options.
+
+        ``when`` may contain a ``flag`` (the option must be truthy) and/or a
+        ``mode`` (a list of matching ``--mode`` values). A missing/empty
+        condition always applies.
+        """
+        if not when:
+            return True
+        if "flag" in when and not options.get(when["flag"]):
+            return False
+        if "mode" in when and options.get("mode") not in when["mode"]:
+            return False
+        return True
+
+    def get_settings_module(self, manage_py):
+        """Extract the DJANGO_SETTINGS_MODULE value from a manage.py file."""
+        text = self._read(manage_py)
+        match = re.search(r"""DJANGO_SETTINGS_MODULE['"]?\s*,\s*['"]([\w.]+)['"]""", text)
+        if not match:
+            raise CommandError("Could not determine DJANGO_SETTINGS_MODULE from manage.py.")
+        return match.group(1)
+
+    def get_urlconf(self, settings_text, settings_module):
+        """Return the ROOT_URLCONF module, falling back to ``<project>.urls``."""
+        match = re.search(r"""(?m)^ROOT_URLCONF\s*=\s*['"]([\w.]+)['"]""", settings_text)
+        if match:
+            return match.group(1)
+        return settings_module.rsplit(".", 1)[0] + ".urls"
+
+    @staticmethod
+    def module_to_path(module):
+        """Resolve a dotted module path to a file below the current directory."""
+        parts = module.split(".")
+        base = os.path.join(os.getcwd(), *parts)
+        if os.path.isfile(base + ".py"):
+            return base + ".py"
+        if os.path.isfile(os.path.join(base, "__init__.py")):
+            return os.path.join(base, "__init__.py")
+        return None
+
+    def update_urls(self, urls_file, options, url_rules):
+        """Add the url patterns whose rule condition matches the options."""
+        text = self._read(urls_file)
+        items = []
+        for rule in url_rules:
+            if not self._rule_applies(rule.get("when"), options):
+                continue
+            pattern = rule["pattern"]
+            # Skip patterns whose include target is already routed.
+            target = re.search(r"""include\(['"]([^'"]+)['"]\)""", pattern)
+            if target and target.group(1) in text:
+                continue
+            items.append(pattern)
+        if not items:
+            return []
+        text = self._ensure_include_import(text)
+        text, added = self._insert_into_list(text, "urlpatterns", items, quote=False)
+        self._write(urls_file, text)
+        return added
+
+    def _ensure_template_dir(self, text, cwd, rule, options):
+        """Create a project template directory if the project has none.
+
+        When the rule's condition matches and the configured directory does not
+        exist, it is created, registered in the ``TEMPLATES`` ``DIRS`` list, and
+        seeded with the rule's base template. Returns
+        ``(new_text, added_dirs, created_paths)``.
+        """
+        if not rule or not self._rule_applies(rule.get("when"), options):
+            return text, [], []
+        dir_name = rule.get("path", "templates")
+        templates_dir = os.path.join(cwd, dir_name)
+        if os.path.isdir(templates_dir):
+            return text, [], []
+
+        os.makedirs(templates_dir)
+        base_template = rule.get("base_template", "base.html")
+        self._write(os.path.join(templates_dir, base_template), rule.get("base_template_content", ""))
+        created_paths = [dir_name + "/", os.path.join(dir_name, base_template)]
+
+        # Settings created before Django 3.1 define BASE_DIR with os.path
+        # instead of pathlib, where the ``/`` operator does not work.
+        if re.search(r"(?m)^BASE_DIR\s*=\s*Path\(", text):
+            entry = f'BASE_DIR / "{dir_name}"'
+        else:
+            entry = f'os.path.join(BASE_DIR, "{dir_name}")'
+            if not re.search(r"(?m)^import os\b", text):
+                text = self._insert_import(text, "import os")
+        text, added_dirs = self._insert_into_list(text, "DIRS", [entry], quote=False)
+        return text, added_dirs, created_paths
+
+    def _append_cms_settings(self, text, settings_rules, options):
+        """Append the extra django CMS settings (from the rules) that are missing.
+
+        Snippets may reference ``{language_code}`` / ``{language_name}``; these
+        are derived from the project's LANGUAGE_CODE.
+        """
+        language_code = self._get_setting_value(text, "LANGUAGE_CODE") or "en-us"
+        format_context = {"language_code": language_code, "language_name": self._language_name(language_code)}
+        additions, added = [], []
+        for rule in settings_rules:
+            name = rule["name"]
+            if not self._rule_applies(rule.get("when"), options):
+                continue
+            if re.search(rf"(?m)^{name}\s*=", text):
+                continue
+            additions.append(rule["snippet"].format(**format_context))
+            added.append(name)
+        if not additions:
+            return text, []
+        if not text.endswith("\n"):
+            text += "\n"
+        block = "\n# django CMS settings (added by `djangocms .`)\n" + "\n".join(additions) + "\n"
+        return text + block, added
+
+    @staticmethod
+    def _get_setting_value(text, name):
+        """Return the quoted string value of a top-level ``NAME = "..."`` setting."""
+        match = re.search(rf"""(?m)^{name}\s*=\s*['"]([^'"]+)['"]""", text)
+        return match.group(1) if match else None
+
+    @staticmethod
+    def _language_name(language_code):
+        """Human-readable name for a language code, falling back to the code."""
+        try:
+            from django.utils.translation import get_language_info
+
+            return get_language_info(language_code)["name"]
+        except KeyError:
+            return language_code
+
+    def _apply_list_rules(self, text, list_name, list_rules, options):
+        """Apply a set of list rules (e.g. INSTALLED_APPS / MIDDLEWARE).
+
+        Each rule may carry a ``when`` condition and a ``before``/``after``
+        anchor for positional insertion; rules without an anchor are appended in
+        order. Returns ``(new_text, all_items, added_items)`` where ``all_items``
+        is every item from matching rules (used for the install hint) and
+        ``added_items`` is what was actually inserted.
+        """
+        all_items, added, append_items = [], [], []
+        for rule in list_rules:
+            if not self._rule_applies(rule.get("when"), options):
+                continue
+            all_items += rule["items"]
+            before, after = rule.get("before"), rule.get("after")
+            if before or after:
+                for item in rule["items"]:
+                    text, just_added = self._insert_near_anchor(
+                        text, item, before or after, before=bool(before), list_name=list_name
+                    )
+                    added += just_added
+            else:
+                append_items += rule["items"]
+        text, just_added = self._insert_into_list(text, list_name, append_items)
+        added += just_added
+        return text, all_items, added
+
+    def _insert_near_anchor(self, text, item, anchor, before=False, list_name=None):
+        """Insert quoted ``item`` immediately before/after the ``anchor`` entry.
+
+        Used for entries with a required position (e.g. Django's LocaleMiddleware
+        after ``SessionMiddleware``, or the admin style before
+        ``django.contrib.admin``). Falls back to appending to ``list_name`` when
+        the anchor is not found.
+        """
+        if f'"{item}"' in text or f"'{item}'" in text:
+            return text, []
+        pattern = re.compile(rf"""(?m)^([ \t]*)(["']){re.escape(anchor)}\2(\s*,)?""")
+        match = pattern.search(text)
+        if not match:
+            return self._insert_into_list(text, list_name, [item]) if list_name else (text, [])
+        indent, quote, comma = match.group(1), match.group(2), match.group(3)
+        if before:
+            new_line = f"{indent}{quote}{item}{quote},\n"
+            text = text[: match.start()] + new_line + text[match.start():]
+        else:
+            # Make sure the anchor line keeps its trailing comma.
+            prefix = "" if comma else ","
+            new_line = f"\n{indent}{quote}{item}{quote},"
+            text = text[: match.end()] + prefix + new_line + text[match.end():]
+        return text, [item]
+
+    @classmethod
+    def _ensure_include_import(cls, text):
+        """Make sure ``include`` is importable from ``django.urls`` in urls.py."""
+        if re.search(r"(?m)^\s*from django\.urls import .*\binclude\b", text):
+            return text
+        return cls._insert_import(text, "from django.urls import include")
+
+    @staticmethod
+    def _insert_import(text, statement):
+        """Insert an import ``statement`` at a safe top-level position.
+
+        Inserts after the last existing top-level ``import``/``from`` line so the
+        statement never lands before a shebang, encoding comment, module
+        docstring, or ``from __future__`` imports (which must stay at the top).
+        If the module has no imports yet, the statement is placed after any
+        shebang, encoding declaration, and module docstring.
+        """
+        lines = text.splitlines(keepends=True)
+        insert_at = 0
+        for i, line in enumerate(lines):
+            if line.startswith(("import ", "from ")):
+                insert_at = i + 1
+        if insert_at == 0:
+            # No imports found: skip over shebang, encoding comment and docstring.
+            if insert_at < len(lines) and lines[insert_at].startswith("#!"):
+                insert_at += 1
+            if insert_at < len(lines) and re.match(r"#.*coding[:=]", lines[insert_at]):
+                insert_at += 1
+            match = re.match(r'\s*(?P<quote>"""|\'\'\')', lines[insert_at]) if insert_at < len(lines) else None
+            if match:
+                quote = match.group("quote")
+                # Single-line docstring (opening and closing quotes on one line).
+                if lines[insert_at].count(quote) >= 2:
+                    insert_at += 1
+                else:
+                    insert_at += 1
+                    while insert_at < len(lines) and quote not in lines[insert_at]:
+                        insert_at += 1
+                    if insert_at < len(lines):
+                        insert_at += 1
+        lines.insert(insert_at, statement + "\n")
+        return "".join(lines)
+
+    @staticmethod
+    def _insert_into_list(text, name, items, quote=True):
+        """Insert ``items`` into a list/tuple assignment ``name = [...]``.
+
+        Works for top-level assignments (``NAME = [`` / ``NAME += [``) as well as
+        dict entries (``"name": [``). Existing entries are left untouched.
+        Returns ``(new_text, added_items)``.
+        """
+        pattern = re.compile(rf"""(?m)^(?P<indent>[ \t]*)['"]?{re.escape(name)}['"]?\s*(?:\+?=|:)\s*[\[(]""")
+        match = pattern.search(text)
+        if not match:
+            return text, []
+        open_pos = match.end() - 1
+        depth = 0
+        close_pos = None
+        for i in range(open_pos, len(text)):
+            char = text[i]
+            if char in "[(":
+                depth += 1
+            elif char in ")]":
+                depth -= 1
+                if depth == 0:
+                    close_pos = i
+                    break
+        if close_pos is None:
+            return text, []
+
+        body = text[open_pos + 1:close_pos]
+        # Derive the indentation of the list items.
+        indent = None
+        for line in body.splitlines():
+            if line.strip():
+                indent = line[: len(line) - len(line.lstrip())]
+                break
+        if indent is None:
+            indent = match.group("indent") + "    "
+
+        added, rendered = [], []
+        for item in items:
+            token = f'"{item}"' if quote else item
+            present = (f'"{item}"' in body or f"'{item}'" in body) if quote else (item in body)
+            if present:
+                continue
+            rendered.append(f"{indent}{token},")
+            added.append(item)
+        if not added:
+            return text, []
+
+        # Splice the new lines in just before the closing bracket, preserving
+        # that bracket's own indentation when it sits on its own line.
+        line_start = text.rfind("\n", 0, close_pos) + 1
+        if text[line_start:close_pos].strip() == "":
+            head, tail = text[:line_start], text[line_start:]
+        else:
+            # Inline list (e.g. ``"DIRS": []``): the closing bracket moves to its
+            # own line, indented like the assignment for readability.
+            head, tail = text[:close_pos], match.group("indent") + text[close_pos:]
+        head = head.rstrip()
+        if head and head[-1] not in "[(,":
+            head += ","
+        new_text = head + "\n" + "\n".join(rendered) + "\n" + tail
+        return new_text, added
+
+    def _finish_existing_project(self, apps, packages_map, options):
+        """Offer to install the missing packages, then migrate and check."""
+        packages = ["django-cms"]
+        for app in apps:
+            # Sub-apps like "djangocms_frontend.contrib.grid" ship with their
+            # top-level package.
+            app = app.split(".", 1)[0]
+            if app in packages_map:
+                packages.append(packages_map[app])
+            elif app.startswith("djangocms"):
+                packages.append(app.replace("_", "-"))
+        packages = list(dict.fromkeys(packages))  # de-duplicate, keep order
+
+        self.stdout.write(self.HEADING("Install dependencies"))
+        self.stdout.write("django CMS needs the following packages:")
+        self.stdout.write("  " + " ".join(packages))
+        # Ask before installing; --noinput proceeds without prompting.
+        if options.get("interactive", True):
+            install = self.ask_bool("Install them now", True)
+        else:
+            install = True
+
+        if not install:
+            self.stdout.write("Skipped. Install them later, then run the migrations and check:")
+            self.write_command("  python -m pip install " + " ".join(shlex.quote(p) for p in packages))
+            self.write_command("  python -m manage migrate")
+            self.write_command("  python -m manage cms check")
+            return
+
+        self.install_packages(packages)
+
+        self.stdout.write(self.HEADING("Run migrations"))
+        self.run_management_command(["migrate"])
+
+        self.stdout.write(self.HEADING("Check installation"))
+        self.run_management_command(["cms", "check"])
+
+        message = f"django CMS {cms_version} added to your project"
+        separator = "*" * len(message)
+        self.stdout.write(self.HEADING(f"{separator}\n{message}\n{separator}"))
+        self.stdout.write(
+            f"""
+Review the automated changes to your settings and urls, then
+start the development server:
+$ {self.style.SUCCESS("python -m manage runserver")}
+
+Learn more at https://docs.django-cms.org/
+Join the django CMS Discord Server at https://discord-main-channel.django-cms.org
+
+Enjoy!
+"""
+        )
+
+    # Package names may only contain letters, digits, underscores and minus signs.
+    SAFE_PACKAGE_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+
+    def install_packages(self, packages):
+        """pip install the given packages (guarded to a virtual environment)."""
+        unsafe = [pkg for pkg in packages if not self.SAFE_PACKAGE_RE.match(pkg)]
+        if unsafe:
+            raise CommandError("Refusing to install packages with unexpected characters: " + ", ".join(unsafe))
+        if not (self.running_in_venv() or os.environ.get("DJANGOCMS_ALLOW_PIP_INSTALL", "False") == "True"):
+            self.stderr.write(
+                self.style.ERROR(
+                    "Refusing to install packages outside a virtual environment. "
+                    "Activate one, or set DJANGOCMS_ALLOW_PIP_INSTALL=True, and install manually:"
+                )
+            )
+            self.write_command("  python -m pip install " + " ".join(shlex.quote(p) for p in packages))
+            raise CommandError("Packages not installed")
+        self.stdout.write(self.HEADING("Install packages"))
+        self.write_command("python -m pip install " + " ".join(shlex.quote(p) for p in packages))
+        result = subprocess.run([sys.executable, "-m", "pip", "install", *packages], check=False)
+        if result.returncode:
+            raise CommandError("Failed to install the required packages.")
+
+    @staticmethod
+    def _read(path):
+        with open(path, encoding="utf-8") as handle:
+            return handle.read()
+
+    @staticmethod
+    def _write(path, text):
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(text)

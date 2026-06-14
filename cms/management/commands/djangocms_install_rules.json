@@ -1,0 +1,89 @@
+{
+    "comment": "Rules used by `djangocms .` to add django CMS to an existing project. Fetched from the cms-template repository (branch matching the installed django CMS major.minor), with this file as the bundled fallback. Top-level keys starting with `$` (such as `$schema`) and this comment are ignored. Each `when` condition may contain a `flag` (truthy command option) and/or a `mode` (list of matching --mode values). For installed_apps and middleware a rule may also carry a `before` or `after` anchor (an existing entry) for positional insertion; otherwise items are appended. The `warnings` list holds `{message, when}` entries; each message whose condition matches is printed to the screen (for example, should djangocms-stories be discontinued, add {\"message\": \"The --stories option no longer has any effect: djangocms-stories has been discontinued.\", \"when\": {\"flag\": \"stories\"}}).",
+    "installed_apps": [
+        {"items": ["djangocms_simple_admin_style"], "before": "django.contrib.admin"},
+        {
+            "items": [
+                "django.contrib.sites",
+                "cms",
+                "menus",
+                "treebeard",
+                "sekizai",
+                "filer",
+                "easy_thumbnails",
+                "djangocms_frontend",
+                "djangocms_frontend.contrib.accordion",
+                "djangocms_frontend.contrib.alert",
+                "djangocms_frontend.contrib.badge",
+                "djangocms_frontend.contrib.card",
+                "djangocms_frontend.contrib.carousel",
+                "djangocms_frontend.contrib.collapse",
+                "djangocms_frontend.contrib.content",
+                "djangocms_frontend.contrib.grid",
+                "djangocms_frontend.contrib.image",
+                "djangocms_frontend.contrib.jumbotron",
+                "djangocms_frontend.contrib.link",
+                "djangocms_frontend.contrib.listgroup",
+                "djangocms_frontend.contrib.media",
+                "djangocms_frontend.contrib.tabs",
+                "djangocms_frontend.contrib.utilities",
+                "djangocms_text",
+                "djangocms_link"
+            ]
+        },
+        {"items": ["djangocms_versioning"], "when": {"flag": "versioning"}},
+        {"items": ["djangocms_moderation"], "when": {"flag": "moderation"}},
+        {"items": ["djangocms_alias"], "when": {"flag": "alias"}},
+        {"items": ["djangocms_stories", "taggit", "taggit_autosuggest"], "when": {"flag": "stories"}},
+        {"items": ["rest_framework", "djangocms_rest"], "when": {"mode": ["headless", "hybrid"]}}
+    ],
+    "middleware": [
+        {
+            "items": ["django.middleware.locale.LocaleMiddleware"],
+            "after": "django.contrib.sessions.middleware.SessionMiddleware"
+        },
+        {
+            "items": [
+                "cms.middleware.user.CurrentUserMiddleware",
+                "cms.middleware.page.CurrentPageMiddleware",
+                "cms.middleware.toolbar.ToolbarMiddleware",
+                "cms.middleware.language.LanguageCookieMiddleware"
+            ]
+        }
+    ],
+    "context_processors": [
+        {
+            "items": [
+                "django.template.context_processors.i18n",
+                "sekizai.context_processors.sekizai",
+                "cms.context_processors.cms_settings"
+            ]
+        }
+    ],
+    "settings": [
+        {"name": "SITE_ID", "snippet": "SITE_ID = 1"},
+        {"name": "X_FRAME_OPTIONS", "snippet": "X_FRAME_OPTIONS = \"SAMEORIGIN\""},
+        {"name": "CMS_CONFIRM_VERSION4", "snippet": "CMS_CONFIRM_VERSION4 = True"},
+        {"name": "LANGUAGES", "snippet": "LANGUAGES = [\n    (\"{language_code}\", \"{language_name}\"),\n]"},
+        {"name": "CMS_TEMPLATES", "snippet": "CMS_TEMPLATES = [\n    (\"cms-base.html\", \"Default\"),\n]", "when": {"mode": ["traditional", "hybrid"]}},
+        {"name": "CMS_PLACEHOLDERS", "snippet": "CMS_PLACEHOLDERS = [\n    (\"cms-base.html\", (\"content\",), \"Content\"),\n]", "when": {"mode": ["headless"]}}
+    ],
+    "urls": [
+        {"pattern": "path(\"api/\", include(\"djangocms_rest.urls\"))", "when": {"mode": ["headless", "hybrid"]}},
+        {"pattern": "path(\"taggit_autosuggest/\", include(\"taggit_autosuggest.urls\"))", "when": {"flag": "stories"}},
+        {"pattern": "path(\"\", include(\"cms.urls\"))", "when": {"mode": ["traditional", "hybrid"]}}
+    ],
+    "packages": {
+        "filer": "django-filer",
+        "rest_framework": "djangorestframework",
+        "taggit": "django-taggit",
+        "taggit_autosuggest": "django-taggit-autosuggest"
+    },
+    "template_dir": {
+        "path": "templates",
+        "base_template": "cms-base.html",
+        "base_template_content": "{% extends \"bootstrap5/base.html\" %}{# Replace this with your CMS base template #}\n",
+        "when": {"mode": ["traditional", "hybrid"]}
+    },
+    "warnings": []
+}

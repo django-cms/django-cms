@@ -14,6 +14,122 @@ command::
     python manage.py cms
 
 
+******************
+Creating a project
+******************
+
+.. _djangocms-command:
+
+``djangocms``
+=============
+
+The ``djangocms`` command creates a new django CMS project directory structure
+for the given project name. It is available as a standalone executable once
+django CMS is installed and can also be invoked as ``python -m cms``::
+
+    djangocms <project_name> [directory]
+
+It clones the official `cms-template
+<https://github.com/django-cms/cms-template>`_ matching your installed django
+CMS version, installs the project requirements, runs the initial migrations,
+creates a superuser and checks the installation.
+
+It accepts the following options:
+
+* ``--interactive``: ask for the project name and for any option not given on
+  the command line. Interactive mode is also entered automatically when no
+  project name is given (unless ``--noinput`` is used).
+* ``--noinput`` / ``--no-input``: do not prompt for any input. A superuser
+  created this way will not be able to log in until given a valid password.
+* ``--username``: the login for the superuser to be created.
+* ``--email``: the email for the superuser to be created.
+* ``--mode {traditional,headless,hybrid}``: select the CMS mode (see
+  :ref:`headless_mode`). Defaults to ``traditional``.
+
+  * ``traditional``: django CMS serves the content as HTML pages.
+  * ``headless``: django CMS serves the content only through an API; the HTML
+    page tree is not published.
+  * ``hybrid``: django CMS serves **both** HTML pages and the content through
+    an API.
+* ``--versioning`` / ``--no-versioning``: add content versioning
+  (`djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_)
+  to the project. On by default.
+* ``--moderation`` / ``--no-moderation``: add content moderation
+  (`djangocms-moderation <https://github.com/django-cms/djangocms-moderation>`_)
+  to the project. Off by default. Moderation builds on top of versioning, so it
+  cannot be combined with ``--no-versioning``.
+* ``--alias`` / ``--no-alias``: add reusable aliases (`djangocms-alias
+  <https://github.com/django-cms/djangocms-alias>`_) to the project. On by
+  default.
+* ``--stories`` / ``--no-stories``: add the stories component library
+  (`djangocms-stories <https://github.com/django-cms/djangocms-stories>`_) to
+  the project. Off by default.
+
+Example::
+
+    djangocms my_project --mode headless --no-versioning --stories
+
+To be guided through the available options interactively, run the command
+without a project name (or pass ``--interactive``)::
+
+    djangocms
+
+Adding django CMS to an existing project
+----------------------------------------
+
+If you pass ``.`` as the project name, the command does **not** clone the
+project template. Instead it adds django CMS to the existing Django project in
+the current directory (see :ref:`add_to_existing_project` for a step-by-step
+guide)::
+
+    djangocms . --mode hybrid --no-versioning
+
+The project's settings module is read from ``manage.py``, and the following
+files are updated:
+
+* the settings module (``DJANGO_SETTINGS_MODULE``): the django CMS apps are
+  added to ``INSTALLED_APPS`` — the core apps plus those selected by the flags
+  (for example ``--versioning`` adds ``djangocms_versioning``). In ``headless``
+  and ``hybrid`` mode the REST API apps ``djangocms_rest`` and
+  ``rest_framework`` (Django REST framework) are added as well. The django CMS
+  middleware (including Django's ``LocaleMiddleware``) and template context
+  processors are added, and a small block of django CMS settings (such as
+  ``LANGUAGES``) is appended if missing. In ``traditional`` and ``hybrid`` mode
+  this includes ``CMS_TEMPLATES``; in ``headless`` mode it includes
+  ``CMS_PLACEHOLDERS`` instead (see :ref:`headless_mode`);
+* the project's ``urls.py`` (resolved from ``ROOT_URLCONF``): the django CMS
+  and/or REST API url patterns are added according to the selected ``--mode``.
+
+In ``traditional`` and ``hybrid`` mode, if the project has no template directory
+yet, a ``templates`` directory is created, registered in ``TEMPLATES['DIRS']``
+and seeded with a minimal base template. In ``headless`` mode no template
+directory is created.
+
+Finally, the command lists the required packages and asks whether to install
+them. If you agree (or run with ``--noinput``), it installs them, runs the
+database migrations and then ``cms check`` to validate the installation. If you
+decline, it prints the commands to run later instead. Existing entries are never
+duplicated, so it is safe to run again.
+
+Unlike when creating a new project, no superuser is created (the ``--username``
+and ``--email`` options have no effect); use your project's existing accounts
+or run ``python -m manage createsuperuser``.
+
+The exact apps, middleware, context processors, settings and url patterns to add
+— and the conditions under which each applies (based on ``--mode`` and the
+feature flags) — are described by a JSON rules file. Like the project template,
+it is fetched from the `cms-template <https://github.com/django-cms/cms-template>`_
+repository (the branch matching your installed django CMS version); a copy
+bundled with django CMS is used as an offline fallback.
+
+.. note::
+
+    The ``--stories``, ``--mode``, ``--versioning``, ``--moderation`` and
+    ``--alias`` options are evaluated by the project template. They require
+    version 5.1 or later of the `cms-template
+    <https://github.com/django-cms/cms-template>`_ to support them.
+
+
 **********************
 Informational commands
 **********************
@@ -169,7 +285,7 @@ Maintenance and repair
 ``fix-tree``
 ============
 
-Occasionally, the page tree can become corrupted. Typical symptoms include problems 
+Occasionally, the page tree can become corrupted. Typical symptoms include problems
 when trying to copy or delete pages.
 
 This command will fix small corruptions by rebuilding the tree.
@@ -177,4 +293,3 @@ This command will fix small corruptions by rebuilding the tree.
 .. versionadded:: 4.0
 
     Since django CMS Version 4 this command does not affect the plugin tree.
-    
