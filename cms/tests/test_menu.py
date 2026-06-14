@@ -498,6 +498,12 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         },
     )
     def test_menu_cache_uses_configured_backend(self):
+        from cms.conf import get_menu_cache
+        from menus import menu_pool
+
+        prev_cache = menu_pool.cache
+        menu_pool.cache = get_menu_cache()
+        
         cms_page = self.get_page(1)
         context = self.get_context(path=cms_page.get_absolute_url(), page=cms_page)
         request = context["request"]
@@ -522,6 +528,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
                 language=request.LANGUAGE_CODE, site=cms_page.site_id
             ).exists()
         )
+        menu_pool.cache = prev_cache
 
     def test_menu_keys_duplicate_clear(self):
         """
