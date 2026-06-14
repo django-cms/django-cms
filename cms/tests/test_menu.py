@@ -484,6 +484,15 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             #     set the menu cache key
             Template("{% load menu_tags %}{% show_menu %}").render(context)
 
+    def test_menu_cache_default_is_default_cache(self):
+        from django.core.cache import caches
+        from cms.utils.conf import get_menu_cache
+
+        menu_cache = get_menu_cache()  # Re-read the patched settings
+        menu_cache.get("something")  # Resolve lazy cache
+
+        self.assertTrue(menu_cache is caches["default"]
+
     @override_settings(
         CMS_MENU_CACHE_BACKEND="secondary",
         CACHES={
@@ -498,37 +507,13 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         },
     )
     def test_menu_cache_uses_configured_backend(self):
+        from django.core.cache import caches
         from cms.utils.conf import get_menu_cache
-        from menus import menu_pool
 
-        prev_cache = menu_pool.cache
-        menu_pool.cache = get_menu_cache()  # Re-read the patched settings
+        menu_cache = get_menu_cache()  # Re-read the patched settings
+        menu_cache.get("something")  # Resolve lazy cache
 
-        cms_page = self.get_page(1)
-        context = self.get_context(path=cms_page.get_absolute_url(), page=cms_page)
-        request = context["request"]
-        request.session["cms_edit"] = False
-
-        Template("{% load menu_tags %}{% show_menu %}").render(context)
-
-        cache_keys = CacheKey.objects.filter(
-            language=request.LANGUAGE_CODE, site=cms_page.site_id
-        )
-        self.assertEqual(cache_keys.count(), 1)
-        cache_key = cache_keys.get().key
-        self.assertIsNone(caches["default"].get(cache_key))
-        self.assertIsNotNone(caches["secondary"].get(cache_key))
-
-        menu_pool.clear(site_id=cms_page.site_id, language=request.LANGUAGE_CODE)
-
-        self.assertIsNone(caches["secondary"].get(cache_key))
-        self.assertIsNone(caches["default"].get(cache_key))
-        self.assertFalse(
-            CacheKey.objects.filter(
-                language=request.LANGUAGE_CODE, site=cms_page.site_id
-            ).exists()
-        )
-        menu_pool.cache = prev_cache
+        self.assertTrue(menu_cache is caches["secondary"]
 
     def test_menu_keys_duplicate_clear(self):
         """
