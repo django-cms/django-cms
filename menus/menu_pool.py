@@ -21,6 +21,7 @@ from menus.exceptions import NamespaceAlreadyRegistered
 from menus.models import CacheKey
 
 logger = getLogger('menus')
+cache = get_menu_cache()
 
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
@@ -162,7 +163,7 @@ class MenuRenderer:
         """
         key = self.cache_key
 
-        cached_nodes = get_menu_cache().get(key, None)
+        cached_nodes = cache.get(key, None)
 
         if cached_nodes and self.is_cached:
             # Only use the cache if the key is present in the database.
@@ -192,7 +193,7 @@ class MenuRenderer:
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
-        get_menu_cache().set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
+        chache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
 
         if not self.is_cached:
             # No need to invalidate the internal lookup cache,
@@ -353,7 +354,7 @@ class MenuPool:
         to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
 
         if to_be_deleted:
-            get_menu_cache().delete_many(to_be_deleted)
+            cache.delete_many(to_be_deleted)
             cache_keys.delete()
 
     def register_menu(self, menu_cls):
