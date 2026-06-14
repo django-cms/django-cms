@@ -491,7 +491,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         menu_cache = get_menu_cache()  # Re-read the patched settings
         menu_cache.get("something")  # Resolve lazy cache
 
-        self.assertTrue(menu_cache is caches["default"], "Menu cache is not "default")
+        self.assertTrue(menu_cache is caches["default"], "Menu cache is not \"default\"")
 
     @override_settings(
         CMS_MENU_CACHE_BACKEND="secondary",
