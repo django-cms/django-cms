@@ -502,7 +502,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         from menus import menu_pool
 
         prev_cache = menu_pool.cache
-        menu_pool.cache = get_menu_cache()
+        menu_pool.cache = get_menu_cache()  # Re-read the patched settings
 
         cms_page = self.get_page(1)
         context = self.get_context(path=cms_page.get_absolute_url(), page=cms_page)
