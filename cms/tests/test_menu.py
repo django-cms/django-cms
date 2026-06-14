@@ -2,6 +2,7 @@ import copy
 
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
+from django.core.cache import caches
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
@@ -437,7 +438,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
 
-    def test_show_menu_cache_key_leak(self):
+    def test_show__key_leak(self):
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         self.assertEqual(CacheKey.objects.count(), 0)
@@ -482,6 +483,35 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             #     get all page url objects
             #     set the menu cache key
             Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+    def test_menu_cache_default_is_default_cache(self):
+        from cms.utils.conf import get_menu_cache
+
+        menu_cache = get_menu_cache()  # Re-read the patched settings
+        menu_cache.get("something")  # Resolve lazy cache
+
+        self.assertEqual(menu_cache, caches["default"], "Menu cache is not \"default\"")
+
+    @override_settings(
+        CMS_MENU_CACHE_BACKEND="secondary",
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "menu-test-default",
+            },
+            "secondary": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "menu-test-secondary",
+            },
+        },
+    )
+    def test_menu_cache_uses_configured_backend(self):
+        from cms.utils.conf import get_menu_cache
+
+        menu_cache = get_menu_cache()  # Re-read the patched settings
+        menu_cache.get("something")  # Resolve lazy cache
+
+        self.assertEqual(menu_cache, caches["secondary"], "Menu cache ignores CMS_MENU_CACHE_BACKEND setting")
 
     def test_menu_keys_duplicate_clear(self):
         """
