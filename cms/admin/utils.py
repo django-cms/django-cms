@@ -382,11 +382,29 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return annotation
 
     def can_change_content(self, request, content_obj):
+        return self.get_content_readonly_message(request, content_obj) is None
+
+    def get_content_readonly_message(self, request, content_obj):
+        """Return ``None`` if the content can be changed, otherwise a human-readable
+        message explaining why it is read-only.
+
+        Permissions are owned by django CMS; editability (and its explanation) is
+        owned by the content object's ``is_editable`` method. That method may return
+        either a plain ``bool`` or a "rich bool" (e.g. from djangocms-versioning) that
+        is falsy but also carries the reason(s) the editability checks failed via
+        ``str()``. Plain bools carry no reason, so a generic message is used.
+        """
         opts = self.content_model._meta
         perm = f"{opts.app_label}.{get_permission_codename('change' if content_obj else 'add', opts)}"
         if not request.user.has_perm(perm, content_obj):
-            return False
-        return getattr(content_obj, "is_editable", lambda *_: True)(request)
+            return _("You do not have permission to change this content.")
+        editable = getattr(content_obj, "is_editable", lambda *_: True)(request)
+        if editable:
+            return None
+        # ``editable`` is falsy: a plain bool offers no explanation, while a rich bool
+        # exposes the reason(s) the checks failed via ``str()``.
+        reason = "" if isinstance(editable, bool) else str(editable)
+        return reason or _("This content is read-only.")
 
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         """Annotates content fields with the name "content__{field_name}" to the grouper queryset if
@@ -551,7 +569,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             extra_context["language_tabs"] = self.get_language_tuple(site=site)
             extra_context["language"] = language
             extra_context["filled_languages"] = filled_languages
-            extra_context["can_change_content_obj"] = self.can_change_content(request, content_instance)
+            readonly_message = self.get_content_readonly_message(request, content_instance)
+            extra_context["content_readonly_message"] = readonly_message
+            extra_context["can_change_content_obj"] = readonly_message is None
             if content_instance is None:
                 subtitle = _("Add %(language)s content") % dict(
                     language=get_language_dict(site_id=site.pk).get(self.language)

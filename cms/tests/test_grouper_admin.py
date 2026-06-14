@@ -712,6 +712,77 @@ class GrouperCanChangeContentTestCase(SetupMixin, CMSTestCase):
         self.assertTrue(self._can_change_content(request, content_obj))
 
 
+class ReasonedBool(int):
+    """Test stand-in for a "rich bool" as returned by e.g. djangocms-versioning's
+    ``as_bool``: truthy/falsy via the int value, with the reason exposed by ``str()``."""
+
+    def __new__(cls, value, reason=""):
+        obj = super().__new__(cls, bool(value))
+        obj.reason = reason
+        return obj
+
+    def __str__(self):
+        return self.reason
+
+
+class GrouperReadonlyMessageTestCase(SetupMixin, CMSTestCase):
+    """Tests for ``GrouperModelAdmin.get_content_readonly_message``: the permission
+    case plus both plain-bool and rich-bool returns from ``is_editable``."""
+
+    def _message(self, request, content_obj):
+        return GrouperModelAdmin.get_content_readonly_message(self.admin, request, content_obj)
+
+    def _request(self, has_perm_return=True):
+        request = self.get_request()
+        request.user = MagicMock()
+        request.user.has_perm.return_value = has_perm_return
+        return request
+
+    def test_missing_permission_returns_permission_message(self):
+        """Without the change permission, the permission message is returned, regardless
+        of editability."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=False)
+
+        self.assertEqual(
+            self._message(request, content_obj),
+            "You do not have permission to change this content.",
+        )
+
+    def test_editable_content_returns_none(self):
+        """Editable content (with permission) has no read-only message."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: True
+        request = self._request(has_perm_return=True)
+
+        self.assertIsNone(self._message(request, content_obj))
+
+    def test_plain_false_returns_generic_message(self):
+        """A plain ``False`` from ``is_editable`` carries no reason, so the generic
+        message is used."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: False
+        request = self._request(has_perm_return=True)
+
+        self.assertEqual(self._message(request, content_obj), "This content is read-only.")
+
+    def test_rich_bool_returns_its_reason(self):
+        """A falsy rich bool surfaces its own reason via ``str()``."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: ReasonedBool(False, "Version is not a draft")
+        request = self._request(has_perm_return=True)
+
+        self.assertEqual(self._message(request, content_obj), "Version is not a draft")
+
+    def test_truthy_rich_bool_returns_none(self):
+        """A truthy rich bool means editable, so no message even though it has a str()."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: ReasonedBool(True)
+        request = self._request(has_perm_return=True)
+
+        self.assertIsNone(self._message(request, content_obj))
+
+
 class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
     def test_save_grouper_model(self) -> None:
         # Arrange
