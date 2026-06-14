@@ -133,6 +133,12 @@ Minor features
 
 * Introduce contracts for django CMS Extensions
 
+* Clearer page permission admin: the ``can_view`` field is now labelled "can view
+  restricted pages" with help text explaining that granting view access also restricts
+  the page, the ``can_change_permissions`` help text spells out what it controls, and the
+  "edit permissions required" validation messages now name the exact "Can edit" checkbox
+  to enable.
+
 
 
 Bug Fixes
