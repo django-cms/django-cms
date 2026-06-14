@@ -485,7 +485,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             Template("{% load menu_tags %}{% show_menu %}").render(context)
 
     def test_menu_cache_default_is_default_cache(self):
-        from django.core.cache import caches
         from cms.utils.conf import get_menu_cache
 
         menu_cache = get_menu_cache()  # Re-read the patched settings
@@ -507,7 +506,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         },
     )
     def test_menu_cache_uses_configured_backend(self):
-        from django.core.cache import caches
         from cms.utils.conf import get_menu_cache
 
         menu_cache = get_menu_cache()  # Re-read the patched settings
