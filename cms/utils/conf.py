@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.connection import ConnectionProxy
 from django.utils.translation import gettext_lazy as _
 
 from cms import __version__, constants
@@ -120,7 +121,7 @@ def get_cache_durations():
 
 
 def get_menu_cache():
-    return caches[get_cms_setting('MENU_CACHE_BACKEND')]
+    return ConnectionProxy(caches, get_cms_setting('MENU_CACHE_BACKEND'))
 
 
 @default('CMS_MEDIA_ROOT')
