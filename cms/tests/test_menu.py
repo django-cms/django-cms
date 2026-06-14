@@ -498,7 +498,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         },
     )
     def test_menu_cache_uses_configured_backend(self):
-        from cms.conf import get_menu_cache
+        from cms.utils.conf import get_menu_cache
         from menus import menu_pool
 
         prev_cache = menu_pool.cache
