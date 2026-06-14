@@ -14,7 +14,9 @@
   {% endblock %}
   {% if not can_change_content_obj and not add %}
     <div class="errornote">
-      <p><i>{% if content_readonly_message %}{{ content_readonly_message }}{% else %}{% trans "Some fields cannot be changed since they are read-only content." %}{% endif %}</i></p>
+      <p>{% trans "Some fields cannot be changed since they are read-only content." %}
+        {% if content_readonly_message %}<i>{{ content_readonly_message }}.</i>{% endif %}
+      </p>
     </div>
   {% endif %}
   {{ block.super }}

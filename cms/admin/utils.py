@@ -404,7 +404,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         # ``editable`` is falsy: a plain bool offers no explanation, while a rich bool
         # exposes the reason(s) the checks failed via ``str()``.
         reason = "" if isinstance(editable, bool) else str(editable)
-        return reason or _("This content is read-only.")
+        return reason or _("This content currently is not editable.")
 
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         """Annotates content fields with the name "content__{field_name}" to the grouper queryset if
