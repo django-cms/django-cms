@@ -405,7 +405,7 @@ jobs:
           python -m coverage report
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
 
       - name: Upload HTML report (for debugging)
         if: ${{ failure() }}

@@ -257,6 +257,40 @@ class ToolbarTests(ToolbarTestBase):
         self.assertRedirects(response, "/en/")
         self.assertTrue(settings.SESSION_COOKIE_NAME in response.cookies)
 
+    def test_toolbar_login_error_preserves_query_string(self):
+        # The error flag must be appended without clobbering an existing query.
+        admin = self.get_superuser()
+        endpoint = reverse("cms_login") + "?next=/en/admin/%3Ffoo%3Dbar"
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={"username": username, "password": "invalid"})
+        self.assertRedirects(
+            response,
+            "/en/admin/?foo=bar&cms_toolbar_login_error=1",
+            target_status_code=302,
+        )
+        self.assertFalse(settings.SESSION_COOKIE_NAME in response.cookies)
+
+    def test_toolbar_login_unresolvable_redirect_to(self):
+        # A same-host path that does not resolve against the URL configuration
+        # must not be used as a redirect target (open redirect protection).
+        admin = self.get_superuser()
+        endpoint = reverse("cms_login") + "?next=/not-a-language/does-not-resolve@@/"
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        password = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={"username": username, "password": password})
+        self.assertRedirects(response, "/en/")
+        self.assertTrue(settings.SESSION_COOKIE_NAME in response.cookies)
+
+    def test_toolbar_login_resolvable_redirect_to(self):
+        # A same-host path that resolves to a project view is accepted.
+        admin = self.get_superuser()
+        endpoint = reverse("cms_login") + "?next=/en/admin/"
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        password = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={"username": username, "password": password})
+        self.assertRedirects(response, "/en/admin/", target_status_code=200)
+        self.assertTrue(settings.SESSION_COOKIE_NAME in response.cookies)
+
     @override_settings(CMS_TOOLBARS=["cms.test_utils.project.sampleapp.cms_toolbars.ToolbarWithMedia"])
     def test_toolbar_media(self):
         """
