@@ -87,6 +87,19 @@ urlpatterns = [
 ]
 """
 
+URLS_PY_I18N = """from django.conf.urls.i18n import i18n_patterns
+from django.contrib import admin
+from django.urls import path
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+]
+
+urlpatterns += i18n_patterns(
+    path("accounts/", include("accounts.urls")),
+)
+"""
+
 DEFAULT_OPTIONS = {
     "interactive": False,
     "mode": "traditional",
@@ -180,6 +193,19 @@ class EditingHelperTests(SimpleTestCase):
         self.assertIn("from django.urls import include", text)
         # Already present: unchanged
         self.assertEqual(Command._ensure_include_import(text), text)
+
+    def test_uses_i18n_patterns_detects_usage_not_import(self):
+        # The bare import must not count as usage.
+        self.assertFalse(Command._uses_i18n_patterns("from django.conf.urls.i18n import i18n_patterns\n"))
+        self.assertTrue(Command._uses_i18n_patterns(URLS_PY_I18N))
+        self.assertFalse(Command._uses_i18n_patterns(URLS_PY))
+
+    def test_append_i18n_patterns_adds_block(self):
+        text, added = Command._append_i18n_patterns(URLS_PY_I18N, ['path("", include("cms.urls"))'])
+        self.assertEqual(added, ['path("", include("cms.urls"))'])
+        self.assertIn('urlpatterns += i18n_patterns(\n    path("", include("cms.urls")),\n)', text)
+        # The CMS catch-all is appended last, after the project's own i18n block.
+        self.assertLess(text.index('include("accounts.urls")'), text.index('include("cms.urls")'))
 
     def test_insert_import_after_existing_imports(self):
         text = "from pathlib import Path\nimport sys\n\nBASE_DIR = Path()\n"
@@ -345,6 +371,40 @@ class AddToExistingProjectTests(SimpleTestCase):
         urls_text = self._read("mysite/urls.py")
         self.assertIn('path("api/", include("djangocms_rest.urls"))', urls_text)
         self.assertNotIn('include("cms.urls")', urls_text)
+
+    def test_cms_urls_go_into_i18n_patterns_when_used(self):
+        # A project whose urls.py already uses i18n_patterns must get the CMS
+        # catch-all routed through i18n_patterns (so pages keep a language
+        # prefix), while non-i18n routes stay in the plain urlpatterns list.
+        self._write("mysite/urls.py", URLS_PY_I18N)
+        self.run_command(mode="hybrid")
+
+        urls_text = self._read("mysite/urls.py")
+        self.assertIn('urlpatterns += i18n_patterns(\n    path("", include("cms.urls")),\n)', urls_text)
+        # The CMS catch-all stays last, after the project's existing i18n block.
+        self.assertLess(urls_text.index('include("accounts.urls")'), urls_text.index('include("cms.urls")'))
+        # The headless API route is not language-prefixed: it joins the plain list.
+        api_pos = urls_text.index('include("djangocms_rest.urls")')
+        self.assertLess(api_pos, urls_text.index("i18n_patterns("))
+
+    def test_cms_urls_join_plain_list_without_i18n_patterns(self):
+        # Without i18n_patterns the catch-all simply joins the plain list and
+        # no i18n_patterns block is introduced.
+        self.run_command()
+
+        urls_text = self._read("mysite/urls.py")
+        self.assertIn('path("", include("cms.urls"))', urls_text)
+        self.assertNotIn("i18n_patterns", urls_text)
+
+    def test_i18n_urls_rerun_is_idempotent(self):
+        self._write("mysite/urls.py", URLS_PY_I18N)
+        self.run_command(mode="hybrid")
+        urls_text = self._read("mysite/urls.py")
+
+        self.run_command(mode="hybrid")
+        self.assertEqual(self._read("mysite/urls.py"), urls_text)
+        # The catch-all was added exactly once.
+        self.assertEqual(urls_text.count('include("cms.urls")'), 1)
 
     def test_rerun_is_idempotent(self):
         self.run_command()

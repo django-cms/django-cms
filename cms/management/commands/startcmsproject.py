@@ -515,9 +515,17 @@ Enjoy!
         return None
 
     def update_urls(self, urls_file, options, url_rules):
-        """Add the url patterns whose rule condition matches the options."""
+        """Add the url patterns whose rule condition matches the options.
+
+        Patterns flagged with ``"i18n": true`` (the CMS catch-all) must keep a
+        language prefix, so they are added through ``i18n_patterns()`` -- but
+        only when the project's urls.py already uses ``i18n_patterns``;
+        otherwise they join the plain ``urlpatterns`` list like every other
+        pattern.
+        """
         text = self._read(urls_file)
-        items = []
+        uses_i18n = self._uses_i18n_patterns(text)
+        plain_items, i18n_items = [], []
         for rule in url_rules:
             if not self._rule_applies(rule.get("when"), options):
                 continue
@@ -526,13 +534,42 @@ Enjoy!
             target = re.search(r"""include\(['"]([^'"]+)['"]\)""", pattern)
             if target and target.group(1) in text:
                 continue
-            items.append(pattern)
-        if not items:
+            if rule.get("i18n") and uses_i18n:
+                i18n_items.append(pattern)
+            else:
+                plain_items.append(pattern)
+        if not plain_items and not i18n_items:
             return []
         text = self._ensure_include_import(text)
-        text, added = self._insert_into_list(text, "urlpatterns", items, quote=False)
+        added = []
+        if plain_items:
+            text, just_added = self._insert_into_list(text, "urlpatterns", plain_items, quote=False)
+            added += just_added
+        if i18n_items:
+            text, just_added = self._append_i18n_patterns(text, i18n_items)
+            added += just_added
         self._write(urls_file, text)
         return added
+
+    @staticmethod
+    def _uses_i18n_patterns(text):
+        """Whether the urls module already routes patterns through ``i18n_patterns``."""
+        return bool(re.search(r"\bi18n_patterns\s*\(", text))
+
+    @staticmethod
+    def _append_i18n_patterns(text, items):
+        """Append ``urlpatterns += i18n_patterns(...)`` with ``items`` to the module.
+
+        A new block is added at the end of the file (after any existing
+        ``i18n_patterns`` call) so the CMS catch-all stays last. The
+        ``i18n_patterns`` import is assumed present -- this is only called when
+        the module already uses it.
+        """
+        if not text.endswith("\n"):
+            text += "\n"
+        lines = "\n".join(f"    {item}," for item in items)
+        block = "\n# django CMS URLs (added by `djangocms .`)\nurlpatterns += i18n_patterns(\n" + lines + "\n)\n"
+        return text + block, list(items)
 
     def _ensure_template_dir(self, text, cwd, rule, options):
         """Create a project template directory if the project has none.
