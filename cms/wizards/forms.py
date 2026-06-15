@@ -81,7 +81,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
             site=self._site,
         ))
         self.fields['entry'].choices = choices
-        # Pre-select the first entry so the radio group always has an active
+        # Preselect the first entry so the radio group always has an active
         # option. This keeps the historical wizard behaviour and lets the
         # option template rely solely on each option's ``selected`` flag.
         if choices and self.fields['entry'].initial is None:
