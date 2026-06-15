@@ -4,6 +4,7 @@ from classytags.helpers import AsTag, InclusionTag
 from django import template
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin.helpers import Fieldset
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
@@ -19,6 +20,24 @@ from cms.utils.urlutils import admin_reverse
 register = template.Library()
 
 CMS_ADMIN_ICON_BASE = f"{settings.STATIC_URL}admin/img/"
+
+
+@register.simple_tag
+def admin_fieldset(form, *fields):
+    """
+    Wrap a plain form in Django admin's ``Fieldset`` helper so it can be
+    rendered with ``admin/includes/fieldset.html``. This gives the form the
+    admin's field layout and accessibility features (label tags, help-text
+    association via ``*_helptext`` ids, checkbox rows, per-field error
+    placement) without depending on djangocms-admin-style.
+
+    No ``ModelAdmin`` is required: it is only consulted for readonly fields,
+    which plain forms do not declare. By default all visible fields are used;
+    pass field names to render a subset.
+    """
+    if not fields:
+        fields = [bound_field.name for bound_field in form.visible_fields()]
+    return Fieldset(form, fields=fields)
 
 
 class GetAdminUrlForLanguage(AsTag):

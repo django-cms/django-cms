@@ -1,26 +1,10 @@
-{% load i18n %}
+{% load cms_admin %}
 
-{% csrf_token %}
+{# Non-field errors are not part of a fieldset, so render them separately. #}
+{{ form.non_field_errors }}
 
-{{ inlineformset.management_form }}
-
+{# Hidden fields are rendered outside the fieldset, mirroring django admin. #}
 {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 
-<fieldset class="module aligned">
-    {% for field in form.visible_fields %}
-        <div class="form-row {{ field.name }}{% if field.errors %} errors{% endif %}">
-            {% if field.errors %}
-                <ul class="errorlist">
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            <div>
-                <label {% if field.field.required %}class="required" {% endif %}for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}{% if field.help_text %}
-                <p class="help">{{ field.help_text }}</p>{% endif %}
-            </div>
-        </div>
-    {% endfor %}
-</fieldset>
+{% admin_fieldset form as fieldset %}
+{% include "admin/includes/fieldset.html" with fieldset=fieldset heading_level=2 %}

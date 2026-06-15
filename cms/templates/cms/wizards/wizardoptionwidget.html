@@ -1,9 +1,29 @@
-{% for group, entries, index in widget.optgroups %}
-    {% for entry in entries %}
-        <label tabindex="0" class="choice{% if forloop.parentloop.first %} active{% endif %}">
-            <input type="radio" name="{{ entry.name }}" value="{{ entry.value }}"{% if forloop.parentloop.first %} checked{% endif %}>
-            <strong>{{ entry.label }}</strong>
-            <span class="info">{{ entry.attrs.description }}</span>
-        </label>
+{% load i18n %}
+{% comment %}
+Accessible radio group for the wizard's first step.
+
+Each ``.choice`` is a styled label exposed as ``role="radio"`` so screen
+readers announce it and its checked state, while the real (visually hidden)
+``<input type="radio">`` it wraps still carries the value on submit. Keyboard
+support (roving tabindex, arrow keys, enter/space) is provided by
+``cms/js/modules/cms.wizards.js``.
+{% endcomment %}
+<div class="choice-group" role="radiogroup" aria-label="{% translate "Select what you would like to create" %}">
+    {% for group, entries, index in widget.optgroups %}
+        {% for entry in entries %}
+            <label class="choice{% if entry.selected %} active{% endif %}"
+                   role="radio"
+                   tabindex="{% if entry.selected %}0{% else %}-1{% endif %}"
+                   aria-checked="{% if entry.selected %}true{% else %}false{% endif %}"
+                   {% if entry.attrs.description %}aria-describedby="{{ entry.attrs.id }}_description"{% endif %}>
+                <input type="radio" tabindex="-1" aria-hidden="true"
+                       name="{{ entry.name }}" value="{{ entry.value }}" id="{{ entry.attrs.id }}"
+                       {% if entry.selected %}checked{% endif %}>
+                <strong>{{ entry.label }}</strong>
+                {% if entry.attrs.description %}
+                    <span class="info" id="{{ entry.attrs.id }}_description">{{ entry.attrs.description }}</span>
+                {% endif %}
+            </label>
+        {% endfor %}
     {% endfor %}
-{% endfor %}
+</div>
