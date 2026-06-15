@@ -21,7 +21,11 @@ from cms import __version__ as cms_version
 class Command(TemplateCommand):  # pragma: no cover
     help = (
         "Creates a django CMS project directory structure for the given project "
-        "name in the current directory or optionally in the given directory."
+        "name in the current directory or optionally in the given directory. "
+        'Alternatively, use a project name of "." to add django CMS to the '
+        "existing Django project in the current directory instead: its settings "
+        "and urls are updated in place (best-effort, automated edits to review "
+        "afterwards) and the required packages are installed."
     )
     missing_args_message = "You must provide a project name."
 
@@ -98,9 +102,12 @@ class Command(TemplateCommand):  # pragma: no cover
         )
         parser.add_argument(
             "--username",
-            help="Specifies the login for the superuser to be created",
+            help="Specifies the login for the superuser to be created (only when creating a new project).",
         )
-        parser.add_argument("--email", help="Specifies the email for the superuser to be created")
+        parser.add_argument(
+            "--email",
+            help="Specifies the email for the superuser to be created (only when creating a new project).",
+        )
         parser.add_argument(
             "--stories",
             action=argparse.BooleanOptionalAction,
