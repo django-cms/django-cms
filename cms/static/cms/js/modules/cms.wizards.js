@@ -9,8 +9,6 @@
  */
 var CMS = window.CMS || {};
 
-'use strict';
-
 document.addEventListener('DOMContentLoaded', function() {
     /**
      * Adds internal methods for the creation wizard.
@@ -18,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
      * @class Wizards
      * @namespace CMS
      */
+    'use strict';
+
     CMS.Wizards = {
         _choice: function initialize() {
             // set active element when making a choice
