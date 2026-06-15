@@ -5,10 +5,12 @@ from django import template
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.helpers import Fieldset
+from django.contrib.admin.options import IS_POPUP_VAR, TO_FIELD_VAR
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
@@ -55,9 +57,25 @@ class GetAdminUrlForLanguage(AsTag):
         if language in page.get_languages():
             page_content = page.get_admin_content(language)
             if page_content:
-                return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+                admin_url = admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+                return self._add_popup_params(context, admin_url)
         admin_url = admin_reverse('cms_pagecontent_add')
         admin_url += f'?cms_page={page.pk}&language={language}'
+        return self._add_popup_params(context, admin_url)
+
+    @staticmethod
+    def _add_popup_params(context, admin_url):
+        """Carry the related-object lookup popup state (``_popup``/``_to_field``)
+        onto the language switch url so the popup survives the navigation. These
+        come from the template context, which is preserved across invalid form
+        submissions (unlike the request url, which the form action strips)."""
+        params = {}
+        if context.get('is_popup'):
+            params[IS_POPUP_VAR] = 1
+        if context.get('to_field'):
+            params[TO_FIELD_VAR] = context['to_field']
+        if params:
+            admin_url += ('&' if '?' in admin_url else '?') + urlencode(params)
         return admin_url
 
 
