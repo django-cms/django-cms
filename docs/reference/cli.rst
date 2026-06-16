@@ -111,6 +111,16 @@ database migrations and then ``cms check`` to validate the installation. If you
 decline, it prints the commands to run later instead. Existing entries are never
 duplicated, so it is safe to run again.
 
+To preview the changes without touching anything, add ``--dry-run``. The command
+then prints a unified diff of every edit it would make to your settings and
+``urls.py`` (and a new-file diff for any template it would create), and lists the
+packages it would install — but writes nothing and installs nothing::
+
+    djangocms . --dry-run
+
+``--dry-run`` only applies when adding django CMS to an existing project; it is
+not available when creating a new project from the template.
+
 Unlike when creating a new project, no superuser is created (the ``--username``
 and ``--email`` options have no effect); use your project's existing accounts
 or run ``python -m manage createsuperuser``.

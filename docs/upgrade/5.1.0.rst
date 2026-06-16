@@ -160,6 +160,12 @@ afterwards, so make sure your project is under version control or backed up
 before running it. The command is idempotent: running it again will not
 duplicate the changes.
 
+You can preview everything first with ``--dry-run``, which prints a unified diff
+of the changes it would make — without writing any files or installing
+anything::
+
+    djangocms . --dry-run
+
 The rules that govern these edits are fetched from the ``cms-template``
 repository (matching your installed django CMS version), with a bundled copy
 serving as an offline fallback, so the integration can keep up with the

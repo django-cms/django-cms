@@ -18,6 +18,13 @@ your project's virtual environment activated.
     you can review every change afterwards. The command asks for confirmation
     before changing anything.
 
+.. tip::
+
+    Run it with ``--dry-run`` first to preview every change as a unified diff,
+    without writing any files or installing packages::
+
+        djangocms . --dry-run
+
 What the command does
 ---------------------
 
