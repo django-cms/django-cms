@@ -46,8 +46,8 @@ def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[s
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> dict[str, Any]:
-    data = plugin.get_plugin_info(children=children, parents=parents)
+def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None) -> dict[str, Any]:
+    data = plugin.get_plugin_info(children=children)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}
@@ -60,11 +60,10 @@ def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None
     return data
 
 
-def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> str:
+def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None) -> str:
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
-        parents=parents,
     )
     return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
 
@@ -124,7 +123,7 @@ def get_plugin_tree(
     root_plugins = create_child_plugin_references(plugins)
 
     def collect_plugin_data(plugin):
-        child_classes, parent_classes = get_plugin_restrictions(
+        child_classes = get_plugin_restrictions(
             plugin=plugin,
             restrictions_cache=restrictions,
             page=placeholder.source,
@@ -132,7 +131,6 @@ def get_plugin_tree(
         plugin_info = get_plugin_info(
             plugin,
             children=child_classes,
-            parents=parent_classes,
         )
 
         tree_data.append(plugin_info)

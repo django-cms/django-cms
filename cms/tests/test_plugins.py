@@ -931,7 +931,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
-            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
             # Baseline
             self.assertIn("ChildPlugin", child_classes)
@@ -940,7 +940,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             # Change parent class rules (cache should NOT be used)
             ChildPlugin.parent_classes = [""]
             # Use cache
-            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertNotIn("ChildPlugin", child_classes)
@@ -966,7 +966,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
-            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
             # Baseline
             self.assertNotIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
@@ -975,7 +975,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             ChildPlugin.parent_classes = ["ParentPlugin"]
 
             # Use cache
-            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
@@ -999,7 +999,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 # First call populates the cache
                 get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
                 # Second call uses the cache, which should have [""] instead of []
-                child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+                child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
                 # Since the restriction results in no valid child classes, it should be replaced with [""]
                 self.assertEqual(child_classes, [""])
@@ -1023,7 +1023,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             # No plugin is an allowed child
             self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
             # The restriction is sent to the frontend as the [""] sentinel (disallow all)
-            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
+            child_classes = get_plugin_restrictions(plugin, placeholder.source, {})
             self.assertEqual([""], child_classes)
 
     def test_plugin_parent_classes_empty_list_allows_no_parent(self):
@@ -1078,7 +1078,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, GlobChildPlugin, settings.LANGUAGES[0][0])
             instance = plugin.get_plugin_class_instance()
             self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
-            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
+            child_classes = get_plugin_restrictions(plugin, placeholder.source, {})
             self.assertEqual([""], child_classes)
 
     def test_plugin_parent_classes_glob(self):
