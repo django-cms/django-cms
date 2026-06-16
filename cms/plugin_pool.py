@@ -371,7 +371,12 @@ class PluginPool:
             return self.global_restrictions_cache[f"{object_class}:{slot}"]
         return self.global_restrictions_cache[object_class]
 
-    restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
+    restriction_methods = (
+        "get_require_parent",
+        "get_child_class_overrides",
+        "get_parent_classes",
+        "get_child_classes",
+    )
 
     def can_cache_globally(self, plugin_class: type[CMSPluginBase]) -> bool:
         """

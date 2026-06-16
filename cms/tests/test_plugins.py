@@ -1746,6 +1746,80 @@ class PluginPoolTestCase(CMSTestCase):
         finally:
             plugin_pool.unregister_plugin(LocalCachePlugin)
 
+    def test_get_restrictions_cache_get_child_classes_without_decorator(self):
+        """A plugin that overrides get_child_classes *without* @template_slot_caching must not be
+        cached globally, even when all other restriction methods are template/slot-pure.
+
+        get_child_classes is part of restriction_methods, so an undecorated override means the
+        result may depend on more than template+slot and must fall back to the per-request cache.
+        """
+        @plugin_pool.register_plugin
+        class UncachedChildClassesPlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Uncached Child Classes Plugin"
+
+            # get_require_parent / get_child_class_overrides / get_parent_classes are inherited
+            # from CMSPluginBase and *are* decorated. Only get_child_classes loses the decorator.
+            def get_child_classes(self, slot, page=None, instance=None, only_uncached=False):
+                return []
+
+        try:
+            self.assertFalse(plugin_pool.can_cache_globally(UncachedChildClassesPlugin))
+
+            page = create_page("Test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").first()
+            plugin_instance = api.add_plugin(placeholder, UncachedChildClassesPlugin, "en")
+
+            request_cache = {}
+            restrictions_cache = plugin_pool.get_restrictions_cache(
+                request_cache, plugin_instance, page
+            )
+
+            # Falls back to the request-local cache, not the global cache.
+            self.assertIs(restrictions_cache, request_cache)
+        finally:
+            plugin_pool.unregister_plugin(UncachedChildClassesPlugin)
+
+    def test_get_restrictions_cache_inherited_child_classes_is_global(self):
+        """The inherited (decorated) get_child_classes keeps a plugin globally cacheable."""
+        from cms.plugin_base import template_slot_caching
+
+        @plugin_pool.register_plugin
+        class InheritedChildClassesPlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Inherited Child Classes Plugin"
+
+            @template_slot_caching
+            def get_require_parent(self, slot, page):
+                return False
+
+            @template_slot_caching
+            def get_child_class_overrides(self, slot, page):
+                return []
+
+            @template_slot_caching
+            def get_parent_classes(self, slot, page):
+                return None
+
+            # get_child_classes is inherited from CMSPluginBase, which carries the decorator.
+
+        try:
+            self.assertTrue(plugin_pool.can_cache_globally(InheritedChildClassesPlugin))
+
+            page = create_page("Test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").first()
+            plugin_instance = api.add_plugin(placeholder, InheritedChildClassesPlugin, "en")
+
+            request_cache = {}
+            restrictions_cache = plugin_pool.get_restrictions_cache(
+                request_cache, plugin_instance, page
+            )
+
+            # Globally cacheable plugins use the shared global cache, not the request cache.
+            self.assertIsNot(restrictions_cache, request_cache)
+        finally:
+            plugin_pool.unregister_plugin(InheritedChildClassesPlugin)
+
     def test_get_restrictions_cache_different_templates(self):
         """Test get_restrictions_cache with different templates"""
         from cms.plugin_base import template_slot_caching
