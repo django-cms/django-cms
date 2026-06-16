@@ -931,7 +931,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
-            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
             # Baseline
             self.assertIn("ChildPlugin", child_classes)
@@ -940,7 +940,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             # Change parent class rules (cache should NOT be used)
             ChildPlugin.parent_classes = [""]
             # Use cache
-            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertNotIn("ChildPlugin", child_classes)
@@ -966,7 +966,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
-            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
             # Baseline
             self.assertNotIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
@@ -975,7 +975,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             ChildPlugin.parent_classes = ["ParentPlugin"]
 
             # Use cache
-            child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
@@ -999,7 +999,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 # First call populates the cache
                 get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
                 # Second call uses the cache, which should have [""] instead of []
-                child_classes = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
+                child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, restriction_cache)
 
                 # Since the restriction results in no valid child classes, it should be replaced with [""]
                 self.assertEqual(child_classes, [""])
@@ -1023,7 +1023,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             # No plugin is an allowed child
             self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
             # The restriction is sent to the frontend as the [""] sentinel (disallow all)
-            child_classes = get_plugin_restrictions(plugin, placeholder.source, {})
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
             self.assertEqual([""], child_classes)
 
     def test_plugin_parent_classes_empty_list_allows_no_parent(self):
@@ -1078,7 +1078,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, GlobChildPlugin, settings.LANGUAGES[0][0])
             instance = plugin.get_plugin_class_instance()
             self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
-            child_classes = get_plugin_restrictions(plugin, placeholder.source, {})
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
             self.assertEqual([""], child_classes)
 
     def test_plugin_parent_classes_glob(self):
@@ -1848,6 +1848,28 @@ class IsSlotPluginTestCase(PluginsTestBaseCase):
             dict(render_plugin=False, is_slot=True),
         )
         self.assertTrue(SlotPlugin.is_slot)
+
+    def test_get_plugin_info_parents_argument_is_deprecated(self):
+        """The deprecated ``parents`` argument still works (with a warning) for backwards compat."""
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+
+        DeprecationInfoPlugin = type("DeprecationInfoPlugin", (CMSPluginBase,), dict(render_plugin=False))
+
+        with register_plugins(DeprecationInfoPlugin):
+            page = api.create_page("test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").get(slot="body")
+            plugin = api.add_plugin(placeholder, DeprecationInfoPlugin, "en")
+
+            # Default: no warning, and no parent restriction key in the payload.
+            with warnings.catch_warnings():
+                warnings.simplefilter("error")
+                info = plugin.get_plugin_info()
+            self.assertNotIn("plugin_parent_restriction", info)
+
+            # Deprecated argument: warns but still emits the key for compatibility.
+            with self.assertWarns(RemovedInDjangoCMS60Warning):
+                info = plugin.get_plugin_info(parents=["OtherPlugin"])
+            self.assertEqual(["OtherPlugin"], info["plugin_parent_restriction"])
 
     def test_is_slot_in_plugin_info(self):
         """Unit test: get_plugin_info includes is_slot value."""

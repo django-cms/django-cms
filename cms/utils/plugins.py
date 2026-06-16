@@ -178,12 +178,24 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
     cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page or plugin.placeholder.source)
+    parents_cache = cache.setdefault("plugin_parents", {})
     children_cache = cache.setdefault("plugin_children", {})
+    try:
+        parent_classes = parents_cache[plugin_type]
+    except KeyError:
+        parent_classes = plugin_class.get_parent_classes(
+            slot=plugin.placeholder.slot,
+            page=page,
+            instance=plugin,
+        )
 
-    # Only the child-class list needs to reach the frontend: a plugin's allowed *parents* are
-    # already encoded in every potential parent's child list (including the placeholder's root
-    # list, which excludes plugins that require a parent). There is therefore no need to compute
-    # or transport parent restrictions here.
+    if plugin_class.cache_parent_classes:
+        parents_cache[plugin_type] = parent_classes or []
+
+    # Note: a plugin's allowed *parents* are not sent to the frontend -- droppability is already
+    # encoded in every potential parent's child list (including the placeholder's root list, which
+    # excludes plugins that require a parent). ``parent_classes`` is still returned here for
+    # backwards compatibility with external callers.
     child_classes = []
     if plugin_class.allow_children:
         # Only check for children if children are allowed
@@ -214,7 +226,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
             # frontend as the ``[""]`` sentinel so that no plugins can be dropped as children.
             child_classes = child_classes or [""]
 
-    return child_classes
+    return child_classes, parent_classes
 
 
 def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_list, plugins_by_id):

@@ -165,7 +165,7 @@ class BaseRenderer:
 
     def get_plugin_toolbar_js(self, plugin: CMSPlugin, obj: models.Model):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
-        child_classes = get_plugin_restrictions(
+        child_classes, _ = get_plugin_restrictions(
             plugin=plugin,
             page=obj,
             restrictions_cache=placeholder_cache,  # Store non-global plugin-restriction in placeholder_cache

@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -266,10 +267,10 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             self._inst = self
         return self._inst
 
-    def get_plugin_info(self, children=None):
+    def get_plugin_info(self, children=None, parents=None):
         plugin_class = self.plugin_class
 
-        return {
+        info = {
             'type': 'plugin',
             'position': self.position,
             'placeholder_id': self.placeholder_id,
@@ -283,6 +284,17 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             'disable_child_plugins': plugin_class.disable_child_plugins,
             'urls': self.get_action_urls(),
         }
+        if parents is not None:
+            warnings.warn(
+                "The 'parents' argument of 'get_plugin_info' is deprecated and will be removed in django CMS 6.0. "
+                "Parent plugin restrictions are no longer sent to the frontend -- droppability is derived from "
+                "child restrictions -- so it can be safely removed from the call.",
+                RemovedInDjangoCMS60Warning,
+                stacklevel=2,
+            )
+            # Keep emitting the key for the deprecation period so existing callers don't break.
+            info['plugin_parent_restriction'] = parents or []
+        return info
 
     def refresh_from_db(self, *args, **kwargs):
         super().refresh_from_db(*args, **kwargs)

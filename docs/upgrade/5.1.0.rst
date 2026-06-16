@@ -195,6 +195,11 @@ Plugin rendering
 
 * ``BaseRenderer`` method ``renderer.get_placeholder_toolbar_js()`` has a keyword argument ``page`` which will be
   removed in django CMS 6.0. It can already be safely removed from all calls.
+* The ``parents`` keyword argument of ``CMSPlugin.get_plugin_info()``, ``cms.toolbar.utils.get_plugin_toolbar_info()``
+  and ``cms.toolbar.utils.get_plugin_toolbar_js()`` is deprecated and will be removed in django CMS 6.0. Parent plugin
+  restrictions are no longer sent to the frontend -- droppability is derived from the child restrictions of each
+  potential parent (and of the placeholder) -- so the argument and the ``plugin_parent_restriction`` entry it produced
+  can be safely removed from all calls.
 
 Utility functions
 -----------------
