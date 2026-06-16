@@ -903,7 +903,7 @@ Enjoy!
             raise CommandError("Packages not installed")
         self.stdout.write(self.HEADING("Install packages"))
         self.write_command("python -m pip install " + " ".join(shlex.quote(p) for p in packages))
-        result = subprocess.run([sys.executable, "-m", "pip", "install", *packages], check=False)
+        result = subprocess.run([sys.executable, "-m", "pip", "install", *(shlex.quote(p) for p in packages)], check=False)
         if result.returncode:
             raise CommandError("Failed to install the required packages.")
 
