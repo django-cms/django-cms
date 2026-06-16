@@ -218,6 +218,9 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 children_cache[plugin_type] = [
                     plugin for plugin in (child_classes or []) if plugin_pool.get_plugin(plugin).cache_parent_classes
                 ] or [""]
+            # An empty list of allowed children (e.g. ``child_classes = []``) is sent to the
+            # frontend as the ``[""]`` sentinel so that no plugins can be dropped as children.
+            child_classes = child_classes or [""]
 
     return child_classes, parent_classes
 

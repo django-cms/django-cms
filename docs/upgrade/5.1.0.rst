@@ -104,6 +104,15 @@ See also the how-to guide for details and more examples:
 Minor features
 ==============
 
+* Plugin parent/child restrictions are more expressive. The ``child_classes`` and
+  ``parent_classes`` attributes (and their ``CMS_PLACEHOLDER_CONF`` counterparts) now accept
+  glob patterns such as ``"Bootstrap*"`` or ``"*Link*"``, which are expanded against the names
+  of all registered plugins. An empty list (``[]``) now consistently means "none allowed"
+  (no children, or no parent — i.e. placeholder only), whereas ``None`` continues to mean
+  "no restriction". As a special case, ``parent_classes = ["*"]`` requires the plugin to have
+  a parent (any plugin). Expansion is cached, so restriction evaluation stays fast on the
+  rendering path.
+
 * Placeholder objects now have a :meth:`~cms.models.placeholdermodel.Placeholder.delete_plugins`
   method which efficiently bulk-deletes multiple plugins from the placeholder. It takes an iterable
   of plugin objects as a parameter.

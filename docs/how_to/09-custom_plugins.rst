@@ -699,6 +699,9 @@ functionality:
         # You can also specify a list of plugins that are accepted as parents,
         # or leave it away completely to accept all
         # parent_classes = ['ParentCMSPlugin']
+        # Entries may be glob patterns, e.g. parent_classes = ['Bootstrap*'].
+        # As a special case, parent_classes = ['*'] requires the plugin to have a
+        # parent (any plugin), since "*" expands to every registered plugin.
 
         def render(self, context, instance, placeholder):
             context = super(ChildCMSPlugin, self).render(context, instance, placeholder)
