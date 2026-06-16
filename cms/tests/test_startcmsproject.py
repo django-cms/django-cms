@@ -79,6 +79,27 @@ OLD_STYLE_SETTINGS_PY = SETTINGS_PY.replace(
     "import os\n\nBASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))",
 )
 
+COMPUTED_APPS_SETTINGS_PY = SETTINGS_PY.replace(
+    """INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+]""",
+    """DJANGO_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+]
+THIRD_PARTY_APPS = []
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS""",
+)
+
 URLS_PY = """from django.contrib import admin
 from django.urls import path
 
@@ -279,6 +300,38 @@ class PackageDerivationTests(SimpleTestCase):
             with self.assertRaises(CommandError):
                 command.install_packages([bad])
 
+    def test_install_packages_refuses_outside_venv(self):
+        # Outside a virtual environment (and without the opt-out env var) the
+        # command refuses to pip install and prints the manual command instead.
+        command = make_command()
+        with mock.patch.object(command, "running_in_venv", return_value=False), mock.patch.dict(
+            os.environ, {"DJANGOCMS_ALLOW_PIP_INSTALL": "False"}
+        ):
+            with self.assertRaises(CommandError):
+                command.install_packages(["django-cms"])
+        self.assertIn("virtual environment", command.stderr.getvalue())
+
+    def test_finish_existing_project_dry_run_skips_install(self):
+        command = make_command()
+        command.install_packages = mock.Mock()
+        command.run_management_command = mock.Mock()
+        command._finish_existing_project(["cms"], {}, {"interactive": False, "dry_run": True})
+        command.install_packages.assert_not_called()
+        command.run_management_command.assert_not_called()
+        self.assertIn("Dry run: would install", command.stdout.getvalue())
+
+    def test_finish_existing_project_can_skip_install(self):
+        # Declining the install prompt prints the manual follow-up steps and
+        # neither installs packages nor runs migrations.
+        command = make_command()
+        command.install_packages = mock.Mock()
+        command.run_management_command = mock.Mock()
+        command.ask_bool = mock.Mock(return_value=False)
+        command._finish_existing_project(["cms"], {}, {"interactive": True})
+        command.install_packages.assert_not_called()
+        command.run_management_command.assert_not_called()
+        self.assertIn("Install them later", command.stdout.getvalue())
+
 
 class AddToExistingProjectTests(SimpleTestCase):
     """Run ``djangocms .`` against a synthetic ``django-admin startproject`` layout."""
@@ -436,6 +489,104 @@ class AddToExistingProjectTests(SimpleTestCase):
         with self.assertRaises(CommandError):
             self.run_command()
 
+    def test_missing_settings_file_fails_cleanly(self):
+        # manage.py still resolves to "mysite.settings", but the settings file
+        # itself is gone: the command must fail with a clear message rather than
+        # blowing up while reading a missing file.
+        os.remove("mysite/settings.py")
+        with self.assertRaises(CommandError) as raised:
+            self.run_command()
+        self.assertIn("Cannot locate the settings file", str(raised.exception))
+
+    def test_missing_urls_file_degrades_gracefully(self):
+        # ROOT_URLCONF points at "mysite.urls" but the file is gone. The settings
+        # edits must still be applied and the install step still reached; the
+        # missing urls only produces a warning, not a crash.
+        os.remove("mysite/urls.py")
+        command = self.run_command()
+        self.assertIn('"cms",', self._read("mysite/settings.py"))
+        self.assertIn("Could not locate the urls file", command.stderr.getvalue())
+        command._finish_existing_project.assert_called_once()
+
+    def test_computed_installed_apps_recovery(self):
+        # INSTALLED_APPS is built from other lists (DJANGO_APPS + THIRD_PARTY_APPS),
+        # so there is no literal list to splice into. The command must recover by
+        # appending a reassignment rather than silently doing nothing.
+        self._write("mysite/settings.py", COMPUTED_APPS_SETTINGS_PY)
+        command = self.run_command()
+        settings_text = self._read("mysite/settings.py")
+
+        # The original computed assignment is preserved...
+        self.assertIn("INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS", settings_text)
+        # ...and the plain apps are added through an appended reassignment.
+        self.assertIn("INSTALLED_APPS = INSTALLED_APPS + [", settings_text)
+        self.assertIn('"cms",', settings_text)
+        self.assertIn('"menus",', settings_text)
+
+        # The admin style is anchored on django.contrib.admin, which lives in the
+        # DJANGO_APPS literal, so it is still placed precisely (not in the wrap block).
+        self.assertLess(
+            settings_text.index("djangocms_simple_admin_style"),
+            settings_text.index("django.contrib.admin"),
+        )
+        self.assertNotIn("djangocms_simple_admin_style", settings_text.split("INSTALLED_APPS = INSTALLED_APPS")[1])
+
+        # The user is warned to review the appended block.
+        self.assertIn("INSTALLED_APPS is a computed value", command.stderr.getvalue())
+
+        # Packages are still derived from all matched apps.
+        self.assertIn("cms", command._finish_existing_project.call_args.args[0])
+
+    def test_computed_installed_apps_rerun_is_idempotent(self):
+        self._write("mysite/settings.py", COMPUTED_APPS_SETTINGS_PY)
+        self.run_command()
+        settings_text = self._read("mysite/settings.py")
+
+        self.run_command()
+        self.assertEqual(self._read("mysite/settings.py"), settings_text)
+        # The recovery reassignment was appended exactly once.
+        self.assertEqual(settings_text.count("INSTALLED_APPS = INSTALLED_APPS + ["), 1)
+
+    def test_dry_run_makes_no_changes_and_shows_diff(self):
+        # --dry-run must leave every file untouched and report the planned edits
+        # purely as unified diffs (no per-item summary).
+        settings_before = self._read("mysite/settings.py")
+        urls_before = self._read("mysite/urls.py")
+        command = self.run_command(dry_run=True)
+
+        self.assertEqual(self._read("mysite/settings.py"), settings_before)
+        self.assertEqual(self._read("mysite/urls.py"), urls_before)
+        self.assertFalse(os.path.isdir("templates"))
+
+        out = command.stdout.getvalue()
+        self.assertIn("Dry run", out)
+        # The diff is the whole report -- the per-item summary is gone.
+        self.assertNotIn("  + INSTALLED_APPS:", out)
+        self.assertNotIn("Updated mysite/", out)
+        # settings.py change shown as a diff
+        self.assertIn("--- mysite/settings.py", out)
+        self.assertIn('+    "cms",', out)
+        # the base template that would be created shows as a new-file diff
+        self.assertIn("+++ templates/cms-base.html", out)
+        self.assertIn("/dev/null", out)
+        # urls.py change shown as a diff
+        self.assertIn("--- mysite/urls.py", out)
+        self.assertIn('include("cms.urls")', out)
+
+    def test_interactive_decline_makes_no_changes(self):
+        # Declining the "Continue?" prompt must abort before anything is read or
+        # written -- the rules are not even fetched and both files stay byte-identical.
+        command = make_command()
+        command.load_install_rules = mock.Mock(return_value=bundled_rules())
+        command._finish_existing_project = mock.Mock()
+        command.ask_bool = mock.Mock(return_value=False)
+        command.add_to_existing_project({**DEFAULT_OPTIONS, "interactive": True})
+        self.assertEqual(self._read("mysite/settings.py"), SETTINGS_PY)
+        self.assertEqual(self._read("mysite/urls.py"), URLS_PY)
+        self.assertIn("Aborted", command.stdout.getvalue())
+        command.load_install_rules.assert_not_called()
+        command._finish_existing_project.assert_not_called()
+
 
 class HandleValidationTests(SimpleTestCase):
     def test_moderation_requires_versioning(self):
@@ -455,6 +606,25 @@ class HandleValidationTests(SimpleTestCase):
         with self.assertRaises(CommandError) as raised:
             command.handle(**options)
         self.assertIn("moderation requires versioning", str(raised.exception))
+
+    def test_dry_run_rejected_for_new_project(self):
+        command = make_command()
+        options = {
+            "name": "mysite",
+            "directory": None,
+            "interactive": False,
+            "prompt": False,
+            "template": None,
+            "mode": "traditional",
+            "versioning": True,
+            "moderation": False,
+            "alias": True,
+            "stories": False,
+            "dry_run": True,
+        }
+        with self.assertRaises(CommandError) as raised:
+            command.handle(**options)
+        self.assertIn("--dry-run is only supported", str(raised.exception))
 
     def test_missing_name_with_noinput(self):
         command = make_command()
