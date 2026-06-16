@@ -101,6 +101,72 @@ Example::
 See also the how-to guide for details and more examples:
 :ref:`plugin-model-restrictions`.
 
+Simplified project creation with the ``djangocms`` command
+==========================================================
+
+Setting up django CMS is now a one-liner. The new ``djangocms`` command (also
+available as ``python -m cms``) scaffolds a complete, ready-to-run project,
+installs its requirements, runs the migrations, creates a superuser and checks
+the installation for you::
+
+    djangocms myproject
+
+Run without a project name it drops into an **interactive mode** that asks for
+the name and walks you through every option. You can also drive it entirely
+from the command line, for example::
+
+    djangocms myproject --mode headless --no-versioning --stories
+
+The most important options are:
+
+* ``--mode {traditional,headless,hybrid}`` — choose how the CMS serves content
+  (default: ``traditional``).
+* ``--versioning`` / ``--no-versioning`` — add content versioning with
+  `djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_
+  (default: on).
+* ``--moderation`` / ``--no-moderation`` — add content moderation (builds on
+  versioning; default: off).
+* ``--alias`` / ``--no-alias`` — add reusable
+  `aliases <https://github.com/django-cms/djangocms-alias>`_ (default: on).
+* ``--stories`` / ``--no-stories`` — add the stories component library
+  (default: off).
+* ``--interactive`` / ``--noinput`` — force or suppress all prompts.
+
+Adding django CMS to an existing project
+----------------------------------------
+
+The same command can now **add django CMS to an existing Django project**
+instead of scaffolding a new one. Run it from your project root with a project
+name of ``.``::
+
+    djangocms .
+
+django CMS then reads your project's settings module from ``manage.py`` and
+makes best-effort, automated edits to wire everything up:
+
+* updates ``INSTALLED_APPS``, ``MIDDLEWARE`` and the template context
+  processors,
+* creates a project ``templates`` directory with a base template if your
+  project does not have one yet,
+* appends the required django CMS settings,
+* adds the CMS URL patterns to your ``ROOT_URLCONF`` (respecting
+  ``i18n_patterns`` when already in use), and
+* installs the packages needed for the selected options, then runs the
+  migrations and ``cms check``.
+
+The same ``--mode`` and component options above apply, so you can tailor the
+installation to your needs. The edits are automated and should be reviewed
+afterwards, so make sure your project is under version control or backed up
+before running it. The command is idempotent: running it again will not
+duplicate the changes.
+
+The rules that govern these edits are fetched from the ``cms-template``
+repository (matching your installed django CMS version), with a bundled copy
+serving as an offline fallback, so the integration can keep up with the
+ecosystem without a new django CMS release.
+
+See :ref:`tutorial_install` for a step-by-step walkthrough.
+
 Minor features
 ==============
 
