@@ -179,14 +179,9 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     #: `django:django.db.models.DateTimeField`: Datetime the plugin was last changed
     changed_date = models.DateTimeField(auto_now=True)
+    #: Request-scoped list of direct child plugin instances when rendering
     child_plugin_instances = None
-    #: Request-scoped list of the plugin classes that may be added as children of this
-    #: instance, as resolved by :func:`cms.utils.plugins.get_plugin_restrictions`. It is set
-    #: by the toolbar/structure renderers while building the plugin tree (and is therefore
-    #: only populated for plugins rendered in the editor) so that the drag-item template can
-    #: decide whether children may be added without recomputing the restrictions per access.
-    #: The sentinel ``[""]`` means "children allowed but none addable"; ``[]``/``None`` mean
-    #: no children -- ``any()`` (``|join:""`` in templates) is falsy for all three.
+    #: Request-scoped list of the plugin classes that may be added as children of this instance
     child_class_restrictions = None
 
     class Meta:
