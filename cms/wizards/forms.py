@@ -75,10 +75,16 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
-        self.fields['entry'].choices = entry_choices(
+        choices = list(entry_choices(
             user=self._request.user,
             page=self._page,
-        )
+        ))
+        self.fields['entry'].choices = choices
+        # Preselect the first entry so the radio group always has an active
+        # option. This keeps the historical wizard behaviour and lets the
+        # option template rely solely on each option's ``selected`` flag.
+        if choices and self.fields['entry'].initial is None:
+            self.fields['entry'].initial = choices[0][0]
 
     def get_wizard_entries(self):
         for entry in self['entry']:

@@ -56,6 +56,10 @@ class WizardCreateView(SessionWizardView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # The wizard is always shown inside the CMS modal. Surface ``is_popup`` to the
+        # template context so that ``admin/base.html`` natively omits the header.
+        context['is_popup'] = True
+
         if self.is_second_step():
             context['wizard_entry'] = self.get_selected_entry()
         return context

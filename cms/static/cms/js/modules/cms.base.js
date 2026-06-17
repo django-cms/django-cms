@@ -545,6 +545,8 @@ export const KEYS = {
     TAB: 9,
     UP: 38,
     DOWN: 40,
+    LEFT: 37,
+    RIGHT: 39,
     ENTER: 13,
     SPACE: 32,
     ESC: 27,
