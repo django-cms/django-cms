@@ -78,7 +78,6 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
         choices = list(entry_choices(
             user=self._request.user,
             page=self._page,
-            site=self._site,
         ))
         self.fields['entry'].choices = choices
         # Preselect the first entry so the radio group always has an active
