@@ -964,6 +964,60 @@ class PluginsTestCase(PluginsTestBaseCase):
             child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
             self.assertEqual([""], child_classes)
 
+    def test_resolved_child_classes_addability(self):
+        """The resolved ``child_classes`` (stashed on ``CMSPlugin.child_class_restrictions``
+        and consumed by the drag-item template via ``any(...)`` / ``|join:""``) reflect
+        whether any plugin can actually be added: falsy for ``allow_children = False`` *and*
+        for an empty resolved ``child_classes`` (used to grey out the structure-editor
+        "add plugin" button)."""
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        NoChildrenPlugin = type("NoChildrenPlugin", (CMSPluginBase,), dict(render_plugin=False))
+        EmptyChildPlugin = type(
+            "EmptyChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=True, child_classes=[], render_template="allow_children_plugin.html"),
+        )
+        OpenChildPlugin = type(
+            "OpenChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=True, render_template="allow_children_plugin.html"),
+        )
+        RestrictedChildPlugin = type(
+            "RestrictedChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=True, child_classes=["LinkPlugin"], render_template="allow_children_plugin.html"),
+        )
+        RestrictedNoChildPlugin = type(
+            "RestrictedNoChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=False, child_classes=["LinkPlugin"], render_template="allow_children_plugin.html"),
+        )
+
+        def allows_add_children(plugin):
+            child_classes, _ = get_plugin_restrictions(plugin, page=placeholder.source)
+            return any(child_classes)
+
+        with register_plugins(NoChildrenPlugin, EmptyChildPlugin, OpenChildPlugin, RestrictedChildPlugin, RestrictedNoChildPlugin):
+            lang = settings.LANGUAGES[0][0]
+            # allow_children = False -> cannot add children
+            no_children = api.add_plugin(placeholder, NoChildrenPlugin, lang)
+            self.assertFalse(allows_add_children(no_children))
+            # allow_children = True but child_classes = [] -> still cannot add children (the bug)
+            empty = api.add_plugin(placeholder, EmptyChildPlugin, lang)
+            self.assertFalse(allows_add_children(empty))
+            # allow_children = True, no restriction -> can add children
+            open_ = api.add_plugin(placeholder, OpenChildPlugin, lang)
+            self.assertTrue(allows_add_children(open_))
+            # allow_children = True with a concrete child class -> can add children
+            restricted = api.add_plugin(placeholder, RestrictedChildPlugin, lang)
+            self.assertTrue(allows_add_children(restricted))
+            # allow_children = False with a concrete child class -> cannot add children
+            restricted_no = api.add_plugin(placeholder, RestrictedNoChildPlugin, lang)
+            self.assertFalse(allows_add_children(restricted_no))
+
     def test_plugin_child_classes_cache_ignores_uncachable_children(self):
         from cms.utils.plugins import get_plugin_restrictions
 
