@@ -183,7 +183,9 @@ Minor features
   (no children, or no parent — i.e. placeholder only), whereas ``None`` continues to mean
   "no restriction". As a special case, ``parent_classes = ["*"]`` requires the plugin to have
   a parent (any plugin). Expansion is cached, so restriction evaluation stays fast on the
-  rendering path.
+  rendering path. In addition, ``child_classes = "auto"`` allows exactly those plugins that
+  explicitly name this plugin in their ``parent_classes``, so children opt in to a parent
+  rather than the parent having to list every allowed child.
 
 * Placeholder objects now have a :meth:`~cms.models.placeholdermodel.Placeholder.delete_plugins`
   method which efficiently bulk-deletes multiple plugins from the placeholder. It takes an iterable

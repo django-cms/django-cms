@@ -911,6 +911,59 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
+    def test_plugin_child_classes_auto(self):
+        """``child_classes = "auto"`` accepts exactly those plugins that explicitly name this
+        plugin in their ``parent_classes`` -- and nothing else."""
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        AutoParentPlugin = type(
+            "AutoParentPlugin",
+            (CMSPluginBase,),
+            dict(child_classes="auto", allow_children=True, render_template="allow_children_plugin.html"),
+        )
+        # Opts in by naming AutoParentPlugin as a parent.
+        OptInChildPlugin = type(
+            "OptInChildPlugin", (CMSPluginBase,), dict(parent_classes=["AutoParentPlugin"], render_plugin=False)
+        )
+        # Names a *different* parent -- must not be auto-allowed.
+        OtherParentChildPlugin = type(
+            "OtherParentChildPlugin", (CMSPluginBase,), dict(parent_classes=["SomeOtherPlugin"], render_plugin=False)
+        )
+        # No parent restriction at all -- not an explicit opt-in, so must not be auto-allowed.
+        UnrestrictedChildPlugin = type("UnrestrictedChildPlugin", (CMSPluginBase,), dict(render_plugin=False))
+
+        with register_plugins(
+            AutoParentPlugin, OptInChildPlugin, OtherParentChildPlugin, UnrestrictedChildPlugin
+        ):
+            plugin = api.add_plugin(placeholder, AutoParentPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            child_classes = instance.get_child_classes(placeholder.slot, placeholder.source)
+
+            # Only the plugin that explicitly names AutoParentPlugin as parent is allowed.
+            self.assertEqual(["OptInChildPlugin"], child_classes)
+
+    def test_plugin_child_classes_auto_no_opt_in(self):
+        """``child_classes = "auto"`` with no plugin naming it as parent allows no children
+        (and notably does not raise on the many installed plugins whose ``parent_classes`` is
+        ``None``)."""
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        LonelyAutoPlugin = type(
+            "LonelyAutoPlugin",
+            (CMSPluginBase,),
+            dict(child_classes="auto", allow_children=True, render_template="allow_children_plugin.html"),
+        )
+
+        with register_plugins(LonelyAutoPlugin):
+            plugin = api.add_plugin(placeholder, LonelyAutoPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
+            # An empty allow-list is normalised to [""] (no children) by the restriction cache.
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
+            self.assertEqual([""], child_classes)
+
     def test_plugin_child_classes_cache_ignores_uncachable_children(self):
         from cms.utils.plugins import get_plugin_restrictions
 

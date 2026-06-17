@@ -388,7 +388,10 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     can be selected. An empty list (``[]``) means no plugins are allowed as
     children. List entries may be glob patterns such as ``"Bootstrap*"`` or
     ``"*Link*"``, which are expanded against the names of all registered plugins
-    (a pattern matching no plugin is therefore equivalent to an empty list).
+    (a pattern matching no plugin is therefore equivalent to an empty list). As a
+    special case, the string ``"auto"`` allows exactly those plugins that name this
+    plugin in their ``parent_classes`` -- the children opt in to the parent rather
+    than the parent listing them.
 
 ``parent_classes``
     A dictionary of plugin names with lists describing which plugins may contain

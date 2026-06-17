@@ -232,7 +232,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Entries may be glob patterns (e.g. ``"Bootstrap*"`` or ``"*Link*"``), which are expanded against the
     #: names of all registered plugins. An empty list (``[]``), or a list of patterns that match no installed
     #: plugin, means that no plugins are allowed as children, whereas ``None`` (the default) means there is no
-    #: restriction. See also: :attr:`parent_classes`.
+    #: restriction. As a special case, the string ``"auto"`` allows exactly those plugins that explicitly name
+    #: this plugin in their :attr:`parent_classes` -- i.e. the restriction is driven by the children opting in,
+    #: rather than the parent listing them. See also: :attr:`parent_classes`.
     child_classes = None
 
     #: Is it required that this plugin is a child of another plugin? Or can it be added to any placeholder, even one
@@ -786,7 +788,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Get all child plugin candidates
         installed_plugins = cls.get_child_plugin_candidates(slot, page)
 
-        if child_classes is not None:
+        if child_classes == "auto":
+            # Allow all plugins as children that explicitly declare this plugin as parent
+            return [plugin.__name__ for plugin in installed_plugins if cls.__name__ in (plugin.parent_classes or [])]
+        elif child_classes is not None:
             # An explicit list of allowed child classes (possibly empty).
             # An empty list means that no plugins are allowed as children, whereas
             # ``None`` (handled below) means there is no restriction.

@@ -682,6 +682,9 @@ functionality:
         # You can also specify a list of plugins that are accepted as children,
         # or leave it away completely to accept all
         # child_classes = ['ChildCMSPlugin']
+        # Entries may be glob patterns, e.g. child_classes = ['Bootstrap*'].
+        # As a special case, child_classes = 'auto' accepts exactly those plugins
+        # that name this plugin in their parent_classes (the children opt in).
 
         def render(self, context, instance, placeholder):
             context = super().render(context, instance, placeholder)
