@@ -42,7 +42,7 @@ class ChangeListActionsMixin(metaclass=forms.widgets.MediaDefiningClass):
     behavior.
 
     To activate the actions make sure ``"admin_list_actions"`` is in the admin classes
-    :prop:`~django.contrib.admin.ModelAdmin.list_display` property.
+    :attr:`~django.contrib.admin.ModelAdmin.list_display` property.
     """
 
     class Media:

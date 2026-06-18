@@ -1126,10 +1126,10 @@ string to the url. The default setting lets ``?toolbar_on`` activate the toolbar
 
 
 CMS_TOOLBAR_URL__DISABLE
-=======================
+========================
 
 default
-    ``"toolbar_off``
+    ``"toolbar_off"``
 
 This setting controls how users can deactivate the CMS toolbar by appending a query
 string to the url. The default setting lets ``?toolbar_off`` deactivate the toolbar.

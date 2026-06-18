@@ -1,3 +1,4 @@
+.. _testing:
 
 Running and writing tests
 =========================
