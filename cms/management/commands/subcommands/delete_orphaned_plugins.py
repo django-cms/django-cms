@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.db.models import Exists, OuterRef
 
 from cms.management.commands.subcommands.list import plugin_report
@@ -11,7 +12,7 @@ from .base import SubcommandsCommand
 class DeleteOrphanedPluginsCommand(SubcommandsCommand):
     help_string = ('Delete plugins from the CMSPlugins table that should have instances '
                    'but don\'t, and ones for which a corresponding plugin model can no '
-                   'longer be found')
+                   'longer be found. MUST be executed within a complete production application environment.')
     command_name = 'delete-orphaned-plugins'
 
     def get_detached_placeholders(self):
@@ -41,7 +42,7 @@ class DeleteOrphanedPluginsCommand(SubcommandsCommand):
                 )
                 .annotate(
                     object_exists=Exists(
-                        model_class._default_manager.filter(pk=OuterRef('object_id'))
+                        model_class._base_manager.filter(pk=OuterRef('object_id'))
                     )
                 )
                 .filter(object_exists=False)
@@ -85,30 +86,31 @@ Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instance_ids),
             # delete items whose plugin is uninstalled and items with unsaved instances
             self.stdout.write('... deleting any instances of uninstalled plugins, empty plugin instances, and detached placeholders\n')
 
-            if detached_placeholder_ids:
-                Placeholder.objects.filter(id__in=detached_placeholder_ids).delete()
+            with transaction.atomic():
+                if detached_placeholder_ids:
+                    Placeholder.objects.filter(id__in=detached_placeholder_ids).delete()
 
-            for instance_id in uninstalled_instance_ids:
-                try:
-                    instance = CMSPlugin.objects.get(pk=instance_id)
-                except CMSPlugin.DoesNotExist:
-                    continue
+                for instance_id in uninstalled_instance_ids:
+                    try:
+                        instance = CMSPlugin.objects.get(pk=instance_id)
+                    except CMSPlugin.DoesNotExist:
+                        continue
 
-                if instance.placeholder:
-                    instance.placeholder.delete_plugin(instance)
-                else:
-                    instance.delete()
+                    if instance.placeholder:
+                        instance.placeholder.delete_plugin(instance)
+                    else:
+                        instance.delete()
 
-            for instance_id in unsaved_instance_ids:
-                try:
-                    instance = CMSPlugin.objects.get(pk=instance_id)
-                except CMSPlugin.DoesNotExist:
-                    continue
+                for instance_id in unsaved_instance_ids:
+                    try:
+                        instance = CMSPlugin.objects.get(pk=instance_id)
+                    except CMSPlugin.DoesNotExist:
+                        continue
 
-                if instance.placeholder:
-                    instance.placeholder.delete_plugin(instance)
-                else:
-                    instance.delete()
+                    if instance.placeholder:
+                        instance.placeholder.delete_plugin(instance)
+                    else:
+                        instance.delete()
 
             self.stdout.write(
                 f'Deleted instances of: \n    {len(uninstalled_instance_ids)} uninstalled plugins  \n    {len(unsaved_instance_ids)} plugins with unsaved instances\n    {len(detached_placeholder_ids)} detached placeholders\n'
