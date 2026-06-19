@@ -17,6 +17,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin, Page
+from cms.models.placeholdermodel import Placeholder
 from cms.toolbar.utils import get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
@@ -833,7 +834,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     plugin_urls = property(plugin_urls)
 
     @classmethod
-    def get_extra_placeholder_menu_items(self, request, placeholder):
+    def get_extra_placeholder_menu_items(cls, request: HttpRequest, placeholder: Placeholder) -> list[PluginMenuItem]:
         """Extends the placeholder context menu for all placeholders.
 
         To add one or more custom context menu items that are displayed in the context menu for all placeholders when
@@ -843,7 +844,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         pass
 
     @classmethod
-    def get_extra_plugin_menu_items(cls, request, plugin):
+    def get_extra_plugin_menu_items(cls, request: HttpRequest, plugin: CMSPlugin) -> list[PluginMenuItem]:
         """Extends the plugin context menu for all plugins.
 
         To add one or more custom context menu items that are displayed in the context menu for all plugins when in
