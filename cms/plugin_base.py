@@ -834,7 +834,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     plugin_urls = property(plugin_urls)
 
     @classmethod
-    def get_extra_placeholder_menu_items(cls, request: HttpRequest, placeholder: Placeholder) -> list[PluginMenuItem] | None:
+    def get_extra_placeholder_menu_items(cls, request: HttpRequest, placeholder: Placeholder) -> list["PluginMenuItem"] | None:
         """Extends the placeholder context menu for all placeholders.
 
         To add one or more custom context menu items that are displayed in the context menu for all placeholders when
@@ -844,7 +844,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         pass
 
     @classmethod
-    def get_extra_plugin_menu_items(cls, request: HttpRequest, plugin: CMSPlugin) -> list[PluginMenuItem] | None:
+    def get_extra_plugin_menu_items(cls, request: HttpRequest, plugin: CMSPlugin) -> list["PluginMenuItem"] | None:
         """Extends the plugin context menu for all plugins.
 
         To add one or more custom context menu items that are displayed in the context menu for all plugins when in
