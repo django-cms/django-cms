@@ -165,15 +165,17 @@ class BaseRenderer:
 
     def get_plugin_toolbar_js(self, plugin: CMSPlugin, obj: models.Model):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
-        child_classes, parent_classes = get_plugin_restrictions(
+        child_classes, _ = get_plugin_restrictions(
             plugin=plugin,
             page=obj,
             restrictions_cache=placeholder_cache,  # Store non-global plugin-restriction in placeholder_cache
         )
+        # Make the resolved restrictions available to the drag-item template (which renders the
+        # same instances) so it can decide whether children may be added without recomputing.
+        plugin.child_class_restrictions = child_classes
         content = get_plugin_toolbar_js(
             plugin,
             children=child_classes,
-            parents=parent_classes,
         )
         return content
 

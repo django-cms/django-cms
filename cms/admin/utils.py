@@ -582,6 +582,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def get_form(self, request: HttpRequest, obj: models.Model | None = None, **kwargs) -> type:
         """Adds the language from the request to the form class"""
+        self.get_grouping_from_request(request)  # direct entry point from django admin
         form_class = super().get_form(request, obj, **kwargs)
         form_class = type(form_class)(
             form_class.__name__,
