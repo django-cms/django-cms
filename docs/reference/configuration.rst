@@ -261,9 +261,9 @@ is used.
 The template name must end in ``.htm`` or ``.html``. ``placeholder`` is a placeholder
 slot name.
 
-.. versionchanged:: 4.2
+.. versionchanged:: 5.0
 
-    The template selector is available on django CMS pages. Since django CMS 4.2 it also
+    The template selector is available on django CMS pages. Since django CMS 5.0 it also
     is available for other models, provided they provide a ``get_template()`` method.
 
 E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
@@ -1293,7 +1293,7 @@ CMS_ALWAYS_REFRESH_CONTENT
 default
     ``False``
 
-.. versionadded:: 4.2
+.. versionadded:: 5.0
 
 If set to ``True``, the CMS will always refresh the content of the page after
 edit action, just as in django CMS 4.1 and before.
