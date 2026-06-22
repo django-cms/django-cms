@@ -14,6 +14,7 @@ Installation & deployment
 
     Install with Docker <22-docker-installation>
     Install manually <23-manual-installation>
+    Add django CMS to an existing project <24-add-to-existing-project>
 
 Using core functionality
 ------------------------

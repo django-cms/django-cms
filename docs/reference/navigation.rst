@@ -274,6 +274,7 @@ Menu system classes and function
 
 
 ..  class:: menus.menu_pool.MenuPool
+    :noindex:
 
     ..  method:: get_nodes()
 
@@ -297,6 +298,7 @@ Menu system classes and function
     ..  method:: get_context()
 
 ..  autoclass:: menus.base.NavigationNode
+    :noindex:
     :members:
     :special-members: __init__
 

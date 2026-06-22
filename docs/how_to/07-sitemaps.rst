@@ -17,12 +17,12 @@ The :class:`cms.sitemaps.CMSSitemap` will create a sitemap with all the publishe
 Configuration
 *************
 
- * add :mod:`django.contrib.sitemaps` to your project's :setting:`django:INSTALLED_APPS`
-   setting
- * add ``from cms.sitemaps import CMSSitemap`` to the top of your main ``urls.py``
- * add ``from django.contrib.sitemaps.views import sitemap`` to ``urls.py```
- * add ``url(r'^sitemap\.xml$', sitemap, {'sitemaps': {'cmspages': CMSSitemap}}),``
-   to your ``urlpatterns``
+* add :mod:`django.contrib.sitemaps` to your project's :setting:`django:INSTALLED_APPS`
+  setting
+* add ``from cms.sitemaps import CMSSitemap`` to the top of your main ``urls.py``
+* add ``from django.contrib.sitemaps.views import sitemap`` to ``urls.py```
+* add ``url(r'^sitemap\.xml$', sitemap, {'sitemaps': {'cmspages': CMSSitemap}}),``
+  to your ``urlpatterns``
 
 
 ***************************
