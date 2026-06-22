@@ -380,7 +380,6 @@ if __name__ == "__main__":
             TEST_RUNNER="django.test.runner.DiscoverRunner",
             MIGRATION_MODULES=MIGRATION_MODULES,
             X_FRAME_OPTIONS="SAMEORIGIN",
-            CMS_CONFIRM_VERSION4=True,
             TEXT_INLINE_EDITING=False,  # Do not pollute toolbar for tests
             **dynamic_configs,
         )
