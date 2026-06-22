@@ -230,7 +230,8 @@ class ManagementTestCase(CMSTestCase):
 
         # Test detached placeholders case
         User = get_user_model()
-        content_type = ContentType.objects.get_for_model(User)  # Use an existing model
+        content_type = ContentType.objects.get_for_model(
+            get_user_model())  # Use an existing model
         obj = User.objects.create(username="test_delete_orphaned")
         ph_detached = Placeholder.objects.create(slot="test_detached", content_type=content_type, object_id=obj.pk)
         pl_detached = add_plugin(ph_detached, TextPlugin, "en", body="en body")
