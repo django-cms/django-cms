@@ -1301,21 +1301,3 @@ edit action, just as in django CMS 4.1 and before.
 Only use this setting of your custom plugins have issues with the new partial
 content refresh when editing. **If you need to set this, make sure to report an
 issue on GitHub.**
-
-
-CMS_CONFIRM_VERSION4
-====================
-
-default
-    ``False``
-
-.. versionadded:: 4.1
-
-    This setting **has to be set** to ``True`` for your project to run on django CMS
-    version 4.1 or later.
-
-The reason is that accidentally running a migration command on an existing installation
-of django CMS v3.x **may corrupt the database**. Upgrading from version 3.x to 4.x is
-not an automatic process.
-
-.. setting:: CMS_CONFIRM_VERSION4
