@@ -1298,6 +1298,6 @@ default
 If set to ``True``, the CMS will always refresh the content of the page after
 edit action, just as in django CMS 4.1 and before.
 
-Only use this setting of your custom plugins have issues with the new partial
+Only use this setting if your custom plugins have issues with the new partial
 content refresh when editing. **If you need to set this, make sure to report an
 issue on GitHub.**
