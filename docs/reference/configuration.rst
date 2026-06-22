@@ -261,9 +261,9 @@ is used.
 The template name must end in ``.htm`` or ``.html``. ``placeholder`` is a placeholder
 slot name.
 
-.. versionchanged:: 4.2
+.. versionchanged:: 5.0
 
-    The template selector is available on django CMS pages. Since django CMS 4.2 it also
+    The template selector is available on django CMS pages. Since django CMS 5.0 it also
     is available for other models, provided they provide a ``get_template()`` method.
 
 E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
@@ -1293,29 +1293,11 @@ CMS_ALWAYS_REFRESH_CONTENT
 default
     ``False``
 
-.. versionadded:: 4.2
+.. versionadded:: 5.0
 
 If set to ``True``, the CMS will always refresh the content of the page after
 edit action, just as in django CMS 4.1 and before.
 
-Only use this setting of your custom plugins have issues with the new partial
+Only use this setting if your custom plugins have issues with the new partial
 content refresh when editing. **If you need to set this, make sure to report an
 issue on GitHub.**
-
-
-CMS_CONFIRM_VERSION4
-====================
-
-default
-    ``False``
-
-.. versionadded:: 4.1
-
-    This setting **has to be set** to ``True`` for your project to run on django CMS
-    version 4.1 or later.
-
-The reason is that accidentally running a migration command on an existing installation
-of django CMS v3.x **may corrupt the database**. Upgrading from version 3.x to 4.x is
-not an automatic process.
-
-.. setting:: CMS_CONFIRM_VERSION4
