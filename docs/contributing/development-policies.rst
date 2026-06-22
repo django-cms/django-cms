@@ -88,7 +88,7 @@ For questions regarding the release process please join the channel and reach ou
 Long-Term Support Release
 ===========================
 
-For the current Long-Term Support (LTS) release overview see :ref:`here <LTS>`. *Long-term
+For the current Long-Term Support (LTS) release overview see :ref:`here <lts>`. *Long-term
 support* means that this version will continue to receive security and other
 critical updates in alignment with the corresponding Django LTS release.
 

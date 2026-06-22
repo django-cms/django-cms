@@ -1,6 +1,14 @@
 name: djangocms mysite test
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - 'cms/management/**'
+      - 'cms/__main__.py'
+      - 'pyproject.toml'
+      - 'MANIFEST.in'
+      - 'setup.py'
+      - '.github/workflows/test_startcmsproject.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,15 +28,21 @@ jobs:
         os: [
           ubuntu-latest,
         ]
+        mode: [traditional, headless, hybrid]
+        switches:
+          - name: all-on
+            flags: "--stories --versioning --moderation --alias"
+          - name: all-off
+            flags: "--no-stories --no-versioning --no-moderation --no-alias"
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Create project from template
+    - name: Create project from template (${{ matrix.mode }} / ${{ matrix.switches.name }})
       run: |
         sudo apt install gettext gcc -y
         python -m venv .venv
@@ -36,4 +50,116 @@ jobs:
         python -m pip install --upgrade pip
         pip install Django~=${{ matrix.django-version }}
         pip install -e .
-        djangocms mysite --noinput
+        djangocms mysite --noinput --mode ${{ matrix.mode }} ${{ matrix.switches.flags }}
+    - name: Verify requirements.in reflects the selected options
+      env:
+        MODE: ${{ matrix.mode }}
+        SWITCHES: ${{ matrix.switches.name }}
+      run: |
+        set -euo pipefail
+        req=mysite/requirements.in
+        if [ ! -f "$req" ]; then
+          echo "FAIL: $req not found"
+          exit 1
+        fi
+        echo "----- $req -----"
+        cat "$req"
+        echo "----------------"
+
+        # A package is "present" if a requirement line starts with its name
+        # (hyphens and underscores treated as equivalent), optionally followed
+        # by a version specifier, extras or marker.
+        is_present() {
+          local pattern
+          pattern="$(printf '%s' "$1" | sed 's/[-_]/[-_]/g')"
+          grep -Eiq "^${pattern}([^a-z0-9].*)?$" "$req"
+        }
+
+        # assert <package> <yes|no>
+        assert() {
+          local pkg="$1" expected="$2" present=no
+          is_present "$pkg" && present=yes
+          if [ "$present" = "$expected" ]; then
+            echo "OK: $pkg present=$present (expected $expected)"
+          else
+            echo "FAIL: $pkg present=$present but expected $expected"
+            exit 1
+          fi
+        }
+
+        # headless and hybrid modes pull in the REST API package
+        if [ "$MODE" = traditional ]; then rest=no; else rest=yes; fi
+        # the optional add-ons are all enabled for all-on, disabled for all-off
+        if [ "$SWITCHES" = all-on ]; then opt=yes; else opt=no; fi
+
+        assert djangocms_rest "$rest"
+        assert djangocms_stories "$opt"
+        assert djangocms_alias "$opt"
+        assert djangocms_moderation "$opt"
+        assert djangocms_versioning "$opt"
+
+  add-to-existing-project:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [traditional, headless, hybrid]
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+    - name: Add django CMS to a plain Django project (${{ matrix.mode }})
+      run: |
+        set -euo pipefail
+        python -m venv .venv
+        source ./.venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -e .
+        django-admin startproject demo
+        cd demo
+        djangocms . --noinput --mode ${{ matrix.mode }}
+    - name: Verify settings and urls
+      env:
+        MODE: ${{ matrix.mode }}
+      run: |
+        set -euo pipefail
+        settings=demo/demo/settings.py
+        urls=demo/demo/urls.py
+        echo "----- $settings -----"; cat "$settings"
+        echo "----- $urls -----"; cat "$urls"
+
+        grep -q '"cms",' "$settings"
+        grep -q '"djangocms_frontend.contrib.grid",' "$settings"
+        grep -q 'cms.middleware.toolbar.ToolbarMiddleware' "$settings"
+        grep -q 'sekizai.context_processors.sekizai' "$settings"
+        if [ "$MODE" = headless ]; then
+          grep -q 'CMS_PLACEHOLDERS' "$settings"
+          ! grep -q 'CMS_TEMPLATES' "$settings"
+          grep -q 'djangocms_rest.urls' "$urls"
+          ! grep -q 'include("cms.urls")' "$urls"
+          [ ! -d demo/templates ]
+        else
+          grep -q 'CMS_TEMPLATES' "$settings"
+          ! grep -q 'CMS_PLACEHOLDERS' "$settings"
+          grep -q 'include("cms.urls")' "$urls"
+          test -f demo/templates/cms-base.html
+        fi
+        if [ "$MODE" = traditional ]; then
+          ! grep -q 'djangocms_rest' "$settings"
+        else
+          grep -q '"djangocms_rest",' "$settings"
+        fi
+        echo "OK"
+    - name: Verify a second run makes no further changes
+      run: |
+        set -euo pipefail
+        source ./.venv/bin/activate
+        cd demo
+        cp demo/settings.py /tmp/settings.before
+        cp demo/urls.py /tmp/urls.before
+        djangocms . --noinput --mode ${{ matrix.mode }}
+        diff /tmp/settings.before demo/settings.py
+        diff /tmp/urls.before demo/urls.py

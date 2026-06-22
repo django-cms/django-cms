@@ -224,7 +224,7 @@ Our documentation is divided into the following main sections:
   tutorials to get you up and running
 - :doc:`/how_to/index` (``how_to``): step-by-step guides covering more advanced
   development
-- :doc:`/topics/index` (``topics``): explanations of key parts of the system
+- :doc:`/explanation/index` (``explanation``): explanations of key parts of the system
 - :doc:`/reference/index` (``reference``): technical reference for APIs, key models and
   so on
 - :doc:`/contributing/index` (``contributing``)
