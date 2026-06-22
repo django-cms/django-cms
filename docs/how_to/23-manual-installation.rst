@@ -4,22 +4,18 @@
 Install django CMS manually
 #############################
 
-This how-to guide walks you through manually installing django CMS into a new or
-existing Django project. For a quick start, see :doc:`/introduction/01-install`.
+This how-to guide walks you through manually installing and configuring django CMS,
+showing every setting that the automated ``djangocms`` command otherwise writes for
+you. If you prefer the automated setup, follow the
+:ref:`installation tutorial <tutorial_install>` for a new project, or
+:doc:`24-add-to-existing-project` for an existing one.
 
 This guide assumes you have basic familiarity with Python and Django.
 
 
 ****************************************
-Create a new project with djangocms
+Set up a project
 ****************************************
-
-This section explains how to create a brand new django CMS project using the
-``djangocms`` command. If you're adding django CMS to an existing project, skip to
-:ref:`minimal-required-configuration`.
-
-Install the django CMS package
-==============================
 
 Check the :ref:`Python/Django requirements <requirements>` for this version of django
 CMS.
@@ -41,87 +37,32 @@ Then install django CMS:
 
     pip install django-cms
 
-
-What the djangocms command does
-===============================
-
-You can create a new django CMS project using:
+If you are starting from scratch, create a plain Django project first:
 
 .. code-block::
 
-    djangocms myproject
+    django-admin startproject myproject
+    cd myproject
 
-This shortcut command performs the following five steps:
-
-1. Creates a new Django project using a template:
-
-   .. code-block::
-
-       django-admin startproject myproject --template https://github.com/django-cms/cms-template/archive/5.1.tar.gz
-
-2. Installs additional *optional packages* used in the template project:
-
-   - `djangocms-text <https://github.com/django-cms/djangocms-text>`_ for rich text input
-   - `djangocms-frontend <https://github.com/django-cms/djangocms-frontend>`_ for Bootstrap 5 support
-   - `django-filer <https://github.com/django-cms/django-filer>`_ for media file management
-   - `djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_ for publishing and version management
-   - `djangocms-alias <https://github.com/django-cms/djangocms-alias>`_ for managing common content parts
-   - `djangocms-simple-admin-style <https://github.com/fsbraun/djangocms-simple-admin-style>`_ for consistent admin styling
-
-3. Runs the ``migrate`` command to create the database:
-
-   .. code-block::
-
-       python -m manage migrate
-
-4. Prompts for creating a superuser:
-
-   .. code-block::
-
-       python -m manage createsuperuser
-
-5. Runs the django CMS check command:
-
-   .. code-block::
-
-       python -m manage cms check
-
-
-Project structure
-=================
-
-After running ``djangocms myproject``, your project looks like this:
-
-.. code-block::
-
-    myproject/
-        LICENSE
-        README.md
-        db.sqlite3
-        myproject/
-            static/
-            templates/
-                base.html
-            __init__.py
-            asgi.py
-            settings.py
-            urls.py
-            wsgi.py
-        manage.py
-        requirements.in
-
-The ``LICENSE`` and ``README.md`` files can be deleted or replaced. The
-``requirements.in`` contains dependencies for the project.
+If you are adding django CMS to an existing project, work from your project's
+root directory (the one containing ``manage.py``) instead. All of the following
+steps apply to both cases.
 
 
 .. _minimal-required-configuration:
 
 ****************************************
-Add django CMS to an existing project
+Required configuration
 ****************************************
 
-To add django CMS to an existing Django project, you need to install dependencies
-and modify ``settings.py`` and ``urls.py``.
+To add django CMS to a Django project, you need to install dependencies and modify
+``settings.py`` and ``urls.py``.
+
+.. tip::
+
+    The steps in this section can be automated by running ``djangocms .`` from
+    your project directory — see :doc:`24-add-to-existing-project`. The rest of
+    this guide describes how to perform the same steps by hand.
 
 Install required packages
 =========================
@@ -155,7 +96,7 @@ Add to ``INSTALLED_APPS`` (order matters):
 
     INSTALLED_APPS = [
         # Add before django.contrib.admin for admin styling (optional)
-        # "djangocms_admin_style",
+        "djangocms_simple_admin_style",
 
         "django.contrib.admin",
         "django.contrib.auth",

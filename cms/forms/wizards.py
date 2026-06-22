@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils.html import strip_tags
 from django.utils.text import slugify
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -98,6 +99,16 @@ class CreateCMSPageForm(AddPageForm):
         if not data['slug']:
             raise forms.ValidationError(_("Please provide a valid slug."))
         return data
+
+    def clean_content(self):
+        # A rich-text editor submits an empty value as an empty paragraph
+        # (e.g. ``<p></p>`` or ``<p>&nbsp;</p>``) rather than an empty string.
+        # Treat any value without visible text as empty so the wizard does not
+        # create a blank text plugin on the new page.
+        content = self.cleaned_data.get("content")
+        if content and not strip_tags(content).replace("\xa0", "").replace("&nbsp;", "").strip():
+            return ""
+        return content
 
     def clean_parent_page(self):
         # Check to see if this user has permissions to make this page. We've

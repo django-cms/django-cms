@@ -62,7 +62,6 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinxcontrib.spelling',
     "sphinx_copybutton",
     "sphinx_design",
     "sphinxext.opengraph",
@@ -288,12 +287,25 @@ latex_documents = [
 # -- Options for LaTeX output --------------------------------------------------
 
 # Spelling check needs an additional module that is not installed by default.
-# Add it only if spelling check is requested so docs can be generated without it.
+# Register it only if it can actually be imported, so the docs still build when
+# the spelling stack is missing. Note that sphinxcontrib.spelling relies on
+# pyenchant, which is only a binding to the native enchant library: even with
+# the Python packages installed the import fails unless libenchant is present
+# on the system (e.g. `apt install libenchant-2-2` / `brew install enchant`).
+try:
+    import sphinxcontrib.spelling  # noqa: F401
 
-# temporarily disabled because of an issue on RTD. see docs/requirements.txt
+    extensions.append("sphinxcontrib.spelling")
+except ImportError:
+    import warnings
 
-# if 'spelling' in sys.argv:
-#     extensions.append("sphinxcontrib.spelling")
+    warnings.warn(
+        "sphinxcontrib.spelling could not be imported; the 'spelling' builder "
+        "will be unavailable. Install the docs requirements and ensure the "
+        "native enchant library is present (e.g. `apt install libenchant-2-2` "
+        "or `brew install enchant`).",
+        stacklevel=2,
+    )
 
 # Spelling language.
 spelling_lang = 'en_US'

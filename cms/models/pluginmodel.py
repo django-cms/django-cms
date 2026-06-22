@@ -296,13 +296,10 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             pass
 
     def get_media_path(self, filename):
-        pages = self.placeholder.page_set.all()
-        if pages.exists():
-            return pages[0].get_media_path(filename)
-        else:  # django 1.0.2 compatibility
-            today = date.today()
-            return os.path.join(get_cms_setting('PAGE_MEDIA_PATH'),
-                                str(today.year), str(today.month), str(today.day), filename)
+        page = self.placeholder.page if self.placeholder_id else None
+        if page:
+            return page.get_media_path(filename)
+        return None
 
     @property
     def page(self):

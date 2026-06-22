@@ -66,6 +66,9 @@ djangocms = "cms.management.djangocms:execute_from_command_line"
 [tool.setuptools]
 packages = { find = {} }
 
+[tool.setuptools.package-data]
+"cms.management.commands" = [ "*.json" ]
+
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }
 

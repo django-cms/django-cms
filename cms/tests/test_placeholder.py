@@ -687,6 +687,43 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             returned = get_placeholder_conf("default_plugins", "layout/other.html main")
             self.assertEqual(returned, TEST_CONF["main"]["default_plugins"])
 
+    def test_get_placeholder_conf_chained_inheritance(self):
+        """
+        A two-level ``inherit`` chain resolves transitively without leaking
+        unrelated top-level conf keys into the slot config and without
+        mutating the inherited-from slot's own configuration.
+
+        Regression test for resolve_inheritance merging the whole top-level
+        CMS_PLACEHOLDER_CONF dict instead of the inherited slot's config, and
+        for the resolved base config being updated in place.
+        """
+        TEST_CONF = {
+            "base": {"plugins": ["TextPlugin"], "name": "Base"},
+            "middle": {"inherit": "base", "limits": {"global": 5}},
+            "leaf": {"inherit": "middle", "name": "Leaf"},
+        }
+        pristine = {
+            "base": {"plugins": ["TextPlugin"], "name": "Base"},
+            "middle": {"inherit": "base", "limits": {"global": 5}},
+            "leaf": {"inherit": "middle", "name": "Leaf"},
+        }
+
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
+            # leaf inherits base's plugins through middle
+            self.assertEqual(get_placeholder_conf("plugins", "leaf"), ["TextPlugin"])
+            # leaf inherits middle's own limits
+            self.assertEqual(get_placeholder_conf("limits", "leaf"), {"global": 5})
+            # leaf keeps its own name
+            self.assertEqual(get_placeholder_conf("name", "leaf"), "Leaf")
+            # middle resolves to base's plugins plus its own limits
+            self.assertEqual(get_placeholder_conf("plugins", "middle"), ["TextPlugin"])
+            self.assertEqual(get_placeholder_conf("name", "middle"), "Base")
+            # base itself is untouched by the inheritance resolution
+            self.assertEqual(get_placeholder_conf("name", "base"), "Base")
+            self.assertIsNone(get_placeholder_conf("limits", "base"))
+            # resolution must not write into the user's settings dict
+            self.assertEqual(TEST_CONF, pristine)
+
     def test_placeholder_name_conf(self):
         page_en = create_page("page_en", "col_two.html", "en")
         placeholder_1 = page_en.get_placeholders("en").get(slot="col_left")

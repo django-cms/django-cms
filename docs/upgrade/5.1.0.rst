@@ -1,8 +1,8 @@
 .. _upgrade-to-5.1.0:
 
-###################
+#####################
 5.1.0a1 release notes
-###################
+#####################
 
 *February 14, 2026*
 
@@ -101,8 +101,84 @@ Example::
 See also the how-to guide for details and more examples:
 :ref:`plugin-model-restrictions`.
 
+Simplified project creation with the ``djangocms`` command
+==========================================================
+
+Setting up django CMS is now a one-liner. The new ``djangocms`` command (also
+available as ``python -m cms``) scaffolds a complete, ready-to-run project,
+installs its requirements, runs the migrations, creates a superuser and checks
+the installation for you::
+
+    djangocms myproject
+
+Run without a project name it drops into an **interactive mode** that asks for
+the name and walks you through every option. You can also drive it entirely
+from the command line, for example::
+
+    djangocms myproject --mode headless --no-versioning --stories
+
+The most important options are:
+
+* ``--mode {traditional,headless,hybrid}`` — choose how the CMS serves content
+  (default: ``traditional``).
+* ``--versioning`` / ``--no-versioning`` — add content versioning with
+  `djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_
+  (default: on).
+* ``--moderation`` / ``--no-moderation`` — add content moderation (builds on
+  versioning; default: off).
+* ``--alias`` / ``--no-alias`` — add reusable
+  `aliases <https://github.com/django-cms/djangocms-alias>`_ (default: on).
+* ``--stories`` / ``--no-stories`` — add the stories component library
+  (default: off).
+* ``--interactive`` / ``--noinput`` — force or suppress all prompts.
+
+Adding django CMS to an existing project
+----------------------------------------
+
+The same command can now **add django CMS to an existing Django project**
+instead of scaffolding a new one. Run it from your project root with a project
+name of ``.``::
+
+    djangocms .
+
+django CMS then reads your project's settings module from ``manage.py`` and
+makes best-effort, automated edits to wire everything up:
+
+* updates ``INSTALLED_APPS``, ``MIDDLEWARE`` and the template context
+  processors,
+* creates a project ``templates`` directory with a base template if your
+  project does not have one yet,
+* appends the required django CMS settings,
+* adds the CMS URL patterns to your ``ROOT_URLCONF`` (respecting
+  ``i18n_patterns`` when already in use), and
+* installs the packages needed for the selected options, then runs the
+  migrations and ``cms check``.
+
+The same ``--mode`` and component options above apply, so you can tailor the
+installation to your needs. The edits are automated and should be reviewed
+afterwards, so make sure your project is under version control or backed up
+before running it. The command is idempotent: running it again will not
+duplicate the changes.
+
+You can preview everything first with ``--dry-run``, which prints a unified diff
+of the changes it would make — without writing any files or installing
+anything::
+
+    djangocms . --dry-run
+
+The rules that govern these edits are fetched from the ``cms-template``
+repository (matching your installed django CMS version), with a bundled copy
+serving as an offline fallback, so the integration can keep up with the
+ecosystem without a new django CMS release.
+
+See :ref:`tutorial_install` for a step-by-step walkthrough.
+
 Minor features
 ==============
+
+* Placeholder objects now have a :meth:`~cms.models.placeholdermodel.Placeholder.delete_plugins`
+  method which efficiently bulk-deletes multiple plugins from the placeholder. It takes an iterable
+  of plugin objects as a parameter.
 
 * Async support: User middleware and apphook registration support async setups
   and now let you run django CMS using asgi. Database access is avoided when
@@ -217,7 +293,7 @@ API
 ---------------------
 
 * ``StaticPlaceholder`` has been removed from ``cms.models`` and ``cms.admin``.
-Use `static aliases <https://github.com/django-cms/djangocms-alias>`_ instead.
+  Use `static aliases <https://github.com/django-cms/djangocms-alias>`_ instead.
 
 * This implies that ``cms.plugin_rendering`` does not accept static placeholders any more.
 
@@ -227,7 +303,7 @@ Placeholders
 ------------
 
 * ``PlaceholderField`` has been removed from ``cms.fields``. Use :class:`~cms.models.fields.PlaceholderRelationField` in conjunction with
-:meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see :ref:`placeholders_outside_cms`).
+  :meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see :ref:`placeholders_outside_cms`).
 
 * ``PlaceholderAdminMixin`` has been removed from ``cms.admin``. It is not needed anymore and can be safely removed from your code.
 
