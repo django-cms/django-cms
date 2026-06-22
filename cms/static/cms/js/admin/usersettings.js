@@ -4,7 +4,7 @@
 // "?reload_window" marker. This script detects that marker and tells the parent
 // window's CMS instance to store the corrected sideframe URL and reload the whole
 // page, so the new settings take effect in the toolbar and surrounding UI.
-window.onload = function () {
+window.addEventListener('load', function () {
     // we have to setTimeout here because the cms.sideframe load event
     // fires after this one :(
     setTimeout(function () {
@@ -19,4 +19,4 @@ window.onload = function () {
             CMS.API.Helpers.reloadBrowser();
         }
     }, 0);
-};
+});
