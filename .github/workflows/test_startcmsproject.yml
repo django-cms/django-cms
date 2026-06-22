@@ -36,7 +36,7 @@ jobs:
             flags: "--no-stories --no-versioning --no-moderation --no-alias"
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v6
@@ -106,7 +106,7 @@ jobs:
         mode: [traditional, headless, hybrid]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
