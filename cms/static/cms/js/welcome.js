@@ -24,19 +24,17 @@
             return;
         }
 
-        var btn = document.querySelector('.js-welcome-add');
+        var buttons = document.querySelectorAll('.js-welcome-add');
 
-        if (!btn) {
-            return;
-        }
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var modal = new CMS.Modal();
 
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            var modal = new CMS.Modal();
-
-            modal.open({
-                url: config.dataset.addUrl,
-                title: config.dataset.addTitle
+                modal.open({
+                    url: config.dataset.addUrl,
+                    title: config.dataset.addTitle
+                });
             });
         });
     }
