@@ -408,6 +408,13 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     A Boolean indication whether that plugin requires another plugin as parent or
     not.
 
+    As a rule of thumb, prefer naming specific ``parent_classes`` over setting
+    ``require_parent = True``. Listing concrete parents both restricts where the
+    plugin may be added *and* requires a parent, so ``require_parent`` becomes
+    redundant. If genuinely any plugin is an acceptable parent, make that explicit
+    with ``parent_classes = ["*"]`` rather than relying on ``require_parent``
+    alone.
+
 .. note::
     For model-level and plugin-level filtering of available plugins, see
     :ref:`plugin-model-restrictions` in the custom plugins documentation. The
