@@ -1,3 +1,4 @@
+import django
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import AsTag, InclusionTag
@@ -22,6 +23,18 @@ from cms.utils.urlutils import admin_reverse
 register = template.Library()
 
 CMS_ADMIN_ICON_BASE = f"{settings.STATIC_URL}admin/img/"
+
+
+@register.simple_tag
+def django_version_gte(major, minor=0):
+    """Return ``True`` if the running Django version is at least ``(major, minor)``.
+
+    Used in admin templates to switch between the legacy
+    ``<div class="breadcrumbs">`` markup (Django < 6.1) and the
+    ``<ol class="breadcrumbs">`` markup introduced in Django 6.1, whose CSS
+    is element-qualified (``ol.breadcrumbs``) and no longer styles a ``<div>``.
+    """
+    return django.VERSION[:2] >= (major, minor)
 
 
 @register.simple_tag
