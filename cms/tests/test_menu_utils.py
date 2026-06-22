@@ -133,6 +133,15 @@ class MenuUtilsTests(CMSTestCase):
         request = self.get_request(path=async_path, language='en', page=cms_page)
         self.assertEqual(CMSToolbar(request).request_path, page_url)
 
+        # A cms_path that carries its own query string/fragment is reduced to the
+        # bare path (``_get_request_path`` uses ``urlparse(cms_path).path``).
+        async_path_with_query = '/admin/cms/placeholder/object/{pk}/structure/?{query}'.format(
+            pk=cms_page.pk,
+            query=urlencode({'cms_path': '%s?foo=bar#frag' % page_url}),
+        )
+        request = self.get_request(path=async_path_with_query, language='en', page=cms_page)
+        self.assertEqual(CMSToolbar(request).request_path, page_url)
+
         # Without a cms_path query it falls back to the request path.
         request = self.get_request(path=page_url, language='en', page=cms_page)
         self.assertEqual(CMSToolbar(request).request_path, page_url)

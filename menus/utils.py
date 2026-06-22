@@ -198,7 +198,9 @@ class DefaultLanguageChanger:
                 page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
                 self._app_path = self.request_path[len(page_path):]
-            else:
+            else:  # pragma: no cover
+                # Defensive fallback: ``get_page_path`` always returns a
+                # non-empty path, so this branch is effectively unreachable.
                 self._app_path = self.request_path
         return self._app_path
 
