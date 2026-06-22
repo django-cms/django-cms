@@ -36,7 +36,6 @@ from cms.signals.permissions import (
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 
-
 # ################### Our own signals ###################
 
 
