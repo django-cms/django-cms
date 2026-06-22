@@ -10,9 +10,12 @@ from .base import SubcommandsCommand
 
 
 class DeleteOrphanedPluginsCommand(SubcommandsCommand):
-    help_string = ('Delete plugins from the CMSPlugins table that should have instances '
-                   'but don\'t, and ones for which a corresponding plugin model can no '
-                   'longer be found. MUST be executed within a complete production application environment.')
+    help_string = (
+        'Delete plugins from the CMSPlugins table that should have instances '
+        'but don\'t, and ones for which a corresponding plugin model can no '
+        'longer be found. ATTENTION: Also removes plugins of apps currently not present in INSTALLED_APPS. '
+        'Ensure nothing is temporarily commented out.'
+    )
     command_name = 'delete-orphaned-plugins'
 
     def get_detached_placeholders(self):

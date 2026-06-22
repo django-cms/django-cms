@@ -771,7 +771,8 @@ class DjangoCmsCommandTestCase(CMSTestCase):
 
             objects = MyManager()
 
-        content_type = ContentType.objects.get_for_model(FilteredUser)
+        content_type = ContentType.objects.get_for_model(FilteredUser, for_concrete_model=False)
+        self.assertEqual(content_type.model_class(), FilteredUser)
         obj = FilteredUser.objects.create(username="test_versioning")
 
         ph = Placeholder.objects.create(slot="test_versioning_slot", content_type=content_type, object_id=obj.pk)
