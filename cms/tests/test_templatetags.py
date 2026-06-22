@@ -28,7 +28,7 @@ from cms.models import (
     PageContent,
     Placeholder,
 )
-from cms.templatetags.cms_admin import get_page_display_name
+from cms.templatetags.cms_admin import django_version_gte, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
@@ -844,3 +844,66 @@ class CmsTagTemplateTagTests(CMSTestCase):
             self.fail("NoReverseMatch should not be raised.")
 
         self.assertEqual(rendered.strip(), "")
+
+
+class AdminBreadcrumbMarkupTests(CMSTestCase):
+    """Django 6.1 changed the admin breadcrumbs markup from
+    ``<div class="breadcrumbs">`` (with ``&rsaquo;`` separators) to a semantic
+    ``<ol class="breadcrumbs">`` whose CSS is element-qualified
+    (``ol.breadcrumbs``) and no longer styles a ``<div>``. The cms admin
+    overrides switch markup on the running Django version via the
+    ``{% django_version_gte %}`` tag, so they render correctly on both the
+    legacy (4.2-6.0) and the new (6.1+) admin.
+    """
+
+    # Plausible version tuples mirroring ``django.VERSION`` for both branches.
+    DJANGO_5_2 = (5, 2, 0, "final", 0)
+    DJANGO_6_1 = (6, 1, 0, "final", 0)
+
+    def test_django_version_gte_tag(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            self.assertFalse(django_version_gte(6, 1))
+            self.assertTrue(django_version_gte(5, 2))
+            self.assertTrue(django_version_gte(4, 2))
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            self.assertTrue(django_version_gte(6, 1))
+            self.assertTrue(django_version_gte(6))
+            self.assertFalse(django_version_gte(7))
+
+    def _get_admin_html(self, uri):
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(uri)
+        self.assertEqual(response.status_code, 200)
+        return response.content.decode("utf-8")
+
+    # -- page tree changelist: admin/cms/page/tree/base.html --
+
+    def test_pagetree_breadcrumbs_legacy_div_below_6_1(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
+        self.assertIn('<div class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+        self.assertNotIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+
+    def test_pagetree_breadcrumbs_ol_on_6_1(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
+        self.assertIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+        self.assertIn('<li aria-current="page">Pages</li>', html)
+        self.assertNotIn('<div class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+
+    # -- page change form: admin/cms/page/change_form.html --
+
+    def test_page_change_form_breadcrumbs_legacy_div_below_6_1(self):
+        page = create_page("Home", "nav_playground.html", "en")
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            html = self._get_admin_html(self.get_page_change_uri("en", page))
+        self.assertIn('<div class="breadcrumbs">', html)
+        self.assertNotIn('<ol class="breadcrumbs">', html)
+
+    def test_page_change_form_breadcrumbs_ol_on_6_1(self):
+        page = create_page("Home", "nav_playground.html", "en")
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            html = self._get_admin_html(self.get_page_change_uri("en", page))
+        self.assertIn('<ol class="breadcrumbs">', html)
+        self.assertIn('aria-current="page"', html)
+        self.assertNotIn('<div class="breadcrumbs">', html)
