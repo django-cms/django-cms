@@ -263,6 +263,92 @@ describe('CMS.Toolbar', function () {
             expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
         });
 
+        it('evaluates a JSON data bridge from the response instead of reloading', function () {
+            var dataBridge = { action: 'edit', plugin_id: 1 };
+
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback(dataBridge);
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.Helpers.dataBridge).toEqual(dataBridge);
+            expect(CMS.API.Helpers.onPluginSave).toHaveBeenCalled();
+            expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
+            expect(hideLoader).toHaveBeenCalled();
+        });
+
+        it('evaluates an HTML data bridge from the response instead of reloading', function () {
+            var dataBridge = { action: 'delete', plugin_id: 2 };
+            var html = '<!DOCTYPE html><html><body class="cms-close-frame">' +
+                '<script id="data-bridge" type="application/json">' +
+                JSON.stringify(dataBridge) + '</script></body></html>';
+
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback(html);
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.Helpers.dataBridge).toEqual(dataBridge);
+            expect(CMS.API.Helpers.onPluginSave).toHaveBeenCalled();
+            expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
+        });
+
+        it('reloads if the response is a JSON object without a valid data bridge', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback({ foo: 'bar' });
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.Helpers.onPluginSave).not.toHaveBeenCalled();
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
+        });
+
+        it('reloads if the HTML response does not contain a data bridge', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback('<html><body>no bridge here</body></html>');
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.Helpers.onPluginSave).not.toHaveBeenCalled();
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
+        });
+
         it('handles parameters', function () {
             spyOn($, 'ajax').and.callFake(function (param) {
                 expect(param.data).toEqual({ param1: true, param2: false, param3: 150, param4: 'alala' });
