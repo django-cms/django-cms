@@ -280,8 +280,7 @@ describe('CMS.Toolbar', function () {
 
             toolbar.openAjax({ url: '/url' });
 
-            expect(CMS.API.Helpers.dataBridge).toEqual(dataBridge);
-            expect(CMS.API.Helpers.onPluginSave).toHaveBeenCalled();
+            expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalled();
             expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
             expect(hideLoader).toHaveBeenCalled();
         });
@@ -306,8 +305,7 @@ describe('CMS.Toolbar', function () {
 
             toolbar.openAjax({ url: '/url' });
 
-            expect(CMS.API.Helpers.dataBridge).toEqual(dataBridge);
-            expect(CMS.API.Helpers.onPluginSave).toHaveBeenCalled();
+            expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalled();
             expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
         });
 

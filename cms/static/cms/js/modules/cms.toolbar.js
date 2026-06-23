@@ -577,9 +577,7 @@ class Toolbar {
         if (!dataBridge || !dataBridge.action) {
             return false;
         }
-
-        CMS.API.Helpers.dataBridge = dataBridge;
-        CMS.API.Helpers.onPluginSave();
+        CMS.API.StructureBoard.invalidateState(dataBridge.action.toUpperCase(), dataBridge);
         return true;
     }
 
