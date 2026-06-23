@@ -17,6 +17,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin, Page
+from cms.models.placeholdermodel import Placeholder
 from cms.toolbar.utils import get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
@@ -837,7 +838,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Expand any glob patterns (e.g. "Bootstrap*") to concrete plugin names.
         return plugin_pool.resolve_plugin_patterns(parent_classes)
 
-    def get_plugin_urls(self):
+    def get_plugin_urls(self) -> list:
         """
         Returns the URL patterns the plugin wants to register views for.
         They are included under django CMS's page admin URLS in the plugin path
@@ -854,7 +855,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     plugin_urls = property(plugin_urls)
 
     @classmethod
-    def get_extra_placeholder_menu_items(self, request, placeholder):
+    def get_extra_placeholder_menu_items(cls, request: HttpRequest, placeholder: Placeholder) -> list["PluginMenuItem"] | None:
         """Extends the placeholder context menu for all placeholders.
 
         To add one or more custom context menu items that are displayed in the context menu for all placeholders when
@@ -864,7 +865,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         pass
 
     @classmethod
-    def get_extra_plugin_menu_items(cls, request, plugin):
+    def get_extra_plugin_menu_items(cls, request: HttpRequest, plugin: CMSPlugin) -> list["PluginMenuItem"] | None:
         """Extends the plugin context menu for all plugins.
 
         To add one or more custom context menu items that are displayed in the context menu for all plugins when in
