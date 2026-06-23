@@ -179,7 +179,6 @@ describe('CMS.Plugin', function() {
                 plugin_id: 1,
                 plugin_parent: null,
                 plugin_restriction: jasmine.any(Array),
-                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '/en/admin/cms/page/add-plugin/',
                     edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
@@ -189,7 +188,6 @@ describe('CMS.Plugin', function() {
                 }
             });
             expect(plugin1.options.plugin_restriction.length).toEqual(0);
-            expect(plugin1.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(plugin2.options).toEqual({
                 type: 'plugin',
@@ -198,7 +196,6 @@ describe('CMS.Plugin', function() {
                 plugin_id: 2,
                 plugin_parent: null,
                 plugin_restriction: jasmine.any(Array),
-                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '/en/admin/cms/page/add-plugin/',
                     edit_plugin: '/en/admin/cms/page/edit-plugin/2/',
@@ -208,7 +205,6 @@ describe('CMS.Plugin', function() {
                 }
             });
             expect(plugin2.options.plugin_restriction.length).toEqual(0);
-            expect(plugin2.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(placeholder1.options).toEqual({
                 type: 'placeholder',
@@ -217,7 +213,6 @@ describe('CMS.Plugin', function() {
                 plugin_id: null,
                 plugin_parent: null,
                 plugin_restriction: jasmine.any(Array),
-                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -227,7 +222,6 @@ describe('CMS.Plugin', function() {
                 }
             });
             expect(placeholder1.options.plugin_restriction.length).toEqual(0);
-            expect(placeholder1.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(generic.options).toEqual({
                 type: '',
@@ -236,7 +230,6 @@ describe('CMS.Plugin', function() {
                 plugin_id: null,
                 plugin_parent: null,
                 plugin_restriction: jasmine.any(Array),
-                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -246,7 +239,6 @@ describe('CMS.Plugin', function() {
                 }
             });
             expect(generic.options.plugin_restriction.length).toEqual(0);
-            expect(generic.options.plugin_parent_restriction.length).toEqual(0);
         });
 
         it('sets its options to the dom node', function() {
@@ -1101,8 +1093,7 @@ describe('CMS.Plugin', function() {
                         {
                             type: 'plugin',
                             plugin_id: 3,
-                            plugin_type: 'ClipboardPlugin',
-                            plugin_parent_restriction: ['RandomPlugin']
+                            plugin_type: 'ClipboardPlugin'
                         }
                     ],
                     [
@@ -1187,7 +1178,6 @@ describe('CMS.Plugin', function() {
                 plugin_id: 2,
                 plugin_parent: null,
                 plugin_restriction: jasmine.arrayContaining([]),
-                plugin_parent_restriction: jasmine.arrayContaining([]),
                 urls: {
                     add_plugin: '/en/admin/cms/page/add-plugin/',
                     edit_plugin: '/en/admin/cms/page/edit-plugin/2/',

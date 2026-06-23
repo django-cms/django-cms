@@ -261,9 +261,9 @@ is used.
 The template name must end in ``.htm`` or ``.html``. ``placeholder`` is a placeholder
 slot name.
 
-.. versionchanged:: 4.2
+.. versionchanged:: 5.0
 
-    The template selector is available on django CMS pages. Since django CMS 4.2 it also
+    The template selector is available on django CMS pages. Since django CMS 5.0 it also
     is available for other models, provided they provide a ``get_template()`` method.
 
 E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
@@ -384,15 +384,36 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
 
 ``child_classes``
     A dictionary of plugin names with lists describing which plugins may be
-    placed inside each plugin. If not supplied, all plugins can be selected.
+    placed inside each plugin. If not supplied (or set to ``None``), all plugins
+    can be selected. An empty list (``[]``) means no plugins are allowed as
+    children. List entries may be glob patterns such as ``"Bootstrap*"`` or
+    ``"*Link*"``, which are expanded against the names of all registered plugins
+    (a pattern matching no plugin is therefore equivalent to an empty list). As a
+    special case, the string ``"auto"`` allows exactly those plugins that name this
+    plugin in their ``parent_classes`` -- the children opt in to the parent rather
+    than the parent listing them.
 
 ``parent_classes``
     A dictionary of plugin names with lists describing which plugins may contain
-    each plugin. If not supplied, all plugins can be selected.
+    each plugin. If not supplied (or set to ``None``), all plugins can be
+    selected. An empty list (``[]``) means the plugin allows no parent and can
+    only be added directly to a placeholder. List entries may be glob patterns
+    such as ``"Bootstrap*"`` or ``"*Link*"``, which are expanded against the
+    names of all registered plugins (a pattern matching no plugin is therefore
+    equivalent to an empty list). As a special case, ``["*"]`` matches every
+    registered plugin and thus requires the plugin to have a parent (any plugin),
+    in contrast to ``None`` which allows -- but does not require -- a parent.
 
 ``require_parent``
     A Boolean indication whether that plugin requires another plugin as parent or
     not.
+
+    As a rule of thumb, prefer naming specific ``parent_classes`` over setting
+    ``require_parent = True``. Listing concrete parents both restricts where the
+    plugin may be added *and* requires a parent, so ``require_parent`` becomes
+    redundant. If genuinely any plugin is an acceptable parent, make that explicit
+    with ``parent_classes = ["*"]`` rather than relying on ``require_parent``
+    alone.
 
 .. note::
     For model-level and plugin-level filtering of available plugins, see
@@ -1293,29 +1314,11 @@ CMS_ALWAYS_REFRESH_CONTENT
 default
     ``False``
 
-.. versionadded:: 4.2
+.. versionadded:: 5.0
 
 If set to ``True``, the CMS will always refresh the content of the page after
 edit action, just as in django CMS 4.1 and before.
 
-Only use this setting of your custom plugins have issues with the new partial
+Only use this setting if your custom plugins have issues with the new partial
 content refresh when editing. **If you need to set this, make sure to report an
 issue on GitHub.**
-
-
-CMS_CONFIRM_VERSION4
-====================
-
-default
-    ``False``
-
-.. versionadded:: 4.1
-
-    This setting **has to be set** to ``True`` for your project to run on django CMS
-    version 4.1 or later.
-
-The reason is that accidentally running a migration command on an existing installation
-of django CMS v3.x **may corrupt the database**. Upgrading from version 3.x to 4.x is
-not an automatic process.
-
-.. setting:: CMS_CONFIRM_VERSION4

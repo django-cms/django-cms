@@ -83,7 +83,3 @@ class PluginConsistencyError(Exception):
 
 class PlaceholderNotFound(Exception):
     pass
-
-
-class ConfirmationOfVersion4Required(Exception):
-    pass

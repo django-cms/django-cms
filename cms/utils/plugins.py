@@ -192,6 +192,10 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     if plugin_class.cache_parent_classes:
         parents_cache[plugin_type] = parent_classes or []
 
+    # Note: a plugin's allowed *parents* are not sent to the frontend -- droppability is already
+    # encoded in every potential parent's child list (including the placeholder's root list, which
+    # excludes plugins that require a parent). ``parent_classes`` is still returned here for
+    # backwards compatibility with external callers.
     child_classes = []
     if plugin_class.allow_children:
         # Only check for children if children are allowed
@@ -218,6 +222,9 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
                 children_cache[plugin_type] = [
                     plugin for plugin in (child_classes or []) if plugin_pool.get_plugin(plugin).cache_parent_classes
                 ] or [""]
+            # An empty list of allowed children (e.g. ``child_classes = []``) is sent to the
+            # frontend as the ``[""]`` sentinel so that no plugins can be dropped as children.
+            child_classes = child_classes or [""]
 
     return child_classes, parent_classes
 

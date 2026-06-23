@@ -1,3 +1,4 @@
+import fnmatch
 from collections import defaultdict
 from functools import lru_cache
 from operator import attrgetter
@@ -18,6 +19,13 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import normalize_name
 
+_GLOB_CHARS = ("*", "?", "[")
+
+
+def _has_glob(pattern: str) -> bool:
+    """Return ``True`` if ``pattern`` looks like a glob (contains ``*``, ``?`` or ``[``)."""
+    return isinstance(pattern, str) and any(char in pattern for char in _GLOB_CHARS)
+
 
 class PluginPool:
     plugins: dict[str, type[CMSPluginBase]]
@@ -37,13 +45,57 @@ class PluginPool:
 
     def _clear_cached(self) -> None:
         self.root_plugin_cache = {}
+        self.global_restrictions_cache = defaultdict(dict)
         self.get_all_plugins_for_model.cache_clear()
+        self.expand_plugin_patterns.cache_clear()
         if "registered_plugins" in self.__dict__:
             del self.__dict__["registered_plugins"]
         if "plugins_with_extra_menu" in self.__dict__:
             del self.__dict__["plugins_with_extra_menu"]
         if "plugins_with_extra_placeholder_menu" in self.__dict__:
             del self.__dict__["plugins_with_extra_placeholder_menu"]
+
+    @lru_cache  # noqa: B019
+    def expand_plugin_patterns(self, patterns: tuple[str, ...]) -> frozenset[str]:
+        """
+        Expand a tuple of plugin-name patterns into the set of matching plugin names.
+
+        Literal names are kept verbatim (so an unregistered literal simply matches no
+        installed plugin, preserving historic behaviour). Glob patterns -- ``*``, ``?``
+        and ``[seq]`` -- are matched case-sensitively against the names of all registered
+        plugins.
+
+        The result is memoized; the cache is cleared whenever plugins are (un)registered
+        (see :meth:`_clear_cached`), so the registry is only scanned on the first use of a
+        given pattern tuple. This keeps restriction evaluation -- which is on the critical
+        rendering path -- cheap.
+        """
+        globs = [pattern for pattern in patterns if _has_glob(pattern)]
+        if not globs:
+            # Fast path: no globs, nothing to expand against the registry.
+            return frozenset(patterns)
+        names = tuple(self.plugins)
+        matched = {pattern for pattern in patterns if not _has_glob(pattern)}
+        for pattern in globs:
+            matched.update(name for name in names if fnmatch.fnmatchcase(name, pattern))
+        return frozenset(matched)
+
+    def resolve_plugin_patterns(self, patterns: list[str] | None) -> list[str] | None:
+        """
+        Resolve a ``child_classes``/``parent_classes`` value, expanding any glob patterns.
+
+        ``None`` (no restriction) is returned unchanged. A list without glob patterns is
+        returned as-is, both to avoid overhead and to preserve its ordering. A list with at
+        least one glob is expanded to the sorted list of matching registered plugin names.
+
+        Expansion happens *before* emptiness is interpreted, so a glob that matches nothing
+        yields an empty list -- i.e. "no plugins allowed", just like an explicit ``[]``.
+        """
+        if patterns is None:
+            return None
+        if not any(_has_glob(pattern) for pattern in patterns):
+            return patterns
+        return sorted(self.expand_plugin_patterns(tuple(patterns)))
 
     def discover_plugins(self) -> None:
         if self.discovered:

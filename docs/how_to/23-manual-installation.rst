@@ -141,17 +141,7 @@ Add to ``settings.py``:
 
     SITE_ID = 1
 
-    CMS_CONFIRM_VERSION4 = True
-
     X_FRAME_OPTIONS = "SAMEORIGIN"
-
-``CMS_CONFIRM_VERSION4`` ensures you do not accidentally run migrations on a django CMS
-version 3 database.
-
-.. warning::
-
-    Do not add ``CMS_CONFIRM_VERSION4 = True`` to a django CMS version 3 project unless
-    you know what you are doing.
 
 Language settings
 =================

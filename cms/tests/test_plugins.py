@@ -911,6 +911,113 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
+    def test_plugin_child_classes_auto(self):
+        """``child_classes = "auto"`` accepts exactly those plugins that explicitly name this
+        plugin in their ``parent_classes`` -- and nothing else."""
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        AutoParentPlugin = type(
+            "AutoParentPlugin",
+            (CMSPluginBase,),
+            dict(child_classes="auto", allow_children=True, render_template="allow_children_plugin.html"),
+        )
+        # Opts in by naming AutoParentPlugin as a parent.
+        OptInChildPlugin = type(
+            "OptInChildPlugin", (CMSPluginBase,), dict(parent_classes=["AutoParentPlugin"], render_plugin=False)
+        )
+        # Names a *different* parent -- must not be auto-allowed.
+        OtherParentChildPlugin = type(
+            "OtherParentChildPlugin", (CMSPluginBase,), dict(parent_classes=["SomeOtherPlugin"], render_plugin=False)
+        )
+        # No parent restriction at all -- not an explicit opt-in, so must not be auto-allowed.
+        UnrestrictedChildPlugin = type("UnrestrictedChildPlugin", (CMSPluginBase,), dict(render_plugin=False))
+
+        with register_plugins(
+            AutoParentPlugin, OptInChildPlugin, OtherParentChildPlugin, UnrestrictedChildPlugin
+        ):
+            plugin = api.add_plugin(placeholder, AutoParentPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            child_classes = instance.get_child_classes(placeholder.slot, placeholder.source)
+
+            # Only the plugin that explicitly names AutoParentPlugin as parent is allowed.
+            self.assertEqual(["OptInChildPlugin"], child_classes)
+
+    def test_plugin_child_classes_auto_no_opt_in(self):
+        """``child_classes = "auto"`` with no plugin naming it as parent allows no children
+        (and notably does not raise on the many installed plugins whose ``parent_classes`` is
+        ``None``)."""
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        LonelyAutoPlugin = type(
+            "LonelyAutoPlugin",
+            (CMSPluginBase,),
+            dict(child_classes="auto", allow_children=True, render_template="allow_children_plugin.html"),
+        )
+
+        with register_plugins(LonelyAutoPlugin):
+            plugin = api.add_plugin(placeholder, LonelyAutoPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
+            # An empty allow-list is normalised to [""] (no children) by the restriction cache.
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
+            self.assertEqual([""], child_classes)
+
+    def test_resolved_child_classes_addability(self):
+        """The resolved ``child_classes`` (stashed on ``CMSPlugin.child_class_restrictions``
+        and consumed by the drag-item template via ``any(...)`` / ``|join:""``) reflect
+        whether any plugin can actually be added: falsy for ``allow_children = False`` *and*
+        for an empty resolved ``child_classes`` (used to grey out the structure-editor
+        "add plugin" button)."""
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        NoChildrenPlugin = type("NoChildrenPlugin", (CMSPluginBase,), dict(render_plugin=False))
+        EmptyChildPlugin = type(
+            "EmptyChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=True, child_classes=[], render_template="allow_children_plugin.html"),
+        )
+        OpenChildPlugin = type(
+            "OpenChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=True, render_template="allow_children_plugin.html"),
+        )
+        RestrictedChildPlugin = type(
+            "RestrictedChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=True, child_classes=["LinkPlugin"], render_template="allow_children_plugin.html"),
+        )
+        RestrictedNoChildPlugin = type(
+            "RestrictedNoChildPlugin",
+            (CMSPluginBase,),
+            dict(allow_children=False, child_classes=["LinkPlugin"], render_template="allow_children_plugin.html"),
+        )
+
+        def allows_add_children(plugin):
+            child_classes, _ = get_plugin_restrictions(plugin, page=placeholder.source)
+            return any(child_classes)
+
+        with register_plugins(NoChildrenPlugin, EmptyChildPlugin, OpenChildPlugin, RestrictedChildPlugin, RestrictedNoChildPlugin):
+            lang = settings.LANGUAGES[0][0]
+            # allow_children = False -> cannot add children
+            no_children = api.add_plugin(placeholder, NoChildrenPlugin, lang)
+            self.assertFalse(allows_add_children(no_children))
+            # allow_children = True but child_classes = [] -> still cannot add children (the bug)
+            empty = api.add_plugin(placeholder, EmptyChildPlugin, lang)
+            self.assertFalse(allows_add_children(empty))
+            # allow_children = True, no restriction -> can add children
+            open_ = api.add_plugin(placeholder, OpenChildPlugin, lang)
+            self.assertTrue(allows_add_children(open_))
+            # allow_children = True with a concrete child class -> can add children
+            restricted = api.add_plugin(placeholder, RestrictedChildPlugin, lang)
+            self.assertTrue(allows_add_children(restricted))
+            # allow_children = False with a concrete child class -> cannot add children
+            restricted_no = api.add_plugin(placeholder, RestrictedNoChildPlugin, lang)
+            self.assertFalse(allows_add_children(restricted_no))
+
     def test_plugin_child_classes_cache_ignores_uncachable_children(self):
         from cms.utils.plugins import get_plugin_restrictions
 
@@ -1003,6 +1110,112 @@ class PluginsTestCase(PluginsTestBaseCase):
 
                 # Since the restriction results in no valid child classes, it should be replaced with [""]
                 self.assertEqual(child_classes, [""])
+
+    def test_plugin_child_classes_empty_list_allows_no_children(self):
+        """An empty ``child_classes`` list means no plugins may be added as children, as
+        opposed to ``None`` which allows any plugin."""
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        NoChildPlugin = type(
+            "NoChildPlugin",
+            (CMSPluginBase,),
+            dict(render_plugin=False, allow_children=True, child_classes=[]),
+        )
+
+        with register_plugins(NoChildPlugin):
+            plugin = api.add_plugin(placeholder, NoChildPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            # No plugin is an allowed child
+            self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
+            # The restriction is sent to the frontend as the [""] sentinel (disallow all)
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
+            self.assertEqual([""], child_classes)
+
+    def test_plugin_parent_classes_empty_list_allows_no_parent(self):
+        """An empty ``parent_classes`` list means the plugin allows no parents (and is therefore
+        never a valid child), as opposed to ``None`` which allows any parent."""
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
+        OrphanPlugin = type("OrphanPlugin", (CMSPluginBase,), dict(render_plugin=False, parent_classes=[]))
+
+        with register_plugins(ParentPlugin, OrphanPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            child_classes = instance.get_child_classes(placeholder.slot, placeholder.source)
+            # A plugin with an empty parent_classes is never a valid child
+            self.assertNotIn("OrphanPlugin", child_classes)
+            # A plugin with parent_classes=None is still allowed as a child
+            self.assertIn("ParentPlugin", child_classes)
+            # An empty parent_classes does not require a parent, so it can be a root plugin
+            self.assertFalse(OrphanPlugin.requires_parent_plugin(placeholder.slot, page))
+
+    def test_plugin_child_classes_glob(self):
+        """Glob patterns in child_classes are expanded to matching registered plugin names."""
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        GlobChildPlugin = type(
+            "GlobChildPlugin",
+            (CMSPluginBase,),
+            dict(child_classes=["Link*"], render_template="allow_children_plugin.html"),
+        )
+
+        with register_plugins(GlobChildPlugin):
+            plugin = api.add_plugin(placeholder, GlobChildPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            child_classes = instance.get_child_classes(placeholder.slot, placeholder.source)
+            self.assertIn("LinkPlugin", child_classes)
+            self.assertNotIn("TextPlugin", child_classes)
+
+    def test_plugin_child_classes_glob_no_match(self):
+        """A child_classes glob matching no plugin means no children are allowed (like ``[]``)."""
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        GlobChildPlugin = type(
+            "GlobChildPlugin",
+            (CMSPluginBase,),
+            dict(child_classes=["DoesNotExist*"], allow_children=True, render_template="allow_children_plugin.html"),
+        )
+
+        with register_plugins(GlobChildPlugin):
+            plugin = api.add_plugin(placeholder, GlobChildPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            self.assertEqual([], instance.get_child_classes(placeholder.slot, placeholder.source))
+            child_classes, _ = get_plugin_restrictions(plugin, placeholder.source, {})
+            self.assertEqual([""], child_classes)
+
+    def test_plugin_parent_classes_glob(self):
+        """Glob patterns in parent_classes are expanded to matching registered plugin names."""
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
+        ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(parent_classes=["Parent*"], render_plugin=False))
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            instance = plugin.get_plugin_class_instance()
+            # "Parent*" expands to include ParentPlugin, so ChildPlugin is a valid child
+            self.assertIn("ParentPlugin", ChildPlugin.get_parent_classes(placeholder.slot, page))
+            self.assertIn("ChildPlugin", instance.get_child_classes(placeholder.slot, placeholder.source))
+
+    def test_plugin_parent_classes_star_requires_any_parent(self):
+        """``parent_classes = ["*"]`` requires a parent (any plugin), unlike ``None``."""
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        AnyParentPlugin = type("AnyParentPlugin", (CMSPluginBase,), dict(parent_classes=["*"], render_plugin=False))
+        NoRestrictionPlugin = type("NoRestrictionPlugin", (CMSPluginBase,), dict(render_plugin=False))
+
+        with register_plugins(AnyParentPlugin, NoRestrictionPlugin):
+            # "*" expands to every registered plugin, so a parent is required ...
+            self.assertTrue(AnyParentPlugin.requires_parent_plugin(placeholder.slot, page))
+            # ... and any plugin is an acceptable parent.
+            self.assertIn("AnyParentPlugin", NoRestrictionPlugin.get_child_classes(placeholder.slot, placeholder.source))
+            # By contrast, parent_classes=None does not require a parent.
+            self.assertFalse(NoRestrictionPlugin.requires_parent_plugin(placeholder.slot, page))
 
     def test_plugin_require_parent_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -1816,6 +2029,28 @@ class IsSlotPluginTestCase(PluginsTestBaseCase):
             dict(render_plugin=False, is_slot=True),
         )
         self.assertTrue(SlotPlugin.is_slot)
+
+    def test_get_plugin_info_parents_argument_is_deprecated(self):
+        """The deprecated ``parents`` argument still works (with a warning) for backwards compat."""
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+
+        DeprecationInfoPlugin = type("DeprecationInfoPlugin", (CMSPluginBase,), dict(render_plugin=False))
+
+        with register_plugins(DeprecationInfoPlugin):
+            page = api.create_page("test", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").get(slot="body")
+            plugin = api.add_plugin(placeholder, DeprecationInfoPlugin, "en")
+
+            # Default: no warning, and no parent restriction key in the payload.
+            with warnings.catch_warnings():
+                warnings.simplefilter("error")
+                info = plugin.get_plugin_info()
+            self.assertNotIn("plugin_parent_restriction", info)
+
+            # Deprecated argument: warns but still emits the key for compatibility.
+            with self.assertWarns(RemovedInDjangoCMS60Warning):
+                info = plugin.get_plugin_info(parents=["OtherPlugin"])
+            self.assertEqual(["OtherPlugin"], info["plugin_parent_restriction"])
 
     def test_is_slot_in_plugin_info(self):
         """Unit test: get_plugin_info includes is_slot value."""
