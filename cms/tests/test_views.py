@@ -614,7 +614,12 @@ class NonPageContentStructureEndpointTests(CMSTestCase):
     Registered through ``admin_site.admin_view`` the endpoint only requires an
     active staff user. Without an object-level check, any staff user could read
     the placeholder/plugin structure of a frontend-editable object (e.g. a model
-    using ``PlaceholderRelationField``) without permission to change it.
+    using ``PlaceholderRelationField``) without permission to view it.
+
+    Viewing the (read-only) structure board requires only *view* permission;
+    mutating the plugins stays gated by change permission at the plugin
+    endpoints. This supports headless reviewers inspecting structure without
+    edit rights.
     """
 
     def setUp(self) -> None:
@@ -632,7 +637,17 @@ class NonPageContentStructureEndpointTests(CMSTestCase):
     def _marker(self):
         return f'"placeholder_id": "{self.placeholder.pk}"'
 
-    def test_denies_staff_without_change_permission(self):
+    def _staff_with_perm(self, codename):
+        staff = self._create_user(f"staff_{codename}", is_staff=True, is_superuser=False)
+        staff.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="placeholder_relation_field_app",
+                codename=codename,
+            )
+        )
+        return staff
+
+    def test_denies_staff_without_view_permission(self):
         staff = self.get_staff_user_with_no_permissions()
         with self.login_user_context(staff):
             response = self.client.get(self._url())
@@ -643,14 +658,37 @@ class NonPageContentStructureEndpointTests(CMSTestCase):
         )
         self.assertNotContains(response, self._marker(), status_code=404)
 
+    def test_allows_staff_with_view_permission(self):
+        # Headless / read-only reviewers may inspect structure with view rights.
+        staff = self._staff_with_perm("view_fancypoll")
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+
+    def test_view_only_user_gets_read_only_structure_board(self):
+        """View permission opens the board, but the editing UX is disabled.
+
+        Mutations stay gated by change permission at the plugin endpoints, so
+        the structure board must render read-only (no drag/add/cut/delete) for a
+        user who may view but not change the object.
+        """
+        view_only = self._staff_with_perm("view_fancypoll")
+        with self.login_user_context(view_only):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+        # Read-only markers from toolbar_with_structure.html / dragbar / dragitem.
+        self.assertContains(response, "cms-drag-disabled")
+        self.assertContains(response, "Placeholder not editable")
+
+        # A user who may change the object still gets the editable board.
+        editor = self._staff_with_perm("change_fancypoll")
+        with self.login_user_context(editor):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+        self.assertNotContains(response, "Placeholder not editable")
+
     def test_allows_staff_with_change_permission(self):
-        staff = self.get_staff_user_with_no_permissions()
-        staff.user_permissions.add(
-            Permission.objects.get(
-                content_type__app_label="placeholder_relation_field_app",
-                codename="change_fancypoll",
-            )
-        )
+        staff = self._staff_with_perm("change_fancypoll")
         with self.login_user_context(staff):
             response = self.client.get(self._url())
         self.assertContains(response, self._marker())

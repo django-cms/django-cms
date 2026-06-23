@@ -55,6 +55,7 @@ from cms.utils.i18n import (
 )
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_view_page
+from cms.utils.permissions import user_can_view_placeholder_source
 from cms.utils.placeholder import get_declared_placeholders_for_obj, get_placeholder_conf
 
 
@@ -312,8 +313,10 @@ def render_object_structure(request, content_type_id, object_id):
                 raise Http404
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-            # Mirror Placeholder.has_change_permission.
-            if not _can_change_placeholder_object(request.user, content_type_obj):
+            # Viewing the structure board requires only view permission (as the
+            # page branch above does via user_can_view_page). Mutations remain
+            # gated by change permission at the plugin endpoints.
+            if not user_can_view_placeholder_source(request.user, content_type_obj):
                 raise Http404
     except ObjectDoesNotExist as err:
         raise Http404 from err
@@ -325,22 +328,6 @@ def render_object_structure(request, content_type_id, object_id):
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
-
-
-def _can_change_placeholder_object(user, obj):
-    """Whether ``user`` may change the placeholders attached to ``obj``.
-
-    Mirrors :meth:`cms.models.placeholdermodel.Placeholder.has_change_permission`
-    at the object level: it honours a custom ``has_placeholder_change_permission``
-    hook on the object and otherwise falls back to the model/object change
-    permission.
-    """
-    from cms.utils.permissions import get_model_permission_codename
-
-    if hasattr(obj, "has_placeholder_change_permission"):
-        return obj.has_placeholder_change_permission(user)
-    change_perm = get_model_permission_codename(type(obj), "change")
-    return user.has_perm(change_perm) or user.has_perm(change_perm, obj)
 
 
 def render_placeholder_content(request, obj, context):
