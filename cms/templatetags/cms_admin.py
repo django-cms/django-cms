@@ -101,7 +101,7 @@ class GetPreviewUrl(AsTag):
             )
         if not page_content:
             return ""
-        return self.get_url(page_content, language=page_content.language)
+        return self.get_url(page_content, language=getattr(page_content, "language", None))
 
     def get_url(self, object, language):
         return get_object_preview_url(object, language=language)

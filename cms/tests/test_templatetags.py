@@ -36,6 +36,7 @@ from cms.templatetags.cms_tags import (
     _show_placeholder_by_id,
     render_plugin,
 )
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
@@ -87,6 +88,25 @@ class TemplatetagTests(CMSTestCase):
 
         self.assertIn(expected_for_page, output)
         self.assertIn(expected_for_german_content, output)
+
+    def test_get_preview_url_object_without_language(self):
+        """A frontend-editable object that has no ``language`` attribute falls back
+        to the active request language instead of raising ``AttributeError``."""
+        example = Example1.objects.create(char_1="a", char_2="b", char_3="c", char_4="d")
+        self.assertFalse(hasattr(example, "language"))
+
+        template = """
+            {% load cms_admin %}
+            preview={% get_preview_url example %}
+            edit={% get_edit_url example %}
+        """
+        with force_language("en"):
+            output = self.render_template_obj(template, {"example": example}, self.get_request())
+            expected_preview = f"preview={get_object_preview_url(example, language='en')}"
+            expected_edit = f"edit={get_object_edit_url(example, language='en')}"
+
+        self.assertIn(expected_preview, output)
+        self.assertIn(expected_edit, output)
 
     def test_get_edit_url(self):
         """The get_edit_url template tag returns the content edit url for its language:
