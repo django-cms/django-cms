@@ -155,6 +155,22 @@ class DefaultLanguageChanger:
         self._app_path = None
 
     @property
+    def request_path(self):
+        """
+        The path of the page the user is *viewing*.
+
+        For regular page requests this equals ``request.path_info``. For
+        asynchronous toolbar/structure requests, ``request.path_info`` points at
+        an internal admin/AJAX endpoint, while the viewed page is reported via the
+        ``cms_path`` GET query and stored on ``toolbar.request_path``. Prefer the
+        latter so that language URLs are built for the viewed page rather than the
+        AJAX endpoint.
+        """
+        toolbar = getattr(self.request, 'toolbar', None)
+        request_path = getattr(toolbar, 'request_path', None)
+        return request_path or self.request.path_info
+
+    @property
     def app_path(self):
         """
         Returns the app path based on the current request.
@@ -172,8 +188,8 @@ class DefaultLanguageChanger:
             If the USE_I18N setting is True, the function tries to get the page path based on the language
             extracted from the current request. Otherwise, it uses the default LANGUAGE_CODE setting.
             If a valid page path is found, the app path is determined by removing the page path from the
-            request's path_info attribute. If no page path is found, the app path is same as the request's
-            path_info attribute.
+            viewed page path (see :attr:`request_path`). If no page path is found, the app path is the
+            same as the viewed page path.
         """
         if self._app_path is None:
             if settings.USE_I18N:
@@ -181,9 +197,11 @@ class DefaultLanguageChanger:
             else:
                 page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
-                self._app_path = self.request.path_info[len(page_path):]
-            else:
-                self._app_path = self.request.path_info
+                self._app_path = self.request_path[len(page_path):]
+            else:  # pragma: no cover
+                # Defensive fallback: ``get_page_path`` always returns a
+                # non-empty path, so this branch is effectively unreachable.
+                self._app_path = self.request_path
         return self._app_path
 
     def get_page_path(self, lang):
@@ -262,7 +280,7 @@ class DefaultLanguageChanger:
         """
         with force_language(self.request_language):
             try:
-                view = resolve(self.request.path_info)
+                view = resolve(self.request_path)
             except (NoReverseMatch, Resolver404):  # NOQA
                 view = None
         if (
