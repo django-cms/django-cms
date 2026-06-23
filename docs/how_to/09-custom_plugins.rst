@@ -682,6 +682,9 @@ functionality:
         # You can also specify a list of plugins that are accepted as children,
         # or leave it away completely to accept all
         # child_classes = ['ChildCMSPlugin']
+        # Entries may be glob patterns, e.g. child_classes = ['Bootstrap*'].
+        # As a special case, child_classes = 'auto' accepts exactly those plugins
+        # that name this plugin in their parent_classes (the children opt in).
 
         def render(self, context, instance, placeholder):
             context = super().render(context, instance, placeholder)
@@ -693,12 +696,16 @@ functionality:
         render_template = "child.html"
         name = "Child"
         model = ChildPlugin
-        require_parent = (
-            True  # Is it required that this plugin is a child of another plugin?
-        )
-        # You can also specify a list of plugins that are accepted as parents,
-        # or leave it away completely to accept all
-        # parent_classes = ['ParentCMSPlugin']
+        # Restricting which plugins are accepted as parents is preferred over
+        # setting require_parent = True: naming concrete parent_classes already
+        # forces the plugin to have a parent, so the two together are redundant.
+        # Here "*" expands to every registered plugin, meaning any plugin is an
+        # acceptable parent -- but the plugin must have one (it cannot be added
+        # directly to a placeholder).
+        parent_classes = ['*']
+        # Narrow this down to specific parents whenever you can, e.g.
+        # parent_classes = ['ParentCMSPlugin']. Entries may be glob patterns,
+        # e.g. parent_classes = ['Bootstrap*'].
 
         def render(self, context, instance, placeholder):
             context = super(ChildCMSPlugin, self).render(context, instance, placeholder)

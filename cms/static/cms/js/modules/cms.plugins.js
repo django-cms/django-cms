@@ -50,7 +50,6 @@ class Plugin {
             plugin_id: null,
             plugin_parent: null,
             plugin_restriction: [],
-            plugin_parent_restriction: [],
             urls: {
                 add_plugin: '',
                 edit_plugin: '',
@@ -494,16 +493,11 @@ class Plugin {
         if (clipboardDraggable.data('cms')) {
             var clipboardPluginData = clipboardDraggable.data('cms');
             var type = clipboardPluginData.plugin_type;
-            var parent_bounds = $.grep(clipboardPluginData.plugin_parent_restriction, function(restriction) {
-                // special case when PlaceholderPlugin has a parent restriction named "0"
-                return restriction !== '0';
-            });
-            var currentPluginType = this.options.plugin_type;
 
-            if (
-                (bounds.length && $.inArray(type, bounds) === -1) ||
-                (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)
-            ) {
+            // The target's child list (bounds) already encodes which plugins it accepts -- including
+            // the placeholder's root list, which excludes plugins that require a parent. So a single
+            // membership check is enough.
+            if (bounds.length && $.inArray(type, bounds) === -1) {
                 pasteItem.addClass('cms-submenu-item-disabled');
                 pasteItem.find('a').attr('tabindex', '-1').attr('aria-disabled', 'true');
                 pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');

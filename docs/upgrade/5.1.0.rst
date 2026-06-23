@@ -176,6 +176,17 @@ See :ref:`tutorial_install` for a step-by-step walkthrough.
 Minor features
 ==============
 
+* Plugin parent/child restrictions are more expressive. The ``child_classes`` and
+  ``parent_classes`` attributes (and their ``CMS_PLACEHOLDER_CONF`` counterparts) now accept
+  glob patterns such as ``"Bootstrap*"`` or ``"*Link*"``, which are expanded against the names
+  of all registered plugins. An empty list (``[]``) now consistently means "none allowed"
+  (no children, or no parent — i.e. placeholder only), whereas ``None`` continues to mean
+  "no restriction". As a special case, ``parent_classes = ["*"]`` requires the plugin to have
+  a parent (any plugin). Expansion is cached, so restriction evaluation stays fast on the
+  rendering path. In addition, ``child_classes = "auto"`` allows exactly those plugins that
+  explicitly name this plugin in their ``parent_classes``, so children opt in to a parent
+  rather than the parent having to list every allowed child.
+
 * Placeholder objects now have a :meth:`~cms.models.placeholdermodel.Placeholder.delete_plugins`
   method which efficiently bulk-deletes multiple plugins from the placeholder. It takes an iterable
   of plugin objects as a parameter.
@@ -258,6 +269,11 @@ Plugin rendering
 
 * ``BaseRenderer`` method ``renderer.get_placeholder_toolbar_js()`` has a keyword argument ``page`` which will be
   removed in django CMS 6.0. It can already be safely removed from all calls.
+* The ``parents`` keyword argument of ``CMSPlugin.get_plugin_info()``, ``cms.toolbar.utils.get_plugin_toolbar_info()``
+  and ``cms.toolbar.utils.get_plugin_toolbar_js()`` is deprecated and will be removed in django CMS 6.0. Parent plugin
+  restrictions are no longer sent to the frontend -- droppability is derived from the child restrictions of each
+  potential parent (and of the placeholder) -- so the argument and the ``plugin_parent_restriction`` entry it produced
+  can be safely removed from all calls.
 
 Utility functions
 -----------------
