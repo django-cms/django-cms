@@ -312,12 +312,7 @@ def render_object_structure(request, content_type_id, object_id):
                 raise Http404
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-            # Enforce object-level authorization before disclosing the
-            # placeholder/plugin structure of a non-PageContent object. Without
-            # this, any staff user could read the structure of a frontend-
-            # editable object through this endpoint, even without permission to
-            # change it (the toolbar UI only offers structure mode to users who
-            # may change the object). Mirror Placeholder.has_change_permission.
+            # EMirror Placeholder.has_change_permission.
             if not _can_change_placeholder_object(request.user, content_type_obj):
                 raise Http404
     except ObjectDoesNotExist as err:
