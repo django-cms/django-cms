@@ -36,8 +36,8 @@ from cms.templatetags.cms_tags import (
     _show_placeholder_by_id,
     render_plugin,
 )
-from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
