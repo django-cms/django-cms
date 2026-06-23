@@ -606,3 +606,56 @@ class EndpointPermissionTests(CMSTestCase):
                 self._endpoint("cms_placeholder_render_object_structure")
             )
         self.assertContains(response, "SuperSecretLinkName")
+
+
+class NonPageContentStructureEndpointTests(CMSTestCase):
+    """The structure endpoint must also authorize non-PageContent objects.
+
+    Registered through ``admin_site.admin_view`` the endpoint only requires an
+    active staff user. Without an object-level check, any staff user could read
+    the placeholder/plugin structure of a frontend-editable object (e.g. a model
+    using ``PlaceholderRelationField``) without permission to change it.
+    """
+
+    def setUp(self) -> None:
+        from cms.test_utils.project.placeholder_relation_field_app.models import (
+            FancyPoll,
+        )
+        from cms.utils.placeholder import rescan_placeholders_for_obj
+
+        self.target = FancyPoll.objects.create(name="private-fancy-poll")
+        self.placeholder = rescan_placeholders_for_obj(self.target)["content"]
+
+    def _url(self):
+        return get_object_structure_url(self.target, language="en")
+
+    def _marker(self):
+        return f'"placeholder_id": "{self.placeholder.pk}"'
+
+    def test_denies_staff_without_change_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertEqual(
+            response.status_code,
+            404,
+            msg="structure endpoint leaked a non-PageContent object's structure",
+        )
+        self.assertNotContains(response, self._marker(), status_code=404)
+
+    def test_allows_staff_with_change_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+        staff.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="placeholder_relation_field_app",
+                codename="change_fancypoll",
+            )
+        )
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+
+    def test_allows_superuser(self):
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())

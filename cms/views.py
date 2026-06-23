@@ -312,6 +312,14 @@ def render_object_structure(request, content_type_id, object_id):
                 raise Http404
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+            # Enforce object-level authorization before disclosing the
+            # placeholder/plugin structure of a non-PageContent object. Without
+            # this, any staff user could read the structure of a frontend-
+            # editable object through this endpoint, even without permission to
+            # change it (the toolbar UI only offers structure mode to users who
+            # may change the object). Mirror Placeholder.has_change_permission.
+            if not _can_change_placeholder_object(request.user, content_type_obj):
+                raise Http404
     except ObjectDoesNotExist as err:
         raise Http404 from err
 
@@ -322,6 +330,22 @@ def render_object_structure(request, content_type_id, object_id):
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
+
+
+def _can_change_placeholder_object(user, obj):
+    """Whether ``user`` may change the placeholders attached to ``obj``.
+
+    Mirrors :meth:`cms.models.placeholdermodel.Placeholder.has_change_permission`
+    at the object level: it honours a custom ``has_placeholder_change_permission``
+    hook on the object and otherwise falls back to the model/object change
+    permission.
+    """
+    from cms.utils.permissions import get_model_permission_codename
+
+    if hasattr(obj, "has_placeholder_change_permission"):
+        return obj.has_placeholder_change_permission(user)
+    change_perm = get_model_permission_codename(type(obj), "change")
+    return user.has_perm(change_perm) or user.has_perm(change_perm, obj)
 
 
 def render_placeholder_content(request, obj, context):
