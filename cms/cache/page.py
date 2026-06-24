@@ -165,15 +165,19 @@ def set_xframe_cache(page, xframe_options):
     _set_cache_version(_get_cache_version())
 
 
-def _page_url_key(page_lookup, lang, site_id):
-    return _get_cache_key("page_url", page_lookup, lang, site_id) + "_type:absolute_url"
+def _page_url_key(page_lookup, lang, site_id, extra_key):
+    return "".join([
+        _get_cache_key("page_url", page_lookup, lang, site_id),
+        f"_key:{extra_key}" if isinstance(extra_key, str) else "",
+        "_type:absolute_url",
+    ])
 
 
-def set_page_url_cache(page_lookup, lang, site_id, url):
+def set_page_url_cache(page_lookup, lang, site_id, url, extra_key=None):
     from django.core.cache import cache
 
     cache.set(
-        _page_url_key(page_lookup, lang, site_id),
+        _page_url_key(page_lookup, lang, site_id, extra_key),
         url,
         get_cms_setting("CACHE_DURATIONS")["content"],
         version=_get_cache_version(),
@@ -181,7 +185,7 @@ def set_page_url_cache(page_lookup, lang, site_id, url):
     _set_cache_version(_get_cache_version())
 
 
-def get_page_url_cache(page_lookup, lang, site_id):
+def get_page_url_cache(page_lookup, lang, site_id, extra_key=None):
     from django.core.cache import cache
 
-    return cache.get(_page_url_key(page_lookup, lang, site_id), version=_get_cache_version())
+    return cache.get(_page_url_key(page_lookup, lang, site_id, extra_key), version=_get_cache_version())
