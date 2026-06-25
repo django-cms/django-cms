@@ -384,15 +384,36 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
 
 ``child_classes``
     A dictionary of plugin names with lists describing which plugins may be
-    placed inside each plugin. If not supplied, all plugins can be selected.
+    placed inside each plugin. If not supplied (or set to ``None``), all plugins
+    can be selected. An empty list (``[]``) means no plugins are allowed as
+    children. List entries may be glob patterns such as ``"Bootstrap*"`` or
+    ``"*Link*"``, which are expanded against the names of all registered plugins
+    (a pattern matching no plugin is therefore equivalent to an empty list). As a
+    special case, the string ``"auto"`` allows exactly those plugins that name this
+    plugin in their ``parent_classes`` -- the children opt in to the parent rather
+    than the parent listing them.
 
 ``parent_classes``
     A dictionary of plugin names with lists describing which plugins may contain
-    each plugin. If not supplied, all plugins can be selected.
+    each plugin. If not supplied (or set to ``None``), all plugins can be
+    selected. An empty list (``[]``) means the plugin allows no parent and can
+    only be added directly to a placeholder. List entries may be glob patterns
+    such as ``"Bootstrap*"`` or ``"*Link*"``, which are expanded against the
+    names of all registered plugins (a pattern matching no plugin is therefore
+    equivalent to an empty list). As a special case, ``["*"]`` matches every
+    registered plugin and thus requires the plugin to have a parent (any plugin),
+    in contrast to ``None`` which allows -- but does not require -- a parent.
 
 ``require_parent``
     A Boolean indication whether that plugin requires another plugin as parent or
     not.
+
+    As a rule of thumb, prefer naming specific ``parent_classes`` over setting
+    ``require_parent = True``. Listing concrete parents both restricts where the
+    plugin may be added *and* requires a parent, so ``require_parent`` becomes
+    redundant. If genuinely any plugin is an acceptable parent, make that explicit
+    with ``parent_classes = ["*"]`` rather than relying on ``require_parent``
+    alone.
 
 .. note::
     For model-level and plugin-level filtering of available plugins, see

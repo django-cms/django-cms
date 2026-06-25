@@ -208,12 +208,27 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
     def add_ajax_item(self, name, action, active=False, disabled=False,
                       extra_classes=None, data=None, question=None,
                       side=LEFT, position=None, on_success=None, method='POST'):
-        """Adds :class:`~cms.toolbar.items.AjaxItem` that sends a POST request to ``action`` with ``data``, and returns
-        it. ``data`` should be ``None`` or a dictionary. The CSRF token will automatically be added
-        to the item.
+        """Adds :class:`~cms.toolbar.items.AjaxItem` that sends a request to ``action`` with ``data``, and returns
+        it. ``data`` should be ``None`` or a dictionary. By default a ``POST`` request is sent; pass ``method`` to use
+        a different HTTP method. For unsafe methods (anything other than ``GET``, ``HEAD``, ``OPTIONS`` and ``TRACE``)
+        the CSRF token is automatically added to the item.
 
         If a string is provided for ``question``, it will be presented to the user to allow
-        confirmation before the request is sent."""
+        confirmation before the request is sent.
+
+        Once the request succeeds, the response is inspected:
+
+        * If ``on_success`` is given, the browser navigates to that URL. The special values
+          ``REFRESH_PAGE`` reloads the current page and ``"FOLLOW_REDIRECT"`` redirects to the ``url``
+          returned in the (JSON) response instead.
+        * Otherwise, if the response carries a *data bridge* -- either an HTML document containing a
+          ``<script id="data-bridge">`` element or a JSON object with an ``action`` key -- the data bridge is
+          evaluated and the structure board is updated in place, without a full page reload.
+        * If neither applies, the page is reloaded.
+
+        ..  versionadded:: 5.1
+            Evaluating a *data bridge* returned by the AJAX response, updating the structure board in
+            place instead of reloading the page."""
 
         item = AjaxItem(
             name, action, self.csrf_token,
