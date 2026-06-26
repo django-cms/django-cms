@@ -1,15 +1,17 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-30 19:36+0100\n"
+"POT-Creation-Date: 2026-06-26 19:53+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Vietnamese (https://app.transifex.com/divio/teams/58664/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,196 +19,129 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin/forms.py:85 admin/forms.py:92 admin/forms.py:1060
-#: templates/admin/cms/page/permissions.html:45
 msgid "All"
 msgstr "Tất cả"
 
-#: admin/forms.py:146
 msgid "Copy permissions"
 msgstr "Sao chép quyền"
 
-#: admin/forms.py:204
 msgid "Slug"
 msgstr "Slug"
 
-#: admin/forms.py:206
 msgid "The part of the title that is used in the URL"
 msgstr "Phần của tiêu đề được sử dụng trong URL"
 
-#: admin/forms.py:248
 msgid "Page type"
 msgstr "Loại trang"
 
-#: admin/forms.py:471
 msgid "Page Types"
 msgstr "Các loại trang"
 
-#: admin/forms.py:523
 msgid "Overwrite URL"
 msgstr "Ghi đè URL"
 
-#: admin/forms.py:526
 msgid "Keep this field empty if standard path should be used."
 msgstr "Để trống trường này nếu muốn sử dụng đường dẫn tiêu chuẩn."
 
-#: admin/forms.py:537
 msgid "Start typing..."
 msgstr "Bắt đầu gõ..."
 
-#: admin/forms.py:542 migrations/0001_initial.py:96 models/contentmodels.py:120
-msgid "menu visibility"
-msgstr "hiển thị trong menu"
-
-#: admin/forms.py:543 models/contentmodels.py:126
 msgid "limit when this page is visible in the menu"
 msgstr "giới hạn khi trang này được hiển thị trong menu"
 
-#: admin/forms.py:551 models/contentmodels.py:133
 msgid "X Frame Options"
 msgstr "Tùy chọn X Frame"
 
-#: admin/forms.py:552
 msgid "Whether this page can be embedded in other pages or websites."
-msgstr "Trang này có thể được nhúng vào các trang hoặc website khác hay không."
+msgstr ""
+"Trang này có thể được nhúng vào các trang hoặc website khác hay không."
 
-#: admin/forms.py:570
 msgid "URL options"
 msgstr "Tùy chọn URL"
 
-#: admin/forms.py:577
 msgid "Menu options"
 msgstr "Tùy chọn menu"
 
-#: admin/forms.py:584
 msgid "Headers"
 msgstr "Tiêu đề HTTP"
 
-#: admin/forms.py:712
 msgid "Application"
 msgstr "Ứng dụng"
 
-#: admin/forms.py:715
 msgid "Hook application to this page."
 msgstr "Gắn ứng dụng vào trang này."
 
-#: admin/forms.py:720
 msgid "Application configurations"
 msgstr "Cấu hình ứng dụng"
 
-#: admin/forms.py:798
 msgid "A page with this reverse URL id exists already."
 msgstr "Đã tồn tại một trang với mã reverse URL này."
 
-#: admin/forms.py:817 admin/forms.py:823
 msgid "Invalid application config value"
 msgstr "Giá trị cấu hình ứng dụng không hợp lệ"
 
-#: admin/forms.py:830
 msgid "An application instance using this configuration already exists."
 msgstr "Đã tồn tại một thực thể ứng dụng sử dụng cấu hình này."
 
-#: admin/forms.py:838 admin/forms.py:849
 msgid "An application instance with this name already exists."
 msgstr "Đã tồn tại một thực thể ứng dụng với tên này."
 
-#: admin/forms.py:955
 msgid "You can't move the home page inside another page"
 msgstr "Bạn không thể di chuyển trang chủ vào bên trong một trang khác"
 
-#: admin/forms.py:1010 admin/forms.py:1026
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
-"Bạn không thể có hai trang với cùng một slug ở cùng cấp trang. Vui lòng thay "
-"đổi slug của một trong các trang trước khi thử di chuyển lại."
+"Bạn không thể có hai trang với cùng một slug ở cùng cấp trang. Vui lòng thay"
+" đổi slug của một trong các trang trước khi thử di chuyển lại."
 
-#: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:87
 msgid "Yes"
 msgstr "Có"
 
-#: admin/forms.py:1062 templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:89
 msgid "No"
 msgstr "Không"
 
-#: admin/forms.py:1117 admin/forms.py:1190 migrations/0001_initial.py:72
-#: migrations/0001_initial.py:135 models/permissionmodels.py:71
-#: test_utils/project/customuserapp/models.py:70
 msgid "user"
 msgstr "người dùng"
 
-#: admin/forms.py:1195
 msgid "can_view"
 msgstr "có thể xem"
 
-#: admin/forms.py:1236 admin/forms.py:1242 admin/forms.py:1246
-#: templates/admin/cms/page/change_form.html:11
-#: templates/admin/cms/usersettings/change_form.html:33
-#: templatetags/cms_tags.py:544
 msgid "Add"
 msgstr "Thêm"
 
-#: admin/forms.py:1237 admin/forms.py:1243 admin/forms.py:1247
 msgid "Change"
 msgstr "Thay đổi"
 
-#: admin/forms.py:1238 admin/forms.py:1244 admin/forms.py:1248
-#: templates/admin/cms/extensions/change_form.html:9
-#: templates/admin/cms/page/plugin/submit_line.html:5
-#: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/actions_dropdown.html:42
-#: templates/admin/cms/page/tree/actions_dropdown.html:47
-#: templates/admin/cms/page/tree/menu.html:203
-#: templates/admin/cms/page/tree/menu.html:205
-#: templates/cms/toolbar/dragitem.html:46
-#: templates/cms/toolbar/dragitem.html:54
 msgid "Delete"
 msgstr "Xóa"
 
-#: admin/forms.py:1267 models/permissionmodels.py:109
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
-"Người dùng không thể tạo trang nếu không có quyền thay đổi trang đã tạo. Yêu "
-"cầu quyền chỉnh sửa."
 
-#: admin/forms.py:1274 models/permissionmodels.py:114
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"Người dùng không thể xóa trang nếu không có quyền thay đổi trang. Yêu cầu "
-"quyền chỉnh sửa."
 
-#: admin/forms.py:1280
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
-"Người dùng không thể thiết lập quyền cho trang nếu không có quyền thay đổi "
-"trang. Yêu cầu quyền chỉnh sửa."
 
-#: admin/forms.py:1286
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
-"Người dùng không thể xóa quyền của trang nếu không có quyền thay đổi trang. "
-"Yêu cầu quyền chỉnh sửa."
 
-#: admin/forms.py:1295
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
-"Người dùng không thể tạo quyền cho trang nếu không có quyền thay đổi quyền "
-"đã tạo. Yêu cầu quyền chỉnh sửa."
 
-#: admin/forms.py:1302
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
@@ -214,55 +149,49 @@ msgstr ""
 "Người dùng không thể xóa quyền của trang nếu không có quyền thay đổi quyền. "
 "Yêu cầu quyền chỉnh sửa."
 
-#: admin/forms.py:1420
 #, python-format
 msgid "Invalid plugin type '%s'"
 msgstr "Loại plugin không hợp lệ '%s'"
 
-#: admin/forms.py:1438 admin/pageadmin.py:1217 admin/placeholderadmin.py:467
 msgid "Language must be set to a supported language!"
 msgstr "Ngôn ngữ phải được đặt là một ngôn ngữ được hỗ trợ!"
 
-#: admin/forms.py:1444
 msgid "Parent plugin language must be same as language!"
 msgstr "Ngôn ngữ của plugin cha phải giống với ngôn ngữ!"
 
-#: admin/forms.py:1449
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Placeholder của plugin cha phải giống với placeholder!"
 
-#: admin/forms.py:1454
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
 msgstr "Vị trí của plugin phải lớn hơn %(position)d"
 
-#: admin/pageadmin.py:320
+msgid "Translations"
+msgstr ""
+
 msgid "Advanced Settings"
 msgstr "Cài đặt nâng cao"
 
-#: admin/pageadmin.py:320 cms_toolbars.py:664
 msgid "Change Permissions"
 msgstr "Thay đổi quyền"
 
-#: admin/pageadmin.py:355
 msgid "The page is not eligible to be home."
 msgstr "Trang này không đủ điều kiện để làm trang chủ."
 
-#: admin/pageadmin.py:502 admin/pageadmin.py:990
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Đối tượng %(name)s với khóa chính %(key)r không tồn tại."
 
-#: admin/pageadmin.py:574
+msgid "error"
+msgstr ""
+
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Lỗi! Bạn không có quyền di chuyển trang này. Vui lòng tải lại trang"
 
-#: admin/pageadmin.py:677
 msgid "Error! You don't have permissions to copy this page."
 msgstr "Lỗi! Bạn không có quyền sao chép trang này."
 
-#: admin/pageadmin.py:685
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
@@ -270,183 +199,155 @@ msgstr ""
 "Lỗi! Trang bạn đang dán không được dịch sang bất kỳ ngôn ngữ nào được cấu "
 "hình bởi trang đích."
 
-#: admin/pageadmin.py:698
 msgid "You do not have permission to edit this page"
 msgstr "Bạn không có quyền chỉnh sửa trang này"
 
-#: admin/pageadmin.py:907
+msgid ""
+"(to change it, first unpublish the currently published version of this page)"
+msgstr ""
+
+msgid "Add Translation"
+msgstr "Thêm bản dịch"
+
 msgid "Add Page Copy"
 msgstr "Thêm bản sao trang"
 
-#: admin/pageadmin.py:913 cms_wizards.py:50
-#: templates/admin/cms/page/tree/menu.html:159
-#: templates/admin/cms/page/tree/menu.html:166
 msgid "New sub page"
 msgstr "Trang con mới"
 
-#: admin/pageadmin.py:919 cms_wizards.py:42
 msgid "New page"
 msgstr "Trang mới"
 
-#: admin/pageadmin.py:1127
+msgid ""
+"You do not have permission to access this site. Please contact your "
+"administrator."
+msgstr ""
+
 msgid "Database error"
 msgstr "Lỗi cơ sở dữ liệu"
 
-#: admin/pageadmin.py:1192
 msgid "Template not valid"
 msgstr "Template không hợp lệ"
 
-#: admin/pageadmin.py:1200
+msgid "Placeholder selection not valid"
+msgstr ""
+
 msgid "The template was successfully changed"
 msgstr "Template đã được thay đổi thành công"
 
-#: admin/pageadmin.py:1227 admin/placeholderadmin.py:507
-#: admin/placeholderadmin.py:511 admin/placeholderadmin.py:578
-#: admin/placeholderadmin.py:582
+#, python-format
+msgid "Placeholder '%s' does not exist in target language"
+msgstr ""
+
 msgid "You do not have permission to copy these plugins."
 msgstr "Bạn không có quyền sao chép các plugin này."
 
-#: admin/pageadmin.py:1236
 msgid "You do not have permission to delete this page"
 msgstr "Bạn không có quyền xóa trang này"
 
-#: admin/pageadmin.py:1264
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Tiêu đề và các plugin với ngôn ngữ %(language)s đã bị xóa"
 
-#: admin/pageadmin.py:1412
 msgid "Public content"
 msgstr "Nội dung công khai"
 
-#: admin/pageadmin.py:1413 templatetags/cms_admin.py:112
 msgid "Empty"
 msgstr "Trống"
 
-#: admin/pageadmin.py:1422
 msgid "Create Content"
 msgstr "Tạo nội dung"
 
-#: admin/permissionadmin.py:119
 msgid "View restriction"
 msgstr "Hạn chế xem"
 
-#: admin/permissionadmin.py:120
 msgid "View restrictions"
 msgstr "Các hạn chế xem"
 
-#: admin/placeholderadmin.py:102
 #, python-format
 msgid "Field %s not found"
 msgstr "Không tìm thấy trường %s"
 
-#: admin/placeholderadmin.py:108 templates/cms/toolbar/dragbar.html:5
-#: templates/cms/toolbar/dragitem.html:14
-#: templates/cms/toolbar/dragitem.html:24
 msgid "You do not have permission to edit this item"
 msgstr "Bạn không có quyền chỉnh sửa mục này"
 
-#: admin/placeholderadmin.py:388 admin/placeholderadmin.py:392
 msgid "You do not have permission to add a plugin"
 msgstr "Bạn không có quyền thêm plugin"
 
-#: admin/placeholderadmin.py:532 admin/placeholderadmin.py:536
 msgid "You do not have permission to copy this placeholder."
 msgstr "Bạn không có quyền sao chép placeholder này."
 
-#: admin/placeholderadmin.py:627
 msgid "Plugin not found"
 msgstr "Không tìm thấy plugin"
 
-#: admin/placeholderadmin.py:635 admin/placeholderadmin.py:638
 msgid "You do not have permission to edit this plugin"
 msgstr "Bạn không có quyền chỉnh sửa plugin này"
 
-#: admin/placeholderadmin.py:797 admin/placeholderadmin.py:801
 msgid "You have no permission to paste this plugin"
 msgstr "Bạn không có quyền dán plugin này"
 
-#: admin/placeholderadmin.py:857 admin/placeholderadmin.py:861
 msgid "You have no permission to paste this placeholder"
 msgstr "Bạn không có quyền dán placeholder này"
 
-#: admin/placeholderadmin.py:914 admin/placeholderadmin.py:918
-#: admin/placeholderadmin.py:922 admin/placeholderadmin.py:926
 msgid "You have no permission to move this plugin"
 msgstr "Bạn không có quyền di chuyển plugin này"
 
-#: admin/placeholderadmin.py:977 admin/placeholderadmin.py:981
 msgid "You have no permission to cut this plugin"
 msgstr "Bạn không có quyền cắt plugin này"
 
-#: admin/placeholderadmin.py:1026 admin/placeholderadmin.py:1030
-#: admin/placeholderadmin.py:1042
 msgid "You do not have permission to delete this plugin"
 msgstr "Bạn không có quyền xóa plugin này"
 
-#: admin/placeholderadmin.py:1059
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "Plugin %(name)s \"%(obj)s\" đã được xóa thành công."
 
-#: admin/placeholderadmin.py:1079 admin/placeholderadmin.py:1170
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Không thể xóa %(name)s"
 
-#: admin/placeholderadmin.py:1081 admin/placeholderadmin.py:1172
 msgid "Are you sure?"
 msgstr "Bạn có chắc chắn không?"
 
-#: admin/placeholderadmin.py:1117 admin/placeholderadmin.py:1121
-#: admin/placeholderadmin.py:1138
 msgid "You do not have permission to clear this placeholder"
 msgstr "Bạn không có quyền xóa nội dung placeholder này"
 
-#: admin/placeholderadmin.py:1151
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "Placeholder \"%(obj)s\" đã được xóa nội dung thành công."
 
-#: admin/placeholderadmin.py:1176
 msgid "placeholder"
 msgstr "placeholder"
 
-#: admin/useradmin.py:126 models/permissionmodels.py:260
 msgid "Page permissions"
 msgstr "Quyền của trang"
 
-#: admin/useradmin.py:127
 msgid "User & Group permissions"
 msgstr "Quyền của người dùng & nhóm"
 
-#: admin/useradmin.py:128
 msgid "Page permissions management"
 msgstr "Quản lý quyền của trang"
 
-#: admin/utils.py:90
 msgid "Actions"
 msgstr "Hành động"
 
-#: admin/utils.py:262
 msgid "Empty content"
 msgstr "Nội dung trống"
 
-#: admin/utils.py:503
+msgid "You do not have permission to change this content."
+msgstr ""
+
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Thuộc tính %(object_name)s"
 
-#: admin/utils.py:507
 #, python-format
 msgid "Add new %(object_name)s"
 msgstr "Thêm %(object_name)s mới"
 
-#: admin/utils.py:512 admin/utils.py:583
 msgid "Add content"
 msgstr "Thêm nội dung"
 
-#: admin/utils.py:516
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
@@ -454,21 +355,16 @@ msgstr ""
 "Nội dung cho ngôn ngữ hiện tại đã được thay đổi. Nhấp \"Hủy\" để quay lại "
 "biểu mẫu và lưu thay đổi. Nhấp \"OK\" để bỏ qua các thay đổi."
 
-#: admin/utils.py:536
 #, python-format
 msgid "Add %(language)s content"
 msgstr "Thêm nội dung %(language)s"
 
-#: admin/utils.py:570 cms_toolbars.py:199
-#: templates/cms/toolbar/items/live_draft.html:6 tests/test_views.py:324
 msgid "Preview"
 msgstr "Xem trước"
 
-#: admin/utils.py:583
 msgid "Settings"
 msgstr "Cài đặt"
 
-#: admin/utils.py:809
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
@@ -477,211 +373,151 @@ msgstr ""
 "Ngôn ngữ không hợp lệ %(value)s. Không thể xử lý biểu mẫu này. Hãy thử thay "
 "đổi ngôn ngữ."
 
-#: admin/utils.py:810
 msgid "<unspecified>"
 msgstr "<chưa xác định>"
 
-#: apphook_pool.py:98
 #, python-format
 msgid "No registered apphook \"%r\" found"
 msgstr "Không tìm thấy apphook đã đăng ký \"%r\""
 
-#: apps.py:7 templates/cms/noapphook.html:6
-#: templates/cms/toolbar/items/logo.html:2 templates/cms/welcome.html:6
-#: templates/cms/welcome.html:23 templates/cms/welcome.html:86
 msgid "django CMS"
 msgstr "django CMS"
 
-#: cms_plugins.py:9
 msgid "Placeholder"
 msgstr "Placeholder"
 
-#: cms_toolbars.py:76
 msgid "Getting started developer guide"
 msgstr "Hướng dẫn bắt đầu dành cho nhà phát triển"
 
-#: cms_toolbars.py:77 templates/cms/welcome.html:88 utils/conf.py:102
 msgid "Documentation"
 msgstr "Tài liệu"
 
-#: cms_toolbars.py:78 templates/cms/welcome.html:89
 msgid "User guide"
 msgstr "Hướng dẫn người dùng"
 
-#: cms_toolbars.py:79
 msgid "Discord community"
 msgstr "Cộng đồng Discord"
 
-#: cms_toolbars.py:80
 msgid "What's new"
 msgstr "Có gì mới"
 
-#: cms_toolbars.py:100 templates/cms/wizards/create.html:5
-#: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
 msgstr "Tạo"
 
-#: cms_toolbars.py:187 templates/cms/toolbar/dragbar.html:17
-#: templates/cms/toolbar/dragitem.html:18
-#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:534
-#: templatetags/cms_tags.py:537 tests/test_views.py:338
 msgid "Edit"
 msgstr "Chỉnh sửa"
 
-#: cms_toolbars.py:217 templates/admin/cms/page/delete_confirmation.html:49
 msgid "Structure"
 msgstr "Cấu trúc"
 
-#: cms_toolbars.py:224 forms/wizards.py:31
 msgid "Content"
 msgstr "Nội dung"
 
-#: cms_toolbars.py:262
 msgid "Help"
 msgstr "Trợ giúp"
 
-#: cms_toolbars.py:306 templates/admin/cms/page/tree/base.html:107
 msgid "Sites"
 msgstr "Các trang web"
 
-#: cms_toolbars.py:307
 msgid "Admin Sites"
 msgstr "Quản trị trang web"
 
-#: cms_toolbars.py:314
 msgid "Administration"
 msgstr "Quản trị"
 
-#: cms_toolbars.py:318
 msgid "User settings"
 msgstr "Cài đặt người dùng"
 
-#: cms_toolbars.py:327
 msgid "Clipboard..."
 msgstr "Bộ nhớ tạm..."
 
-#: cms_toolbars.py:332
 msgid "Clear clipboard"
 msgstr "Xóa bộ nhớ tạm"
 
-#: cms_toolbars.py:340
 msgid "Disable toolbar"
 msgstr "Tắt thanh công cụ"
 
-#: cms_toolbars.py:344
 msgid "Shortcuts..."
 msgstr "Phím tắt..."
 
-#: cms_toolbars.py:360
 msgid "Users"
 msgstr "Người dùng"
 
-#: cms_toolbars.py:378 tests/test_toolbar.py:1009 tests/test_toolbar.py:1026
-#: tests/test_toolbar.py:1060
 #, python-format
 msgid "Logout %s"
 msgstr "Đăng xuất %s"
 
-#: cms_toolbars.py:378
 msgid "Logout"
 msgstr "Đăng xuất"
 
-#: cms_toolbars.py:394 models/settingmodels.py:20
-#: templates/admin/cms/grouper/change_list.html:4
 msgid "Language"
 msgstr "Ngôn ngữ"
 
-#: cms_toolbars.py:520
-msgid "Add Translation"
-msgstr "Thêm bản dịch"
-
-#: cms_toolbars.py:533
 msgid "Delete Translation"
 msgstr "Xóa bản dịch"
 
-#: cms_toolbars.py:545 tests/test_toolbar.py:961 tests/test_toolbar.py:968
 msgid "Copy all plugins"
 msgstr "Sao chép tất cả plugin"
 
-#: cms_toolbars.py:547
 #, python-format
 msgid "from %s"
 msgstr "từ %s"
 
-#: cms_toolbars.py:548
 #, python-format
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "Bạn có chắc chắn muốn sao chép tất cả plugin từ %s không?"
 
-#: cms_toolbars.py:576
 msgid "Pages"
 msgstr "Các trang"
 
-#: cms_toolbars.py:596 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:92 tests/test_wizards.py:115 tests/test_wizards.py:172
 msgid "Page"
 msgstr "Trang"
 
-#: cms_toolbars.py:628
 msgid "Create Page"
 msgstr "Tạo trang"
 
-#: cms_toolbars.py:632 templates/admin/cms/page/tree/base.html:140
 msgid "New Page"
 msgstr "Trang mới"
 
-#: cms_toolbars.py:633
 msgid "New Sub Page"
 msgstr "Trang con mới"
 
-#: cms_toolbars.py:645
 msgid "Duplicate this Page"
 msgstr "Nhân bản trang này"
 
-#: cms_toolbars.py:656
 msgid "Page settings"
 msgstr "Cài đặt trang"
 
-#: cms_toolbars.py:664 templates/admin/cms/page/tree/actions_dropdown.html:67
-#: templates/admin/cms/page/tree/actions_dropdown.html:72
-#: templates/admin/cms/page/tree/menu.html:209
-#: templates/admin/cms/page/tree/menu.html:211
 msgid "Advanced settings"
 msgstr "Cài đặt nâng cao"
 
-#: cms_toolbars.py:674
 msgid "Templates"
 msgstr "Mẫu (template)"
 
-#: cms_toolbars.py:694
+msgid "Placeholders"
+msgstr ""
+
 msgid "Hide in navigation"
 msgstr "Ẩn khỏi điều hướng"
 
-#: cms_toolbars.py:694
 msgid "Display in navigation"
 msgstr "Hiển thị trong điều hướng"
 
-#: cms_toolbars.py:707
 msgid "Delete page"
 msgstr "Xóa trang"
 
-#: cms_wizards.py:46
 msgid "Create a new page next to the current page."
 msgstr "Tạo một trang mới bên cạnh trang hiện tại."
 
-#: cms_wizards.py:54
 msgid "Create a page below the current page."
 msgstr "Tạo một trang bên dưới trang hiện tại."
 
-#: forms/fields.py:24
 msgid "Select a valid site"
 msgstr "Chọn một trang web hợp lệ"
 
-#: forms/fields.py:25
 msgid "Select a valid page"
 msgstr "Chọn một trang hợp lệ"
 
-#: forms/validators.py:77
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -690,273 +526,197 @@ msgstr ""
 "Trang %(conflict_page)s có cùng url '%(url)s' với trang hiện tại "
 "\"%(instance)s\"."
 
-#: forms/validators.py:79
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Trang %(conflict_page)s có cùng url '%(url)s' với trang hiện tại."
 
-#: forms/wizards.py:32
+msgid "Add another"
+msgstr ""
+
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
 "Tùy chọn. Nếu được cung cấp, sẽ tự động được thêm vào trong một plugin văn "
 "bản mới."
 
-#: forms/wizards.py:45
 msgid "Provide a title for the new page."
 msgstr "Cung cấp tiêu đề cho trang mới."
 
-#: forms/wizards.py:47
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Để trống để tạo slug tự động, hoặc ghi đè nếu cần."
 
-#: forms/wizards.py:83
 msgid "Cannot automatically create slug. Please provide one manually."
 msgstr "Không thể tự động tạo slug. Vui lòng cung cấp thủ công."
 
-#: forms/wizards.py:99
 msgid "Please provide a valid slug."
 msgstr "Vui lòng cung cấp một slug hợp lệ."
 
-#: forms/wizards.py:123
 msgid "You don't have the permissions required to add a page."
 msgstr "Bạn không có quyền cần thiết để thêm trang."
 
-#: migrations/0001_initial.py:26 migrations/0001_initial.py:60
-#: migrations/0001_initial.py:83 migrations/0001_initial.py:123
 msgid "ID"
 msgstr "ID"
 
-#: migrations/0001_initial.py:27 models/pluginmodel.py:172
 msgid "position"
 msgstr "vị trí"
 
-#: migrations/0001_initial.py:28 models/contentmodels.py:40
-#: models/pagemodel.py:1098 models/pluginmodel.py:174
 msgid "language"
 msgstr "ngôn ngữ"
 
-#: migrations/0001_initial.py:29 models/pluginmodel.py:176
 msgid "plugin_name"
 msgstr "tên plugin"
 
-#: migrations/0001_initial.py:30 models/contentmodels.py:82
-#: models/pluginmodel.py:178
 msgid "creation date"
 msgstr "ngày tạo"
 
-#: migrations/0001_initial.py:61 migrations/0001_initial.py:124
-#: models/permissionmodels.py:84
 msgid "can edit"
 msgstr "có thể chỉnh sửa"
 
-#: migrations/0001_initial.py:62 migrations/0001_initial.py:125
-#: models/permissionmodels.py:85
 msgid "can add"
 msgstr "có thể thêm"
 
-#: migrations/0001_initial.py:63 migrations/0001_initial.py:126
-#: models/permissionmodels.py:86
 msgid "can delete"
 msgstr "có thể xóa"
 
-#: migrations/0001_initial.py:64 migrations/0001_initial.py:127
-#: models/permissionmodels.py:88
 msgid "can change advanced settings"
 msgstr "có thể thay đổi cài đặt nâng cao"
 
-#: migrations/0001_initial.py:65 migrations/0001_initial.py:128
-#: models/permissionmodels.py:87
 msgid "can publish"
 msgstr "có thể xuất bản"
 
-#: migrations/0001_initial.py:66 migrations/0001_initial.py:129
-#: models/permissionmodels.py:90
 msgid "can change permissions"
 msgstr "có thể thay đổi quyền"
 
-#: migrations/0001_initial.py:67 migrations/0001_initial.py:130
-#: models/permissionmodels.py:92
 msgid "can move"
 msgstr "có thể di chuyển"
 
-#: migrations/0001_initial.py:68 migrations/0001_initial.py:131
-#: models/permissionmodels.py:93
 msgid "view restricted"
 msgstr "bị hạn chế xem"
 
-#: migrations/0001_initial.py:69 models/permissionmodels.py:196
 msgid "can recover pages"
 msgstr "có thể khôi phục trang"
 
-#: migrations/0001_initial.py:70 migrations/0001_initial.py:133
-#: models/permissionmodels.py:78
 msgid "group"
 msgstr "nhóm"
 
-#: migrations/0001_initial.py:71 models/permissionmodels.py:204
 msgid "sites"
 msgstr "các trang web"
 
-#: migrations/0001_initial.py:84 models/contentmodels.py:90
-#: models/pagemodel.py:65
 msgid "created by"
 msgstr "được tạo bởi"
 
-#: migrations/0001_initial.py:85 models/contentmodels.py:95
-#: models/pagemodel.py:70
 msgid "changed by"
 msgstr "được thay đổi bởi"
 
-#: migrations/0001_initial.py:88
-#: templates/admin/cms/page/tree/actions_dropdown.html:79
 msgid "publication date"
 msgstr "ngày xuất bản"
 
-#: migrations/0001_initial.py:89
-#: templates/admin/cms/page/tree/actions_dropdown.html:82
 msgid "publication end date"
 msgstr "ngày kết thúc xuất bản"
 
-#: migrations/0001_initial.py:90 models/contentmodels.py:102
 msgid "in navigation"
 msgstr "trong điều hướng"
 
-#: migrations/0001_initial.py:91 models/contentmodels.py:107
 msgid "soft root"
 msgstr "gốc mềm"
 
-#: migrations/0001_initial.py:92 models/pagemodel.py:82
 msgid "id"
 msgstr "id"
 
-#: migrations/0001_initial.py:93 models/pagemodel.py:90
 msgid "attached menu"
 msgstr "menu đính kèm"
 
-#: migrations/0001_initial.py:94 models/contentmodels.py:113
-#: templates/admin/cms/page/tree/actions_dropdown.html:99
 msgid "template"
 msgstr "template"
 
-#: migrations/0001_initial.py:95 models/pagemodel.py:97
 msgid "login required"
 msgstr "yêu cầu đăng nhập"
 
-#: migrations/0001_initial.py:98 models/pagemodel.py:106
+msgid "menu visibility"
+msgstr "hiển thị trong menu"
+
 msgid "application"
 msgstr "ứng dụng"
 
-#: migrations/0001_initial.py:99 models/pagemodel.py:113
 msgid "application instance name"
 msgstr "tên thực thể ứng dụng"
 
-#: migrations/0001_initial.py:110 models/pagemodel.py:60
-#: templates/admin/cms/page/tree/actions_dropdown.html:105
 msgid "site"
 msgstr "trang web"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:253
-#: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "Cấp quyền cho"
 
-#: migrations/0001_initial.py:134 models/contentmodels.py:78
-#: models/pagemodel.py:133 models/pagemodel.py:1102
-#: models/permissionmodels.py:254 templates/admin/cms/page/tree/base.html:298
-#: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
 msgstr "trang"
 
-#: models/contentmodels.py:14
 msgid "no limit set"
 msgstr "không đặt giới hạn"
 
-#: models/contentmodels.py:15
 msgid "for logged in users only"
 msgstr "chỉ dành cho người dùng đã đăng nhập"
 
-#: models/contentmodels.py:16
 msgid "for anonymous users only"
 msgstr "chỉ dành cho người dùng ẩn danh"
 
-#: models/contentmodels.py:22
 msgid "Inherit from parent page"
 msgstr "Kế thừa từ trang cha"
 
-#: models/contentmodels.py:23
 msgid "Deny"
 msgstr "Từ chối"
 
-#: models/contentmodels.py:24
 msgid "Only this website"
 msgstr "Chỉ website này"
 
-#: models/contentmodels.py:25
 msgid "Allow"
 msgstr "Cho phép"
 
-#: models/contentmodels.py:42
 msgid "title"
 msgstr "tiêu đề"
 
-#: models/contentmodels.py:44
 msgid "The default title"
 msgstr "Tiêu đề mặc định"
 
-#: models/contentmodels.py:47
 msgid "Page Title"
 msgstr "Tiêu đề trang"
 
-#: models/contentmodels.py:52
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Ghi đè nội dung hiển thị ở phía trên trình duyệt hoặc trong dấu trang"
 
-#: models/contentmodels.py:56
 msgid "Menu Title"
 msgstr "Tiêu đề menu"
 
-#: models/contentmodels.py:60
 msgid "Overwrite what is displayed in the menu"
 msgstr "Ghi đè nội dung hiển thị trong menu"
 
-#: models/contentmodels.py:63
 msgid "Description meta tag"
 msgstr "Thẻ meta mô tả"
 
-#: models/contentmodels.py:66
 msgid "A description of the page used by search engines."
 msgstr "Mô tả của trang được các công cụ tìm kiếm sử dụng."
 
-#: models/contentmodels.py:69
 msgid "redirect"
 msgstr "chuyển hướng"
 
-#: models/contentmodels.py:73
 msgid "Redirects to this URL."
 msgstr "Chuyển hướng đến URL này."
 
-#: models/contentmodels.py:110
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Tất cả các trang tổ tiên sẽ không được hiển thị trong điều hướng"
 
-#: models/contentmodels.py:116
 msgid "The template used to render the content."
 msgstr "Template được sử dụng để hiển thị nội dung."
 
-#: models/contentmodels.py:146
 msgid "page content"
 msgstr "nội dung trang"
 
-#: models/contentmodels.py:147
 msgid "page contents"
 msgstr "các nội dung trang"
 
-#: models/contentmodels.py:289 models/pagemodel.py:985
 msgid "default"
 msgstr "mặc định"
 
-#: models/pagemodel.py:87
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
@@ -964,111 +724,81 @@ msgstr ""
 "Một mã định danh duy nhất được sử dụng với templatetag page_url để liên kết "
 "đến trang này"
 
-#: models/pagemodel.py:120
 msgid "Mark this page as a page type"
 msgstr "Đánh dấu trang này là một loại trang"
 
-#: models/pagemodel.py:134
 msgid "pages"
 msgstr "các trang"
 
-#: models/pagemodel.py:153
 msgid "No available title"
 msgstr "Không có tiêu đề"
 
-#: models/pagemodel.py:1096
 msgid "slug"
 msgstr "slug"
 
-#: models/pagemodel.py:1097
 msgid "Path"
 msgstr "Đường dẫn"
 
-#: models/permissionmodels.py:55
 msgid "Current page"
 msgstr "Trang hiện tại"
 
-#: models/permissionmodels.py:56
 msgid "Page children (immediate)"
 msgstr "Trang con (trực tiếp)"
 
-#: models/permissionmodels.py:57
 msgid "Page and children (immediate)"
 msgstr "Trang và các trang con (trực tiếp)"
 
-#: models/permissionmodels.py:58
 msgid "Page descendants"
 msgstr "Các trang hậu duệ"
 
-#: models/permissionmodels.py:59
 msgid "Page and descendants"
 msgstr "Trang và các trang hậu duệ"
 
-#: models/permissionmodels.py:90
 msgid "on page level"
 msgstr "ở cấp trang"
 
-#: models/permissionmodels.py:93
 msgid "frontend view restriction"
 msgstr "hạn chế xem ở giao diện người dùng"
 
-#: models/permissionmodels.py:103
 msgid "Please select user or group."
 msgstr "Vui lòng chọn người dùng hoặc nhóm."
 
-#: models/permissionmodels.py:119
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"Người dùng không thể xuất bản trang nếu không có quyền thay đổi trang. Yêu "
-"cầu quyền chỉnh sửa."
 
-#: models/permissionmodels.py:124
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
 msgstr ""
-"Người dùng không thể thay đổi cài đặt nâng cao của trang nếu không có quyền "
-"thay đổi trang. Yêu cầu quyền chỉnh sửa."
 
-#: models/permissionmodels.py:129
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
 msgstr ""
-"Người dùng không thể thay đổi quyền của trang nếu không có quyền thay đổi "
-"trang. Yêu cầu quyền chỉnh sửa."
 
-#: models/permissionmodels.py:134
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"Người dùng không thể di chuyển trang nếu không có quyền thay đổi trang. Yêu "
-"cầu quyền chỉnh sửa."
 
-#: models/permissionmodels.py:198
 msgid "can recover any deleted page"
 msgstr "có thể khôi phục bất kỳ trang nào đã xóa"
 
-#: models/permissionmodels.py:203
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr "Nếu không chọn gì, người dùng được cấp quyền cho tất cả các trang web."
+msgstr ""
+"Nếu không chọn gì, người dùng được cấp quyền cho tất cả các trang web."
 
-#: models/permissionmodels.py:210
 msgid "Page global permission"
 msgstr "Quyền toàn cục của trang"
 
-#: models/permissionmodels.py:211
 msgid "Pages global permissions"
 msgstr "Các quyền toàn cục của trang"
 
-#: models/permissionmodels.py:259
 msgid "Page permission"
 msgstr "Quyền của trang"
 
-#: models/permissionmodels.py:274
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
@@ -1077,201 +807,151 @@ msgstr ""
 "trang hậu duệ, nếu không trang được thêm sẽ không thể được thay đổi bởi "
 "người tạo nó."
 
-#: models/permissionmodels.py:320
 msgid "User (page)"
 msgstr "Người dùng (trang)"
 
-#: models/permissionmodels.py:321
 msgid "Users (page)"
 msgstr "Người dùng (trang)"
 
-#: models/permissionmodels.py:336
 msgid "User group (page)"
 msgstr "Nhóm người dùng (trang)"
 
-#: models/permissionmodels.py:337
 msgid "User groups (page)"
 msgstr "Các nhóm người dùng (trang)"
 
-#: models/placeholdermodel.py:30
 msgid "slot"
 msgstr "khe"
 
-#: models/placeholdermodel.py:32
 msgid "width"
 msgstr "chiều rộng"
 
-#: models/pluginmodel.py:212
+msgid "Edit object"
+msgstr ""
+
+msgid "This is an external placeholder"
+msgstr ""
+
+msgid "plugin"
+msgstr ""
+
+msgid "plugins"
+msgstr ""
+
 msgid "<Empty>"
 msgstr "<Trống>"
 
-#: models/settingmodels.py:21
 msgid "The language for the admin interface and toolbar"
 msgstr "Ngôn ngữ cho giao diện quản trị và thanh công cụ"
 
-#: models/settingmodels.py:31
 msgid "user setting"
 msgstr "cài đặt người dùng"
 
-#: models/settingmodels.py:32
 msgid "user settings"
 msgstr "các cài đặt người dùng"
 
-#: plugin_base.py:70
 msgid "Advanced options"
 msgstr "Tùy chọn nâng cao"
 
-#: plugin_base.py:125
 msgid "Generic"
 msgstr "Chung"
 
-#: plugin_base.py:612
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" đã được thay đổi thành công."
 
-#: plugin_base.py:700
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Không còn cài đặt nào khác cho plugin này. Vui lòng nhấn lưu."
 
-#: signals/log_entries.py:12 tests/test_log_entries.py:141
 msgid "Moved"
 msgstr "Đã di chuyển"
 
-#: signals/log_entries.py:16
 msgid "Changed"
 msgstr "Đã thay đổi"
 
-#: signals/log_entries.py:20 tests/test_log_entries.py:171
 msgid "Deleted"
 msgstr "Đã xóa"
 
-#: signals/log_entries.py:24
 msgid "Added Page Translation"
 msgstr "Đã thêm bản dịch trang"
 
-#: signals/log_entries.py:28 tests/test_log_entries.py:201
 msgid "Changed Page Translation"
 msgstr "Đã thay đổi bản dịch trang"
 
-#: signals/log_entries.py:32 tests/test_log_entries.py:234
 msgid "Deleted Page Translation"
 msgstr "Đã xóa bản dịch trang"
 
-#: signals/log_entries.py:39 tests/test_log_entries.py:301
 msgid "Added Plugin"
 msgstr "Đã thêm plugin"
 
-#: signals/log_entries.py:44 tests/test_log_entries.py:362
 msgid "Changed Plugin"
 msgstr "Đã thay đổi plugin"
 
-#: signals/log_entries.py:49 tests/test_log_entries.py:334
 msgid "Moved Plugin"
 msgstr "Đã di chuyển plugin"
 
-#: signals/log_entries.py:54 tests/test_log_entries.py:390
 msgid "Deleted Plugin"
 msgstr "Đã xóa plugin"
 
-#: signals/log_entries.py:59 tests/test_log_entries.py:427
 msgid "Cut Plugin"
-msgstr "Đã cắt plugin"
+msgstr ""
 
-#: signals/log_entries.py:64 tests/test_log_entries.py:466
 msgid "Paste Plugin"
 msgstr "Đã dán plugin"
 
-#: signals/log_entries.py:69 tests/test_log_entries.py:546
 msgid "Paste to Placeholder"
 msgstr "Đã dán vào placeholder"
 
-#: signals/log_entries.py:74 tests/test_log_entries.py:499
 msgid "Added plugins to placeholder from clipboard"
 msgstr "Đã thêm plugin vào placeholder từ bộ nhớ tạm"
 
-#: signals/log_entries.py:79 tests/test_log_entries.py:573
 msgid "Cleared Placeholder"
 msgstr "Đã xóa nội dung placeholder"
 
-#: templates/admin/cms/extensions/change_form.html:5
-#: templates/admin/cms/page/change_form.html:84
-#: templates/admin/cms/page/plugin/submit_line.html:3
-#: templates/admin/cms/page/submit_row.html:4
-#: templates/admin/cms/page/tree/copy_premissions.html:10
-#: templates/admin/cms/usersettings/change_form.html:41
 msgid "Save"
 msgstr "Lưu"
 
-#: templates/admin/cms/grouper/change_form.html:17
 msgid "Some fields cannot be changed since they are read-only content."
 msgstr "Một số trường không thể thay đổi vì chúng là nội dung chỉ đọc."
 
-#: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
 msgstr "Đăng nhập vào trang quản trị <a href=\"%(login_url)s\">tại đây</a>."
 
-#: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
 msgstr "URL đăng nhập: %(login_url)s"
 
-#: templates/admin/cms/mail/page_user_change.html:7
-#: templates/admin/cms/mail/page_user_change.txt:5
 msgid "Username:"
 msgstr "Tên đăng nhập:"
 
-#: templates/admin/cms/mail/page_user_change.html:11
-#: templates/admin/cms/mail/page_user_change.txt:6
 msgid "Password:"
 msgstr "Mật khẩu:"
 
-#: templates/admin/cms/page/change_form.html:4
 msgid "Add a page"
 msgstr "Thêm một trang"
 
-#: templates/admin/cms/page/change_form.html:4
 msgid "Change a page"
 msgstr "Thay đổi một trang"
 
-#: templates/admin/cms/page/change_form.html:8
-#: templates/admin/cms/page/tree/base.html:23
-#: templates/admin/cms/page/tree/legend.html:34
-#: templates/admin/cms/page/tree/menu.html:41
-#: templates/admin/cms/usersettings/change_form.html:30
 msgid "Home"
 msgstr "Trang chủ"
 
-#: templates/admin/cms/page/change_form.html:28
-#: templates/admin/cms/page/tree/menu.html:80
-#: templates/admin/cms/page/tree/menu.html:83
 msgid "View on site"
 msgstr "Xem trên trang web"
 
-#: templates/admin/cms/page/change_form.html:56
-#: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Vui lòng sửa các lỗi bên dưới."
 
-#: templates/admin/cms/page/change_form.html:73
 msgid "All permissions"
 msgstr "Tất cả quyền"
 
-#: templates/admin/cms/page/change_form.html:74
-#: templates/admin/cms/page/tree/base.html:206
-#: templates/admin/cms/page/tree/base.html:270
 msgid "Loading..."
 msgstr "Đang tải..."
 
-#: templates/admin/cms/page/change_form.html:85
-#: templates/admin/cms/page/plugin/submit_line.html:9
-#: templates/admin/cms/page/submit_row.html:12
 msgid "Save and continue editing"
 msgstr "Lưu và tiếp tục chỉnh sửa"
 
-#: templates/admin/cms/page/delete_confirmation.html:39
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -1280,149 +960,96 @@ msgstr ""
 "Bạn có chắc chắn muốn xóa %(object_name)s \"%(escaped_object)s\" không? Tất "
 "cả các mục liên quan sau đây sẽ bị xóa:"
 
-#: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
 msgstr "Có, tôi chắc chắn"
 
-#: templates/admin/cms/page/delete_confirmation.html:58
 msgid "No, take me back"
 msgstr "Không, đưa tôi quay lại"
 
-#: templates/admin/cms/page/delete_summary.html:2
 msgid "Summary"
 msgstr "Tóm tắt"
 
-#: templates/admin/cms/page/permissions.html:6
 msgid "User"
 msgstr "Người dùng"
 
-#: templates/admin/cms/page/permissions.html:7
 msgid "Group"
 msgstr "Nhóm"
 
-#: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
 msgstr "Có thể chỉnh sửa"
 
-#: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
 msgstr "Có thể thêm"
 
-#: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
 msgstr "Có thể xóa"
 
-#: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
 msgstr "Có thể xuất bản"
 
-#: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
 msgstr "Có thể thay đổi quyền"
 
-#: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
 msgstr "Có thể di chuyển"
 
-#: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
 msgstr "Có thể xem"
 
-#: templates/admin/cms/page/permissions.html:23
-#: templates/admin/cms/page/permissions.html:24
 msgid "(global)"
 msgstr "(toàn cục)"
 
-#: templates/admin/cms/page/permissions.html:28
 msgid "(current)"
 msgstr "(hiện tại)"
 
-#: templates/admin/cms/page/permissions.html:54
 msgid "Page doesn't inherit any permissions."
 msgstr "Trang không kế thừa bất kỳ quyền nào."
 
-#: templates/admin/cms/page/plugin/error_form.html:4
 msgid "Edit model"
 msgstr "Chỉnh sửa model"
 
-#: templates/admin/cms/page/plugin/submit_line.html:7
-#: templates/admin/cms/page/submit_row.html:10
 msgid "Save as new"
 msgstr "Lưu thành mới"
 
-#: templates/admin/cms/page/plugin/submit_line.html:8
-#: templates/admin/cms/page/submit_row.html:11
 msgid "Save and add another"
 msgstr "Lưu và thêm cái khác"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:13
-#: templates/admin/cms/page/tree/actions_dropdown.html:15
-#: templates/admin/cms/page/tree/menu.html:185
-#: templates/admin/cms/page/tree/menu.html:187
-#: templates/cms/toolbar/dragitem.html:41
 msgid "Copy"
 msgstr "Sao chép"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:26
-#: templates/admin/cms/page/tree/actions_dropdown.html:28
-#: templates/admin/cms/page/tree/menu.html:191
-#: templates/admin/cms/page/tree/menu.html:193
-#: templates/cms/toolbar/dragitem.html:40
 msgid "Cut"
 msgstr "Cắt"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:37
-#: templates/admin/cms/page/tree/base.html:170
-#: templates/admin/cms/page/tree/menu.html:199
-#: templates/cms/toolbar/dragbar.html:25 templates/cms/toolbar/dragbar.html:28
-#: templates/cms/toolbar/dragitem.html:44
-#: templates/cms/toolbar/dragitem.html:49
 msgid "Paste"
 msgstr "Dán"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:52
-#: templates/admin/cms/page/tree/actions_dropdown.html:54
-#: templates/admin/cms/page/tree/actions_dropdown.html:61
 msgid "Set as home"
 msgstr "Đặt làm trang chủ"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:85
 msgid "is restricted"
 msgstr "bị hạn chế"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:93
 msgid "last change by"
 msgstr "thay đổi cuối bởi"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:96
 msgid "last change on"
 msgstr "thay đổi cuối vào"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:102
 msgid "meta"
 msgstr "meta"
 
-#: templates/admin/cms/page/tree/base.html:5
 msgid "List of pages"
 msgstr "Danh sách các trang"
 
-#: templates/admin/cms/page/tree/base.html:28
-#: templates/admin/cms/page/tree/base.html:58
-#: templates/admin/cms/page/tree/base.html:60
-#: templates/admin/cms/page/tree/base.html:89
 msgid "Search"
 msgstr "Tìm kiếm"
 
-#: templates/admin/cms/page/tree/base.html:46
 msgid "Page Tree"
 msgstr "Cây trang"
 
-#: templates/admin/cms/page/tree/base.html:52
 msgid "Reset filter"
 msgstr "Đặt lại bộ lọc"
 
-#: templates/admin/cms/page/tree/base.html:118
 #, python-format
 msgid ""
 "\n"
@@ -1433,248 +1060,177 @@ msgstr ""
 "                                                Khôi phục %(name)s đã xóa\n"
 "                                            "
 
-#: templates/admin/cms/page/tree/base.html:150
 msgid "Main Navigation"
 msgstr "Điều hướng chính"
 
-#: templates/admin/cms/page/tree/base.html:162
-#: templates/admin/cms/page/tree/menu.html:176
 msgid "Options"
 msgstr "Tùy chọn"
 
-#: templates/admin/cms/page/tree/base.html:200
-#: templates/admin/cms/page/tree/base.html:264
 msgid "Successfully moved"
 msgstr "Đã di chuyển thành công"
 
-#: templates/admin/cms/page/tree/base.html:201
-#: templates/admin/cms/page/tree/base.html:265
 msgid "Changes within the tree might require a refresh."
 msgstr "Các thay đổi trong cây có thể yêu cầu làm mới."
 
-#: templates/admin/cms/page/tree/base.html:202
-#: templates/admin/cms/page/tree/base.html:266
 msgid "Error:"
 msgstr "Lỗi:"
 
-#: templates/admin/cms/page/tree/base.html:203
-#: templates/admin/cms/page/tree/base.html:267
 msgid ""
-"This page cannot be copied because an application is attached to it. See the "
-"Page's Advanced settings to manage apphooks."
+"This page cannot be copied because an application is attached to it. See the"
+" Page's Advanced settings to manage apphooks."
 msgstr ""
-"Không thể sao chép trang này vì có một ứng dụng được gắn vào nó. Xem Cài đặt "
-"nâng cao của trang để quản lý apphook."
+"Không thể sao chép trang này vì có một ứng dụng được gắn vào nó. Xem Cài đặt"
+" nâng cao của trang để quản lý apphook."
 
-#: templates/admin/cms/page/tree/base.html:204
-#: templates/admin/cms/page/tree/base.html:268
 msgid "Are you sure you want to § this page?"
 msgstr "Bạn có chắc chắn muốn § trang này không?"
 
-#: templates/admin/cms/page/tree/base.html:205
-#: templates/admin/cms/page/tree/base.html:269
 msgid "Reload"
 msgstr "Tải lại"
 
-#: templates/admin/cms/page/tree/base.html:207
-#: templates/admin/cms/page/tree/base.html:271
 msgid "New node"
 msgstr "Nút mới"
 
-#: templates/admin/cms/page/tree/base.html:208
-#: templates/admin/cms/page/tree/base.html:272
 msgid "nodes"
 msgstr "các nút"
 
-#: templates/admin/cms/page/tree/base.html:219
-#: templates/admin/cms/page/tree/base.html:283
 msgid "View"
 msgstr "Xem"
 
-#: templates/admin/cms/page/tree/base.html:225
-#: templates/admin/cms/page/tree/base.html:289
 msgid "Menu"
 msgstr "Menu"
 
-#: templates/admin/cms/page/tree/base.html:298
 #, python-format
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add "
-"%(object)s</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
 "\n"
 "                            <em>Chưa có %(object)s nào.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Thêm "
-"%(object)s</a> ngay.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Thêm %(object)s</a> ngay.\n"
 "                        "
 
-#: templates/admin/cms/page/tree/copy_premissions.html:4
 msgid "Copy options"
 msgstr "Tùy chọn sao chép"
 
-#: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Choose copy options"
 msgstr "Chọn tùy chọn sao chép"
 
-#: templates/admin/cms/page/tree/copy_premissions.html:11
-#: templates/cms/toolbar/toolbar_with_structure.html:12
-#: templates/cms/toolbar/toolbar_with_structure.html:49
 msgid "Close"
 msgstr "Đóng"
 
-#: templates/admin/cms/page/tree/legend.html:7
 msgid "Legend"
 msgstr "Chú thích"
 
-#: templates/admin/cms/page/tree/legend.html:16
 msgid "In menu"
 msgstr "Trong menu"
 
-#: templates/admin/cms/page/tree/legend.html:22
 msgid "Not in menu"
 msgstr "Không trong menu"
 
-#: templates/admin/cms/page/tree/legend.html:28
 msgid "View page"
 msgstr "Xem trang"
 
-#: templates/admin/cms/page/tree/legend.html:40
-#: templates/admin/cms/page/tree/menu.html:51
 msgid "Softroot"
 msgstr "Gốc mềm"
 
-#: templates/admin/cms/page/tree/legend.html:46
 msgid "Apphook"
 msgstr "Apphook"
 
-#: templates/admin/cms/page/tree/menu.html:63
+msgid "Redirect"
+msgstr ""
+
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Ứng dụng: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu.html:118
 msgid "in menu"
 msgstr "trong menu"
 
-#: templates/admin/cms/page/tree/menu.html:123
 msgid "not in menu"
 msgstr "không trong menu"
 
-#: templates/admin/cms/page/tree/menu.html:140
-#: templates/admin/cms/page/tree/menu.html:151
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Cài đặt trang (nhấn SHIFT để xem cài đặt nâng cao)"
 
-#: templates/admin/cms/page/tree/menu.html:218
 msgid "Permissions"
 msgstr "Quyền"
 
-#: templates/cms/headless/placeholder.html:17
 msgid "inherited"
 msgstr "được kế thừa"
 
-#: templates/cms/noapphook.html:18
-#: templates/cms/toolbar/toolbar_with_structure.html:90
 msgid "This page has no preview!"
 msgstr "Trang này không có bản xem trước!"
 
-#: templates/cms/noapphook.html:19
-msgid "Potentially the attached apphook does not provide content for its root."
+msgid ""
+"Potentially the attached apphook does not provide content for its root."
 msgstr "Có thể apphook được gắn không cung cấp nội dung cho gốc của nó."
 
-#: templates/cms/noapphook.html:20
-#: templates/cms/toolbar/toolbar_with_structure.html:91
 msgid "It is being redirected to:"
 msgstr "Đang được chuyển hướng đến:"
 
-#: templates/cms/toolbar/clipboard.html:3
 msgid "Clipboard"
 msgstr "Bộ nhớ tạm"
 
-#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:28
-#: templates/cms/toolbar/toolbar_javascript.html:91
 msgid "Add plugin"
 msgstr "Thêm plugin"
 
-#: templates/cms/toolbar/dragbar.html:20
 msgid "Copy all"
 msgstr "Sao chép tất cả"
 
-#: templates/cms/toolbar/dragbar.html:22
 msgid "Copy from"
 msgstr "Sao chép từ"
 
-#: templates/cms/toolbar/dragbar.html:26 templates/cms/toolbar/dragbar.html:29
 msgid "Empty all"
 msgstr "Làm trống tất cả"
 
-#: templates/cms/toolbar/dragbar.html:35 templates/cms/toolbar/dragitem.html:61
 msgid "Filter plugins..."
 msgstr "Lọc plugin..."
 
-#: templates/cms/toolbar/dragbar.html:41
-msgid "This is a static placeholder"
-msgstr "Đây là một placeholder tĩnh"
-
-#: templates/cms/toolbar/dragbar.html:43
 msgid "Expand all"
 msgstr "Mở rộng tất cả"
 
-#: templates/cms/toolbar/dragbar.html:44
 msgid "Collapse all"
 msgstr "Thu gọn tất cả"
 
-#: templates/cms/toolbar/dragitem.html:26
 msgid "You cannot add plugins to this plugin."
 msgstr "Bạn không thể thêm plugin vào plugin này."
 
-#: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr ""
 "Plugin này không thể được di chuyển hoặc chỉnh sửa bên ngoài plugin cha"
 
-#: templates/cms/toolbar/dragitem.html:50
 msgid "Clipboard is empty."
 msgstr "Bộ nhớ tạm trống."
 
-#: templates/cms/toolbar/dragitem.html:51
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr "Plugin này không cho phép plugin loại này làm plugin lồng nhau."
 
-#: templates/cms/toolbar/dragitem.html:52
 msgid "This plugin cannot have nested plugins."
 msgstr "Plugin này không thể có plugin lồng nhau."
 
-#: templates/cms/toolbar/dragitem_extra_menu.html:2
 msgid "Highlight"
 msgstr "Làm nổi bật"
 
-#: templates/cms/toolbar/dragitem_menu.html:4
 msgid "Available plugins"
 msgstr "Các plugin có sẵn"
 
-#: templates/cms/toolbar/items/button_list.html:4
 msgid "Toggle structure"
 msgstr "Bật/tắt cấu trúc"
 
-#: templates/cms/toolbar/items/login.html:16
 msgid "Login"
 msgstr "Đăng nhập"
 
-#: templates/cms/toolbar/plugin.html:24
 msgid "Add plugin to"
 msgstr "Thêm plugin vào"
 
-#: templates/cms/toolbar/toolbar.html:28
 msgid "More"
 msgstr "Thêm"
 
-#: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
@@ -1683,220 +1239,174 @@ msgstr ""
 "Phiên bản phát triển sử dụng django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
 
-#: templates/cms/toolbar/toolbar_javascript.html:27
 msgid "Cancel"
 msgstr "Hủy"
 
-#: templates/cms/toolbar/toolbar_javascript.html:28
 msgid "The following error occurred:"
 msgstr "Đã xảy ra lỗi sau:"
 
-#: templates/cms/toolbar/toolbar_javascript.html:29
 msgid "Action successful."
 msgstr "Hành động thành công."
 
-#: templates/cms/toolbar/toolbar_javascript.html:30
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Bạn có chắc chắn muốn xóa plugin này không?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:31
 msgid "Are you sure you want to publish this page?"
 msgstr "Bạn có chắc chắn muốn xuất bản trang này không?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:32
 msgid "Plugin will be added here"
 msgstr "Plugin sẽ được thêm vào đây"
 
-#: templates/cms/toolbar/toolbar_javascript.html:33
 msgid "You have unsaved changes."
 msgstr "Bạn có những thay đổi chưa được lưu."
 
-#: templates/cms/toolbar/toolbar_javascript.html:34
 msgid "Loading"
 msgstr "Đang tải"
 
-#: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Are you sure you want to abandon these changes?"
 msgstr "Bạn có chắc chắn muốn bỏ qua những thay đổi này không?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:36
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
 msgstr ""
-"Không thể tải biểu mẫu. Vui lòng kiểm tra xem máy chủ có đang chạy đúng cách "
-"không."
+"Không thể tải biểu mẫu. Vui lòng kiểm tra xem máy chủ có đang chạy đúng cách"
+" không."
 
-#: templates/cms/toolbar/toolbar_javascript.html:37
 msgid "Most used"
 msgstr "Được dùng nhiều nhất"
 
-#: templates/cms/toolbar/toolbar_javascript.html:38
 msgid "Shortcuts"
 msgstr "Phím tắt"
 
-#: templates/cms/toolbar/toolbar_javascript.html:39
 msgid "The page was changed in the meantime, reloading..."
 msgstr "Trang đã bị thay đổi trong thời gian đó, đang tải lại..."
 
-#: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "CMS-wide Shortcuts"
 msgstr "Phím tắt toàn CMS"
 
-#: templates/cms/toolbar/toolbar_javascript.html:46
 msgid "Bring up this help dialog"
 msgstr "Hiển thị hộp thoại trợ giúp này"
 
-#: templates/cms/toolbar/toolbar_javascript.html:50
 msgid "Close/cancel"
 msgstr "Đóng/hủy"
 
-#: templates/cms/toolbar/toolbar_javascript.html:54
 msgid "Toggle structure mode"
 msgstr "Bật/tắt chế độ cấu trúc"
 
-#: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Bật/tắt chế độ cấu trúc và làm nổi bật plugin đang di chuột qua"
 
-#: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Open \\"
 msgstr "Mở \\"
 
-#: templates/cms/toolbar/toolbar_javascript.html:66
 msgid "Focus on Toolbar"
 msgstr "Tập trung vào thanh công cụ"
 
-#: templates/cms/toolbar/toolbar_javascript.html:75
 msgid "Focus on placeholders"
 msgstr "Tập trung vào các placeholder"
 
-#: templates/cms/toolbar/toolbar_javascript.html:79
 msgid "Move to next/previous element"
 msgstr "Chuyển đến phần tử tiếp theo/trước đó"
 
-#: templates/cms/toolbar/toolbar_javascript.html:83
 msgid "Focus on plugins of placeholder"
 msgstr "Tập trung vào các plugin của placeholder"
 
-#: templates/cms/toolbar/toolbar_javascript.html:87
 msgid "Edit plugin"
 msgstr "Chỉnh sửa plugin"
 
-#: templates/cms/toolbar/toolbar_javascript.html:95
 msgid "Open actions menu"
 msgstr "Mở menu hành động"
 
-#: templates/cms/toolbar/toolbar_javascript.html:99
 msgid "Expand/collapse"
 msgstr "Mở rộng/thu gọn"
 
-#: templates/cms/toolbar/toolbar_javascript.html:126
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
 "<strong>Đăng nhập thất bại.</strong> Vui lòng kiểm tra thông tin đăng nhập "
 "và thử lại."
 
-#: templates/cms/toolbar/toolbar_with_structure.html:5
 msgid "Double-click to edit"
 msgstr "Nhấp đúp để chỉnh sửa"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:6
 msgid "Tap to edit"
 msgstr "Chạm để chỉnh sửa"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:25
 msgid "Click to go back"
 msgstr "Nhấp để quay lại"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:26
 msgid "Click to go forward"
 msgstr "Nhấp để tiến tới"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:47
 msgid "Minimize"
 msgstr "Thu nhỏ"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:48
 msgid "Maximize"
 msgstr "Phóng to"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:74
+msgid "Placeholder not editable"
+msgstr ""
+
 msgid "Drop a plugin here"
 msgstr "Thả một plugin vào đây"
 
-#: templates/cms/welcome.html:26
+msgid "Welcome to your new django CMS installation!"
+msgstr ""
+
 #, python-format
 msgid "Version %(cms_version)s"
 msgstr "Phiên bản %(cms_version)s"
 
-#: templates/cms/welcome.html:30
 msgid "Let’s build something great together!"
 msgstr "Hãy cùng nhau xây dựng điều gì đó tuyệt vời!"
 
-#: templates/cms/welcome.html:32
 msgid "Please log in"
 msgstr "Vui lòng đăng nhập"
 
-#: templates/cms/welcome.html:36
 msgid ""
 "\n"
-"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your "
-"first page</a>\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
 "\n"
-"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Thêm "
-"trang đầu tiên của bạn</a>\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Thêm trang đầu tiên của bạn</a>\n"
 "            "
 
-#: templates/cms/welcome.html:43
 msgid ""
 "\n"
 "                    <h2>Help Funding</h2>\n"
 "                    <p>\n"
-"                        Your funding directly benefits the product, mainly "
-"through the\n"
-"                        <a href=\"https://www.django-cms.org/en/fellowship-"
-"program/\">django CMS Fellowship Program</a>!\n"
+"                        Your funding directly benefits the product, mainly through the\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>!\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        A quick way for yourself or your organisation to "
-"donate is on\n"
-"                        <a href=\"https://github.com/sponsors/django-"
-"cms\">Github Sponsors</a>.\n"
+"                        A quick way for yourself or your organisation to donate is on\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
 "                    </p>\n"
 "                "
 msgstr ""
 "\n"
 "                    <h2>Hỗ trợ tài chính</h2>\n"
 "                    <p>\n"
-"                        Sự đóng góp của bạn mang lại lợi ích trực tiếp cho "
-"sản phẩm, chủ yếu thông qua\n"
-"                        <a href=\"https://www.django-cms.org/en/fellowship-"
-"program/\">Chương trình Fellowship của django CMS</a>!\n"
+"                        Sự đóng góp của bạn mang lại lợi ích trực tiếp cho sản phẩm, chủ yếu thông qua\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">Chương trình Fellowship của django CMS</a>!\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        Một cách nhanh chóng để bạn hoặc tổ chức của bạn "
-"quyên góp là tại\n"
-"                        <a href=\"https://github.com/sponsors/django-"
-"cms\">Github Sponsors</a>.\n"
+"                        Một cách nhanh chóng để bạn hoặc tổ chức của bạn quyên góp là tại\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
 "                    </p>\n"
 "                "
 
-#: templates/cms/welcome.html:56
 msgid ""
 "\n"
 "                    <h2>Join Us</h2>\n"
 "                    <p>\n"
-"                        The django CMS Association is a non-profit "
-"organisation that funds and steers the development of\n"
+"                        The django CMS Association is a non-profit organisation that funds and steers the development of\n"
 "                        django CMS.\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        You can <a href=\"https://www.django-cms.org/en/"
-"memberships/\">join both as an individual or as an\n"
+"                        You can <a href=\"https://www.django-cms.org/en/memberships/\">join both as an individual or as an\n"
 "                        organisation</a>.\n"
 "                    </p>\n"
 "                "
@@ -1904,30 +1414,24 @@ msgstr ""
 "\n"
 "                    <h2>Tham gia với chúng tôi</h2>\n"
 "                    <p>\n"
-"                        Hiệp hội django CMS là một tổ chức phi lợi nhuận tài "
-"trợ và định hướng cho sự phát triển của\n"
+"                        Hiệp hội django CMS là một tổ chức phi lợi nhuận tài trợ và định hướng cho sự phát triển của\n"
 "                        django CMS.\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        Bạn có thể <a href=\"https://www.django-cms.org/en/"
-"memberships/\">tham gia với tư cách cá nhân hoặc\n"
+"                        Bạn có thể <a href=\"https://www.django-cms.org/en/memberships/\">tham gia với tư cách cá nhân hoặc\n"
 "                        tổ chức</a>.\n"
 "                    </p>\n"
 "                "
 
-#: templates/cms/welcome.html:69
 msgid ""
 "\n"
 "                    <h2>Contribute</h2>\n"
 "                    <ul>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"contribute/\">Contribute code:</a> fix a bug or\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Contribute code:</a> fix a bug or\n"
 "                            implement a new feature!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"volunteering-opportunities/\">Volunteer:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Volunteer:</a>\n"
 "                            We offer fun and efficient team work!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"repositories-plugins/\">Open-source your work:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Open-source your work:</a>\n"
 "                            Make the ecosystem strong.</li>\n"
 "                    </ul>\n"
 "                "
@@ -1935,151 +1439,115 @@ msgstr ""
 "\n"
 "                    <h2>Đóng góp</h2>\n"
 "                    <ul>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"contribute/\">Đóng góp mã nguồn:</a> sửa lỗi hoặc\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Đóng góp mã nguồn:</a> sửa lỗi hoặc\n"
 "                            triển khai một tính năng mới!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"volunteering-opportunities/\">Tình nguyện:</a>\n"
-"                            Chúng tôi mang đến công việc nhóm vui vẻ và hiệu "
-"quả!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"repositories-plugins/\">Mã nguồn mở công việc của bạn:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Tình nguyện:</a>\n"
+"                            Chúng tôi mang đến công việc nhóm vui vẻ và hiệu quả!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Mã nguồn mở công việc của bạn:</a>\n"
 "                            Làm cho hệ sinh thái thêm vững mạnh.</li>\n"
 "                    </ul>\n"
 "                "
 
-#: templates/cms/welcome.html:84
 msgid "Installation Notes"
 msgstr "Ghi chú cài đặt"
 
-#: templates/cms/welcome.html:87
 msgid "Support"
 msgstr "Hỗ trợ"
 
-#: templates/cms/welcome.html:90
 msgid "Give back"
 msgstr "Đóng góp lại"
 
-#: templates/cms/welcome.html:92
 msgid ""
 "\n"
-"                <p class=\"cms-welcome-notes\">If you don't see the django "
-"CMS logo at the top, make sure\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
 msgstr ""
 "\n"
-"                <p class=\"cms-welcome-notes\">Nếu bạn không thấy logo "
-"django CMS ở phía trên, hãy chắc chắn\n"
-"                    rằng bạn đã liên kết thư mục <code>static/cms</code> với "
-"các tệp\n"
+"                <p class=\"cms-welcome-notes\">Nếu bạn không thấy logo django CMS ở phía trên, hãy chắc chắn\n"
+"                    rằng bạn đã liên kết thư mục <code>static/cms</code> với các tệp\n"
 "                    tĩnh của bạn.</p>\n"
 "            "
 
-#: templates/cms/welcome.html:98
 msgid ""
 "\n"
-"                    <p class=\"cms-welcome-notes\">You're seeing this "
-"message because you have\n"
-"                        <code>DEBUG = True</code> in your django settings "
-"file and\n"
+"                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
+"                        <code>DEBUG = True</code> in your django settings file and\n"
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
 msgstr ""
 "\n"
-"                    <p class=\"cms-welcome-notes\">Bạn đang thấy thông báo "
-"này vì bạn có\n"
-"                        <code>DEBUG = True</code> trong tệp cài đặt django "
-"của bạn và\n"
+"                    <p class=\"cms-welcome-notes\">Bạn đang thấy thông báo này vì bạn có\n"
+"                        <code>DEBUG = True</code> trong tệp cài đặt django của bạn và\n"
 "                        chưa thêm bất kỳ trang nào.\n"
 "                    </p>\n"
 "                "
 
-#: templates/cms/welcome.html:120
 msgid "Welcome to django CMS"
 msgstr "Chào mừng đến với django CMS"
 
-#: templates/cms/widgets/applicationconfigselect.html:6
 msgid "Add Another"
 msgstr "Thêm cái khác"
 
-#: templates/cms/wizards/create.html:25
 msgid "Back"
 msgstr "Quay lại"
 
-#: templates/cms/wizards/start.html:15
 msgid "Please choose an option from below to proceed to the next step."
 msgstr "Vui lòng chọn một tùy chọn bên dưới để tiếp tục sang bước tiếp theo."
 
-#: templates/cms/wizards/start.html:23
 msgid "Next"
 msgstr "Tiếp theo"
 
-#: templatetags/cms_admin.py:129
+msgid "Select what you would like to create"
+msgstr ""
+
 msgid "Unknown"
 msgstr "Không xác định"
 
-#: templatetags/cms_tags.py:87
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr "Không tìm thấy trang trên %(domain)s"
 
-#: templatetags/cms_tags.py:89
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments "
-"`%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
-"Một template tag không thể tìm thấy trang với các đối số tra cứu "
-"`%(page_lookup)s\n"
+"Một template tag không thể tìm thấy trang với các đối số tra cứu `%(page_lookup)s\n"
 "`. URL của yêu cầu là: http://%(host)s%(path)s"
 
-#: test_utils/project/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:4
 msgid "Two columns"
 msgstr "Hai cột"
 
-#: test_utils/project/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:5
 msgid "Three columns"
 msgstr "Ba cột"
 
-#: test_utils/project/customuserapp/models.py:44
 msgid "username"
 msgstr "tên đăng nhập"
 
-#: test_utils/project/customuserapp/models.py:45
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr "Bắt buộc. Tối đa 300 ký tự. Chỉ gồm chữ cái, số và các ký tự @/./+/-/_"
+msgstr ""
+"Bắt buộc. Tối đa 300 ký tự. Chỉ gồm chữ cái, số và các ký tự @/./+/-/_"
 
-#: test_utils/project/customuserapp/models.py:48
 msgid "Enter a valid username."
 msgstr "Nhập một tên đăng nhập hợp lệ."
 
-#: test_utils/project/customuserapp/models.py:51
 msgid "email address"
 msgstr "địa chỉ email"
 
-#: test_utils/project/customuserapp/models.py:53
 msgid "staff status"
 msgstr "trạng thái nhân viên"
 
-#: test_utils/project/customuserapp/models.py:54
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Xác định liệu người dùng có thể đăng nhập vào trang quản trị này hay không."
 
-#: test_utils/project/customuserapp/models.py:58
 msgid "active"
 msgstr "đang hoạt động"
 
-#: test_utils/project/customuserapp/models.py:59
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -2087,184 +1555,144 @@ msgstr ""
 "Xác định liệu người dùng này có được coi là đang hoạt động hay không. Bỏ "
 "chọn mục này thay vì xóa tài khoản."
 
-#: test_utils/project/customuserapp/models.py:71
 msgid "users"
 msgstr "người dùng"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:44
 msgid "Title Extension"
 msgstr "Phần mở rộng tiêu đề"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:75
 msgid "Page Extension"
 msgstr "Phần mở rộng trang"
 
-#: test_utils/project/objectpermissionsapp/models.py:45
 msgid "object ID"
 msgstr "ID đối tượng"
 
-#: test_utils/project/placeholderapp/cms_apps.py:8
 msgid "Example1 App"
 msgstr "Ứng dụng Example1"
 
-#: test_utils/project/placeholderapp/cms_apps.py:15
 msgid "MultilingualExample1 App"
 msgstr "Ứng dụng MultilingualExample1"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:25
 msgid "Example1"
 msgstr "Example1"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:26
 msgid "Examples"
 msgstr "Các ví dụ"
 
-#: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:10
 msgid "Extra Context"
 msgstr "Ngữ cảnh bổ sung"
 
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:16
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:35
 msgid "Articles"
 msgstr "Bài viết"
 
-#: test_utils/project/sampleapp/cms_apps.py:25
 msgid "Sample App"
 msgstr "Ứng dụng mẫu"
 
-#: test_utils/project/sampleapp/cms_apps.py:36
 msgid "Sample App with config"
 msgstr "Ứng dụng mẫu có cấu hình"
 
-#: test_utils/project/sampleapp/cms_apps.py:56
 msgid "Sample App with excluded permissions"
 msgstr "Ứng dụng mẫu với các quyền bị loại trừ"
 
-#: test_utils/project/sampleapp/cms_apps.py:65
 msgid "Sample App 2"
 msgstr "Ứng dụng mẫu 2"
 
-#: test_utils/project/sampleapp/cms_apps.py:76
 msgid "Sample App 3"
-msgstr "Ứng dụng mẫu 3"
+msgstr "Ứng dụng mẫu 2"
 
-#: test_utils/project/sampleapp/cms_apps.py:97
+msgid "Sample App Without Landing Page"
+msgstr ""
+
 msgid "Namespaced App"
 msgstr "Ứng dụng có namespace"
 
-#: test_utils/project/sampleapp/cms_apps.py:111
 msgid "Parent app"
 msgstr "Ứng dụng cha"
 
-#: test_utils/project/sampleapp/cms_apps.py:118
 msgid "Child app"
 msgstr "Ứng dụng con"
 
-#: test_utils/project/sampleapp/cms_apps.py:125
 msgid "Variable urls-menus App"
 msgstr "Ứng dụng urls-menus biến đổi"
 
-#: test_utils/project/sampleapp/cms_menus.py:18
 msgid "sample root page"
 msgstr "trang gốc mẫu"
 
-#: test_utils/project/sampleapp/cms_menus.py:19
 msgid "sample settings page"
 msgstr "trang cài đặt mẫu"
 
-#: test_utils/project/sampleapp/cms_menus.py:20
 msgid "sample account page"
 msgstr "trang tài khoản mẫu"
 
-#: test_utils/project/sampleapp/cms_menus.py:21
 msgid "sample my profile page"
 msgstr "trang hồ sơ của tôi mẫu"
 
-#: test_utils/project/sampleapp/cms_menus.py:35
 msgid "Static Menu"
 msgstr "Menu tĩnh"
 
-#: test_utils/project/sampleapp/cms_menus.py:54
 msgid "Static Menu2"
 msgstr "Menu tĩnh 2"
 
-#: test_utils/project/sampleapp/cms_menus.py:61
 msgid "Static Menu3"
 msgstr "Menu tĩnh 3"
 
-#: test_utils/project/sampleapp/cms_menus.py:68
 msgid "Static Menu4"
-msgstr "Menu tĩnh 4"
+msgstr "Menu tĩnh"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:21
-#: test_utils/project/sampleapp/views.py:30
 msgid "Category"
 msgstr "Danh mục"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:22
 msgid "Categories"
 msgstr "Các danh mục"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:23
 msgid "Add Category"
 msgstr "Thêm danh mục"
 
-#: test_utils/project/sampleapp/urls.py:14
 msgid "^account/$"
 msgstr "^account/$"
 
-#: test_utils/project/sampleapp/views.py:32
 msgid "Change Category"
 msgstr "Thay đổi danh mục"
 
-#: test_utils/project/templates/registration/logged_out.html:7
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Cảm ơn bạn đã dành thời gian quý báu với trang web hôm nay."
 
-#: tests/test_templates.py:57 utils/conf.py:186
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Kế thừa template của trang tổ tiên gần nhất"
 
-#: tests/test_wizards.py:104
 msgid "UserSettings"
 msgstr "Cài đặt người dùng"
 
-#: toolbar/utils.py:30
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "Thêm plugin vào placeholder \"%(placeholder_label)s\""
 
-#: toolbar/utils.py:50
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Thêm plugin vào %(plugin_name)s"
 
-#: utils/conf.py:101
+msgid "Single placeholder"
+msgstr ""
+
 msgid "Community forum"
 msgstr "Diễn đàn cộng đồng"
 
-#: utils/conf.py:103
 msgid "Getting started"
 msgstr "Bắt đầu"
 
-#: utils/conf.py:104
 msgid "Talk to us"
 msgstr "Trò chuyện với chúng tôi"
 
-#: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - tài khoản người dùng của bạn đã được tạo."
 
-#: utils/mail.py:39
 msgid "CMS - your user account was changed."
 msgstr "CMS - tài khoản người dùng của bạn đã được thay đổi."
 
-#: utils/plugins.py:520
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "Placeholder này đã có số lượng plugin tối đa (%s)."
 
-#: utils/plugins.py:526
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
@@ -2273,13 +1701,10 @@ msgstr ""
 "Placeholder này đã có số lượng tối đa (%(limit)s) plugin %(plugin_name)s "
 "được phép."
 
-#: utils/request_ip_resolvers.py:22
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
-"Không thể tìm thấy module CMS_REQUEST_IP_RESOLVER được chỉ định: \"{0}\"."
+msgstr "Không thể tìm thấy module CMS_REQUEST_IP_RESOLVER được chỉ định: \"{0}\"."
 
-#: utils/request_ip_resolvers.py:26
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
@@ -2288,12 +1713,10 @@ msgstr ""
 "Không thể tìm thấy hàm CMS_REQUEST_IP_RESOLVER được chỉ định: \"{0}\" trong "
 "module \"{1}\"."
 
-#: wizards/wizard_base.py:145
 #, python-format
 msgid "Create a new %s instance."
 msgstr "Tạo một thực thể %s mới."
 
-#: wizards/wizard_pool.py:54
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "Một wizard đã được đăng ký cho model: %s"

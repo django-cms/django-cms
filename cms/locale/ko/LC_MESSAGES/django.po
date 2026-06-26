@@ -5,14 +5,17 @@
 # Translators:
 # Александр, 2022
 # Song M. Kim <songmink@hawaii.edu>, 2025
+# Fabian Braun <fsbraun@gmx.de>, 2026
+# Yeri Choi, 2026
+# MinJi Park, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-30 19:36+0100\n"
+"POT-Creation-Date: 2026-06-26 19:53+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Song M. Kim <songmink@hawaii.edu>, 2025\n"
+"Last-Translator: MinJi Park, 2026\n"
 "Language-Team: Korean (https://app.transifex.com/divio/teams/58664/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,1445 +23,1075 @@ msgstr ""
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin/forms.py:85 admin/forms.py:92 admin/forms.py:1060
-#: templates/admin/cms/page/permissions.html:45
 msgid "All"
 msgstr "전부"
 
-#: admin/forms.py:146
 msgid "Copy permissions"
 msgstr "복사 허가"
 
-#: admin/forms.py:204
 msgid "Slug"
 msgstr "요약문장"
 
-#: admin/forms.py:206
 msgid "The part of the title that is used in the URL"
 msgstr "URL에 사용된 제목의 일부"
 
-#: admin/forms.py:248
 msgid "Page type"
 msgstr "페이지 타입"
 
-#: admin/forms.py:471
 msgid "Page Types"
 msgstr "페이지 타입들"
 
-#: admin/forms.py:523
 msgid "Overwrite URL"
-msgstr "URL을 덮어 씌움니다"
+msgstr "URL을 덮어 씌웁니다"
 
-#: admin/forms.py:526
 msgid "Keep this field empty if standard path should be used."
 msgstr "표준 경로를 사용해야만 하는 경우에는 이 필드를 비워 두세요."
 
-#: admin/forms.py:537
 msgid "Start typing..."
-msgstr ""
+msgstr "입력 시작..."
 
-#: admin/forms.py:542 migrations/0001_initial.py:96
-#: models/contentmodels.py:120
-msgid "menu visibility"
-msgstr ""
-
-#: admin/forms.py:543 models/contentmodels.py:126
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "페이지가 메뉴에서 보여질 때만 제한함"
 
-#: admin/forms.py:551 models/contentmodels.py:133
 msgid "X Frame Options"
 msgstr "X  프레임 옵션들"
 
-#: admin/forms.py:552
 msgid "Whether this page can be embedded in other pages or websites."
-msgstr ""
+msgstr "이 페이지는 다른 페이지들이나 웹 사이트들에 탑재될 수 있습니다."
 
-#: admin/forms.py:570
 msgid "URL options"
-msgstr ""
+msgstr "URL 옵션들"
 
-#: admin/forms.py:577
 msgid "Menu options"
-msgstr ""
+msgstr "메뉴 옵션들"
 
-#: admin/forms.py:584
 msgid "Headers"
-msgstr ""
+msgstr "헤더들"
 
-#: admin/forms.py:712
 msgid "Application"
 msgstr "어플리케이션"
 
-#: admin/forms.py:715
 msgid "Hook application to this page."
 msgstr "이 페이지로 어플리케이션을 걸어 주세요."
 
-#: admin/forms.py:720
 msgid "Application configurations"
-msgstr ""
+msgstr "앱 구성"
 
-#: admin/forms.py:798
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "이 역방향 URL 매핑을 가진 페이지가 이미 존재합니다."
 
-#: admin/forms.py:817 admin/forms.py:823
 msgid "Invalid application config value"
-msgstr ""
+msgstr "잘못된 앱 구성 값"
 
-#: admin/forms.py:830
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "이 설정을 사용하는 응용 프로그램이 이미 존재합니다."
 
-#: admin/forms.py:838 admin/forms.py:849
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "이 이름을 가진 응용 프로그램이 이미 존재 합니다. "
 
-#: admin/forms.py:955
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "홈페이지를 다른 페이지 안으로 이동할 수 없습니다."
 
-#: admin/forms.py:1010 admin/forms.py:1026
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"동일한 페이지 수준에서 동일한 슬러그를 가진 페이지 두 개를 가질 수 없습니다. 다시 이동하기 전에 두 페이지 중 하나의 슬러그를 "
+"변경하세요."
 
-#: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:87
 msgid "Yes"
-msgstr ""
+msgstr "네"
 
-#: admin/forms.py:1062 templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:89
 msgid "No"
-msgstr ""
+msgstr "아니오"
 
-#: admin/forms.py:1117 admin/forms.py:1190 migrations/0001_initial.py:72
-#: migrations/0001_initial.py:135 models/permissionmodels.py:71
-#: test_utils/project/customuserapp/models.py:70
 msgid "user"
-msgstr ""
+msgstr "사용자"
 
-#: admin/forms.py:1195
 msgid "can_view"
-msgstr ""
+msgstr "조회_가능"
 
-#: admin/forms.py:1236 admin/forms.py:1242 admin/forms.py:1246
-#: templates/admin/cms/page/change_form.html:11
-#: templates/admin/cms/usersettings/change_form.html:33
-#: templatetags/cms_tags.py:544
 msgid "Add"
-msgstr ""
+msgstr "추가"
 
-#: admin/forms.py:1237 admin/forms.py:1243 admin/forms.py:1247
 msgid "Change"
-msgstr ""
+msgstr "변경"
 
-#: admin/forms.py:1238 admin/forms.py:1244 admin/forms.py:1248
-#: templates/admin/cms/extensions/change_form.html:9
-#: templates/admin/cms/page/plugin/submit_line.html:5
-#: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/actions_dropdown.html:42
-#: templates/admin/cms/page/tree/actions_dropdown.html:47
-#: templates/admin/cms/page/tree/menu.html:203
-#: templates/admin/cms/page/tree/menu.html:205
-#: templates/cms/toolbar/dragitem.html:46
-#: templates/cms/toolbar/dragitem.html:54
 msgid "Delete"
-msgstr ""
+msgstr "삭제"
 
-#: admin/forms.py:1267 models/permissionmodels.py:109
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
+"사용자는 생성된 페이지 변경 권한 없이 페이지를 생성할 수 없습니다. \n"
+"수정 권한이 필요합니다."
 
-#: admin/forms.py:1274 models/permissionmodels.py:114
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"사용자는 페이지 변경 권한 없이 페이지를 삭제할 수 없습니다. \n"
+"수정 권한이 필요합니다. "
 
-#: admin/forms.py:1280
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
+"사용자는 페이지 변경 권한 없이 페이지 권한을 설정할 수 없습니다. \n"
+"수정 권한이 필요합니다. "
 
-#: admin/forms.py:1286
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "페이지 변경 권한이 없으면 사용자는 페이지 권한을 삭제할 수 없습니다. 편집 권한이 필요합니다."
 
-#: admin/forms.py:1295
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "사용자는 생성된 권한을 변경할 권한이 없으면 페이지 권한을 생성할 수 없습니다. 편집 권한이 필요합니다."
 
-#: admin/forms.py:1302
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "페이지 변경 권한이 없으면 사용자는 페이지 권한을 삭제할 수 없습니다. 편집 권한이 필요합니다."
 
-#: admin/forms.py:1420
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "'%s' 플러그인 형식은 유효하지 않습니다."
 
-#: admin/forms.py:1438 admin/pageadmin.py:1217 admin/placeholderadmin.py:467
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "지원 가능한 언어로 설정되어야 합니다!"
 
-#: admin/forms.py:1444
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "상위 플러그인의 언어는 기본 언어와 동일해야 합니다!"
 
-#: admin/forms.py:1449
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "상위 플러그인의 언어는 기본 언어와 반드시 동일해야 합니다!"
 
-#: admin/forms.py:1454
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "플러그인 위치는 %(position)d보다 커야 합니다."
 
-#: admin/pageadmin.py:320
+msgid "Translations"
+msgstr "번역"
+
 msgid "Advanced Settings"
 msgstr "고급 설정"
 
-#: admin/pageadmin.py:320 cms_toolbars.py:664
 msgid "Change Permissions"
-msgstr ""
+msgstr "권한 수정"
 
-#: admin/pageadmin.py:355
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "해당 페이지는 홈페이지가 될 자격이 없습니다."
 
-#: admin/pageadmin.py:502 admin/pageadmin.py:990
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr " 기본 키(primary key)가 %(key)r인 %(name)s 객체가 존재하지 않습니다."
 
-#: admin/pageadmin.py:574
+msgid "error"
+msgstr "오류"
+
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
+msgstr "오류입니다! 당신은 이 페이지를 이동할 수 있는 권한이 없습니다. 페이지를 다시 로드해주세요."
 
-#: admin/pageadmin.py:677
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "오류입니다! 당신은 이 페이지를 복사할 권한이 없습니다."
 
-#: admin/pageadmin.py:685
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "오류입니다! 붙여넣으신 페이지는 타겟 사이트에서 설정된 언어 중 어느 언어로도 번역되어 있지 않습니다."
 
-#: admin/pageadmin.py:698
 msgid "You do not have permission to edit this page"
-msgstr ""
+msgstr "이 페이지를 수정할 권한이 없습니다"
 
-#: admin/pageadmin.py:907
+msgid ""
+"(to change it, first unpublish the currently published version of this page)"
+msgstr "(변경하려면 먼저 현재 게시된 이 페이지의 버전을 게시 취소하세요)"
+
+msgid "Add Translation"
+msgstr "번역 추가하기"
+
 msgid "Add Page Copy"
-msgstr ""
+msgstr "페이지 복사본 추가"
 
-#: admin/pageadmin.py:913 cms_wizards.py:50
-#: templates/admin/cms/page/tree/menu.html:159
-#: templates/admin/cms/page/tree/menu.html:166
 msgid "New sub page"
-msgstr ""
+msgstr "새 하위 페이지"
 
-#: admin/pageadmin.py:919 cms_wizards.py:42
 msgid "New page"
+msgstr "새 페이지"
+
+msgid ""
+"You do not have permission to access this site. Please contact your "
+"administrator."
 msgstr ""
 
-#: admin/pageadmin.py:1127
 msgid "Database error"
-msgstr ""
+msgstr "데이터베이스 오류"
 
-#: admin/pageadmin.py:1192
 msgid "Template not valid"
-msgstr ""
+msgstr "템플릿이 잘못됨"
 
-#: admin/pageadmin.py:1200
+msgid "Placeholder selection not valid"
+msgstr "플레이스홀더 선택이 잘못되었습니다"
+
 msgid "The template was successfully changed"
-msgstr ""
+msgstr "템플릿이 잘 바뀌었습니다."
 
-#: admin/pageadmin.py:1227 admin/placeholderadmin.py:507
-#: admin/placeholderadmin.py:511 admin/placeholderadmin.py:578
-#: admin/placeholderadmin.py:582
+#, python-format
+msgid "Placeholder '%s' does not exist in target language"
+msgstr "대상 언어에 플레이스홀더 '%s'이/가 존재하지 않습니다"
+
 msgid "You do not have permission to copy these plugins."
-msgstr ""
+msgstr "이 플러그인을 복사할 권한이 없습니다."
 
-#: admin/pageadmin.py:1236
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "이 페이지를 삭제할 권한이 없습니다."
 
-#: admin/pageadmin.py:1264
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "%(language)s 언어의 제목과 플러그인은 삭제 되었습니다."
 
-#: admin/pageadmin.py:1412
 msgid "Public content"
-msgstr ""
+msgstr "공개 콘텐츠"
 
-#: admin/pageadmin.py:1413 templatetags/cms_admin.py:112
 msgid "Empty"
-msgstr ""
+msgstr "없음"
 
-#: admin/pageadmin.py:1422
 msgid "Create Content"
-msgstr ""
+msgstr "콘텐츠 만들기"
 
-#: admin/permissionadmin.py:119
 msgid "View restriction"
-msgstr ""
+msgstr "제한 보기"
 
-#: admin/permissionadmin.py:120
 msgid "View restrictions"
-msgstr ""
+msgstr "제한들을 보기"
 
-#: admin/placeholderadmin.py:102
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "필드 %s를 찾지 못했습니다."
 
-#: admin/placeholderadmin.py:108 templates/cms/toolbar/dragbar.html:5
-#: templates/cms/toolbar/dragitem.html:14
-#: templates/cms/toolbar/dragitem.html:24
 msgid "You do not have permission to edit this item"
-msgstr ""
+msgstr "이 아이템을 수정할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:388 admin/placeholderadmin.py:392
 msgid "You do not have permission to add a plugin"
-msgstr ""
+msgstr "플러그인을 추가할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:532 admin/placeholderadmin.py:536
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "이 플레이스홀더를 복사할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:627
 msgid "Plugin not found"
-msgstr ""
+msgstr "플러그인이 발견되지 않습니다."
 
-#: admin/placeholderadmin.py:635 admin/placeholderadmin.py:638
 msgid "You do not have permission to edit this plugin"
-msgstr ""
+msgstr "이 플러그인을 수정할 권한이 없습니다"
 
-#: admin/placeholderadmin.py:797 admin/placeholderadmin.py:801
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "이 플러그인을 복사할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:857 admin/placeholderadmin.py:861
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "이 플레이스홀더를 복사할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:914 admin/placeholderadmin.py:918
-#: admin/placeholderadmin.py:922 admin/placeholderadmin.py:926
 msgid "You have no permission to move this plugin"
-msgstr ""
+msgstr "이 플러그인을 이동할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:977 admin/placeholderadmin.py:981
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "이 플러그인을 잘라낼 권한이 없습니다."
 
-#: admin/placeholderadmin.py:1026 admin/placeholderadmin.py:1030
-#: admin/placeholderadmin.py:1042
 msgid "You do not have permission to delete this plugin"
-msgstr ""
+msgstr "이 플러그인을 삭제할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:1059
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr " %(name)s 플러그인 \"%(obj)s\" 이 잘 삭제되었습니다."
 
-#: admin/placeholderadmin.py:1079 admin/placeholderadmin.py:1170
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s 을 삭제할 수 없습니다."
 
-#: admin/placeholderadmin.py:1081 admin/placeholderadmin.py:1172
 msgid "Are you sure?"
-msgstr ""
+msgstr "확실합니까 ?"
 
-#: admin/placeholderadmin.py:1117 admin/placeholderadmin.py:1121
-#: admin/placeholderadmin.py:1138
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "이 플레이스홀더를 삭제할 권한이 없습니다."
 
-#: admin/placeholderadmin.py:1151
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "\"%(obj)s\" 플레이스홀더가 성공적으로 삭제되었습니다."
 
-#: admin/placeholderadmin.py:1176
 msgid "placeholder"
-msgstr ""
+msgstr "플레이스홀더"
 
-#: admin/useradmin.py:126 models/permissionmodels.py:260
 msgid "Page permissions"
-msgstr ""
+msgstr "페이지 권한"
 
-#: admin/useradmin.py:127
 msgid "User & Group permissions"
-msgstr ""
+msgstr "사용자 & 그룹 권한"
 
-#: admin/useradmin.py:128
 msgid "Page permissions management"
-msgstr ""
+msgstr "페이지 권한 관리"
 
-#: admin/utils.py:90
 msgid "Actions"
-msgstr ""
+msgstr "활동들"
 
-#: admin/utils.py:262
 msgid "Empty content"
+msgstr "빈 콘텐츠"
+
+msgid "You do not have permission to change this content."
 msgstr ""
 
-#: admin/utils.py:503
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "%(object_name)s의 속성들 "
 
-#: admin/utils.py:507
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "새로운 %(object_name)s을/를 추가하기"
 
-#: admin/utils.py:512 admin/utils.py:583
 msgid "Add content"
-msgstr ""
+msgstr "콘텐츠 추가하기"
 
-#: admin/utils.py:516
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"현재 언어에 대한 콘텐츠가 변경되었습니다. 변경 사항을 저장하려면 \"취소\"를 클릭하여 양식으로 돌아가십시오. 변경 사항을 취소하려면 "
+"\"확인\"을 클릭하십시오."
 
-#: admin/utils.py:536
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "%(language)s 콘텐츠 추가하기 "
 
-#: admin/utils.py:570 cms_toolbars.py:199
-#: templates/cms/toolbar/items/live_draft.html:6 tests/test_views.py:324
 msgid "Preview"
-msgstr ""
+msgstr "미리보기"
 
-#: admin/utils.py:583
 msgid "Settings"
-msgstr ""
+msgstr "설정들"
 
-#: admin/utils.py:809
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
-msgstr ""
+msgstr "%(value)s는 잘못된 언어입니다. 이 양식을 처리할 수 없습니다. 언어를 변경해 보세요."
 
-#: admin/utils.py:810
 msgid "<unspecified>"
-msgstr ""
+msgstr "<unspecified>"
 
-#: apphook_pool.py:98
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "등록된 앱훅 \"%r\"을/를 찾을 수 없습니다."
 
-#: apps.py:7 templates/cms/noapphook.html:6
-#: templates/cms/toolbar/items/logo.html:2 templates/cms/welcome.html:6
-#: templates/cms/welcome.html:23 templates/cms/welcome.html:86
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
-#: cms_plugins.py:9
 msgid "Placeholder"
-msgstr ""
+msgstr "플레이스홀더"
 
-#: cms_toolbars.py:76
 msgid "Getting started developer guide"
-msgstr ""
+msgstr "개발자 가이드 시작하기"
 
-#: cms_toolbars.py:77 templates/cms/welcome.html:88 utils/conf.py:102
 msgid "Documentation"
-msgstr ""
+msgstr "문서화"
 
-#: cms_toolbars.py:78 templates/cms/welcome.html:89
 msgid "User guide"
-msgstr ""
+msgstr "사용자 가이드"
 
-#: cms_toolbars.py:79
 msgid "Discord community"
-msgstr ""
+msgstr "디스코드 커뮤니티"
 
-#: cms_toolbars.py:80
 msgid "What's new"
-msgstr ""
+msgstr "새로운 소식"
 
-#: cms_toolbars.py:100 templates/cms/wizards/create.html:5
-#: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
-msgstr ""
+msgstr "만들기"
 
-#: cms_toolbars.py:187 templates/cms/toolbar/dragbar.html:17
-#: templates/cms/toolbar/dragitem.html:18
-#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:534
-#: templatetags/cms_tags.py:537 tests/test_views.py:338
 msgid "Edit"
-msgstr ""
+msgstr "수정"
 
-#: cms_toolbars.py:217 templates/admin/cms/page/delete_confirmation.html:49
 msgid "Structure"
-msgstr ""
+msgstr "구조"
 
-#: cms_toolbars.py:224 forms/wizards.py:31
 msgid "Content"
-msgstr ""
+msgstr "내용"
 
-#: cms_toolbars.py:262
 msgid "Help"
-msgstr ""
+msgstr "도움"
 
-#: cms_toolbars.py:306 templates/admin/cms/page/tree/base.html:107
 msgid "Sites"
-msgstr ""
+msgstr "사이트들"
 
-#: cms_toolbars.py:307
 msgid "Admin Sites"
-msgstr ""
+msgstr "관리 사이트들"
 
-#: cms_toolbars.py:314
 msgid "Administration"
-msgstr ""
+msgstr "관리"
 
-#: cms_toolbars.py:318
 msgid "User settings"
-msgstr ""
+msgstr "사용자 설정들"
 
-#: cms_toolbars.py:327
 msgid "Clipboard..."
-msgstr ""
+msgstr "클립보드..."
 
-#: cms_toolbars.py:332
 msgid "Clear clipboard"
-msgstr ""
+msgstr "클립보드 지우기"
 
-#: cms_toolbars.py:340
 msgid "Disable toolbar"
-msgstr ""
+msgstr "툴바 비활성화하기"
 
-#: cms_toolbars.py:344
 msgid "Shortcuts..."
-msgstr ""
+msgstr "단축키들..."
 
-#: cms_toolbars.py:360
 msgid "Users"
-msgstr ""
+msgstr "사용자들"
 
-#: cms_toolbars.py:378 tests/test_toolbar.py:1009 tests/test_toolbar.py:1026
-#: tests/test_toolbar.py:1060
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "%s 로그아웃하기"
 
-#: cms_toolbars.py:378
 msgid "Logout"
-msgstr ""
+msgstr "로그아웃"
 
-#: cms_toolbars.py:394 models/settingmodels.py:20
-#: templates/admin/cms/grouper/change_list.html:4
 msgid "Language"
 msgstr "언어"
 
-#: cms_toolbars.py:520
-msgid "Add Translation"
-msgstr ""
-
-#: cms_toolbars.py:533
 msgid "Delete Translation"
-msgstr ""
+msgstr "번역 삭제하기"
 
-#: cms_toolbars.py:545 tests/test_toolbar.py:961 tests/test_toolbar.py:968
 msgid "Copy all plugins"
-msgstr ""
+msgstr "모든 플러그인들을 복사하기"
 
-#: cms_toolbars.py:547
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "%s부터"
 
-#: cms_toolbars.py:548
 #, python-format
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "정말 %s의 모든 플러그인들을 복사하시겠습니까?"
 
-#: cms_toolbars.py:576
 msgid "Pages"
-msgstr ""
+msgstr "페이지들"
 
-#: cms_toolbars.py:596 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:92 tests/test_wizards.py:115
-#: tests/test_wizards.py:172
 msgid "Page"
-msgstr ""
+msgstr "페이지"
 
-#: cms_toolbars.py:628
 msgid "Create Page"
-msgstr ""
+msgstr "페이지 생성하기"
 
-#: cms_toolbars.py:632 templates/admin/cms/page/tree/base.html:140
 msgid "New Page"
-msgstr ""
+msgstr "새 페이지"
 
-#: cms_toolbars.py:633
 msgid "New Sub Page"
-msgstr ""
+msgstr "새 하위 페이지"
 
-#: cms_toolbars.py:645
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "이 페이지 복제"
 
-#: cms_toolbars.py:656
 msgid "Page settings"
-msgstr ""
+msgstr "페이지 설정들"
 
-#: cms_toolbars.py:664 templates/admin/cms/page/tree/actions_dropdown.html:67
-#: templates/admin/cms/page/tree/actions_dropdown.html:72
-#: templates/admin/cms/page/tree/menu.html:209
-#: templates/admin/cms/page/tree/menu.html:211
 msgid "Advanced settings"
-msgstr ""
+msgstr "고급 설정"
 
-#: cms_toolbars.py:674
 msgid "Templates"
-msgstr ""
+msgstr "템플릿"
 
-#: cms_toolbars.py:694
+msgid "Placeholders"
+msgstr "플레이스홀더"
+
 msgid "Hide in navigation"
-msgstr ""
+msgstr "탐색 중에 숨기기"
 
-#: cms_toolbars.py:694
 msgid "Display in navigation"
-msgstr ""
+msgstr "탐색 중에 표시하기"
 
-#: cms_toolbars.py:707
 msgid "Delete page"
-msgstr ""
+msgstr "페이지 삭제"
 
-#: cms_wizards.py:46
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "현재 페이지 옆에 새 페이지 생성하기"
 
-#: cms_wizards.py:54
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "현재 페이지 아래에 새로운 페이지 생성하기"
 
-#: forms/fields.py:24
 msgid "Select a valid site"
-msgstr ""
+msgstr "유효한 사이트를 선택하세요."
 
-#: forms/fields.py:25
 msgid "Select a valid page"
-msgstr ""
+msgstr "유효한 페이지를 선택하세요."
 
-#: forms/validators.py:77
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
+"페이지 %(conflict_page)s은 현재 페이지 \"%(instance)s\"와 동일한 url '%(url)s'을 가지고 있습니다."
 
-#: forms/validators.py:79
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
+msgstr "%(conflict_page)s페이지의 url은 현재 페이지와 동일한 '%(url)s'입니다."
+
+msgid "Add another"
 msgstr ""
 
-#: forms/wizards.py:32
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
-msgstr ""
+msgstr "선택 사항입니다. 제공될 경우 새 텍스트 플러그인에 자동으로 추가됩니다."
 
-#: forms/wizards.py:45
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "새 페이지의 제목을 입력하세요."
 
-#: forms/wizards.py:47
 msgid "Leave empty for automatic slug, or override as required."
-msgstr ""
+msgstr "자동 슬러그 생성을 위해 비워 두거나, 필요에 따라 수동으로 수정하십시오."
 
-#: forms/wizards.py:83
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "슬러그를 자동으로 생성할 수 없습니다. 수동으로 입력해 주세요."
 
-#: forms/wizards.py:99
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "유효한 슬러그를 입력해 주세요."
 
-#: forms/wizards.py:123
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "페이지를 추가하는 데 필요한 권한이 없습니다."
 
-#: migrations/0001_initial.py:26 migrations/0001_initial.py:60
-#: migrations/0001_initial.py:83 migrations/0001_initial.py:123
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
-#: migrations/0001_initial.py:27 models/pluginmodel.py:172
 msgid "position"
-msgstr ""
+msgstr "위치"
 
-#: migrations/0001_initial.py:28 models/contentmodels.py:40
-#: models/pagemodel.py:1098 models/pluginmodel.py:174
 msgid "language"
-msgstr ""
+msgstr "언어"
 
-#: migrations/0001_initial.py:29 models/pluginmodel.py:176
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
-#: migrations/0001_initial.py:30 models/contentmodels.py:82
-#: models/pluginmodel.py:178
 msgid "creation date"
-msgstr ""
+msgstr "생성일"
 
-#: migrations/0001_initial.py:61 migrations/0001_initial.py:124
-#: models/permissionmodels.py:84
 msgid "can edit"
-msgstr ""
+msgstr "수정 가능"
 
-#: migrations/0001_initial.py:62 migrations/0001_initial.py:125
-#: models/permissionmodels.py:85
 msgid "can add"
-msgstr ""
+msgstr "추가 가능"
 
-#: migrations/0001_initial.py:63 migrations/0001_initial.py:126
-#: models/permissionmodels.py:86
 msgid "can delete"
-msgstr ""
+msgstr "삭제 가능"
 
-#: migrations/0001_initial.py:64 migrations/0001_initial.py:127
-#: models/permissionmodels.py:88
 msgid "can change advanced settings"
-msgstr ""
+msgstr "고급 설정 변경 가능"
 
-#: migrations/0001_initial.py:65 migrations/0001_initial.py:128
-#: models/permissionmodels.py:87
 msgid "can publish"
-msgstr ""
+msgstr "게시 가능"
 
-#: migrations/0001_initial.py:66 migrations/0001_initial.py:129
-#: models/permissionmodels.py:90
 msgid "can change permissions"
-msgstr ""
+msgstr "권한 수정 가능"
 
-#: migrations/0001_initial.py:67 migrations/0001_initial.py:130
-#: models/permissionmodels.py:92
 msgid "can move"
-msgstr ""
+msgstr "이동 가능"
 
-#: migrations/0001_initial.py:68 migrations/0001_initial.py:131
-#: models/permissionmodels.py:93
 msgid "view restricted"
-msgstr ""
+msgstr "보기 제한"
 
-#: migrations/0001_initial.py:69 models/permissionmodels.py:196
 msgid "can recover pages"
-msgstr ""
+msgstr "페이지 복구 가능"
 
-#: migrations/0001_initial.py:70 migrations/0001_initial.py:133
-#: models/permissionmodels.py:78
 msgid "group"
-msgstr ""
+msgstr "그룹"
 
-#: migrations/0001_initial.py:71 models/permissionmodels.py:204
 msgid "sites"
-msgstr ""
+msgstr "사이트들"
 
-#: migrations/0001_initial.py:84 models/contentmodels.py:90
-#: models/pagemodel.py:65
 msgid "created by"
-msgstr ""
+msgstr "만든 이"
 
-#: migrations/0001_initial.py:85 models/contentmodels.py:95
-#: models/pagemodel.py:70
 msgid "changed by"
-msgstr ""
+msgstr "수정한 이"
 
-#: migrations/0001_initial.py:88
-#: templates/admin/cms/page/tree/actions_dropdown.html:79
 msgid "publication date"
-msgstr ""
+msgstr "발행 날짜"
 
-#: migrations/0001_initial.py:89
-#: templates/admin/cms/page/tree/actions_dropdown.html:82
 msgid "publication end date"
-msgstr ""
+msgstr "발행 마지막 날짜"
 
-#: migrations/0001_initial.py:90 models/contentmodels.py:102
 msgid "in navigation"
-msgstr ""
+msgstr "탐색중"
 
-#: migrations/0001_initial.py:91 models/contentmodels.py:107
 msgid "soft root"
-msgstr ""
+msgstr "소프트 루팅"
 
-#: migrations/0001_initial.py:92 models/pagemodel.py:82
 msgid "id"
-msgstr ""
+msgstr "id"
 
-#: migrations/0001_initial.py:93 models/pagemodel.py:90
 msgid "attached menu"
-msgstr ""
+msgstr "첨부된 메뉴"
 
-#: migrations/0001_initial.py:94 models/contentmodels.py:113
-#: templates/admin/cms/page/tree/actions_dropdown.html:99
 msgid "template"
-msgstr ""
+msgstr "템플릿"
 
-#: migrations/0001_initial.py:95 models/pagemodel.py:97
 msgid "login required"
-msgstr ""
+msgstr "로그인이 필요함"
 
-#: migrations/0001_initial.py:98 models/pagemodel.py:106
+msgid "menu visibility"
+msgstr "메뉴 가시성"
+
 msgid "application"
-msgstr ""
+msgstr "애플리케이션"
 
-#: migrations/0001_initial.py:99 models/pagemodel.py:113
 msgid "application instance name"
-msgstr ""
+msgstr "애플리케이션 인스턴스 이름"
 
-#: migrations/0001_initial.py:110 models/pagemodel.py:60
-#: templates/admin/cms/page/tree/actions_dropdown.html:105
 msgid "site"
-msgstr ""
+msgstr "사이트"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:253
-#: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
-msgstr ""
+msgstr "~에 대한 권한 부여"
 
-#: migrations/0001_initial.py:134 models/contentmodels.py:78
-#: models/pagemodel.py:133 models/pagemodel.py:1102
-#: models/permissionmodels.py:254 templates/admin/cms/page/tree/base.html:298
-#: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
-msgstr ""
+msgstr "페이지"
 
-#: models/contentmodels.py:14
 msgid "no limit set"
-msgstr ""
+msgstr "설정된 제한 없음"
 
-#: models/contentmodels.py:15
 msgid "for logged in users only"
-msgstr ""
+msgstr "로그인한 사용자 전용"
 
-#: models/contentmodels.py:16
 msgid "for anonymous users only"
-msgstr ""
+msgstr "익명 사용자 전용"
 
-#: models/contentmodels.py:22
 msgid "Inherit from parent page"
-msgstr ""
+msgstr "상위 페이지에서 상속 받음"
 
-#: models/contentmodels.py:23
 msgid "Deny"
-msgstr ""
+msgstr "거부"
 
-#: models/contentmodels.py:24
 msgid "Only this website"
-msgstr ""
+msgstr "오직 이 웹사이트만"
 
-#: models/contentmodels.py:25
 msgid "Allow"
-msgstr ""
+msgstr "허가"
 
-#: models/contentmodels.py:42
 msgid "title"
-msgstr ""
+msgstr "제목"
 
-#: models/contentmodels.py:44
 msgid "The default title"
 msgstr "기본 제목"
 
-#: models/contentmodels.py:47
 msgid "Page Title"
 msgstr "페이지 제목"
 
-#: models/contentmodels.py:52
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "당신의 블라우져 가장 상단이나 북마크에 표시되어 있는 것을 덮어 씌웁니다"
 
-#: models/contentmodels.py:56
 msgid "Menu Title"
 msgstr "메뉴 제목"
 
-#: models/contentmodels.py:60
 msgid "Overwrite what is displayed in the menu"
 msgstr "메뉴에 표시된 것을 덮어 씌웁니다"
 
-#: models/contentmodels.py:63
 msgid "Description meta tag"
 msgstr "설명 메타 태그 "
 
-#: models/contentmodels.py:66
 msgid "A description of the page used by search engines."
 msgstr "검색 엔진들에서 사용되어지는 페이지에 관한 설명"
 
-#: models/contentmodels.py:69
 msgid "redirect"
-msgstr ""
+msgstr "리다이렉트"
 
-#: models/contentmodels.py:73
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "이 URL로 리다이렉트"
 
-#: models/contentmodels.py:110
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "모든 상위 항목이 탐색 메뉴에 표시되지는 않을 것입니다."
 
-#: models/contentmodels.py:116
 msgid "The template used to render the content."
-msgstr ""
+msgstr "콘텐츠를 렌더링하는 데 사용되는 템플릿입니다."
 
-#: models/contentmodels.py:146
 msgid "page content"
-msgstr ""
+msgstr "페이지 콘텐츠"
 
-#: models/contentmodels.py:147
 msgid "page contents"
-msgstr ""
+msgstr "페이지 콘텐츠들"
 
-#: models/contentmodels.py:289 models/pagemodel.py:985
 msgid "default"
-msgstr ""
+msgstr "기본"
 
-#: models/pagemodel.py:87
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
+msgstr "이 페이지로 연결하기 위해 page_url 템플릿 태그와 함께 사용되는 고유 식별자입니다."
 
-#: models/pagemodel.py:120
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "이 페이지를 페이지 유형으로 표시하세요."
 
-#: models/pagemodel.py:134
 msgid "pages"
-msgstr ""
+msgstr "페이지들"
 
-#: models/pagemodel.py:153
 msgid "No available title"
-msgstr ""
+msgstr "제목 없음"
 
-#: models/pagemodel.py:1096
 msgid "slug"
-msgstr ""
+msgstr "슬러그"
 
-#: models/pagemodel.py:1097
 msgid "Path"
-msgstr ""
+msgstr "경로"
 
-#: models/permissionmodels.py:55
 msgid "Current page"
-msgstr ""
+msgstr "현재 페이지"
 
-#: models/permissionmodels.py:56
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "(직계) 하위 페이지"
 
-#: models/permissionmodels.py:57
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "현재 페이지 및 (직계) 하위 페이지"
 
-#: models/permissionmodels.py:58
 msgid "Page descendants"
-msgstr ""
+msgstr "하위 페이지들"
 
-#: models/permissionmodels.py:59
 msgid "Page and descendants"
-msgstr ""
+msgstr "페이지와 하위 페이지들"
 
-#: models/permissionmodels.py:90
 msgid "on page level"
-msgstr ""
+msgstr "페이지 레벨에서"
 
-#: models/permissionmodels.py:93
 msgid "frontend view restriction"
-msgstr ""
+msgstr "프런트엔드 보기 제한"
 
-#: models/permissionmodels.py:103
 msgid "Please select user or group."
-msgstr ""
+msgstr "사용자 또는 그룹을 선택하십시오."
 
-#: models/permissionmodels.py:119
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "사용자는 페이지 수정 권한이 없으면 페이지를 게시할 수 없습니다. 편집 권한이 필요합니다."
 
-#: models/permissionmodels.py:124
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr ""
+msgstr "페이지 변경 권한이 없으면 사용자는 페이지 고급 설정을 변경할 수 없습니다. 편집 권한이 필요합니다."
 
-#: models/permissionmodels.py:129
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr ""
+msgstr "사용자는 페이지 변경 권한이 없으면 페이지 권한을 변경할 수 없습니다. 편집 권한이 필요합니다."
 
-#: models/permissionmodels.py:134
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "페이지 변경 권한이 없으면 사용자는 페이지를 이동할 수 없습니다. 편집 권한이 필요합니다."
 
-#: models/permissionmodels.py:198
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "삭제된 페이지는 모두 복구할 수 있습니다."
 
-#: models/permissionmodels.py:203
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "아무것도 선택하지 않으면, 사용자는 모든 사이트에 부여된 권한들을 가집니다."
 
-#: models/permissionmodels.py:210
 msgid "Page global permission"
-msgstr ""
+msgstr "전체적인 페이지 권한"
 
-#: models/permissionmodels.py:211
 msgid "Pages global permissions"
-msgstr ""
+msgstr "전체적인 페이지 권한들"
 
-#: models/permissionmodels.py:259
 msgid "Page permission"
-msgstr ""
+msgstr "페이지 권한"
 
-#: models/permissionmodels.py:274
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "페이지 추가 권한은 자식이나 후손에 대한 액세스도 필요하며, 그렇지 않으면 추가된 페이지는 작성자가 변경할 수 없습니다."
 
-#: models/permissionmodels.py:320
 msgid "User (page)"
-msgstr ""
+msgstr "사용자 (페이지)"
 
-#: models/permissionmodels.py:321
 msgid "Users (page)"
-msgstr ""
+msgstr "사용자들 (페이지)"
 
-#: models/permissionmodels.py:336
 msgid "User group (page)"
-msgstr ""
+msgstr "사용자 그룹 (페이지)"
 
-#: models/permissionmodels.py:337
 msgid "User groups (page)"
-msgstr ""
+msgstr "사용자 그룹들 (페이지)"
 
-#: models/placeholdermodel.py:30
 msgid "slot"
-msgstr ""
+msgstr "슬롯"
 
-#: models/placeholdermodel.py:32
 msgid "width"
-msgstr ""
+msgstr "너비"
 
-#: models/pluginmodel.py:212
+msgid "Edit object"
+msgstr "객체 수정"
+
+msgid "This is an external placeholder"
+msgstr "이것은 외부 플레이스홀더입니다"
+
+msgid "plugin"
+msgstr "플러그인"
+
+msgid "plugins"
+msgstr "플러그인"
+
 msgid "<Empty>"
-msgstr ""
+msgstr "<Empty>"
 
-#: models/settingmodels.py:21
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "관리 인터페이스 및 툴바의 언어"
 
-#: models/settingmodels.py:31
 msgid "user setting"
-msgstr ""
+msgstr "사용자 설정"
 
-#: models/settingmodels.py:32
 msgid "user settings"
-msgstr ""
+msgstr "사용자 설정들"
 
-#: plugin_base.py:70
 msgid "Advanced options"
 msgstr "고급 옵션"
 
-#: plugin_base.py:125
 msgid "Generic"
-msgstr ""
+msgstr "일반적인"
 
-#: plugin_base.py:612
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\"가 성공적으로 변경되었습니다."
 
-#: plugin_base.py:700
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "더 이상 이 플러그인을 위한 설정이 없습니다. 저장하기를 누르세요."
 
-#: signals/log_entries.py:12 tests/test_log_entries.py:141
 msgid "Moved"
-msgstr ""
+msgstr "이동됨"
 
-#: signals/log_entries.py:16
 msgid "Changed"
-msgstr ""
+msgstr "변경됨"
 
-#: signals/log_entries.py:20 tests/test_log_entries.py:171
 msgid "Deleted"
-msgstr ""
+msgstr "삭제됨"
 
-#: signals/log_entries.py:24
 msgid "Added Page Translation"
-msgstr ""
+msgstr "추가된 페이지 번역"
 
-#: signals/log_entries.py:28 tests/test_log_entries.py:201
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "변경된 페이지 번역"
 
-#: signals/log_entries.py:32 tests/test_log_entries.py:234
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "삭제된 페이지 번역"
 
-#: signals/log_entries.py:39 tests/test_log_entries.py:301
 msgid "Added Plugin"
-msgstr ""
+msgstr "추가된 플러그인"
 
-#: signals/log_entries.py:44 tests/test_log_entries.py:362
 msgid "Changed Plugin"
-msgstr ""
+msgstr "번경된 플러그인"
 
-#: signals/log_entries.py:49 tests/test_log_entries.py:334
 msgid "Moved Plugin"
-msgstr ""
+msgstr "이동된 플러그인"
 
-#: signals/log_entries.py:54 tests/test_log_entries.py:390
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "삭제된 플러그인"
 
-#: signals/log_entries.py:59 tests/test_log_entries.py:427
 msgid "Cut Plugin"
-msgstr ""
+msgstr "플러그인 잘라내기"
 
-#: signals/log_entries.py:64 tests/test_log_entries.py:466
 msgid "Paste Plugin"
-msgstr ""
+msgstr "플러그인 붙여넣기"
 
-#: signals/log_entries.py:69 tests/test_log_entries.py:546
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "플레이스홀더에 붙여넣기"
 
-#: signals/log_entries.py:74 tests/test_log_entries.py:499
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "클립보드에서 가져온 플러그인을 플레이스홀더에 추가했습니다."
 
-#: signals/log_entries.py:79 tests/test_log_entries.py:573
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "플레이스홀더를 비웠습니다."
 
-#: templates/admin/cms/extensions/change_form.html:5
-#: templates/admin/cms/page/change_form.html:84
-#: templates/admin/cms/page/plugin/submit_line.html:3
-#: templates/admin/cms/page/submit_row.html:4
-#: templates/admin/cms/page/tree/copy_premissions.html:10
-#: templates/admin/cms/usersettings/change_form.html:41
 msgid "Save"
-msgstr ""
+msgstr "저장"
 
-#: templates/admin/cms/grouper/change_form.html:17
 msgid "Some fields cannot be changed since they are read-only content."
-msgstr ""
+msgstr "일부 필드는 읽기 전용 콘텐츠이므로 변경할 수 없습니다."
 
-#: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "관리자 <a href=\"%(login_url)s\">에 로그인하려면 </a>를 클릭하세요."
 
-#: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "로그인 주소: %(login_url)s"
 
-#: templates/admin/cms/mail/page_user_change.html:7
-#: templates/admin/cms/mail/page_user_change.txt:5
 msgid "Username:"
-msgstr ""
+msgstr "사용자 이름:"
 
-#: templates/admin/cms/mail/page_user_change.html:11
-#: templates/admin/cms/mail/page_user_change.txt:6
 msgid "Password:"
-msgstr ""
+msgstr "비밀번호:"
 
-#: templates/admin/cms/page/change_form.html:4
 msgid "Add a page"
-msgstr ""
+msgstr "페이지 추가하기"
 
-#: templates/admin/cms/page/change_form.html:4
 msgid "Change a page"
-msgstr ""
+msgstr "페이지 수정하기"
 
-#: templates/admin/cms/page/change_form.html:8
-#: templates/admin/cms/page/tree/base.html:23
-#: templates/admin/cms/page/tree/legend.html:34
-#: templates/admin/cms/page/tree/menu.html:41
-#: templates/admin/cms/usersettings/change_form.html:30
 msgid "Home"
-msgstr ""
+msgstr "홈"
 
-#: templates/admin/cms/page/change_form.html:28
-#: templates/admin/cms/page/tree/menu.html:80
-#: templates/admin/cms/page/tree/menu.html:83
 msgid "View on site"
-msgstr ""
+msgstr "사이트에서 보기"
 
-#: templates/admin/cms/page/change_form.html:56
-#: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
+msgstr[0] "아래 오류를 수정하세요."
 
-#: templates/admin/cms/page/change_form.html:73
 msgid "All permissions"
-msgstr ""
+msgstr "모든 권한들"
 
-#: templates/admin/cms/page/change_form.html:74
-#: templates/admin/cms/page/tree/base.html:206
-#: templates/admin/cms/page/tree/base.html:270
 msgid "Loading..."
-msgstr ""
+msgstr "로딩 중..."
 
-#: templates/admin/cms/page/change_form.html:85
-#: templates/admin/cms/page/plugin/submit_line.html:9
-#: templates/admin/cms/page/submit_row.html:12
 msgid "Save and continue editing"
-msgstr ""
+msgstr "저장 후 편집을 계속하세요"
 
-#: templates/admin/cms/page/delete_confirmation.html:39
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"%(object_name)s \"%(escaped_object)s\"를 정말로 삭제하시겠습니까? 다음과 관련된 모든 항목이 삭제될 "
+"것입니다:"
 
-#: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "네, 확실해요."
 
-#: templates/admin/cms/page/delete_confirmation.html:58
 msgid "No, take me back"
-msgstr ""
+msgstr "아니요, 이전으로 돌아가 주세요"
 
-#: templates/admin/cms/page/delete_summary.html:2
 msgid "Summary"
-msgstr ""
+msgstr "요약"
 
-#: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "사용자"
 
-#: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr ""
+msgstr "그룹"
 
-#: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr ""
+msgstr "수정 가능"
 
-#: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr ""
+msgstr "추가 가능"
 
-#: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr ""
+msgstr "삭제 가능"
 
-#: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr ""
+msgstr "게시 가능"
 
-#: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "권한들을 변경할 수 있습니다"
 
-#: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "이동 가능"
 
-#: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
-msgstr ""
+msgstr "보기 가능"
 
-#: templates/admin/cms/page/permissions.html:23
-#: templates/admin/cms/page/permissions.html:24
 msgid "(global)"
-msgstr ""
+msgstr "(글로벌)"
 
-#: templates/admin/cms/page/permissions.html:28
 msgid "(current)"
-msgstr ""
+msgstr "(현재의)"
 
-#: templates/admin/cms/page/permissions.html:54
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "페이지는 어떤 권한도 상속받지 않습니다."
 
-#: templates/admin/cms/page/plugin/error_form.html:4
 msgid "Edit model"
-msgstr ""
+msgstr "모델 수정"
 
-#: templates/admin/cms/page/plugin/submit_line.html:7
-#: templates/admin/cms/page/submit_row.html:10
 msgid "Save as new"
-msgstr ""
+msgstr "다른 이름으로 저장"
 
-#: templates/admin/cms/page/plugin/submit_line.html:8
-#: templates/admin/cms/page/submit_row.html:11
 msgid "Save and add another"
-msgstr ""
+msgstr "저장 후 다른 항목 추가"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:13
-#: templates/admin/cms/page/tree/actions_dropdown.html:15
-#: templates/admin/cms/page/tree/menu.html:185
-#: templates/admin/cms/page/tree/menu.html:187
-#: templates/cms/toolbar/dragitem.html:41
 msgid "Copy"
-msgstr ""
+msgstr "복사"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:26
-#: templates/admin/cms/page/tree/actions_dropdown.html:28
-#: templates/admin/cms/page/tree/menu.html:191
-#: templates/admin/cms/page/tree/menu.html:193
-#: templates/cms/toolbar/dragitem.html:40
 msgid "Cut"
-msgstr ""
+msgstr "잘라내기"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:37
-#: templates/admin/cms/page/tree/base.html:170
-#: templates/admin/cms/page/tree/menu.html:199
-#: templates/cms/toolbar/dragbar.html:25 templates/cms/toolbar/dragbar.html:28
-#: templates/cms/toolbar/dragitem.html:44
-#: templates/cms/toolbar/dragitem.html:49
 msgid "Paste"
-msgstr ""
+msgstr "붙여넣기"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:52
-#: templates/admin/cms/page/tree/actions_dropdown.html:54
-#: templates/admin/cms/page/tree/actions_dropdown.html:61
 msgid "Set as home"
-msgstr ""
+msgstr "홈으로 설정하기"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:85
 msgid "is restricted"
-msgstr ""
+msgstr "제한된"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:93
 msgid "last change by"
-msgstr ""
+msgstr "마지막 변경자:"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:96
 msgid "last change on"
-msgstr ""
+msgstr "마지막 변경일:"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:102
 msgid "meta"
-msgstr ""
+msgstr "메타"
 
-#: templates/admin/cms/page/tree/base.html:5
 msgid "List of pages"
-msgstr ""
+msgstr "페이지들의 목록"
 
-#: templates/admin/cms/page/tree/base.html:28
-#: templates/admin/cms/page/tree/base.html:58
-#: templates/admin/cms/page/tree/base.html:60
-#: templates/admin/cms/page/tree/base.html:89
 msgid "Search"
-msgstr ""
+msgstr "검색"
 
-#: templates/admin/cms/page/tree/base.html:46
 msgid "Page Tree"
-msgstr ""
+msgstr "페이지 트리"
 
-#: templates/admin/cms/page/tree/base.html:52
 msgid "Reset filter"
-msgstr ""
+msgstr "필터 재설정"
 
-#: templates/admin/cms/page/tree/base.html:118
 #, python-format
 msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
 msgstr ""
+"\n"
+"                                                삭제된 %(name)s를 복원하세요\n"
+"                                            "
 
-#: templates/admin/cms/page/tree/base.html:150
 msgid "Main Navigation"
-msgstr ""
+msgstr "주요 탐색 메뉴"
 
-#: templates/admin/cms/page/tree/base.html:162
-#: templates/admin/cms/page/tree/menu.html:176
 msgid "Options"
-msgstr ""
+msgstr "옵션들"
 
-#: templates/admin/cms/page/tree/base.html:200
-#: templates/admin/cms/page/tree/base.html:264
 msgid "Successfully moved"
-msgstr ""
+msgstr "잘 옮겨짐"
 
-#: templates/admin/cms/page/tree/base.html:201
-#: templates/admin/cms/page/tree/base.html:265
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "트리 구조의 변경으로 인해 새로 고침이 필요할 수 있습니다."
 
-#: templates/admin/cms/page/tree/base.html:202
-#: templates/admin/cms/page/tree/base.html:266
 msgid "Error:"
-msgstr ""
+msgstr "오류:"
 
-#: templates/admin/cms/page/tree/base.html:203
-#: templates/admin/cms/page/tree/base.html:267
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
-msgstr ""
+msgstr "이 페이지에는 애플리케이션이 연결되어 있으므로 복사할 수 없습니다. 앱훅을 관리하려면 페이지의 고급 설정을 참조하세요."
 
-#: templates/admin/cms/page/tree/base.html:204
-#: templates/admin/cms/page/tree/base.html:268
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "이 페이지를  §  하기 원하십니까 ?"
 
-#: templates/admin/cms/page/tree/base.html:205
-#: templates/admin/cms/page/tree/base.html:269
 msgid "Reload"
-msgstr ""
+msgstr "새로고침"
 
-#: templates/admin/cms/page/tree/base.html:207
-#: templates/admin/cms/page/tree/base.html:271
 msgid "New node"
-msgstr ""
+msgstr "새 노드"
 
-#: templates/admin/cms/page/tree/base.html:208
-#: templates/admin/cms/page/tree/base.html:272
 msgid "nodes"
-msgstr ""
+msgstr "노드들"
 
-#: templates/admin/cms/page/tree/base.html:219
-#: templates/admin/cms/page/tree/base.html:283
 msgid "View"
-msgstr ""
+msgstr "보기"
 
-#: templates/admin/cms/page/tree/base.html:225
-#: templates/admin/cms/page/tree/base.html:289
 msgid "Menu"
-msgstr ""
+msgstr "메뉴"
 
-#: templates/admin/cms/page/tree/base.html:298
 #, python-format
 msgid ""
 "\n"
@@ -1467,336 +1100,266 @@ msgid ""
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
+"\n"
+"                            <em>아직 %(object)s이 없습니다. </em>\n"
+"                            <br>\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">지금 %(object)s</a>를 추가하세요.\n"
+"                        "
 
-#: templates/admin/cms/page/tree/copy_premissions.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "옵션 복사"
 
-#: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Choose copy options"
-msgstr ""
+msgstr "옵션 복사를 선택하세요."
 
-#: templates/admin/cms/page/tree/copy_premissions.html:11
-#: templates/cms/toolbar/toolbar_with_structure.html:12
-#: templates/cms/toolbar/toolbar_with_structure.html:49
 msgid "Close"
-msgstr ""
+msgstr "종료"
 
-#: templates/admin/cms/page/tree/legend.html:7
 msgid "Legend"
-msgstr ""
+msgstr "범례"
 
-#: templates/admin/cms/page/tree/legend.html:16
 msgid "In menu"
-msgstr ""
+msgstr "메뉴에 있습니다"
 
-#: templates/admin/cms/page/tree/legend.html:22
 msgid "Not in menu"
-msgstr ""
+msgstr "메뉴에 없습니다"
 
-#: templates/admin/cms/page/tree/legend.html:28
 msgid "View page"
-msgstr ""
+msgstr "페이지 보기"
 
-#: templates/admin/cms/page/tree/legend.html:40
-#: templates/admin/cms/page/tree/menu.html:51
 msgid "Softroot"
-msgstr ""
+msgstr "소프트루트"
 
-#: templates/admin/cms/page/tree/legend.html:46
 msgid "Apphook"
-msgstr ""
+msgstr "앱훅"
 
-#: templates/admin/cms/page/tree/menu.html:63
+msgid "Redirect"
+msgstr "리다이렉트"
+
 #, python-format
 msgid "Application: %(apphook)s"
-msgstr ""
+msgstr "적용: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu.html:118
 msgid "in menu"
-msgstr ""
+msgstr "메뉴에 있습니다"
 
-#: templates/admin/cms/page/tree/menu.html:123
 msgid "not in menu"
-msgstr ""
+msgstr "메뉴에 없습니다"
 
-#: templates/admin/cms/page/tree/menu.html:140
-#: templates/admin/cms/page/tree/menu.html:151
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "페이지 설정 (고급 설정을 보려면 Shift 키를 누른 상태에서 클릭하세요)"
 
-#: templates/admin/cms/page/tree/menu.html:218
 msgid "Permissions"
-msgstr ""
+msgstr "권한들"
 
-#: templates/cms/headless/placeholder.html:17
 msgid "inherited"
-msgstr ""
+msgstr "상속받은"
 
-#: templates/cms/noapphook.html:18
-#: templates/cms/toolbar/toolbar_with_structure.html:90
 msgid "This page has no preview!"
-msgstr ""
+msgstr "이 페이지는 미리보기가 없습니다!"
 
-#: templates/cms/noapphook.html:19
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
-msgstr ""
+msgstr "첨부된 앱훅이 루트에 콘텐츠를 제공하지 않을 가능성이 있습니다."
 
-#: templates/cms/noapphook.html:20
-#: templates/cms/toolbar/toolbar_with_structure.html:91
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "다음으로 리디렉션됩니다:"
 
-#: templates/cms/toolbar/clipboard.html:3
 msgid "Clipboard"
-msgstr ""
+msgstr "클립보드"
 
-#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:28
-#: templates/cms/toolbar/toolbar_javascript.html:91
 msgid "Add plugin"
-msgstr ""
+msgstr "플러그인 추가"
 
-#: templates/cms/toolbar/dragbar.html:20
 msgid "Copy all"
-msgstr ""
+msgstr "모두 복사"
 
-#: templates/cms/toolbar/dragbar.html:22
 msgid "Copy from"
-msgstr ""
+msgstr "~에서 복사"
 
-#: templates/cms/toolbar/dragbar.html:26 templates/cms/toolbar/dragbar.html:29
 msgid "Empty all"
-msgstr ""
+msgstr "모두 비우기"
 
-#: templates/cms/toolbar/dragbar.html:35
-#: templates/cms/toolbar/dragitem.html:61
 msgid "Filter plugins..."
-msgstr ""
+msgstr "필터 플러그인들..."
 
-#: templates/cms/toolbar/dragbar.html:41
-msgid "This is a static placeholder"
-msgstr ""
-
-#: templates/cms/toolbar/dragbar.html:43
 msgid "Expand all"
-msgstr ""
+msgstr "모두 펼치기"
 
-#: templates/cms/toolbar/dragbar.html:44
 msgid "Collapse all"
-msgstr ""
+msgstr "모두 접기"
 
-#: templates/cms/toolbar/dragitem.html:26
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "이 플러그인에는 다른 플러그인을 추가할 수 없습니다."
 
-#: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "이 플러그인은 상위 플러그인 외부로 이동하거나 편집할 수 없습니다."
 
-#: templates/cms/toolbar/dragitem.html:50
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "클립보드가 비어 있습니다."
 
-#: templates/cms/toolbar/dragitem.html:51
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr ""
+msgstr "이 플러그인은 이러한 유형의 플러그인을 중첩 플러그인으로 허용하지 않습니다."
 
-#: templates/cms/toolbar/dragitem.html:52
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "이 플러그인은 중첩된 플러그인을 가질 수 없습니다."
 
-#: templates/cms/toolbar/dragitem_extra_menu.html:2
 msgid "Highlight"
-msgstr ""
+msgstr "하이라이트"
 
-#: templates/cms/toolbar/dragitem_menu.html:4
 msgid "Available plugins"
-msgstr ""
+msgstr "사용 가능한 플러그인들"
 
-#: templates/cms/toolbar/items/button_list.html:4
 msgid "Toggle structure"
-msgstr ""
+msgstr "토글 구조"
 
-#: templates/cms/toolbar/items/login.html:16
 msgid "Login"
-msgstr ""
+msgstr "로그인"
 
-#: templates/cms/toolbar/plugin.html:24
 msgid "Add plugin to"
-msgstr ""
+msgstr "~에 플러그인 추가"
 
-#: templates/cms/toolbar/toolbar.html:28
 msgid "More"
-msgstr ""
+msgstr "더"
 
-#: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
 msgstr ""
+"Django CMS %(cms_version)s, Django %(django_version)s, Python "
+"%(python_version)s을 사용한 개발 버전"
 
-#: templates/cms/toolbar/toolbar_javascript.html:27
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
-#: templates/cms/toolbar/toolbar_javascript.html:28
 msgid "The following error occurred:"
-msgstr ""
+msgstr "다음과 같은 오류가 발생했습니다:"
 
-#: templates/cms/toolbar/toolbar_javascript.html:29
 msgid "Action successful."
-msgstr ""
+msgstr "작업이 성공적으로 완료되었습니다."
 
-#: templates/cms/toolbar/toolbar_javascript.html:30
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "이 플러그인을 정말로 삭제하시겠습니까?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:31
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "이 페이지를 정말로 게시하시겠습니까?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:32
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "플러그인이 여기에 추가될 예정입니다."
 
-#: templates/cms/toolbar/toolbar_javascript.html:33
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "저장되지 않은 변경 사항이 있습니다."
 
-#: templates/cms/toolbar/toolbar_javascript.html:34
 msgid "Loading"
-msgstr ""
+msgstr "로딩 중"
 
-#: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "이러한 변경 사항을 정말로 포기하시겠습니까?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:36
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr ""
+msgstr "폼을 불러올 수 없습니다. 서버가 정상적으로 실행 중인지 확인해 주세요."
 
-#: templates/cms/toolbar/toolbar_javascript.html:37
 msgid "Most used"
-msgstr ""
+msgstr "가장 많이 사용된"
 
-#: templates/cms/toolbar/toolbar_javascript.html:38
 msgid "Shortcuts"
-msgstr ""
+msgstr "단축키들"
 
-#: templates/cms/toolbar/toolbar_javascript.html:39
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "페이지가 변경되었습니다. 새로 고침 중입니다..."
 
-#: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "CMS 전체 범위에서 적용되는 단축키들"
 
-#: templates/cms/toolbar/toolbar_javascript.html:46
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "이 도움말 대화 상자를 표시하세요"
 
-#: templates/cms/toolbar/toolbar_javascript.html:50
 msgid "Close/cancel"
-msgstr ""
+msgstr "닫기/취소"
 
-#: templates/cms/toolbar/toolbar_javascript.html:54
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "토글 구조 모드"
 
-#: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "구조 모드를 전환하고 마우스 오버된 플러그인을 강조 표시합니다."
 
-#: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Open \\"
-msgstr ""
+msgstr "Open \\"
 
-#: templates/cms/toolbar/toolbar_javascript.html:66
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "툴바에 포커스"
 
-#: templates/cms/toolbar/toolbar_javascript.html:75
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "플레이스홀더들에 포커스"
 
-#: templates/cms/toolbar/toolbar_javascript.html:79
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "다음/이전 요소로 이동"
 
-#: templates/cms/toolbar/toolbar_javascript.html:83
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "플레이스홀더 플러그인에 집중하세요"
 
-#: templates/cms/toolbar/toolbar_javascript.html:87
 msgid "Edit plugin"
-msgstr ""
+msgstr "플러그인 수정"
 
-#: templates/cms/toolbar/toolbar_javascript.html:95
 msgid "Open actions menu"
-msgstr ""
+msgstr "작업 메뉴 열기"
 
-#: templates/cms/toolbar/toolbar_javascript.html:99
 msgid "Expand/collapse"
-msgstr ""
+msgstr "펼치기/접기"
 
-#: templates/cms/toolbar/toolbar_javascript.html:126
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr ""
+msgstr "<strong>로그인에 실패했습니다.</strong> 자격 증명을 확인하고 다시 시도해 주세요."
 
-#: templates/cms/toolbar/toolbar_with_structure.html:5
 msgid "Double-click to edit"
-msgstr ""
+msgstr "더블 클릭하여 편집하세요"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:6
 msgid "Tap to edit"
-msgstr ""
+msgstr "탭하여 편집하세요"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:25
 msgid "Click to go back"
-msgstr ""
+msgstr "뒤로 가기 위해 클릭하세요"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:26
 msgid "Click to go forward"
-msgstr ""
+msgstr "이전으로 가기 위해 클릭하세요"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:47
 msgid "Minimize"
-msgstr ""
+msgstr "최소화"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:48
 msgid "Maximize"
-msgstr ""
+msgstr "최대화"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:74
+msgid "Placeholder not editable"
+msgstr "플레이스홀더를 수정할 수 없습니다"
+
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "여기에 플러그인을 드롭하세요"
 
-#: templates/cms/welcome.html:26
+msgid "Welcome to your new django CMS installation!"
+msgstr "새로운 django CMS 설치를 환영합니다!"
+
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "%(cms_version)s 버전"
 
-#: templates/cms/welcome.html:30
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "우리 함께 멋진 것을 만들어 봅시다!"
 
-#: templates/cms/welcome.html:32
 msgid "Please log in"
-msgstr ""
+msgstr "로그인해 주세요"
 
-#: templates/cms/welcome.html:36
 msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
+"\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">첫 페이지를추가하세요 </a>\n"
+"            "
 
-#: templates/cms/welcome.html:43
 msgid ""
 "\n"
 "                    <h2>Help Funding</h2>\n"
@@ -1810,8 +1373,18 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>후원 지</h2>\n"
+"                    <p>\n"
+"                        여러분의 후원은 주로\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS 펠로우십 프로그램</a>을 통해 제품 개발에 직접적인 도움이 됩니다!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                       개인 또는 소속 기관에서 간편하게 후원하실 수 있는 방법은 다음과 같습니다.\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"                    </p>\n"
+"                "
 
-#: templates/cms/welcome.html:56
 msgid ""
 "\n"
 "                    <h2>Join Us</h2>\n"
@@ -1825,8 +1398,16 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>함께하세요</h2>\n"
+"                    <p>\n"
+"                         django CMS 협회는 django CMS 개발에 자금을 지원하고 방향을 제시하는 비영리 단체입니다.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        당신은 <a href=\"https://www.django-cms.org/en/memberships/\">개인 또는 단체로 참여할 수 있습니다.</a>.\n"
+"                    </p>\n"
+"                "
 
-#: templates/cms/welcome.html:69
 msgid ""
 "\n"
 "                    <h2>Contribute</h2>\n"
@@ -1840,20 +1421,27 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>기여</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">기여 코드:</a> 버그를 수정하거나\n"
+"                            새로운 기능을 구현하세요!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">자원 봉사자:</a>\n"
+"                            저희는 즐겁고 효율적인 팀워크를 제공합니다!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">여러분의 작품을 오픈소스로 공개하세요:</a>\n"
+"                            생태계를 강하게 만드세요.</li>\n"
+"                    </ul>\n"
+"                "
 
-#: templates/cms/welcome.html:84
 msgid "Installation Notes"
-msgstr ""
+msgstr "설치 참고 사항"
 
-#: templates/cms/welcome.html:87
 msgid "Support"
-msgstr ""
+msgstr "지원"
 
-#: templates/cms/welcome.html:90
 msgid "Give back"
-msgstr ""
+msgstr "돌려주기"
 
-#: templates/cms/welcome.html:92
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1861,8 +1449,11 @@ msgid ""
 "                    static files.</p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">상단에 Django CMS 로고가 보이지 않으면\n"
+"                    <code>static/cms</code> 폴더를 당신의 정적 폴더에 연결했는지 확인하세요. </p>\n"
+"            "
 
-#: templates/cms/welcome.html:98
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1871,396 +1462,237 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">이 메시지가 표시되는 이유는\n"
+"                        당신의 Django 설정 파일이 <code>DEBUG = True</code> 로 설정되어 있고\n"
+"                        아직 페이지를 추가하지 않았기 때문입니다.\n"
+"                    </p>\n"
+"                "
 
-#: templates/cms/welcome.html:120
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "django CMS에 오신 것을 환영합니다"
 
-#: templates/cms/widgets/applicationconfigselect.html:6
 msgid "Add Another"
-msgstr ""
+msgstr "다른 항목을 추가하세요"
 
-#: templates/cms/wizards/create.html:25
 msgid "Back"
-msgstr ""
+msgstr "돌아가기"
 
-#: templates/cms/wizards/start.html:15
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "다음 단계로 진행하려면 아래 옵션 중 하나를 선택하십시오."
 
-#: templates/cms/wizards/start.html:23
 msgid "Next"
+msgstr "다음"
+
+msgid "Select what you would like to create"
 msgstr ""
 
-#: templatetags/cms_admin.py:129
 msgid "Unknown"
-msgstr ""
+msgstr "알 수 없음"
 
-#: templatetags/cms_tags.py:87
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "%(domain)s 에서 페이지가 발견되지 않음"
 
-#: templatetags/cms_tags.py:89
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"템플릿 태그가 조회 인수 `%(page_lookup)s` 를 사용하여 페이지를 찾을 수 없습니다.\n"
+"요청 URL은 다음과 같습니다: http://%(host)s%(path)s"
 
-#: test_utils/project/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:4
 msgid "Two columns"
-msgstr ""
+msgstr "두 개의 열"
 
-#: test_utils/project/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:5
 msgid "Three columns"
-msgstr ""
+msgstr "세 개의 열"
 
-#: test_utils/project/customuserapp/models.py:44
 msgid "username"
-msgstr ""
+msgstr "사용자 이름"
 
-#: test_utils/project/customuserapp/models.py:45
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "필수 입력 사항입니다. 300자 이내로 작성해야 합니다. 문자, 숫자 및 @/./+/-/_ 문자를 사용할 수 있습니다."
 
-#: test_utils/project/customuserapp/models.py:48
 msgid "Enter a valid username."
-msgstr ""
+msgstr "유효한 사용자 이름을 입력하세요."
 
-#: test_utils/project/customuserapp/models.py:51
 msgid "email address"
-msgstr ""
+msgstr "이메일 주소"
 
-#: test_utils/project/customuserapp/models.py:53
 msgid "staff status"
-msgstr ""
+msgstr "직원 현황"
 
-#: test_utils/project/customuserapp/models.py:54
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "사용자가 이 관리자 사이트에 로그인할 수 있는지 여부를 지정합니다."
 
-#: test_utils/project/customuserapp/models.py:58
 msgid "active"
-msgstr ""
+msgstr "동작 중"
 
-#: test_utils/project/customuserapp/models.py:59
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr ""
+msgstr "이 사용자를 활성 상태로 유지할지 여부를 지정합니다. 계정을 삭제하는 대신 이 옵션을 선택 해제하십시오."
 
-#: test_utils/project/customuserapp/models.py:71
 msgid "users"
-msgstr ""
+msgstr "사용자들"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:44
 msgid "Title Extension"
-msgstr ""
+msgstr "타이틀 확장"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:75
 msgid "Page Extension"
-msgstr ""
+msgstr "페이지 확장"
 
-#: test_utils/project/objectpermissionsapp/models.py:45
 msgid "object ID"
-msgstr ""
+msgstr "객체 ID"
 
-#: test_utils/project/placeholderapp/cms_apps.py:8
 msgid "Example1 App"
-msgstr ""
+msgstr "Example1 App"
 
-#: test_utils/project/placeholderapp/cms_apps.py:15
 msgid "MultilingualExample1 App"
-msgstr ""
+msgstr "MultilingualExample1 App"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:25
 msgid "Example1"
-msgstr ""
+msgstr "Example1"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:26
 msgid "Examples"
-msgstr ""
+msgstr "예제들"
 
-#: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:10
 msgid "Extra Context"
-msgstr ""
+msgstr "부가 정보"
 
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:16
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:35
 msgid "Articles"
-msgstr ""
+msgstr "조항들"
 
-#: test_utils/project/sampleapp/cms_apps.py:25
 msgid "Sample App"
-msgstr ""
+msgstr "샘플 앱"
 
-#: test_utils/project/sampleapp/cms_apps.py:36
 msgid "Sample App with config"
-msgstr ""
+msgstr "설정이 포함된 샘플 앱"
 
-#: test_utils/project/sampleapp/cms_apps.py:56
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "권한이 제외된 샘플 앱"
 
-#: test_utils/project/sampleapp/cms_apps.py:65
 msgid "Sample App 2"
-msgstr ""
+msgstr "샘플 앱 2"
 
-#: test_utils/project/sampleapp/cms_apps.py:76
 msgid "Sample App 3"
-msgstr ""
+msgstr "샘플 앱 2"
 
-#: test_utils/project/sampleapp/cms_apps.py:97
+msgid "Sample App Without Landing Page"
+msgstr "랜딩 페이지가 없는 샘플 앱"
+
 msgid "Namespaced App"
-msgstr ""
+msgstr "네임스페이스 앱"
 
-#: test_utils/project/sampleapp/cms_apps.py:111
 msgid "Parent app"
-msgstr ""
+msgstr "상위 앱"
 
-#: test_utils/project/sampleapp/cms_apps.py:118
 msgid "Child app"
-msgstr ""
+msgstr "하위 앱"
 
-#: test_utils/project/sampleapp/cms_apps.py:125
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "가변 URL 메뉴 앱"
 
-#: test_utils/project/sampleapp/cms_menus.py:18
 msgid "sample root page"
-msgstr ""
+msgstr "샘플 루트 페이지"
 
-#: test_utils/project/sampleapp/cms_menus.py:19
 msgid "sample settings page"
-msgstr ""
+msgstr "샘플 설정 페이지"
 
-#: test_utils/project/sampleapp/cms_menus.py:20
 msgid "sample account page"
-msgstr ""
+msgstr "샘플 계정 페이지"
 
-#: test_utils/project/sampleapp/cms_menus.py:21
 msgid "sample my profile page"
-msgstr ""
+msgstr "내 프로필 페이지 샘플"
 
-#: test_utils/project/sampleapp/cms_menus.py:35
 msgid "Static Menu"
-msgstr ""
+msgstr "정적 메뉴"
 
-#: test_utils/project/sampleapp/cms_menus.py:54
 msgid "Static Menu2"
-msgstr ""
+msgstr "정적 메뉴2"
 
-#: test_utils/project/sampleapp/cms_menus.py:61
 msgid "Static Menu3"
-msgstr ""
+msgstr "정적 메뉴3"
 
-#: test_utils/project/sampleapp/cms_menus.py:68
 msgid "Static Menu4"
-msgstr ""
+msgstr "정적 메뉴"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:21
-#: test_utils/project/sampleapp/views.py:30
 msgid "Category"
-msgstr ""
+msgstr "카테고리"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:22
 msgid "Categories"
-msgstr ""
+msgstr "카테고리들"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:23
 msgid "Add Category"
-msgstr ""
+msgstr "카테고리 추가"
 
-#: test_utils/project/sampleapp/urls.py:14
 msgid "^account/$"
-msgstr ""
+msgstr "^계정/$"
 
-#: test_utils/project/sampleapp/views.py:32
 msgid "Change Category"
-msgstr ""
+msgstr "카테고리 변경"
 
-#: test_utils/project/templates/registration/logged_out.html:7
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "오늘 저희 웹사이트를 방문해 주셔서 감사합니다."
 
-#: tests/test_templates.py:57 utils/conf.py:186
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "가장 가까운 상위의 템플릿을 상속합니다."
 
-#: tests/test_wizards.py:104
 msgid "UserSettings"
-msgstr ""
+msgstr "사용자 설정"
 
-#: toolbar/utils.py:30
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "플레이스홀더 \"%(placeholder_label)s\"에 플러그인 추가"
 
-#: toolbar/utils.py:50
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "%(plugin_name)s에 플러그인 추가"
 
-#: utils/conf.py:101
+msgid "Single placeholder"
+msgstr "단일 플레이스홀더"
+
 msgid "Community forum"
-msgstr ""
+msgstr "커뮤니티 포럼"
 
-#: utils/conf.py:103
 msgid "Getting started"
-msgstr ""
+msgstr "시작하기"
 
-#: utils/conf.py:104
 msgid "Talk to us"
-msgstr ""
+msgstr "저희에게 이야기해 주세요"
 
-#: utils/mail.py:37
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - 사용자 계정이 생성되었습니다."
 
-#: utils/mail.py:39
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - 사용자 계정이 수정되었습니다."
 
-#: utils/plugins.py:520
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "이 플레이스홀더는 이미 최대 플러그인 수(%s)를 가지고 있습니다."
 
-#: utils/plugins.py:526
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "이 플레이스홀더는 이미 허용된 %(plugin_name)s 플러그인의 최대 개수(%(limit)s)를 가지고 있습니다."
 
-#: utils/request_ip_resolvers.py:22
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "지정된 CMS_REQUEST_IP_RESOLVER 모듈을 찾을 수 없습니다: \"{0}\"."
 
-#: utils/request_ip_resolvers.py:26
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
-msgstr ""
+msgstr "지정된 CMS_REQUEST_IP_RESOLVER 함수 \"{0}\"를 모듈 \"{1}\"에서 찾을 수 없습니다."
 
-#: wizards/wizard_base.py:145
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "새 %s 인스턴스를 생성합니다."
 
-#: wizards/wizard_pool.py:54
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
-
-#~ msgid "by template"
-#~ msgstr ""
-
-#~ msgid "by code"
-#~ msgstr ""
-
-#~ msgid "static placeholder name"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Descriptive name to identify this static placeholder. Not displayed to "
-#~ "users."
-#~ msgstr ""
-
-#~ msgid "placeholder code"
-#~ msgstr ""
-
-#~ msgid "To render the static placeholder in templates."
-#~ msgstr ""
-
-#~ msgid "placeholder content"
-#~ msgstr ""
-
-#~ msgid "creation_method"
-#~ msgstr ""
-
-#~ msgid "static placeholder"
-#~ msgstr ""
-
-#~ msgid "static placeholders"
-#~ msgstr ""
-
-#~ msgid "A static placeholder with the same site and code already exists"
-#~ msgstr ""
-
-#~ msgid "Title"
-#~ msgstr "제목"
-
-#~ msgid "Soft root"
-#~ msgstr ""
-
-#~ msgid "Redirect"
-#~ msgstr ""
-
-#~ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-#~ msgstr ""
-
-#~ msgid "Alias"
-#~ msgstr ""
-
-#~ msgid "Create Alias"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This is an alias reference, you can edit the content only on the <a "
-#~ "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-#~ msgstr ""
-
-#~ msgid "Edit this Page"
-#~ msgstr ""
-
-#~ msgid "overwrite the title (html title tag)"
-#~ msgstr ""
-
-#~ msgid "overwrite the title in the menu"
-#~ msgstr ""
-
-#~ msgid "description"
-#~ msgstr ""
-
-#~ msgid "The text displayed in search engines."
-#~ msgstr ""
-
-#~ msgid "Open \"Create\" dialog"
-#~ msgstr ""
-
-#~ msgid "Installation successful!"
-#~ msgstr ""
-
-#~ msgid "Add your first page"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
-#~ "                "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "                        JavaScript seems to be disabled so please\n"
-#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
-#~ "                    "
-#~ msgstr ""
-
-#~ msgid "You do not have permission to change a page's navigation status"
-#~ msgstr ""
-
-#~ msgid "You cannot change this page's navigation status"
-#~ msgstr ""
-
-#~ msgid "Slug must not be empty."
-#~ msgstr "슬러그는 비어 있어서는 안됩니다."
+msgstr "해당 모델에 대해 이미 마법사가 등록되었습니다: %s"
