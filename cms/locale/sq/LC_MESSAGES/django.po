@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Fabian Braun <fsbraun@gmx.de>, 2025
 # Besnik Bleta <besnik@programeshqip.org>, 2025
@@ -10,115 +10,110 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-30 19:36+0100\n"
+"POT-Creation-Date: 2026-06-26 22:13+0200\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2025\n"
 "Language-Team: Albanian (https://app.transifex.com/divio/teams/58664/sq/)\n"
+"Language: sq\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/forms.py:85 admin/forms.py:92 admin/forms.py:1060
+#: admin/forms.py:84 admin/forms.py:91 admin/forms.py:1098
 #: templates/admin/cms/page/permissions.html:45
 msgid "All"
 msgstr "Krejt"
 
-#: admin/forms.py:146
+#: admin/forms.py:145
 msgid "Copy permissions"
 msgstr "Leje kopjimi"
 
-#: admin/forms.py:204
+#: admin/forms.py:203 admin/pageadmin.py:862
 msgid "Slug"
 msgstr "Identifikues"
 
-#: admin/forms.py:206
+#: admin/forms.py:205
 msgid "The part of the title that is used in the URL"
 msgstr "Pjesa e titullit që përdoret te URL-ja"
 
-#: admin/forms.py:248
+#: admin/forms.py:247
 msgid "Page type"
 msgstr "Lloj faqeje"
 
-#: admin/forms.py:471
+#: admin/forms.py:470
 msgid "Page Types"
 msgstr "Lloje Faqesh"
 
-#: admin/forms.py:523
+#: admin/forms.py:542 admin/pageadmin.py:875
 msgid "Overwrite URL"
 msgstr "Mbishkruaje URL-në"
 
-#: admin/forms.py:526
+#: admin/forms.py:545
 msgid "Keep this field empty if standard path should be used."
 msgstr "Mbajeni të zbrazët këtë fushë, nëse duhet përdorur shtegu standard."
 
-#: admin/forms.py:537
+#: admin/forms.py:556
 msgid "Start typing..."
 msgstr "Filloni të shtypni…"
 
-#: admin/forms.py:542 migrations/0001_initial.py:96
-#: models/contentmodels.py:120
-msgid "menu visibility"
-msgstr "dukshmëri menush"
-
-#: admin/forms.py:543 models/contentmodels.py:126
+#: admin/forms.py:562 models/contentmodels.py:119
 msgid "limit when this page is visible in the menu"
 msgstr "kufizo kur kjo faqe është e dukshme te menuja"
 
-#: admin/forms.py:551 models/contentmodels.py:133
+#: admin/forms.py:570 models/contentmodels.py:126
 msgid "X Frame Options"
 msgstr "Mundësi për X Frame"
 
-#: admin/forms.py:552
+#: admin/forms.py:571
 msgid "Whether this page can be embedded in other pages or websites."
 msgstr "Nëse mund të trupëzohet a jo kjo faqe në faqe ose sajte të tjerë."
 
-#: admin/forms.py:570
+#: admin/forms.py:589
 msgid "URL options"
 msgstr "Mundësi URL-sh"
 
-#: admin/forms.py:577
+#: admin/forms.py:596
 msgid "Menu options"
 msgstr "Mundësi menuje"
 
-#: admin/forms.py:584
+#: admin/forms.py:603
 msgid "Headers"
 msgstr "Krye"
 
-#: admin/forms.py:712
+#: admin/forms.py:751
 msgid "Application"
 msgstr "Aplikacion"
 
-#: admin/forms.py:715
+#: admin/forms.py:754
 msgid "Hook application to this page."
 msgstr "Lidhe aplikacionin me këtë faqe."
 
-#: admin/forms.py:720
+#: admin/forms.py:759
 msgid "Application configurations"
 msgstr "Formësime aplikacioni"
 
-#: admin/forms.py:798
+#: admin/forms.py:837
 msgid "A page with this reverse URL id exists already."
 msgstr "Ka tashmë një faqe me këtë URL të përmbysur."
 
-#: admin/forms.py:817 admin/forms.py:823
+#: admin/forms.py:856 admin/forms.py:862
 msgid "Invalid application config value"
 msgstr "Vlerë e pavlefshme formësimi aplikacioni"
 
-#: admin/forms.py:830
+#: admin/forms.py:869
 msgid "An application instance using this configuration already exists."
 msgstr "Ka tashmë një instancë aplikacioni që përdor këtë formësim."
 
-#: admin/forms.py:838 admin/forms.py:849
+#: admin/forms.py:877 admin/forms.py:888
 msgid "An application instance with this name already exists."
 msgstr "Ka tashmë një instancë aplikacioni me këtë emër."
 
-#: admin/forms.py:955
+#: admin/forms.py:994
 msgid "You can't move the home page inside another page"
 msgstr "S’mund ta kaloni faqen e kreut brenda një faqeje tjetër"
 
-#: admin/forms.py:1010 admin/forms.py:1026
+#: admin/forms.py:1049 admin/forms.py:1065
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
@@ -127,51 +122,51 @@ msgstr ""
 "faqesh. Ju lutemi, ndryshojeni identifikuesin e njërës prej faqeve, para se "
 "të riprovoni ta lëvizni."
 
-#: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
+#: admin/forms.py:1099 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:87
 msgid "Yes"
 msgstr "Po"
 
-#: admin/forms.py:1062 templates/admin/cms/page/tree/actions_dropdown.html:84
+#: admin/forms.py:1100 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:89
 msgid "No"
 msgstr "Jo"
 
-#: admin/forms.py:1117 admin/forms.py:1190 migrations/0001_initial.py:72
+#: admin/forms.py:1157 admin/forms.py:1232 migrations/0001_initial.py:72
 #: migrations/0001_initial.py:135 models/permissionmodels.py:71
 #: test_utils/project/customuserapp/models.py:70
 msgid "user"
 msgstr "përdorues"
 
-#: admin/forms.py:1195
+#: admin/forms.py:1237
 msgid "can_view"
 msgstr "mund_të_shohë"
 
-#: admin/forms.py:1236 admin/forms.py:1242 admin/forms.py:1246
-#: templates/admin/cms/page/change_form.html:11
+#: admin/forms.py:1278 admin/forms.py:1284 admin/forms.py:1288
+#: forms/widgets.py:157 templates/admin/cms/page/change_form.html:11
 #: templates/admin/cms/usersettings/change_form.html:33
-#: templatetags/cms_tags.py:544
+#: templatetags/cms_tags.py:545
 msgid "Add"
 msgstr "Shtoni"
 
-#: admin/forms.py:1237 admin/forms.py:1243 admin/forms.py:1247
+#: admin/forms.py:1279 admin/forms.py:1285 admin/forms.py:1289
 msgid "Change"
 msgstr "Ndryshoje"
 
-#: admin/forms.py:1238 admin/forms.py:1244 admin/forms.py:1248
+#: admin/forms.py:1280 admin/forms.py:1286 admin/forms.py:1290
 #: templates/admin/cms/extensions/change_form.html:9
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
 #: templates/admin/cms/page/tree/actions_dropdown.html:42
 #: templates/admin/cms/page/tree/actions_dropdown.html:47
-#: templates/admin/cms/page/tree/menu.html:203
-#: templates/admin/cms/page/tree/menu.html:205
-#: templates/cms/toolbar/dragitem.html:46
-#: templates/cms/toolbar/dragitem.html:54
+#: templates/admin/cms/page/tree/menu.html:215
+#: templates/admin/cms/page/tree/menu.html:217
+#: templates/cms/toolbar/dragitem.html:44
+#: templates/cms/toolbar/dragitem.html:52
 msgid "Delete"
 msgstr "Fshije"
 
-#: admin/forms.py:1267 models/permissionmodels.py:109
+#: admin/forms.py:1309 models/permissionmodels.py:109
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
@@ -179,15 +174,15 @@ msgstr ""
 "Përdoruesit s’mund të krijojnë një faqe pa leje për ndryshim të faqes së "
 "krijuar. Lypsen leje përpunimi."
 
-#: admin/forms.py:1274 models/permissionmodels.py:114
+#: admin/forms.py:1316 models/permissionmodels.py:114
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"Përdoruesit s’mund të fshijnë një faqe pa leje për ndryshim të faqes. Lypsen"
-" leje përpunimi."
+"Përdoruesit s’mund të fshijnë një faqe pa leje për ndryshim të faqes. Lypsen "
+"leje përpunimi."
 
-#: admin/forms.py:1280
+#: admin/forms.py:1322
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
@@ -195,7 +190,7 @@ msgstr ""
 "Përdoruesit s’mund të caktojnë leje faqeje pa leje për ndryshim të faqes. "
 "Lypsen leje përpunimi."
 
-#: admin/forms.py:1286
+#: admin/forms.py:1328
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
@@ -203,7 +198,7 @@ msgstr ""
 "Përdoruesit s’mund të fshijnë leje faqeje pa leje për ndryshim të faqes. "
 "Lypsen leje përpunimi."
 
-#: admin/forms.py:1295
+#: admin/forms.py:1337
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
@@ -211,7 +206,7 @@ msgstr ""
 "Përdoruesit s’mund të krijojnë leje faqeje pa leje për ndryshim të lejes së "
 "krijuar. Lypsen leje përpunimi."
 
-#: admin/forms.py:1302
+#: admin/forms.py:1344
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
@@ -219,57 +214,68 @@ msgstr ""
 "Përdoruesit s’mund të fshijnë leje faqeje pa leje për ndryshim lejesh. "
 "Lypsen leje përpunimi."
 
-#: admin/forms.py:1420
+#: admin/forms.py:1462
 #, python-format
 msgid "Invalid plugin type '%s'"
 msgstr "Lloj i pavlefshëm shtojce '%s'"
 
-#: admin/forms.py:1438 admin/pageadmin.py:1217 admin/placeholderadmin.py:467
+#: admin/forms.py:1480 admin/pageadmin.py:1218 admin/placeholderadmin.py:474
 msgid "Language must be set to a supported language!"
 msgstr "Si gjuhë duhet caktuar një nga gjuhët që mbulohet!"
 
-#: admin/forms.py:1444
+#: admin/forms.py:1486
 msgid "Parent plugin language must be same as language!"
 msgstr "Gjuha e shtojcës mëmë duhet të jetë e njëjtë me gjuhën!"
 
-#: admin/forms.py:1449
+#: admin/forms.py:1491
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
-"Vendmbajtësja e shtojcës mëmë duhet të jetë e njëjtë me vendmbajtësen!"
+msgstr "Vendmbajtësja e shtojcës mëmë duhet të jetë e njëjtë me vendmbajtësen!"
 
-#: admin/forms.py:1454
+#: admin/forms.py:1496
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
 msgstr "Pozicioni i shtojcës duhet të jetë më i madh se %(position)d"
 
-#: admin/pageadmin.py:320
+#: admin/pageadmin.py:138
+#, fuzzy
+#| msgid "Add Translation"
+msgid "Translations"
+msgstr "Shtoni Përkthim"
+
+#: admin/pageadmin.py:310
 msgid "Advanced Settings"
 msgstr "Rregullime të Mëtejshme"
 
-#: admin/pageadmin.py:320 cms_toolbars.py:664
+#: admin/pageadmin.py:310
 msgid "Change Permissions"
 msgstr "Ndryshoni Leje"
 
-#: admin/pageadmin.py:355
+#: admin/pageadmin.py:345
 msgid "The page is not eligible to be home."
 msgstr "Faqja s’kualifikohet për të qenë faqe kreu."
 
-#: admin/pageadmin.py:502 admin/pageadmin.py:990
+#: admin/pageadmin.py:488 admin/pageadmin.py:988
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekti %(name)s me kyç parësor %(key)r s’ekziston."
 
-#: admin/pageadmin.py:574
+#: admin/pageadmin.py:549
+#, fuzzy
+#| msgid "Error:"
+msgid "error"
+msgstr "Gabim:"
+
+#: admin/pageadmin.py:556
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 "Gabim! S’keni leje për lëvizjen e kësaj faqeje. Ju lutemi, ringarkoni faqen"
 
-#: admin/pageadmin.py:677
+#: admin/pageadmin.py:661
 msgid "Error! You don't have permissions to copy this page."
 msgstr "Gabim! S’keni leje të kopjoni këtë faqe."
 
-#: admin/pageadmin.py:685
+#: admin/pageadmin.py:669
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
@@ -277,149 +283,177 @@ msgstr ""
 "Gabim! Faqja që po ngjitni s’është e përkthyer në ndonjë nga gjuhët e "
 "formësuara nga sajti i synuar."
 
-#: admin/pageadmin.py:698
+#: admin/pageadmin.py:684
 msgid "You do not have permission to edit this page"
 msgstr "S’keni leje për të përpunuar këtë faqe"
 
-#: admin/pageadmin.py:907
+#: admin/pageadmin.py:863 admin/pageadmin.py:876
+msgid ""
+"(to change it, first unpublish the currently published version of this page)"
+msgstr ""
+
+#: admin/pageadmin.py:920 cms_toolbars.py:520
+msgid "Add Translation"
+msgstr "Shtoni Përkthim"
+
+#: admin/pageadmin.py:922
 msgid "Add Page Copy"
 msgstr "Shtoni Kopje Faqeje"
 
-#: admin/pageadmin.py:913 cms_wizards.py:50
-#: templates/admin/cms/page/tree/menu.html:159
-#: templates/admin/cms/page/tree/menu.html:166
+#: admin/pageadmin.py:924 cms_wizards.py:51
+#: templates/admin/cms/page/tree/menu.html:171
+#: templates/admin/cms/page/tree/menu.html:178
 msgid "New sub page"
 msgstr "Nënfaqe e re"
 
-#: admin/pageadmin.py:919 cms_wizards.py:42
+#: admin/pageadmin.py:926 cms_wizards.py:43
 msgid "New page"
 msgstr "Faqe e re"
 
-#: admin/pageadmin.py:1127
+#: admin/pageadmin.py:1099
+#, fuzzy
+#| msgid "You do not have permission to copy this placeholder."
+msgid ""
+"You do not have permission to access this site. Please contact your "
+"administrator."
+msgstr "S’keni leje të kopjoni këtë vendmbajtëse."
+
+#: admin/pageadmin.py:1128
 msgid "Database error"
 msgstr "Gabim baze të dhënash"
 
-#: admin/pageadmin.py:1192
+#: admin/pageadmin.py:1193
 msgid "Template not valid"
 msgstr "Gjedhe jo e vlefshme"
 
-#: admin/pageadmin.py:1200
+#: admin/pageadmin.py:1196
+#, fuzzy
+#| msgid "placeholder content"
+msgid "Placeholder selection not valid"
+msgstr "lëndë vendmbajtëseje"
+
+#: admin/pageadmin.py:1201
 msgid "The template was successfully changed"
 msgstr "Gjedhja u ndryshua me sukses"
 
-#: admin/pageadmin.py:1227 admin/placeholderadmin.py:507
-#: admin/placeholderadmin.py:511 admin/placeholderadmin.py:578
-#: admin/placeholderadmin.py:582
+#: admin/pageadmin.py:1226
+#, python-format
+msgid "Placeholder '%s' does not exist in target language"
+msgstr ""
+
+#: admin/pageadmin.py:1231 admin/placeholderadmin.py:515
+#: admin/placeholderadmin.py:522 admin/placeholderadmin.py:526
+#: admin/placeholderadmin.py:530 admin/placeholderadmin.py:608
+#: admin/placeholderadmin.py:612
 msgid "You do not have permission to copy these plugins."
 msgstr "S’keni leje të kopjoni këto shtojca."
 
-#: admin/pageadmin.py:1236
+#: admin/pageadmin.py:1244
 msgid "You do not have permission to delete this page"
 msgstr "S’keni leje për fshirje të kësaj faqeje"
 
-#: admin/pageadmin.py:1264
+#: admin/pageadmin.py:1269
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Titulli dhe shtojcat me gjuhën %(language)s u fshinë"
 
-#: admin/pageadmin.py:1412
+#: admin/pageadmin.py:1426
 msgid "Public content"
 msgstr "Lëndë publike"
 
-#: admin/pageadmin.py:1413 templatetags/cms_admin.py:112
+#: admin/pageadmin.py:1427 templatetags/cms_admin.py:149
 msgid "Empty"
 msgstr "E zbrazët"
 
-#: admin/pageadmin.py:1422
+#: admin/pageadmin.py:1436
 msgid "Create Content"
 msgstr "Krijoni Lëndë"
 
-#: admin/permissionadmin.py:119
+#: admin/permissionadmin.py:120
 msgid "View restriction"
 msgstr "Shihni kufizim"
 
-#: admin/permissionadmin.py:120
+#: admin/permissionadmin.py:121
 msgid "View restrictions"
 msgstr "Shihni kufizime"
 
-#: admin/placeholderadmin.py:102
+#: admin/placeholderadmin.py:101
 #, python-format
 msgid "Field %s not found"
 msgstr "Fusha %s s’u gjet"
 
-#: admin/placeholderadmin.py:108 templates/cms/toolbar/dragbar.html:5
-#: templates/cms/toolbar/dragitem.html:14
-#: templates/cms/toolbar/dragitem.html:24
+#: admin/placeholderadmin.py:107
 msgid "You do not have permission to edit this item"
 msgstr "S’keni leje të përpunoni këtë objekt"
 
-#: admin/placeholderadmin.py:388 admin/placeholderadmin.py:392
+#: admin/placeholderadmin.py:395 admin/placeholderadmin.py:399
 msgid "You do not have permission to add a plugin"
 msgstr "S’keni leje të shtoni një shtojcë"
 
-#: admin/placeholderadmin.py:532 admin/placeholderadmin.py:536
+#: admin/placeholderadmin.py:551 admin/placeholderadmin.py:558
+#: admin/placeholderadmin.py:562 admin/placeholderadmin.py:566
 msgid "You do not have permission to copy this placeholder."
 msgstr "S’keni leje të kopjoni këtë vendmbajtëse."
 
-#: admin/placeholderadmin.py:627
+#: admin/placeholderadmin.py:658
 msgid "Plugin not found"
 msgstr "S’u gjet shtojcë"
 
-#: admin/placeholderadmin.py:635 admin/placeholderadmin.py:638
+#: admin/placeholderadmin.py:666 admin/placeholderadmin.py:669
 msgid "You do not have permission to edit this plugin"
 msgstr "S’keni leje të përpunoni këtë shtojcë"
 
-#: admin/placeholderadmin.py:797 admin/placeholderadmin.py:801
+#: admin/placeholderadmin.py:846 admin/placeholderadmin.py:850
 msgid "You have no permission to paste this plugin"
 msgstr "S’keni leje ta ngjitni këtë shtojcë"
 
-#: admin/placeholderadmin.py:857 admin/placeholderadmin.py:861
+#: admin/placeholderadmin.py:906 admin/placeholderadmin.py:910
 msgid "You have no permission to paste this placeholder"
 msgstr "S’keni leje ta ngjitni këtë vendmbajtëse"
 
-#: admin/placeholderadmin.py:914 admin/placeholderadmin.py:918
-#: admin/placeholderadmin.py:922 admin/placeholderadmin.py:926
+#: admin/placeholderadmin.py:963 admin/placeholderadmin.py:967
+#: admin/placeholderadmin.py:971 admin/placeholderadmin.py:975
 msgid "You have no permission to move this plugin"
 msgstr "S’keni leje të lëvizni këtë shtojcë"
 
-#: admin/placeholderadmin.py:977 admin/placeholderadmin.py:981
+#: admin/placeholderadmin.py:1026 admin/placeholderadmin.py:1030
 msgid "You have no permission to cut this plugin"
 msgstr "S’keni leje ta prisni këtë shtojcash"
 
-#: admin/placeholderadmin.py:1026 admin/placeholderadmin.py:1030
-#: admin/placeholderadmin.py:1042
+#: admin/placeholderadmin.py:1075 admin/placeholderadmin.py:1079
+#: admin/placeholderadmin.py:1091
 msgid "You do not have permission to delete this plugin"
 msgstr "S’keni leje ta fshini këtë shtojcë"
 
-#: admin/placeholderadmin.py:1059
+#: admin/placeholderadmin.py:1108
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "Shtojca %(name)s \"%(obj)s\" u fshi me sukses."
 
-#: admin/placeholderadmin.py:1079 admin/placeholderadmin.py:1170
+#: admin/placeholderadmin.py:1128 admin/placeholderadmin.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "S’fshihet dot %(name)s"
 
-#: admin/placeholderadmin.py:1081 admin/placeholderadmin.py:1172
+#: admin/placeholderadmin.py:1130 admin/placeholderadmin.py:1221
 msgid "Are you sure?"
 msgstr "Jeni i sigurt?"
 
-#: admin/placeholderadmin.py:1117 admin/placeholderadmin.py:1121
-#: admin/placeholderadmin.py:1138
+#: admin/placeholderadmin.py:1166 admin/placeholderadmin.py:1170
+#: admin/placeholderadmin.py:1187
 msgid "You do not have permission to clear this placeholder"
 msgstr "S’keni leje të spastroni këtë vendmbajtëse"
 
-#: admin/placeholderadmin.py:1151
+#: admin/placeholderadmin.py:1200
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "Vendmbajtësja \"%(obj)s\" u fshi me sukses."
 
-#: admin/placeholderadmin.py:1176
+#: admin/placeholderadmin.py:1225
 msgid "placeholder"
 msgstr "vendmbajtëse"
 
-#: admin/useradmin.py:126 models/permissionmodels.py:260
+#: admin/useradmin.py:126 models/permissionmodels.py:287
 msgid "Page permissions"
 msgstr "Leje faqeje"
 
@@ -431,52 +465,58 @@ msgstr "Leje Përdoruessih & Grupesh"
 msgid "Page permissions management"
 msgstr "Administrim leje faqesh"
 
-#: admin/utils.py:90
+#: admin/utils.py:93
 msgid "Actions"
 msgstr "Veprime"
 
-#: admin/utils.py:262
+#: admin/utils.py:265
 msgid "Empty content"
 msgstr "Lëndë e zbrazët"
 
-#: admin/utils.py:503
+#: admin/utils.py:400
+#, fuzzy
+#| msgid "You do not have permission to edit this item"
+msgid "You do not have permission to change this content."
+msgstr "S’keni leje të përpunoni këtë objekt"
+
+#: admin/utils.py:538
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Veti %(object_name)s"
 
-#: admin/utils.py:507
+#: admin/utils.py:542
 #, python-format
 msgid "Add new %(object_name)s"
 msgstr "Shtoni %(object_name)s të ri"
 
-#: admin/utils.py:512 admin/utils.py:583
+#: admin/utils.py:547 admin/utils.py:639
 msgid "Add content"
 msgstr "Shtoni lëndë"
 
-#: admin/utils.py:516
+#: admin/utils.py:551
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
 "Lënda për gjuhën e tanishme është ndryshuar. Klikoni mbi “Anuloje”, që të "
-"riktheheni te formulari dhe ruani ndryshimet. Klikoni mbi “OK” për të hedhur"
-" tej ndryshimet."
+"riktheheni te formulari dhe ruani ndryshimet. Klikoni mbi “OK” për të hedhur "
+"tej ndryshimet."
 
-#: admin/utils.py:536
+#: admin/utils.py:575
 #, python-format
 msgid "Add %(language)s content"
 msgstr "Shtoni lëndë në %(language)s"
 
-#: admin/utils.py:570 cms_toolbars.py:199
+#: admin/utils.py:618 cms_toolbars.py:194
 #: templates/cms/toolbar/items/live_draft.html:6 tests/test_views.py:324
 msgid "Preview"
 msgstr "Paraparje"
 
-#: admin/utils.py:583
+#: admin/utils.py:639
 msgid "Settings"
 msgstr "Rregullime"
 
-#: admin/utils.py:809
+#: admin/utils.py:887
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
@@ -485,7 +525,7 @@ msgstr ""
 "%(value)s e pavlefshme gjuhe. Ky formular s’mund të përpunohet. Provoni të "
 "ndryshoni gjuhë."
 
-#: admin/utils.py:810
+#: admin/utils.py:888
 msgid "<unspecified>"
 msgstr "<e papërcaktuar?"
 
@@ -508,7 +548,7 @@ msgstr "Vendmbajtëse"
 msgid "Getting started developer guide"
 msgstr "Udhërrëfyes si t’ia fillohet për zhvillues"
 
-#: cms_toolbars.py:77 templates/cms/welcome.html:88 utils/conf.py:102
+#: cms_toolbars.py:77 templates/cms/welcome.html:88 utils/conf.py:104
 msgid "Documentation"
 msgstr "Dokumentim"
 
@@ -524,23 +564,23 @@ msgstr "Bashkësi Discord"
 msgid "What's new"
 msgstr "Ç’ka të re"
 
-#: cms_toolbars.py:100 templates/cms/wizards/create.html:5
+#: cms_toolbars.py:101 templates/cms/wizards/create.html:5
 #: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
 msgstr "Krijoje"
 
-#: cms_toolbars.py:187 templates/cms/toolbar/dragbar.html:17
-#: templates/cms/toolbar/dragitem.html:18
-#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:534
-#: templatetags/cms_tags.py:537 tests/test_views.py:338
+#: cms_toolbars.py:182 templates/admin/cms/page/tree/menu.html:95
+#: templates/cms/toolbar/dragitem.html:17
+#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:535
+#: templatetags/cms_tags.py:538 tests/test_views.py:338
 msgid "Edit"
 msgstr "Përpunim"
 
-#: cms_toolbars.py:217 templates/admin/cms/page/delete_confirmation.html:49
+#: cms_toolbars.py:216 templates/admin/cms/page/delete_confirmation.html:49
 msgid "Structure"
 msgstr "Strukturë"
 
-#: cms_toolbars.py:224 forms/wizards.py:31
+#: cms_toolbars.py:223 forms/wizards.py:32
 msgid "Content"
 msgstr "Lëndë"
 
@@ -548,66 +588,62 @@ msgstr "Lëndë"
 msgid "Help"
 msgstr "Ndihmë"
 
-#: cms_toolbars.py:306 templates/admin/cms/page/tree/base.html:107
+#: cms_toolbars.py:307 templates/admin/cms/page/tree/base.html:107
 msgid "Sites"
 msgstr "Sajte"
 
-#: cms_toolbars.py:307
+#: cms_toolbars.py:308
 msgid "Admin Sites"
 msgstr "Sajte Përgjegjësi"
 
-#: cms_toolbars.py:314
+#: cms_toolbars.py:316
 msgid "Administration"
 msgstr "Administrim"
 
-#: cms_toolbars.py:318
+#: cms_toolbars.py:320
 msgid "User settings"
 msgstr "Rregullime përdoruesi"
 
-#: cms_toolbars.py:327
+#: cms_toolbars.py:329
 msgid "Clipboard..."
 msgstr "E papastër…"
 
-#: cms_toolbars.py:332
+#: cms_toolbars.py:335
 msgid "Clear clipboard"
 msgstr "Spastro të papastrën"
 
-#: cms_toolbars.py:340
+#: cms_toolbars.py:344
 msgid "Disable toolbar"
 msgstr "Çaktivizo panelin"
 
-#: cms_toolbars.py:344
+#: cms_toolbars.py:347
 msgid "Shortcuts..."
 msgstr "Shkurtore…"
 
-#: cms_toolbars.py:360
+#: cms_toolbars.py:361
 msgid "Users"
 msgstr "Përdorues"
 
-#: cms_toolbars.py:378 tests/test_toolbar.py:1009 tests/test_toolbar.py:1026
-#: tests/test_toolbar.py:1060
+#: cms_toolbars.py:379 tests/test_toolbar.py:1094 tests/test_toolbar.py:1111
+#: tests/test_toolbar.py:1141
 #, python-format
 msgid "Logout %s"
 msgstr "Dilni %s"
 
-#: cms_toolbars.py:378
+#: cms_toolbars.py:379
 msgid "Logout"
 msgstr "Dalje"
 
-#: cms_toolbars.py:394 models/settingmodels.py:20
-#: templates/admin/cms/grouper/change_list.html:4
+#: cms_toolbars.py:395 models/settingmodels.py:20
+#: templates/admin/cms/grouper/change_list.html:5
 msgid "Language"
 msgstr "Gjuhë"
-
-#: cms_toolbars.py:520
-msgid "Add Translation"
-msgstr "Shtoni Përkthim"
 
 #: cms_toolbars.py:533
 msgid "Delete Translation"
 msgstr "Fshije Përkthimin"
 
-#: cms_toolbars.py:545 tests/test_toolbar.py:961 tests/test_toolbar.py:968
+#: cms_toolbars.py:545 tests/test_toolbar.py:1043 tests/test_toolbar.py:1050
 msgid "Copy all plugins"
 msgstr "Kopjo krejt shtojcat"
 
@@ -621,64 +657,69 @@ msgstr "nga %s"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "Jeni i sigurt se doni të kopjohen krejt shtojcat prej %s?"
 
-#: cms_toolbars.py:576
+#: cms_toolbars.py:578
 msgid "Pages"
 msgstr "Faqe"
 
-#: cms_toolbars.py:596 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:92 tests/test_wizards.py:115
-#: tests/test_wizards.py:172
+#: cms_toolbars.py:598 templates/admin/cms/page/permissions.html:5
+#: tests/test_wizards.py:92 tests/test_wizards.py:115 tests/test_wizards.py:172
 msgid "Page"
 msgstr "Faqe"
 
-#: cms_toolbars.py:628
+#: cms_toolbars.py:631
 msgid "Create Page"
 msgstr "Krijoni Faqe"
 
-#: cms_toolbars.py:632 templates/admin/cms/page/tree/base.html:140
+#: cms_toolbars.py:635 templates/admin/cms/page/tree/base.html:130
 msgid "New Page"
 msgstr "Faqe e Re"
 
-#: cms_toolbars.py:633
+#: cms_toolbars.py:636
 msgid "New Sub Page"
 msgstr "Nënfaqe e Re"
 
-#: cms_toolbars.py:645
+#: cms_toolbars.py:648
 msgid "Duplicate this Page"
 msgstr "Përsëdyte këtë Faqe"
 
-#: cms_toolbars.py:656
+#: cms_toolbars.py:660
 msgid "Page settings"
 msgstr "Rregullime faqeje"
 
-#: cms_toolbars.py:664 templates/admin/cms/page/tree/actions_dropdown.html:67
+#: cms_toolbars.py:670 templates/admin/cms/page/tree/actions_dropdown.html:67
 #: templates/admin/cms/page/tree/actions_dropdown.html:72
-#: templates/admin/cms/page/tree/menu.html:209
-#: templates/admin/cms/page/tree/menu.html:211
+#: templates/admin/cms/page/tree/menu.html:221
+#: templates/admin/cms/page/tree/menu.html:223
 msgid "Advanced settings"
 msgstr "Rregullime të mëtejshme"
 
-#: cms_toolbars.py:674
+#: cms_toolbars.py:679
 msgid "Templates"
 msgstr "Gjedhe"
 
-#: cms_toolbars.py:694
+#: cms_toolbars.py:684
+#, fuzzy
+#| msgid "Placeholder"
+msgid "Placeholders"
+msgstr "Vendmbajtëse"
+
+#: cms_toolbars.py:702
 msgid "Hide in navigation"
 msgstr "Fshihe te lëvizja"
 
-#: cms_toolbars.py:694
+#: cms_toolbars.py:702
 msgid "Display in navigation"
 msgstr "Shfaqe te lëvizja"
 
-#: cms_toolbars.py:707
+#: cms_toolbars.py:716
 msgid "Delete page"
 msgstr "Fshije faqen"
 
-#: cms_wizards.py:46
+#: cms_wizards.py:47
 msgid "Create a new page next to the current page."
 msgstr "Krijoni një faqe të re krah faqes së tanishme."
 
-#: cms_wizards.py:54
+#: cms_wizards.py:55
 msgid "Create a page below the current page."
 msgstr "Krijo një faqe nën faqen e tanishme."
 
@@ -690,7 +731,7 @@ msgstr "Përzgjidhni sajt të vlefshëm"
 msgid "Select a valid page"
 msgstr "Përzgjidhni faqe të vlefshme"
 
-#: forms/validators.py:77
+#: forms/validators.py:78
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -699,39 +740,45 @@ msgstr ""
 "Faqja %(conflict_page)s ka të njëjtën URL '%(url)s' me faqen e tanishme "
 "\"%(instance)s\"."
 
-#: forms/validators.py:79
+#: forms/validators.py:80
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Faqja %(conflict_page)s ka të njëjtën URL '%(url)s' me faqen e tanishme."
 
-#: forms/wizards.py:32
+#: forms/widgets.py:155
+#, fuzzy
+#| msgid "Add Another"
+msgid "Add another"
+msgstr "Shtoni Tjetër"
+
+#: forms/wizards.py:33
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
 "Në dëshirë. Në u dhëntë, do të shtohet automatikisht brenda një shtojce të "
 "re tekst."
 
-#: forms/wizards.py:45
+#: forms/wizards.py:46
 msgid "Provide a title for the new page."
 msgstr "Jepni një titull për faqen e re."
 
-#: forms/wizards.py:47
+#: forms/wizards.py:48
 msgid "Leave empty for automatic slug, or override as required."
 msgstr ""
 "Lëreni të zbrazët për identifikues të automatizuar, ose anashkalojeni siç "
 "kërkohet."
 
-#: forms/wizards.py:83
+#: forms/wizards.py:84
 msgid "Cannot automatically create slug. Please provide one manually."
 msgstr ""
 "S’mund të krijohet identifikues automatikisht. Ju lutemi, jepni një dorazi."
 
-#: forms/wizards.py:99
+#: forms/wizards.py:100
 msgid "Please provide a valid slug."
 msgstr "Ju lutemi, jepni një identifikues të vlefshëm."
 
-#: forms/wizards.py:123
+#: forms/wizards.py:134
 msgid "You don't have the permissions required to add a page."
 msgstr "S’keni lejet e domosdoshme për të krijuar një faqe."
 
@@ -740,21 +787,21 @@ msgstr "S’keni lejet e domosdoshme për të krijuar një faqe."
 msgid "ID"
 msgstr "ID"
 
-#: migrations/0001_initial.py:27 models/pluginmodel.py:172
+#: migrations/0001_initial.py:27 models/pluginmodel.py:173
 msgid "position"
 msgstr "pozicion"
 
-#: migrations/0001_initial.py:28 models/contentmodels.py:40
-#: models/pagemodel.py:1098 models/pluginmodel.py:174
+#: migrations/0001_initial.py:28 models/contentmodels.py:44
+#: models/pagemodel.py:1112 models/pluginmodel.py:175
 msgid "language"
 msgstr "gjuhë"
 
-#: migrations/0001_initial.py:29 models/pluginmodel.py:176
+#: migrations/0001_initial.py:29 models/pluginmodel.py:177
 msgid "plugin_name"
 msgstr "emër_shtojce"
 
-#: migrations/0001_initial.py:30 models/contentmodels.py:82
-#: models/pluginmodel.py:178
+#: migrations/0001_initial.py:30 models/contentmodels.py:78
+#: models/pluginmodel.py:179
 msgid "creation date"
 msgstr "datë krijimi"
 
@@ -811,13 +858,13 @@ msgstr "grup"
 msgid "sites"
 msgstr "sajte"
 
-#: migrations/0001_initial.py:84 models/contentmodels.py:90
-#: models/pagemodel.py:65
+#: migrations/0001_initial.py:84 models/contentmodels.py:83
+#: models/pagemodel.py:75
 msgid "created by"
 msgstr "krijuar nga"
 
-#: migrations/0001_initial.py:85 models/contentmodels.py:95
-#: models/pagemodel.py:70
+#: migrations/0001_initial.py:85 models/contentmodels.py:88
+#: models/pagemodel.py:80
 msgid "changed by"
 msgstr "ndryshuar nga"
 
@@ -831,52 +878,56 @@ msgstr "datë botimi"
 msgid "publication end date"
 msgstr "datë përfundimi botimi"
 
-#: migrations/0001_initial.py:90 models/contentmodels.py:102
+#: migrations/0001_initial.py:90 models/contentmodels.py:95
 msgid "in navigation"
 msgstr "në lëvizje"
 
-#: migrations/0001_initial.py:91 models/contentmodels.py:107
+#: migrations/0001_initial.py:91 models/contentmodels.py:100
 msgid "soft root"
 msgstr ""
 
-#: migrations/0001_initial.py:92 models/pagemodel.py:82
+#: migrations/0001_initial.py:92 models/pagemodel.py:92
 msgid "id"
 msgstr "id"
 
-#: migrations/0001_initial.py:93 models/pagemodel.py:90
+#: migrations/0001_initial.py:93 models/pagemodel.py:100
 msgid "attached menu"
 msgstr "menuja bashkëngjitur"
 
-#: migrations/0001_initial.py:94 models/contentmodels.py:113
+#: migrations/0001_initial.py:94 models/contentmodels.py:106
 #: templates/admin/cms/page/tree/actions_dropdown.html:99
 msgid "template"
 msgstr "gjedhe"
 
-#: migrations/0001_initial.py:95 models/pagemodel.py:97
+#: migrations/0001_initial.py:95 models/pagemodel.py:107
 msgid "login required"
 msgstr "lypset hyrje"
 
-#: migrations/0001_initial.py:98 models/pagemodel.py:106
+#: migrations/0001_initial.py:96 models/contentmodels.py:113
+msgid "menu visibility"
+msgstr "dukshmëri menush"
+
+#: migrations/0001_initial.py:98 models/pagemodel.py:116
 msgid "application"
 msgstr "aplikacion"
 
-#: migrations/0001_initial.py:99 models/pagemodel.py:113
+#: migrations/0001_initial.py:99 models/pagemodel.py:123
 msgid "application instance name"
 msgstr "emër instance aplikacioni"
 
-#: migrations/0001_initial.py:110 models/pagemodel.py:60
+#: migrations/0001_initial.py:110 models/pagemodel.py:70
 #: templates/admin/cms/page/tree/actions_dropdown.html:105
 msgid "site"
 msgstr "sajt"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:253
+#: migrations/0001_initial.py:132 models/permissionmodels.py:280
 #: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "Akordo gjatë"
 
-#: migrations/0001_initial.py:134 models/contentmodels.py:78
-#: models/pagemodel.py:133 models/pagemodel.py:1102
-#: models/permissionmodels.py:254 templates/admin/cms/page/tree/base.html:298
+#: migrations/0001_initial.py:134 models/contentmodels.py:77
+#: models/pagemodel.py:143 models/pagemodel.py:1116
+#: models/permissionmodels.py:281 templates/admin/cms/page/tree/base.html:288
 #: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
 msgstr "faqe"
@@ -893,84 +944,83 @@ msgstr "vetëm për përdorues të futur"
 msgid "for anonymous users only"
 msgstr "vetëm për përdorues anonimë"
 
-#: models/contentmodels.py:22
+#: models/contentmodels.py:28
 msgid "Inherit from parent page"
 msgstr "Trashëgoje prej faqeje mëmë"
 
-#: models/contentmodels.py:23
+#: models/contentmodels.py:29
 msgid "Deny"
 msgstr "Mohojei"
 
-#: models/contentmodels.py:24
+#: models/contentmodels.py:30
 msgid "Only this website"
 msgstr "Vetëm këtë sajt"
 
-#: models/contentmodels.py:25
+#: models/contentmodels.py:31
 msgid "Allow"
 msgstr "Lejoje"
 
-#: models/contentmodels.py:42
+#: models/contentmodels.py:46
 msgid "title"
 msgstr "titull"
 
-#: models/contentmodels.py:44
+#: models/contentmodels.py:48
 msgid "The default title"
 msgstr "Titulli parazgjedhje"
 
-#: models/contentmodels.py:47
+#: models/contentmodels.py:51
 msgid "Page Title"
 msgstr "Titull Faqeje"
 
-#: models/contentmodels.py:52
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+#: models/contentmodels.py:55
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Mbishkruan ç’shfaqet në krye të shfletuesit tuaj ose te faqerojtësit"
 
-#: models/contentmodels.py:56
+#: models/contentmodels.py:58
 msgid "Menu Title"
 msgstr "Titull Menuje"
 
-#: models/contentmodels.py:60
+#: models/contentmodels.py:62
 msgid "Overwrite what is displayed in the menu"
 msgstr "Mbishkruaj ç’ka shfaqet te menuja"
 
-#: models/contentmodels.py:63
+#: models/contentmodels.py:65
 msgid "Description meta tag"
 msgstr "Etiketë meta përshkrimi"
 
-#: models/contentmodels.py:66
+#: models/contentmodels.py:68
 msgid "A description of the page used by search engines."
 msgstr "Përshkrim i faqes i përdorur nga motorë kërkimesh."
 
-#: models/contentmodels.py:69
+#: models/contentmodels.py:71
 msgid "redirect"
 msgstr "ridrejtim"
 
-#: models/contentmodels.py:73
+#: models/contentmodels.py:75
 msgid "Redirects to this URL."
 msgstr "Ridrejto te kjo URL."
 
-#: models/contentmodels.py:110
+#: models/contentmodels.py:103
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Krejt paraardhësit s’do të shfaqen te lëvizja"
 
-#: models/contentmodels.py:116
+#: models/contentmodels.py:109
 msgid "The template used to render the content."
 msgstr "Gjedhja e përdorur për vizatimin e lëndës."
 
-#: models/contentmodels.py:146
+#: models/contentmodels.py:139
 msgid "page content"
 msgstr "lëndë faqeje"
 
-#: models/contentmodels.py:147
+#: models/contentmodels.py:140
 msgid "page contents"
 msgstr "lëndë faqeje"
 
-#: models/contentmodels.py:289 models/pagemodel.py:985
+#: models/contentmodels.py:296 models/pagemodel.py:999
 msgid "default"
 msgstr "parazgjedhje"
 
-#: models/pagemodel.py:87
+#: models/pagemodel.py:97
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
@@ -978,23 +1028,23 @@ msgstr ""
 "Një identifikues unik që përdoret me etiketën e gjedhes page_url për të "
 "lidhur këtë faqe"
 
-#: models/pagemodel.py:120
+#: models/pagemodel.py:130
 msgid "Mark this page as a page type"
 msgstr ""
 
-#: models/pagemodel.py:134
+#: models/pagemodel.py:144
 msgid "pages"
 msgstr "faqe"
 
-#: models/pagemodel.py:153
+#: models/pagemodel.py:163
 msgid "No available title"
 msgstr ""
 
-#: models/pagemodel.py:1096
+#: models/pagemodel.py:1110
 msgid "slug"
 msgstr "identifikues"
 
-#: models/pagemodel.py:1097
+#: models/pagemodel.py:1111
 msgid "Path"
 msgstr "Shteg"
 
@@ -1059,8 +1109,8 @@ msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"Përdoruesit s’mund të lëvizin një faqe pa leje për ndryshim të faqes. Lypsen"
-" leje përpunimi."
+"Përdoruesit s’mund të lëvizin një faqe pa leje për ndryshim të faqes. Lypsen "
+"leje përpunimi."
 
 #: models/permissionmodels.py:198
 msgid "can recover any deleted page"
@@ -1078,11 +1128,11 @@ msgstr "Leje globale faqeje"
 msgid "Pages global permissions"
 msgstr "Leje globale faqesh"
 
-#: models/permissionmodels.py:259
+#: models/permissionmodels.py:286
 msgid "Page permission"
 msgstr "Leje faqesh"
 
-#: models/permissionmodels.py:274
+#: models/permissionmodels.py:301
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
@@ -1090,31 +1140,55 @@ msgstr ""
 "Leja për shtim faqesh lyp gjithashtu hyrje te pjella, ose pasardhës, "
 "përndryshe faqja e shtuar s’mund të ndryshohet nga krijuesi i saj."
 
-#: models/permissionmodels.py:320
+#: models/permissionmodels.py:347
 msgid "User (page)"
 msgstr "Përdorues (faqe)"
 
-#: models/permissionmodels.py:321
+#: models/permissionmodels.py:348
 msgid "Users (page)"
 msgstr "Përdorues (faqe)"
 
-#: models/permissionmodels.py:336
+#: models/permissionmodels.py:363
 msgid "User group (page)"
 msgstr "Grup përdoruesish (faqe)"
 
-#: models/permissionmodels.py:337
+#: models/permissionmodels.py:364
 msgid "User groups (page)"
 msgstr "Grupe përdoruesish (faqe)"
 
-#: models/placeholdermodel.py:30
+#: models/placeholdermodel.py:35
 msgid "slot"
 msgstr ""
 
-#: models/placeholdermodel.py:32
+#: models/placeholdermodel.py:37
 msgid "width"
 msgstr "gjerësi"
 
-#: models/pluginmodel.py:212
+#: models/placeholdermodel.py:48
+#, fuzzy
+#| msgid "Edit model"
+msgid "Edit object"
+msgstr "Përpunoni model"
+
+#: models/placeholdermodel.py:49
+#, fuzzy
+#| msgid "This is a static placeholder"
+msgid "This is an external placeholder"
+msgstr "Kjo është një vendmbajtëse statike"
+
+#: models/pluginmodel.py:188
+#, fuzzy
+#| msgid "Add plugin"
+msgid "plugin"
+msgstr "Shtoni shtojcë"
+
+#: models/pluginmodel.py:189
+#, fuzzy
+#| msgid "Add plugin"
+msgid "plugins"
+msgstr "Shtoni shtojcë"
+
+#: models/pluginmodel.py:216
 msgid "<Empty>"
 msgstr "<E zbrazët>"
 
@@ -1130,23 +1204,22 @@ msgstr "rregullim përdoruesi"
 msgid "user settings"
 msgstr "rregullime përdoruesi"
 
-#: plugin_base.py:70
+#: plugin_base.py:71
 msgid "Advanced options"
 msgstr "Mundësi të mëtejshme"
 
-#: plugin_base.py:125
+#: plugin_base.py:138
 msgid "Generic"
 msgstr "Elementare"
 
-#: plugin_base.py:612
+#: plugin_base.py:654
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" u ndryshua me sukses."
 
-#: plugin_base.py:700
+#: plugin_base.py:742
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
-"S’ka rregullime të tjera për këtë shtojcë. Ju lutemi, shtypni “Ruaje”."
+msgstr "S’ka rregullime të tjera për këtë shtojcë. Ju lutemi, shtypni “Ruaje”."
 
 #: signals/log_entries.py:12 tests/test_log_entries.py:141
 msgid "Moved"
@@ -1209,7 +1282,7 @@ msgid "Cleared Placeholder"
 msgstr "U spastrua Vendmbajtësja"
 
 #: templates/admin/cms/extensions/change_form.html:5
-#: templates/admin/cms/page/change_form.html:84
+#: templates/admin/cms/page/change_form.html:86
 #: templates/admin/cms/page/plugin/submit_line.html:3
 #: templates/admin/cms/page/submit_row.html:4
 #: templates/admin/cms/page/tree/copy_premissions.html:10
@@ -1258,29 +1331,28 @@ msgid "Home"
 msgstr "Kreu"
 
 #: templates/admin/cms/page/change_form.html:28
-#: templates/admin/cms/page/tree/menu.html:80
-#: templates/admin/cms/page/tree/menu.html:83
+#: templates/admin/cms/page/tree/menu.html:92
 msgid "View on site"
 msgstr "Shiheni në sajt"
 
-#: templates/admin/cms/page/change_form.html:56
+#: templates/admin/cms/page/change_form.html:58
 #: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Ju lutemi, ndreqni gabimin më poshtë."
 msgstr[1] "Ju lutemi, ndreqni gabimet më poshtë."
 
-#: templates/admin/cms/page/change_form.html:73
+#: templates/admin/cms/page/change_form.html:75
 msgid "All permissions"
 msgstr "Krejt lejet"
 
-#: templates/admin/cms/page/change_form.html:74
-#: templates/admin/cms/page/tree/base.html:206
-#: templates/admin/cms/page/tree/base.html:270
+#: templates/admin/cms/page/change_form.html:76
+#: templates/admin/cms/page/tree/base.html:196
+#: templates/admin/cms/page/tree/base.html:260
 msgid "Loading..."
 msgstr "Po ngarkohet…"
 
-#: templates/admin/cms/page/change_form.html:85
+#: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/plugin/submit_line.html:9
 #: templates/admin/cms/page/submit_row.html:12
 msgid "Save and continue editing"
@@ -1372,26 +1444,26 @@ msgstr "Ruajeni dhe shtoni një tjetër"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:13
 #: templates/admin/cms/page/tree/actions_dropdown.html:15
-#: templates/admin/cms/page/tree/menu.html:185
-#: templates/admin/cms/page/tree/menu.html:187
-#: templates/cms/toolbar/dragitem.html:41
+#: templates/admin/cms/page/tree/menu.html:197
+#: templates/admin/cms/page/tree/menu.html:199
+#: templates/cms/toolbar/dragitem.html:39
 msgid "Copy"
 msgstr "Kopjoje"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:26
 #: templates/admin/cms/page/tree/actions_dropdown.html:28
-#: templates/admin/cms/page/tree/menu.html:191
-#: templates/admin/cms/page/tree/menu.html:193
-#: templates/cms/toolbar/dragitem.html:40
+#: templates/admin/cms/page/tree/menu.html:203
+#: templates/admin/cms/page/tree/menu.html:205
+#: templates/cms/toolbar/dragitem.html:38
 msgid "Cut"
 msgstr "Prije"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:37
-#: templates/admin/cms/page/tree/base.html:170
-#: templates/admin/cms/page/tree/menu.html:199
+#: templates/admin/cms/page/tree/base.html:160
+#: templates/admin/cms/page/tree/menu.html:211
 #: templates/cms/toolbar/dragbar.html:25 templates/cms/toolbar/dragbar.html:28
-#: templates/cms/toolbar/dragitem.html:44
-#: templates/cms/toolbar/dragitem.html:49
+#: templates/cms/toolbar/dragitem.html:42
+#: templates/cms/toolbar/dragitem.html:47
 msgid "Paste"
 msgstr "Ngjite"
 
@@ -1448,82 +1520,85 @@ msgstr ""
 "                                                Riktheni %(name)s e fshirë\n"
 "                                            "
 
-#: templates/admin/cms/page/tree/base.html:150
+#: templates/admin/cms/page/tree/base.html:140
 msgid "Main Navigation"
 msgstr "Lëvizjet Kryesore"
 
-#: templates/admin/cms/page/tree/base.html:162
-#: templates/admin/cms/page/tree/menu.html:176
+#: templates/admin/cms/page/tree/base.html:152
+#: templates/admin/cms/page/tree/menu.html:188
 msgid "Options"
 msgstr "Mundësi"
 
-#: templates/admin/cms/page/tree/base.html:200
-#: templates/admin/cms/page/tree/base.html:264
+#: templates/admin/cms/page/tree/base.html:190
+#: templates/admin/cms/page/tree/base.html:254
 msgid "Successfully moved"
 msgstr "U lëviz sukses"
 
-#: templates/admin/cms/page/tree/base.html:201
-#: templates/admin/cms/page/tree/base.html:265
+#: templates/admin/cms/page/tree/base.html:191
+#: templates/admin/cms/page/tree/base.html:255
 msgid "Changes within the tree might require a refresh."
 msgstr "Ndryshimet brenda pemës mund të duan një rifreskim."
 
-#: templates/admin/cms/page/tree/base.html:202
-#: templates/admin/cms/page/tree/base.html:266
+#: templates/admin/cms/page/tree/base.html:192
+#: templates/admin/cms/page/tree/base.html:256
 msgid "Error:"
 msgstr "Gabim:"
 
-#: templates/admin/cms/page/tree/base.html:203
-#: templates/admin/cms/page/tree/base.html:267
+#: templates/admin/cms/page/tree/base.html:193
+#: templates/admin/cms/page/tree/base.html:257
 msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+"This page cannot be copied because an application is attached to it. See the "
+"Page's Advanced settings to manage apphooks."
 msgstr ""
 "Kjo faqe s’mund të kopjohet, ngaqë i është bashkëngjitur një aplikacion. Se "
 "si të administroni apphook-e, shihni Rregullime të Thelluara Faqesh."
 
-#: templates/admin/cms/page/tree/base.html:204
-#: templates/admin/cms/page/tree/base.html:268
+#: templates/admin/cms/page/tree/base.html:194
+#: templates/admin/cms/page/tree/base.html:258
 msgid "Are you sure you want to § this page?"
 msgstr "Jeni i sigurt se doni të § kjo faqe?"
 
-#: templates/admin/cms/page/tree/base.html:205
-#: templates/admin/cms/page/tree/base.html:269
+#: templates/admin/cms/page/tree/base.html:195
+#: templates/admin/cms/page/tree/base.html:259
 msgid "Reload"
 msgstr "Ringarkoje"
 
-#: templates/admin/cms/page/tree/base.html:207
-#: templates/admin/cms/page/tree/base.html:271
+#: templates/admin/cms/page/tree/base.html:197
+#: templates/admin/cms/page/tree/base.html:261
 msgid "New node"
 msgstr "Nyjë e re"
 
-#: templates/admin/cms/page/tree/base.html:208
-#: templates/admin/cms/page/tree/base.html:272
+#: templates/admin/cms/page/tree/base.html:198
+#: templates/admin/cms/page/tree/base.html:262
 msgid "nodes"
 msgstr "nyje"
 
-#: templates/admin/cms/page/tree/base.html:219
-#: templates/admin/cms/page/tree/base.html:283
+#: templates/admin/cms/page/tree/base.html:209
+#: templates/admin/cms/page/tree/base.html:273
+#: templates/admin/cms/page/tree/menu.html:95
 msgid "View"
 msgstr "Shihni"
 
-#: templates/admin/cms/page/tree/base.html:225
-#: templates/admin/cms/page/tree/base.html:289
+#: templates/admin/cms/page/tree/base.html:215
+#: templates/admin/cms/page/tree/base.html:279
 msgid "Menu"
 msgstr "Menu"
 
-#: templates/admin/cms/page/tree/base.html:298
+#: templates/admin/cms/page/tree/base.html:288
 #, python-format
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add "
+"%(object)s</a> now.\n"
 "                        "
 msgstr ""
 "\n"
 "                            <em>Ende s’ka %(object)s përqark.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Shtoni %(object)s</a> tani.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Shtoni "
+"%(object)s</a> tani.\n"
 "                        "
 
 #: templates/admin/cms/page/tree/copy_premissions.html:4
@@ -1536,7 +1611,7 @@ msgstr "Zgjidhni mundësi kopjimi"
 
 #: templates/admin/cms/page/tree/copy_premissions.html:11
 #: templates/cms/toolbar/toolbar_with_structure.html:12
-#: templates/cms/toolbar/toolbar_with_structure.html:49
+#: templates/cms/toolbar/toolbar_with_structure.html:48
 msgid "Close"
 msgstr "Mbylle"
 
@@ -1565,26 +1640,31 @@ msgstr ""
 msgid "Apphook"
 msgstr "Apphook"
 
+#: templates/admin/cms/page/tree/legend.html:52
+#: templates/admin/cms/page/tree/menu.html:75
+msgid "Redirect"
+msgstr "Ridrejtoje"
+
 #: templates/admin/cms/page/tree/menu.html:63
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikacion: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu.html:118
+#: templates/admin/cms/page/tree/menu.html:130
 msgid "in menu"
 msgstr "në menu"
 
-#: templates/admin/cms/page/tree/menu.html:123
+#: templates/admin/cms/page/tree/menu.html:135
 msgid "not in menu"
 msgstr "jo në menu"
 
-#: templates/admin/cms/page/tree/menu.html:140
-#: templates/admin/cms/page/tree/menu.html:151
+#: templates/admin/cms/page/tree/menu.html:152
+#: templates/admin/cms/page/tree/menu.html:163
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 "Rregullime faqeje (për rregullime të thelluara, shtypni SHIFT dhe klikoni)"
 
-#: templates/admin/cms/page/tree/menu.html:218
+#: templates/admin/cms/page/tree/menu.html:230
 msgid "Permissions"
 msgstr "Lleje"
 
@@ -1598,8 +1678,7 @@ msgid "This page has no preview!"
 msgstr "Kjo faqe s’ka paraparje!"
 
 #: templates/cms/noapphook.html:19
-msgid ""
-"Potentially the attached apphook does not provide content for its root."
+msgid "Potentially the attached apphook does not provide content for its root."
 msgstr ""
 
 #: templates/cms/noapphook.html:20
@@ -1611,7 +1690,7 @@ msgstr "Po ridrejtohet te:"
 msgid "Clipboard"
 msgstr "E papastër"
 
-#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:28
+#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:25
 #: templates/cms/toolbar/toolbar_javascript.html:91
 msgid "Add plugin"
 msgstr "Shtoni shtojcë"
@@ -1628,14 +1707,9 @@ msgstr "Kopjoje prej"
 msgid "Empty all"
 msgstr "Zbrazi krejt"
 
-#: templates/cms/toolbar/dragbar.html:35
-#: templates/cms/toolbar/dragitem.html:61
+#: templates/cms/toolbar/dragbar.html:35 templates/cms/toolbar/dragitem.html:59
 msgid "Filter plugins..."
 msgstr "Filtroni shtojca…"
-
-#: templates/cms/toolbar/dragbar.html:41
-msgid "This is a static placeholder"
-msgstr "Kjo është një vendmbajtëse statike"
 
 #: templates/cms/toolbar/dragbar.html:43
 msgid "Expand all"
@@ -1645,25 +1719,25 @@ msgstr "Zgjeroji krejt"
 msgid "Collapse all"
 msgstr "Tkurri krejt"
 
-#: templates/cms/toolbar/dragitem.html:26
+#: templates/cms/toolbar/dragitem.html:23
 msgid "You cannot add plugins to this plugin."
 msgstr "S’mund të shtoni shtojca te kjo shtojcë."
 
-#: templates/cms/toolbar/dragitem.html:34
+#: templates/cms/toolbar/dragitem.html:32
 msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr "Kjo shtojcë s’mund të hiqet apo përpunohet jashtë mëmës së vet"
 
-#: templates/cms/toolbar/dragitem.html:50
+#: templates/cms/toolbar/dragitem.html:48
 msgid "Clipboard is empty."
 msgstr "E papastra është e zbrazët."
 
-#: templates/cms/toolbar/dragitem.html:51
+#: templates/cms/toolbar/dragitem.html:49
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr ""
 "Kjo shtojcë nuk lejon shtojca të këtij lloji si shtojca futur brenda njëra-"
 "tjetrës."
 
-#: templates/cms/toolbar/dragitem.html:52
+#: templates/cms/toolbar/dragitem.html:50
 msgid "This plugin cannot have nested plugins."
 msgstr "Kjo shtojcë s’mund të ketë shtojca futur brenda njëra-tjetrës."
 
@@ -1683,11 +1757,11 @@ msgstr "Shfaq/Fshih strukturë"
 msgid "Login"
 msgstr "Hyrje"
 
-#: templates/cms/toolbar/plugin.html:24
+#: templates/cms/toolbar/plugin.html:23
 msgid "Add plugin to"
 msgstr "Shtoni shtojcë te"
 
-#: templates/cms/toolbar/toolbar.html:28
+#: templates/cms/toolbar/toolbar.html:27
 msgid "More"
 msgstr "Më tepër"
 
@@ -1832,17 +1906,29 @@ msgstr "Klikoni që të ecet mbrapsht"
 msgid "Click to go forward"
 msgstr "Klikoni që të ecet përpara"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:47
+#: templates/cms/toolbar/toolbar_with_structure.html:46
 msgid "Minimize"
 msgstr "Minimizoje"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:48
+#: templates/cms/toolbar/toolbar_with_structure.html:47
 msgid "Maximize"
 msgstr "Maksimizoje"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:74
+#: templates/cms/toolbar/toolbar_with_structure.html:70
+#, fuzzy
+#| msgid "placeholder code"
+msgid "Placeholder not editable"
+msgstr "kod vendmbajtëseje"
+
+#: templates/cms/toolbar/toolbar_with_structure.html:73
 msgid "Drop a plugin here"
 msgstr "Hidhni këtu një shtojcë"
+
+#: templates/cms/welcome.html:20
+#, fuzzy
+#| msgid "Welcome to django CMS"
+msgid "Welcome to your new django CMS installation!"
+msgstr "Mirë se vini te django- CMS"
 
 #: templates/cms/welcome.html:26
 #, python-format
@@ -1860,11 +1946,13 @@ msgstr "Ju lutemi, bëni hyrjen"
 #: templates/cms/welcome.html:36
 msgid ""
 "\n"
-"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your "
+"first page</a>\n"
 "            "
 msgstr ""
 "\n"
-"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Shtoni faqen tuaj të parë</a>\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Shtoni "
+"faqen tuaj të parë</a>\n"
 "            "
 
 #: templates/cms/welcome.html:43
@@ -1872,24 +1960,32 @@ msgid ""
 "\n"
 "                    <h2>Help Funding</h2>\n"
 "                    <p>\n"
-"                        Your funding directly benefits the product, mainly through the\n"
-"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>!\n"
+"                        Your funding directly benefits the product, mainly "
+"through the\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-"
+"program/\">django CMS Fellowship Program</a>!\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        A quick way for yourself or your organisation to donate is on\n"
-"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"                        A quick way for yourself or your organisation to "
+"donate is on\n"
+"                        <a href=\"https://github.com/sponsors/django-"
+"cms\">Github Sponsors</a>.\n"
 "                    </p>\n"
 "                "
 msgstr ""
 "\n"
 "                    <h2>Ndihmoni Financimin</h2>\n"
 "                    <p>\n"
-"                        Fondet tuaja i bëjnë mirë drejtpërdrejt projektit, kryesisht përmes\n"
-"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>!\n"
+"                        Fondet tuaja i bëjnë mirë drejtpërdrejt projektit, "
+"kryesisht përmes\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-"
+"program/\">django CMS Fellowship Program</a>!\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        Një rrugë e shpejtë për ju ose entin tuaj për të dhuruar është në\n"
-"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"                        Një rrugë e shpejtë për ju ose entin tuaj për të "
+"dhuruar është në\n"
+"                        <a href=\"https://github.com/sponsors/django-"
+"cms\">Github Sponsors</a>.\n"
 "                    </p>\n"
 "                "
 
@@ -1898,11 +1994,13 @@ msgid ""
 "\n"
 "                    <h2>Join Us</h2>\n"
 "                    <p>\n"
-"                        The django CMS Association is a non-profit organisation that funds and steers the development of\n"
+"                        The django CMS Association is a non-profit "
+"organisation that funds and steers the development of\n"
 "                        django CMS.\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        You can <a href=\"https://www.django-cms.org/en/memberships/\">join both as an individual or as an\n"
+"                        You can <a href=\"https://www.django-cms.org/en/"
+"memberships/\">join both as an individual or as an\n"
 "                        organisation</a>.\n"
 "                    </p>\n"
 "                "
@@ -1910,11 +2008,13 @@ msgstr ""
 "\n"
 "                    <h2>Ejani me ne</h2>\n"
 "                    <p>\n"
-"                        Shoqata django CMS është një ent jofitimprurës që financon dhe drejton zhvillimin e\n"
+"                        Shoqata django CMS është një ent jofitimprurës që "
+"financon dhe drejton zhvillimin e\n"
 "                        django CMS-së.\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        Mundeni <a href=\"https://www.django-cms.org/en/memberships/\">të vini si individ, ose si një\n"
+"                        Mundeni <a href=\"https://www.django-cms.org/en/"
+"memberships/\">të vini si individ, ose si një\n"
 "                        ent</a>.\n"
 "                    </p>\n"
 "                "
@@ -1924,11 +2024,14 @@ msgid ""
 "\n"
 "                    <h2>Contribute</h2>\n"
 "                    <ul>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Contribute code:</a> fix a bug or\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"contribute/\">Contribute code:</a> fix a bug or\n"
 "                            implement a new feature!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Volunteer:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"volunteering-opportunities/\">Volunteer:</a>\n"
 "                            We offer fun and efficient team work!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Open-source your work:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"repositories-plugins/\">Open-source your work:</a>\n"
 "                            Make the ecosystem strong.</li>\n"
 "                    </ul>\n"
 "                "
@@ -1936,11 +2039,14 @@ msgstr ""
 "\n"
 "                    <h2>Jepni ndihmesë</h2>\n"
 "                    <ul>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Kontribuoni kod:</a> ndreqni një të metë ose\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"contribute/\">Kontribuoni kod:</a> ndreqni një të metë ose\n"
 "                            sendërtoni një veçori të re!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Dilni vullnetar:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"volunteering-opportunities/\">Dilni vullnetar:</a>\n"
 "                            Ofrojmë dëfrim dhe punë efikase në ekip!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Kalojeni punën tuaj me burim të hapët:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/"
+"repositories-plugins/\">Kalojeni punën tuaj me burim të hapët:</a>\n"
 "                            Bëjeni ekosistemin të fuqishëm.</li>\n"
 "                    </ul>\n"
 "                "
@@ -1960,13 +2066,15 @@ msgstr ""
 #: templates/cms/welcome.html:92
 msgid ""
 "\n"
-"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django "
+"CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
 msgstr ""
 "\n"
-"                <p class=\"cms-welcome-notes\">Nëse s’e shihni stemën e django CMS -s në krye, sigurohuni\n"
+"                <p class=\"cms-welcome-notes\">Nëse s’e shihni stemën e "
+"django CMS -s në krye, sigurohuni\n"
 "                    se e keni lidhur dosjen tuaj <code>static/cms</code> me\n"
 "                    kartelat tuaja statike.</p>\n"
 "            "
@@ -1974,15 +2082,19 @@ msgstr ""
 #: templates/cms/welcome.html:98
 msgid ""
 "\n"
-"                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
-"                        <code>DEBUG = True</code> in your django settings file and\n"
+"                    <p class=\"cms-welcome-notes\">You're seeing this "
+"message because you have\n"
+"                        <code>DEBUG = True</code> in your django settings "
+"file and\n"
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
 msgstr ""
 "\n"
-"                    <p class=\"cms-welcome-notes\">Këtë mesazh po e shihni ngaqë keni\n"
-"                        caktuar <code>DEBUG = True</code> te kartela e rregullimeve tuaja për django-n\n"
+"                    <p class=\"cms-welcome-notes\">Këtë mesazh po e shihni "
+"ngaqë keni\n"
+"                        caktuar <code>DEBUG = True</code> te kartela e "
+"rregullimeve tuaja për django-n\n"
 "                        dhe s’keni shtuar ende ndonjë faqe.\n"
 "                    </p>\n"
 "                "
@@ -1991,7 +2103,7 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "Mirë se vini te django- CMS"
 
-#: templates/cms/widgets/applicationconfigselect.html:6
+#: templates/cms/widgets/applicationconfigselect.html:7
 msgid "Add Another"
 msgstr "Shtoni Tjetër"
 
@@ -2008,7 +2120,11 @@ msgstr ""
 msgid "Next"
 msgstr "Pasuesi"
 
-#: templatetags/cms_admin.py:129
+#: templates/cms/wizards/wizardoptionwidget.html:11
+msgid "Select what you would like to create"
+msgstr ""
+
+#: templatetags/cms_admin.py:166
 msgid "Unknown"
 msgstr "E panjohur"
 
@@ -2020,10 +2136,12 @@ msgstr "Faqe që s’u gjet te %(domain)s"
 #: templatetags/cms_tags.py:89
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments "
+"`%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
-"Një etiketë gjedheje s’gjeti dot faqen me argumente kërkimi `%(page_lookup)s\n"
+"Një etiketë gjedheje s’gjeti dot faqen me argumente kërkimi "
+"`%(page_lookup)s\n"
 "`. URL-ja e kërkesës qe: http://%(host)s%(path)s"
 
 #: test_utils/project/custom_templates/__init__.py:4
@@ -2062,8 +2180,7 @@ msgstr ""
 
 #: test_utils/project/customuserapp/models.py:54
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
-"Përcakton nëse mund të hyjë ose jo përdoruesi te ky sajt administrimi."
+msgstr "Përcakton nëse mund të hyjë ose jo përdoruesi te ky sajt administrimi."
 
 #: test_utils/project/customuserapp/models.py:58
 msgid "active"
@@ -2138,6 +2255,12 @@ msgstr "Aplikacion Shembull 2"
 msgid "Sample App 3"
 msgstr "Aplikacion Shembull 2"
 
+#: test_utils/project/sampleapp/cms_apps.py:90
+#, fuzzy
+#| msgid "Sample App with config"
+msgid "Sample App Without Landing Page"
+msgstr "Aplikacion Shembull me formësim"
+
 #: test_utils/project/sampleapp/cms_apps.py:97
 msgid "Namespaced App"
 msgstr ""
@@ -2211,7 +2334,7 @@ msgstr "Ndryshoni Kategorinë"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Faleminderit që shpenzoni sot pak kohë të çmuar me sajtin Web."
 
-#: tests/test_templates.py:57 utils/conf.py:186
+#: tests/test_templates.py:57 utils/conf.py:192
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Trashëgo gjedhen e paraardhësit më të afërt"
 
@@ -2219,25 +2342,31 @@ msgstr "Trashëgo gjedhen e paraardhësit më të afërt"
 msgid "UserSettings"
 msgstr "RregullimePërdoruesi"
 
-#: toolbar/utils.py:30
+#: toolbar/utils.py:32
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "Shtoje shtojcën te vendmbajtësja \"%(placeholder_label)s\""
 
-#: toolbar/utils.py:50
+#: toolbar/utils.py:53
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Shtoje shtojcën te %(plugin_name)s"
 
-#: utils/conf.py:101
+#: utils/conf.py:54
+#, fuzzy
+#| msgid "placeholder"
+msgid "Single placeholder"
+msgstr "vendmbajtëse"
+
+#: utils/conf.py:103
 msgid "Community forum"
 msgstr "Forum bashkësie"
 
-#: utils/conf.py:103
+#: utils/conf.py:105
 msgid "Getting started"
 msgstr "Si t’ia fillohet"
 
-#: utils/conf.py:104
+#: utils/conf.py:106
 msgid "Talk to us"
 msgstr "Flisni me ne"
 
@@ -2249,12 +2378,12 @@ msgstr "CMS - llogaria juaj e përdoruesit u krijua."
 msgid "CMS - your user account was changed."
 msgstr "CMS - llogaria juaj e përdoruesit u ndryshua."
 
-#: utils/plugins.py:520
+#: utils/plugins.py:524
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "Kjo vendmbajtëse ka tashmë numrin maksimum të shtojcave (%s)."
 
-#: utils/plugins.py:526
+#: utils/plugins.py:530
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
@@ -2277,7 +2406,7 @@ msgstr ""
 "S’arrihet të gjendet funksioni specifik CMS_REQUEST_IP_RESOLVER: \"{0}\" te "
 "moduli \"{1}\"."
 
-#: wizards/wizard_base.py:145
+#: wizards/wizard_base.py:144
 #, python-format
 msgid "Create a new %s instance."
 msgstr "Krijo një instancë %s të re."
@@ -2300,17 +2429,11 @@ msgstr "Është regjistruar tashmë një ndihmës për modelin: %s"
 #~ "Descriptive name to identify this static placeholder. Not displayed to "
 #~ "users."
 #~ msgstr ""
-#~ "Emër përshkrues për identifikim të kësaj vendmbajtëse statike. S’u shfaqet "
-#~ "përdoruesve."
-
-#~ msgid "placeholder code"
-#~ msgstr "kod vendmbajtëseje"
+#~ "Emër përshkrues për identifikim të kësaj vendmbajtëse statike. S’u "
+#~ "shfaqet përdoruesve."
 
 #~ msgid "To render the static placeholder in templates."
 #~ msgstr "Për vizatim të vendmbajtëses statike në gjedhe."
-
-#~ msgid "placeholder content"
-#~ msgstr "lëndë vendmbajtëseje"
 
 #~ msgid "creation_method"
 #~ msgstr "metodë_krijimi"
@@ -2327,12 +2450,6 @@ msgstr "Është regjistruar tashmë një ndihmës për modelin: %s"
 #~ msgid "Title"
 #~ msgstr "Titulli"
 
-#~ msgid "Soft root"
-#~ msgstr ""
-
-#~ msgid "Redirect"
-#~ msgstr "Ridrejtoje"
-
 #~ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 #~ msgstr "%(name)s \"%(obj)s\" u fshi me sukses."
 
@@ -2346,8 +2463,8 @@ msgstr "Është regjistruar tashmë një ndihmës për modelin: %s"
 #~ "This is an alias reference, you can edit the content only on the <a "
 #~ "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 #~ msgstr ""
-#~ "Kjo është një referencë aliasi, lëndën mund ta përpunoni vetëm te faqja <a "
-#~ "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
+#~ "Kjo është një referencë aliasi, lëndën mund ta përpunoni vetëm te faqja "
+#~ "<a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
 #~ msgid "Edit this Page"
 #~ msgstr "Përpunoni këtë Faqe"
@@ -2375,22 +2492,27 @@ msgstr "Është regjistruar tashmë një ndihmës për modelin: %s"
 
 #~ msgid ""
 #~ "\n"
-#~ "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
+#~ "                    Welcome to django CMS version <strong>%"
+#~ "(cms_version)s</strong>.\n"
 #~ "                "
 #~ msgstr ""
 #~ "\n"
-#~ "                    Mirë se vini te django CMS version <strong>%(cms_version)s</strong>.\n"
+#~ "                    Mirë se vini te django CMS version <strong>%"
+#~ "(cms_version)s</strong>.\n"
 #~ "                "
 
 #~ msgid ""
 #~ "\n"
 #~ "                        JavaScript seems to be disabled so please\n"
-#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
+#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
+#~ "add\">add a page</a> manually.\n"
 #~ "                    "
 #~ msgstr ""
 #~ "\n"
-#~ "                        JavaScript-i duket të jetë i çaktivizuar, ndaj, ju lutemi\n"
-#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">shtoni një faqe</a> dorazi.\n"
+#~ "                        JavaScript-i duket të jetë i çaktivizuar, ndaj, "
+#~ "ju lutemi\n"
+#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
+#~ "add\">shtoni një faqe</a> dorazi.\n"
 #~ "                    "
 
 #~ msgid "You do not have permission to change a page's navigation status"

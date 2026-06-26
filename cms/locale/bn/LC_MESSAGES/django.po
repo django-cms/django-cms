@@ -10,226 +10,274 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-30 19:36+0100\n"
+"POT-Creation-Date: 2026-06-26 22:13+0200\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Bengali (https://app.transifex.com/divio/teams/58664/bn/)\n"
+"Language: bn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: bn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/forms.py:85 admin/forms.py:92 admin/forms.py:1060
+#: admin/forms.py:84 admin/forms.py:91 admin/forms.py:1098
 #: templates/admin/cms/page/permissions.html:45
 msgid "All"
 msgstr "সব"
 
-#: admin/forms.py:146
+#: admin/forms.py:145
 msgid "Copy permissions"
 msgstr "অনুমতিসমূহ কপি করুন"
 
-#: admin/forms.py:248
+#: admin/forms.py:203 admin/pageadmin.py:862
+msgid "Slug"
+msgstr "স্লাগ"
+
+#: admin/forms.py:205
+msgid "The part of the title that is used in the URL"
+msgstr "শিরোনামের যে অংশ ইউআরএল-এ ব্যবহৃত হবে"
+
+#: admin/forms.py:247
 msgid "Page type"
 msgstr "পৃষ্ঠার ধরন"
 
-#: admin/forms.py:471
+#: admin/forms.py:470
 msgid "Page Types"
 msgstr "পৃষ্ঠার ধরনসমূহ"
 
-#: admin/forms.py:523
+#: admin/forms.py:542 admin/pageadmin.py:875
 msgid "Overwrite URL"
 msgstr "ইউআরএল ওভাররাইট করুন"
 
-#: admin/forms.py:526
+#: admin/forms.py:545
 msgid "Keep this field empty if standard path should be used."
 msgstr "স্ট্যান্ডার্ড পাথ ব্যবহার করতে চাইলে এই ঘরটি খালি রাখুন।"
 
-#: admin/forms.py:537
+#: admin/forms.py:556
 msgid "Start typing..."
 msgstr "টাইপ করা শুরু করুন..."
 
-#: admin/forms.py:542 migrations/0001_initial.py:96 models/contentmodels.py:120
-msgid "menu visibility"
-msgstr "মেনুর দৃশ্যমানতা"
-
-#: admin/forms.py:543 models/contentmodels.py:126
+#: admin/forms.py:562 models/contentmodels.py:119
 msgid "limit when this page is visible in the menu"
 msgstr "এই পৃষ্ঠাটি মেনুতে কখন দৃশ্যমান হবে তা সীমাবদ্ধ করুন"
 
-#: admin/forms.py:551 models/contentmodels.py:133
+#: admin/forms.py:570 models/contentmodels.py:126
 msgid "X Frame Options"
 msgstr "X Frame অপশনসমূহ"
 
-#: admin/forms.py:552
+#: admin/forms.py:571
 msgid "Whether this page can be embedded in other pages or websites."
 msgstr "এই পৃষ্ঠাটি অন্যান্য পৃষ্ঠা বা ওয়েবসাইটে এম্বেড করা যাবে কিনা।"
 
-#: admin/forms.py:570
+#: admin/forms.py:589
 msgid "URL options"
 msgstr "ইউআরএল অপশনসমূহ"
 
-#: admin/forms.py:577
+#: admin/forms.py:596
 msgid "Menu options"
 msgstr "মেনু অপশনসমূহ"
 
-#: admin/forms.py:584
+#: admin/forms.py:603
 msgid "Headers"
 msgstr "হেডারসমূহ"
 
-#: admin/forms.py:715
+#: admin/forms.py:751
+msgid "Application"
+msgstr "এ্যাপ্লিকেশন"
+
+#: admin/forms.py:754
 msgid "Hook application to this page."
 msgstr "এই পৃষ্ঠায় এ্যাপ্লিকেশন হুক করুন।"
 
-#: admin/forms.py:720
+#: admin/forms.py:759
 msgid "Application configurations"
 msgstr "এ্যাপ্লিকেশন কনফিগারেশনসমূহ"
 
-#: admin/forms.py:798
+#: admin/forms.py:837
 msgid "A page with this reverse URL id exists already."
 msgstr "এই রিভার্স ইউআরএল আইডি সহ একটি পৃষ্ঠা ইতিমধ্যেই বিদ্যমান।"
 
-#: admin/forms.py:817 admin/forms.py:823
+#: admin/forms.py:856 admin/forms.py:862
 msgid "Invalid application config value"
 msgstr "অবৈধ এ্যাপ্লিকেশন কনফিগ মান"
 
-#: admin/forms.py:830
+#: admin/forms.py:869
 msgid "An application instance using this configuration already exists."
-msgstr "এই কনফিগারেশন ব্যবহার করে একটি এ্যাপ্লিকেশন ইনস্ট্যান্স ইতিমধ্যেই বিদ্যমান।"
+msgstr ""
+"এই কনফিগারেশন ব্যবহার করে একটি এ্যাপ্লিকেশন ইনস্ট্যান্স ইতিমধ্যেই বিদ্যমান।"
 
-#: admin/forms.py:838 admin/forms.py:849
+#: admin/forms.py:877 admin/forms.py:888
 msgid "An application instance with this name already exists."
 msgstr "এই নামের একটি এ্যাপ্লিকেশন ইনস্ট্যান্স ইতিমধ্যেই বিদ্যমান।"
 
-#: admin/forms.py:955
+#: admin/forms.py:994
 msgid "You can't move the home page inside another page"
 msgstr "আপনি হোম পৃষ্ঠাটিকে অন্য একটি পৃষ্ঠার ভিতরে সরাতে পারবেন না"
 
-#: admin/forms.py:1010 admin/forms.py:1026
+#: admin/forms.py:1049 admin/forms.py:1065
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
-"একই পৃষ্ঠা স্তরে একই স্লাগ সহ দুটি পৃষ্ঠা থাকতে পারে না। আবার সরানোর চেষ্টা করার আগে "
-"অনুগ্রহ করে পৃষ্ঠাগুলোর একটির স্লাগ পরিবর্তন করুন।"
+"একই পৃষ্ঠা স্তরে একই স্লাগ সহ দুটি পৃষ্ঠা থাকতে পারে না। আবার সরানোর চেষ্টা "
+"করার আগে অনুগ্রহ করে পৃষ্ঠাগুলোর একটির স্লাগ পরিবর্তন করুন।"
 
-#: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
+#: admin/forms.py:1099 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:87
 msgid "Yes"
 msgstr "হ্যাঁ"
 
-#: admin/forms.py:1062 templates/admin/cms/page/tree/actions_dropdown.html:84
+#: admin/forms.py:1100 templates/admin/cms/page/tree/actions_dropdown.html:84
 #: templates/admin/cms/page/tree/actions_dropdown.html:89
 msgid "No"
 msgstr "না"
 
-#: admin/forms.py:1117 admin/forms.py:1190 migrations/0001_initial.py:72
+#: admin/forms.py:1157 admin/forms.py:1232 migrations/0001_initial.py:72
 #: migrations/0001_initial.py:135 models/permissionmodels.py:71
 #: test_utils/project/customuserapp/models.py:70
 msgid "user"
 msgstr "ব্যবহারকারী"
 
-#: admin/forms.py:1195
+#: admin/forms.py:1237
 msgid "can_view"
 msgstr "দেখতে_পারে"
 
-#: admin/forms.py:1267 models/permissionmodels.py:109
+#: admin/forms.py:1278 admin/forms.py:1284 admin/forms.py:1288
+#: forms/widgets.py:157 templates/admin/cms/page/change_form.html:11
+#: templates/admin/cms/usersettings/change_form.html:33
+#: templatetags/cms_tags.py:545
+msgid "Add"
+msgstr "যুক্ত করুন"
+
+#: admin/forms.py:1279 admin/forms.py:1285 admin/forms.py:1289
+msgid "Change"
+msgstr "পরিবর্তন"
+
+#: admin/forms.py:1280 admin/forms.py:1286 admin/forms.py:1290
+#: templates/admin/cms/extensions/change_form.html:9
+#: templates/admin/cms/page/plugin/submit_line.html:5
+#: templates/admin/cms/page/submit_row.html:7
+#: templates/admin/cms/page/tree/actions_dropdown.html:42
+#: templates/admin/cms/page/tree/actions_dropdown.html:47
+#: templates/admin/cms/page/tree/menu.html:215
+#: templates/admin/cms/page/tree/menu.html:217
+#: templates/cms/toolbar/dragitem.html:44
+#: templates/cms/toolbar/dragitem.html:52
+msgid "Delete"
+msgstr "মুছে ফেলুন"
+
+#: admin/forms.py:1309 models/permissionmodels.py:109
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
-"তৈরি করা পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা তৈরি করতে পারবেন না। "
-"সম্পাদনার অনুমতি প্রয়োজন।"
+"তৈরি করা পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা তৈরি করতে "
+"পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
-#: admin/forms.py:1274 models/permissionmodels.py:114
+#: admin/forms.py:1316 models/permissionmodels.py:114
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা মুছতে পারবেন না। সম্পাদনার অনুমতি "
-"প্রয়োজন।"
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা মুছতে পারবেন না। "
+"সম্পাদনার অনুমতি প্রয়োজন।"
 
-#: admin/forms.py:1280
+#: admin/forms.py:1322
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
-"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি নির্ধারণ করতে পারবেন না। "
-"সম্পাদনার অনুমতি প্রয়োজন।"
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি নির্ধারণ করতে "
+"পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
-#: admin/forms.py:1286
+#: admin/forms.py:1328
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
-"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি মুছতে পারবেন না। সম্পাদনার "
-"অনুমতি প্রয়োজন।"
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি মুছতে পারবেন না।"
+" সম্পাদনার অনুমতি প্রয়োজন।"
 
-#: admin/forms.py:1295
+#: admin/forms.py:1337
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
-"তৈরি করা অনুমতি পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি তৈরি করতে "
-"পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
+"তৈরি করা অনুমতি পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি তৈরি "
+"করতে পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
-#: admin/forms.py:1302
+#: admin/forms.py:1344
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
 msgstr ""
-"অনুমতি পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি মুছতে পারবেন না। সম্পাদনার "
-"অনুমতি প্রয়োজন।"
+"অনুমতি পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি মুছতে পারবেন না।"
+" সম্পাদনার অনুমতি প্রয়োজন।"
 
-#: admin/forms.py:1420
+#: admin/forms.py:1462
 #, python-format
 msgid "Invalid plugin type '%s'"
 msgstr "অবৈধ প্লাগ-ইন ধরন '%s'"
 
-#: admin/forms.py:1438 admin/pageadmin.py:1217 admin/placeholderadmin.py:467
+#: admin/forms.py:1480 admin/pageadmin.py:1218 admin/placeholderadmin.py:474
 msgid "Language must be set to a supported language!"
 msgstr "ভাষা একটি সমর্থিত ভাষায় নির্ধারণ করতে হবে!"
 
-#: admin/forms.py:1444
+#: admin/forms.py:1486
 msgid "Parent plugin language must be same as language!"
 msgstr "প্যারেন্ট প্লাগ-ইনের ভাষা অবশ্যই ভাষার সাথে অভিন্ন হতে হবে!"
 
-#: admin/forms.py:1449
+#: admin/forms.py:1491
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr "প্যারেন্ট প্লাগ-ইনের প্লেসহোল্ডার অবশ্যই প্লেসহোল্ডারের সাথে অভিন্ন হতে হবে!"
+msgstr ""
+"প্যারেন্ট প্লাগ-ইনের প্লেসহোল্ডার অবশ্যই প্লেসহোল্ডারের সাথে অভিন্ন হতে হবে!"
 
-#: admin/forms.py:1454
+#: admin/forms.py:1496
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
 msgstr "প্লাগ-ইনের অবস্থান অবশ্যই %(position)d-এর চেয়ে বড় হতে হবে"
 
-#: admin/pageadmin.py:320
+#: admin/pageadmin.py:138
+#, fuzzy
+#| msgid "Add Translation"
+msgid "Translations"
+msgstr "অনুবাদ যুক্ত করুন"
+
+#: admin/pageadmin.py:310
 msgid "Advanced Settings"
 msgstr "উন্নত সেটিংস"
 
-#: admin/pageadmin.py:320 cms_toolbars.py:664
+#: admin/pageadmin.py:310
 msgid "Change Permissions"
 msgstr "অনুমতি পরিবর্তন করুন"
 
-#: admin/pageadmin.py:355
+#: admin/pageadmin.py:345
 msgid "The page is not eligible to be home."
 msgstr "পৃষ্ঠাটি হোম হওয়ার যোগ্য নয়।"
 
-#: admin/pageadmin.py:502 admin/pageadmin.py:990
+#: admin/pageadmin.py:488 admin/pageadmin.py:988
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "প্রাইমারি কী %(key)r সহ %(name)s অবজেক্ট বিদ্যমান নেই।"
 
-#: admin/pageadmin.py:574
+#: admin/pageadmin.py:549
+#, fuzzy
+#| msgid "Error:"
+msgid "error"
+msgstr "ত্রুটি:"
+
+#: admin/pageadmin.py:556
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "ত্রুটি! এই পৃষ্ঠাটি সরানোর অনুমতি আপনার নেই। অনুগ্রহ করে পৃষ্ঠাটি পুনরায় লোড করুন"
+msgstr ""
+"ত্রুটি! এই পৃষ্ঠাটি সরানোর অনুমতি আপনার নেই। অনুগ্রহ করে পৃষ্ঠাটি পুনরায় "
+"লোড করুন"
 
-#: admin/pageadmin.py:677
+#: admin/pageadmin.py:661
 msgid "Error! You don't have permissions to copy this page."
 msgstr "ত্রুটি! এই পৃষ্ঠাটি কপি করার অনুমতি আপনার নেই।"
 
-#: admin/pageadmin.py:685
+#: admin/pageadmin.py:669
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
@@ -237,141 +285,177 @@ msgstr ""
 "ত্রুটি! আপনি যে পৃষ্ঠাটি পেস্ট করছেন তা টার্গেট সাইটে কনফিগার করা ভাষাগুলোর "
 "কোনোটিতেই অনুবাদ করা হয়নি।"
 
-#: admin/pageadmin.py:698
+#: admin/pageadmin.py:684
 msgid "You do not have permission to edit this page"
 msgstr "এই পৃষ্ঠাটি সম্পাদনার অনুমতি আপনার নেই"
 
-#: admin/pageadmin.py:907
+#: admin/pageadmin.py:863 admin/pageadmin.py:876
+msgid ""
+"(to change it, first unpublish the currently published version of this page)"
+msgstr ""
+"(এটি পরিবর্তন করতে, প্রথমে এই পৃষ্ঠার বর্তমানে প্রকাশিত সংস্করণটি অপ্রকাশিত "
+"করুন)"
+
+#: admin/pageadmin.py:920 cms_toolbars.py:520
+msgid "Add Translation"
+msgstr "অনুবাদ যুক্ত করুন"
+
+#: admin/pageadmin.py:922
 msgid "Add Page Copy"
 msgstr "পৃষ্ঠার কপি যুক্ত করুন"
 
-#: admin/pageadmin.py:913 cms_wizards.py:50
-#: templates/admin/cms/page/tree/menu.html:159
-#: templates/admin/cms/page/tree/menu.html:166
+#: admin/pageadmin.py:924 cms_wizards.py:51
+#: templates/admin/cms/page/tree/menu.html:171
+#: templates/admin/cms/page/tree/menu.html:178
 msgid "New sub page"
 msgstr "নতুন সাব পৃষ্ঠা"
 
-#: admin/pageadmin.py:919 cms_wizards.py:42
+#: admin/pageadmin.py:926 cms_wizards.py:43
 msgid "New page"
 msgstr "নতুন পৃষ্ঠা"
 
-#: admin/pageadmin.py:1192
+#: admin/pageadmin.py:1099
+#, fuzzy
+#| msgid "You do not have permission to copy this placeholder."
+msgid ""
+"You do not have permission to access this site. Please contact your "
+"administrator."
+msgstr "এই প্লেসহোল্ডারটি কপি করার অনুমতি আপনার নেই।"
+
+#: admin/pageadmin.py:1128
+msgid "Database error"
+msgstr "ডাটাবেজ ত্রুটি"
+
+#: admin/pageadmin.py:1193
 msgid "Template not valid"
 msgstr "টেমপ্লেট বৈধ নয়"
 
-#: admin/pageadmin.py:1200
+#: admin/pageadmin.py:1196
+msgid "Placeholder selection not valid"
+msgstr "প্লেসহোল্ডার নির্বাচন বৈধ নয়"
+
+#: admin/pageadmin.py:1201
 msgid "The template was successfully changed"
 msgstr "টেমপ্লেট সফলভাবে পরিবর্তন করা হয়েছে"
 
-#: admin/pageadmin.py:1227 admin/placeholderadmin.py:507
-#: admin/placeholderadmin.py:511 admin/placeholderadmin.py:578
-#: admin/placeholderadmin.py:582
+#: admin/pageadmin.py:1226
+#, python-format
+msgid "Placeholder '%s' does not exist in target language"
+msgstr "প্লেসহোল্ডার '%s' লক্ষ্য ভাষায় বিদ্যমান নেই"
+
+#: admin/pageadmin.py:1231 admin/placeholderadmin.py:515
+#: admin/placeholderadmin.py:522 admin/placeholderadmin.py:526
+#: admin/placeholderadmin.py:530 admin/placeholderadmin.py:608
+#: admin/placeholderadmin.py:612
 msgid "You do not have permission to copy these plugins."
 msgstr "এই প্লাগ-ইনগুলো কপি করার অনুমতি আপনার নেই।"
 
-#: admin/pageadmin.py:1236
+#: admin/pageadmin.py:1244
 msgid "You do not have permission to delete this page"
 msgstr "এই পৃষ্ঠাটি মুছে ফেলার অনুমতি আপনার নেই"
 
-#: admin/pageadmin.py:1264
+#: admin/pageadmin.py:1269
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "%(language)s ভাষার শিরোনাম এবং প্লাগ-ইনগুলো মুছে ফেলা হয়েছে"
 
-#: admin/pageadmin.py:1412
+#: admin/pageadmin.py:1426
 msgid "Public content"
 msgstr "পাবলিক কন্টেন্ট"
 
-#: admin/pageadmin.py:1413 templatetags/cms_admin.py:112
+#: admin/pageadmin.py:1427 templatetags/cms_admin.py:149
 msgid "Empty"
 msgstr "খালি"
 
-#: admin/pageadmin.py:1422
+#: admin/pageadmin.py:1436
 msgid "Create Content"
 msgstr "কন্টেন্ট তৈরি করুন"
 
-#: admin/permissionadmin.py:119
+#: admin/permissionadmin.py:120
 msgid "View restriction"
 msgstr "দেখার সীমাবদ্ধতা"
 
-#: admin/permissionadmin.py:120
+#: admin/permissionadmin.py:121
 msgid "View restrictions"
 msgstr "দেখার সীমাবদ্ধতাসমূহ"
 
-#: admin/placeholderadmin.py:102
+#: admin/placeholderadmin.py:101
 #, python-format
 msgid "Field %s not found"
 msgstr "ঘর %s পাওয়া যায়নি"
 
-#: admin/placeholderadmin.py:108 templates/cms/toolbar/dragbar.html:5
-#: templates/cms/toolbar/dragitem.html:14
-#: templates/cms/toolbar/dragitem.html:24
+#: admin/placeholderadmin.py:107
 msgid "You do not have permission to edit this item"
 msgstr "এই আইটেমটি সম্পাদনার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:388 admin/placeholderadmin.py:392
+#: admin/placeholderadmin.py:395 admin/placeholderadmin.py:399
 msgid "You do not have permission to add a plugin"
 msgstr "প্লাগ-ইন যুক্ত করার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:532 admin/placeholderadmin.py:536
+#: admin/placeholderadmin.py:551 admin/placeholderadmin.py:558
+#: admin/placeholderadmin.py:562 admin/placeholderadmin.py:566
 msgid "You do not have permission to copy this placeholder."
 msgstr "এই প্লেসহোল্ডারটি কপি করার অনুমতি আপনার নেই।"
 
-#: admin/placeholderadmin.py:627
+#: admin/placeholderadmin.py:658
 msgid "Plugin not found"
 msgstr "প্লাগ-ইন পাওয়া যায়নি"
 
-#: admin/placeholderadmin.py:635 admin/placeholderadmin.py:638
+#: admin/placeholderadmin.py:666 admin/placeholderadmin.py:669
 msgid "You do not have permission to edit this plugin"
 msgstr "এই প্লাগ-ইনটি সম্পাদনার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:797 admin/placeholderadmin.py:801
+#: admin/placeholderadmin.py:846 admin/placeholderadmin.py:850
 msgid "You have no permission to paste this plugin"
 msgstr "এই প্লাগ-ইনটি পেস্ট করার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:857 admin/placeholderadmin.py:861
+#: admin/placeholderadmin.py:906 admin/placeholderadmin.py:910
 msgid "You have no permission to paste this placeholder"
 msgstr "এই প্লেসহোল্ডারটি পেস্ট করার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:914 admin/placeholderadmin.py:918
-#: admin/placeholderadmin.py:922 admin/placeholderadmin.py:926
+#: admin/placeholderadmin.py:963 admin/placeholderadmin.py:967
+#: admin/placeholderadmin.py:971 admin/placeholderadmin.py:975
 msgid "You have no permission to move this plugin"
 msgstr "এই প্লাগ-ইনটি সরানোর অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:977 admin/placeholderadmin.py:981
+#: admin/placeholderadmin.py:1026 admin/placeholderadmin.py:1030
 msgid "You have no permission to cut this plugin"
 msgstr "এই প্লাগ-ইনটি কাট করার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:1026 admin/placeholderadmin.py:1030
-#: admin/placeholderadmin.py:1042
+#: admin/placeholderadmin.py:1075 admin/placeholderadmin.py:1079
+#: admin/placeholderadmin.py:1091
 msgid "You do not have permission to delete this plugin"
 msgstr "এই প্লাগ-ইনটি মুছে ফেলার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:1059
+#: admin/placeholderadmin.py:1108
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s প্লাগ-ইন \"%(obj)s\" সফলভাবে মুছে ফেলা হয়েছে।"
 
-#: admin/placeholderadmin.py:1079 admin/placeholderadmin.py:1170
+#: admin/placeholderadmin.py:1128 admin/placeholderadmin.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s মুছে ফেলা যাবে না"
 
-#: admin/placeholderadmin.py:1117 admin/placeholderadmin.py:1121
-#: admin/placeholderadmin.py:1138
+#: admin/placeholderadmin.py:1130 admin/placeholderadmin.py:1221
+msgid "Are you sure?"
+msgstr "আপনি কি নিশ্চিত?"
+
+#: admin/placeholderadmin.py:1166 admin/placeholderadmin.py:1170
+#: admin/placeholderadmin.py:1187
 msgid "You do not have permission to clear this placeholder"
 msgstr "এই প্লেসহোল্ডারটি খালি করার অনুমতি আপনার নেই"
 
-#: admin/placeholderadmin.py:1151
+#: admin/placeholderadmin.py:1200
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "প্লেসহোল্ডার \"%(obj)s\" সফলভাবে খালি করা হয়েছে।"
 
-#: admin/placeholderadmin.py:1176
+#: admin/placeholderadmin.py:1225
 msgid "placeholder"
 msgstr "প্লেসহোল্ডার"
 
-#: admin/useradmin.py:126 models/permissionmodels.py:260
+#: admin/useradmin.py:126 models/permissionmodels.py:287
 msgid "Page permissions"
 msgstr "পৃষ্ঠার অনুমতিসমূহ"
 
@@ -383,59 +467,67 @@ msgstr "ব্যবহারকারী ও গ্রুপের অনুম
 msgid "Page permissions management"
 msgstr "পৃষ্ঠার অনুমতি ব্যবস্থাপনা"
 
-#: admin/utils.py:90
+#: admin/utils.py:93
 msgid "Actions"
 msgstr "অ্যাকশনসমূহ"
 
-#: admin/utils.py:262
+#: admin/utils.py:265
 msgid "Empty content"
 msgstr "খালি কন্টেন্ট"
 
-#: admin/utils.py:503
+#: admin/utils.py:400
+#, fuzzy
+#| msgid "You do not have permission to edit this item"
+msgid "You do not have permission to change this content."
+msgstr "এই আইটেমটি সম্পাদনার অনুমতি আপনার নেই"
+
+#: admin/utils.py:538
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)s প্রোপার্টিসমূহ"
 
-#: admin/utils.py:507
+#: admin/utils.py:542
 #, python-format
 msgid "Add new %(object_name)s"
 msgstr "নতুন %(object_name)s যুক্ত করুন"
 
-#: admin/utils.py:512 admin/utils.py:583
+#: admin/utils.py:547 admin/utils.py:639
 msgid "Add content"
 msgstr "কন্টেন্ট যুক্ত করুন"
 
-#: admin/utils.py:516
+#: admin/utils.py:551
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
-"বর্তমান ভাষার কন্টেন্ট পরিবর্তন করা হয়েছে। ফর্মে ফিরে গিয়ে পরিবর্তনগুলো সংরক্ষণ করতে "
-"\"Cancel\" ক্লিক করুন। পরিবর্তনগুলো বাতিল করতে \"OK\" ক্লিক করুন।"
+"বর্তমান ভাষার কন্টেন্ট পরিবর্তন করা হয়েছে। ফর্মে ফিরে গিয়ে পরিবর্তনগুলো "
+"সংরক্ষণ করতে \"Cancel\" ক্লিক করুন। পরিবর্তনগুলো বাতিল করতে \"OK\" ক্লিক "
+"করুন।"
 
-#: admin/utils.py:536
+#: admin/utils.py:575
 #, python-format
 msgid "Add %(language)s content"
 msgstr "%(language)s কন্টেন্ট যুক্ত করুন"
 
-#: admin/utils.py:570 cms_toolbars.py:199
+#: admin/utils.py:618 cms_toolbars.py:194
 #: templates/cms/toolbar/items/live_draft.html:6 tests/test_views.py:324
 msgid "Preview"
 msgstr "প্রিভিউ"
 
-#: admin/utils.py:583
+#: admin/utils.py:639
 msgid "Settings"
 msgstr "সেটিংস"
 
-#: admin/utils.py:809
+#: admin/utils.py:887
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
-"অবৈধ ভাষা %(value)s। এই ফর্মটি প্রক্রিয়া করা যাবে না। ভাষা পরিবর্তন করে দেখুন।"
+"অবৈধ ভাষা %(value)s। এই ফর্মটি প্রক্রিয়া করা যাবে না। ভাষা পরিবর্তন করে "
+"দেখুন।"
 
-#: admin/utils.py:810
+#: admin/utils.py:888
 msgid "<unspecified>"
 msgstr "<অনির্দিষ্ট>"
 
@@ -458,7 +550,7 @@ msgstr "প্লেসহোল্ডার"
 msgid "Getting started developer guide"
 msgstr "শুরু করার ডেভেলপার গাইড"
 
-#: cms_toolbars.py:77 templates/cms/welcome.html:88 utils/conf.py:102
+#: cms_toolbars.py:77 templates/cms/welcome.html:88 utils/conf.py:104
 msgid "Documentation"
 msgstr "ডকুমেন্টেশন"
 
@@ -474,23 +566,23 @@ msgstr "Discord কমিউনিটি"
 msgid "What's new"
 msgstr "নতুন কী আছে"
 
-#: cms_toolbars.py:100 templates/cms/wizards/create.html:5
+#: cms_toolbars.py:101 templates/cms/wizards/create.html:5
 #: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
 msgstr "তৈরি করুন"
 
-#: cms_toolbars.py:187 templates/cms/toolbar/dragbar.html:17
-#: templates/cms/toolbar/dragitem.html:18
-#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:534
-#: templatetags/cms_tags.py:537 tests/test_views.py:338
+#: cms_toolbars.py:182 templates/admin/cms/page/tree/menu.html:95
+#: templates/cms/toolbar/dragitem.html:17
+#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:535
+#: templatetags/cms_tags.py:538 tests/test_views.py:338
 msgid "Edit"
 msgstr "সম্পাদনা"
 
-#: cms_toolbars.py:217 templates/admin/cms/page/delete_confirmation.html:49
+#: cms_toolbars.py:216 templates/admin/cms/page/delete_confirmation.html:49
 msgid "Structure"
 msgstr "স্ট্রাকচার"
 
-#: cms_toolbars.py:224 forms/wizards.py:31
+#: cms_toolbars.py:223 forms/wizards.py:32
 msgid "Content"
 msgstr "কন্টেন্ট"
 
@@ -498,61 +590,62 @@ msgstr "কন্টেন্ট"
 msgid "Help"
 msgstr "সহায়তা"
 
-#: cms_toolbars.py:306 templates/admin/cms/page/tree/base.html:107
+#: cms_toolbars.py:307 templates/admin/cms/page/tree/base.html:107
 msgid "Sites"
 msgstr "সাইটসমূহ"
 
-#: cms_toolbars.py:307
+#: cms_toolbars.py:308
 msgid "Admin Sites"
 msgstr "অ্যাডমিন সাইটসমূহ"
 
-#: cms_toolbars.py:314
+#: cms_toolbars.py:316
 msgid "Administration"
 msgstr "প্রশাসন"
 
-#: cms_toolbars.py:318
+#: cms_toolbars.py:320
 msgid "User settings"
 msgstr "ব্যবহারকারী সেটিংস"
 
-#: cms_toolbars.py:327
+#: cms_toolbars.py:329
 msgid "Clipboard..."
 msgstr "ক্লিপবোর্ড..."
 
-#: cms_toolbars.py:332
+#: cms_toolbars.py:335
 msgid "Clear clipboard"
 msgstr "ক্লিপবোর্ড খালি করুন"
 
-#: cms_toolbars.py:340
+#: cms_toolbars.py:344
 msgid "Disable toolbar"
 msgstr "টুলবার নিষ্ক্রিয় করুন"
 
-#: cms_toolbars.py:344
+#: cms_toolbars.py:347
 msgid "Shortcuts..."
 msgstr "শর্টকাট..."
 
-#: cms_toolbars.py:360
+#: cms_toolbars.py:361
 msgid "Users"
 msgstr "ব্যবহারকারীগণ"
 
-#: cms_toolbars.py:378 tests/test_toolbar.py:1009 tests/test_toolbar.py:1026
-#: tests/test_toolbar.py:1060
+#: cms_toolbars.py:379 tests/test_toolbar.py:1094 tests/test_toolbar.py:1111
+#: tests/test_toolbar.py:1141
 #, python-format
 msgid "Logout %s"
 msgstr "লগআউট %s"
 
-#: cms_toolbars.py:378
+#: cms_toolbars.py:379
 msgid "Logout"
 msgstr "লগআউট"
 
-#: cms_toolbars.py:520
-msgid "Add Translation"
-msgstr "অনুবাদ যুক্ত করুন"
+#: cms_toolbars.py:395 models/settingmodels.py:20
+#: templates/admin/cms/grouper/change_list.html:5
+msgid "Language"
+msgstr "ভাষা"
 
 #: cms_toolbars.py:533
 msgid "Delete Translation"
 msgstr "অনুবাদ মুছে ফেলুন"
 
-#: cms_toolbars.py:545 tests/test_toolbar.py:961 tests/test_toolbar.py:968
+#: cms_toolbars.py:545 tests/test_toolbar.py:1043 tests/test_toolbar.py:1050
 msgid "Copy all plugins"
 msgstr "সব প্লাগ-ইন কপি করুন"
 
@@ -566,58 +659,70 @@ msgstr "%s থেকে"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "আপনি কি নিশ্চিত যে আপনি %s থেকে সব প্লাগ-ইন কপি করতে চান?"
 
-#: cms_toolbars.py:576
+#: cms_toolbars.py:578
 msgid "Pages"
 msgstr "পৃষ্ঠাসমূহ"
 
-#: cms_toolbars.py:628
+#: cms_toolbars.py:598 templates/admin/cms/page/permissions.html:5
+#: tests/test_wizards.py:92 tests/test_wizards.py:115
+#: tests/test_wizards.py:172
+msgid "Page"
+msgstr "পৃষ্ঠা"
+
+#: cms_toolbars.py:631
 msgid "Create Page"
 msgstr "পৃষ্ঠা তৈরি করুন"
 
-#: cms_toolbars.py:632 templates/admin/cms/page/tree/base.html:140
+#: cms_toolbars.py:635 templates/admin/cms/page/tree/base.html:130
 msgid "New Page"
 msgstr "নতুন পৃষ্ঠা"
 
-#: cms_toolbars.py:633
+#: cms_toolbars.py:636
 msgid "New Sub Page"
 msgstr "নতুন সাব পৃষ্ঠা"
 
-#: cms_toolbars.py:645
+#: cms_toolbars.py:648
 msgid "Duplicate this Page"
 msgstr "এই পৃষ্ঠাটির অনুলিপি তৈরি করুন"
 
-#: cms_toolbars.py:656
+#: cms_toolbars.py:660
 msgid "Page settings"
 msgstr "পৃষ্ঠার সেটিংস"
 
-#: cms_toolbars.py:664 templates/admin/cms/page/tree/actions_dropdown.html:67
+#: cms_toolbars.py:670 templates/admin/cms/page/tree/actions_dropdown.html:67
 #: templates/admin/cms/page/tree/actions_dropdown.html:72
-#: templates/admin/cms/page/tree/menu.html:209
-#: templates/admin/cms/page/tree/menu.html:211
+#: templates/admin/cms/page/tree/menu.html:221
+#: templates/admin/cms/page/tree/menu.html:223
 msgid "Advanced settings"
 msgstr "উন্নত সেটিংস"
 
-#: cms_toolbars.py:674
+#: cms_toolbars.py:679
 msgid "Templates"
 msgstr "টেমপ্লেটসমূহ"
 
-#: cms_toolbars.py:694
+#: cms_toolbars.py:684
+#, fuzzy
+#| msgid "Placeholder"
+msgid "Placeholders"
+msgstr "প্লেসহোল্ডার"
+
+#: cms_toolbars.py:702
 msgid "Hide in navigation"
 msgstr "নেভিগেশনে লুকান"
 
-#: cms_toolbars.py:694
+#: cms_toolbars.py:702
 msgid "Display in navigation"
 msgstr "নেভিগেশনে দেখান"
 
-#: cms_toolbars.py:707
+#: cms_toolbars.py:716
 msgid "Delete page"
 msgstr "পৃষ্ঠা মুছে ফেলুন"
 
-#: cms_wizards.py:46
+#: cms_wizards.py:47
 msgid "Create a new page next to the current page."
 msgstr "বর্তমান পৃষ্ঠার পাশে একটি নতুন পৃষ্ঠা তৈরি করুন।"
 
-#: cms_wizards.py:54
+#: cms_wizards.py:55
 msgid "Create a page below the current page."
 msgstr "বর্তমান পৃষ্ঠার নিচে একটি পৃষ্ঠা তৈরি করুন।"
 
@@ -629,43 +734,54 @@ msgstr "একটি বৈধ সাইট নির্বাচন করু�
 msgid "Select a valid page"
 msgstr "একটি বৈধ পৃষ্ঠা নির্বাচন করুন"
 
-#: forms/validators.py:77
+#: forms/validators.py:78
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
-"পৃষ্ঠা %(conflict_page)s-এর ইউআরএল '%(url)s' বর্তমান পৃষ্ঠা \"%(instance)s\"-এর "
-"সাথে অভিন্ন।"
+"পৃষ্ঠা %(conflict_page)s-এর ইউআরএল '%(url)s' বর্তমান পৃষ্ঠা "
+"\"%(instance)s\"-এর সাথে অভিন্ন।"
 
-#: forms/validators.py:79
+#: forms/validators.py:80
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr "পৃষ্ঠা %(conflict_page)s-এর ইউআরএল '%(url)s' বর্তমান পৃষ্ঠার সাথে অভিন্ন।"
+msgstr ""
+"পৃষ্ঠা %(conflict_page)s-এর ইউআরএল '%(url)s' বর্তমান পৃষ্ঠার সাথে অভিন্ন।"
 
-#: forms/wizards.py:32
+#: forms/widgets.py:155
+#, fuzzy
+#| msgid "Add Another"
+msgid "Add another"
+msgstr "আরেকটি যুক্ত করুন"
+
+#: forms/wizards.py:33
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
-"ঐচ্ছিক। প্রদান করা হলে, এটি স্বয়ংক্রিয়ভাবে একটি নতুন টেক্সট প্লাগ-ইনে যুক্ত হবে।"
+"ঐচ্ছিক। প্রদান করা হলে, এটি স্বয়ংক্রিয়ভাবে একটি নতুন টেক্সট প্লাগ-ইনে "
+"যুক্ত হবে।"
 
-#: forms/wizards.py:45
+#: forms/wizards.py:46
 msgid "Provide a title for the new page."
 msgstr "নতুন পৃষ্ঠার জন্য একটি শিরোনাম প্রদান করুন।"
 
-#: forms/wizards.py:47
+#: forms/wizards.py:48
 msgid "Leave empty for automatic slug, or override as required."
-msgstr "স্বয়ংক্রিয় স্লাগের জন্য খালি রাখুন, অথবা প্রয়োজন অনুযায়ী ওভাররাইড করুন।"
+msgstr ""
+"স্বয়ংক্রিয় স্লাগের জন্য খালি রাখুন, অথবা প্রয়োজন অনুযায়ী ওভাররাইড করুন।"
 
-#: forms/wizards.py:83
+#: forms/wizards.py:84
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr "স্বয়ংক্রিয়ভাবে স্লাগ তৈরি করা যাবে না। অনুগ্রহ করে একটি ম্যানুয়ালি প্রদান করুন।"
+msgstr ""
+"স্বয়ংক্রিয়ভাবে স্লাগ তৈরি করা যাবে না। অনুগ্রহ করে একটি ম্যানুয়ালি প্রদান"
+" করুন।"
 
-#: forms/wizards.py:99
+#: forms/wizards.py:100
 msgid "Please provide a valid slug."
 msgstr "অনুগ্রহ করে একটি বৈধ স্লাগ প্রদান করুন।"
 
-#: forms/wizards.py:123
+#: forms/wizards.py:134
 msgid "You don't have the permissions required to add a page."
 msgstr "পৃষ্ঠা যুক্ত করার জন্য প্রয়োজনীয় অনুমতি আপনার নেই।"
 
@@ -674,21 +790,21 @@ msgstr "পৃষ্ঠা যুক্ত করার জন্য প্র�
 msgid "ID"
 msgstr "আইডি"
 
-#: migrations/0001_initial.py:27 models/pluginmodel.py:172
+#: migrations/0001_initial.py:27 models/pluginmodel.py:173
 msgid "position"
 msgstr "অবস্থান"
 
-#: migrations/0001_initial.py:28 models/contentmodels.py:40
-#: models/pagemodel.py:1098 models/pluginmodel.py:174
+#: migrations/0001_initial.py:28 models/contentmodels.py:44
+#: models/pagemodel.py:1112 models/pluginmodel.py:175
 msgid "language"
 msgstr "ভাষা"
 
-#: migrations/0001_initial.py:29 models/pluginmodel.py:176
+#: migrations/0001_initial.py:29 models/pluginmodel.py:177
 msgid "plugin_name"
 msgstr "plugin_name"
 
-#: migrations/0001_initial.py:30 models/contentmodels.py:82
-#: models/pluginmodel.py:178
+#: migrations/0001_initial.py:30 models/contentmodels.py:78
+#: models/pluginmodel.py:179
 msgid "creation date"
 msgstr "তৈরির তারিখ"
 
@@ -745,13 +861,13 @@ msgstr "গ্রুপ"
 msgid "sites"
 msgstr "সাইটসমূহ"
 
-#: migrations/0001_initial.py:84 models/contentmodels.py:90
-#: models/pagemodel.py:65
+#: migrations/0001_initial.py:84 models/contentmodels.py:83
+#: models/pagemodel.py:75
 msgid "created by"
 msgstr "তৈরি করেছেন"
 
-#: migrations/0001_initial.py:85 models/contentmodels.py:95
-#: models/pagemodel.py:70
+#: migrations/0001_initial.py:85 models/contentmodels.py:88
+#: models/pagemodel.py:80
 msgid "changed by"
 msgstr "পরিবর্তন করেছেন"
 
@@ -765,48 +881,59 @@ msgstr "প্রকাশের তারিখ"
 msgid "publication end date"
 msgstr "প্রকাশের সমাপ্তির তারিখ"
 
-#: migrations/0001_initial.py:90 models/contentmodels.py:102
+#: migrations/0001_initial.py:90 models/contentmodels.py:95
 msgid "in navigation"
 msgstr "নেভিগেশনে"
 
-#: migrations/0001_initial.py:91 models/contentmodels.py:107
+#: migrations/0001_initial.py:91 models/contentmodels.py:100
 msgid "soft root"
 msgstr "সফট রুট"
 
-#: migrations/0001_initial.py:92 models/pagemodel.py:82
+#: migrations/0001_initial.py:92 models/pagemodel.py:92
 msgid "id"
 msgstr "আইডি"
 
-#: migrations/0001_initial.py:93 models/pagemodel.py:90
+#: migrations/0001_initial.py:93 models/pagemodel.py:100
 msgid "attached menu"
 msgstr "সংযুক্ত মেনু"
 
-#: migrations/0001_initial.py:94 models/contentmodels.py:113
+#: migrations/0001_initial.py:94 models/contentmodels.py:106
 #: templates/admin/cms/page/tree/actions_dropdown.html:99
 msgid "template"
 msgstr "টেমপ্লেট"
 
-#: migrations/0001_initial.py:95 models/pagemodel.py:97
+#: migrations/0001_initial.py:95 models/pagemodel.py:107
 msgid "login required"
 msgstr "লগইন প্রয়োজন"
 
-#: migrations/0001_initial.py:98 models/pagemodel.py:106
+#: migrations/0001_initial.py:96 models/contentmodels.py:113
+msgid "menu visibility"
+msgstr "মেনুর দৃশ্যমানতা"
+
+#: migrations/0001_initial.py:98 models/pagemodel.py:116
 msgid "application"
 msgstr "এ্যাপ্লিকেশন"
 
-#: migrations/0001_initial.py:99 models/pagemodel.py:113
+#: migrations/0001_initial.py:99 models/pagemodel.py:123
 msgid "application instance name"
 msgstr "এ্যাপ্লিকেশন ইনস্ট্যান্সের নাম"
 
-#: migrations/0001_initial.py:110 models/pagemodel.py:60
+#: migrations/0001_initial.py:110 models/pagemodel.py:70
 #: templates/admin/cms/page/tree/actions_dropdown.html:105
 msgid "site"
 msgstr "সাইট"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:253
+#: migrations/0001_initial.py:132 models/permissionmodels.py:280
 #: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "অনুমতি দিন"
+
+#: migrations/0001_initial.py:134 models/contentmodels.py:77
+#: models/pagemodel.py:143 models/pagemodel.py:1116
+#: models/permissionmodels.py:281 templates/admin/cms/page/tree/base.html:288
+#: test_utils/project/sampleapp/ns_urls.py:8
+msgid "page"
+msgstr "পৃষ্ঠা"
 
 #: models/contentmodels.py:14
 msgid "no limit set"
@@ -820,91 +947,108 @@ msgstr "শুধুমাত্র লগইন করা ব্যবহার
 msgid "for anonymous users only"
 msgstr "শুধুমাত্র বেনামী ব্যবহারকারীদের জন্য"
 
-#: models/contentmodels.py:22
+#: models/contentmodels.py:28
 msgid "Inherit from parent page"
 msgstr "প্যারেন্ট পৃষ্ঠা থেকে উত্তরাধিকার সূত্রে গ্রহণ করুন"
 
-#: models/contentmodels.py:23
+#: models/contentmodels.py:29
 msgid "Deny"
 msgstr "অস্বীকার করুন"
 
-#: models/contentmodels.py:24
+#: models/contentmodels.py:30
 msgid "Only this website"
 msgstr "শুধুমাত্র এই ওয়েবসাইট"
 
-#: models/contentmodels.py:25
+#: models/contentmodels.py:31
 msgid "Allow"
 msgstr "অনুমতি দিন"
 
-#: models/contentmodels.py:52
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+#: models/contentmodels.py:46
+msgid "title"
+msgstr "শিরোনাম"
+
+#: models/contentmodels.py:48
+msgid "The default title"
+msgstr "ডিফল্ট শিরোনাম"
+
+#: models/contentmodels.py:51
+msgid "Page Title"
+msgstr "পৃষ্ঠার শিরোনাম"
+
+#: models/contentmodels.py:55
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "আপনার ব্রাউজারের উপরে অথবা বুকমার্কে যা প্রদর্শিত হয় তা ওভাররাইট করে"
 
-#: models/contentmodels.py:56
+#: models/contentmodels.py:58
 msgid "Menu Title"
 msgstr "মেনু শিরোনাম"
 
-#: models/contentmodels.py:60
+#: models/contentmodels.py:62
 msgid "Overwrite what is displayed in the menu"
 msgstr "মেনুতে যা প্রদর্শিত হয় তা ওভাররাইট করুন"
 
-#: models/contentmodels.py:63
+#: models/contentmodels.py:65
 msgid "Description meta tag"
 msgstr "বিবরণ মেটা ট্যাগ"
 
-#: models/contentmodels.py:66
+#: models/contentmodels.py:68
 msgid "A description of the page used by search engines."
 msgstr "সার্চ ইঞ্জিন কর্তৃক ব্যবহৃত পৃষ্ঠার একটি বিবরণ।"
 
-#: models/contentmodels.py:69
+#: models/contentmodels.py:71
 msgid "redirect"
 msgstr "পুনঃনির্দেশ"
 
-#: models/contentmodels.py:110
+#: models/contentmodels.py:75
+msgid "Redirects to this URL."
+msgstr "এই ইউআরএল-এ পুনঃনির্দেশ করে"
+
+#: models/contentmodels.py:103
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "সকল পূর্বপুরুষ নেভিগেশনে প্রদর্শিত হবে না"
 
-#: models/contentmodels.py:116
+#: models/contentmodels.py:109
 msgid "The template used to render the content."
 msgstr "কন্টেন্ট রেন্ডার করতে ব্যবহৃত টেমপ্লেট।"
 
-#: models/contentmodels.py:146
+#: models/contentmodels.py:139
 msgid "page content"
 msgstr "পৃষ্ঠার কন্টেন্ট"
 
-#: models/contentmodels.py:147
+#: models/contentmodels.py:140
 msgid "page contents"
 msgstr "পৃষ্ঠার কন্টেন্টসমূহ"
 
-#: models/contentmodels.py:289 models/pagemodel.py:985
+#: models/contentmodels.py:296 models/pagemodel.py:999
 msgid "default"
 msgstr "ডিফল্ট"
 
-#: models/pagemodel.py:87
+#: models/pagemodel.py:97
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
-"একটি অনন্য আইডেন্টিফায়ার যা এই পৃষ্ঠার সাথে লিঙ্ক করার জন্য page_url templatetag-"
-"এর সাথে ব্যবহৃত হয়"
+"একটি অনন্য আইডেন্টিফায়ার যা এই পৃষ্ঠার সাথে লিঙ্ক করার জন্য page_url "
+"templatetag-এর সাথে ব্যবহৃত হয়"
 
-#: models/pagemodel.py:120
+#: models/pagemodel.py:130
 msgid "Mark this page as a page type"
 msgstr "এই পৃষ্ঠাটিকে একটি পৃষ্ঠার ধরন হিসেবে চিহ্নিত করুন"
 
-#: models/pagemodel.py:134
+#: models/pagemodel.py:144
 msgid "pages"
 msgstr "পৃষ্ঠাসমূহ"
 
-#: models/pagemodel.py:153
+#: models/pagemodel.py:163
 msgid "No available title"
 msgstr "কোনো শিরোনাম উপলব্ধ নেই"
 
-#: models/pagemodel.py:1096
+#: models/pagemodel.py:1110
 msgid "slug"
 msgstr "স্লাগ"
 
-#: models/pagemodel.py:1097
+#: models/pagemodel.py:1111
 msgid "Path"
 msgstr "পাথ"
 
@@ -945,32 +1089,32 @@ msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা প্রকাশ করতে পারবেন না। সম্পাদনার "
-"অনুমতি প্রয়োজন।"
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা প্রকাশ করতে পারবেন না। "
+"সম্পাদনার অনুমতি প্রয়োজন।"
 
 #: models/permissionmodels.py:124
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
 msgstr ""
-"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার উন্নত সেটিংস পরিবর্তন করতে পারবেন "
-"না। সম্পাদনার অনুমতি প্রয়োজন।"
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার উন্নত সেটিংস পরিবর্তন "
+"করতে পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
 #: models/permissionmodels.py:129
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
 msgstr ""
-"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি পরিবর্তন করতে পারবেন না। "
-"সম্পাদনার অনুমতি প্রয়োজন।"
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি পরিবর্তন করতে "
+"পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
 #: models/permissionmodels.py:134
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
-"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা সরাতে পারবেন না। সম্পাদনার অনুমতি "
-"প্রয়োজন।"
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা সরাতে পারবেন না। "
+"সম্পাদনার অনুমতি প্রয়োজন।"
 
 #: models/permissionmodels.py:198
 msgid "can recover any deleted page"
@@ -978,7 +1122,8 @@ msgstr "মুছে ফেলা যেকোনো পৃষ্ঠা পু�
 
 #: models/permissionmodels.py:203
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr "কোনোটি নির্বাচন না করা হলে, ব্যবহারকারীকে সকল সাইটে অনুমতি প্রদান করা হয়।"
+msgstr ""
+"কোনোটি নির্বাচন না করা হলে, ব্যবহারকারীকে সকল সাইটে অনুমতি প্রদান করা হয়।"
 
 #: models/permissionmodels.py:210
 msgid "Page global permission"
@@ -988,39 +1133,67 @@ msgstr "পৃষ্ঠার গ্লোবাল অনুমতি"
 msgid "Pages global permissions"
 msgstr "পৃষ্ঠাসমূহের গ্লোবাল অনুমতিসমূহ"
 
-#: models/permissionmodels.py:259
+#: models/permissionmodels.py:286
 msgid "Page permission"
 msgstr "পৃষ্ঠার অনুমতি"
 
-#: models/permissionmodels.py:274
+#: models/permissionmodels.py:301
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
-"পৃষ্ঠা যোগের অনুমতির জন্য সন্তান বা বংশধরের অ্যাক্সেসও প্রয়োজন, অন্যথায় যোগ করা পৃষ্ঠা "
-"এর প্রস্তুতকারক পরিবর্তন করতে পারবেন না।"
+"পৃষ্ঠা যোগের অনুমতির জন্য সন্তান বা বংশধরের অ্যাক্সেসও প্রয়োজন, অন্যথায় "
+"যোগ করা পৃষ্ঠা এর প্রস্তুতকারক পরিবর্তন করতে পারবেন না।"
 
-#: models/permissionmodels.py:320
+#: models/permissionmodels.py:347
 msgid "User (page)"
 msgstr "ব্যবহারকারী (পৃষ্ঠা)"
 
-#: models/permissionmodels.py:321
+#: models/permissionmodels.py:348
 msgid "Users (page)"
 msgstr "ব্যবহারকারীগণ (পৃষ্ঠা)"
 
-#: models/permissionmodels.py:336
+#: models/permissionmodels.py:363
 msgid "User group (page)"
 msgstr "ব্যবহারকারী গ্রুপ (পৃষ্ঠা)"
 
-#: models/permissionmodels.py:337
+#: models/permissionmodels.py:364
 msgid "User groups (page)"
 msgstr "ব্যবহারকারী গ্রুপসমূহ (পৃষ্ঠা)"
 
-#: models/placeholdermodel.py:30
+#: models/placeholdermodel.py:35
 msgid "slot"
 msgstr "স্লট"
 
-#: models/pluginmodel.py:212
+#: models/placeholdermodel.py:37
+msgid "width"
+msgstr "প্রস্থ"
+
+#: models/placeholdermodel.py:48
+#, fuzzy
+#| msgid "Edit model"
+msgid "Edit object"
+msgstr "মডেল সম্পাদনা করুন"
+
+#: models/placeholdermodel.py:49
+#, fuzzy
+#| msgid "This is a static placeholder"
+msgid "This is an external placeholder"
+msgstr "এটি একটি স্ট্যাটিক প্লেসহোল্ডার"
+
+#: models/pluginmodel.py:188
+#, fuzzy
+#| msgid "Add plugin"
+msgid "plugin"
+msgstr "প্লাগ-ইন যুক্ত করুন"
+
+#: models/pluginmodel.py:189
+#, fuzzy
+#| msgid "Add plugin"
+msgid "plugins"
+msgstr "প্লাগ-ইন যুক্ত করুন"
+
+#: models/pluginmodel.py:216
 msgid "<Empty>"
 msgstr "<খালি>"
 
@@ -1036,20 +1209,20 @@ msgstr "ব্যবহারকারী সেটিং"
 msgid "user settings"
 msgstr "ব্যবহারকারী সেটিংস"
 
-#: plugin_base.py:70
+#: plugin_base.py:71
 msgid "Advanced options"
 msgstr "উন্নত অপশনসমূহ"
 
-#: plugin_base.py:125
+#: plugin_base.py:138
 msgid "Generic"
 msgstr "জেনেরিক"
 
-#: plugin_base.py:612
+#: plugin_base.py:654
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" সফলভাবে পরিবর্তন করা হয়েছে।"
 
-#: plugin_base.py:700
+#: plugin_base.py:742
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "এই প্লাগ-ইনের জন্য আর কোনো সেটিংস নেই। অনুগ্রহ করে সংরক্ষণ চাপুন।"
 
@@ -1114,7 +1287,7 @@ msgid "Cleared Placeholder"
 msgstr "প্লেসহোল্ডার খালি করা হয়েছে"
 
 #: templates/admin/cms/extensions/change_form.html:5
-#: templates/admin/cms/page/change_form.html:84
+#: templates/admin/cms/page/change_form.html:86
 #: templates/admin/cms/page/plugin/submit_line.html:3
 #: templates/admin/cms/page/submit_row.html:4
 #: templates/admin/cms/page/tree/copy_premissions.html:10
@@ -1163,29 +1336,28 @@ msgid "Home"
 msgstr "হোম"
 
 #: templates/admin/cms/page/change_form.html:28
-#: templates/admin/cms/page/tree/menu.html:80
-#: templates/admin/cms/page/tree/menu.html:83
+#: templates/admin/cms/page/tree/menu.html:92
 msgid "View on site"
 msgstr "সাইটে দেখুন"
 
-#: templates/admin/cms/page/change_form.html:56
+#: templates/admin/cms/page/change_form.html:58
 #: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "অনুগ্রহ করে নিচের ত্রুটিটি সংশোধন করুন।"
 msgstr[1] "অনুগ্রহ করে নিচের ত্রুটিগুলো সংশোধন করুন।"
 
-#: templates/admin/cms/page/change_form.html:73
+#: templates/admin/cms/page/change_form.html:75
 msgid "All permissions"
 msgstr "সকল অনুমতি"
 
-#: templates/admin/cms/page/change_form.html:74
-#: templates/admin/cms/page/tree/base.html:206
-#: templates/admin/cms/page/tree/base.html:270
+#: templates/admin/cms/page/change_form.html:76
+#: templates/admin/cms/page/tree/base.html:196
+#: templates/admin/cms/page/tree/base.html:260
 msgid "Loading..."
 msgstr "লোড হচ্ছে..."
 
-#: templates/admin/cms/page/change_form.html:85
+#: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/plugin/submit_line.html:9
 #: templates/admin/cms/page/submit_row.html:12
 msgid "Save and continue editing"
@@ -1197,8 +1369,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"আপনি কি নিশ্চিত যে আপনি %(object_name)s \"%(escaped_object)s\" মুছে ফেলতে চান? "
-"নিম্নলিখিত সম্পর্কিত সকল আইটেম মুছে ফেলা হবে:"
+"আপনি কি নিশ্চিত যে আপনি %(object_name)s \"%(escaped_object)s\" মুছে ফেলতে "
+"চান? নিম্নলিখিত সম্পর্কিত সকল আইটেম মুছে ফেলা হবে:"
 
 #: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
@@ -1211,6 +1383,10 @@ msgstr "না, আমাকে ফিরিয়ে নিন"
 #: templates/admin/cms/page/delete_summary.html:2
 msgid "Summary"
 msgstr "সারসংক্ষেপ"
+
+#: templates/admin/cms/page/permissions.html:6
+msgid "User"
+msgstr "ব্যবহারকারী"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
@@ -1273,26 +1449,26 @@ msgstr "সংরক্ষণ করুন এবং আরেকটি যু�
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:13
 #: templates/admin/cms/page/tree/actions_dropdown.html:15
-#: templates/admin/cms/page/tree/menu.html:185
-#: templates/admin/cms/page/tree/menu.html:187
-#: templates/cms/toolbar/dragitem.html:41
+#: templates/admin/cms/page/tree/menu.html:197
+#: templates/admin/cms/page/tree/menu.html:199
+#: templates/cms/toolbar/dragitem.html:39
 msgid "Copy"
 msgstr "কপি করুন"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:26
 #: templates/admin/cms/page/tree/actions_dropdown.html:28
-#: templates/admin/cms/page/tree/menu.html:191
-#: templates/admin/cms/page/tree/menu.html:193
-#: templates/cms/toolbar/dragitem.html:40
+#: templates/admin/cms/page/tree/menu.html:203
+#: templates/admin/cms/page/tree/menu.html:205
+#: templates/cms/toolbar/dragitem.html:38
 msgid "Cut"
 msgstr "কাট করুন"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:37
-#: templates/admin/cms/page/tree/base.html:170
-#: templates/admin/cms/page/tree/menu.html:199
+#: templates/admin/cms/page/tree/base.html:160
+#: templates/admin/cms/page/tree/menu.html:211
 #: templates/cms/toolbar/dragbar.html:25 templates/cms/toolbar/dragbar.html:28
-#: templates/cms/toolbar/dragitem.html:44
-#: templates/cms/toolbar/dragitem.html:49
+#: templates/cms/toolbar/dragitem.html:42
+#: templates/cms/toolbar/dragitem.html:47
 msgid "Paste"
 msgstr "পেস্ট করুন"
 
@@ -1346,88 +1522,86 @@ msgid ""
 "                                            "
 msgstr ""
 "\n"
-"                                                মুছে ফেলা %(name)s পুনরুদ্ধার "
-"করুন\n"
+"                                                মুছে ফেলা %(name)s পুনরুদ্ধার করুন\n"
 "                                            "
 
-#: templates/admin/cms/page/tree/base.html:150
+#: templates/admin/cms/page/tree/base.html:140
 msgid "Main Navigation"
 msgstr "প্রধান নেভিগেশন"
 
-#: templates/admin/cms/page/tree/base.html:162
-#: templates/admin/cms/page/tree/menu.html:176
+#: templates/admin/cms/page/tree/base.html:152
+#: templates/admin/cms/page/tree/menu.html:188
 msgid "Options"
 msgstr "অপশনসমূহ"
 
-#: templates/admin/cms/page/tree/base.html:200
-#: templates/admin/cms/page/tree/base.html:264
+#: templates/admin/cms/page/tree/base.html:190
+#: templates/admin/cms/page/tree/base.html:254
 msgid "Successfully moved"
 msgstr "সফলভাবে সরানো হয়েছে"
 
-#: templates/admin/cms/page/tree/base.html:201
-#: templates/admin/cms/page/tree/base.html:265
+#: templates/admin/cms/page/tree/base.html:191
+#: templates/admin/cms/page/tree/base.html:255
 msgid "Changes within the tree might require a refresh."
 msgstr "ট্রির মধ্যে করা পরিবর্তনের জন্য রিফ্রেশ প্রয়োজন হতে পারে।"
 
-#: templates/admin/cms/page/tree/base.html:202
-#: templates/admin/cms/page/tree/base.html:266
+#: templates/admin/cms/page/tree/base.html:192
+#: templates/admin/cms/page/tree/base.html:256
 msgid "Error:"
 msgstr "ত্রুটি:"
 
-#: templates/admin/cms/page/tree/base.html:203
-#: templates/admin/cms/page/tree/base.html:267
+#: templates/admin/cms/page/tree/base.html:193
+#: templates/admin/cms/page/tree/base.html:257
 msgid ""
-"This page cannot be copied because an application is attached to it. See the "
-"Page's Advanced settings to manage apphooks."
+"This page cannot be copied because an application is attached to it. See the"
+" Page's Advanced settings to manage apphooks."
 msgstr ""
 "এই পৃষ্ঠাটি কপি করা যাবে না কারণ এতে একটি এ্যাপ্লিকেশন সংযুক্ত আছে। apphook "
 "পরিচালনা করতে পৃষ্ঠার উন্নত সেটিংস দেখুন।"
 
-#: templates/admin/cms/page/tree/base.html:204
-#: templates/admin/cms/page/tree/base.html:268
+#: templates/admin/cms/page/tree/base.html:194
+#: templates/admin/cms/page/tree/base.html:258
 msgid "Are you sure you want to § this page?"
 msgstr "আপনি কি নিশ্চিত যে আপনি এই পৃষ্ঠাটি § করতে চান?"
 
-#: templates/admin/cms/page/tree/base.html:205
-#: templates/admin/cms/page/tree/base.html:269
+#: templates/admin/cms/page/tree/base.html:195
+#: templates/admin/cms/page/tree/base.html:259
 msgid "Reload"
 msgstr "পুনরায় লোড করুন"
 
-#: templates/admin/cms/page/tree/base.html:207
-#: templates/admin/cms/page/tree/base.html:271
+#: templates/admin/cms/page/tree/base.html:197
+#: templates/admin/cms/page/tree/base.html:261
 msgid "New node"
 msgstr "নতুন নোড"
 
-#: templates/admin/cms/page/tree/base.html:208
-#: templates/admin/cms/page/tree/base.html:272
+#: templates/admin/cms/page/tree/base.html:198
+#: templates/admin/cms/page/tree/base.html:262
 msgid "nodes"
 msgstr "নোডসমূহ"
 
-#: templates/admin/cms/page/tree/base.html:219
-#: templates/admin/cms/page/tree/base.html:283
+#: templates/admin/cms/page/tree/base.html:209
+#: templates/admin/cms/page/tree/base.html:273
+#: templates/admin/cms/page/tree/menu.html:95
 msgid "View"
 msgstr "দেখুন"
 
-#: templates/admin/cms/page/tree/base.html:225
-#: templates/admin/cms/page/tree/base.html:289
+#: templates/admin/cms/page/tree/base.html:215
+#: templates/admin/cms/page/tree/base.html:279
 msgid "Menu"
 msgstr "মেনু"
 
-#: templates/admin/cms/page/tree/base.html:298
+#: templates/admin/cms/page/tree/base.html:288
 #, python-format
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add "
-"%(object)s</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
 "\n"
 "                            <em>এখনও কোনো %(object)s নেই।</em>\n"
 "                            <br>\n"
-"                            এখন <a href=\"%(add_url)s\" "
-"class=\"addlink\">%(object)s যুক্ত করুন</a>।\n"
+"                            এখন <a href=\"%(add_url)s\" class=\"addlink\">%(object)s যুক্ত করুন</a>।\n"
 "                        "
 
 #: templates/admin/cms/page/tree/copy_premissions.html:4
@@ -1440,7 +1614,7 @@ msgstr "কপি অপশন নির্বাচন করুন"
 
 #: templates/admin/cms/page/tree/copy_premissions.html:11
 #: templates/cms/toolbar/toolbar_with_structure.html:12
-#: templates/cms/toolbar/toolbar_with_structure.html:49
+#: templates/cms/toolbar/toolbar_with_structure.html:48
 msgid "Close"
 msgstr "বন্ধ করুন"
 
@@ -1469,25 +1643,30 @@ msgstr "সফটরুট"
 msgid "Apphook"
 msgstr "Apphook"
 
+#: templates/admin/cms/page/tree/legend.html:52
+#: templates/admin/cms/page/tree/menu.html:75
+msgid "Redirect"
+msgstr "পুনঃনির্দেশ"
+
 #: templates/admin/cms/page/tree/menu.html:63
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "এ্যাপ্লিকেশন: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu.html:118
+#: templates/admin/cms/page/tree/menu.html:130
 msgid "in menu"
 msgstr "মেনুতে"
 
-#: templates/admin/cms/page/tree/menu.html:123
+#: templates/admin/cms/page/tree/menu.html:135
 msgid "not in menu"
 msgstr "মেনুতে নেই"
 
-#: templates/admin/cms/page/tree/menu.html:140
-#: templates/admin/cms/page/tree/menu.html:151
+#: templates/admin/cms/page/tree/menu.html:152
+#: templates/admin/cms/page/tree/menu.html:163
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "পৃষ্ঠার সেটিংস (উন্নত সেটিংসের জন্য SHIFT ক্লিক করুন)"
 
-#: templates/admin/cms/page/tree/menu.html:218
+#: templates/admin/cms/page/tree/menu.html:230
 msgid "Permissions"
 msgstr "অনুমতিসমূহ"
 
@@ -1501,7 +1680,8 @@ msgid "This page has no preview!"
 msgstr "এই পৃষ্ঠার কোনো প্রিভিউ নেই!"
 
 #: templates/cms/noapphook.html:19
-msgid "Potentially the attached apphook does not provide content for its root."
+msgid ""
+"Potentially the attached apphook does not provide content for its root."
 msgstr "সম্ভবত সংযুক্ত apphook তার রুটের জন্য কোনো কন্টেন্ট প্রদান করে না।"
 
 #: templates/cms/noapphook.html:20
@@ -1513,7 +1693,7 @@ msgstr "এটি পুনঃনির্দেশিত হচ্ছে:"
 msgid "Clipboard"
 msgstr "ক্লিপবোর্ড"
 
-#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:28
+#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:25
 #: templates/cms/toolbar/toolbar_javascript.html:91
 msgid "Add plugin"
 msgstr "প্লাগ-ইন যুক্ত করুন"
@@ -1530,13 +1710,10 @@ msgstr "যেখান থেকে কপি করবেন"
 msgid "Empty all"
 msgstr "সব খালি করুন"
 
-#: templates/cms/toolbar/dragbar.html:35 templates/cms/toolbar/dragitem.html:61
+#: templates/cms/toolbar/dragbar.html:35
+#: templates/cms/toolbar/dragitem.html:59
 msgid "Filter plugins..."
 msgstr "প্লাগ-ইন ফিল্টার করুন..."
-
-#: templates/cms/toolbar/dragbar.html:41
-msgid "This is a static placeholder"
-msgstr "এটি একটি স্ট্যাটিক প্লেসহোল্ডার"
 
 #: templates/cms/toolbar/dragbar.html:43
 msgid "Expand all"
@@ -1546,23 +1723,24 @@ msgstr "সব প্রসারিত করুন"
 msgid "Collapse all"
 msgstr "সব সংকুচিত করুন"
 
-#: templates/cms/toolbar/dragitem.html:26
+#: templates/cms/toolbar/dragitem.html:23
 msgid "You cannot add plugins to this plugin."
 msgstr "আপনি এই প্লাগ-ইনে প্লাগ-ইন যুক্ত করতে পারবেন না।"
 
-#: templates/cms/toolbar/dragitem.html:34
+#: templates/cms/toolbar/dragitem.html:32
 msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr "এই প্লাগ-ইনটি এর প্যারেন্টের বাইরে সরানো বা সম্পাদনা করা যাবে না"
 
-#: templates/cms/toolbar/dragitem.html:50
+#: templates/cms/toolbar/dragitem.html:48
 msgid "Clipboard is empty."
 msgstr "ক্লিপবোর্ড খালি।"
 
-#: templates/cms/toolbar/dragitem.html:51
+#: templates/cms/toolbar/dragitem.html:49
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr "এই প্লাগ-ইনটি এই ধরনের প্লাগ-ইনকে নেস্টেড প্লাগ-ইন হিসেবে অনুমতি দেয় না।"
+msgstr ""
+"এই প্লাগ-ইনটি এই ধরনের প্লাগ-ইনকে নেস্টেড প্লাগ-ইন হিসেবে অনুমতি দেয় না।"
 
-#: templates/cms/toolbar/dragitem.html:52
+#: templates/cms/toolbar/dragitem.html:50
 msgid "This plugin cannot have nested plugins."
 msgstr "এই প্লাগ-ইনে নেস্টেড প্লাগ-ইন থাকতে পারে না।"
 
@@ -1582,11 +1760,11 @@ msgstr "স্ট্রাকচার টগল করুন"
 msgid "Login"
 msgstr "লগইন"
 
-#: templates/cms/toolbar/plugin.html:24
+#: templates/cms/toolbar/plugin.html:23
 msgid "Add plugin to"
 msgstr "প্লাগ-ইন যুক্ত করুন এতে"
 
-#: templates/cms/toolbar/toolbar.html:28
+#: templates/cms/toolbar/toolbar.html:27
 msgid "More"
 msgstr "আরও"
 
@@ -1610,6 +1788,10 @@ msgstr "নিম্নলিখিত ত্রুটি ঘটেছে:"
 #: templates/cms/toolbar/toolbar_javascript.html:29
 msgid "Action successful."
 msgstr "অ্যাকশন সফল।"
+
+#: templates/cms/toolbar/toolbar_javascript.html:30
+msgid "Are you sure you want to delete this plugin?"
+msgstr "আপনি নিশ্চিত যে, আপনি প্লাগ-ইনটি মুছতে চান?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:31
 msgid "Are you sure you want to publish this page?"
@@ -1635,7 +1817,8 @@ msgstr "আপনি কি নিশ্চিত যে আপনি এই প
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr "ফর্মটি লোড করা যায়নি। অনুগ্রহ করে নিশ্চিত করুন যে সার্ভারটি সঠিকভাবে চলছে।"
+msgstr ""
+"ফর্মটি লোড করা যায়নি। অনুগ্রহ করে নিশ্চিত করুন যে সার্ভারটি সঠিকভাবে চলছে।"
 
 #: templates/cms/toolbar/toolbar_javascript.html:37
 msgid "Most used"
@@ -1705,8 +1888,8 @@ msgstr "প্রসারিত/সংকুচিত করুন"
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
-"<strong>লগইন ব্যর্থ হয়েছে।</strong> অনুগ্রহ করে আপনার শংসাপত্র যাচাই করে আবার "
-"চেষ্টা করুন।"
+"<strong>লগইন ব্যর্থ হয়েছে।</strong> অনুগ্রহ করে আপনার শংসাপত্র যাচাই করে "
+"আবার চেষ্টা করুন।"
 
 #: templates/cms/toolbar/toolbar_with_structure.html:5
 msgid "Double-click to edit"
@@ -1724,17 +1907,29 @@ msgstr "পেছনে যেতে ক্লিক করুন"
 msgid "Click to go forward"
 msgstr "সামনে যেতে ক্লিক করুন"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:47
+#: templates/cms/toolbar/toolbar_with_structure.html:46
 msgid "Minimize"
 msgstr "মিনিমাইজ করুন"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:48
+#: templates/cms/toolbar/toolbar_with_structure.html:47
 msgid "Maximize"
 msgstr "ম্যাক্সিমাইজ করুন"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:74
+#: templates/cms/toolbar/toolbar_with_structure.html:70
+#, fuzzy
+#| msgid "Placeholder"
+msgid "Placeholder not editable"
+msgstr "প্লেসহোল্ডার"
+
+#: templates/cms/toolbar/toolbar_with_structure.html:73
 msgid "Drop a plugin here"
 msgstr "এখানে একটি প্লাগ-ইন ছেড়ে দিন"
+
+#: templates/cms/welcome.html:20
+#, fuzzy
+#| msgid "Welcome to django CMS"
+msgid "Welcome to your new django CMS installation!"
+msgstr "django CMS-এ স্বাগতম"
 
 #: templates/cms/welcome.html:26
 #, python-format
@@ -1752,13 +1947,11 @@ msgstr "অনুগ্রহ করে লগইন করুন"
 #: templates/cms/welcome.html:36
 msgid ""
 "\n"
-"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your "
-"first page</a>\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
 "\n"
-"                <a class=\"js-welcome-add cms-btn cms-btn-action\">আপনার "
-"প্রথম পৃষ্ঠা যুক্ত করুন</a>\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">আপনার প্রথম পৃষ্ঠা যুক্ত করুন</a>\n"
 "            "
 
 #: templates/cms/welcome.html:43
@@ -1766,16 +1959,12 @@ msgid ""
 "\n"
 "                    <h2>Help Funding</h2>\n"
 "                    <p>\n"
-"                        Your funding directly benefits the product, mainly "
-"through the\n"
-"                        <a href=\"https://www.django-cms.org/en/fellowship-"
-"program/\">django CMS Fellowship Program</a>!\n"
+"                        Your funding directly benefits the product, mainly through the\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>!\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        A quick way for yourself or your organisation to "
-"donate is on\n"
-"                        <a href=\"https://github.com/sponsors/django-"
-"cms\">Github Sponsors</a>.\n"
+"                        A quick way for yourself or your organisation to donate is on\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
 "                    </p>\n"
 "                "
 msgstr ""
@@ -1783,14 +1972,11 @@ msgstr ""
 "                    <h2>তহবিল সহায়তা করুন</h2>\n"
 "                    <p>\n"
 "                        আপনার তহবিল সরাসরি পণ্যের উপকার করে, মূলত\n"
-"                        <a href=\"https://www.django-cms.org/en/fellowship-"
-"program/\">django CMS Fellowship Program</a>-এর মাধ্যমে!\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>-এর মাধ্যমে!\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        আপনার নিজের বা আপনার প্রতিষ্ঠানের দান করার একটি দ্রুত "
-"উপায় হলো\n"
-"                        <a href=\"https://github.com/sponsors/django-"
-"cms\">Github Sponsors</a>।\n"
+"                        আপনার নিজের বা আপনার প্রতিষ্ঠানের দান করার একটি দ্রুত উপায় হলো\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>।\n"
 "                    </p>\n"
 "                "
 
@@ -1799,13 +1985,11 @@ msgid ""
 "\n"
 "                    <h2>Join Us</h2>\n"
 "                    <p>\n"
-"                        The django CMS Association is a non-profit "
-"organisation that funds and steers the development of\n"
+"                        The django CMS Association is a non-profit organisation that funds and steers the development of\n"
 "                        django CMS.\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        You can <a href=\"https://www.django-cms.org/en/"
-"memberships/\">join both as an individual or as an\n"
+"                        You can <a href=\"https://www.django-cms.org/en/memberships/\">join both as an individual or as an\n"
 "                        organisation</a>.\n"
 "                    </p>\n"
 "                "
@@ -1813,12 +1997,10 @@ msgstr ""
 "\n"
 "                    <h2>আমাদের সাথে যোগ দিন</h2>\n"
 "                    <p>\n"
-"                        django CMS Association একটি অলাভজনক প্রতিষ্ঠান যা "
-"django CMS-এর উন্নয়নে তহবিল প্রদান করে এবং পরিচালনা করে।\n"
+"                        django CMS Association একটি অলাভজনক প্রতিষ্ঠান যা django CMS-এর উন্নয়নে তহবিল প্রদান করে এবং পরিচালনা করে।\n"
 "                    </p>\n"
 "                    <p>\n"
-"                        আপনি <a href=\"https://www.django-cms.org/en/"
-"memberships/\">একজন ব্যক্তি হিসেবে অথবা একটি\n"
+"                        আপনি <a href=\"https://www.django-cms.org/en/memberships/\">একজন ব্যক্তি হিসেবে অথবা একটি\n"
 "                        প্রতিষ্ঠান হিসেবে যোগ দিতে পারেন</a>।\n"
 "                    </p>\n"
 "                "
@@ -1828,14 +2010,11 @@ msgid ""
 "\n"
 "                    <h2>Contribute</h2>\n"
 "                    <ul>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"contribute/\">Contribute code:</a> fix a bug or\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Contribute code:</a> fix a bug or\n"
 "                            implement a new feature!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"volunteering-opportunities/\">Volunteer:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Volunteer:</a>\n"
 "                            We offer fun and efficient team work!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"repositories-plugins/\">Open-source your work:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Open-source your work:</a>\n"
 "                            Make the ecosystem strong.</li>\n"
 "                    </ul>\n"
 "                "
@@ -1843,15 +2022,11 @@ msgstr ""
 "\n"
 "                    <h2>অবদান রাখুন</h2>\n"
 "                    <ul>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"contribute/\">কোডে অবদান রাখুন:</a> একটি বাগ ঠিক করুন অথবা\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">কোডে অবদান রাখুন:</a> একটি বাগ ঠিক করুন অথবা\n"
 "                            একটি নতুন ফিচার বাস্তবায়ন করুন!</li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"volunteering-opportunities/\">স্বেচ্ছাসেবক হন:</a>\n"
-"                            আমরা আনন্দদায়ক ও কার্যকর টিম ওয়ার্কের সুযোগ দিই!</"
-"li>\n"
-"                        <li><a href=\"https://www.django-cms.org/en/"
-"repositories-plugins/\">আপনার কাজ ওপেন-সোর্স করুন:</a>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">স্বেচ্ছাসেবক হন:</a>\n"
+"                            আমরা আনন্দদায়ক ও কার্যকর টিম ওয়ার্কের সুযোগ দিই!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">আপনার কাজ ওপেন-সোর্স করুন:</a>\n"
 "                            ইকোসিস্টেমকে শক্তিশালী করুন।</li>\n"
 "                    </ul>\n"
 "                "
@@ -1871,15 +2046,13 @@ msgstr "ফিরিয়ে দিন"
 #: templates/cms/welcome.html:92
 msgid ""
 "\n"
-"                <p class=\"cms-welcome-notes\">If you don't see the django "
-"CMS logo at the top, make sure\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
 msgstr ""
 "\n"
-"                <p class=\"cms-welcome-notes\">যদি আপনি উপরে django CMS লোগো "
-"না দেখেন, তাহলে নিশ্চিত করুন\n"
+"                <p class=\"cms-welcome-notes\">যদি আপনি উপরে django CMS লোগো না দেখেন, তাহলে নিশ্চিত করুন\n"
 "                    যে আপনি <code>static/cms</code> ফোল্ডারটি আপনার\n"
 "                    স্ট্যাটিক ফাইলের সাথে লিঙ্ক করেছেন।</p>\n"
 "            "
@@ -1887,19 +2060,15 @@ msgstr ""
 #: templates/cms/welcome.html:98
 msgid ""
 "\n"
-"                    <p class=\"cms-welcome-notes\">You're seeing this "
-"message because you have\n"
-"                        <code>DEBUG = True</code> in your django settings "
-"file and\n"
+"                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
+"                        <code>DEBUG = True</code> in your django settings file and\n"
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
 msgstr ""
 "\n"
-"                    <p class=\"cms-welcome-notes\">আপনি এই বার্তাটি দেখছেন "
-"কারণ আপনার\n"
-"                        django সেটিংস ফাইলে <code>DEBUG = True</code> আছে "
-"এবং\n"
+"                    <p class=\"cms-welcome-notes\">আপনি এই বার্তাটি দেখছেন কারণ আপনার\n"
+"                        django সেটিংস ফাইলে <code>DEBUG = True</code> আছে এবং\n"
 "                        আপনি এখনও কোনো পৃষ্ঠা যুক্ত করেননি।\n"
 "                    </p>\n"
 "                "
@@ -1908,7 +2077,7 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "django CMS-এ স্বাগতম"
 
-#: templates/cms/widgets/applicationconfigselect.html:6
+#: templates/cms/widgets/applicationconfigselect.html:7
 msgid "Add Another"
 msgstr "আরেকটি যুক্ত করুন"
 
@@ -1924,7 +2093,11 @@ msgstr "পরবর্তী ধাপে এগোতে অনুগ্রহ
 msgid "Next"
 msgstr "পরবর্তী"
 
-#: templatetags/cms_admin.py:129
+#: templates/cms/wizards/wizardoptionwidget.html:11
+msgid "Select what you would like to create"
+msgstr "আপনি কী তৈরি করতে চান তা নির্বাচন করুন"
+
+#: templatetags/cms_admin.py:166
 msgid "Unknown"
 msgstr "অজানা"
 
@@ -1936,13 +2109,11 @@ msgstr "%(domain)s-এ পৃষ্ঠা পাওয়া যায়নি"
 #: templatetags/cms_tags.py:89
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments "
-"`%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 "একটি template tag `%(page_lookup)s\n"
-"` লুকআপ আর্গুমেন্ট সহ পৃষ্ঠাটি খুঁজে পায়নি। অনুরোধের ইউআরএল ছিল: http://"
-"%(host)s%(path)s"
+"` লুকআপ আর্গুমেন্ট সহ পৃষ্ঠাটি খুঁজে পায়নি। অনুরোধের ইউআরএল ছিল: http://%(host)s%(path)s"
 
 #: test_utils/project/custom_templates/__init__.py:4
 #: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
@@ -1969,6 +2140,10 @@ msgstr "আবশ্যক। ৩০০ অক্ষর বা তার কম�
 msgid "Enter a valid username."
 msgstr "একটি বৈধ ব্যবহারকারীর নাম লিখুন।"
 
+#: test_utils/project/customuserapp/models.py:51
+msgid "email address"
+msgstr "ইমেইল ঠিকানা"
+
 #: test_utils/project/customuserapp/models.py:53
 msgid "staff status"
 msgstr "স্টাফ স্ট্যাটাস"
@@ -1986,8 +2161,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"এই ব্যবহারকারীকে সক্রিয় হিসেবে গণ্য করা হবে কিনা তা নির্দেশ করে। অ্যাকাউন্ট মুছে "
-"ফেলার পরিবর্তে এটি অনির্বাচিত করুন।"
+"এই ব্যবহারকারীকে সক্রিয় হিসেবে গণ্য করা হবে কিনা তা নির্দেশ করে। অ্যাকাউন্ট"
+" মুছে ফেলার পরিবর্তে এটি অনির্বাচিত করুন।"
 
 #: test_utils/project/customuserapp/models.py:71
 msgid "users"
@@ -2049,6 +2224,12 @@ msgstr "নমুনা অ্যাপ ২"
 #: test_utils/project/sampleapp/cms_apps.py:76
 msgid "Sample App 3"
 msgstr "নমুনা অ্যাপ ৩"
+
+#: test_utils/project/sampleapp/cms_apps.py:90
+#, fuzzy
+#| msgid "Sample App with config"
+msgid "Sample App Without Landing Page"
+msgstr "কনফিগ সহ নমুনা অ্যাপ"
 
 #: test_utils/project/sampleapp/cms_apps.py:97
 msgid "Namespaced App"
@@ -2123,7 +2304,7 @@ msgstr "ক্যাটাগরি পরিবর্তন করুন"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "আজ ওয়েব সাইটের সাথে কিছু মূল্যবান সময় কাটানোর জন্য ধন্যবাদ।"
 
-#: tests/test_templates.py:57 utils/conf.py:186
+#: tests/test_templates.py:57 utils/conf.py:192
 msgid "Inherit the template of the nearest ancestor"
 msgstr "নিকটতম পূর্বপুরুষের টেমপ্লেট উত্তরাধিকার সূত্রে গ্রহণ করুন"
 
@@ -2131,25 +2312,31 @@ msgstr "নিকটতম পূর্বপুরুষের টেমপ্�
 msgid "UserSettings"
 msgstr "UserSettings"
 
-#: toolbar/utils.py:30
+#: toolbar/utils.py:32
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "\"%(placeholder_label)s\" প্লেসহোল্ডারে প্লাগ-ইন যুক্ত করুন"
 
-#: toolbar/utils.py:50
+#: toolbar/utils.py:53
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "%(plugin_name)s-এ প্লাগ-ইন যুক্ত করুন"
 
-#: utils/conf.py:101
+#: utils/conf.py:54
+#, fuzzy
+#| msgid "placeholder"
+msgid "Single placeholder"
+msgstr "প্লেসহোল্ডার"
+
+#: utils/conf.py:103
 msgid "Community forum"
 msgstr "কমিউনিটি ফোরাম"
 
-#: utils/conf.py:103
+#: utils/conf.py:105
 msgid "Getting started"
 msgstr "শুরু করা"
 
-#: utils/conf.py:104
+#: utils/conf.py:106
 msgid "Talk to us"
 msgstr "আমাদের সাথে কথা বলুন"
 
@@ -2161,19 +2348,19 @@ msgstr "CMS - আপনার ব্যবহারকারী অ্যাক�
 msgid "CMS - your user account was changed."
 msgstr "CMS - আপনার ব্যবহারকারী অ্যাকাউন্ট পরিবর্তন করা হয়েছে।"
 
-#: utils/plugins.py:520
+#: utils/plugins.py:524
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "এই প্লেসহোল্ডারে ইতিমধ্যেই সর্বোচ্চ সংখ্যক প্লাগ-ইন (%s) রয়েছে।"
 
-#: utils/plugins.py:526
+#: utils/plugins.py:530
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr ""
-"এই প্লেসহোল্ডারে ইতিমধ্যেই অনুমোদিত %(plugin_name)s প্লাগ-ইনের সর্বোচ্চ সংখ্যা "
-"(%(limit)s) রয়েছে।"
+"এই প্লেসহোল্ডারে ইতিমধ্যেই অনুমোদিত %(plugin_name)s প্লাগ-ইনের সর্বোচ্চ "
+"সংখ্যা (%(limit)s) রয়েছে।"
 
 #: utils/request_ip_resolvers.py:22
 #, python-brace-format
@@ -2189,7 +2376,7 @@ msgstr ""
 "\"{1}\" মডিউলে নির্দিষ্ট CMS_REQUEST_IP_RESOLVER ফাংশন খুঁজে পাওয়া যায়নি: "
 "\"{0}\"।"
 
-#: wizards/wizard_base.py:145
+#: wizards/wizard_base.py:144
 #, python-format
 msgid "Create a new %s instance."
 msgstr "একটি নতুন %s ইনস্ট্যান্স তৈরি করুন।"
@@ -2199,101 +2386,5 @@ msgstr "একটি নতুন %s ইনস্ট্যান্স তৈর
 msgid "A wizard has already been registered for model: %s"
 msgstr "মডেলের জন্য ইতিমধ্যেই একটি উইজার্ড নিবন্ধিত হয়েছে: %s"
 
-#: admin/forms.py:204
-msgid "Slug"
-msgstr "স্লাগ"
-
-#: admin/forms.py:206
-msgid "The part of the title that is used in the URL"
-msgstr "শিরোনামের যে অংশ ইউআরএল-এ ব্যবহৃত হবে"
-
-#: admin/forms.py:712
-msgid "Application"
-msgstr "এ্যাপ্লিকেশন"
-
-#: admin/forms.py:1236 admin/forms.py:1242 admin/forms.py:1246
-#: templates/admin/cms/page/change_form.html:11
-#: templates/admin/cms/usersettings/change_form.html:33
-#: templatetags/cms_tags.py:544
-msgid "Add"
-msgstr "যুক্ত করুন"
-
-#: admin/forms.py:1237 admin/forms.py:1243 admin/forms.py:1247
-msgid "Change"
-msgstr "পরিবর্তন"
-
-#: admin/forms.py:1238 admin/forms.py:1244 admin/forms.py:1248
-#: templates/admin/cms/extensions/change_form.html:9
-#: templates/admin/cms/page/plugin/submit_line.html:5
-#: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/actions_dropdown.html:42
-#: templates/admin/cms/page/tree/actions_dropdown.html:47
-#: templates/admin/cms/page/tree/menu.html:203
-#: templates/admin/cms/page/tree/menu.html:205
-#: templates/cms/toolbar/dragitem.html:46
-#: templates/cms/toolbar/dragitem.html:54
-msgid "Delete"
-msgstr "মুছে ফেলুন"
-
-#: admin/pageadmin.py:1127
-msgid "Database error"
-msgstr "ডাটাবেজ ত্রুটি"
-
-#: admin/placeholderadmin.py:1081 admin/placeholderadmin.py:1172
-msgid "Are you sure?"
-msgstr "আপনি কি নিশ্চিত?"
-
-#: cms_toolbars.py:394 models/settingmodels.py:20
-#: templates/admin/cms/grouper/change_list.html:4
-msgid "Language"
-msgstr "ভাষা"
-
-#: cms_toolbars.py:596 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:92 tests/test_wizards.py:115 tests/test_wizards.py:172
-msgid "Page"
-msgstr "পৃষ্ঠা"
-
-#: migrations/0001_initial.py:134 models/contentmodels.py:78
-#: models/pagemodel.py:133 models/pagemodel.py:1102
-#: models/permissionmodels.py:254 templates/admin/cms/page/tree/base.html:298
-#: test_utils/project/sampleapp/ns_urls.py:8
-msgid "page"
-msgstr "পৃষ্ঠা"
-
-#: models/contentmodels.py:42
-msgid "title"
-msgstr "শিরোনাম"
-
-#: models/contentmodels.py:44
-msgid "The default title"
-msgstr "ডিফল্ট শিরোনাম"
-
-#: models/contentmodels.py:47
-msgid "Page Title"
-msgstr "পৃষ্ঠার শিরোনাম"
-
-#: models/contentmodels.py:73
-msgid "Redirects to this URL."
-msgstr "এই ইউআরএল-এ পুনঃনির্দেশ করে"
-
-#: models/placeholdermodel.py:32
-msgid "width"
-msgstr "প্রস্থ"
-
-#: templates/admin/cms/page/permissions.html:6
-msgid "User"
-msgstr "ব্যবহারকারী"
-
-#: templates/cms/toolbar/toolbar_javascript.html:30
-msgid "Are you sure you want to delete this plugin?"
-msgstr "আপনি নিশ্চিত যে, আপনি প্লাগ-ইনটি মুছতে চান?"
-
-#: test_utils/project/customuserapp/models.py:51
-msgid "email address"
-msgstr "ইমেইল ঠিকানা"
-
 #~ msgid "Title"
 #~ msgstr "শিরোনাম"
-
-#~ msgid "Redirect"
-#~ msgstr "পুনঃনির্দেশ"
