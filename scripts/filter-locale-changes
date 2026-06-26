@@ -7,7 +7,11 @@ NORMAL="\033[0m"
 ROOT=$(git rev-parse --show-toplevel)
 
 for file in $(git status "${ROOT}/cms/locale" | grep modified | awk '{print $2}' ); do
-    if ! git diff "${file}" | grep -v '^---\|^+++\|^.\"POT-Creation-Date:.*n\"\|[+-]\"PO-Revision-Date:.*n\"' | grep -q '^[-+]'; then
+    # Capture the significant diff lines in full rather than piping into
+    # `grep -q`, which exits on the first match and sends SIGPIPE back up the
+    # pipe ("grep: write error: Broken pipe"). Here both greps read to EOF.
+    significant=$(git diff "${file}" | grep -v '^---\|^+++\|^.\"POT-Creation-Date:.*n\"\|[+-]\"PO-Revision-Date:.*n\"' | grep '^[-+]' || true)
+    if [ -z "${significant}" ]; then
         echo -e " * ${GREEN}reverting${NORMAL} $file (no significant modifications)"
         git checkout "${file}"
     fi
