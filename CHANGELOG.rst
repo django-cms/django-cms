@@ -4,6 +4,14 @@
 
 Features:
 ---------
+* Accessibility update for wizards (#8674) (55e59ff13) -- Fabian Braun
+* Allow toolbar ajax items to return a data bridge structure (#8694) (04d003b98) -- Fabian Braun
+* Allow wildcards (*, ?, []) for plugin restrictions, and "auto" `child_classes` detection (#8675) (69e06dad9) -- Fabian Braun
+* Extend CMSApp class to provide root template for apphook (#8619) (8f8df2f56) -- Fabian Braun
+* Propagate information why fields are readonly to user (#8673) (34df31041) -- Fabian Braun
+* Provide UI for plugins acting as slots (#8540) (9157e822c) -- Fabian Braun
+* Simplify project creation with interactive djangocms command and options (#8671) (ae8aba21e) -- Fabian Braun
+* add configurable menu cache backend (fixes #4440) (#8475) (ba1fdb11f) -- 사재혁
 
 * introduce contracts for django CMS Extensions (#8455) -- Fabian Braun
 * Avoid database access when registering apphook urls to make them async-safe (#8460) -- Fabian Braun
@@ -23,6 +31,47 @@ Features:
 
 Bug Fixes:
 ----------
+* Add `page_title` parameter to `cms.api.create_page` function (#8567) (096575377) -- Peter Wischer
+* Chick size was missing for plugin queryset.iterator() (#8532) (7d1b6dae8) -- Fabian Braun
+* Compatibility shim for Page.objects.order_by used non-existing fields (#8597) (85079b0fe) -- Fabian Braun
+* Compatibility with formtools 2.6+ form caching (#8629) (b7d95f920) -- Fabian Braun
+* Convert value to string in ApplicationConfigSelect. (#8594) (3734b23d0) -- Zdeněk Böhm
+* Copying from the clipboard into a different language sometimes failed (#8664) (469101350) -- Fabian Braun
+* Corrupted plugin positions are now automatically healed (#8667) (485ba4ffc) -- Fabian Braun
+* Deleting a non-local plugin did not refresh the screen (#8582) (61d0206d6) -- Fabian Braun
+* Do not lock whole tree when editing a page (#8612) (3caf62b04) -- Fabian Braun
+* DomDiff re-executed existing scripts or link tags (#8523) (8562357bf) -- Fabian Braun
+* Enforce authorization on structure, move and clipboard endpoints (#8644) (c4d3c18e9) -- Fabian Braun
+* Fallback languages rendered empty (when not redirecting) (#8557) (ce58952b8) -- Fabian Braun
+* FrontendEditableMixin failed to provide the obj to the Django permission backend (#8584) (cfeaecee8) -- Fabian Braun
+* GrouperModelAdmin shadowed prepopulated_fields class attribute (#8636) (9eccef8e1) -- Fabian Braun
+* Honour plugin-declared Vary headers in the page cache key (#8646) (8758714b8) -- Fabian Braun
+* Inline editing could circumvent permissions (#8542) (3b63f093f) -- Fabian Braun
+* Keep GET params when toggling structure mode (#8497) (#8501) (7a359ee80) -- Fabian Braun
+* Language selector triggered wrong toolbar (#8687) (a2dc439ba) -- Fabian Braun
+* Latent XSS vulnerability in the tooltip (#8568) (62c892255) -- Fabian Braun
+* Migrations with a custom user model caused a Programming error (#8606) (2937a13e1) -- Fabian Braun
+* Minor fixes of long-standing bugs (#8666) (5f09c677f) -- Fabian Braun
+* Missing redirect_url in CMSNavigationNode.attr (#8625) (#8627) (6f066fbc2) -- Fabian Braun
+* Outdated code in UserSelectAdminWidget (#8575) (857e5d4d3) -- Fabian Braun
+* Proxy models of `CMSPlugin` were not downcasted correctly (#8539) (57375c316) -- Fabian Braun
+* Refactor content object caching in GrouperAdmin (#8588) (c41b7fe20) -- Fabian Braun
+* Remove optional dependency on deprecated djangocms-admin-style (#8548) (e4906fe4a) -- Fabian Braun
+* Single phased CMSAppExtension could extensions with contracts (#8632) (f39961a5a) -- Fabian Braun
+* Slugs of published pages could be changed (#8640) (3d78f94d8) -- Fabian Braun
+* Some page permissions created invalid filter strings (#8662) (01d168f89) -- Fabian Braun
+* Text not fully centered in toobar buttons (#8563) (d0992b2c0) -- Fabian Braun
+* Toolbar login followed an unverified redirect after authentication (#8642)r (2c171e30d) -- Fabian Braun
+* Update Apphook Widget template for modern admin (#8585) (502939837) -- Fabian Braun
+* Updating plugins could lead to minified toolbar (#8550) (4be269261) -- Fabian Braun
+* XSS vulnerability in validator error message (#8576) (fe08cc19e) -- Fabian Braun
+* deadlock could happen on moving large pagesubtrees (#8529) (874602005) -- Fabian Braun
+* django CMS logo on welcome page ignored to dark mode (#8513) (1a28c25ee) -- entuziaz
+* domdiff for text elements (8a7646995) -- Fabian Braun
+* get_child_classes was always cached (#8677) (ab0424ed8) -- Fabian Braun
+* scripts for posix (260f82d9f) -- Fabian Braun
+* slug and overwrite_url caching failed in read-only change_views (#8507) (d6b556993) -- Fabian Braun
+* transifex scripts (ba026926a) -- Github Release Action
 * get_permissions failed for missing global permissions (#8468) (65d84a929) -- Fabian Braun
 * Create page wizard not available on empty install (#8463) -- Fabian Braun
 * Make Placeholder.add_plugin() set plugin.instance to self (#8442) (#8447) -- Jasper Bok
@@ -41,13 +90,52 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 245 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
+* Abdulwasiu Apalowo (2 pull requests)
+* Daniel (2 pull requests)
+* Ea001 (1 pull request)
+* Fabian Braun (120 pull requests)
+* Florian Schieder (1 pull request)
+* Jasper (2 pull requests)
+* Mario Colombo (1 pull request)
+* Mark Walker (1 pull request)
+* Moritz Pietzschke (2 pull requests)
+* Muhammad Hassan Siddiqi (2 pull requests)
+* Nguyễn Anh Bình (1 pull request)
+* Peter Wischer (2 pull requests)
+* Stefan Wehrmeyer (5 pull requests)
+* Thiago Chaves de Oliveira Horta (1 pull request)
+* Vašek Chalupníček (1 pull request)
+* Vincent Ngobeh (2 pull requests)
+* Vinit Kumar (4 pull requests)
+* Wesley B (1 pull request)
+* Wolfgang Fehr (1 pull request)
+* Zdeněk Böhm (1 pull request)
+* entuziaz (2 pull requests)
+* jmit-modern (1 pull request)
+* 김주희 (1 pull request)
+* 사재혁 (1 pull request)
 
 With the review help of the following contributors:
 
+* Claude Opus 4.5
+* Claude Opus 4.6
+* Copilot Autofix powered by AI
+* Django CMS Release
+* Fabian Braun
+* Github Release Action
+* Petr Klus
+* Ralph
+* Thiago Chaves de Oliveira Horta
+* Vinit Kumar
+* [Aaditya1273]
+* copilot-swe-agent[bot]
+* dependabot[bot]
+* fsbraun
+* keni
+* sourcery-ai[bot]
+* unknown
 
 Thanks to all contributors for their efforts!
 
