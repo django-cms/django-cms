@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 SCRIPTS=$(dirname "$(realpath "$0")")
 ROOT=$(git rev-parse --show-toplevel)
 
@@ -7,6 +10,26 @@ cd "${ROOT}/cms"
 django-admin makemessages -l en --no-location
 django-admin makemessages -l en -d djangojs --no-location
 
+# The English catalogs are the Transifex *source* files: every msgstr must
+# equal its msgid. makemessages leaves newly extracted strings with an empty
+# msgstr, and may fuzzy-match others (carrying over a wrong msgstr from a
+# similar string). Transifex rejects both with a parse error such as
+# "the entry with msgid '...' includes an empty msgstr". Normalise the en
+# catalogs so msgstr == msgid for every entry:
+#   - msgattrib clears fuzzy flags / previous-msgid markers and empties the
+#     (now un-fuzzied) translations, leaving a clean POT-like file;
+#   - msgen then fills every empty msgstr from its msgid.
+for po in locale/en/LC_MESSAGES/django.po locale/en/LC_MESSAGES/djangojs.po; do
+    msgattrib --clear-fuzzy --clear-previous --empty --no-obsolete "${po}" -o "${po}.tmp"
+    msgen "${po}.tmp" -o "${po}"
+    rm -f "${po}.tmp"
+done
 
 "${SCRIPTS}/filter-locale-changes"
-"${SCRIPTS}/tx" --token "$TX_TOKEN" push -s --skip
+
+# tx resolves the paths in .tx/config relative to the current directory, and
+# those paths are repo-root relative (cms/locale/...). Run tx from the root,
+# mirroring transifex-pull-strings, otherwise it looks for cms/cms/locale/...
+# and fails to find the source files.
+cd "${ROOT}"
+"${SCRIPTS}/tx" --token "$TX_TOKEN" push -s
