@@ -47,6 +47,7 @@ def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[s
 
 
 def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> dict[str, Any]:
+    # ``parents`` is deprecated (see CMSPlugin.get_plugin_info); forwarded for backwards compatibility.
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
@@ -61,6 +62,7 @@ def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None
 
 
 def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> str:
+    # ``parents`` is deprecated (see CMSPlugin.get_plugin_info); forwarded for backwards compatibility.
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
@@ -124,15 +126,17 @@ def get_plugin_tree(
     root_plugins = create_child_plugin_references(plugins)
 
     def collect_plugin_data(plugin):
-        child_classes, parent_classes = get_plugin_restrictions(
+        child_classes, _ = get_plugin_restrictions(
             plugin=plugin,
             restrictions_cache=restrictions,
             page=placeholder.source,
         )
+        # Make the resolved restrictions available to the drag-item template so it can decide
+        # whether children may be added without recomputing them per access.
+        plugin.child_class_restrictions = child_classes
         plugin_info = get_plugin_info(
             plugin,
             children=child_classes,
-            parents=parent_classes,
         )
 
         tree_data.append(plugin_info)
