@@ -174,6 +174,25 @@ logged-in users (menu visibility), require login to view at all
 (login-required), and be further restricted to one group (view
 restriction).
 
+**These are front-end controls only.** View restrictions,
+login-required, and menu visibility all govern who can *see a
+published page on the public site*. They do **not** hide a page inside
+the admin. The page tree in the admin — and the page-link
+autocomplete used by the smart-link field, which mirrors it — list
+*every* page on a site to any staff user who can edit at least one
+page on that site. Such a user can therefore see the titles, paths,
+and URLs of restricted, login-required, and draft pages, even ones
+they cannot view on the front end or edit. Per-page edit permissions
+gate the *actions* offered on each node (edit, move, delete), not
+whether the node is listed.
+
+In other words, a page title or path is not a secret from your staff
+editors. If a page's *existence* must be hidden from some staff users,
+the page tree is the wrong tool: keep that content on a separate site
+(see :setting:`CMS_PERMISSION` and multi-site setups) or outside the
+CMS, rather than relying on a view restriction to conceal it in the
+admin.
+
 
 ********
 Strategy
