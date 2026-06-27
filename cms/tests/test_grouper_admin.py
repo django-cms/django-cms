@@ -621,6 +621,18 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         self.assertContains(response, content.secret_greeting)
         self.assertContains(response, 'id="page_form_lang_tabs"')
 
+    def test_nonexistent_content_pk_falls_back_to_latest(self) -> None:
+        """A syntactically valid but nonexistent content pk falls back to the latest content."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        nonexistent_pk = content.pk + 1
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(
+                f"{self.change_url}?language=en&{param}={nonexistent_pk}"
+            )
+        self.assertContains(response, content.secret_greeting)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
     @wo_content_permission
     def test_change_form_wo_write_permit(self) -> None:
         """If no change permission exists for content mark content fields readonly."""
