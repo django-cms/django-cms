@@ -194,9 +194,9 @@ CMS, rather than relying on a view restriction to conceal it in the
 admin.
 
 
-*******************************
+*************************
 Delegated user management
-*******************************
+*************************
 
 With ``CMS_PERMISSION = True`` a non-superuser can be given the right
 to manage *other* users — the "Users" and "User groups" entries in the
