@@ -1553,6 +1553,32 @@ class PageTest(PageTestBase):
                 content_admin.slug(content2)
                 content_admin.overwrite_url(content2)
 
+    def test_change_view_shows_language_tabs_for_latest_content(self):
+        """The page content change view offers the language selector for the latest content."""
+        superuser = self.get_superuser()
+        page = self.get_page()
+        content = self.get_pagecontent_obj(page, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        with self.login_user_context(superuser):
+            response = self.client.get(change_url)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_change_view_drops_language_tabs_for_non_latest_content(self):
+        """The page content change view drops the language selector when an older (non-latest)
+        content object is shown. Switching languages back and forth would otherwise silently bring
+        up the latest content instead - confusing UX."""
+        superuser = self.get_superuser()
+        page = self.get_page()
+        content = self.get_pagecontent_obj(page, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        # Simulate a versioning package: the latest content for this language differs from the
+        # content object being shown.
+        fake_latest = type("FakeContent", (), {"pk": content.pk + 1000})()
+        with patch("cms.models.pagemodel.Page.get_admin_content", return_value=fake_latest):
+            with self.login_user_context(superuser):
+                response = self.client.get(change_url)
+        self.assertNotContains(response, 'id="page_form_lang_tabs"')
+
     def _parse_page_tree(self, response, parser_class):
         content = response.content
         content = content.decode(response.charset)
