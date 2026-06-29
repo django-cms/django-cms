@@ -2724,6 +2724,20 @@ class ToolbarAPITests(TestCase):
         self.assertNotEqual(result, None)
         self.assertEqual(result.index, 0)
 
+    def test_find_item_lazy_matches_source_not_translation(self):
+        # Lazy (gettext_lazy) names are matched by their *source* string, independent of the
+        # active language. Third-party apps must therefore search by the untranslated string.
+        api = ToolbarAPIMixin()
+        with override("de"):
+            label = _("Save")
+            # Sanity check: the German catalog is active, so the label actually translates.
+            self.assertNotEqual(str(label), "Save")
+            api.add_link_item(label, None)
+            # Found by the untranslated source string...
+            self.assertIsNotNone(api.find_first(LinkItem, name="Save"))
+            # ...but not by its translation.
+            self.assertIsNone(api.find_first(LinkItem, name=str(label)))
+
     def test_not_is_staff(self):
         request = RequestFactory().get("/en/")
         request.session = {}

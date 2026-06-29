@@ -42,10 +42,25 @@ class ItemSearchResult:
 
 
 def may_be_lazy(thing):
+    """Normalise a (possibly lazy) attribute value for comparison in the find APIs.
+
+    Toolbar item names are frequently ``gettext_lazy`` strings. To let callers
+    -- including third-party apps -- look items up by their *source* (English)
+    string regardless of the active language, we compare against the lazy
+    callable's source argument rather than its resolved/translated value.
+
+    ``Promise._args`` is a private Django internal; there is no public API to
+    recover a lazy's source argument. Only single-argument lazies such as
+    ``_("label")`` have a meaningful source string, so anything else (e.g.
+    ``format_lazy``) falls back to its resolved value instead of raising -- the
+    find APIs run this over *every* candidate, so a crash here would break
+    unrelated lookups too.
+    """
     if isinstance(thing, Promise):
-        return thing._args[0]
-    else:
-        return thing
+        if len(thing._args) == 1:
+            return thing._args[0]
+        return force_str(thing)
+    return thing
 
 
 class ToolbarAPIMixin(metaclass=ABCMeta):
@@ -108,7 +123,18 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
 
     def find_items(self, item_type, **attributes):
         """Returns a list of :class:`~cms.toolbar.items.ItemSearchResult` objects matching all items of ``item_type``
-        (e.g. ``LinkItem``)."""
+        (e.g. ``LinkItem``).
+
+        Items whose attributes are lazy (e.g. a ``gettext_lazy`` ``name``) are matched by their
+        *source* string, not their translation. Search for an item by the original (untranslated,
+        usually English) string -- e.g. ``find_items(LinkItem, name="Save")`` -- so the lookup works
+        regardless of the active language. Passing the lazy itself or a translated string is not
+        reliable across languages.
+
+        This source matching only works for single-argument lazies such as ``_("Save")``. Composite
+        lazy values -- e.g. ``format_lazy("Save {}", model_name)`` -- have no single source string and
+        are matched by their *resolved* (translated) value, so they cannot be looked up
+        language-independently. Give such items a stable ``identifier`` and search by that instead."""
         results = []
         attr_items = attributes.items()
         notfound = object()
