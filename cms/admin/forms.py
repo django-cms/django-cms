@@ -110,13 +110,22 @@ def get_main_language_page_content_template(new_page):
     return None
 
 
+# Permission actions managed by the CMS permission forms (Django's defaults).
+CMS_PERMISSION_ACTIONS = ("add", "change", "delete")
+
+# Maps each ``can_<action>_<name>`` permission group to the model whose
+# permission governs it. Used to render, read and authorize the checkboxes.
+CMS_PERMISSION_MODELS = (
+    (Page, "page"),
+    (PageUser, "pageuser"),
+    (PagePermission, "pagepermission"),
+)
+
+
 def save_permissions(data, obj):
-    models = (
-        (Page, "page"),
-        (PageUser, "pageuser"),
-        (PageUserGroup, "pageuser"),
-        (PagePermission, "pagepermission"),
-    )
+    # ``PageUserGroup`` shares the ``pageuser`` field with ``PageUser`` but has
+    # its own content type, so the permission must be (un)assigned on both.
+    models = (*CMS_PERMISSION_MODELS, (PageUserGroup, "pageuser"))
 
     if not obj.pk:
         # save obj, otherwise we can't assign permissions to him
@@ -126,7 +135,7 @@ def save_permissions(data, obj):
 
     for model, name in models:
         content_type = ContentType.objects.get_for_model(model)
-        for key in ("add", "change", "delete"):
+        for key in CMS_PERMISSION_ACTIONS:
             # add permission `key` for model `model`
             codename = get_permission_codename(key, model._meta)
             permission = Permission.objects.get(content_type=content_type, codename=codename)
@@ -1304,7 +1313,6 @@ class GenericCmsPermissionForm(forms.ModelForm):
     # Maps the ``can_<action>_<name>`` permission fields to the model whose
     # permission they grant. Mirrors ``save_permissions`` and the fieldsets
     # rendered by ``PageUserGroupAdmin``/``PageUserAdmin``.
-    _permission_models = ((Page, "page"), (PageUser, "pageuser"), (PagePermission, "pagepermission"))
 
     def __init__(self, *args, **kwargs):
         instance = kwargs.get("instance")
@@ -1381,8 +1389,8 @@ class GenericCmsPermissionForm(forms.ModelForm):
         untouched as well.
         """
         user = self._current_user
-        for model, name in self._permission_models:
-            for action in ("add", "change", "delete"):
+        for model, name in CMS_PERMISSION_MODELS:
+            for action in CMS_PERMISSION_ACTIONS:
                 field = f"can_{action}_{name}"
                 if field not in self.fields:
                     continue
@@ -1395,11 +1403,10 @@ class GenericCmsPermissionForm(forms.ModelForm):
         initials = {}
         permission_accessor = get_permission_accessor(obj)
 
-        for model in (Page, PageUser, PagePermission):
-            name = model.__name__.lower()
+        for model, name in CMS_PERMISSION_MODELS:
             content_type = ContentType.objects.get_for_model(model)
             permissions = permission_accessor.filter(content_type=content_type).values_list("codename", flat=True)
-            for key in ("add", "change", "delete"):
+            for key in CMS_PERMISSION_ACTIONS:
                 codename = get_permission_codename(key, model._meta)
                 initials[f"can_{key}_{name}"] = codename in permissions
         return initials
