@@ -1133,6 +1133,36 @@ class ToolbarModeTests(ToolbarTestBase):
         self.assertTrue(toolbar.structure_mode_active)
         self.assertFalse(toolbar.preview_mode_active)
 
+    def _use_structure_permission(self):
+        return Permission.objects.get(
+            content_type__app_label="cms", codename="use_structure"
+        )
+
+    def test_structure_switcher_shown_to_view_only_user_with_use_structure(self):
+        """Structure mode is a read affordance: view permission is enough.
+
+        Viewing the structure board only requires view permission (mutations
+        stay gated by change permission at the plugin endpoints), so a user with
+        ``cms.use_structure`` who may view — but not change — an unrestricted
+        page is still offered the structure switcher.
+        """
+        page = create_page("normal", "nav_playground.html", "en")
+        page_content = page.get_content_obj("en")
+        user = self.get_staff_user_with_no_permissions()
+        user.user_permissions.add(self._use_structure_permission())
+        with self.login_user_context(user):
+            response = self.client.get(get_object_edit_url(page_content, language="en"))
+        self.assertContains(response, 'title="Toggle structure"')
+
+    def test_structure_switcher_hidden_without_use_structure(self):
+        """Without ``cms.use_structure`` the switcher stays hidden."""
+        page = create_page("normal", "nav_playground.html", "en")
+        page_content = page.get_content_obj("en")
+        user = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(user):
+            response = self.client.get(get_object_edit_url(page_content, language="en"))
+        self.assertNotContains(response, 'title="Toggle structure"')
+
 
 @override_settings(ROOT_URLCONF="cms.test_utils.project.placeholderapp_urls")
 class EditModelTemplateTagTest(ToolbarTestBase):

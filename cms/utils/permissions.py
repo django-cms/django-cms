@@ -58,6 +58,28 @@ def get_model_permission_codename(model, action):
     return opts.app_label + '.' + get_permission_codename(action, opts)
 
 
+def user_can_view_placeholder_source(user, source):
+    """Whether ``user`` may view the placeholders attached to ``source``.
+
+    Viewing the (read-only) structure board of a frontend-editable object
+    requires only *view* permission; mutating its plugins stays gated by
+    change permission at the plugin endpoints. This lets headless reviewers
+    inspect content structure without edit rights.
+
+    Honours a custom ``has_placeholder_view_permission`` hook on the object
+    and otherwise grants access to users holding the model/object ``view`` or
+    ``change`` permission (change implies the right to view).
+    """
+    if hasattr(source, "has_placeholder_view_permission"):
+        return source.has_placeholder_view_permission(user)
+    model = type(source)
+    perms = (
+        get_model_permission_codename(model, "view"),
+        get_model_permission_codename(model, "change"),
+    )
+    return any(user.has_perm(perm) or user.has_perm(perm, source) for perm in perms)
+
+
 def _has_global_permission(user, site, action):
     if not user.is_authenticated:
         return False
