@@ -523,13 +523,7 @@ class DuplicatePageForm(AddPageForm):
         # ``source`` is a hidden field whose value is fully controlled by the
         # client on POST and whose queryset spans every page on every site.
         # ``has_add_permission`` only checks that the user may create *a* page,
-        # not that they may read ``source``. Without an explicit object-level
-        # check, a staff user with only "add page" rights could duplicate (and
-        # thereby read the plugin content of) any page -- bypassing per-page
-        # view restrictions and multi-site isolation (CWE-639 / CWE-862).
-        # ``copy(..., permissions=False)`` even strips the source's view
-        # restrictions, leaving the copy fully readable. Require that the user
-        # is actually allowed to view the page they are copying.
+        # not that they may read ``source``.
         if source and not user_can_view_page(self._user, source):
             raise ValidationError(_("You do not have permission to copy this page."))
         return source
