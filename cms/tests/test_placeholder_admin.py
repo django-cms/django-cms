@@ -31,6 +31,48 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugins.count(), 1)
 
+    def test_add_plugin_rejected_in_disallowed_slot(self):
+        """A plugin with allowed_slots cannot be added to a slot it does not allow."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="sidebar")
+        plugins = placeholder.get_plugins("en").filter(plugin_type="LinkPlugin")
+        uri = self.get_add_plugin_uri(
+            placeholder=placeholder,
+            plugin_type="LinkPlugin",
+            language="en",
+        )
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {"name": "A Link", "external_link": "https://www.django-cms.org"}
+                response = self.client.post(uri, data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(plugins.count(), 0)
+
+    def test_add_plugin_allowed_in_listed_slot(self):
+        """A plugin with allowed_slots can be added to a slot it allows."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="content")
+        plugins = placeholder.get_plugins("en").filter(plugin_type="LinkPlugin")
+        uri = self.get_add_plugin_uri(
+            placeholder=placeholder,
+            plugin_type="LinkPlugin",
+            language="en",
+        )
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {"name": "A Link", "external_link": "https://www.django-cms.org"}
+                response = self.client.post(uri, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(plugins.count(), 1)
+
     def test_add_plugin_with_ghost(self):
         """Adding a text plugin works. Text plugins create a ghost plugin."""
         superuser = self.get_superuser()
@@ -438,6 +480,32 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
         # No cycle: parent stays at the root, child stays under parent.
         self.assertIsNone(parent.parent_id)
         self.assertEqual(child.parent_id, parent.pk)
+
+    def test_move_plugin_rejected_into_disallowed_slot(self):
+        """A plugin with allowed_slots cannot be moved into a slot it does not allow."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source = Placeholder.objects.create(slot="content")
+        target = Placeholder.objects.create(slot="sidebar")
+        plugin = add_plugin(source, "LinkPlugin", "en", name="link", external_link="https://example.com")
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        endpoint = self.get_move_plugin_uri(plugin)
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "plugin_id": plugin.pk,
+                    "placeholder_id": target.pk,
+                    "target_language": "en",
+                    "target_position": 1,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 400)
+        plugin.refresh_from_db()
+        # The plugin stays in its original placeholder.
+        self.assertEqual(plugin.placeholder_id, source.pk)
 
     def test_copy_plugin_to_clipboard_requires_source_permission(self):
         """Copying a plugin to the clipboard must check source-side permission.

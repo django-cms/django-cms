@@ -1500,6 +1500,12 @@ class PluginAddValidationForm(forms.Form):
         page = placeholder.page
         template = page.get_template() if page else None
 
+        plugin_class = plugin_pool.get_plugin(data["plugin_type"])
+        if not plugin_class.is_allowed_in_slot(placeholder.slot):
+            message = gettext("Plugin %(plugin)s is not allowed in placeholder '%(slot)s'.")
+            self.add_error(None, message % {"plugin": plugin_class.__name__, "slot": placeholder.slot})
+            return self.cleaned_data
+
         try:
             has_reached_plugin_limit(placeholder, data["plugin_type"], language, template=template)
         except PluginLimitReached as error:

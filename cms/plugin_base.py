@@ -1,3 +1,4 @@
+import fnmatch
 import json
 import re
 from collections.abc import Callable
@@ -207,6 +208,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     See also: Model's ``allowed_plugins`` attribute for model-level restrictions.
     """
 
+    allowed_slots = None
+    """Plugin-level restriction: A list of placeholder slot names where this plugin can be added.
+
+    Each entry may be an exact slot name or a glob pattern (e.g. ``"content"`` or ``"footer_*"``),
+    matched against the placeholder's ``slot``.
+
+    - If ``None`` (default): The plugin can be added to any slot.
+    - If a list/tuple is provided: The plugin can only be added to slots matching one of the entries.
+    - If an empty list ``[]``: The plugin cannot be added to any slot.
+
+    This is the plugin-side counterpart to the ``plugins``/``excluded_plugins`` keys of
+    ``CMS_PLACEHOLDER_CONF``. Both filters must pass for the plugin to be available in a slot.
+
+    See also: :attr:`allowed_models`, ``CMS_PLACEHOLDER_CONF``.
+    """
+
     allow_children = False
     """Allows this plugin to have child plugins - other plugins placed inside it?
 
@@ -374,6 +391,17 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         context["instance"] = instance
         context["placeholder"] = placeholder
         return context
+
+    @classmethod
+    def is_allowed_in_slot(cls, slot: str | None) -> bool:
+        """Return whether this plugin may be added to a placeholder with the given ``slot``.
+
+        Honours the :attr:`allowed_slots` plugin-level restriction. A ``slot`` of ``None``
+        (an unbound query, e.g. the global plugin listing) is always allowed.
+        """
+        if cls.allowed_slots is None or slot is None:
+            return True
+        return any(fnmatch.fnmatchcase(slot, pattern) for pattern in cls.allowed_slots)
 
     @classmethod
     def requires_parent_plugin(cls, slot, page):

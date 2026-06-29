@@ -734,6 +734,12 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         source_placeholder = plugin.placeholder
 
         if placeholder and placeholder != source_placeholder:
+            if not move_to_clipboard:
+                plugin_class = plugin_pool.get_plugin(plugin.plugin_type)
+                if not plugin_class.is_allowed_in_slot(placeholder.slot):
+                    return HttpResponseBadRequest(
+                        f"Plugin {plugin.plugin_type} is not allowed in placeholder '{placeholder.slot}'."
+                    )
             try:
                 template = self.get_placeholder_template(request, placeholder)
                 has_reached_plugin_limit(placeholder, plugin.plugin_type,
