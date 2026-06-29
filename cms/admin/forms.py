@@ -49,8 +49,10 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
+from cms.utils.page_permissions import user_can_view_page
 from cms.utils.permissions import (
     get_current_user,
+    get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
     get_user_permission_level,
@@ -515,6 +517,22 @@ class DuplicatePageForm(AddPageForm):
         required=True,
         widget=forms.HiddenInput(),
     )
+
+    def clean_source(self):
+        source = self.cleaned_data.get("source")
+        # ``source`` is a hidden field whose value is fully controlled by the
+        # client on POST and whose queryset spans every page on every site.
+        # ``has_add_permission`` only checks that the user may create *a* page,
+        # not that they may read ``source``. Without an explicit object-level
+        # check, a staff user with only "add page" rights could duplicate (and
+        # thereby read the plugin content of) any page -- bypassing per-page
+        # view restrictions and multi-site isolation (CWE-639 / CWE-862).
+        # ``copy(..., permissions=False)`` even strips the source's view
+        # restrictions, leaving the copy fully readable. Require that the user
+        # is actually allowed to view the page they are copying.
+        if source and not user_can_view_page(self._user, source):
+            raise ValidationError(_("You do not have permission to copy this page."))
+        return source
 
 
 def url_is_locked(page_content: PageContent) -> bool:
@@ -1289,6 +1307,11 @@ class GenericCmsPermissionForm(forms.ModelForm):
     can_change_pagepermission = forms.BooleanField(label=_("Change"), required=False)
     can_delete_pagepermission = forms.BooleanField(label=_("Delete"), required=False)
 
+    # Maps the ``can_<action>_<name>`` permission fields to the model whose
+    # permission they grant. Mirrors ``save_permissions`` and the fieldsets
+    # rendered by ``PageUserGroupAdmin``/``PageUserAdmin``.
+    _permission_models = ((Page, "page"), (PageUser, "pageuser"), (PagePermission, "pagepermission"))
+
     def __init__(self, *args, **kwargs):
         instance = kwargs.get("instance")
         initial = kwargs.get("initial") or {}
@@ -1345,6 +1368,33 @@ class GenericCmsPermissionForm(forms.ModelForm):
                     "to change permissions. Edit permissions required."
                 )
                 raise ValidationError(message)
+
+        # Enforce "nobody can grant more than they have" at the data layer.
+        self._drop_unauthorized_permissions(data)
+        return data
+
+    def _drop_unauthorized_permissions(self, data):
+        """Remove ``can_*`` entries the current manager is not allowed to manage.
+
+        ``PageUserGroupAdmin.get_fieldsets`` only *renders* the permission
+        checkboxes the manager actually holds, but the ``can_*`` fields are
+        declared on this form and therefore stay in ``base_fields`` regardless
+        of the admin's ``fields=`` restriction. A crafted POST can set the
+        hidden ones, and ``save_permissions`` would then grant them -- letting a
+        delegated manager escalate a group beyond their own rights (CWE-269).
+        Dropping the unauthorized entries here means they are neither granted
+        nor revoked, so any existing value the manager may not touch is left
+        untouched as well.
+        """
+        user = self._current_user
+        for model, name in self._permission_models:
+            for action in ("add", "change", "delete"):
+                field = f"can_{action}_{name}"
+                if field not in self.fields:
+                    continue
+                if user is None or not user.has_perm(get_model_permission_codename(model, action)):
+                    data.pop(field, None)
+        return data
 
     def populate_initials(self, obj):
         """Read out permissions from permission system."""
