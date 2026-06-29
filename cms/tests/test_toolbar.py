@@ -1529,7 +1529,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                     "example1",
                     "date_field",
                     ex1.pk,
-                    ex1.date_field.strftime("%b. %d, %Y" if DJANGO_4_2 else "%b. %-d, %Y"),
+                    ex1.date_field.strftime("%b. %d, %Y").replace(" 0", " "),
                 ),
             )
 
