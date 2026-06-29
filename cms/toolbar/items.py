@@ -7,7 +7,6 @@ from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 from cms.constants import LEFT, REFRESH_PAGE, RIGHT, URL_CHANGE
-from cms.utils.compat import DJANGO_4_2
 
 
 class ItemSearchResult:
@@ -42,18 +41,11 @@ class ItemSearchResult:
         return self.index
 
 
-if DJANGO_4_2:
-    def may_be_lazy(thing):
-        if isinstance(thing, Promise):
-            return thing._proxy____args[0]
-        else:
-            return thing
-else:
-    def may_be_lazy(thing):
-        if isinstance(thing, Promise):
-            return thing._args[0]
-        else:
-            return thing
+def may_be_lazy(thing):
+    if isinstance(thing, Promise):
+        return thing._args[0]
+    else:
+        return thing
 
 
 class ToolbarAPIMixin(metaclass=ABCMeta):
