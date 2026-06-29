@@ -48,6 +48,7 @@ from cms.utils.i18n import (
 )
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_view_page
+from cms.utils.permissions import user_can_view_placeholder_source
 from cms.utils.placeholder import get_declared_placeholders_for_obj, get_placeholder_conf
 
 
@@ -264,6 +265,11 @@ def render_object_structure(request, content_type_id, object_id):
                 raise Http404
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+            # Viewing the structure board requires only view permission (as the
+            # page branch above does via user_can_view_page). Mutations remain
+            # gated by change permission at the plugin endpoints.
+            if not user_can_view_placeholder_source(request.user, content_type_obj):
+                raise Http404
     except ObjectDoesNotExist as err:
         raise Http404 from err
 

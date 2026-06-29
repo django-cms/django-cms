@@ -192,6 +192,9 @@ class PageContent(models.Model):
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)
 
+    def has_placeholder_view_permission(self, user):
+        return self.page.has_view_permission(user)
+
     def has_publish_permission(self, user):
         return self.page.has_publish_permission(user)
 
