@@ -1,7 +1,15 @@
 // CSP-safe replacement for the previously inline script in templates/cms/welcome.html
 // Reads its configuration from the #cms-welcome-config element's data-* attributes
 // so that no inline JavaScript (and no template interpolation into JS) is required.
+
 (function () {
+    /**
+     * Reads configuration from #cms-welcome-config and either redirects anonymous
+     * users to the login page or wires up the wizard modal for authenticated users.
+     *
+     * @function init
+     * @returns {void}
+     */
     function init() {
         var config = document.getElementById('cms-welcome-config');
 
