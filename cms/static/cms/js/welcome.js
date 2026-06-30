@@ -33,9 +33,10 @@
         }
 
         var buttons = document.querySelectorAll('.js-welcome-add');
+        var i;
 
-        buttons.forEach(function (btn) {
-            btn.addEventListener('click', function (e) {
+        for (i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function (e) {
                 e.preventDefault();
                 var modal = new CMS.Modal();
 
@@ -44,7 +45,7 @@
                     title: config.dataset.addTitle
                 });
             });
-        });
+        }
     }
 
     if (document.readyState === 'loading') {
