@@ -6,10 +6,9 @@ from cms.api import create_page, create_page_content
 from cms.models import PageUrl
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 
-protocol = "http" if DJANGO_4_2 else "https"
+protocol = "https"
 
 
 class SitemapTestCase(CMSTestCase):

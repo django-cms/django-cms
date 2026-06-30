@@ -1,2 +1,0 @@
--r requirements_base.txt
-Django>=4.2,<4.3
