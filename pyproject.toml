@@ -30,11 +30,9 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Framework :: Django",
-  "Framework :: Django :: 4.2",
-  "Framework :: Django :: 5.0",
-  "Framework :: Django :: 5.1",
   "Framework :: Django :: 5.2",
   "Framework :: Django :: 6.0",
+  "Framework :: Django :: 6.1",
   "Topic :: Internet :: WWW/HTTP",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
   "Topic :: Software Development",
@@ -43,7 +41,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 dependencies = [
-  "Django >= 4.2.26",
+  "Django >= 5.2",
   "django-classy-tags >=0.7.2",
   "django-formtools >=2.1",
   "django-treebeard >=4.3",
