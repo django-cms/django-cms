@@ -174,6 +174,31 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(placeholder.get_plugins("en").count(), 0)
 
+    def test_clear_clipboard_requires_post(self):
+        """
+        Clearing the clipboard mutates state immediately (no confirmation
+        page), so it must reject CSRF-exempt GET requests. A GET leaves the
+        clipboard untouched; a POST clears it.
+        """
+        superuser = self.get_superuser()
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=superuser,
+            clipboard=Placeholder.objects.create(slot="clipboard"),
+        )
+        self._add_plugin_to_placeholder(user_settings.clipboard)
+        endpoint = self.get_clear_placeholder_url(user_settings.clipboard)
+
+        with self.login_user_context(superuser):
+            get_response = self.client.get(endpoint)
+            self.assertEqual(get_response.status_code, 405)
+            # The clipboard was not cleared by the GET request.
+            self.assertEqual(user_settings.clipboard.get_plugins("en").count(), 1)
+
+            post_response = self.client.post(endpoint)
+            self.assertEqual(post_response.status_code, 200)
+            self.assertEqual(user_settings.clipboard.get_plugins("en").count(), 0)
+
     def _fill_page_body(self, page, lang):
         ph_en = page.get_placeholders(lang).get(slot="placeholder")
         # add misc plugins
