@@ -138,6 +138,32 @@ class PlaceholderAdminTestCase(CMSTestCase):
         # Nothing was copied into the disallowed target slot.
         self.assertFalse(target_placeholder.get_plugins("en").exists())
 
+    def test_copy_plugins_allowed_into_listed_slot(self):
+        """A plugin with allowed_slots can be copied into a slot it allows."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source_placeholder = Placeholder.objects.create(slot="content")
+        target_placeholder = Placeholder.objects.create(slot="sidebar")
+        source_plugin = self._add_plugin_to_placeholder(source_placeholder)
+        endpoint = self.get_copy_plugin_uri(source_plugin)
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        with patch.object(LinkPlugin, "allowed_slots", ["content", "sidebar"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "source_language": "en",
+                    "source_placeholder_id": source_placeholder.pk,
+                    "target_language": "en",
+                    "target_placeholder_id": target_placeholder.pk,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            target_placeholder.get_plugins("en").filter(plugin_type="LinkPlugin").exists()
+        )
+
     def test_copy_plugins_to_clipboard(self):
         """
         User can copy plugins from a placeholder to the clipboard
@@ -559,6 +585,32 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
         parent.refresh_from_db()
         # The subtree stays in its original placeholder.
         self.assertEqual(parent.placeholder_id, source.pk)
+
+    def test_move_plugin_allowed_into_listed_slot(self):
+        """A plugin with allowed_slots can be moved into a slot it allows."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source = Placeholder.objects.create(slot="content")
+        target = Placeholder.objects.create(slot="sidebar")
+        plugin = add_plugin(source, "LinkPlugin", "en", name="link", external_link="https://example.com")
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        endpoint = self.get_move_plugin_uri(plugin)
+        with patch.object(LinkPlugin, "allowed_slots", ["content", "sidebar"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "plugin_id": plugin.pk,
+                    "placeholder_id": target.pk,
+                    "target_language": "en",
+                    "target_position": 1,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        plugin.refresh_from_db()
+        # The plugin moved into the allowed target placeholder.
+        self.assertEqual(plugin.placeholder_id, target.pk)
 
     def test_copy_plugin_to_clipboard_requires_source_permission(self):
         """Copying a plugin to the clipboard must check source-side permission.

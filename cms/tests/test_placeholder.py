@@ -1305,6 +1305,12 @@ class PlaceholderConfTests(TestCase):
             # An empty list forbids every slot.
             self.assertFalse(LinkPlugin.is_allowed_in_slot("content"))
 
+        with patch.object(LinkPlugin, "allowed_slots", "content"):
+            # A bare string is treated as a single pattern, not iterated per character.
+            self.assertTrue(LinkPlugin.is_allowed_in_slot("content"))
+            self.assertFalse(LinkPlugin.is_allowed_in_slot("sidebar"))
+            self.assertFalse(LinkPlugin.is_allowed_in_slot("c"))
+
     def test_get_all_plugins_respects_allowed_slots(self):
         page = create_page("page", "col_two.html", "en")
         placeholder = page.get_placeholders("en").get(slot="col_left")
@@ -1316,6 +1322,23 @@ class PlaceholderConfTests(TestCase):
             # The plugin is available in a slot it allows.
             allowed = list(plugin_pool.get_all_plugins("col_right", placeholder.source))
             self.assertIn(LinkPlugin, allowed)
+
+    def test_get_plugin_disallowed_in_slot(self):
+        from cms.utils.plugins import get_plugin_disallowed_in_slot
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            # The offending plugin type is returned for a disallowed slot.
+            self.assertEqual(
+                get_plugin_disallowed_in_slot(["LinkPlugin"], "sidebar"), "LinkPlugin"
+            )
+            # Every plugin is allowed -> nothing is reported.
+            self.assertIsNone(get_plugin_disallowed_in_slot(["LinkPlugin"], "content"))
+            # Unregistered plugin types are skipped (treated as allowed).
+            self.assertIsNone(
+                get_plugin_disallowed_in_slot(["DoesNotExistPlugin"], "sidebar")
+            )
 
 
 class PlaceholderPluginTestsBase(CMSTestCase):

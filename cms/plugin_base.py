@@ -401,7 +401,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         if cls.allowed_slots is None or slot is None:
             return True
-        return any(fnmatch.fnmatchcase(slot, pattern) for pattern in cls.allowed_slots)
+        # Tolerate a bare string (e.g. ``allowed_slots = "content"``) instead of
+        # iterating over its characters, which would silently misbehave.
+        patterns = [cls.allowed_slots] if isinstance(cls.allowed_slots, str) else cls.allowed_slots
+        return any(fnmatch.fnmatchcase(slot, pattern) for pattern in patterns)
 
     @classmethod
     def requires_parent_plugin(cls, slot, page):
