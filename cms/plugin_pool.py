@@ -270,6 +270,11 @@ class PluginPool:
             # Check that plugins are not in the list of the excluded ones
             plugins = (plugin for plugin in plugins if plugin.__name__ not in excluded_plugins)
 
+        if placeholder is not None:
+            # Honour each plugin's allowed_slots restriction (plugin-side counterpart to the
+            # placeholder's plugins/excluded_plugins config).
+            plugins = (plugin for plugin in plugins if plugin.is_allowed_in_slot(placeholder))
+
         if root_plugin:
             # Filters out any plugin that requires a parent or has set parent classes
             plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
