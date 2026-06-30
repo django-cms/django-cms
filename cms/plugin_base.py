@@ -348,15 +348,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             raise ValidationError("plugin has no render_template: %s" % self.__class__)
         return template
 
-    if DJANGO_5_1:
-        # Avoid a bug in Django's template engine that is incompatible with Python 3.9+
-        # type hinting. By default, the parent class has no __class_getitem__ method.
-        # There exist third-party packages, however, that inject type hinting into Django.
-        # This ensures, that any type hinting is ignored for CMSPlugin (below Django 5.2)
-        # See https://github.com/django-cms/django-cms/issues/7948
-        def __class_getitem__(cls, item):
-            raise TypeError
-
     @classmethod
     def get_render_queryset(cls):
         return cls.model._default_manager.all()
