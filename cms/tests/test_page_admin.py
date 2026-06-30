@@ -38,7 +38,6 @@ from cms.test_utils.util.context_managers import (
     override_placeholder_conf,
 )
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -308,18 +307,11 @@ class PageTest(PageTestBase):
 
             response = self.client.post(add_endpoint, page_data)
             new_page = Page.objects.only("id").latest("id")
-            if DJANGO_5_1:
-                expected_error = (
-                    '<ul class="errorlist"><li>Page '
-                    '<a href="{}" target="_blank">test page 1</a> '
-                    "has the same url 'test-page-1' as current page.</li></ul>"
-                ).format(self.get_page_change_uri("en", new_page))
-            else:
-                expected_error = (
-                    '<ul class="errorlist" id="id_slug_error"><li>Page '
-                    '<a href="{}" target="_blank">test page 1</a> '
-                    "has the same url 'test-page-1' as current page.</li></ul>"
-                ).format(self.get_page_change_uri("en", new_page))
+            expected_error = (
+                '<ul class="errorlist" id="id_slug_error"><li>Page '
+                '<a href="{}" target="_blank">test page 1</a> '
+                "has the same url 'test-page-1' as current page.</li></ul>"
+            ).format(self.get_page_change_uri("en", new_page))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error)
 
@@ -339,18 +331,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data(page.pk)
                 page_data["slug"] = "subpage"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">subpage</a> '
-                        "has the same url 'page/subpage' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", sub_page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">subpage</a> '
-                        "has the same url 'page/subpage' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", sub_page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">subpage</a> '
+                    "has the same url 'page/subpage' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", sub_page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -359,18 +344,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data()
                 page_data["slug"] = "child-page"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">child-page</a> '
-                        "has the same url 'child-page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", child_page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">child-page</a> '
-                        "has the same url 'child-page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", child_page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">child-page</a> '
+                    "has the same url 'child-page' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", child_page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -379,18 +357,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data()
                 page_data["slug"] = "page"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">page</a> '
-                        "has the same url 'page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">page</a> '
-                        "has the same url 'page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">page</a> '
+                    "has the same url 'page' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -426,10 +397,7 @@ class PageTest(PageTestBase):
         data["template"] = page.template
         endpoint = self.get_page_change_uri("en", page)
         redirect_to = self.get_pages_admin_list_uri("en")
-        if DJANGO_5_1:
-            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
-        else:
-            validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
+        validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
 
         with self.subTest("Test that a redirect to the root page (valid)"):
             with self.login_user_context(superuser):
@@ -1170,13 +1138,9 @@ class PageTest(PageTestBase):
         cms_page = create_page("page", "nav_playground.html", "en")
         translation = cms_page.get_content_obj("en", fallback=False)
         expected = (
-            ('<input id="id_overwrite_url" maxlength="255" ' 'value="new-url" name="overwrite_url" type="text" />')
-            if DJANGO_4_2
-            else (
-                '<input type="text" name="overwrite_url" value="new-url" '
-                'maxlength="255" aria-describedby="id_overwrite_url_helptext" '
-                'id="id_overwrite_url">'
-            )
+            '<input type="text" name="overwrite_url" value="new-url" '
+            'maxlength="255" aria-describedby="id_overwrite_url_helptext" '
+            'id="id_overwrite_url">'
         )
         changelist = self.get_pages_admin_list_uri()
         endpoint = self.get_page_change_uri("en", cms_page)
@@ -1203,18 +1167,11 @@ class PageTest(PageTestBase):
         boo = create_page("boo", "nav_playground.html", "en")
         hoo = create_page("hoo", "nav_playground.html", "en")
         translation = hoo.get_content_obj("en", fallback=False)
-        if DJANGO_5_1:
-            expected_error = (
-                '<ul class="errorlist"><li>Page '
-                '<a href="{}" target="_blank">boo</a> '
-                "has the same url 'boo' as current page \"hoo\".</li></ul>"
-            ).format(self.get_page_change_uri("en", boo))
-        else:
-            expected_error = (
-                '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
-                '<a href="{}" target="_blank">boo</a> '
-                "has the same url 'boo' as current page \"hoo\".</li></ul>"
-            ).format(self.get_page_change_uri("en", boo))
+        expected_error = (
+            '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
+            '<a href="{}" target="_blank">boo</a> '
+            "has the same url 'boo' as current page \"hoo\".</li></ul>"
+        ).format(self.get_page_change_uri("en", boo))
 
         with self.login_user_context(superuser):
             endpoint = self.get_page_change_uri("en", hoo)
@@ -1239,12 +1196,8 @@ class PageTest(PageTestBase):
         )
         translation = cms_page.get_content_obj("en", fallback=False)
         expected = (
-            ('<input id="id_overwrite_url" maxlength="255" ' 'name="overwrite_url" type="text" />')
-            if DJANGO_4_2
-            else (
-                '<input type="text" name="overwrite_url" maxlength="255" '
-                'aria-describedby="id_overwrite_url_helptext" id="id_overwrite_url">'
-            )
+            '<input type="text" name="overwrite_url" maxlength="255" '
+            'aria-describedby="id_overwrite_url_helptext" id="id_overwrite_url">'
         )
         changelist = self.get_pages_admin_list_uri()
         endpoint = self.get_page_change_uri("en", cms_page)
