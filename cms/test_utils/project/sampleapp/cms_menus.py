@@ -70,7 +70,12 @@ class StaticMenu4(CMSAttachMenu):
     def get_nodes(self, request):
         nodes = list()
         nodes.append(NavigationNode('static fresh', '/static/fresh/', 'static fresh'))
-        nodes.append(NavigationNode('sample2-root', reverse('sample2-root'), 'sample2-root'))
+        try:
+            # 'sample2-root' only resolves while the sample2 apphook is attached;
+            # skip it gracefully otherwise instead of letting menu_pool log it.
+            nodes.append(NavigationNode('sample2-root', reverse('sample2-root'), 'sample2-root'))
+        except NoReverseMatch:
+            pass
         return nodes
 
 
