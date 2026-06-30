@@ -14,6 +14,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpRequest
 from django.template import Context
 from django.utils.functional import cached_property
+from django.utils.html import format_html
 from django.utils.module_loading import import_string
 from django.utils.safestring import SafeText, mark_safe
 from django.utils.translation import get_language, override
@@ -598,7 +599,7 @@ class ContentRenderer(BaseRenderer):
                 html = reporter.get_traceback_html()
             else:
                 html = ""
-            heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
+            heading = format_html('<h2 class="cms-rendering-exception-title">{}</h2>', message)
             if "_last_plugin" in context:
                 # Make error message editable by double-click to open the editor for the plugin causing the exception
                 instance = context["_last_plugin"]
