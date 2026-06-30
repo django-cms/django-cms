@@ -131,8 +131,8 @@ class TemplatetagTests(CMSTestCase):
     def test_placeholder_is_immutable_filter(self):
         template = """
             {% load cms_admin %}
-            non-placeholder={{ True|placeholder_is_immutable:request.user }}
-            placeholder={{ placeholder|placeholder_is_immutable:request.user }}
+            non-placeholder={{ True|placeholder_is_immutable:user }}
+            placeholder={{ placeholder|placeholder_is_immutable:user }}
         """
         from unittest.mock import patch
 
@@ -142,11 +142,25 @@ class TemplatetagTests(CMSTestCase):
         placeholder = page.get_placeholders("en").first()
         request = self.get_request()
 
+        # A placeholder is mutable only if the source permits editing *and* the
+        # user may change it: a user with change permission gets the editable
+        # board (placeholder=False).
         with patch.object(Placeholder, "check_source", wraps=placeholder.check_source) as mock_check_source:
-            output = self.render_template_obj(template, {"placeholder": placeholder}, request=request)
+            output = self.render_template_obj(
+                template, {"placeholder": placeholder, "user": self.get_superuser()}, request=request
+            )
             self.assertIn("non-placeholder=True", output)
             self.assertIn("placeholder=False", output)
             self.assertEqual(mock_check_source.call_count, 1)
+
+        # A user without change permission only gets a read-only board, even
+        # though the source itself permits editing (placeholder=True).
+        output = self.render_template_obj(
+            template,
+            {"placeholder": placeholder, "user": self.get_staff_user_with_no_permissions()},
+            request=request,
+        )
+        self.assertIn("placeholder=True", output)
 
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en", slug="slug-test2")

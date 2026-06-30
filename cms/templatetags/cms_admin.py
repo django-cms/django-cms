@@ -330,5 +330,8 @@ def submit_row_plugin(context):
 @register.filter
 def placeholder_is_immutable(placeholder, user):
     if isinstance(placeholder, Placeholder):
-        return not placeholder.check_source(user)
+        # A placeholder is editable only if the source permits editing *and*
+        # the user may change it. View-only users (e.g. headless reviewers) can
+        # open the structure board but must see it read-only.
+        return not (placeholder.check_source(user) and placeholder.has_change_permission(user))
     return True
