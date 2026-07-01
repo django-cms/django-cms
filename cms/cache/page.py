@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Mapping
 
 from django.conf import settings
 from django.utils.cache import (
