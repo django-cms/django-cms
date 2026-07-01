@@ -1,9 +1,11 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
+# Fabian Braun <fsbraun@gmx.de>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # kochin <kochinc@outlook.com>, 2013
 # kochin <kochinc@outlook.com>, 2013
 msgid ""
@@ -14,10 +16,10 @@ msgstr ""
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: kochin <kochinc@outlook.com>, 2013\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/divio/django-cms/language/zh_TW/)\n"
+"Language: zh_Hant\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Are you sure you want to change tabs without saving the page first?"

@@ -1,0 +1,1674 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Translators:
+# 华鹏 刘 <lhp.n.reg@gmail.com>, 2023
+# Aosp T, 2023
+# da27e4edd0c28b0ec121570dac46e169_947ca9c, 2023
+# Scott Jiang, 2023
+# libingchao <popil1987@126.com>, 2025
+# spaceoi <zhangzhaoyu@gmail.com>, 2025
+# Joe Shen <sheninter@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
+# Jonas Obrist <ojiidotch@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django-cms\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"PO-Revision-Date: 2022-12-12 10:32+0000\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/divio/teams/58664/zh_CN/)\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "All"
+msgstr "全部"
+
+msgid "Copy permissions"
+msgstr "复制权限"
+
+msgid "Slug"
+msgstr "缩略名"
+
+msgid "The part of the title that is used in the URL"
+msgstr "标题中被用在URL中的部分"
+
+msgid "Page type"
+msgstr "页面类型"
+
+msgid "Page Types"
+msgstr "页面类型"
+
+msgid "Overwrite URL"
+msgstr "重写 URL"
+
+msgid "Keep this field empty if standard path should be used."
+msgstr "如果使用标准路径则本项目为空。"
+
+msgid "Start typing..."
+msgstr "开始输入…"
+
+msgid "limit when this page is visible in the menu"
+msgstr "该页在菜单可见时限制"
+
+msgid "X Frame Options"
+msgstr "X 框架选项"
+
+msgid "Whether this page can be embedded in other pages or websites."
+msgstr "此页面是否可以嵌入其他页面或网站。"
+
+msgid "URL options"
+msgstr "URL选项"
+
+msgid "Menu options"
+msgstr "菜单选项"
+
+msgid "Headers"
+msgstr "标头"
+
+msgid "Application"
+msgstr "应用"
+
+msgid "Hook application to this page."
+msgstr "附加第三方应用到本页面。"
+
+msgid "Application configurations"
+msgstr "应用程序设置"
+
+msgid "A page with this reverse URL id exists already."
+msgstr "该URL id已经被使用。"
+
+msgid "Invalid application config value"
+msgstr "无效的应用设置值"
+
+msgid "An application instance using this configuration already exists."
+msgstr "已经存在使用此设置的应用实例。"
+
+msgid "An application instance with this name already exists."
+msgstr "已经存在使用此名称的应用实例。"
+
+msgid "You can't move the home page inside another page"
+msgstr "你不能将主页移入到另一页面"
+
+msgid ""
+"You cannot have two pages with the same slug at the same page level. Please "
+"alter the slug of one of the pages before trying to move again."
+msgstr "同一页面层级下不能有相同缩略名的两个页面。请先修改其中一个页面的缩略名后再尝试移动。"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "user"
+msgstr "用户"
+
+msgid "can_view"
+msgstr "can_view"
+
+msgid "Add"
+msgstr "增加"
+
+msgid "Change"
+msgstr "修改"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid ""
+"Users can't create a page without permissions to change the created page. "
+"Edit permissions required."
+msgstr "用户没有权限修改已创建的页面，不能创建页面。需要编辑权限。"
+
+msgid ""
+"Users can't delete a page without permissions to change the page. Edit "
+"permissions required."
+msgstr "用户没有权限修改页面，不能删除页面。需要编辑权限。"
+
+msgid ""
+"Users can't set page permissions without permissions to change a page. Edit "
+"permissions required."
+msgstr "用户没有权限修改页面，不能设置页面的权限。需要编辑权限。"
+
+msgid ""
+"Users can't delete page permissions without permissions to change a page. "
+"Edit permissions required."
+msgstr "用户没有修改页面的权限，不能删除页面的权限。需要编辑权限。"
+
+msgid ""
+"Users can't create page permissions without permissions to change the "
+"created permission. Edit permissions required."
+msgstr "用户没有修改已创建页面的权限，不能创建页面权限。需要编辑权限。"
+
+msgid ""
+"Users can't delete page permissions without permissions to change "
+"permissions. Edit permissions required."
+msgstr "用户没有修改权限的权限，不能删除页面权限。需要编辑权限。"
+
+#, python-format
+msgid "Invalid plugin type '%s'"
+msgstr "无效的插件类型 '%s'"
+
+msgid "Language must be set to a supported language!"
+msgstr "语言项目必须被设置为支持的语言！"
+
+msgid "Parent plugin language must be same as language!"
+msgstr "父层插件语言必须与当前语言一致！"
+
+msgid "Parent plugin placeholder must be same as placeholder!"
+msgstr "父层插件占位符必须与当前占位符一致！"
+
+#, python-format
+msgid "Plugin position must be greater than %(position)d"
+msgstr "插件位置必须大于 %(position)d"
+
+msgid "Translations"
+msgstr "翻译"
+
+msgid "Advanced Settings"
+msgstr "高级设置"
+
+msgid "Change Permissions"
+msgstr "修改权限"
+
+msgid "The page is not eligible to be home."
+msgstr "此页面不能用于主页"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
+
+msgid "error"
+msgstr "错误"
+
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr "错误！你没有权限移动页面。请刷新页面"
+
+msgid "Error! You don't have permissions to copy this page."
+msgstr "出错！你没有权限复制此页"
+
+msgid ""
+"Error! The page you're pasting is not translated in any of the languages "
+"configured by the target site."
+msgstr "出错！你复制的页面尚未翻译成任何一种目标网站设定的语言"
+
+msgid "You do not have permission to edit this page"
+msgstr "你没有权限编辑本页面"
+
+msgid ""
+"(to change it, first unpublish the currently published version of this page)"
+msgstr "（若要修改它，请先取消发布该页面当前已发布的版本）"
+
+msgid "Add Translation"
+msgstr "加翻译"
+
+msgid "Add Page Copy"
+msgstr "添加页面拷贝"
+
+msgid "New sub page"
+msgstr "新建子页面"
+
+msgid "New page"
+msgstr "新建页面"
+
+msgid ""
+"You do not have permission to access this site. Please contact your "
+"administrator."
+msgstr "你没有权限访问此站点，请联系管理员。"
+
+msgid "Database error"
+msgstr "数据库错误"
+
+msgid "Template not valid"
+msgstr "模板不可用"
+
+msgid "Placeholder selection not valid"
+msgstr "占位符选择无效"
+
+msgid "The template was successfully changed"
+msgstr "模板修改成功"
+
+#, python-format
+msgid "Placeholder '%s' does not exist in target language"
+msgstr "占位符 '%s' 在目标语言中不存在"
+
+msgid "You do not have permission to copy these plugins."
+msgstr "你没有复制插件的权限"
+
+msgid "You do not have permission to delete this page"
+msgstr "你没有权限删除本页面"
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "使用 %(language)s 译文的标题和插件被删除"
+
+msgid "Public content"
+msgstr "公开内容"
+
+msgid "Empty"
+msgstr "空"
+
+msgid "Create Content"
+msgstr "创建内容"
+
+msgid "View restriction"
+msgstr "视图限制"
+
+msgid "View restrictions"
+msgstr "视图限制"
+
+#, python-format
+msgid "Field %s not found"
+msgstr "未找到字段 %s"
+
+msgid "You do not have permission to edit this item"
+msgstr "你没有权限编辑当前项"
+
+msgid "You do not have permission to add a plugin"
+msgstr "你没有添加插件的权限"
+
+msgid "You do not have permission to copy this placeholder."
+msgstr "没有权限复制该占位符"
+
+msgid "Plugin not found"
+msgstr "找不到该插件"
+
+msgid "You do not have permission to edit this plugin"
+msgstr "你没有编辑插件的权限"
+
+msgid "You have no permission to paste this plugin"
+msgstr "你没有权限粘贴这个插件"
+
+msgid "You have no permission to paste this placeholder"
+msgstr "你没有权限粘贴这个占位符"
+
+msgid "You have no permission to move this plugin"
+msgstr "没有移动插件权限"
+
+msgid "You have no permission to cut this plugin"
+msgstr "你没有权限剪切这个插件"
+
+msgid "You do not have permission to delete this plugin"
+msgstr "没有删除插件权限"
+
+#, python-format
+msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgstr "插件%(name)s“%(obj)s”已被成功删除。"
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "无法删除 %(name)s"
+
+msgid "Are you sure?"
+msgstr "你确认码？"
+
+msgid "You do not have permission to clear this placeholder"
+msgstr "没有权限清楚该占位符"
+
+#, python-format
+msgid "The placeholder \"%(obj)s\" was cleared successfully."
+msgstr "占位符“%(obj)s”已被成功清除。"
+
+msgid "placeholder"
+msgstr "占位符"
+
+msgid "Page permissions"
+msgstr "页面权限"
+
+msgid "User & Group permissions"
+msgstr "用户/组权限"
+
+msgid "Page permissions management"
+msgstr "页面权限管理"
+
+msgid "Actions"
+msgstr "操作"
+
+msgid "Empty content"
+msgstr "内容为空"
+
+msgid "You do not have permission to change this content."
+msgstr "你没有权限修改此内容。"
+
+#, python-format
+msgid "%(object_name)s Properties"
+msgstr "%(object_name)s 属性"
+
+#, python-format
+msgid "Add new %(object_name)s"
+msgstr "添加新的%(object_name)s"
+
+msgid "Add content"
+msgstr "添加内容"
+
+msgid ""
+"Content for the current language has been changed. Click \"Cancel\" to "
+"return to the form and save changes. Click \"OK\" to discard changes."
+msgstr "当前语言的内容已更改。点击“取消”返回表单并保存更改。点击“确定”放弃更改。"
+
+#, python-format
+msgid "Add %(language)s content"
+msgstr "添加%(language)s内容"
+
+msgid "Preview"
+msgstr "预览"
+
+msgid "Settings"
+msgstr "设置"
+
+#, python-format
+msgid ""
+"Invalid language %(value)s. This form cannot be processed. Try changing "
+"languages."
+msgstr "无效的语言 %(value)s。此表单无法处理。请尝试切换语言。"
+
+msgid "<unspecified>"
+msgstr "未指定"
+
+#, python-format
+msgid "No registered apphook \"%r\" found"
+msgstr "找不到与 \"%r\" 对应的已注册应用"
+
+msgid "django CMS"
+msgstr "django CMS"
+
+msgid "Placeholder"
+msgstr "占位符"
+
+msgid "Getting started developer guide"
+msgstr "开发者入门指南"
+
+msgid "Documentation"
+msgstr "文档"
+
+msgid "User guide"
+msgstr "用户指南"
+
+msgid "Discord community"
+msgstr "Discord 社区"
+
+msgid "What's new"
+msgstr "最新动态"
+
+msgid "Create"
+msgstr "创建"
+
+msgid "Edit"
+msgstr "编辑"
+
+msgid "Structure"
+msgstr "结构"
+
+msgid "Content"
+msgstr "内容"
+
+msgid "Help"
+msgstr "帮助"
+
+msgid "Sites"
+msgstr "站点"
+
+msgid "Admin Sites"
+msgstr "管理后台"
+
+msgid "Administration"
+msgstr "管理"
+
+msgid "User settings"
+msgstr "用户设定"
+
+msgid "Clipboard..."
+msgstr "剪贴板"
+
+msgid "Clear clipboard"
+msgstr "清空剪贴板"
+
+msgid "Disable toolbar"
+msgstr "禁用工具栏"
+
+msgid "Shortcuts..."
+msgstr "快捷键…"
+
+msgid "Users"
+msgstr "用户"
+
+#, python-format
+msgid "Logout %s"
+msgstr "退出 %s"
+
+msgid "Logout"
+msgstr "退出"
+
+msgid "Language"
+msgstr "语言"
+
+msgid "Delete Translation"
+msgstr "删除翻译"
+
+msgid "Copy all plugins"
+msgstr "复制所有插件"
+
+#, python-format
+msgid "from %s"
+msgstr "从 %s"
+
+#, python-format
+msgid "Are you sure you want to copy all plugins from %s?"
+msgstr "确定要从 %s 复制所有插件吗？"
+
+msgid "Pages"
+msgstr "页"
+
+msgid "Page"
+msgstr "页"
+
+msgid "Create Page"
+msgstr "创建页面"
+
+msgid "New Page"
+msgstr "新建页面"
+
+msgid "New Sub Page"
+msgstr "新建子页面"
+
+msgid "Duplicate this Page"
+msgstr "复制当前页"
+
+msgid "Page settings"
+msgstr "页面设置"
+
+msgid "Advanced settings"
+msgstr "高级设置"
+
+msgid "Templates"
+msgstr "模板"
+
+msgid "Placeholders"
+msgstr "占位符"
+
+msgid "Hide in navigation"
+msgstr "隐藏导航"
+
+msgid "Display in navigation"
+msgstr "在导航栏中显示"
+
+msgid "Delete page"
+msgstr "删除页"
+
+msgid "Create a new page next to the current page."
+msgstr "在当前页面后新建页面"
+
+msgid "Create a page below the current page."
+msgstr "在当前页面以下新建页面"
+
+msgid "Select a valid site"
+msgstr "选择一个有效站点"
+
+msgid "Select a valid page"
+msgstr "选择一个有效页面"
+
+#, python-format
+msgid ""
+"Page %(conflict_page)s has the same url '%(url)s' as current page "
+"\"%(instance)s\"."
+msgstr "页面 %(conflict_page)s 与当前页面 \"%(instance)s\" 具有相同的 URL '%(url)s'。"
+
+#, python-format
+msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
+msgstr "页面 %(conflict_page)s 与当前页面具有相同的 URL '%(url)s'。"
+
+msgid "Add another"
+msgstr "再添加一个"
+
+msgid ""
+"Optional. If supplied, will be automatically added within a new text plugin."
+msgstr "可选。如果提供，会自动添加在在新的文本插件里"
+
+msgid "Provide a title for the new page."
+msgstr "给新建页面标题"
+
+msgid "Leave empty for automatic slug, or override as required."
+msgstr "留空以自动生成缩略名，或按需覆盖。"
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr "无法自动创建缩略名。请手动提供一个。"
+
+msgid "Please provide a valid slug."
+msgstr "请提供有效的缩略名。"
+
+msgid "You don't have the permissions required to add a page."
+msgstr "你没有添加页面所需的权限。"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "position"
+msgstr "位置"
+
+msgid "language"
+msgstr "语言"
+
+msgid "plugin_name"
+msgstr "插件名称"
+
+msgid "creation date"
+msgstr "创建日期"
+
+msgid "can edit"
+msgstr "可以修改"
+
+msgid "can add"
+msgstr "允许新建"
+
+msgid "can delete"
+msgstr "允许删除"
+
+msgid "can change advanced settings"
+msgstr "允许修改高级设置"
+
+msgid "can publish"
+msgstr "可以发布"
+
+msgid "can change permissions"
+msgstr "允许修改权限"
+
+msgid "can move"
+msgstr "允许移动"
+
+msgid "view restricted"
+msgstr "视图受限"
+
+msgid "can recover pages"
+msgstr "允许恢复页面"
+
+msgid "group"
+msgstr "组"
+
+msgid "sites"
+msgstr "站点"
+
+msgid "created by"
+msgstr "创建者"
+
+msgid "changed by"
+msgstr "修正者"
+
+msgid "publication date"
+msgstr "发表日期"
+
+msgid "publication end date"
+msgstr "发表结束日期"
+
+msgid "in navigation"
+msgstr "导航中"
+
+msgid "soft root"
+msgstr "伪根节点"
+
+msgid "id"
+msgstr "编号"
+
+msgid "attached menu"
+msgstr "附带的菜单"
+
+msgid "template"
+msgstr "模板"
+
+msgid "login required"
+msgstr "需要登录"
+
+msgid "menu visibility"
+msgstr "菜单可见性"
+
+msgid "application"
+msgstr "应用"
+
+msgid "application instance name"
+msgstr "应用实例名"
+
+msgid "site"
+msgstr "站点"
+
+msgid "Grant on"
+msgstr "授权给"
+
+msgid "page"
+msgstr "页面"
+
+msgid "no limit set"
+msgstr "未设置限制"
+
+msgid "for logged in users only"
+msgstr "登录用户专用"
+
+msgid "for anonymous users only"
+msgstr "匿名用户专用"
+
+msgid "Inherit from parent page"
+msgstr "继承于父页面"
+
+msgid "Deny"
+msgstr "拒绝"
+
+msgid "Only this website"
+msgstr "仅这个网站"
+
+msgid "Allow"
+msgstr "允许"
+
+msgid "title"
+msgstr "标题"
+
+msgid "The default title"
+msgstr "默认标题"
+
+msgid "Page Title"
+msgstr "页面标题"
+
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "覆盖显示在浏览器顶部标题栏或书签中的信息"
+
+msgid "Menu Title"
+msgstr "菜单标题"
+
+msgid "Overwrite what is displayed in the menu"
+msgstr "覆盖菜单上的显示"
+
+msgid "Description meta tag"
+msgstr "描述性的原标签"
+
+msgid "A description of the page used by search engines."
+msgstr "被搜索引擎收录的常见关键字列表"
+
+msgid "redirect"
+msgstr "重定向"
+
+msgid "Redirects to this URL."
+msgstr "转到这个链接"
+
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "所有的上级页面将不会在导航中显示"
+
+msgid "The template used to render the content."
+msgstr "用于生成页面内容的模板。"
+
+msgid "page content"
+msgstr "页面内容"
+
+msgid "page contents"
+msgstr "页面内容"
+
+msgid "default"
+msgstr "默认"
+
+msgid ""
+"A unique identifier that is used with the page_url templatetag for linking "
+"to this page"
+msgstr "与 page_url 模板标签共同用来链接到当前页的唯一识别码"
+
+msgid "Mark this page as a page type"
+msgstr "将此页面标记为页面类型"
+
+msgid "pages"
+msgstr "页面"
+
+msgid "No available title"
+msgstr "无可用标题"
+
+msgid "slug"
+msgstr "缩略名"
+
+msgid "Path"
+msgstr "路径"
+
+msgid "Current page"
+msgstr "当前页"
+
+msgid "Page children (immediate)"
+msgstr "最接近的子页面"
+
+msgid "Page and children (immediate)"
+msgstr "页面以及最接近的子页面"
+
+msgid "Page descendants"
+msgstr "子页面"
+
+msgid "Page and descendants"
+msgstr "页面及所有下级页面"
+
+msgid "on page level"
+msgstr "在页面级别"
+
+msgid "frontend view restriction"
+msgstr "前端视图限制"
+
+msgid "Please select user or group."
+msgstr "请选择用户或组"
+
+msgid ""
+"Users can't publish a page without permissions to change the page. Edit "
+"permissions required."
+msgstr "没有修改页面的权限，用户无法发布页面。需要编辑权限。"
+
+msgid ""
+"Users can't change page advanced settings without permissions to change the "
+"page. Edit permissions required."
+msgstr "没有修改页面的权限，用户无法更改页面高级设置。需要编辑权限。"
+
+msgid ""
+"Users can't change page permissions without permissions to change the page. "
+"Edit permissions required."
+msgstr "没有修改页面的权限，用户无法更改页面权限。需要编辑权限。"
+
+msgid ""
+"Users can't move a page without permissions to change the page. Edit "
+"permissions required."
+msgstr "没有修改页面的权限，用户无法移动页面。需要编辑权限。"
+
+msgid "can recover any deleted page"
+msgstr "允许恢复任何已删除的页面"
+
+msgid "If none selected, user haves granted permissions to all sites."
+msgstr "如果没有选择，用户将被授予整个网站的权限"
+
+msgid "Page global permission"
+msgstr "页面全局权限"
+
+msgid "Pages global permissions"
+msgstr "页面全局权限"
+
+msgid "Page permission"
+msgstr "页面权限"
+
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr "新增页面的权限同时赋予其子页面，否则新增页面不能被其建立者修改"
+
+msgid "User (page)"
+msgstr "用户(页面)"
+
+msgid "Users (page)"
+msgstr "用户(页面)"
+
+msgid "User group (page)"
+msgstr "用户组(页面)"
+
+msgid "User groups (page)"
+msgstr "用户组(页面)"
+
+msgid "slot"
+msgstr "插槽"
+
+msgid "width"
+msgstr "宽"
+
+msgid "Edit object"
+msgstr "编辑对象"
+
+msgid "This is an external placeholder"
+msgstr "这是一个外部占位符"
+
+msgid "plugin"
+msgstr "插件"
+
+msgid "plugins"
+msgstr "插件"
+
+msgid "<Empty>"
+msgstr "<空>"
+
+msgid "The language for the admin interface and toolbar"
+msgstr "管理界面的语言和工具栏"
+
+msgid "user setting"
+msgstr "用户设定"
+
+msgid "user settings"
+msgstr "用户设定"
+
+msgid "Advanced options"
+msgstr "高级选项"
+
+msgid "Generic"
+msgstr "普通的"
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s“%(obj)s”已成功更改。"
+
+msgid "There are no further settings for this plugin. Please press save."
+msgstr "当前插件没有更多设置选项。请点击保存。"
+
+msgid "Moved"
+msgstr "已移动"
+
+msgid "Changed"
+msgstr "已修改"
+
+msgid "Deleted"
+msgstr "已删除"
+
+msgid "Added Page Translation"
+msgstr "已添加页面翻译"
+
+msgid "Changed Page Translation"
+msgstr "已修改页面翻译"
+
+msgid "Deleted Page Translation"
+msgstr "已删除页面翻译"
+
+msgid "Added Plugin"
+msgstr "已添加插件"
+
+msgid "Changed Plugin"
+msgstr "已修改插件"
+
+msgid "Moved Plugin"
+msgstr "已移动插件"
+
+msgid "Deleted Plugin"
+msgstr "已删除插件"
+
+msgid "Cut Plugin"
+msgstr "已剪切插件"
+
+msgid "Paste Plugin"
+msgstr "已粘贴插件"
+
+msgid "Paste to Placeholder"
+msgstr "已粘贴到占位符"
+
+msgid "Added plugins to placeholder from clipboard"
+msgstr "已从剪贴板向占位符添加插件"
+
+msgid "Cleared Placeholder"
+msgstr "已清空占位符"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Some fields cannot be changed since they are read-only content."
+msgstr "部分字段为只读内容，无法更改。"
+
+#, python-format
+msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
+msgstr "登录到管理界面 <a href=\"%(login_url)s\">请点这里</a>。"
+
+#, python-format
+msgid "Login url: %(login_url)s"
+msgstr "登录地址：%(login_url)s"
+
+msgid "Username:"
+msgstr "用户名："
+
+msgid "Password:"
+msgstr "密码："
+
+msgid "Add a page"
+msgstr "添加页面"
+
+msgid "Change a page"
+msgstr "修改一个页面"
+
+msgid "Home"
+msgstr "首页"
+
+msgid "View on site"
+msgstr "在站点上查看"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "请更正以下的错误。"
+
+msgid "All permissions"
+msgstr "所有权限"
+
+msgid "Loading..."
+msgstr "加载中…"
+
+msgid "Save and continue editing"
+msgstr "保存并继续编辑"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr "确定要删除 %(object_name)s“%(escaped_object)s”吗？以下相关项也将被删除："
+
+msgid "Yes, I’m sure"
+msgstr "是的，我确定"
+
+msgid "No, take me back"
+msgstr "不，返回"
+
+msgid "Summary"
+msgstr "概览"
+
+msgid "User"
+msgstr "用户"
+
+msgid "Group"
+msgstr "组"
+
+msgid "Can edit"
+msgstr "允许修改"
+
+msgid "Can add"
+msgstr "允许添加"
+
+msgid "Can delete"
+msgstr "允许删除"
+
+msgid "Can publish"
+msgstr "允许发表"
+
+msgid "Can change permissions"
+msgstr "允许修改权限"
+
+msgid "Can move"
+msgstr "允许移动"
+
+msgid "Can view"
+msgstr "Can view"
+
+msgid "(global)"
+msgstr "(全局的)"
+
+msgid "(current)"
+msgstr "(当前的)"
+
+msgid "Page doesn't inherit any permissions."
+msgstr "页面不继承任何权限。"
+
+msgid "Edit model"
+msgstr "编辑模型"
+
+msgid "Save as new"
+msgstr "保存为新的"
+
+msgid "Save and add another"
+msgstr "保存并增加另一个"
+
+msgid "Copy"
+msgstr "复制"
+
+msgid "Cut"
+msgstr "剪切"
+
+msgid "Paste"
+msgstr "粘贴"
+
+msgid "Set as home"
+msgstr "设为首页"
+
+msgid "is restricted"
+msgstr "受限的"
+
+msgid "last change by"
+msgstr "最后修改者"
+
+msgid "last change on"
+msgstr "最后修改于"
+
+msgid "meta"
+msgstr "元信息"
+
+msgid "List of pages"
+msgstr "页面一览"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "Page Tree"
+msgstr "页面树"
+
+msgid "Reset filter"
+msgstr "重置筛选"
+
+#, python-format
+msgid ""
+"\n"
+"                                                Restore deleted %(name)s\n"
+"                                            "
+msgstr ""
+"\n"
+"                                                恢复已删除的%(name)s\n"
+"                                            "
+
+msgid "Main Navigation"
+msgstr "主导航"
+
+msgid "Options"
+msgstr "选项"
+
+msgid "Successfully moved"
+msgstr "移动完成"
+
+msgid "Changes within the tree might require a refresh."
+msgstr "树中的修改可能需要刷新。"
+
+msgid "Error:"
+msgstr "错误："
+
+msgid ""
+"This page cannot be copied because an application is attached to it. See the"
+" Page's Advanced settings to manage apphooks."
+msgstr "此页面无法复制，因为已附加应用。请在页面的“高级设置”中管理应用挂钩（apphook）。"
+
+msgid "Are you sure you want to § this page?"
+msgstr "确定要 § 这个页面吗？"
+
+msgid "Reload"
+msgstr "重新加载"
+
+msgid "New node"
+msgstr "新节点"
+
+msgid "nodes"
+msgstr "节点"
+
+msgid "View"
+msgstr "查看"
+
+msgid "Menu"
+msgstr "目录"
+
+#, python-format
+msgid ""
+"\n"
+"                            <em>There is no %(object)s around yet.</em>\n"
+"                            <br>\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
+"                        "
+msgstr ""
+"\n"
+"                            <em>尚未存在 %(object)s。</em>\n"
+"                            <br>\n"
+"                            立即<a href=\"%(add_url)s\" class=\"addlink\">添加 %(object)s</a>。\n"
+"                        "
+
+msgid "Copy options"
+msgstr "复制选项"
+
+msgid "Choose copy options"
+msgstr "选择复制选项"
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "Legend"
+msgstr "图例"
+
+msgid "In menu"
+msgstr "在菜单中"
+
+msgid "Not in menu"
+msgstr "不在菜单中"
+
+msgid "View page"
+msgstr "查看页面"
+
+msgid "Softroot"
+msgstr "伪根节点"
+
+msgid "Apphook"
+msgstr "应用挂钩"
+
+msgid "Redirect"
+msgstr "转向"
+
+#, python-format
+msgid "Application: %(apphook)s"
+msgstr "应用：%(apphook)s"
+
+msgid "in menu"
+msgstr "目录中"
+
+msgid "not in menu"
+msgstr "不在目录中"
+
+msgid "Page settings (SHIFT click for advanced settings)"
+msgstr "页面设置（按住 SHIFT 点击打开高级设置）"
+
+msgid "Permissions"
+msgstr "权限"
+
+msgid "inherited"
+msgstr "继承"
+
+msgid "This page has no preview!"
+msgstr "当前页面没有预览！"
+
+msgid ""
+"Potentially the attached apphook does not provide content for its root."
+msgstr "可能附加的 apphook 没有为其根节点提供内容。"
+
+msgid "It is being redirected to:"
+msgstr "它被重定向到："
+
+msgid "Clipboard"
+msgstr "剪贴板"
+
+msgid "Add plugin"
+msgstr "添加插件"
+
+msgid "Copy all"
+msgstr "复制全部"
+
+msgid "Copy from"
+msgstr "复制来源"
+
+msgid "Empty all"
+msgstr "清空全部"
+
+msgid "Filter plugins..."
+msgstr "筛选插件"
+
+msgid "Expand all"
+msgstr "全部展开"
+
+msgid "Collapse all"
+msgstr "全部收起"
+
+msgid "You cannot add plugins to this plugin."
+msgstr "无法在该插件中添加其它插件"
+
+msgid "This plugin cannot be moved or edited outside of its parent"
+msgstr "此插件不能在其父级之外移动或编辑"
+
+msgid "Clipboard is empty."
+msgstr "剪贴板已空"
+
+msgid "This plugin does not allow plugins of this type as nested plugins."
+msgstr "该插件不能允许该类型插件作为嵌套插件"
+
+msgid "This plugin cannot have nested plugins."
+msgstr "该插件无法有嵌套插件"
+
+msgid "Highlight"
+msgstr "高亮显示"
+
+msgid "Available plugins"
+msgstr "可用的插件"
+
+msgid "Toggle structure"
+msgstr "切换结构"
+
+msgid "Login"
+msgstr "登陆"
+
+msgid "Add plugin to"
+msgstr "添加插件到"
+
+msgid "More"
+msgstr "更多"
+
+#, python-format
+msgid ""
+"Development version using django CMS %(cms_version)s, Django "
+"%(django_version)s, Python %(python_version)s"
+msgstr ""
+"开发版本：django CMS %(cms_version)s, Django %(django_version)s, Python "
+"%(python_version)s开发版本：django CMS %(cms_version)s，Django "
+"%(django_version)s，Python %(python_version)s"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "The following error occurred:"
+msgstr "发生了下述错误："
+
+msgid "Action successful."
+msgstr "操作成功。"
+
+msgid "Are you sure you want to delete this plugin?"
+msgstr "你确认要删除当前插件吗？"
+
+msgid "Are you sure you want to publish this page?"
+msgstr "你确定你要发布该页面吗？"
+
+msgid "Plugin will be added here"
+msgstr "插件将被添加到这里"
+
+msgid "You have unsaved changes."
+msgstr "你有未保存的更改。"
+
+msgid "Loading"
+msgstr "加载中"
+
+msgid "Are you sure you want to abandon these changes?"
+msgstr "确定要放弃这些更改吗？"
+
+msgid ""
+"The form could not be loaded. Please check that the server is running "
+"correctly."
+msgstr "无法加载表单。请检查服务器是否正常运行。"
+
+msgid "Most used"
+msgstr "常用"
+
+msgid "Shortcuts"
+msgstr "快捷键"
+
+msgid "The page was changed in the meantime, reloading..."
+msgstr "页面在此期间已被更改，正在重新加载…"
+
+msgid "CMS-wide Shortcuts"
+msgstr "CMS 全局快捷键"
+
+msgid "Bring up this help dialog"
+msgstr "显示此帮助对话框"
+
+msgid "Close/cancel"
+msgstr "关闭/取消"
+
+msgid "Toggle structure mode"
+msgstr "切换结构模式"
+
+msgid "Toggle structure mode and highlight hovered-over plugin"
+msgstr "切换结构模式并高亮悬停插件"
+
+msgid "Open \\"
+msgstr "打开 \\"
+
+msgid "Focus on Toolbar"
+msgstr "聚焦到工具栏"
+
+msgid "Focus on placeholders"
+msgstr "聚焦到占位符"
+
+msgid "Move to next/previous element"
+msgstr "移动到下一个/上一个元素"
+
+msgid "Focus on plugins of placeholder"
+msgstr "聚焦到占位符的插件"
+
+msgid "Edit plugin"
+msgstr "编辑插件"
+
+msgid "Open actions menu"
+msgstr "打开操作菜单"
+
+msgid "Expand/collapse"
+msgstr "展开/折叠"
+
+msgid ""
+"<strong>Login failed.</strong> Please check your credentials and try again."
+msgstr "<strong>登录失败。</strong>请检查你的认证信息并重试。"
+
+msgid "Double-click to edit"
+msgstr "双击进行编辑"
+
+msgid "Tap to edit"
+msgstr "点击来编辑"
+
+msgid "Click to go back"
+msgstr "点击返回"
+
+msgid "Click to go forward"
+msgstr "点击前进"
+
+msgid "Minimize"
+msgstr "最小化"
+
+msgid "Maximize"
+msgstr "最大化"
+
+msgid "Placeholder not editable"
+msgstr "占位符不可编辑"
+
+msgid "Drop a plugin here"
+msgstr "拖放一个插件到这里"
+
+msgid "Welcome to your new django CMS installation!"
+msgstr "欢迎使用你全新安装的 django CMS！"
+
+#, python-format
+msgid "Version %(cms_version)s"
+msgstr "版本 %(cms_version)s"
+
+msgid "Let’s build something great together!"
+msgstr "让我们一起创造伟大的作品！"
+
+msgid "Please log in"
+msgstr "请登录"
+
+msgid ""
+"\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
+"            "
+msgstr ""
+"\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">添加你的第一个页面</a>\n"
+"            "
+
+msgid ""
+"\n"
+"                    <h2>Help Funding</h2>\n"
+"                    <p>\n"
+"                        Your funding directly benefits the product, mainly through the\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        A quick way for yourself or your organisation to donate is on\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"                    </p>\n"
+"                "
+msgstr ""
+"\n"
+"                    <h2>资助我们</h2>\n"
+"                    <p>\n"
+"                        你的资助将直接促进产品改进，主要通过 <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS 奖学金项目</a>！\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        你或组织可以通过 <a href=\"https://github.com/sponsors/django-cms\">Github 赞助</a> 快速捐助。\n"
+"                    </p>\n"
+"                "
+
+msgid ""
+"\n"
+"                    <h2>Join Us</h2>\n"
+"                    <p>\n"
+"                        The django CMS Association is a non-profit organisation that funds and steers the development of\n"
+"                        django CMS.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        You can <a href=\"https://www.django-cms.org/en/memberships/\">join both as an individual or as an\n"
+"                        organisation</a>.\n"
+"                    </p>\n"
+"                "
+msgstr ""
+"\n"
+"                    <h2>加入我们</h2>\n"
+"                    <p>django CMS 协会是一个资助并引导 django CMS 开发的非营利组织。</p>\n"
+"                    <p>你可以作为个人或<a href=\"https://www.django-cms.org/en/memberships/\">组织加入</a>。</p>\n"
+"                "
+
+msgid ""
+"\n"
+"                    <h2>Contribute</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Contribute code:</a> fix a bug or\n"
+"                            implement a new feature!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Volunteer:</a>\n"
+"                            We offer fun and efficient team work!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Open-source your work:</a>\n"
+"                            Make the ecosystem strong.</li>\n"
+"                    </ul>\n"
+"                "
+msgstr ""
+"\n"
+"                    <h2>参与贡献</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">贡献代码：</a> 修复缺陷或实现新功能！</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">志愿者：</a> 加入有趣高效的团队协作！</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">开源你的工作：</a> 共同强化生态。</li>\n"
+"                    </ul>\n"
+"                "
+
+msgid "Installation Notes"
+msgstr "安装备注"
+
+msgid "Support"
+msgstr "支持"
+
+msgid "Give back"
+msgstr "回馈"
+
+msgid ""
+"\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
+"                    you linked the <code>static/cms</code> folder to your\n"
+"                    static files.</p>\n"
+"            "
+msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">若顶部未显示 django CMS 标志，请确认已将 <code>static/cms</code> 目录链接到静态文件。</p>\n"
+"            "
+
+msgid ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
+"                        <code>DEBUG = True</code> in your django settings file and\n"
+"                        haven't added any pages yet.\n"
+"                    </p>\n"
+"                "
+msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">出现此消息是因为在设置中 <code>DEBUG = True</code> 且尚未添加任何页面。</p>\n"
+"                "
+
+msgid "Welcome to django CMS"
+msgstr "欢迎来到django CMS"
+
+msgid "Add Another"
+msgstr "添加其他"
+
+msgid "Back"
+msgstr "返回"
+
+msgid "Please choose an option from below to proceed to the next step."
+msgstr "请在下面选择一选项来继续下一步"
+
+msgid "Next"
+msgstr "下一个"
+
+msgid "Select what you would like to create"
+msgstr "选择你要创建的内容"
+
+msgid "Unknown"
+msgstr "未知"
+
+#, python-format
+msgid "Page not found on %(domain)s"
+msgstr "该页面在 %(domain)s 中未找到"
+
+#, python-format
+msgid ""
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"`. The URL of the request was: http://%(host)s%(path)s"
+msgstr "模板标签无法找到`%(page_lookup)s `所对应的页面。源请求页面为http://%(host)s%(path)s"
+
+msgid "Two columns"
+msgstr "两列"
+
+msgid "Three columns"
+msgstr "三列"
+
+msgid "username"
+msgstr "用户名"
+
+msgid ""
+"Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "300个字符以内，必须是字母、数字及@/./+/-/_ "
+
+msgid "Enter a valid username."
+msgstr "输入一个有效的用户名"
+
+msgid "email address"
+msgstr "电子邮件地址"
+
+msgid "staff status"
+msgstr "工作人员状态"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "指明用户是否可以登录到这个管理站点。"
+
+msgid "active"
+msgstr "有效"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "指明用户是否被认为是活跃的。以反选代替删除帐号。"
+
+msgid "users"
+msgstr "用户"
+
+msgid "Title Extension"
+msgstr "标题扩展"
+
+msgid "Page Extension"
+msgstr "页面扩展"
+
+msgid "object ID"
+msgstr "对象ID"
+
+msgid "Example1 App"
+msgstr "样例1 App"
+
+msgid "MultilingualExample1 App"
+msgstr "多语言样例1 App"
+
+msgid "Example1"
+msgstr "样例1"
+
+msgid "Examples"
+msgstr "样例"
+
+msgid "Extra Context"
+msgstr "额外内容"
+
+msgid "Articles"
+msgstr "文章"
+
+msgid "Sample App"
+msgstr "样板程序"
+
+msgid "Sample App with config"
+msgstr "带配置的样板程序"
+
+msgid "Sample App with excluded permissions"
+msgstr "排除权限的示例"
+
+msgid "Sample App 2"
+msgstr "样板程序2"
+
+msgid "Sample App 3"
+msgstr "样板程序2"
+
+msgid "Sample App Without Landing Page"
+msgstr "无着陆页的示例应用"
+
+msgid "Namespaced App"
+msgstr "程序命名空间"
+
+msgid "Parent app"
+msgstr "母应用程序"
+
+msgid "Child app"
+msgstr "子应用程序"
+
+msgid "Variable urls-menus App"
+msgstr "可变 URL 菜单应用"
+
+msgid "sample root page"
+msgstr "根页样板"
+
+msgid "sample settings page"
+msgstr "设置页样板"
+
+msgid "sample account page"
+msgstr "账户页样板"
+
+msgid "sample my profile page"
+msgstr "个人资料页样板"
+
+msgid "Static Menu"
+msgstr "静态菜单"
+
+msgid "Static Menu2"
+msgstr "静态菜单2"
+
+msgid "Static Menu3"
+msgstr "静态菜单3"
+
+msgid "Static Menu4"
+msgstr "静态菜单"
+
+msgid "Category"
+msgstr "分类"
+
+msgid "Categories"
+msgstr "分类"
+
+msgid "Add Category"
+msgstr "添加分类"
+
+msgid "^account/$"
+msgstr "^account/$"
+
+msgid "Change Category"
+msgstr "修改分类"
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "感谢你今天在网站上花费了宝贵的时间！"
+
+msgid "Inherit the template of the nearest ancestor"
+msgstr "继承最近的上级页面模板"
+
+msgid "UserSettings"
+msgstr "用户设置"
+
+#, python-format
+msgid "Add plugin to placeholder \"%(placeholder_label)s\""
+msgstr "向占位符“%(placeholder_label)s”添加插件"
+
+#, python-format
+msgid "Add plugin to %(plugin_name)s"
+msgstr "向 %(plugin_name)s 添加插件"
+
+msgid "Single placeholder"
+msgstr "单个占位符"
+
+msgid "Community forum"
+msgstr "社区论坛"
+
+msgid "Getting started"
+msgstr "入门指南"
+
+msgid "Talk to us"
+msgstr "联系我们"
+
+msgid "CMS - your user account was created."
+msgstr "CMS - 你的用户帐号已创建。"
+
+msgid "CMS - your user account was changed."
+msgstr "CMS - 你的用户帐号已变更。"
+
+#, python-format
+msgid "This placeholder already has the maximum number of plugins (%s)."
+msgstr "当前位置已经到达插件(%s)允许的最大数量。"
+
+#, python-format
+msgid ""
+"This placeholder already has the maximum number (%(limit)s) of allowed "
+"%(plugin_name)s plugins."
+msgstr "当前位置已经到达插件%(plugin_name)s允许的最大数量限制(%(limit)s)。"
+
+#, python-brace-format
+msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
+msgstr "无法找到指定的 CMS_REQUEST_IP_RESOLVER 模块：\"{0}\"。"
+
+#, python-brace-format
+msgid ""
+"Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
+"module \"{1}\"."
+msgstr "无法在模块“{1}”中找到指定的 CMS_REQUEST_IP_RESOLVER 函数：\"{0}\"。"
+
+#, python-format
+msgid "Create a new %s instance."
+msgstr "创建一个新的%s实例"
+
+#, python-format
+msgid "A wizard has already been registered for model: %s"
+msgstr "一向导程序已经注册在模型%s"
