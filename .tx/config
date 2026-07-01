@@ -1,5 +1,8 @@
 [main]
 host = https://www.transifex.com
+# Map Transifex remote language codes to local (script-based) directory names.
+# Format: <remote>: <local>. The local code fills the <lang> token in file_filter.
+lang_map = zh_CN: zh_Hans, zh_TW: zh_Hant
 
 [o:divio:p:django-cms:r:core4]
 file_filter = cms/locale/<lang>/LC_MESSAGES/django.po
