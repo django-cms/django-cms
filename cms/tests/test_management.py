@@ -7,8 +7,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
-from django.db import models
-from django.test.utils import override_settings
+from django.db import connection, models
+from django.test.utils import CaptureQueriesContext, override_settings
 from djangocms_text.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
@@ -301,6 +301,39 @@ class ManagementTestCase(CMSTestCase):
         self.assertIn("1 uninstalled plugins", output)
         self.assertIn("1 plugins with unsaved instances", output)
         self.assertIn("2 detached placeholders", output)
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_plugin_report_query_count_does_not_scale_with_instances(self):
+        """
+        plugin_report() must resolve unsaved instances with bulk queries.
+
+        It previously called get_plugin_instance() once per plugin row, an
+        N+1 that made ``cms check`` and ``cms delete-orphaned-plugins`` appear
+        to hang on databases with many plugins. Guard against a regression by
+        asserting the query count is independent of the number of instances.
+        """
+        placeholder = Placeholder.objects.create(slot="test")
+
+        def count_queries():
+            with CaptureQueriesContext(connection) as ctx:
+                # Force full evaluation so deferred querysets are counted too.
+                for plugin in plugin_report():
+                    list(plugin["instances"])
+                    list(plugin["unsaved_instances"])
+            return len(ctx.captured_queries)
+
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        baseline = count_queries()
+
+        for _ in range(10):
+            add_plugin(placeholder, TextPlugin, "en", body="en body")
+        scaled = count_queries()
+
+        self.assertEqual(
+            baseline,
+            scaled,
+            "plugin_report() issues a query per plugin instance (N+1 regression)",
+        )
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_delete_orphaned_plugins_keeps_positions_consecutive(self):
