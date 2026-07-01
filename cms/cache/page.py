@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import datetime
 import hashlib
+from collections.abc import Mapping
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any, Mapping
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.cache import (
