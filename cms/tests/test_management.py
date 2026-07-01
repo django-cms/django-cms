@@ -2,6 +2,8 @@ import sys
 from io import StringIO
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
@@ -148,7 +150,7 @@ class ManagementTestCase(CMSTestCase):
 
         # create a bogus CMSPlugin to simulate one which used to exist but
         # is no longer installed
-        bogus_plugin = CMSPlugin.objects.create(
+        CMSPlugin.objects.create(
             position=5,
             language="en",
             plugin_type="BogusPlugin",
@@ -164,18 +166,14 @@ class ManagementTestCase(CMSTestCase):
             3)
 
         # check the bogus plugin
-        bogus_plugins_report = report[0]
-        self.assertEqual(
-            bogus_plugins_report["model"],
-            None)
-
-        self.assertEqual(
-            bogus_plugins_report["type"],
-            'BogusPlugin')
-
-        self.assertEqual(
-            bogus_plugins_report["instances"][0],
-            bogus_plugin)
+        for plugin in report:
+            if plugin["type"] == "BogusPlugin":
+                self.assertEqual(len(plugin["instances"]), 1)
+                self.assertFalse(plugin["model"])
+            if plugin["type"] == "LinkPlugin":
+                self.assertEqual(len(plugin["instances"]), 1)
+            if plugin["type"] == "TextPlugin":
+                self.assertEqual(len(plugin["instances"]), 3)
 
         # check the link plugin
         link_plugins_report = report[1]
@@ -230,6 +228,20 @@ class ManagementTestCase(CMSTestCase):
         placeholder.add_plugin(bogus_plugin)
         add_plugin(placeholder, TextPlugin, "en", body="en body")
 
+        # Test detached placeholders case
+        User = get_user_model()
+        content_type = ContentType.objects.get_for_model(
+            get_user_model())  # Use an existing model
+        obj = User.objects.create(username="test_delete_orphaned")
+        ph_detached = Placeholder.objects.create(slot="test_detached", content_type=content_type, object_id=obj.pk)
+        pl_detached = add_plugin(ph_detached, TextPlugin, "en", body="en body")
+        obj.delete()  # Now ph_detached is detached
+
+        # Test model class not existing
+        bogus_ct = ContentType.objects.create(app_label="bogus", model="bogus")
+        ph_bogus = Placeholder.objects.create(slot="test_bogus", content_type=bogus_ct, object_id=1)
+        pl_bogus = add_plugin(ph_bogus, TextPlugin, "en", body="en body")
+
         report = plugin_report()
 
         # there should be reports for three plugin types
@@ -238,26 +250,14 @@ class ManagementTestCase(CMSTestCase):
             3)
 
         # check the bogus plugin
-        bogus_plugins_report = report[0]
-        self.assertEqual(
-            len(bogus_plugins_report["instances"]),
-            1)
-
-        # check the link plugin
-        link_plugins_report = report[1]
-        self.assertEqual(
-            len(link_plugins_report["instances"]),
-            1)
-
-        # check the text plugins
-        text_plugins_report = report[2]
-        self.assertEqual(
-            len(text_plugins_report["instances"]),
-            3)
-
-        self.assertEqual(
-            len(text_plugins_report["unsaved_instances"]),
-            1)
+        for plugin in report:
+            if plugin["type"] == "BogusPlugin":
+                self.assertEqual(len(plugin["instances"]), 1)
+                self.assertFalse(plugin["model"])
+            if plugin["type"] == "LinkPlugin":
+                self.assertEqual(len(plugin["instances"]), 1)
+            if plugin["type"] == "TextPlugin":
+                self.assertEqual(len(plugin["instances"]), 5)
 
         out = StringIO()
         management.call_command('cms', 'delete-orphaned-plugins', interactive=False, stdout=out)
@@ -287,6 +287,20 @@ class ManagementTestCase(CMSTestCase):
         # No gaps in plugin tree
         max_position = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
         self.assertEqual(max_position, 3)
+
+        self.assertEqual(CMSPlugin.objects.all().count(), 3)
+
+        # Then both detached placeholders and their plugins should be gone
+        self.assertFalse(Placeholder.objects.filter(pk=ph_detached.pk).exists())
+        self.assertFalse(Placeholder.objects.filter(pk=ph_bogus.pk).exists())
+        self.assertFalse(CMSPlugin.objects.filter(pk=pl_detached.pk).exists())
+        self.assertFalse(CMSPlugin.objects.filter(pk=pl_bogus.pk).exists())
+
+        # check stdout
+        output = out.getvalue()
+        self.assertIn("1 uninstalled plugins", output)
+        self.assertIn("1 plugins with unsaved instances", output)
+        self.assertIn("2 detached placeholders", output)
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_delete_orphaned_plugins_keeps_positions_consecutive(self):
@@ -739,6 +753,37 @@ class DjangoCmsCommandTestCase(CMSTestCase):
             sys.stdout = old_stdout
         result = out.getvalue()
         self.assertEqual(result, __version__ + "\n")
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_delete_orphaned_plugins_with_versioning_simulation(self):
+        # We simulate versioning (meaning rows might be filtered by the default manager).
+        # We will create a user, but assign it a custom manager that filters it out.
+        User = get_user_model()
+
+        class FilteredUser(User):
+            class Meta:
+                proxy = True
+                app_label = 'auth'
+
+            class MyManager(models.Manager):
+                def get_queryset(self):
+                    return super().get_queryset().none()
+
+            objects = MyManager()
+
+        content_type = ContentType.objects.get_for_model(FilteredUser, for_concrete_model=False)
+        self.assertEqual(content_type.model_class(), FilteredUser)
+        obj = FilteredUser.objects.create(username="test_versioning")
+
+        ph = Placeholder.objects.create(slot="test_versioning_slot", content_type=content_type, object_id=obj.pk)
+        add_plugin(ph, TextPlugin, "en", body="en body versioning")
+
+        out = StringIO()
+        management.call_command('cms', 'delete-orphaned-plugins', interactive=False, stdout=out)
+
+        # Test that the placeholder wasn't deleted
+        self.assertTrue(Placeholder.objects.filter(pk=ph.pk).exists())
+        obj.delete()
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_delete_orphaned_plugins_keeps_positions_consecutive(self):
