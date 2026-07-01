@@ -18,6 +18,13 @@
     }
 }
 
+// The toggle is an <a> without href (CSP-safe, no "javascript:" URI), so the
+// pointer cursor has to be set explicitly. Disabled toggles keep "not-allowed"
+// via the higher-specificity .cms-btn.cms-btn-disabled rule.
+.cms-dropdown-toggle {
+    cursor: pointer;
+}
+
 // Prevent the focus on the dropdown toggle when closing dropdowns
 .cms-dropdown-toggle:focus {
     outline: 0;

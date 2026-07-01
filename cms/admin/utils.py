@@ -165,6 +165,8 @@ CONTENT_PREFIX = "content__"
 class GrouperChangeListBase(ChangeList):
     """Subclass ChangeList to disregard grouping fields get parameter as filter"""
 
+    current_language: str = None
+    available_languages: tuple[tuple[str, str], ...] = ()
     _extra_grouping_fields = []
 
     def get_filters_params(self, params: dict | None = None):
@@ -448,7 +450,11 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def get_changelist_instance(self, request: HttpRequest) -> GrouperChangeListBase:
         """Update grouping field properties and get changelist instance"""
         self.get_grouping_from_request(request)
-        return super().get_changelist_instance(request)
+        cl = super().get_changelist_instance(request)
+        cl.current_language = self.get_language()
+        if "language" in self.extra_grouping_fields:
+            cl.available_languages = self.get_language_tuple()
+        return cl
 
     def changeform_view(
         self,
