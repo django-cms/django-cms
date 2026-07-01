@@ -168,7 +168,7 @@ def set_page_cache(response: HttpResponse) -> HttpResponse:
     return response
 
 
-def get_page_cache(request: HttpRequest) -> tuple | None:
+def get_page_cache(request: HttpRequest) -> tuple[bytes, Mapping[str, str], datetime] | None:
     """Return the cached page response for ``request`` or ``None``.
 
     Mirrors Django's two-step ``get_cache_key`` lookup: first the list of
