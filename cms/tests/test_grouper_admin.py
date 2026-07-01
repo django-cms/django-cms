@@ -515,6 +515,124 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             self.assertContains(response, 'name="content__language" value="de"')
             self.assertNotContains(response, 'name="content__language" value="en"')
 
+    def test_is_latest_content_obj(self) -> None:
+        """The latest content object is recognized as such, a stale one is not, and the
+        add view (no content object) counts as latest."""
+        content = self.createContentInstance("en")
+        self.admin.language = "en"
+        try:
+            # The actual content object is the latest
+            self.assertTrue(self.admin.is_latest_content_obj(content, self.grouper_instance))
+            # A stale content object (different pk) is not the latest
+            stale = copy.copy(content)
+            stale.pk = content.pk + 1000
+            self.assertFalse(self.admin.is_latest_content_obj(stale, self.grouper_instance))
+            # The add view (no content object) always counts as latest
+            self.assertTrue(self.admin.is_latest_content_obj(None))
+        finally:
+            del self.admin.language
+
+    def test_language_selector_shown_for_latest_content(self) -> None:
+        """The change form offers the language selector when the latest content is shown."""
+        self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.change_url + "?language=en")
+            self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_language_selector_hidden_for_non_latest_content(self) -> None:
+        """The change form drops the language selector when an older (non-latest) content
+        object is shown. Switching languages back and forth would otherwise silently bring
+        up the latest content instead - confusing UX."""
+        content = self.createContentInstance("en")
+        # Simulate a versioning package that shows an older (non-latest) content object
+        stale = copy.copy(content)
+        stale.pk = content.pk + 1000
+        with patch.object(type(self.admin), "get_content_obj", return_value=stale):
+            with self.login_user_context(self.admin_user):
+                response = self.client.get(self.change_url + "?language=en")
+                self.assertNotContains(response, 'id="page_form_lang_tabs"')
+
+    def test_get_urls_declares_content_change_when_unregistered(self) -> None:
+        """The grouper admin provides a change URL for the (unregistered) content model."""
+        names = [url.name for url in self.admin.get_urls()]
+        self.assertIn("sampleapp_groupermodelcontent_change", names)
+
+    def test_get_urls_skips_content_change_when_registered(self) -> None:
+        """The declaration is dropped when the content model has its own admin."""
+        site.register(GrouperModelContent)
+        try:
+            names = [url.name for url in self.admin.get_urls()]
+            self.assertNotIn("sampleapp_groupermodelcontent_change", names)
+        finally:
+            site.unregister(GrouperModelContent)
+
+    def test_content_change_url_redirects_to_grouper(self) -> None:
+        """A content object's change URL redirects to the grouper change view, selecting that
+        specific content object and its grouping fields."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        content_change_url = admin_reverse("sampleapp_groupermodelcontent_change", args=(content.pk,))
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(content_change_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith(self.change_url))
+        self.assertIn(f"{param}={content.pk}", response.url)
+        self.assertIn("language=en", response.url)
+
+    def test_content_change_redirect_rejects_post(self) -> None:
+        """The redirect view is GET-only: a POST is rejected (405) rather than silently turned
+        into a GET that discards its payload."""
+        content = self.createContentInstance("en")
+        content_change_url = admin_reverse("sampleapp_groupermodelcontent_change", args=(content.pk,))
+        with self.login_user_context(self.admin_user):
+            response = self.client.post(content_change_url, data={"category_name": "changed"})
+        self.assertEqual(response.status_code, 405)
+
+    def test_specific_content_obj_shown_and_selector_dropped(self) -> None:
+        """Requesting a specific (non-latest) content object by pk shows exactly that object and
+        drops the language selector."""
+        param = self.admin.content_pk_url_param
+        latest = self.createContentInstance("en")  # lower pk: picked as latest by .first()
+        other = self.createContentInstance("en")  # higher pk: a different content object
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.change_url}?{param}={other.pk}")
+        # The requested (non-latest) content object is shown ...
+        self.assertContains(response, other.secret_greeting)
+        self.assertNotContains(response, latest.secret_greeting)
+        # ... and the language selector is dropped because it is not the latest content
+        self.assertNotContains(response, 'id="page_form_lang_tabs"')
+
+    def test_specific_latest_content_obj_keeps_selector(self) -> None:
+        """Requesting the latest content object by pk shows it and keeps the language selector."""
+        param = self.admin.content_pk_url_param
+        latest = self.createContentInstance("en")  # lower pk: picked as latest by .first()
+        self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.change_url}?{param}={latest.pk}")
+        self.assertContains(response, latest.secret_greeting)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_invalid_content_pk_falls_back_to_latest(self) -> None:
+        """An invalid content pk is ignored and the latest content is shown."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.change_url}?language=en&{param}=not-a-pk")
+        self.assertContains(response, content.secret_greeting)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_nonexistent_content_pk_falls_back_to_latest(self) -> None:
+        """A syntactically valid but nonexistent content pk falls back to the latest content."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        nonexistent_pk = content.pk + 1
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(
+                f"{self.change_url}?language=en&{param}={nonexistent_pk}"
+            )
+        self.assertContains(response, content.secret_greeting)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
     @wo_content_permission
     def test_change_form_wo_write_permit(self) -> None:
         """If no change permission exists for content mark content fields readonly."""

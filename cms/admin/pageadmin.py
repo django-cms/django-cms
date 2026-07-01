@@ -957,7 +957,13 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             "language_tabs": get_language_tuple(site.pk),
             "filled_languages": self.get_filled_languages(request, obj.page),
         }
-        context["show_language_tabs"] = len(context["language_tabs"])
+        # Only offer the language selector for the latest content. Switching the language always
+        # navigates to the latest content of the target language, so for an older content object
+        # (e.g. an outdated version) switching languages back and forth would silently bring up a
+        # different (the latest) content object - confusing UX.
+        latest = obj.page.get_admin_content(obj.language)
+        is_latest_content = getattr(latest, "pk", None) == obj.pk
+        context["show_language_tabs"] = len(context["language_tabs"]) if is_latest_content else 0
         context.update(extra_context or {})
 
         if "basic_info" in extra_context:
