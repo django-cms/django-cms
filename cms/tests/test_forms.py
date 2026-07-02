@@ -401,8 +401,8 @@ class PermissionFormTestCase(CMSTestCase):
             form = PagePermissionInlineAdminForm(data=data, files=None)
 
             error_message = (
-                "<li>Users can't create a page without permissions "
-                "to change the created page. Edit permissions required.</li>"
+                "<li>Users can't create a page without also being able to "
+                "change it. Please also enable 'Can edit'.</li>"
             )
             self.assertFalse(form.is_valid())
             self.assertTrue(error_message in unescape(str(form.errors)))

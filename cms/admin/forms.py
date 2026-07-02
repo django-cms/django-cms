@@ -36,7 +36,10 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
-from cms.models.permissionmodels import User
+from cms.models.permissionmodels import (
+    EDIT_PERMISSION_REQUIRED_MESSAGES,
+    User,
+)
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
 from cms.operations.helpers import (
     send_post_page_operation,
@@ -1305,28 +1308,22 @@ class GenericCmsPermissionForm(forms.ModelForm):
         # Validate Page options
         if not data.get("can_change_page"):
             if data.get("can_add_page"):
-                message = _(
-                    "Users can't create a page without permissions "
-                    "to change the created page. Edit permissions required."
-                )
-                raise ValidationError(message)
+                raise ValidationError(EDIT_PERMISSION_REQUIRED_MESSAGES["can_add"])
 
             if data.get("can_delete_page"):
-                message = _(
-                    "Users can't delete a page without permissions to change the page. Edit permissions required."
-                )
-                raise ValidationError(message)
+                raise ValidationError(EDIT_PERMISSION_REQUIRED_MESSAGES["can_delete"])
 
             if data.get("can_add_pagepermission"):
                 message = _(
-                    "Users can't set page permissions without permissions to change a page. Edit permissions required."
+                    "Users can't set page permissions without also being able to "
+                    "change the page. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
 
             if data.get("can_delete_pagepermission"):
                 message = _(
-                    "Users can't delete page permissions without permissions "
-                    "to change a page. Edit permissions required."
+                    "Users can't delete page permissions without also being able "
+                    "to change the page. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
 
@@ -1334,15 +1331,15 @@ class GenericCmsPermissionForm(forms.ModelForm):
         if not data.get("can_change_pagepermission"):
             if data.get("can_add_pagepermission"):
                 message = _(
-                    "Users can't create page permissions without permissions "
-                    "to change the created permission. Edit permissions required."
+                    "Users can't create page permissions without also being able "
+                    "to change them. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
 
             if data.get("can_delete_pagepermission"):
                 message = _(
-                    "Users can't delete page permissions without permissions "
-                    "to change permissions. Edit permissions required."
+                    "Users can't delete page permissions without also being able "
+                    "to change them. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
 
