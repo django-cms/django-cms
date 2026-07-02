@@ -24,6 +24,7 @@ from cms.forms.utils import (
 )
 from cms.forms.widgets import ApplicationConfigSelect
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
+from cms.utils.permissions import current_user
 from cms.test_utils.testcases import (
     URL_CMS_PAGE_ADVANCED_CHANGE,
     URL_CMS_PAGE_PERMISSIONS,
@@ -377,7 +378,7 @@ class PermissionFormTestCase(CMSTestCase):
             response = self.client.get(URL_CMS_PAGE_PERMISSIONS % page.pk)
             self.assertEqual(response.status_code, 200)
 
-        with self.settings(CMS_RAW_ID_USERS=True):
+        with self.settings(CMS_RAW_ID_USERS=True), current_user(self.get_superuser()):
             data = {
                 "page": page.pk,
                 "grant_on": "hello",
