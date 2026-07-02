@@ -21,7 +21,12 @@ from django.utils.html import escape
 from django.utils.translation import get_language, gettext_lazy as _, override
 
 from cms.admin.forms import RequestToolbarForm
-from cms.api import add_plugin, create_page, create_page_content
+from cms.api import (
+    add_plugin,
+    assign_user_to_page,
+    create_page,
+    create_page_content,
+)
 from cms.cms_toolbars import (
     ADMIN_MENU_IDENTIFIER,
     ADMINISTRATION_BREAK,
@@ -347,6 +352,38 @@ class ToolbarTests(ToolbarTestBase):
                 data={"obj_id": cms_page.pk, "obj_type": "cms.somemodel", "cms_path": cms_page.get_absolute_url("en")},
             )
             self.assertEqual(response.status_code, 400)
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_toolbar_request_endpoint_enforces_object_view_permission(self):
+        # The obj_id/obj_type come straight from the client, so the endpoint
+        # must enforce an object-level view check before rendering a toolbar
+        # (which discloses the object's title/breadcrumb/edit URLs). A staff
+        # user who cannot view a restricted page must be denied.
+        endpoint = self.get_admin_url(UserSettings, "get_toolbar")
+        cms_page = create_page("secret-page", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(cms_page)
+
+        # Grant view to one user only -> the page is now view-restricted.
+        assign_user_to_page(cms_page, self.get_standard_user(), can_view=True)
+
+        data = {
+            "obj_id": page_content.pk,
+            "obj_type": "cms.pagecontent",
+            "cms_path": get_object_edit_url(page_content),
+        }
+
+        # A staff user without view permission is denied with the same generic
+        # response as an unknown object (no existence oracle).
+        with self.login_user_context(self.get_staff_user_with_no_permissions()):
+            response = self.client.get(endpoint, data=data)
+        self.assertEqual(response.status_code, 400)
+        self.assertNotContains(response, "Clipboard", status_code=400)
+
+        # A superuser can still render the toolbar.
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(endpoint, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Clipboard")
 
     def test_toolbar_request_form(self):
         cms_page = create_page("toolbar-page", "col_two.html", "en")
