@@ -24,12 +24,12 @@ from cms.forms.utils import (
 )
 from cms.forms.widgets import ApplicationConfigSelect
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-from cms.utils.permissions import current_user
 from cms.test_utils.testcases import (
     URL_CMS_PAGE_ADVANCED_CHANGE,
     URL_CMS_PAGE_PERMISSIONS,
     CMSTestCase,
 )
+from cms.utils.permissions import current_user
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
