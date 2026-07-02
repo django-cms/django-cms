@@ -108,23 +108,15 @@
     {% render_block "js" %}
 
     {% language request.toolbar.toolbar_language %}
-    <script>
-        {% if user.is_authenticated %}
-            CMS.$(function () {
-                var btn = CMS.$('.js-welcome-add');
-                btn.on('click', function (e) {
-                    e.preventDefault();
-                    var modal = new CMS.Modal();
-                    modal.open({
-                        url: '{% url "admin:cms_wizard_create" %}?language={{ LANGUAGE_CODE }}',
-                        title: '{% trans "Welcome to django CMS" %}'
-                    });
-                });
-            });
-        {% else %}
-            window.location.href = '{% url "admin:login" %}?next={{ next_url }}';
-        {% endif %}
-    </script>
+    {% if user.is_authenticated %}
+        <div id="cms-welcome-config"
+             data-add-url="{% url "admin:cms_wizard_create" %}?language={{ LANGUAGE_CODE }}"
+             data-add-title="{% trans "Welcome to django CMS" %}"></div>
+    {% else %}
+        <div id="cms-welcome-config"
+             data-login-url="{% url "admin:login" %}?next={{ next_url }}"></div>
+    {% endif %}
     {% endlanguage %}
+    <script src="{% static_with_version "cms/js/welcome.js" %}"></script>
 </body>
 </html>

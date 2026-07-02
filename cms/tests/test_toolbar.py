@@ -10,7 +10,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.http import HttpResponse, QueryDict
-from django.template.defaultfilters import truncatewords
+from django.template.defaultfilters import date as date_filter, truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -59,7 +59,6 @@ from cms.toolbar.utils import (
     get_object_structure_url,
 )
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -1531,21 +1530,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         )
 
     def test_filters_date(self):
-        # Ensure we have a consistent testing env...
-        with self.settings(USE_L10N=False, DATE_FORMAT="M. d, Y"):
-            user = self.get_staff()
-            page = create_page("Test", "col_two.html", "en")
-            page_content = self.get_pagecontent_obj(page)
-            edit_url = get_object_edit_url(page_content)
-            ex1 = Example1(
-                char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>",
-                char_2="char_2",
-                char_3="char_3",
-                char_4="char_4",
-                date_field=datetime.date(2012, 1, 2),
-            )
-            ex1.save()
-            template_text = """{% extends "base.html" %}
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = Example1(
+            char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+            date_field=datetime.date(2012, 1, 2),
+        )
+        ex1.save()
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
@@ -1553,61 +1550,61 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% endblock content %}
 """
 
-            request = self.get_page_request(page, user, edit_url)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                "<h1>"
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "{4}"
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "</h1>".format(
-                    "placeholderapp",
-                    "example1",
-                    "date_field",
-                    ex1.pk,
-                    ex1.date_field.strftime("%b. %d, %Y" if DJANGO_4_2 else "%b. %-d, %Y"),
-                ),
-            )
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            "<h1>"
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "{4}"
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "</h1>".format(
+                "placeholderapp",
+                "example1",
+                "date_field",
+                ex1.pk,
+                date_filter(ex1.date_field),
+            ),
+        )
 
-            template_text = """{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" "" "" "safe" %}</h1>
 {% endblock content %}
 """
-            request = self.get_page_request(page, user, edit_url)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                "<h1>"
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "{4}"
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "</h1>".format(
-                    "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y-%m-%d")
-                ),
-            )
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            "<h1>"
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "{4}"
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "</h1>".format(
+                "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y-%m-%d")
+            ),
+        )
 
-            template_text = """{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" "" "" 'date:"Y m d"' %}</h1>
 {% endblock content %}
 """
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                "<h1>"
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "{4}"
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "</h1>".format(
-                    "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y %m %d")
-                ),
-            )
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            "<h1>"
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "{4}"
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "</h1>".format(
+                "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y %m %d")
+            ),
+        )
 
     def test_filters_notoolbar(self):
         user = self.get_staff()
@@ -2793,6 +2790,20 @@ class ToolbarAPITests(TestCase):
         result = api.find_first(LinkItem, name="Test")
         self.assertNotEqual(result, None)
         self.assertEqual(result.index, 0)
+
+    def test_find_item_lazy_matches_source_not_translation(self):
+        # Lazy (gettext_lazy) names are matched by their *source* string, independent of the
+        # active language. Third-party apps must therefore search by the untranslated string.
+        api = ToolbarAPIMixin()
+        with override("de"):
+            label = _("Save")
+            # Sanity check: the German catalog is active, so the label actually translates.
+            self.assertNotEqual(str(label), "Save")
+            api.add_link_item(label, None)
+            # Found by the untranslated source string...
+            self.assertIsNotNone(api.find_first(LinkItem, name="Save"))
+            # ...but not by its translation.
+            self.assertIsNone(api.find_first(LinkItem, name=str(label)))
 
     def test_not_is_staff(self):
         request = RequestFactory().get("/en/")

@@ -101,8 +101,6 @@ class GetPreviewUrl(AsTag):
             )
         if not page_content:
             return ""
-        # Frontend-editable objects (non-PageContent) may not carry a language
-        # attribute; fall back to the active request language. See PR #8691.
         return self.get_url(page_content, language=getattr(page_content, "language", None))
 
     def get_url(self, object, language):
