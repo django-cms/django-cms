@@ -80,7 +80,7 @@ class PythonAPITests(CMSTestCase):
 
         set_current_user(prior_user)
         try:
-            create_page_content("de", "Titel", page, created_by=creator)
+            create_page_content("de", "Überschrift", page, created_by=creator)
             self.assertEqual(get_current_user(), prior_user)
         finally:
             set_current_user(None)
