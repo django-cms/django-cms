@@ -238,50 +238,57 @@ def create_page(
     else:
         application_urls = None
 
-    # ugly permissions hack
+    # ugly permissions hack: expose the creator through the _current_user
+    # context variable for the duration of the creation, then restore the
+    # previous value. Capturing the token and resetting (instead of blindly
+    # setting None at the end) avoids clobbering a user set by
+    # CurrentUserMiddleware and prevents leaking the creator into the next
+    # operation on the same thread. See cms.utils.permissions.reset_current_user.
     if created_by and isinstance(created_by, get_user_model()):
-        _current_user.set(created_by)
+        user_token = _current_user.set(created_by)
         created_by = get_clean_username(created_by)
     else:
-        _current_user.set(None)
+        user_token = _current_user.set(None)
 
-    if reverse_id:
-        if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
-            raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
+    try:
+        if reverse_id:
+            if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
+                raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
-    page = Page(
-        parent=parent,
-        created_by=created_by,
-        changed_by=created_by,
-        reverse_id=reverse_id,
-        navigation_extenders=navigation_extenders,
-        application_urls=application_urls,
-        application_namespace=apphook_namespace,
-        login_required=login_required,
-        site=site,
-    )
-    page.add_to_tree(position=position)
-    page.save()
+        page = Page(
+            parent=parent,
+            created_by=created_by,
+            changed_by=created_by,
+            reverse_id=reverse_id,
+            navigation_extenders=navigation_extenders,
+            application_urls=application_urls,
+            application_namespace=apphook_namespace,
+            login_required=login_required,
+            site=site,
+        )
+        page.add_to_tree(position=position)
+        page.save()
 
-    create_page_content(
-        language=language,
-        title=title,
-        menu_title=menu_title,
-        page_title=page_title,
-        slug=slug,
-        created_by=created_by,
-        redirect=redirect,
-        meta_description=meta_description,
-        page=page,
-        overwrite_url=overwrite_url,
-        soft_root=soft_root,
-        in_navigation=in_navigation,
-        template=template,
-        limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,
-    )
-    _current_user.set(None)
-    return page
+        create_page_content(
+            language=language,
+            title=title,
+            menu_title=menu_title,
+            page_title=page_title,
+            slug=slug,
+            created_by=created_by,
+            redirect=redirect,
+            meta_description=meta_description,
+            page=page,
+            overwrite_url=overwrite_url,
+            soft_root=soft_root,
+            in_navigation=in_navigation,
+            template=template,
+            limit_visibility_in_menu=limit_visibility_in_menu,
+            xframe_options=xframe_options,
+        )
+        return page
+    finally:
+        _current_user.reset(user_token)
 
 
 @transaction.atomic
@@ -348,49 +355,61 @@ def create_page_content(
     elif path is None:
         path = page.get_path_for_slug(slug, language)
 
+    # When called directly (not via create_page) with a user instance, expose
+    # it through the _current_user context variable so signal handlers and
+    # PageContent.objects.with_user() attribute the creation correctly. Capture
+    # the token so we can restore the previous value at the end -- otherwise the
+    # user leaks into the next operation on the same thread when
+    # CurrentUserMiddleware is not installed (it only resets at the request
+    # boundary). See cms.utils.permissions.reset_current_user.
+    user_token = None
     if created_by and isinstance(created_by, get_user_model()):
-        _current_user.set(created_by)
+        user_token = _current_user.set(created_by)
         created_by = get_clean_username(created_by)
 
     try:
-        from cms.forms.validators import validate_url_uniqueness
+        try:
+            from cms.forms.validators import validate_url_uniqueness
 
-        validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
-    except ValidationError as e:
-        raise IntegrityError(e)
+            validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+        except ValidationError as e:
+            raise IntegrityError(e)
 
-    page.urls.update_or_create(
-        page=page,
-        language=language,
-        defaults=dict(
-            slug=slug,
-            path=path,
-            managed=not bool(overwrite_url),
-        ),
-    )
+        page.urls.update_or_create(
+            page=page,
+            language=language,
+            defaults=dict(
+                slug=slug,
+                path=path,
+                managed=not bool(overwrite_url),
+            ),
+        )
 
-    # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
-    user = _current_user.get(None)
-    page_content = PageContent.objects.with_user(user).create(
-        language=language,
-        title=title,
-        menu_title=menu_title,
-        page_title=page_title,
-        redirect=redirect,
-        meta_description=meta_description,
-        page=page,
-        created_by=created_by,
-        changed_by=created_by,
-        soft_root=soft_root,
-        in_navigation=in_navigation,
-        template=template,
-        limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,
-    )
-    page_content.rescan_placeholders()
-    page._clear_internal_cache()
+        # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
+        user = _current_user.get(None)
+        page_content = PageContent.objects.with_user(user).create(
+            language=language,
+            title=title,
+            menu_title=menu_title,
+            page_title=page_title,
+            redirect=redirect,
+            meta_description=meta_description,
+            page=page,
+            created_by=created_by,
+            changed_by=created_by,
+            soft_root=soft_root,
+            in_navigation=in_navigation,
+            template=template,
+            limit_visibility_in_menu=limit_visibility_in_menu,
+            xframe_options=xframe_options,
+        )
+        page_content.rescan_placeholders()
+        page._clear_internal_cache()
 
-    return page_content
+        return page_content
+    finally:
+        if user_token is not None:
+            _current_user.reset(user_token)
 
 
 @transaction.atomic
