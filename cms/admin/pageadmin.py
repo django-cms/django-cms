@@ -1140,6 +1140,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 to_attr="filtered_translations",
                 queryset=page_contents,
             ),
+            "urls",  # rendering a tree row resolves the page's URLs
         )
 
         if changelist_form.is_filtered():
@@ -1342,6 +1343,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 to_attr="filtered_translations",
                 queryset=PageContent.admin_manager.get_queryset().latest_content(),
             ),
+            "urls",  # rendering a tree row resolves the page's URLs
         )
         rows = self.get_tree_rows(
             request,

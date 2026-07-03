@@ -11,9 +11,10 @@ from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.forms.models import model_to_dict
+from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
-from django.test.utils import override_settings
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.urls import clear_url_caches
 from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
@@ -1623,6 +1624,40 @@ class PageTest(PageTestBase):
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
             content = force_str(parsed)
             self.assertIn(tree, content)
+
+    def test_page_tree_prefetches_page_urls(self):
+        """
+        Regression test: the page tree endpoints must fetch the ``PageUrl``
+        objects of all pages in bulk instead of issuing one query per page
+        row (triggered by ``Page.get_url_obj`` filling ``urls_cache`` from
+        ``self.urls.all()`` for every rendered row).
+        """
+        superuser = self.get_superuser()
+
+        create_page("Home", "nav_playground.html", "en")
+        for index in range(4):
+            create_page(f"Page {index}", "nav_playground.html", "en")
+
+        endpoints = (
+            self.get_admin_url(PageContent, "get_tree"),
+            self.get_admin_url(PageContent, "changelist"),
+        )
+
+        with self.login_user_context(superuser):
+            for endpoint in endpoints:
+                with self.subTest(endpoint=endpoint):
+                    with CaptureQueriesContext(connection) as queries:
+                        response = self.client.get(endpoint)
+                    self.assertEqual(response.status_code, 200)
+                    page_url_queries = [
+                        query["sql"] for query in queries.captured_queries if '"cms_pageurl"' in query["sql"]
+                    ]
+                    self.assertLessEqual(
+                        len(page_url_queries),
+                        1,
+                        "The page tree issued one PageUrl query per page instead "
+                        "of prefetching them:\n" + "\n".join(page_url_queries),
+                    )
 
     def test_page_tree_redirect_icon_display(self):
         """Test that redirect icon is displayed in page tree when page has redirect"""
