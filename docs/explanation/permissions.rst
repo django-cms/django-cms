@@ -8,9 +8,84 @@ need finer control. This page explains how those two layers fit
 together, the roles they are designed to support, and the trade-offs
 that come with each.
 
-For step-by-step setup of users and groups, see the Django admin and
-your project's permission how-to (under construction). This page is
-about *why* the system looks the way it does.
+
+****************
+Permission modes
+****************
+
+Permissions operate in two different modes, depending on the :setting:`CMS_PERMISSION` setting.
+
+* Simple permissions mode (``CMS_PERMISSION = False``): only the standard Django Users and Groups
+  permissions will apply. This is the default.
+* Page permissions mode (``CMS_PERMISSION = True``): as well as standard Django permissions, django
+  CMS provides row-level permissions on pages, allowing you to control the access of users to
+  different sections of a site, and sites within a multi-site project.
+
+.. _key-user-permissions:
+
+********************
+Key user permissions
+********************
+
+You can find the permissions you can set for a user or groups in the Django admin, in the
+*Authentication and Authorization* section. These apply equally in Simple permissions mode and
+Page permissions mode.
+
+Filtering by ``cms`` will show the ones that belong to the CMS application. Permissions that a CMS
+editor will need are likely to include the following core package permissions:
+
+* ``django CMS | cms plugin``
+* ``django CMS | page``
+* ``django CMS | placeholder``
+* ``django CMS | placeholder reference``
+
+Most of these offer the usual add/change/delete options, though there are some exceptions, such as
+``django CMS | placeholder | Can use Structure mode``.
+
+In addition to the core package permissions, an editor will likely need the following permissions
+from 3rd-party packages:
+
+* `djangocms-alias <https://pypi.org/project/djangocms-alias/>`_
+
+  * ``django CMS Alias | alias``
+  * ``django CMS Alias | alias content``
+  * ``django CMS Alias | category``
+
+* `djangocms-frontend <https://pypi.org/project/djangocms-frontend/>`_
+
+  * ``django CMS Frontend | UI item``
+  * After adding these permissions, save and use the ``python manage.py frontend sync_permissions``
+    command as documented in `djangocms-frontend's documentation
+    <https://djangocms-frontend.readthedocs.io/en/stable/tutorial/builtin_components.html#assigning-permissions>`_
+
+* `djangocms-text <https://pypi.org/project/djangocms-text/>`_
+
+  * ``django CMS Rich Text | text``
+
+* `djangocms-versioning <https://pypi.org/project/djangocms-versioning/>`_
+
+  * ``django CMS Versioning | alias content version``
+  * ``django CMS Versioning | page content version``
+  * ``django CMS Versioning | version``
+
+Typically when adding other 3rd party packages or custom plugins you may need to add additional
+permissions to enable their features. Sometimes documentation for such needed permissions may be
+missing, in that case you can compare the list of available permissions with the package enabled
+and disabled on your site.
+
+See :ref:`use-permissions-on-groups` below on applying permissions to groups rather than users.
+
+
+************************************
+Permissions in Page permissions mode
+************************************
+
+In Page permissions mode, you also need to give users permission to the right pages and sub-sites.
+
+
+.. _global-and-per-page-permissions:
+
+Global and per-page permissions
 
 *********************
 Roles, not just users
