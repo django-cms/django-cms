@@ -29,15 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // hide rows when hidden input fields are added
-    document.querySelectorAll('input[type="hidden"]').forEach(input => {
-        const parent = input.closest('.form-row');
-
-        if (parent) {
-            parent.style.display = 'none';
-        }
-    });
-
     document.querySelectorAll('#page_form_lang_tabs .language_button').forEach(btn => {
         btn.addEventListener('click', function() {
             CMS.API.changeLanguage(this.dataset.adminUrl);
