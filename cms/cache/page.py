@@ -1,5 +1,10 @@
+from __future__ import annotations
+
+import datetime
 import hashlib
+from collections.abc import Mapping
 from datetime import timedelta
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.cache import (
@@ -19,8 +24,15 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
 from cms.utils.i18n import get_default_language_for_site
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
-def _page_cache_key(request, vary_on=None):
+    from django.http import HttpRequest, HttpResponse
+
+    from cms.models import Page
+
+
+def _page_cache_key(request: HttpRequest, vary_on: Iterable[str] | None = None) -> str:
     """
     Generate a cache key based on the request path and language.
     The language is determined following django-cms's language resolution order.
@@ -49,7 +61,7 @@ def _page_cache_key(request, vary_on=None):
     return cache_key
 
 
-def _vary_on_hash(request, vary_on):
+def _vary_on_hash(request: HttpRequest, vary_on: Iterable[str]) -> str:
     """Hash of the request's values for the given (plugin-declared) headers."""
     ctx = hashlib.sha1()
     for header in sorted(header.lower() for header in vary_on):
@@ -60,7 +72,7 @@ def _vary_on_hash(request, vary_on):
     return ctx.hexdigest()
 
 
-def _page_vary_headers_cache_key(request):
+def _page_vary_headers_cache_key(request: HttpRequest) -> str:
     """Key under which the list of plugin-declared vary headers is stored.
 
     The list cannot be known on a cache read until the page is rendered, so it
@@ -70,7 +82,23 @@ def _page_vary_headers_cache_key(request):
     return _page_cache_key(request) + ".vary-on"
 
 
-def set_page_cache(response):
+def set_page_cache(response: HttpResponse) -> HttpResponse:
+    """Store a rendered page response in the CMS page cache.
+
+    The response is only cached for anonymous requests when the page cache is
+    enabled and the toolbar has not disabled caching. The cache timeout is the
+    smallest of the configured ``content`` duration and every cache-able
+    placeholder's TTL (as returned by ``get_cache_expiration()``); if any
+    placeholder requests ``EXPIRE_NOW`` the response is not cached at all.
+
+    When the response is cacheable, expiration and ``Vary`` headers are patched
+    onto it and two entries are written: the list of plugin-declared vary
+    headers (see :func:`_page_vary_headers_cache_key`) and the response payload
+    (content, headers and absolute expiry timestamp) under the header-aware
+    content key. Otherwise ``never cache`` headers are added.
+
+    Returns the (possibly header-patched) ``response``.
+    """
     from django.core.cache import cache
 
     request = response._request
@@ -142,7 +170,15 @@ def set_page_cache(response):
     return response
 
 
-def get_page_cache(request):
+def get_page_cache(request: HttpRequest) -> tuple[bytes, Mapping[str, str], datetime] | None:
+    """Return the cached page response for ``request`` or ``None``.
+
+    Mirrors Django's two-step ``get_cache_key`` lookup: first the list of
+    plugin-declared vary headers is read, then the request's values for those
+    headers are folded into the content key so the matching variant is
+    returned. The cached value is the ``(content, headers, expires_datetime)``
+    tuple stored by :func:`set_page_cache`, or ``None`` on a cache miss.
+    """
     from django.core.cache import cache
 
     version = _get_cache_version()
@@ -152,28 +188,63 @@ def get_page_cache(request):
     return cache.get(_page_cache_key(request, vary_on), version=version)
 
 
-def get_xframe_cache(page):
+def get_xframe_cache(page: Page) -> int | None:
+    """Return the cached ``X-Frame-Options`` value for ``page`` or ``None``."""
     from django.core.cache import cache
 
     return cache.get("cms:xframe_options:%s" % page.pk)
 
 
-def set_xframe_cache(page, xframe_options):
+def set_xframe_cache(page: Page, xframe_options: int) -> None:
+    """Cache the resolved ``X-Frame-Options`` value for ``page``.
+
+    The cache version is re-written afterwards so the version key always
+    outlives the entries written against it (see
+    :func:`cms.cache.invalidate_cms_page_cache`).
+    """
     from django.core.cache import cache
 
     cache.set("cms:xframe_options:%s" % page.pk, xframe_options, version=_get_cache_version())
     _set_cache_version(_get_cache_version())
 
 
-def _page_url_key(page_lookup, lang, site_id):
-    return _get_cache_key("page_url", page_lookup, lang, site_id) + "_type:absolute_url"
+def _page_url_key(
+    page_lookup: Any,
+    lang: str,
+    site_id: int,
+    extra_key: str | None,
+) -> str:
+    """Build the cache key for a page's absolute URL.
+
+    ``page_lookup`` is the untyped page reference accepted by the ``page_url``
+    template tag (a :class:`~cms.models.Page`, pk, reverse id, ...). When
+    ``extra_key`` is a string it is folded into the key so callers can cache
+    distinct URLs (e.g. per query string) for the same page.
+    """
+    return "".join([
+        _get_cache_key("page_url", page_lookup, lang, site_id),
+        f"_key:{extra_key}" if isinstance(extra_key, str) else "",
+        "_type:absolute_url",
+    ])
 
 
-def set_page_url_cache(page_lookup, lang, site_id, url):
+def set_page_url_cache(
+    page_lookup: Any,
+    lang: str,
+    site_id: int,
+    url: str,
+    extra_key: str | None = None,
+) -> None:
+    """Cache the absolute ``url`` of a page for the ``content`` duration.
+
+    The cache version is re-written afterwards so the version key always
+    outlives the entries written against it (see
+    :func:`cms.cache.invalidate_cms_page_cache`).
+    """
     from django.core.cache import cache
 
     cache.set(
-        _page_url_key(page_lookup, lang, site_id),
+        _page_url_key(page_lookup, lang, site_id, extra_key),
         url,
         get_cms_setting("CACHE_DURATIONS")["content"],
         version=_get_cache_version(),
@@ -181,7 +252,13 @@ def set_page_url_cache(page_lookup, lang, site_id, url):
     _set_cache_version(_get_cache_version())
 
 
-def get_page_url_cache(page_lookup, lang, site_id):
+def get_page_url_cache(
+    page_lookup: Any,
+    lang: str,
+    site_id: int,
+    extra_key: str | None = None,
+) -> str | None:
+    """Return the cached absolute URL for a page lookup, or ``None`` on a miss."""
     from django.core.cache import cache
 
-    return cache.get(_page_url_key(page_lookup, lang, site_id), version=_get_cache_version())
+    return cache.get(_page_url_key(page_lookup, lang, site_id, extra_key), version=_get_cache_version())
