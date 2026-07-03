@@ -122,7 +122,7 @@ class AbstractPagePermission(models.Model):
     can_change_permissions = models.BooleanField(
         _("can change permissions"),
         default=False,
-        help_text=_("Allows granting and revoking permissions for this page covered by this permission."),
+        help_text=_("Allows this user to grant and revoke page permissions for other users."),
     )
     can_move_page = models.BooleanField(_("can move"), default=True)
     can_view = models.BooleanField(
