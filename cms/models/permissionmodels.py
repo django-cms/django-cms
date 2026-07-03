@@ -145,7 +145,7 @@ class AbstractPagePermission(models.Model):
     def save(self, *args, **kwargs):
         if not self.user and not self.group:
             # don't allow `empty` objects
-            return
+            raise TypeError(_('Please select user or group.'))
         return super().save(*args, **kwargs)
 
     def get_configured_actions(self):

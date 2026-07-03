@@ -10,8 +10,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.forms.models import model_to_dict
 from django.db import connection
+from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import CaptureQueriesContext, override_settings
