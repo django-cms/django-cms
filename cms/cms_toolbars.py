@@ -728,7 +728,7 @@ class PageToolbar(CMSToolbar):
             # delete
             delete_url = admin_reverse("cms_page_delete", args=(self.page.pk,))
             delete_disabled = not edit_mode or not user_can_delete_page(self.request.user, page=self.page)
-            on_delete_redirect_url = self.get_on_delete_redirect_url()
+            on_delete_redirect_url = self.get_on_delete_redirect_url() if not delete_disabled else None
             current_page_menu.add_modal_item(
                 _("Delete page"), url=delete_url, on_close=on_delete_redirect_url, disabled=delete_disabled
             )

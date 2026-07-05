@@ -28,6 +28,8 @@ from cms.cms_toolbars import (
     DEFAULT_HELP_MENU_ITEMS,
     HELP_MENU_IDENTIFIER,
     LANGUAGE_MENU_IDENTIFIER,
+    PAGE_MENU_IDENTIFIER,
+    PageToolbar,
     get_user_model,
 )
 from cms.models import PagePermission, UserSettings
@@ -682,6 +684,45 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(copy_german.name.lower(), "from german")
         self.assertEqual(
             copy_german_context["action"], admin_reverse("cms_pagecontent_copy_language", args=(german_content.pk,))
+        )
+
+    def _get_delete_page_item(self, toolbar):
+        page_menu = toolbar.get_menu(PAGE_MENU_IDENTIFIER)
+        for item in page_menu.items:
+            if force_str(getattr(item, "name", "")).startswith("Delete page"):
+                return item
+        return None
+
+    def test_delete_redirect_not_computed_when_delete_disabled(self):
+        """
+        Regression test: the on-delete redirect URL was computed on every
+        toolbar render of a page with a parent, issuing two parent-page
+        queries even when the delete item is disabled (e.g. outside edit
+        mode). It must only be computed when the delete action is available.
+        """
+        parent = create_page("parent", "nav_playground.html", "en")
+        child = create_page("child", "nav_playground.html", "en", parent=parent)
+
+        with patch.object(PageToolbar, "get_on_delete_redirect_url", autospec=True) as mocked:
+            # View mode: the delete item is disabled, so no redirect is needed.
+            self.get_page_request(child, self.get_superuser(), child.get_absolute_url())
+
+        mocked.assert_not_called()
+
+    def test_delete_redirect_computed_when_delete_enabled(self):
+        """The redirect URL is still resolved (to the parent) when deletion is possible."""
+        parent = create_page("parent", "nav_playground.html", "en")
+        child = create_page("child", "nav_playground.html", "en", parent=parent)
+        edit_url = get_object_edit_url(child.get_content_obj("en"))
+
+        request = self.get_page_request(child, self.get_superuser(), edit_url)
+
+        delete_item = self._get_delete_page_item(request.toolbar)
+        self.assertIsNotNone(delete_item)
+        self.assertFalse(delete_item.disabled)
+        self.assertEqual(
+            delete_item.on_close,
+            get_object_preview_url(parent.get_admin_content("en")),
         )
 
     def test_show_toolbar_staff(self):

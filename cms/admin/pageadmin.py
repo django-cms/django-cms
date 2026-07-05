@@ -65,6 +65,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
+from cms.models.pagemodel import AdminCacheDict
 from cms.models.permissionmodels import PermissionTuple
 from cms.operations.helpers import (
     send_post_page_operation,
@@ -375,12 +376,17 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             query_term = request.GET.get("q", "").strip("/")
 
             language_code = request.GET.get("language_code", settings.LANGUAGE_CODE)
-            matching_published_pages = self.model.objects.on_site(site).filter(
-                Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
-            ).distinct()
+            matching_published_pages = (
+                self.model.objects.on_site(site)
+                .filter(
+                    Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
+                    | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
+                    | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
+                    | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
+                )
+                .prefetch_related("urls", "pagecontent_set")
+                .distinct()
+            )
 
             results = []
             for page in matching_published_pages:
@@ -1274,7 +1280,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             "language": force_str(get_language_object(obj.language, site_id=obj.page.site_id)["name"])
         }
         messages.success(request, message)
-        if obj.language in obj.page.admin_content_cache:
+        if obj.page.admin_content_cache and obj.language in obj.page.admin_content_cache:
             del obj.page.admin_content_cache[obj.language]
         if obj.language in obj.page.page_content_cache:
             del obj.page.page_content_cache[obj.language]
@@ -1372,7 +1378,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         user_can_change_permissions = page_permissions.user_can_change_page_permissions
 
         def render_page_row(page):
-            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations}
+            page.admin_content_cache = AdminCacheDict(
+                (trans.language, trans) for trans in page.filtered_translations
+            )
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
             if permissions_on and not has_move_page_permission:
