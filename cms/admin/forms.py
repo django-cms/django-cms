@@ -52,7 +52,7 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
-from cms.utils.page_permissions import user_can_view_page
+from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 from cms.utils.permissions import (
     get_current_user,
     get_model_permission_codename,
@@ -288,15 +288,14 @@ class AddPageForm(BasePageContentForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        page_field = self.fields.get("cms_page")
+        if page_field:
+            page_field.queryset = page_field.queryset.filter(site=self._site)
+
         source_field = self.fields.get("source")
 
         if not source_field or source_field.widget.is_hidden:
             return
-
-        page_field = self.fields.get("cms_page")
-
-        if page_field:
-            page_field.queryset = page_field.queryset.filter(site=self._site)
 
         root_page = PageType.get_root_page(site=self._site)
 
@@ -348,6 +347,12 @@ class AddPageForm(BasePageContentForm):
         if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
         return parent_page
+
+    def clean_cms_page(self):
+        page = self.cleaned_data.get("cms_page")
+        if page and not user_can_change_page(self._user, page, site=page.site):
+            raise ValidationError(_("You do not have permission to change this page."))
+        return page
 
     def create_translation(self, page, main_language_page_content_template=None):
         data = self.cleaned_data
