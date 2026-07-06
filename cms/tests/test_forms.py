@@ -8,6 +8,7 @@ from django.utils.translation import override as force_language
 
 from cms.admin import forms
 from cms.admin.forms import (
+    AddPageForm,
     DuplicatePageForm,
     GlobalPagePermissionAdminForm,
     MovePageForm,
@@ -560,6 +561,52 @@ class DuplicatePageFormSecurityTestCase(CMSTestCase):
             # ``source`` must not be the reason the form is (in)valid.
             form.is_valid()
             self.assertNotIn("source", form.errors)
+
+
+class AddPageFormSecurityTestCase(CMSTestCase):
+    def _build_form(self, user, page, site):
+        request = self.get_request("/en/")
+        request.user = user
+        form_cls = type(
+            "TestAddPageForm",
+            (AddPageForm,),
+            # Admin form construction can omit ``source``, causing
+            # AddPageForm.__init__ to return before narrowing cms_page.
+            {
+                "source": None,
+                "_site": site,
+                "_request": request,
+                "Meta": type("Meta", (AddPageForm.Meta,), {"fields": []}),
+            },
+        )
+        return form_cls(data={"cms_page": page.pk, "title": "French", "slug": "french"})
+
+    def test_rejects_cms_page_from_another_site(self):
+        owner = self.get_superuser()
+        site = Site.objects.get_current()
+        other_site = Site.objects.create(domain="other.example.com", name="other.example.com")
+        allowed_page = create_page("allowed", "nav_playground.html", "en", site=site, created_by=owner)
+        page = create_page("secret", "nav_playground.html", "de", site=other_site, created_by=owner)
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(allowed_page, attacker, can_change=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, page, site)
+            self.assertFalse(form.is_valid())
+            self.assertIn("cms_page", form.errors)
+
+    def test_rejects_cms_page_user_cannot_change(self):
+        owner = self.get_superuser()
+        site = Site.objects.get_current()
+        allowed_page = create_page("allowed", "nav_playground.html", "en", site=site, created_by=owner)
+        page = create_page("secret", "nav_playground.html", "en", site=site, created_by=owner)
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(allowed_page, attacker, can_change=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, page, site)
+            self.assertFalse(form.is_valid())
+            self.assertIn("cms_page", form.errors)
 
 
 class ValidateUrlTestCase(CMSTestCase):
