@@ -64,10 +64,15 @@ It accepts the following options:
 * ``--stories`` / ``--no-stories``: add the stories component library
   (`djangocms-stories <https://github.com/django-cms/djangocms-stories>`_) to
   the project. Off by default.
+* ``--history`` / ``--no-history``: add content history
+  (``djangocms-history>=3``) to the project. Off by default.
+* ``--use-bundled-install-rules``: use the installation rules JSON bundled
+  with the installed django CMS package instead of fetching it from the
+  matching ``cms-template`` branch. Guarantees reproducibility.
 
 Example::
 
-    djangocms my_project --mode headless --no-versioning --stories
+    djangocms my_project --mode headless --no-versioning --stories --history
 
 To be guided through the available options interactively, run the command
 without a project name (or pass ``--interactive``)::
@@ -134,8 +139,9 @@ bundled with django CMS is used as an offline fallback.
 
 .. note::
 
-    The ``--stories``, ``--mode``, ``--versioning``, ``--moderation`` and
-    ``--alias`` options are evaluated by the project template. They require
+    The ``--stories``, ``--history``, ``--mode``, ``--versioning``,
+    ``--moderation`` and ``--alias`` options are evaluated by the project
+    template. They require
     version 5.1 or later of the `cms-template
     <https://github.com/django-cms/cms-template>`_ to support them.
 
