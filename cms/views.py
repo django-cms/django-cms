@@ -82,9 +82,16 @@ def details(request, slug):
     ):
         cache_content = get_page_cache(request)
         if cache_content is not None:
-            content, headers, expires_datetime = cache_content
+            # ``xframe_options_exempt`` is absent on cache entries written before
+            # this field was added; default to True to preserve their behaviour
+            # until they expire.
+            content, headers, expires_datetime, *rest = cache_content
+            xframe_options_exempt = rest[0] if rest else True
             response = HttpResponse(content)
-            response.xframe_options_exempt = True
+            # Replay the page's clickjacking decision. For "Inherit" pages this
+            # is False, so Django's XFrameOptionsMiddleware still adds the site
+            # default X-Frame-Options header to the cached response.
+            response.xframe_options_exempt = xframe_options_exempt
             response.headers = headers
             # Recalculate the max-age header for this cached response
             max_age = int(

@@ -15,6 +15,7 @@ from cms.api import (
     add_plugin,
     assign_user_to_page,
     create_page,
+    create_page_content,
 )
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
@@ -46,6 +47,43 @@ class PythonAPITests(CMSTestCase):
             self.assertRaises(TemplateDoesNotExist, create_page, **kwargs)
             kwargs["template"] = TEMPLATE_INHERITANCE_MAGIC
         create_page(**kwargs)
+
+    def test_create_page_restores_current_user(self):
+        # create_page must not leave the creator in the _current_user context
+        # variable, and must restore (not clobber) a user set by a surrounding
+        # request context. Otherwise the creator leaks into the next operation
+        # on the same thread when CurrentUserMiddleware is not installed.
+        from cms.utils.permissions import get_current_user, set_current_user
+
+        prior_user = self.get_superuser()
+        creator = get_user_model().objects.create_user(
+            username="creator", email="creator@django-cms.org", password="creator", is_staff=True,
+        )
+
+        set_current_user(prior_user)
+        try:
+            create_page(created_by=creator, **self._get_default_create_page_arguments())
+            self.assertEqual(get_current_user(), prior_user)
+        finally:
+            set_current_user(None)
+
+    def test_create_page_content_restores_current_user(self):
+        # Same guarantee for a direct create_page_content() call, which sets
+        # _current_user for attribution but must restore the previous value.
+        from cms.utils.permissions import get_current_user, set_current_user
+
+        prior_user = self.get_superuser()
+        creator = get_user_model().objects.create_user(
+            username="creator", email="creator@django-cms.org", password="creator", is_staff=True,
+        )
+        page = create_page(**self._get_default_create_page_arguments())
+
+        set_current_user(prior_user)
+        try:
+            create_page_content("de", "Überschrift", page, created_by=creator)
+            self.assertEqual(get_current_user(), prior_user)
+        finally:
+            set_current_user(None)
 
     def test_apphook_by_class(self):
         if APP_MODULE in sys.modules:

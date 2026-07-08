@@ -1020,7 +1020,7 @@ class PageCacheRoundTripTestCase(CMSTestCase):
             request = self.get_request(page_url, language="en")
             cached = get_page_cache(request)
             self.assertIsNotNone(cached)
-            content, headers, expires_datetime = cached
+            content, headers, expires_datetime, xframe_options_exempt = cached
             self.assertIn(b"Cached body", content)
             self.assertIsNotNone(expires_datetime)
 
