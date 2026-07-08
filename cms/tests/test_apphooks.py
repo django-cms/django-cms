@@ -1268,6 +1268,11 @@ class ApphooksSiteTestCase(BaseApphooksTestCase):
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphook_site_filter_preserves_view_name(self):
         self.create_pages()
+        # Force a fresh import of the urlconf now that the apphook pages exist so
+        # that the global APP_RESOLVERS are rebuilt for the overridden
+        # ROOT_URLCONF. Without this, reverse() below depends on whether prior
+        # tests left the url modules cached in sys.modules (order dependence).
+        self.reload_urls()
 
         view_names = (
             ('sample-settings', 'sample_view'),
