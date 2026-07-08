@@ -22,8 +22,19 @@ def set_current_user(user):
     """
     Assigns current user from request to context variable, used by
     CurrentUserMiddleware.
+
+    Returns the ``contextvars.Token`` for the change, so callers can restore
+    the previous value with :func:`reset_current_user`.
     """
-    _current_user.set(user)
+    return _current_user.set(user)
+
+
+def reset_current_user(token):
+    """
+    Restores the current user context variable to the value it held before the
+    ``set_current_user`` call that produced ``token``.
+    """
+    _current_user.reset(token)
 
 
 def get_current_user():

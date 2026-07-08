@@ -147,6 +147,13 @@ def set_page_cache(response: HttpResponse) -> HttpResponse:
             # recomputing it on cache-reads.
             expires_datetime = timestamp + timedelta(seconds=ttl)
             response_headers = get_response_headers(response)
+            # Persist whether this page opted out of Django's clickjacking
+            # middleware. Only "Allow" pages (no X-Frame-Options header) set
+            # xframe_options_exempt; "Inherit" pages leave it unset so the
+            # middleware adds the site default. The read path must replay this
+            # decision -- unconditionally exempting a cached response would drop
+            # X-Frame-Options from every inherit-default page (clickjacking).
+            xframe_options_exempt = getattr(response, "xframe_options_exempt", False)
             # Persist the list of plugin-declared vary headers so the read path
             # can rebuild the same (header-value aware) content key.
             cache.set(
@@ -161,6 +168,7 @@ def set_page_cache(response: HttpResponse) -> HttpResponse:
                     response.content,
                     response_headers,
                     expires_datetime,
+                    xframe_options_exempt,
                 ),
                 ttl,
                 version=version,

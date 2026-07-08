@@ -52,8 +52,10 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
+from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 from cms.utils.permissions import (
     get_current_user,
+    get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
     get_user_permission_level,
@@ -111,13 +113,22 @@ def get_main_language_page_content_template(new_page):
     return None
 
 
+# Permission actions managed by the CMS permission forms (Django's defaults).
+CMS_PERMISSION_ACTIONS = ("add", "change", "delete")
+
+# Maps each ``can_<action>_<name>`` permission group to the model whose
+# permission governs it. Used to render, read and authorize the checkboxes.
+CMS_PERMISSION_MODELS = (
+    (Page, "page"),
+    (PageUser, "pageuser"),
+    (PagePermission, "pagepermission"),
+)
+
+
 def save_permissions(data, obj):
-    models = (
-        (Page, "page"),
-        (PageUser, "pageuser"),
-        (PageUserGroup, "pageuser"),
-        (PagePermission, "pagepermission"),
-    )
+    # ``PageUserGroup`` shares the ``pageuser`` field with ``PageUser`` but has
+    # its own content type, so the permission must be (un)assigned on both.
+    models = (*CMS_PERMISSION_MODELS, (PageUserGroup, "pageuser"))
 
     if not obj.pk:
         # save obj, otherwise we can't assign permissions to him
@@ -127,7 +138,7 @@ def save_permissions(data, obj):
 
     for model, name in models:
         content_type = ContentType.objects.get_for_model(model)
-        for key in ("add", "change", "delete"):
+        for key in CMS_PERMISSION_ACTIONS:
             # add permission `key` for model `model`
             codename = get_permission_codename(key, model._meta)
             permission = Permission.objects.get(content_type=content_type, codename=codename)
@@ -277,15 +288,14 @@ class AddPageForm(BasePageContentForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        page_field = self.fields.get("cms_page")
+        if page_field:
+            page_field.queryset = page_field.queryset.filter(site=self._site)
+
         source_field = self.fields.get("source")
 
         if not source_field or source_field.widget.is_hidden:
             return
-
-        page_field = self.fields.get("cms_page")
-
-        if page_field:
-            page_field.queryset = page_field.queryset.filter(site=self._site)
 
         root_page = PageType.get_root_page(site=self._site)
 
@@ -337,6 +347,12 @@ class AddPageForm(BasePageContentForm):
         if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
         return parent_page
+
+    def clean_cms_page(self):
+        page = self.cleaned_data.get("cms_page")
+        if page and not user_can_change_page(self._user, page, site=page.site):
+            raise ValidationError(_("You do not have permission to change this page."))
+        return page
 
     def create_translation(self, page, main_language_page_content_template=None):
         data = self.cleaned_data
@@ -518,6 +534,16 @@ class DuplicatePageForm(AddPageForm):
         required=True,
         widget=forms.HiddenInput(),
     )
+
+    def clean_source(self):
+        source = self.cleaned_data.get("source")
+        # ``source`` is a hidden field whose value is fully controlled by the
+        # client on POST and whose queryset spans every page on every site.
+        # ``has_add_permission`` only checks that the user may create *a* page,
+        # not that they may read ``source``.
+        if source and not user_can_view_page(self._user, source):
+            raise ValidationError(_("You do not have permission to copy this page."))
+        return source
 
 
 def url_is_locked(page_content: PageContent) -> bool:
@@ -1292,6 +1318,10 @@ class GenericCmsPermissionForm(forms.ModelForm):
     can_change_pagepermission = forms.BooleanField(label=_("Change"), required=False)
     can_delete_pagepermission = forms.BooleanField(label=_("Delete"), required=False)
 
+    # Maps the ``can_<action>_<name>`` permission fields to the model whose
+    # permission they grant. Mirrors ``save_permissions`` and the fieldsets
+    # rendered by ``PageUserGroupAdmin``/``PageUserAdmin``.
+
     def __init__(self, *args, **kwargs):
         instance = kwargs.get("instance")
         initial = kwargs.get("initial") or {}
@@ -1343,16 +1373,42 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 )
                 raise ValidationError(message)
 
+        # Enforce "nobody can grant more than they have" at the data layer.
+        self._drop_unauthorized_permissions(data)
+        return data
+
+    def _drop_unauthorized_permissions(self, data):
+        """Remove ``can_*`` entries the current manager is not allowed to manage.
+
+        ``PageUserGroupAdmin.get_fieldsets`` only *renders* the permission
+        checkboxes the manager actually holds, but the ``can_*`` fields are
+        declared on this form and therefore stay in ``base_fields`` regardless
+        of the admin's ``fields=`` restriction. A crafted POST can set the
+        hidden ones, and ``save_permissions`` would then grant them -- letting a
+        delegated manager escalate a group beyond their own rights (CWE-269).
+        Dropping the unauthorized entries here means they are neither granted
+        nor revoked, so any existing value the manager may not touch is left
+        untouched as well.
+        """
+        user = self._current_user
+        for model, name in CMS_PERMISSION_MODELS:
+            for action in CMS_PERMISSION_ACTIONS:
+                field = f"can_{action}_{name}"
+                if field not in self.fields:
+                    continue
+                if user is None or not user.has_perm(get_model_permission_codename(model, action)):
+                    data.pop(field, None)
+        return data
+
     def populate_initials(self, obj):
         """Read out permissions from permission system."""
         initials = {}
         permission_accessor = get_permission_accessor(obj)
 
-        for model in (Page, PageUser, PagePermission):
-            name = model.__name__.lower()
+        for model, name in CMS_PERMISSION_MODELS:
             content_type = ContentType.objects.get_for_model(model)
             permissions = permission_accessor.filter(content_type=content_type).values_list("codename", flat=True)
-            for key in ("add", "change", "delete"):
+            for key in CMS_PERMISSION_ACTIONS:
                 codename = get_permission_codename(key, model._meta)
                 initials[f"can_{key}_{name}"] = codename in permissions
         return initials
