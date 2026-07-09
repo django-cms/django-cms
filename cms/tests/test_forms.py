@@ -3,15 +3,19 @@ from html import unescape
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.utils.translation import override as force_language
 
 from cms.admin import forms
 from cms.admin.forms import (
+    AddPageForm,
+    DuplicatePageForm,
     GlobalPagePermissionAdminForm,
     MovePageForm,
     PagePermissionInlineAdminForm,
     PageUserGroupForm,
     ViewRestrictionInlineAdminForm,
+    get_permission_accessor,
 )
 from cms.api import assign_user_to_page, create_page, create_page_content
 from cms.forms.fields import PageSelectFormField
@@ -470,3 +474,195 @@ class PermissionFormTestCase(CMSTestCase):
         form._current_user = user
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
+
+    def test_page_user_group_form_drops_unauthorized_permissions(self):
+        """A delegated manager must not be able to grant a group permissions
+        they do not hold themselves, even by POSTing the hidden ``can_*``
+        fields that ``get_fieldsets`` never rendered for them (CWE-269).
+        """
+        # Manager holds change_page but NOT any pagepermission/pageuser perms.
+        manager = self._create_user("manager", is_staff=True, permissions=["change_page"])
+        self.assertTrue(manager.has_perm("cms.change_page"))
+        self.assertFalse(manager.has_perm("cms.change_pagepermission"))
+
+        data = {
+            "name": "evil_group",
+            "can_change_page": True,           # held by the manager -> must be kept
+            "can_change_pagepermission": True,  # NOT held -> must be dropped
+            "can_add_pagepermission": True,     # NOT held -> must be dropped
+            "can_change_pageuser": True,        # NOT held -> must be dropped
+        }
+        form = PageUserGroupForm(data=data, files=None)
+        form._current_user = manager
+        self.assertTrue(form.is_valid(), form.errors)
+        group = form.save()
+
+        granted = set(get_permission_accessor(group).values_list("codename", flat=True))
+        self.assertIn("change_page", granted)
+        self.assertNotIn("change_pagepermission", granted)
+        self.assertNotIn("add_pagepermission", granted)
+        self.assertNotIn("change_pageuser", granted)
+
+    def test_page_user_group_form_superuser_can_grant_anything(self):
+        """A superuser holds every permission, so nothing is dropped."""
+        superuser = self.get_superuser()
+        data = {
+            "name": "trusted_group",
+            "can_change_page": True,
+            "can_change_pagepermission": True,
+        }
+        form = PageUserGroupForm(data=data, files=None)
+        form._current_user = superuser
+        self.assertTrue(form.is_valid(), form.errors)
+        group = form.save()
+
+        granted = set(get_permission_accessor(group).values_list("codename", flat=True))
+        self.assertIn("change_page", granted)
+        self.assertIn("change_pagepermission", granted)
+
+
+class DuplicatePageFormSecurityTestCase(CMSTestCase):
+    def _build_form(self, user, source):
+        request = self.get_request("/en/")
+        request.user = user
+        # The admin sets ``_site``/``_request`` as class attributes via
+        # ``get_form`` before instantiation (they are read in ``__init__``).
+        form_cls = type(
+            "TestDuplicatePageForm",
+            (DuplicatePageForm,),
+            {"_site": Site.objects.get_current(), "_request": request},
+        )
+        return form_cls(data={"source": source.pk, "title": "x", "slug": "x"})
+
+    def test_duplicate_rejects_source_user_cannot_view(self):
+        """A staff user with only 'add page' rights must not be able to copy a
+        page they are not allowed to view (CWE-639 / CWE-862). ``source`` is a
+        hidden, client-controlled field whose queryset spans every page.
+        """
+        superuser = self.get_superuser()
+        secret = create_page("secret", "nav_playground.html", "en", created_by=superuser)
+        # Add a view restriction so the page is only viewable by the superuser.
+        self.add_page_permission(superuser, secret, can_view=True)
+
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, secret)
+            self.assertFalse(form.is_valid())
+            self.assertIn("source", form.errors)
+
+    def test_duplicate_allows_source_user_can_view(self):
+        """Copying a page the user is allowed to view keeps working."""
+        superuser = self.get_superuser()
+        source = create_page("source", "nav_playground.html", "en", created_by=superuser)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(superuser, source)
+            # ``source`` must not be the reason the form is (in)valid.
+            form.is_valid()
+            self.assertNotIn("source", form.errors)
+
+
+class AddPageFormSecurityTestCase(CMSTestCase):
+    def _build_form(self, user, page, site):
+        request = self.get_request("/en/")
+        request.user = user
+        form_cls = type(
+            "TestAddPageForm",
+            (AddPageForm,),
+            # Admin form construction can omit ``source``, causing
+            # AddPageForm.__init__ to return before narrowing cms_page.
+            {
+                "source": None,
+                "_site": site,
+                "_request": request,
+                "Meta": type("Meta", (AddPageForm.Meta,), {"fields": []}),
+            },
+        )
+        return form_cls(data={"cms_page": page.pk, "title": "French", "slug": "french"})
+
+    def test_rejects_cms_page_from_another_site(self):
+        owner = self.get_superuser()
+        site = Site.objects.get_current()
+        other_site = Site.objects.create(domain="other.example.com", name="other.example.com")
+        allowed_page = create_page("allowed", "nav_playground.html", "en", site=site, created_by=owner)
+        page = create_page("secret", "nav_playground.html", "de", site=other_site, created_by=owner)
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(allowed_page, attacker, can_change=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, page, site)
+            self.assertFalse(form.is_valid())
+            self.assertIn("cms_page", form.errors)
+
+    def test_rejects_cms_page_user_cannot_change(self):
+        owner = self.get_superuser()
+        site = Site.objects.get_current()
+        allowed_page = create_page("allowed", "nav_playground.html", "en", site=site, created_by=owner)
+        page = create_page("secret", "nav_playground.html", "en", site=site, created_by=owner)
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(allowed_page, attacker, can_change=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, page, site)
+            self.assertFalse(form.is_valid())
+            self.assertIn("cms_page", form.errors)
+
+
+class ValidateUrlTestCase(CMSTestCase):
+    """Regression tests for the dangerous-scheme bypass in ``validate_url``.
+
+    ``relative_url_regex`` matches any value whose first segment contains no
+    ``/<>``; a scheme such as ``javascript:`` was therefore accepted as a
+    "relative URL" and never reached ``URLValidator``. Such schemes execute
+    script when the value is later rendered into an ``href`` (CWE-79).
+    """
+
+    # Script-executing schemes -- these are the actual XSS vector.
+    DANGEROUS = [
+        "javascript:alert(1)/x",
+        "JavaScript:alert(document.domain)/a",
+        "data:text/html,<script>alert(1)</script>",
+        "vbscript:msgbox(1)/x",
+    ]
+
+    VALID_RELATIVE = [
+        "/foo/bar",
+        "/foo/bar/",
+        "foo/bar",
+        "../page/",
+        "./page/",
+        "/en/some-slug/",
+    ]
+
+    VALID_ABSOLUTE = [
+        "http://example.com/x",
+        "https://example.com/x?y=1",
+        # Protocol-relative / off-site targets navigate (not execute script)
+        # and are an intended capability of this field; they must be accepted
+        # just like an explicit ``https://`` URL.
+        "//example.com",
+        "//example.com/path",
+    ]
+
+    def test_dangerous_schemes_are_rejected(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.DANGEROUS:
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validate_url(value)
+
+    def test_valid_relative_urls_are_accepted(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.VALID_RELATIVE:
+            with self.subTest(value=value):
+                validate_url(value)  # must not raise
+
+    def test_valid_absolute_urls_are_accepted(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.VALID_ABSOLUTE:
+            with self.subTest(value=value):
+                validate_url(value)  # must not raise

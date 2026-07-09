@@ -210,6 +210,23 @@ a.cms-actions-dropdown-menu-item-anchor.inactive {
 }
 
 
+// Language selector on grouper change lists (replaces former inline styles).
+.language-selector {
+    display: inline;
+    width: fit-content;
+    margin-bottom: 1em;
+}
+
+select.language-selector {
+    min-width: 180px;
+}
+
+// Submit row in admin popups needs to clear its floated buttons
+// (replaces a former inline style on the page/extension change forms).
+.submit-row.cms-submit-row-popup {
+    overflow: auto;
+}
+
 body:not(.djangocms-admin-style) #page_form_lang_tabs input[type="button"].selected {
     background-color: var(--button-bg);
     color: var(--button-fg)
