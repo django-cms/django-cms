@@ -3,16 +3,15 @@
 
 @use "sass:math";
 
-// "Pages" frame on the left
+// Admin / "Pages" frame on the left
 .cms-sideframe {
     display: none;
     position: fixed;
     top: 0;
-    inline-start: 0;
+    inset-inline-start: 0;
     width: 0;
     bottom: 0;
     z-index: z(sideframe, base);
-
     @media (max-width: $screen-tablet) {
         width: 100% !important;
     }
@@ -20,8 +19,9 @@
 
 .cms-sideframe-frame {
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     top: 0;
+    padding-top: $toolbar-height;  // Covered by toolbar
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
     z-index: z(sideframe, frame);

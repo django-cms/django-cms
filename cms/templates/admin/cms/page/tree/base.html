@@ -19,6 +19,20 @@
 
 {% if not is_popup %}
     {% block breadcrumbs %}
+        {% django_version_gte 6 1 as new_breadcrumbs %}
+        {% if new_breadcrumbs %}
+        <ol class="breadcrumbs cms-pagetree-breadcrumbs">
+            <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>
+            <li><a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a></li>
+            {# TODO might remove this or add reset #}
+            {% if request.GET.q or request.POST.q %}
+            <li>{% trans "Pages" %}</li>
+            <li aria-current="page">{% trans "Search" %}</li>
+            {% else %}
+            <li aria-current="page">Pages</li>
+            {% endif %}
+        </ol>
+        {% else %}
         <div class="breadcrumbs cms-pagetree-breadcrumbs">
             <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
             <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
@@ -28,6 +42,7 @@
             &rsaquo; {% trans "Search" %}
             {% endif %}
         </div>
+        {% endif %}
     {% endblock %}
 {% endif %}
 {% block content_title %}{% endblock %}

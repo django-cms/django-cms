@@ -1,4 +1,4 @@
-{% extends "admin/change_form.html" %}{% load i18n static cms_tags %}
+{% extends "admin/change_form.html" %}{% load i18n static cms_tags cms_admin %}
 
 {% block extrahead %}
 {{ block.super }}
@@ -6,12 +6,22 @@
 {% endblock %}
 
 {% block breadcrumbs %}
+{% django_version_gte 6 1 as new_breadcrumbs %}
+{% if new_breadcrumbs %}
+<ol class="breadcrumbs">
+    <li><a href="{% cms_admin_url 'index' %}">{% trans 'Home' %}</a></li>
+    <li><a href="{% cms_admin_url 'app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a></li>
+    <li>{{ opts.verbose_name_plural|capfirst }}</li>
+    <li aria-current="page">{% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}</li>
+</ol>
+{% else %}
 <div class="breadcrumbs">
     <a href="{% cms_admin_url 'index' %}">{% trans 'Home' %}</a>
     &rsaquo; <a href="{% cms_admin_url 'app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a>
     &rsaquo; {{ opts.verbose_name_plural|capfirst }}
     &rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
+{% endif %}
 {% endblock %}
 
 {% block object-tools %}{% endblock %}
