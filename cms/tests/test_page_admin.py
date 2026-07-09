@@ -10,10 +10,11 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.db import connection
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
-from django.test.utils import override_settings
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.urls import clear_url_caches
 from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
@@ -1650,6 +1651,75 @@ class PageTest(PageTestBase):
             content = force_str(parsed)
             self.assertIn(tree, content)
 
+    def test_page_tree_prefetches_page_urls(self):
+        """
+        Regression test: the page tree endpoints must fetch the ``PageUrl``
+        objects of all pages in bulk instead of issuing one query per page
+        row (triggered by ``Page.get_url_obj`` filling ``urls_cache`` from
+        ``self.urls.all()`` for every rendered row).
+        """
+        superuser = self.get_superuser()
+
+        create_page("Home", "nav_playground.html", "en")
+        for index in range(4):
+            create_page(f"Page {index}", "nav_playground.html", "en")
+
+        endpoints = (
+            self.get_admin_url(PageContent, "get_tree"),
+            self.get_admin_url(PageContent, "changelist"),
+        )
+
+        with self.login_user_context(superuser):
+            for endpoint in endpoints:
+                with self.subTest(endpoint=endpoint):
+                    with CaptureQueriesContext(connection) as queries:
+                        response = self.client.get(endpoint)
+                    self.assertEqual(response.status_code, 200)
+                    page_url_queries = [
+                        query["sql"] for query in queries.captured_queries if '"cms_pageurl"' in query["sql"]
+                    ]
+                    self.assertLessEqual(
+                        len(page_url_queries),
+                        1,
+                        "The page tree issued one PageUrl query per page instead "
+                        "of prefetching them:\n" + "\n".join(page_url_queries),
+                    )
+
+    def test_page_tree_does_not_requery_content_less_pages(self):
+        """
+        Regression test: pages without any (filtered) translations must not
+        trigger a fresh ``set_admin_content_cache`` query per row. An empty
+        admin content cache used to be indistinguishable from an unpopulated
+        one, so ``get_admin_content`` / ``get_languages`` re-queried the
+        database for every content-less page in the tree.
+        """
+        superuser = self.get_superuser()
+        endpoint = self.get_admin_url(PageContent, "get_tree")
+
+        def add_content_less_pages(count, prefix):
+            for index in range(count):
+                page = create_page(f"{prefix}-{index}", "nav_playground.html", "en")
+                PageContent.admin_manager.filter(page=page).delete()
+
+        create_page("Home", "nav_playground.html", "en")
+        add_content_less_pages(2, "empty-a")
+
+        with self.login_user_context(superuser):
+            self.client.get(endpoint)  # warm up caches (content types, permissions, ...)
+            with CaptureQueriesContext(connection) as first:
+                self.assertEqual(self.client.get(endpoint).status_code, 200)
+
+            add_content_less_pages(3, "empty-b")
+            with CaptureQueriesContext(connection) as second:
+                self.assertEqual(self.client.get(endpoint).status_code, 200)
+
+        self.assertEqual(
+            len(second.captured_queries),
+            len(first.captured_queries),
+            "The page tree issued extra queries for content-less pages:\n"
+            + "\n".join(query["sql"] for query in second.captured_queries),
+        )
+
     def test_page_tree_redirect_icon_display(self):
         """Test that redirect icon is displayed in page tree when page has redirect"""
         superuser = self.get_superuser()
@@ -1953,6 +2023,44 @@ class PageActionsTestCase(PageTestBase):
         titles = {result["title"] for result in results}
         self.assertIn("Bravo Site 1", titles)
         self.assertNotIn("Bravo Site 2", titles)
+
+    def test_get_list_prefetches_page_urls(self):
+        """
+        Regression test: the smart-link autocomplete endpoint resolves the
+        path/title/URL of every matching page. It must prefetch ``urls`` (and
+        ``pagecontent_set``) in bulk instead of issuing one ``PageUrl`` query
+        per matched page.
+        """
+        for index in range(4):
+            create_page(
+                f"Bravo {index}",
+                "nav_playground.html",
+                "en",
+                site=self.site,
+                slug=f"bravo-{index}",
+                created_by=self.admin,
+            )
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            with CaptureQueriesContext(connection) as queries:
+                response = self.client.get(
+                    endpoint,
+                    data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                    HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.content.decode("utf-8"))), 4)
+        page_url_queries = [
+            query["sql"] for query in queries.captured_queries if 'FROM "cms_pageurl"' in query["sql"]
+        ]
+        self.assertLessEqual(
+            len(page_url_queries),
+            1,
+            "The smart-link endpoint issued one PageUrl query per matched page:\n"
+            + "\n".join(page_url_queries),
+        )
 
     def test_actions_menu_superuser(self):
         """Test actions_menu view returns correct context for superuser"""
