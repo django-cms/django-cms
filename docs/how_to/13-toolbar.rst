@@ -168,6 +168,45 @@ the modal or sideframe. Note that protocols may need to match and the requested 
 it.
 
 
+..  _create-toolbar-ajax-item:
+
+Triggering an AJAX action
+-------------------------
+
+Use :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_ajax_item` for an item that performs an action on
+the server rather than navigating to a page. It sends a request (``POST`` by default) to ``action``,
+optionally asking the user to confirm first:
+
+..  code-block:: python
+    :emphasize-lines: 7-13
+
+    from cms.utils.urlutils import admin_reverse
+
+    class PollToolbar(CMSToolbar):
+
+        def populate(self):
+
+            self.toolbar.add_ajax_item(
+                name='Reset votes',
+                action=admin_reverse('polls_poll_reset', args=[self.poll.pk]),
+                data={'confirm': True},
+                question='Reset all votes for this poll?',
+                on_success=self.toolbar.REFRESH_PAGE,
+            )
+
+The ``data`` dictionary is sent with the request; the CSRF token is added automatically for unsafe
+HTTP methods. Use ``on_success`` to control what happens after a successful response: pass a URL to
+navigate to it, ``REFRESH_PAGE`` to reload the current page, or ``"FOLLOW_REDIRECT"`` to redirect to
+the ``url`` returned in a JSON response.
+
+..  versionadded:: 5.1
+
+    If ``on_success`` is not given and the response carries a *data bridge* -- either an HTML document
+    containing a ``<script id="data-bridge">`` element or a JSON object with an ``action`` key -- the
+    data bridge is evaluated and the structure board is updated in place, without a full page reload.
+    This is the same mechanism used when a plugin is saved in a modal.
+
+
 ..  _create-toolbar-button:
 
 Adding buttons to the toolbar

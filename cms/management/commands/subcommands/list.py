@@ -50,27 +50,47 @@ def plugin_report():
     ]
     """
     plugin_report = []
-    all_plugins = CMSPlugin.objects.order_by('plugin_type')
-    plugin_types = list(set(all_plugins.values_list('plugin_type', flat=True)))
-    plugin_types.sort()
+    plugin_types = list(
+        CMSPlugin.objects.order_by('plugin_type')
+        .values_list('plugin_type', flat=True)
+        .distinct()
+    )
 
     for plugin_type in plugin_types:
-        plugin = {}
-        plugin['type'] = plugin_type
-        try:
-            # get all plugins of this type
-            plugins = CMSPlugin.objects.filter(plugin_type=plugin_type)
-            plugin['instances'] = plugins
-            # does this plugin have a model? report unsaved instances
-            plugin['model'] = plugin_pool.get_plugin(name=plugin_type).model
-            unsaved_instances = [p for p in plugins if not p.get_plugin_instance()[0]]
-            plugin['unsaved_instances'] = unsaved_instances
+        # get all plugins of this type
+        plugins = CMSPlugin.objects.filter(plugin_type=plugin_type)
+        plugin = {
+            'type': plugin_type,
+            'instances': plugins,
+        }
 
+        try:
+            # does this plugin have a model? report unsaved instances
+            model = plugin_pool.get_plugin(name=plugin_type).model
         # catch uninstalled plugins
         except KeyError:
             plugin['model'] = None
-            plugin['instances'] = plugins
             plugin['unsaved_instances'] = []
+            plugin_report.append(plugin)
+            continue
+
+        plugin['model'] = model
+
+        if model._meta.concrete_model == CMSPlugin._meta.concrete_model:
+            # Model-less plugin: the bound instance is the CMSPlugin row
+            # itself, so there can never be unsaved instances.
+            plugin['unsaved_instances'] = []
+        else:
+            # An instance is "unsaved" when its CMSPlugin row has no matching
+            # row in the plugin's own (child) table. Resolve this with a single
+            # bulk query for the saved ids instead of one query per instance.
+            saved_ids = set(
+                model.objects.filter(cmsplugin_ptr__in=plugins)
+                .values_list('cmsplugin_ptr_id', flat=True)
+            )
+            plugin['unsaved_instances'] = [
+                instance for instance in plugins if instance.pk not in saved_ids
+            ]
 
         plugin_report.append(plugin)
 

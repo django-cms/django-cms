@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Optional
+from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
@@ -24,6 +25,21 @@ def validate_url(value):
     except ValidationError:
         # Fallback to absolute urls
         URLValidator()(value)
+    else:
+        # ``relative_url_regex`` only constrains the *characters* of a relative
+        # path, not the part before the first slash. Values such as
+        # ``javascript:alert(1)/x``, ``data:text/html,...`` or ``vbscript:.../x``
+        # therefore match the relative branch while still carrying a scheme that
+        # executes script when the value is later rendered into an ``href``
+        # (CWE-79). A genuine relative URL has no scheme, so reject any value
+        # that does. (Off-site targets such as ``https://example.com`` or
+        # ``//example.com`` are intentionally permitted -- this field allows
+        # absolute redirects -- and navigate rather than execute script.)
+        if urlsplit(value).scheme:
+            raise ValidationError(
+                gettext("Enter a valid relative or absolute URL."),
+                code="invalid",
+            )
 
 
 def validate_url_uniqueness(

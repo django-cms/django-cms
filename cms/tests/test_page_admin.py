@@ -10,10 +10,11 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.db import connection
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
-from django.test.utils import override_settings
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.urls import clear_url_caches
 from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
@@ -38,7 +39,6 @@ from cms.test_utils.util.context_managers import (
     override_placeholder_conf,
 )
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -308,18 +308,11 @@ class PageTest(PageTestBase):
 
             response = self.client.post(add_endpoint, page_data)
             new_page = Page.objects.only("id").latest("id")
-            if DJANGO_5_1:
-                expected_error = (
-                    '<ul class="errorlist"><li>Page '
-                    '<a href="{}" target="_blank">test page 1</a> '
-                    "has the same url 'test-page-1' as current page.</li></ul>"
-                ).format(self.get_page_change_uri("en", new_page))
-            else:
-                expected_error = (
-                    '<ul class="errorlist" id="id_slug_error"><li>Page '
-                    '<a href="{}" target="_blank">test page 1</a> '
-                    "has the same url 'test-page-1' as current page.</li></ul>"
-                ).format(self.get_page_change_uri("en", new_page))
+            expected_error = (
+                '<ul class="errorlist" id="id_slug_error"><li>Page '
+                '<a href="{}" target="_blank">test page 1</a> '
+                "has the same url 'test-page-1' as current page.</li></ul>"
+            ).format(self.get_page_change_uri("en", new_page))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error)
 
@@ -339,18 +332,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data(page.pk)
                 page_data["slug"] = "subpage"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">subpage</a> '
-                        "has the same url 'page/subpage' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", sub_page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">subpage</a> '
-                        "has the same url 'page/subpage' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", sub_page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">subpage</a> '
+                    "has the same url 'page/subpage' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", sub_page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -359,18 +345,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data()
                 page_data["slug"] = "child-page"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">child-page</a> '
-                        "has the same url 'child-page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", child_page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">child-page</a> '
-                        "has the same url 'child-page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", child_page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">child-page</a> '
+                    "has the same url 'child-page' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", child_page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -379,18 +358,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data()
                 page_data["slug"] = "page"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">page</a> '
-                        "has the same url 'page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">page</a> '
-                        "has the same url 'page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">page</a> '
+                    "has the same url 'page' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -426,10 +398,7 @@ class PageTest(PageTestBase):
         data["template"] = page.template
         endpoint = self.get_page_change_uri("en", page)
         redirect_to = self.get_pages_admin_list_uri("en")
-        if DJANGO_5_1:
-            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
-        else:
-            validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
+        validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
 
         with self.subTest("Test that a redirect to the root page (valid)"):
             with self.login_user_context(superuser):
@@ -1170,13 +1139,9 @@ class PageTest(PageTestBase):
         cms_page = create_page("page", "nav_playground.html", "en")
         translation = cms_page.get_content_obj("en", fallback=False)
         expected = (
-            ('<input id="id_overwrite_url" maxlength="255" ' 'value="new-url" name="overwrite_url" type="text" />')
-            if DJANGO_4_2
-            else (
-                '<input type="text" name="overwrite_url" value="new-url" '
-                'maxlength="255" aria-describedby="id_overwrite_url_helptext" '
-                'id="id_overwrite_url">'
-            )
+            '<input type="text" name="overwrite_url" value="new-url" '
+            'maxlength="255" aria-describedby="id_overwrite_url_helptext" '
+            'id="id_overwrite_url">'
         )
         changelist = self.get_pages_admin_list_uri()
         endpoint = self.get_page_change_uri("en", cms_page)
@@ -1203,18 +1168,11 @@ class PageTest(PageTestBase):
         boo = create_page("boo", "nav_playground.html", "en")
         hoo = create_page("hoo", "nav_playground.html", "en")
         translation = hoo.get_content_obj("en", fallback=False)
-        if DJANGO_5_1:
-            expected_error = (
-                '<ul class="errorlist"><li>Page '
-                '<a href="{}" target="_blank">boo</a> '
-                "has the same url 'boo' as current page \"hoo\".</li></ul>"
-            ).format(self.get_page_change_uri("en", boo))
-        else:
-            expected_error = (
-                '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
-                '<a href="{}" target="_blank">boo</a> '
-                "has the same url 'boo' as current page \"hoo\".</li></ul>"
-            ).format(self.get_page_change_uri("en", boo))
+        expected_error = (
+            '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
+            '<a href="{}" target="_blank">boo</a> '
+            "has the same url 'boo' as current page \"hoo\".</li></ul>"
+        ).format(self.get_page_change_uri("en", boo))
 
         with self.login_user_context(superuser):
             endpoint = self.get_page_change_uri("en", hoo)
@@ -1239,12 +1197,8 @@ class PageTest(PageTestBase):
         )
         translation = cms_page.get_content_obj("en", fallback=False)
         expected = (
-            ('<input id="id_overwrite_url" maxlength="255" ' 'name="overwrite_url" type="text" />')
-            if DJANGO_4_2
-            else (
-                '<input type="text" name="overwrite_url" maxlength="255" '
-                'aria-describedby="id_overwrite_url_helptext" id="id_overwrite_url">'
-            )
+            '<input type="text" name="overwrite_url" maxlength="255" '
+            'aria-describedby="id_overwrite_url_helptext" id="id_overwrite_url">'
         )
         changelist = self.get_pages_admin_list_uri()
         endpoint = self.get_page_change_uri("en", cms_page)
@@ -1553,6 +1507,32 @@ class PageTest(PageTestBase):
                 content_admin.slug(content2)
                 content_admin.overwrite_url(content2)
 
+    def test_change_view_shows_language_tabs_for_latest_content(self):
+        """The page content change view offers the language selector for the latest content."""
+        superuser = self.get_superuser()
+        page = self.get_page()
+        content = self.get_pagecontent_obj(page, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        with self.login_user_context(superuser):
+            response = self.client.get(change_url)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_change_view_drops_language_tabs_for_non_latest_content(self):
+        """The page content change view drops the language selector when an older (non-latest)
+        content object is shown. Switching languages back and forth would otherwise silently bring
+        up the latest content instead - confusing UX."""
+        superuser = self.get_superuser()
+        page = self.get_page()
+        content = self.get_pagecontent_obj(page, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        # Simulate a versioning package: the latest content for this language differs from the
+        # content object being shown.
+        fake_latest = type("FakeContent", (), {"pk": content.pk + 1000})()
+        with patch("cms.models.pagemodel.Page.get_admin_content", return_value=fake_latest):
+            with self.login_user_context(superuser):
+                response = self.client.get(change_url)
+        self.assertNotContains(response, 'id="page_form_lang_tabs"')
+
     def _parse_page_tree(self, response, parser_class):
         content = response.content
         content = content.decode(response.charset)
@@ -1670,6 +1650,75 @@ class PageTest(PageTestBase):
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
             content = force_str(parsed)
             self.assertIn(tree, content)
+
+    def test_page_tree_prefetches_page_urls(self):
+        """
+        Regression test: the page tree endpoints must fetch the ``PageUrl``
+        objects of all pages in bulk instead of issuing one query per page
+        row (triggered by ``Page.get_url_obj`` filling ``urls_cache`` from
+        ``self.urls.all()`` for every rendered row).
+        """
+        superuser = self.get_superuser()
+
+        create_page("Home", "nav_playground.html", "en")
+        for index in range(4):
+            create_page(f"Page {index}", "nav_playground.html", "en")
+
+        endpoints = (
+            self.get_admin_url(PageContent, "get_tree"),
+            self.get_admin_url(PageContent, "changelist"),
+        )
+
+        with self.login_user_context(superuser):
+            for endpoint in endpoints:
+                with self.subTest(endpoint=endpoint):
+                    with CaptureQueriesContext(connection) as queries:
+                        response = self.client.get(endpoint)
+                    self.assertEqual(response.status_code, 200)
+                    page_url_queries = [
+                        query["sql"] for query in queries.captured_queries if '"cms_pageurl"' in query["sql"]
+                    ]
+                    self.assertLessEqual(
+                        len(page_url_queries),
+                        1,
+                        "The page tree issued one PageUrl query per page instead "
+                        "of prefetching them:\n" + "\n".join(page_url_queries),
+                    )
+
+    def test_page_tree_does_not_requery_content_less_pages(self):
+        """
+        Regression test: pages without any (filtered) translations must not
+        trigger a fresh ``set_admin_content_cache`` query per row. An empty
+        admin content cache used to be indistinguishable from an unpopulated
+        one, so ``get_admin_content`` / ``get_languages`` re-queried the
+        database for every content-less page in the tree.
+        """
+        superuser = self.get_superuser()
+        endpoint = self.get_admin_url(PageContent, "get_tree")
+
+        def add_content_less_pages(count, prefix):
+            for index in range(count):
+                page = create_page(f"{prefix}-{index}", "nav_playground.html", "en")
+                PageContent.admin_manager.filter(page=page).delete()
+
+        create_page("Home", "nav_playground.html", "en")
+        add_content_less_pages(2, "empty-a")
+
+        with self.login_user_context(superuser):
+            self.client.get(endpoint)  # warm up caches (content types, permissions, ...)
+            with CaptureQueriesContext(connection) as first:
+                self.assertEqual(self.client.get(endpoint).status_code, 200)
+
+            add_content_less_pages(3, "empty-b")
+            with CaptureQueriesContext(connection) as second:
+                self.assertEqual(self.client.get(endpoint).status_code, 200)
+
+        self.assertEqual(
+            len(second.captured_queries),
+            len(first.captured_queries),
+            "The page tree issued extra queries for content-less pages:\n"
+            + "\n".join(query["sql"] for query in second.captured_queries),
+        )
 
     def test_page_tree_redirect_icon_display(self):
         """Test that redirect icon is displayed in page tree when page has redirect"""
@@ -1974,6 +2023,44 @@ class PageActionsTestCase(PageTestBase):
         titles = {result["title"] for result in results}
         self.assertIn("Bravo Site 1", titles)
         self.assertNotIn("Bravo Site 2", titles)
+
+    def test_get_list_prefetches_page_urls(self):
+        """
+        Regression test: the smart-link autocomplete endpoint resolves the
+        path/title/URL of every matching page. It must prefetch ``urls`` (and
+        ``pagecontent_set``) in bulk instead of issuing one ``PageUrl`` query
+        per matched page.
+        """
+        for index in range(4):
+            create_page(
+                f"Bravo {index}",
+                "nav_playground.html",
+                "en",
+                site=self.site,
+                slug=f"bravo-{index}",
+                created_by=self.admin,
+            )
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            with CaptureQueriesContext(connection) as queries:
+                response = self.client.get(
+                    endpoint,
+                    data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                    HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.content.decode("utf-8"))), 4)
+        page_url_queries = [
+            query["sql"] for query in queries.captured_queries if 'FROM "cms_pageurl"' in query["sql"]
+        ]
+        self.assertLessEqual(
+            len(page_url_queries),
+            1,
+            "The smart-link endpoint issued one PageUrl query per matched page:\n"
+            + "\n".join(page_url_queries),
+        )
 
     def test_actions_menu_superuser(self):
         """Test actions_menu view returns correct context for superuser"""

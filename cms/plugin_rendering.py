@@ -13,6 +13,7 @@ from django.db import models
 from django.http import HttpRequest
 from django.template import Context
 from django.utils.functional import cached_property
+from django.utils.html import format_html
 from django.utils.module_loading import import_string
 from django.utils.safestring import SafeText, mark_safe
 from django.utils.translation import get_language, override
@@ -165,15 +166,17 @@ class BaseRenderer:
 
     def get_plugin_toolbar_js(self, plugin: CMSPlugin, obj: models.Model):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
-        child_classes, parent_classes = get_plugin_restrictions(
+        child_classes, _ = get_plugin_restrictions(
             plugin=plugin,
             page=obj,
             restrictions_cache=placeholder_cache,  # Store non-global plugin-restriction in placeholder_cache
         )
+        # Make the resolved restrictions available to the drag-item template (which renders the
+        # same instances) so it can decide whether children may be added without recomputing.
+        plugin.child_class_restrictions = child_classes
         content = get_plugin_toolbar_js(
             plugin,
             children=child_classes,
-            parents=parent_classes,
         )
         return content
 
@@ -542,7 +545,7 @@ class ContentRenderer(BaseRenderer):
                 html = reporter.get_traceback_html()
             else:
                 html = ""
-            heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
+            heading = format_html('<h2 class="cms-rendering-exception-title">{}</h2>', message)
             if "_last_plugin" in context:
                 # Make error message editable by double-click to open the editor for the plugin causing the exception
                 is_slot = getattr(instance, "is_slot", False)

@@ -26,7 +26,9 @@ from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
     user_can_change_page,
     user_can_delete_page,
+    user_can_view_page,
 )
+from cms.utils.permissions import user_can_view_placeholder_source
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
 
@@ -157,6 +159,17 @@ class PlaceholderToolbar(CMSToolbar):
             return False
         return any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user))
 
+    def _has_page_view_perm(self):
+        if self.page and user_can_view_page(self.request.user, self.page):
+            return True
+        return False
+
+    def _has_placeholder_view_perm(self):
+        obj = self.toolbar.obj
+        if obj is None:
+            return False
+        return user_can_view_placeholder_source(self.request.user, obj)
+
     def _can_add_button(self):
         if self._has_page_change_perm():
             return True
@@ -165,12 +178,16 @@ class PlaceholderToolbar(CMSToolbar):
         return False
 
     def _can_add_structure_mode(self):
+        # Viewing the structure board only requires view permission: editing
+        # the plugins stays gated by change permission at the plugin endpoints.
+        # This lets headless reviewers (and view-only staff) inspect content
+        # structure without edit rights.
         if not self.request.user.has_perm("cms.use_structure"):
             return False
 
-        if self.page and not self.page.application_urls and self._has_page_change_perm():
+        if self.page and not self.page.application_urls and self._has_page_view_perm():
             return True
-        elif self._has_placeholder_change_perm():
+        elif self._has_placeholder_view_perm():
             return True
         return False
 
@@ -711,7 +728,7 @@ class PageToolbar(CMSToolbar):
             # delete
             delete_url = admin_reverse("cms_page_delete", args=(self.page.pk,))
             delete_disabled = not edit_mode or not user_can_delete_page(self.request.user, page=self.page)
-            on_delete_redirect_url = self.get_on_delete_redirect_url()
+            on_delete_redirect_url = self.get_on_delete_redirect_url() if not delete_disabled else None
             current_page_menu.add_modal_item(
                 _("Delete page"), url=delete_url, on_close=on_delete_redirect_url, disabled=delete_disabled
             )

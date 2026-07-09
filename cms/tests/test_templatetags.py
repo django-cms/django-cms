@@ -37,6 +37,7 @@ from cms.templatetags.cms_tags import (
     render_plugin,
 )
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
@@ -88,6 +89,25 @@ class TemplatetagTests(CMSTestCase):
         self.assertIn(expected_for_page, output)
         self.assertIn(expected_for_german_content, output)
 
+    def test_get_preview_url_object_without_language(self):
+        """A frontend-editable object that has no ``language`` attribute falls back
+        to the active request language instead of raising ``AttributeError``."""
+        example = Example1.objects.create(char_1="a", char_2="b", char_3="c", char_4="d")
+        self.assertFalse(hasattr(example, "language"))
+
+        template = """
+            {% load cms_admin %}
+            preview={% get_preview_url example %}
+            edit={% get_edit_url example %}
+        """
+        with force_language("en"):
+            output = self.render_template_obj(template, {"example": example}, self.get_request())
+            expected_preview = f"preview={get_object_preview_url(example, language='en')}"
+            expected_edit = f"edit={get_object_edit_url(example, language='en')}"
+
+        self.assertIn(expected_preview, output)
+        self.assertIn(expected_edit, output)
+
     def test_get_edit_url(self):
         """The get_edit_url template tag returns the content edit url for its language:
         If a page is given, take the current language (en), if a page_content is given,
@@ -111,8 +131,8 @@ class TemplatetagTests(CMSTestCase):
     def test_placeholder_is_immutable_filter(self):
         template = """
             {% load cms_admin %}
-            non-placeholder={{ True|placeholder_is_immutable:request.user }}
-            placeholder={{ placeholder|placeholder_is_immutable:request.user }}
+            non-placeholder={{ True|placeholder_is_immutable:user }}
+            placeholder={{ placeholder|placeholder_is_immutable:user }}
         """
         from unittest.mock import patch
 
@@ -122,11 +142,25 @@ class TemplatetagTests(CMSTestCase):
         placeholder = page.get_placeholders("en").first()
         request = self.get_request()
 
+        # A placeholder is mutable only if the source permits editing *and* the
+        # user may change it: a user with change permission gets the editable
+        # board (placeholder=False).
         with patch.object(Placeholder, "check_source", wraps=placeholder.check_source) as mock_check_source:
-            output = self.render_template_obj(template, {"placeholder": placeholder}, request=request)
+            output = self.render_template_obj(
+                template, {"placeholder": placeholder, "user": self.get_superuser()}, request=request
+            )
             self.assertIn("non-placeholder=True", output)
             self.assertIn("placeholder=False", output)
             self.assertEqual(mock_check_source.call_count, 1)
+
+        # A user without change permission only gets a read-only board, even
+        # though the source itself permits editing (placeholder=True).
+        output = self.render_template_obj(
+            template,
+            {"placeholder": placeholder, "user": self.get_staff_user_with_no_permissions()},
+            request=request,
+        )
+        self.assertIn("placeholder=True", output)
 
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en", slug="slug-test2")

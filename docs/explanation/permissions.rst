@@ -8,9 +8,84 @@ need finer control. This page explains how those two layers fit
 together, the roles they are designed to support, and the trade-offs
 that come with each.
 
-For step-by-step setup of users and groups, see the Django admin and
-your project's permission how-to (under construction). This page is
-about *why* the system looks the way it does.
+
+****************
+Permission modes
+****************
+
+Permissions operate in two different modes, depending on the :setting:`CMS_PERMISSION` setting.
+
+* Simple permissions mode (``CMS_PERMISSION = False``): only the standard Django Users and Groups
+  permissions will apply. This is the default.
+* Page permissions mode (``CMS_PERMISSION = True``): as well as standard Django permissions, django
+  CMS provides row-level permissions on pages, allowing you to control the access of users to
+  different sections of a site, and sites within a multi-site project.
+
+.. _key-user-permissions:
+
+********************
+Key user permissions
+********************
+
+You can find the permissions you can set for a user or groups in the Django admin, in the
+*Authentication and Authorization* section. These apply equally in Simple permissions mode and
+Page permissions mode.
+
+Filtering by ``cms`` will show the ones that belong to the CMS application. Permissions that a CMS
+editor will need are likely to include the following core package permissions:
+
+* ``django CMS | cms plugin``
+* ``django CMS | page``
+* ``django CMS | placeholder``
+* ``django CMS | placeholder reference``
+
+Most of these offer the usual add/change/delete options, though there are some exceptions, such as
+``django CMS | placeholder | Can use Structure mode``.
+
+In addition to the core package permissions, an editor will likely need the following permissions
+from 3rd-party packages:
+
+* `djangocms-alias <https://pypi.org/project/djangocms-alias/>`_
+
+  * ``django CMS Alias | alias``
+  * ``django CMS Alias | alias content``
+  * ``django CMS Alias | category``
+
+* `djangocms-frontend <https://pypi.org/project/djangocms-frontend/>`_
+
+  * ``django CMS Frontend | UI item``
+  * After adding these permissions, save and use the ``python manage.py frontend sync_permissions``
+    command as documented in `djangocms-frontend's documentation
+    <https://djangocms-frontend.readthedocs.io/en/stable/tutorial/builtin_components.html#assigning-permissions>`_
+
+* `djangocms-text <https://pypi.org/project/djangocms-text/>`_
+
+  * ``django CMS Rich Text | text``
+
+* `djangocms-versioning <https://pypi.org/project/djangocms-versioning/>`_
+
+  * ``django CMS Versioning | alias content version``
+  * ``django CMS Versioning | page content version``
+  * ``django CMS Versioning | version``
+
+Typically when adding other 3rd party packages or custom plugins you may need to add additional
+permissions to enable their features. Sometimes documentation for such needed permissions may be
+missing, in that case you can compare the list of available permissions with the package enabled
+and disabled on your site.
+
+See :ref:`use-permissions-on-groups` below on applying permissions to groups rather than users.
+
+
+************************************
+Permissions in Page permissions mode
+************************************
+
+In Page permissions mode, you also need to give users permission to the right pages and sub-sites.
+
+
+.. _global-and-per-page-permissions:
+
+Global and per-page permissions
 
 *********************
 Roles, not just users
@@ -173,6 +248,74 @@ These three controls are layered. A page can be in the menu for
 logged-in users (menu visibility), require login to view at all
 (login-required), and be further restricted to one group (view
 restriction).
+
+**These are front-end controls only.** View restrictions,
+login-required, and menu visibility all govern who can *see a
+published page on the public site*. They do **not** hide a page inside
+the admin. The page tree in the admin — and the page-link
+autocomplete used by the smart-link field, which mirrors it — list
+*every* page on a site to any staff user who can edit at least one
+page on that site. Such a user can therefore see the titles, paths,
+and URLs of restricted, login-required, and draft pages, even ones
+they cannot view on the front end or edit. Per-page edit permissions
+gate the *actions* offered on each node (edit, move, delete), not
+whether the node is listed.
+
+In other words, a page title or path is not a secret from your staff
+editors. If a page's *existence* must be hidden from some staff users,
+the page tree is the wrong tool: keep that content on a separate site
+(see :setting:`CMS_PERMISSION` and multi-site setups) or outside the
+CMS, rather than relying on a view restriction to conceal it in the
+admin.
+
+
+*************************
+Delegated user management
+*************************
+
+With ``CMS_PERMISSION = True`` a non-superuser can be given the right
+to manage *other* users — the "Users" and "User groups" entries in the
+admin become available to anyone who has the ``change`` permission on
+the CMS user/group models and a page-permission level of their own.
+These users are **page-user managers**. They are not superusers, yet
+inside their own corner of the system they act with superuser-like
+authority.
+
+The mental model is deliberate: **a page-user manager is a superuser
+for their subordinate users only.** A user is "subordinate" when the
+manager created them, or when they sit at the same or a lower level in
+the page tree the manager controls. Within that subordinate set, the
+manager can do almost everything a superuser could do to those
+accounts:
+
+* create new staff users (new page-users are made staff automatically);
+* grant and revoke any permission or group the manager *themselves*
+  holds — they cannot hand out rights they do not have;
+* edit account status fields, including ``is_staff`` (admin-login
+  capability) and ``is_active`` (whether the account may log in at
+  all).
+
+The single boundary a manager cannot cross is **superuser status**:
+``is_superuser`` is read-only for non-superusers, so a manager can
+never promote a subordinate (or themselves) to full superuser.
+
+**A manager can reverse a setting a superuser made.** This follows
+directly from the model and is worth stating plainly. If a superuser
+disables a subordinate account (``is_active = False``) or removes its
+staff flag (``is_staff = False``), a page-user manager with that user
+in their subordinate set can switch it back on. The manager's authority
+over a subordinate is not subordinate to the superuser's earlier edit;
+it is the *same* authority over that account, minus the ability to
+grant superuser. If you need a deactivation or a demotion to be
+permanent against a manager, the user must be moved out of that
+manager's subordinate set — for example by deleting the account, or by
+re-parenting it above the manager's page-tree level — rather than
+relying on the status flag alone.
+
+This is intentional delegation, not a gap: the whole point of a
+page-user manager is to off-load routine account administration from
+the superuser. Hand the role only to people you would trust with the
+accounts it covers.
 
 
 ********

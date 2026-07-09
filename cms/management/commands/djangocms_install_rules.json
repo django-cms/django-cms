@@ -1,5 +1,45 @@
 {
-    "comment": "Rules used by `djangocms .` to add django CMS to an existing project. Fetched from the cms-template repository (branch matching the installed django CMS major.minor), with this file as the bundled fallback. Top-level keys starting with `$` (such as `$schema`) and this comment are ignored. Each `when` condition may contain a `flag` (truthy command option) and/or a `mode` (list of matching --mode values). For installed_apps and middleware a rule may also carry a `before` or `after` anchor (an existing entry) for positional insertion; otherwise items are appended. A url rule may carry `\"i18n\": true` to route its pattern through `i18n_patterns()` (so the CMS catch-all keeps its language prefix) when the project's urls.py already uses i18n_patterns; otherwise the pattern is added to the plain urlpatterns list. The `warnings` list holds `{message, when}` entries; each message whose condition matches is printed to the screen (for example, should djangocms-stories be discontinued, add {\"message\": \"The --stories option no longer has any effect: djangocms-stories has been discontinued.\", \"when\": {\"flag\": \"stories\"}}).",
+    "comment": "Rules used by `djangocms .` to add django CMS to an existing project. Fetched from the cms-template repository (branch matching the installed django CMS major.minor), with this file as the bundled fallback. Top-level keys starting with `$` (such as `$schema`) and this comment are ignored. The `options` object describes template-owned command options. Each `when` condition may contain a `flag` (truthy command option) and/or a `mode` (list of matching --mode values). For installed_apps and middleware a rule may also carry a `before` or `after` anchor (an existing entry) for positional insertion; otherwise items are appended. A url rule may carry `\"i18n\": true` to route its pattern through `i18n_patterns()` (so the CMS catch-all keeps its language prefix) when the project's urls.py already uses i18n_patterns; otherwise the pattern is added to the plain urlpatterns list. The `warnings` list holds `{message, when}` entries; each message whose condition matches is printed to the screen (for example, should djangocms-stories be discontinued, add {\"message\": \"The --stories option no longer has any effect: djangocms-stories has been discontinued.\", \"when\": {\"flag\": \"stories\"}}).",
+    "options": {
+        "mode": {
+            "type": "choice",
+            "default": "traditional",
+            "choices": ["traditional", "headless", "hybrid"],
+            "label": "CMS mode",
+            "help": "Selects the CMS mode: traditional, headless or hybrid (default: traditional)."
+        },
+        "versioning": {
+            "type": "boolean",
+            "default": true,
+            "label": "Enable content versioning",
+            "help": "Adds content versioning (djangocms-versioning) to the project (default: on)."
+        },
+        "moderation": {
+            "type": "boolean",
+            "default": false,
+            "label": "Enable content moderation",
+            "requires": {"versioning": true},
+            "help": "Adds content moderation (djangocms-moderation) to the project (default: off)."
+        },
+        "alias": {
+            "type": "boolean",
+            "default": true,
+            "label": "Add reusable aliases",
+            "help": "Adds reusable aliases (djangocms-alias) to the project (default: on)."
+        },
+        "stories": {
+            "type": "boolean",
+            "default": false,
+            "label": "Add the stories component library",
+            "help": "Adds the stories component library (djangocms-stories) to the project (default: off)."
+        },
+        "history": {
+            "type": "boolean",
+            "default": false,
+            "label": "Add undo/redo history",
+            "help": "Adds djangocms-history to the project (default: off)."
+        }
+    },
     "installed_apps": [
         {"items": ["djangocms_simple_admin_style"], "before": "django.contrib.admin"},
         {
@@ -34,7 +74,8 @@
         {"items": ["djangocms_versioning"], "when": {"flag": "versioning"}},
         {"items": ["djangocms_moderation"], "when": {"flag": "moderation"}},
         {"items": ["djangocms_alias"], "when": {"flag": "alias"}},
-        {"items": ["djangocms_stories", "taggit", "taggit_autosuggest"], "when": {"flag": "stories"}},
+        {"items": ["djangocms_stories", "taggit"], "when": {"flag": "stories"}},
+        {"items": ["djangocms_history"], "when": {"flag": "history"}},
         {"items": ["rest_framework", "djangocms_rest"], "when": {"mode": ["headless", "hybrid"]}}
     ],
     "middleware": [
@@ -70,14 +111,13 @@
     ],
     "urls": [
         {"pattern": "path(\"api/\", include(\"djangocms_rest.urls\"))", "when": {"mode": ["headless", "hybrid"]}},
-        {"pattern": "path(\"taggit_autosuggest/\", include(\"taggit_autosuggest.urls\"))", "when": {"flag": "stories"}},
         {"pattern": "path(\"\", include(\"cms.urls\"))", "i18n": true, "when": {"mode": ["traditional", "hybrid"]}}
     ],
     "packages": {
         "filer": "django-filer",
+        "djangocms_history": "djangocms-history>=3",
         "rest_framework": "djangorestframework",
-        "taggit": "django-taggit",
-        "taggit_autosuggest": "django-taggit-autosuggest"
+        "taggit": "django-taggit"
     },
     "template_dir": {
         "path": "templates",
