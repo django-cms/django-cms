@@ -4,6 +4,7 @@
 
 Features:
 ---------
+* Support django 6.1+ breadcrumb styles (#8689) (fa220cd79) -- Fabian Braun
 
 * introduce contracts for django CMS Extensions (#8455) -- Fabian Braun
 * Avoid database access when registering apphook urls to make them async-safe (#8460) -- Fabian Braun
