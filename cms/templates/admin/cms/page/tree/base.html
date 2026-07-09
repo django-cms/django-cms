@@ -26,7 +26,7 @@
             <li><a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a></li>
             {# TODO might remove this or add reset #}
             {% if request.GET.q or request.POST.q %}
-            <li>Pages</li>
+            <li>{% trans "Pages" %}</li>
             <li aria-current="page">{% trans "Search" %}</li>
             {% else %}
             <li aria-current="page">Pages</li>
