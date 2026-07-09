@@ -66,6 +66,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
+from cms.models.pagemodel import AdminCacheDict
 from cms.models.permissionmodels import PermissionTuple
 from cms.operations.helpers import (
     send_post_page_operation,
@@ -386,7 +387,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
                 | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
                 | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
-            ).distinct()
+            ).prefetch_related("urls", "pagecontent_set").distinct()
 
             results = []
             for page in matching_published_pages:
@@ -1153,6 +1154,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 to_attr="filtered_translations",
                 queryset=page_contents,
             ),
+            "urls",  # rendering a tree row resolves the page's URLs
         )
 
         if changelist_form.is_filtered():
@@ -1285,7 +1287,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             "language": force_str(get_language_object(obj.language)["name"])
         }
         messages.success(request, message)
-        if obj.language in obj.page.admin_content_cache:
+        if obj.page.admin_content_cache and obj.language in obj.page.admin_content_cache:
             del obj.page.admin_content_cache[obj.language]
         if obj.language in obj.page.page_content_cache:
             del obj.page.page_content_cache[obj.language]
@@ -1352,6 +1354,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 to_attr="filtered_translations",
                 queryset=PageContent.admin_manager.get_queryset().latest_content(),
             ),
+            "urls",  # rendering a tree row resolves the page's URLs
         )
         rows = self.get_tree_rows(
             request,
@@ -1378,7 +1381,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         user_can_change_advanced = page_permissions.user_can_change_page_advanced_settings
 
         def render_page_row(page):
-            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations}
+            page.admin_content_cache = AdminCacheDict(
+                (trans.language, trans) for trans in page.filtered_translations
+            )
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
             if permissions_on and not has_move_page_permission:
