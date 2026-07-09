@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict, deque
-from typing import Any, Optional
+from collections.abc import Sequence
+from typing import Any
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -90,7 +91,7 @@ def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]
 
 def get_plugin_tree(
     request: HttpRequest,
-    plugins: list[CMSPlugin],
+    plugins: Sequence[CMSPlugin],
     restrictions: dict | None = None,
     target_plugin: CMSPlugin | None = None,
 ) -> dict[str, Any]:
