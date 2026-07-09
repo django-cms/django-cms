@@ -46,20 +46,14 @@ class ShellMixin:  # pragma: no cover
 class PromptMixin:  # pragma: no cover
     """Interactive prompting for the project name and the project options."""
 
-    # Effective defaults for the project options. The arguments themselves
-    # default to ``None`` so that ``--interactive`` can tell apart an option
-    # that was given on the command line from one that needs to be asked for.
-    OPTION_DEFAULTS = {
-        "mode": "traditional",
-        "versioning": True,
-        "moderation": False,
-        "alias": True,
-        "stories": False,
-    }
-
     def ask(self, label, default=None):
         suffix = f" [{default}]" if default not in (None, "") else ""
-        return input(f"{label}{suffix}: ").strip() or default
+        try:
+            return input(f"{label}{suffix}: ").strip() or default
+        except EOFError as exc:
+            raise CommandError(
+                "Input is not available. Provide a project name, or use --noinput to disable prompts."
+            ) from exc
 
     def ask_choice(self, label, choices, default):
         while True:
@@ -85,24 +79,19 @@ class PromptMixin:  # pragma: no cover
                 name = self.ask("Project name")
                 if not name:
                     self.stderr.write(self.style.ERROR("A project name is required."))
-        if options.get("mode") is None:
-            options["mode"] = self.ask_choice(
-                "CMS mode", ("traditional", "headless", "hybrid"), self.OPTION_DEFAULTS["mode"]
-            )
-        if options.get("versioning") is None:
-            options["versioning"] = self.ask_bool("Enable content versioning", self.OPTION_DEFAULTS["versioning"])
-        if options.get("moderation") is None:
-            # Moderation builds on top of versioning, so only offer it when
-            # versioning is enabled; otherwise it stays off.
-            options["moderation"] = (
-                self.ask_bool("Enable content moderation", self.OPTION_DEFAULTS["moderation"])
-                if options["versioning"]
-                else False
-            )
-        if options.get("alias") is None:
-            options["alias"] = self.ask_bool("Add reusable aliases", self.OPTION_DEFAULTS["alias"])
-        if options.get("stories") is None:
-            options["stories"] = self.ask_bool("Add the stories component library", self.OPTION_DEFAULTS["stories"])
+        for option_name, definition in self.get_template_options().items():
+            if options.get(option_name) is not None:
+                continue
+            if not self._requirements_met(definition.get("requires"), options):
+                options[option_name] = False if definition["type"] == "boolean" else definition["default"]
+                continue
+            label = definition.get("label", option_name.replace("_", " ").title())
+            if definition["type"] == "choice":
+                options[option_name] = self.ask_choice(label, tuple(definition["choices"]), definition["default"])
+            elif definition["type"] == "boolean":
+                options[option_name] = self.ask_bool(label, definition["default"])
+            else:
+                raise CommandError(f"Unsupported option type for --{option_name}: {definition['type']}")
         return name
 
 
@@ -497,8 +486,10 @@ class ExistingProjectMixin:
     # bundled next to this command serving as the offline fallback.
     INSTALL_RULES_FILENAME = "djangocms_install_rules.json"
 
-    # Package names may only contain letters, digits, underscores and minus signs.
-    SAFE_PACKAGE_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+    # Package specs are intentionally narrow: a package name plus an optional
+    # lower-bound version pin from trusted install rules.
+    SAFE_PACKAGE_RE = re.compile(r"^[A-Za-z0-9_-]+(>=[0-9][A-Za-z0-9_.-]*)?$")
+    BUNDLED_RULES_OPTION = "--use-bundled-install-rules"
 
     def get_install_rules_url(self):
         return (
@@ -646,20 +637,133 @@ class ExistingProjectMixin:
 
     def load_install_rules(self):
         """Fetch the install rules from GitHub, falling back to the bundled file."""
-        url = self.get_install_rules_url()
-        try:
-            with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 (https URL)
-                rules = json.loads(response.read().decode("utf-8"))
-        except (urllib.error.URLError, OSError, ValueError) as exc:
-            self.stderr.write(
-                self.style.WARNING(f"Could not fetch installation rules from {url} ({exc}); using bundled defaults.")
-            )
-            bundled = os.path.join(os.path.dirname(__file__), self.INSTALL_RULES_FILENAME)
-            rules = json.loads(self._read(bundled))
+        cached = getattr(self, "_install_rules", None)
+        if cached is not None:
+            return cached
+        if getattr(self, "_use_bundled_install_rules", False):
+            rules = self.load_bundled_install_rules()
+        else:
+            url = self.get_install_rules_url()
+            try:
+                with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 (https URL)
+                    rules = json.loads(response.read().decode("utf-8"))
+            except (urllib.error.URLError, OSError, ValueError) as exc:
+                self.stderr.write(
+                    self.style.WARNING(
+                        f"Could not fetch installation rules from {url} ({exc}); using bundled defaults."
+                    )
+                )
+                rules = self.load_bundled_install_rules()
         if not isinstance(rules, dict):
             raise CommandError("Invalid installation rules: expected a JSON object.")
         # Metadata keys such as "$schema" or "comment" carry no rules.
-        return {key: value for key, value in rules.items() if not key.startswith("$")}
+        rules = {key: value for key, value in rules.items() if not key.startswith("$")}
+        if "options" not in rules:
+            bundled_rules = {
+                key: value for key, value in self.load_bundled_install_rules().items() if not key.startswith("$")
+            }
+            rules["options"] = bundled_rules["options"]
+        self._validate_install_rules(rules)
+        self._install_rules = rules
+        return rules
+
+    def load_bundled_install_rules(self):
+        """Read the bundled install rules without fetching from cms-template."""
+        bundled = os.path.join(os.path.dirname(__file__), self.INSTALL_RULES_FILENAME)
+        return json.loads(self._read(bundled))
+
+    def get_template_options(self):
+        """Return the template-owned command options from the install rules."""
+        return self.load_install_rules()["options"]
+
+    def get_template_option_defaults(self):
+        """Effective defaults for template-owned options."""
+        return {name: definition["default"] for name, definition in self.get_template_options().items()}
+
+    def apply_template_option_defaults(self, options):
+        """Fill unset template-owned options from the JSON metadata."""
+        for key, value in self.get_template_option_defaults().items():
+            if options.get(key) is None:
+                options[key] = value
+
+    def validate_template_option_requirements(self, options):
+        """Validate simple option dependencies from the JSON metadata."""
+        for option_name, definition in self.get_template_options().items():
+            required = definition.get("requires")
+            if options.get(option_name) and not self._requirements_met(required, options):
+                requirements = ", ".join(name if value is True else f"{name}={value}" for name, value in required.items())
+                raise CommandError(f"--{option_name} requires {requirements}.")
+
+    @classmethod
+    def _validate_install_rules(cls, rules):
+        """Validate the parts of the install rules that the command executes."""
+        options = rules.get("options")
+        if not isinstance(options, dict) or not options:
+            raise CommandError("Invalid installation rules: expected a non-empty 'options' object.")
+        for option_name, definition in options.items():
+            if not re.match(r"^[A-Za-z][A-Za-z0-9_]*$", option_name):
+                raise CommandError(f"Invalid installation rules: invalid option name '{option_name}'.")
+            if not isinstance(definition, dict):
+                raise CommandError(f"Invalid installation rules: option '{option_name}' must be an object.")
+            option_type = definition.get("type")
+            if option_type not in ("boolean", "choice"):
+                raise CommandError(
+                    f"Invalid installation rules: option '{option_name}' has unsupported type '{option_type}'."
+                )
+            if "default" not in definition:
+                raise CommandError(f"Invalid installation rules: option '{option_name}' needs a default.")
+            if option_type == "boolean" and not isinstance(definition["default"], bool):
+                raise CommandError(f"Invalid installation rules: option '{option_name}' default must be boolean.")
+            if option_type == "choice":
+                choices = definition.get("choices")
+                if not isinstance(choices, list) or not choices:
+                    raise CommandError(f"Invalid installation rules: option '{option_name}' needs choices.")
+                if definition["default"] not in choices:
+                    raise CommandError(
+                        f"Invalid installation rules: option '{option_name}' default must be one of its choices."
+                    )
+            requires = definition.get("requires", {})
+            if not isinstance(requires, dict):
+                raise CommandError(f"Invalid installation rules: option '{option_name}' requires must be an object.")
+            for required_name in requires:
+                if required_name not in options:
+                    raise CommandError(
+                        f"Invalid installation rules: option '{option_name}' requires unknown option "
+                        f"'{required_name}'."
+                    )
+
+        declared_options = set(options)
+        for when in cls._iter_when_conditions(rules):
+            flag = when.get("flag")
+            if flag and flag not in declared_options:
+                raise CommandError(f"Invalid installation rules: unknown option flag '{flag}'.")
+            modes = when.get("mode")
+            if modes is not None:
+                mode_definition = options.get("mode")
+                if not mode_definition or mode_definition["type"] != "choice":
+                    raise CommandError("Invalid installation rules: 'mode' conditions require a choice option.")
+                unknown_modes = set(modes) - set(mode_definition["choices"])
+                if unknown_modes:
+                    raise CommandError(
+                        "Invalid installation rules: unknown mode value(s) " + ", ".join(sorted(unknown_modes))
+                    )
+
+    @classmethod
+    def _iter_when_conditions(cls, rules):
+        for section in ("installed_apps", "middleware", "context_processors", "settings", "urls", "warnings"):
+            for rule in rules.get(section, []):
+                when = rule.get("when") if isinstance(rule, dict) else None
+                if when:
+                    yield when
+        template_dir = rules.get("template_dir")
+        if isinstance(template_dir, dict) and template_dir.get("when"):
+            yield template_dir["when"]
+
+    @staticmethod
+    def _requirements_met(requirements, options):
+        if not requirements:
+            return True
+        return all(options.get(name) == value for name, value in requirements.items())
 
     @staticmethod
     def _rule_applies(when, options):
@@ -957,6 +1061,7 @@ class Command(PromptMixin, NewProjectMixin, ExistingProjectMixin, SourceEditorMi
 
     def add_arguments(self, parser):  # pragma: no cover -- argparse wiring; tests call handle() directly
         super().add_arguments(parser)
+        self._use_bundled_install_rules = self.BUNDLED_RULES_OPTION in sys.argv
         # Make the project name optional so it can be asked for in interactive
         # mode; a missing name is reported by handle() otherwise.
         for action in parser._actions:
@@ -994,35 +1099,25 @@ class Command(PromptMixin, NewProjectMixin, ExistingProjectMixin, SourceEditorMi
             help="Specifies the email for the superuser to be created (only when creating a new project).",
         )
         parser.add_argument(
-            "--stories",
-            action=argparse.BooleanOptionalAction,
-            default=None,
-            help="Adds the stories component library (djangocms-stories) to the project (default: off)",
+            self.BUNDLED_RULES_OPTION,
+            action="store_true",
+            dest="use_bundled_install_rules",
+            default=False,
+            help=(
+                "Use the install rules bundled with this django CMS package instead of fetching "
+                "them from cms-template."
+            ),
         )
-        parser.add_argument(
-            "--mode",
-            choices=("traditional", "headless", "hybrid"),
-            default=None,
-            help="Selects the CMS mode: traditional, headless or hybrid (default: traditional).",
-        )
-        parser.add_argument(
-            "--versioning",
-            action=argparse.BooleanOptionalAction,
-            default=None,
-            help="Adds content versioning (djangocms-versioning) to the project (default: on).",
-        )
-        parser.add_argument(
-            "--moderation",
-            action=argparse.BooleanOptionalAction,
-            default=None,
-            help="Adds content moderation (djangocms-moderation) to the project (default: off).",
-        )
-        parser.add_argument(
-            "--alias",
-            action=argparse.BooleanOptionalAction,
-            default=None,
-            help="Adds reusable aliases (djangocms-alias) to the project (default: on).",
-        )
+        for option_name, definition in self.get_template_options().items():
+            argument = "--" + option_name.replace("_", "-")
+            kwargs = {"default": None, "dest": option_name, "help": definition.get("help", argparse.SUPPRESS)}
+            if definition["type"] == "boolean":
+                kwargs["action"] = argparse.BooleanOptionalAction
+            elif definition["type"] == "choice":
+                kwargs["choices"] = tuple(definition["choices"])
+            else:
+                raise CommandError(f"Unsupported option type for {argument}: {definition['type']}")
+            parser.add_argument(argument, **kwargs)
         parser.add_argument(
             "--dry-run",
             action="store_true",
@@ -1038,6 +1133,12 @@ class Command(PromptMixin, NewProjectMixin, ExistingProjectMixin, SourceEditorMi
         # Capture target and name for postprocessing
         name = options.pop("name", None)
         directory = options.pop("directory", None)
+        use_bundled_install_rules = options.pop("use_bundled_install_rules", False)
+        if use_bundled_install_rules and not getattr(self, "_use_bundled_install_rules", False):
+            self._install_rules = None
+        self._use_bundled_install_rules = use_bundled_install_rules or getattr(
+            self, "_use_bundled_install_rules", False
+        )
 
         # Interactively ask for the project name and any option not provided.
         # Prompting is enabled explicitly via --interactive, or implicitly when
@@ -1046,18 +1147,14 @@ class Command(PromptMixin, NewProjectMixin, ExistingProjectMixin, SourceEditorMi
         if prompt:
             name = self.prompt_for_options(name, options)
 
-        # Fill in the effective defaults for any option not given (and not
-        # asked for interactively).
-        for key, value in self.OPTION_DEFAULTS.items():
-            if options.get(key) is None:
-                options[key] = value
+        # Fill in the effective defaults for any template-owned option not given
+        # (and not asked for interactively).
+        self.apply_template_option_defaults(options)
 
         if not name:
             raise CommandError(self.missing_args_message)
 
-        # Content moderation builds on top of content versioning.
-        if options["moderation"] and not options["versioning"]:
-            raise CommandError("--moderation requires versioning; remove --no-versioning or drop --moderation.")
+        self.validate_template_option_requirements(options)
 
         # A project name of "." means: add django CMS to the existing project in
         # the current directory instead of cloning the project template.
