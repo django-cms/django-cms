@@ -6,6 +6,7 @@
 # Translators:
 # cafe-click <cafeclick@rocketmail.com>, 2013
 # Pouya Abbassi, 2016
+# Pouya Abbassi, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"

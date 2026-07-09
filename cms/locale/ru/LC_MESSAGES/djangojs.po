@@ -7,6 +7,7 @@
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # Gleb Chipiga <gleb.chipiga@gmail.com>, 2011
 # Oleg Fish <okfish@yandex.ru>, 2015
+# Oleg Fish <okfish@yandex.ru>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
