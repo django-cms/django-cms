@@ -84,7 +84,7 @@ from cms.utils.i18n import (
 )
 from cms.utils.permissions import clear_permission_lru_caches
 from cms.utils.plugins import copy_plugins_to_placeholder
-from cms.utils.urlutils import admin_reverse
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
 
@@ -754,6 +754,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = "admin/cms/page/tree/actions_dropdown.html"
     page_tree_row_template = "admin/cms/page/tree/menu.html"
+
+    class Media:
+        css = {"all": (static_with_version("cms/css/cms.admin.css"),)}
 
     form = AddPageForm
     add_form = form

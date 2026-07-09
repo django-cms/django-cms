@@ -34,7 +34,7 @@
         {"items": ["djangocms_versioning"], "when": {"flag": "versioning"}},
         {"items": ["djangocms_moderation"], "when": {"flag": "moderation"}},
         {"items": ["djangocms_alias"], "when": {"flag": "alias"}},
-        {"items": ["djangocms_stories", "taggit", "taggit_autosuggest"], "when": {"flag": "stories"}},
+        {"items": ["djangocms_stories", "taggit"], "when": {"flag": "stories"}},
         {"items": ["rest_framework", "djangocms_rest"], "when": {"mode": ["headless", "hybrid"]}}
     ],
     "middleware": [
@@ -70,14 +70,12 @@
     ],
     "urls": [
         {"pattern": "path(\"api/\", include(\"djangocms_rest.urls\"))", "when": {"mode": ["headless", "hybrid"]}},
-        {"pattern": "path(\"taggit_autosuggest/\", include(\"taggit_autosuggest.urls\"))", "when": {"flag": "stories"}},
         {"pattern": "path(\"\", include(\"cms.urls\"))", "i18n": true, "when": {"mode": ["traditional", "hybrid"]}}
     ],
     "packages": {
         "filer": "django-filer",
         "rest_framework": "djangorestframework",
-        "taggit": "django-taggit",
-        "taggit_autosuggest": "django-taggit-autosuggest"
+        "taggit": "django-taggit"
     },
     "template_dir": {
         "path": "templates",

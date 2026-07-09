@@ -55,6 +55,7 @@ from cms.utils.i18n import (
 )
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_view_page
+from cms.utils.permissions import user_can_view_placeholder_source
 from cms.utils.placeholder import get_declared_placeholders_for_obj, get_placeholder_conf
 
 
@@ -81,9 +82,16 @@ def details(request, slug):
     ):
         cache_content = get_page_cache(request)
         if cache_content is not None:
-            content, headers, expires_datetime = cache_content
+            # ``xframe_options_exempt`` is absent on cache entries written before
+            # this field was added; default to True to preserve their behaviour
+            # until they expire.
+            content, headers, expires_datetime, *rest = cache_content
+            xframe_options_exempt = rest[0] if rest else True
             response = HttpResponse(content)
-            response.xframe_options_exempt = True
+            # Replay the page's clickjacking decision. For "Inherit" pages this
+            # is False, so Django's XFrameOptionsMiddleware still adds the site
+            # default X-Frame-Options header to the cached response.
+            response.xframe_options_exempt = xframe_options_exempt
             response.headers = headers
             # Recalculate the max-age header for this cached response
             max_age = int(
@@ -312,6 +320,11 @@ def render_object_structure(request, content_type_id, object_id):
                 raise Http404
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+            # Viewing the structure board requires only view permission (as the
+            # page branch above does via user_can_view_page). Mutations remain
+            # gated by change permission at the plugin endpoints.
+            if not user_can_view_placeholder_source(request.user, content_type_obj):
+                raise Http404
     except ObjectDoesNotExist as err:
         raise Http404 from err
 

@@ -10,7 +10,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.http import HttpResponse, QueryDict
-from django.template.defaultfilters import truncatewords
+from django.template.defaultfilters import date as date_filter, truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -21,7 +21,12 @@ from django.utils.html import escape
 from django.utils.translation import get_language, gettext_lazy as _, override
 
 from cms.admin.forms import RequestToolbarForm
-from cms.api import add_plugin, create_page, create_page_content
+from cms.api import (
+    add_plugin,
+    assign_user_to_page,
+    create_page,
+    create_page_content,
+)
 from cms.cms_toolbars import (
     ADMIN_MENU_IDENTIFIER,
     ADMINISTRATION_BREAK,
@@ -54,7 +59,6 @@ from cms.toolbar.utils import (
     get_object_structure_url,
 )
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -347,6 +351,38 @@ class ToolbarTests(ToolbarTestBase):
                 data={"obj_id": cms_page.pk, "obj_type": "cms.somemodel", "cms_path": cms_page.get_absolute_url("en")},
             )
             self.assertEqual(response.status_code, 400)
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_toolbar_request_endpoint_enforces_object_view_permission(self):
+        # The obj_id/obj_type come straight from the client, so the endpoint
+        # must enforce an object-level view check before rendering a toolbar
+        # (which discloses the object's title/breadcrumb/edit URLs). A staff
+        # user who cannot view a restricted page must be denied.
+        endpoint = self.get_admin_url(UserSettings, "get_toolbar")
+        cms_page = create_page("secret-page", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(cms_page)
+
+        # Grant view to one user only -> the page is now view-restricted.
+        assign_user_to_page(cms_page, self.get_standard_user(), can_view=True)
+
+        data = {
+            "obj_id": page_content.pk,
+            "obj_type": "cms.pagecontent",
+            "cms_path": get_object_edit_url(page_content),
+        }
+
+        # A staff user without view permission is denied with the same generic
+        # response as an unknown object (no existence oracle).
+        with self.login_user_context(self.get_staff_user_with_no_permissions()):
+            response = self.client.get(endpoint, data=data)
+        self.assertEqual(response.status_code, 400)
+        self.assertNotContains(response, "Clipboard", status_code=400)
+
+        # A superuser can still render the toolbar.
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(endpoint, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Clipboard")
 
     def test_toolbar_request_form(self):
         cms_page = create_page("toolbar-page", "col_two.html", "en")
@@ -1198,6 +1234,36 @@ class ToolbarModeTests(ToolbarTestBase):
         self.assertTrue(toolbar.structure_mode_active)
         self.assertFalse(toolbar.preview_mode_active)
 
+    def _use_structure_permission(self):
+        return Permission.objects.get(
+            content_type__app_label="cms", codename="use_structure"
+        )
+
+    def test_structure_switcher_shown_to_view_only_user_with_use_structure(self):
+        """Structure mode is a read affordance: view permission is enough.
+
+        Viewing the structure board only requires view permission (mutations
+        stay gated by change permission at the plugin endpoints), so a user with
+        ``cms.use_structure`` who may view — but not change — an unrestricted
+        page is still offered the structure switcher.
+        """
+        page = create_page("normal", "nav_playground.html", "en")
+        page_content = page.get_content_obj("en")
+        user = self.get_staff_user_with_no_permissions()
+        user.user_permissions.add(self._use_structure_permission())
+        with self.login_user_context(user):
+            response = self.client.get(get_object_edit_url(page_content, language="en"))
+        self.assertContains(response, 'title="Toggle structure"')
+
+    def test_structure_switcher_hidden_without_use_structure(self):
+        """Without ``cms.use_structure`` the switcher stays hidden."""
+        page = create_page("normal", "nav_playground.html", "en")
+        page_content = page.get_content_obj("en")
+        user = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(user):
+            response = self.client.get(get_object_edit_url(page_content, language="en"))
+        self.assertNotContains(response, 'title="Toggle structure"')
+
     @override_settings(CMS_EXTRA_HELP_MENU_ITEMS=(("google", "www.google.com"),))
     def test_help_menu(self):
         page = create_page("help-page", "nav_playground.html", "en")
@@ -1464,21 +1530,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         )
 
     def test_filters_date(self):
-        # Ensure we have a consistent testing env...
-        with self.settings(USE_L10N=False, DATE_FORMAT="M. d, Y"):
-            user = self.get_staff()
-            page = create_page("Test", "col_two.html", "en")
-            page_content = self.get_pagecontent_obj(page)
-            edit_url = get_object_edit_url(page_content)
-            ex1 = Example1(
-                char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>",
-                char_2="char_2",
-                char_3="char_3",
-                char_4="char_4",
-                date_field=datetime.date(2012, 1, 2),
-            )
-            ex1.save()
-            template_text = """{% extends "base.html" %}
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = Example1(
+            char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+            date_field=datetime.date(2012, 1, 2),
+        )
+        ex1.save()
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
@@ -1486,61 +1550,61 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% endblock content %}
 """
 
-            request = self.get_page_request(page, user, edit_url)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                "<h1>"
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "{4}"
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "</h1>".format(
-                    "placeholderapp",
-                    "example1",
-                    "date_field",
-                    ex1.pk,
-                    ex1.date_field.strftime("%b. %d, %Y" if DJANGO_4_2 else "%b. %-d, %Y"),
-                ),
-            )
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            "<h1>"
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "{4}"
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "</h1>".format(
+                "placeholderapp",
+                "example1",
+                "date_field",
+                ex1.pk,
+                date_filter(ex1.date_field),
+            ),
+        )
 
-            template_text = """{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" "" "" "safe" %}</h1>
 {% endblock content %}
 """
-            request = self.get_page_request(page, user, edit_url)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                "<h1>"
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "{4}"
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "</h1>".format(
-                    "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y-%m-%d")
-                ),
-            )
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            "<h1>"
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "{4}"
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "</h1>".format(
+                "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y-%m-%d")
+            ),
+        )
 
-            template_text = """{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" "" "" 'date:"Y m d"' %}</h1>
 {% endblock content %}
 """
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                "<h1>"
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "{4}"
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                "</h1>".format(
-                    "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y %m %d")
-                ),
-            )
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            "<h1>"
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "{4}"
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            "</h1>".format(
+                "placeholderapp", "example1", "date_field", ex1.pk, ex1.date_field.strftime("%Y %m %d")
+            ),
+        )
 
     def test_filters_notoolbar(self):
         user = self.get_staff()
@@ -2726,6 +2790,20 @@ class ToolbarAPITests(TestCase):
         result = api.find_first(LinkItem, name="Test")
         self.assertNotEqual(result, None)
         self.assertEqual(result.index, 0)
+
+    def test_find_item_lazy_matches_source_not_translation(self):
+        # Lazy (gettext_lazy) names are matched by their *source* string, independent of the
+        # active language. Third-party apps must therefore search by the untranslated string.
+        api = ToolbarAPIMixin()
+        with override("de"):
+            label = _("Save")
+            # Sanity check: the German catalog is active, so the label actually translates.
+            self.assertNotEqual(str(label), "Save")
+            api.add_link_item(label, None)
+            # Found by the untranslated source string...
+            self.assertIsNotNone(api.find_first(LinkItem, name="Save"))
+            # ...but not by its translation.
+            self.assertIsNone(api.find_first(LinkItem, name=str(label)))
 
     def test_not_is_staff(self):
         request = RequestFactory().get("/en/")

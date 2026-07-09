@@ -28,7 +28,6 @@ from cms.test_utils.testcases import (
     CMSTestCase,
 )
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
@@ -594,13 +593,10 @@ class AdminTests(AdminTestsBase):
         )
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(endpoint)
-        if DJANGO_4_2:
-            self.assertContains(response, '<input type="text" name="page_title" maxlength="255" id="id_page_title">')
-        else:
-            self.assertContains(
-                response,
-                '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">',
-            )
+        self.assertContains(
+            response,
+            '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">',
+        )
 
 
 class NoDBAdminTests(CMSTestCase):
@@ -610,17 +606,11 @@ class NoDBAdminTests(CMSTestCase):
 
     def test_lookup_allowed_site__exact(self):
         request = self.get_request()
-        if DJANGO_5_1:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1"))
-        else:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
+        self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
 
     def test_lookup_allowed_published(self):
         request = self.get_request()
-        if DJANGO_5_1:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1"))
-        else:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
+        self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
 
 
 class PluginPermissionTests(AdminTestsBase):
@@ -735,15 +725,10 @@ class AdminFormsTests(AdminTestsBase):
             # Invalid parent
             endpoint = self.get_page_add_uri("en")
             response = self.client.post(endpoint, new_page_data)
-            if DJANGO_5_1:
-                expected_error = (
-                    '<ul class="errorlist">' "<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>"
-                )
-            else:
-                expected_error = (
-                    '<ul class="errorlist" id="id_parent_page_error">'
-                    "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
-                )
+            expected_error = (
+                '<ul class="errorlist" id="id_parent_page_error">'
+                "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
+            )
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
@@ -762,15 +747,10 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid parent
             response = self.client.post(endpoint, new_page_data)
-            if DJANGO_5_1:
-                expected_error = (
-                    '<ul class="errorlist">' "<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>"
-                )
-            else:
-                expected_error = (
-                    '<ul class="errorlist" id="id_parent_page_error">'
-                    "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
-                )
+            expected_error = (
+                '<ul class="errorlist" id="id_parent_page_error">'
+                "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
+            )
 
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
@@ -784,16 +764,10 @@ class AdminFormsTests(AdminTestsBase):
             with self.login_user_context(superuser):
                 # Invalid slug
                 response = self.client.post(endpoint, new_page_data)
-                if DJANGO_5_1:
-                    expected_error = (
-                        '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, '
-                        "underscores or hyphens.</li></ul>"
-                    )
-                else:
-                    expected_error = (
-                        '<ul class="errorlist" id="id_slug_error"><li>Enter a valid “slug” consisting of '
-                        "letters, numbers, underscores or hyphens.</li></ul>"
-                    )
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error"><li>Enter a valid “slug” consisting of '
+                    "letters, numbers, underscores or hyphens.</li></ul>"
+                )
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_error, html=True)
@@ -807,18 +781,11 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             with self.subTest("Duplicate slug / path"):
                 response = self.client.post(endpoint, new_page_data)
-                if DJANGO_5_1:
-                    expected_error = (
-                        '<ul class="errorlist"><li>Page '
-                        '<a href="{}" target="_blank">test</a> '
-                        "has the same url 'test' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page2))
-                else:
-                    expected_error = (
-                        '<ul class="errorlist" id="id_slug_error"><li>Page '
-                        '<a href="{}" target="_blank">test</a> '
-                        "has the same url 'test' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page2))
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error"><li>Page '
+                    '<a href="{}" target="_blank">test</a> '
+                    "has the same url 'test' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", page2))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_error, html=True)
