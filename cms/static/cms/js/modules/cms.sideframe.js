@@ -217,7 +217,7 @@ var Sideframe = new Class({
 
             // the sideframe provides its own toolbar, so hide the admin page
             // header regardless of which admin styles the loaded page ships
-            body.find('header#header').hide();
+            body.find('#header').hide();
 
             // remove loader
             that.ui.frame.removeClass('cms-loader');
