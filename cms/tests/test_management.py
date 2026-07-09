@@ -7,8 +7,8 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
-from django.db import models
-from django.test.utils import override_settings
+from django.db import connection, models
+from django.test.utils import CaptureQueriesContext, override_settings
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
@@ -289,6 +289,123 @@ class ManagementTestCase(CMSTestCase):
         # No gaps in plugin tree
         max_position = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
         self.assertEqual(max_position, 3)
+
+        self.assertEqual(CMSPlugin.objects.all().count(), 3)
+
+        # Then both detached placeholders and their plugins should be gone
+        self.assertFalse(Placeholder.objects.filter(pk=ph_detached.pk).exists())
+        self.assertFalse(Placeholder.objects.filter(pk=ph_bogus.pk).exists())
+        self.assertFalse(CMSPlugin.objects.filter(pk=pl_detached.pk).exists())
+        self.assertFalse(CMSPlugin.objects.filter(pk=pl_bogus.pk).exists())
+
+        # check stdout
+        output = out.getvalue()
+        self.assertIn("1 uninstalled plugins", output)
+        self.assertIn("1 plugins with unsaved instances", output)
+        self.assertIn("2 detached placeholders", output)
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_plugin_report_query_count_does_not_scale_with_instances(self):
+        """
+        plugin_report() must resolve unsaved instances with bulk queries.
+
+        It previously called get_plugin_instance() once per plugin row, an
+        N+1 that made ``cms check`` and ``cms delete-orphaned-plugins`` appear
+        to hang on databases with many plugins. Guard against a regression by
+        asserting the query count is independent of the number of instances.
+        """
+        placeholder = Placeholder.objects.create(slot="test")
+
+        def count_queries():
+            with CaptureQueriesContext(connection) as ctx:
+                # Force full evaluation so deferred querysets are counted too.
+                for plugin in plugin_report():
+                    list(plugin["instances"])
+                    list(plugin["unsaved_instances"])
+            return len(ctx.captured_queries)
+
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        baseline = count_queries()
+
+        for _ in range(10):
+            add_plugin(placeholder, TextPlugin, "en", body="en body")
+        scaled = count_queries()
+
+        self.assertEqual(
+            baseline,
+            scaled,
+            "plugin_report() issues a query per plugin instance (N+1 regression)",
+        )
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_delete_orphaned_plugins_keeps_positions_consecutive(self):
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="first")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="second")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="third")
+
+        self.assertEqual(
+            list(placeholder.cmsplugin_set.order_by("position").values_list("plugin_type", "position")),
+            [
+                ("TextPlugin", 1),
+                ("BogusPlugin", 2),
+                ("TextPlugin", 3),
+                ("BogusPlugin", 4),
+                ("TextPlugin", 5),
+            ],
+        )
+
+        management.call_command("cms", "delete-orphaned-plugins", interactive=False, stdout=StringIO())
+
+        self.assertEqual(
+            list(placeholder.cmsplugin_set.order_by("position").values_list("plugin_type", "position")),
+            [
+                ("TextPlugin", 1),
+                ("TextPlugin", 2),
+                ("TextPlugin", 3),
+            ],
+        )
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_delete_plugin_uses_stale_position_from_prefetched_instance(self):
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="first")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="second")
+        CMSPlugin.objects.create(
+            position=placeholder.get_next_plugin_position("en", insert_order="last"),
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
+        add_plugin(placeholder, TextPlugin, "en", body="third")
+
+        stale_plugins = list(CMSPlugin.objects.filter(plugin_type="BogusPlugin").order_by("position"))
+        self.assertEqual([plugin.position for plugin in stale_plugins], [2, 4])
+
+        placeholder.delete_plugin(stale_plugins[0])
+
+        self.assertEqual(stale_plugins[1].position, 4)
+        stale_plugins[1].refresh_from_db()
+
+        self.assertEqual(stale_plugins[1].position, 3)
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
