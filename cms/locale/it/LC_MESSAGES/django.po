@@ -5,18 +5,18 @@
 # Translators:
 # Marco Badan <marco.badan@gmail.com>, 2022
 # giammi <gian-maria.daffre@giammi.org>, 2023
-# yakky <i.spalletti@nephila.it>, 2023
 # Raffaella Suardini, 2024
 # Stefano Brentegani <sbrentegani@gmail.com>, 2025
-# geobaldi <geobaldi@gmail.com>, 2026
 # Leonardo Cavallucci, 2026
+# geobaldi <geobaldi@gmail.com>, 2026
+# yakky <i.spalletti@nephila.it>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Italian (https://app.transifex.com/divio/teams/58664/it/)\n"
@@ -41,8 +41,14 @@ msgstr "La parte del titolo che viene utilizzata nell'URL"
 msgid "Page type"
 msgstr "Tipo di pagina"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipi Pagina"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sovrascrive l'URL"
@@ -226,6 +232,9 @@ msgid ""
 msgstr ""
 "(per modificarlo, annulla prima la pubblicazione della versione attualmente "
 "pubblicata di questa pagina)"
+
+msgid "Add Translation"
+msgstr "Aggiungi traduzione"
 
 msgid "Add Page Copy"
 msgstr "Aggiungi Copia Pagina"
@@ -446,9 +455,6 @@ msgstr "Logout"
 msgid "Language"
 msgstr "Lingua"
 
-msgid "Add Translation"
-msgstr "Aggiungi traduzione"
-
 msgid "Delete Translation"
 msgstr "Elimina traduzione"
 
@@ -513,6 +519,9 @@ msgstr "Seleziona un sito valido"
 
 msgid "Select a valid page"
 msgstr "Seleziona una pagina valida"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1542,6 +1551,9 @@ msgstr "Seleziona un'opzione fra quelle presenti per procedere."
 
 msgid "Next"
 msgstr "Avanti"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Sconosciuto"

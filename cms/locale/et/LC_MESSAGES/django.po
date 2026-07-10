@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:10+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Rivo Zängov <eraser@eraser.ee>, 2026\n"
 "Language-Team: Estonian (https://app.transifex.com/divio/teams/58664/et/)\n"
@@ -36,8 +36,14 @@ msgstr "Osa pealkirjast, mida kasutatakse internetiaadressi koostamiseks"
 msgid "Page type"
 msgstr "Lehekülje tüüp"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Lehekülje tüübid"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Kirjuta üle internetiaadress"
@@ -200,6 +206,9 @@ msgstr ""
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr ""
+
+msgid "Add Translation"
+msgstr "Lisa tõlge"
 
 msgid "Add Page Copy"
 msgstr "Lisa lehe koopia"
@@ -415,9 +424,6 @@ msgstr "Logi välja"
 msgid "Language"
 msgstr "Keel"
 
-msgid "Add Translation"
-msgstr "Lisa tõlge"
-
 msgid "Delete Translation"
 msgstr "Kustuta tõlge"
 
@@ -482,6 +488,9 @@ msgstr "Vali korrektne sait"
 
 msgid "Select a valid page"
 msgstr "Vali korrektne lehekülg"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1425,6 +1434,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Edasi"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr ""

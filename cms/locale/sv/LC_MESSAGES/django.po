@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Swedish (https://app.transifex.com/divio/teams/58664/sv/)\n"
@@ -36,8 +36,14 @@ msgstr "Den del av rubriken som används i webbadressen"
 msgid "Page type"
 msgstr "Sidtyp"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sidtyp"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Ändra URL"
@@ -220,6 +226,9 @@ msgid ""
 msgstr ""
 "(för att ändra den, avpublicera först den nu publicerade versionen av denna "
 "sida)"
+
+msgid "Add Translation"
+msgstr "Lägg till översättning"
 
 msgid "Add Page Copy"
 msgstr "Lägg till kopia av sidan"
@@ -440,9 +449,6 @@ msgstr "Logga ut"
 msgid "Language"
 msgstr "Språk"
 
-msgid "Add Translation"
-msgstr "Lägg till översättning"
-
 msgid "Delete Translation"
 msgstr "Radera översättning"
 
@@ -507,6 +513,9 @@ msgstr "Välj en giltig webbplats"
 
 msgid "Select a valid page"
 msgstr "Välj en giltig sida"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1534,6 +1543,9 @@ msgstr "Välj ett alternativ från nedan för att gå vidare till nästa steg"
 
 msgid "Next"
 msgstr "Nästa"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Okänd"

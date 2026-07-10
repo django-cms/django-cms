@@ -3,19 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Julio Lucchese <juliorieger@gmail.com>, 2023
-# Welligton Miguel <miguelwelligton@gmail.com>, 2023
 # Diego Ponci <dgo.ponciano@gmail.com>, 2023
-# Rafaela Santos <faelaphoenix@gmail.com>, 2023
 # Diefferson Môro <dieffersonmoro@gmail.com>, 2025
 # Guilherme Vierno <guilhermevierno@gmail.com>, 2025
+# Welligton Miguel <miguelwelligton@gmail.com>, 2026
+# Julio Lucchese <juliorieger@gmail.com>, 2026
+# Rafaela Santos <faelaphoenix@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/divio/teams/58664/pt_BR/)\n"
@@ -40,8 +40,14 @@ msgstr "A parte do título que é usada na URL"
 msgid "Page type"
 msgstr "Tipo de página"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipos de Página"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sobrescreva a URL"
@@ -224,6 +230,9 @@ msgid ""
 msgstr ""
 "(para alterá-lo, primeiro despublique a versão atualmente publicada desta "
 "página)"
+
+msgid "Add Translation"
+msgstr "Adicionar Tradução"
 
 msgid "Add Page Copy"
 msgstr "Adicionar Cópia de Página"
@@ -444,9 +453,6 @@ msgstr "Logout"
 msgid "Language"
 msgstr "Idioma"
 
-msgid "Add Translation"
-msgstr "Adicionar Tradução"
-
 msgid "Delete Translation"
 msgstr "Excluir Tradução"
 
@@ -511,6 +517,9 @@ msgstr "Selecione um site válido"
 
 msgid "Select a valid page"
 msgstr "Selecione uma página válida"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -932,7 +941,7 @@ msgid "Deleted Plugin"
 msgstr "Plugin Excluído"
 
 msgid "Cut Plugin"
-msgstr "Plugin Recortado"
+msgstr "Recortar Plugin"
 
 msgid "Paste Plugin"
 msgstr "Colar Plugin"
@@ -1545,6 +1554,9 @@ msgstr ""
 msgid "Next"
 msgstr "Próximo"
 
+msgid "Select what you would like to create"
+msgstr ""
+
 msgid "Unknown"
 msgstr "Desconhecido"
 
@@ -1639,7 +1651,7 @@ msgid "Sample App 2"
 msgstr "Aplicativo modelo 2"
 
 msgid "Sample App 3"
-msgstr "Aplicativo modelo 2"
+msgstr "Exemplo de aplicação 3"
 
 msgid "Sample App Without Landing Page"
 msgstr "Aplicação de Exemplo Sem Página Inicial"
@@ -1678,7 +1690,7 @@ msgid "Static Menu3"
 msgstr "Menu Estático 3"
 
 msgid "Static Menu4"
-msgstr "Menu Estático"
+msgstr "Menu Estático4"
 
 msgid "Category"
 msgstr "Categoria"

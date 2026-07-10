@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:10+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Basque (https://app.transifex.com/divio/teams/58664/eu/)\n"
@@ -34,7 +34,13 @@ msgstr "URLetan erabiltzen den izenburuaren zatia"
 msgid "Page type"
 msgstr ""
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
+msgstr ""
+
+msgid "You do not have permission to copy this page."
 msgstr ""
 
 msgid "Overwrite URL"
@@ -198,6 +204,9 @@ msgstr "Ez duzu orri hau editatzeko baimenik"
 
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
+msgstr ""
+
+msgid "Add Translation"
 msgstr ""
 
 msgid "Add Page Copy"
@@ -414,9 +423,6 @@ msgstr "Irten"
 msgid "Language"
 msgstr "Hizkuntza"
 
-msgid "Add Translation"
-msgstr ""
-
 msgid "Delete Translation"
 msgstr ""
 
@@ -481,6 +487,9 @@ msgstr "Hautatu baliozko gunea"
 
 msgid "Select a valid page"
 msgstr "Hautatu baliozko orria"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1424,6 +1433,9 @@ msgid "Please choose an option from below to proceed to the next step."
 msgstr ""
 
 msgid "Next"
+msgstr ""
+
+msgid "Select what you would like to create"
 msgstr ""
 
 msgid "Unknown"

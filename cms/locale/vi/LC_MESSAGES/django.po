@@ -3,13 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:10+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Vietnamese (https://app.transifex.com/divio/teams/58664/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,465 +20,497 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "All"
-msgstr ""
+msgstr "Tất cả"
 
 msgid "Copy permissions"
-msgstr ""
+msgstr "Sao chép quyền"
 
 msgid "Slug"
-msgstr ""
+msgstr "Slug"
 
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "Phần của tiêu đề được sử dụng trong URL"
 
 msgid "Page type"
+msgstr "Loại trang"
+
+msgid "You do not have permission to change this page."
 msgstr ""
 
 msgid "Page Types"
+msgstr "Các loại trang"
+
+msgid "You do not have permission to copy this page."
 msgstr ""
 
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Ghi đè URL"
 
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Để trống trường này nếu muốn sử dụng đường dẫn tiêu chuẩn."
 
 msgid "Start typing..."
-msgstr ""
+msgstr "Bắt đầu gõ..."
 
 msgid "menu visibility"
-msgstr ""
+msgstr "hiển thị trong menu"
 
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "giới hạn khi trang này được hiển thị trong menu"
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "Tùy chọn X Frame"
 
 msgid "Whether this page can be embedded in other pages or websites."
 msgstr ""
+"Trang này có thể được nhúng vào các trang hoặc website khác hay không."
 
 msgid "URL options"
-msgstr ""
+msgstr "Tùy chọn URL"
 
 msgid "Menu options"
-msgstr ""
+msgstr "Tùy chọn menu"
 
 msgid "Headers"
-msgstr ""
+msgstr "Tiêu đề HTTP"
 
 msgid "Application"
-msgstr ""
+msgstr "Ứng dụng"
 
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Gắn ứng dụng vào trang này."
 
 msgid "Application configurations"
-msgstr ""
+msgstr "Cấu hình ứng dụng"
 
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Đã tồn tại một trang với mã reverse URL này."
 
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Giá trị cấu hình ứng dụng không hợp lệ"
 
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "Đã tồn tại một thực thể ứng dụng sử dụng cấu hình này."
 
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "Đã tồn tại một thực thể ứng dụng với tên này."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Bạn không thể di chuyển trang chủ vào bên trong một trang khác"
 
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"Bạn không thể có hai trang với cùng một slug ở cùng cấp trang. Vui lòng thay"
+" đổi slug của một trong các trang trước khi thử di chuyển lại."
 
 msgid "Yes"
-msgstr ""
+msgstr "Có"
 
 msgid "No"
-msgstr ""
+msgstr "Không"
 
 msgid "user"
-msgstr ""
+msgstr "người dùng"
 
 msgid "can_view"
-msgstr ""
+msgstr "có thể xem"
 
 msgid "Add"
-msgstr ""
+msgstr "Thêm"
 
 msgid "Change"
-msgstr ""
+msgstr "Thay đổi"
 
 msgid "Delete"
-msgstr ""
+msgstr "Xóa"
 
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
+"Người dùng không thể tạo trang nếu không có quyền thay đổi trang đã tạo. Yêu"
+" cầu quyền chỉnh sửa."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"Người dùng không thể xóa trang nếu không có quyền thay đổi trang. Yêu cầu "
+"quyền chỉnh sửa."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
+"Người dùng không thể thiết lập quyền cho trang nếu không có quyền thay đổi "
+"trang. Yêu cầu quyền chỉnh sửa."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
+"Người dùng không thể xóa quyền của trang nếu không có quyền thay đổi trang. "
+"Yêu cầu quyền chỉnh sửa."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
+"Người dùng không thể tạo quyền cho trang nếu không có quyền thay đổi quyền "
+"đã tạo. Yêu cầu quyền chỉnh sửa."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
 msgstr ""
+"Người dùng không thể xóa quyền của trang nếu không có quyền thay đổi quyền. "
+"Yêu cầu quyền chỉnh sửa."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Loại plugin không hợp lệ '%s'"
 
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "Ngôn ngữ phải được đặt là một ngôn ngữ được hỗ trợ!"
 
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "Ngôn ngữ của plugin cha phải giống với ngôn ngữ!"
 
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Placeholder của plugin cha phải giống với placeholder!"
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "Vị trí của plugin phải lớn hơn %(position)d"
 
 msgid "Translations"
 msgstr ""
 
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Cài đặt nâng cao"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "Trang này không đủ điều kiện để làm trang chủ."
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Đối tượng %(name)s với khóa chính %(key)r không tồn tại."
 
 msgid "error"
 msgstr ""
 
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
+msgstr "Lỗi! Bạn không có quyền di chuyển trang này. Vui lòng tải lại trang"
 
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Lỗi! Bạn không có quyền sao chép trang này."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
+"Lỗi! Trang bạn đang dán không được dịch sang bất kỳ ngôn ngữ nào được cấu "
+"hình bởi trang đích."
 
 msgid "You do not have permission to edit this page"
-msgstr ""
+msgstr "Bạn không có quyền chỉnh sửa trang này"
 
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr ""
+"(để thay đổi, trước tiên hãy hủy xuất bản phiên bản hiện đang được xuất bản "
+"của trang này)"
+
+msgid "Add Translation"
+msgstr "Thêm bản dịch"
 
 msgid "Add Page Copy"
-msgstr ""
+msgstr "Thêm bản sao trang"
 
 msgid "New sub page"
-msgstr ""
+msgstr "Trang con mới"
 
 msgid "New page"
-msgstr ""
+msgstr "Trang mới"
 
 msgid "Database error"
-msgstr ""
+msgstr "Lỗi cơ sở dữ liệu"
 
 msgid "Template not valid"
-msgstr ""
+msgstr "Template không hợp lệ"
 
 msgid "Placeholder selection not valid"
-msgstr ""
+msgstr "Lựa chọn placeholder không hợp lệ"
 
 msgid "The template was successfully changed"
-msgstr ""
+msgstr "Template đã được thay đổi thành công"
 
 #, python-format
 msgid "Placeholder '%s' does not exist in target language"
-msgstr ""
+msgstr "Placeholder '%s' không tồn tại trong ngôn ngữ đích"
 
 msgid "You do not have permission to copy these plugins."
-msgstr ""
+msgstr "Bạn không có quyền sao chép các plugin này."
 
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "Bạn không có quyền xóa trang này"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "Tiêu đề và các plugin với ngôn ngữ %(language)s đã bị xóa"
 
 msgid "Public content"
-msgstr ""
+msgstr "Nội dung công khai"
 
 msgid "Empty"
-msgstr ""
+msgstr "Trống"
 
 msgid "Create Content"
-msgstr ""
+msgstr "Tạo nội dung"
 
 msgid "View restriction"
-msgstr ""
+msgstr "Hạn chế xem"
 
 msgid "View restrictions"
-msgstr ""
+msgstr "Các hạn chế xem"
 
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "Không tìm thấy trường %s"
 
 msgid "You do not have permission to edit this item"
-msgstr ""
+msgstr "Bạn không có quyền chỉnh sửa mục này"
 
 msgid "You do not have permission to add a plugin"
-msgstr ""
+msgstr "Bạn không có quyền thêm plugin"
 
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "Bạn không có quyền sao chép placeholder này."
 
 msgid "Plugin not found"
-msgstr ""
+msgstr "Không tìm thấy plugin"
 
 msgid "You do not have permission to edit this plugin"
-msgstr ""
+msgstr "Bạn không có quyền chỉnh sửa plugin này"
 
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "Bạn không có quyền dán plugin này"
 
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "Bạn không có quyền dán placeholder này"
 
 msgid "You have no permission to move this plugin"
-msgstr ""
+msgstr "Bạn không có quyền di chuyển plugin này"
 
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "Bạn không có quyền cắt plugin này"
 
 msgid "You do not have permission to delete this plugin"
-msgstr ""
+msgstr "Bạn không có quyền xóa plugin này"
 
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "Plugin %(name)s \"%(obj)s\" đã được xóa thành công."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Không thể xóa %(name)s"
 
 msgid "Are you sure?"
-msgstr ""
+msgstr "Bạn có chắc chắn không?"
 
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "Bạn không có quyền xóa nội dung placeholder này"
 
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "Placeholder \"%(obj)s\" đã được xóa nội dung thành công."
 
 msgid "placeholder"
-msgstr ""
+msgstr "placeholder"
 
 msgid "Page permissions"
-msgstr ""
+msgstr "Quyền của trang"
 
 msgid "User & Group permissions"
-msgstr ""
+msgstr "Quyền của người dùng & nhóm"
 
 msgid "Page permissions management"
-msgstr ""
+msgstr "Quản lý quyền của trang"
 
 msgid "Actions"
-msgstr ""
+msgstr "Hành động"
 
 msgid "Empty content"
-msgstr ""
+msgstr "Nội dung trống"
 
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "Thuộc tính %(object_name)s"
 
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "Thêm %(object_name)s mới"
 
 msgid "Add content"
-msgstr ""
+msgstr "Thêm nội dung"
 
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"Nội dung cho ngôn ngữ hiện tại đã được thay đổi. Nhấp \"Hủy\" để quay lại "
+"biểu mẫu và lưu thay đổi. Nhấp \"OK\" để bỏ qua các thay đổi."
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "Thêm nội dung %(language)s"
 
 msgid "Preview"
-msgstr ""
+msgstr "Xem trước"
 
 msgid "Settings"
-msgstr ""
+msgstr "Cài đặt"
 
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
+"Ngôn ngữ không hợp lệ %(value)s. Không thể xử lý biểu mẫu này. Hãy thử thay "
+"đổi ngôn ngữ."
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<chưa xác định>"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "Không tìm thấy apphook đã đăng ký \"%r\""
 
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
 msgid "Placeholder"
-msgstr ""
+msgstr "Placeholder"
 
 msgid "Create"
-msgstr ""
+msgstr "Tạo"
 
 msgid "Edit"
-msgstr ""
+msgstr "Chỉnh sửa"
 
 msgid "Structure"
-msgstr ""
+msgstr "Cấu trúc"
 
 msgid "Content"
-msgstr ""
+msgstr "Nội dung"
 
 msgid "Sites"
-msgstr ""
+msgstr "Các trang web"
 
 msgid "Admin Sites"
-msgstr ""
+msgstr "Quản trị trang web"
 
 msgid "Administration"
-msgstr ""
+msgstr "Quản trị"
 
 msgid "User settings"
-msgstr ""
+msgstr "Cài đặt người dùng"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "Bộ nhớ tạm..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Xóa bộ nhớ tạm"
 
 msgid "Disable toolbar"
-msgstr ""
+msgstr "Tắt thanh công cụ"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Phím tắt..."
 
 msgid "Users"
-msgstr ""
+msgstr "Người dùng"
 
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "Đăng xuất %s"
 
 msgid "Logout"
-msgstr ""
+msgstr "Đăng xuất"
 
 msgid "Language"
-msgstr ""
-
-msgid "Add Translation"
-msgstr ""
+msgstr "Ngôn ngữ"
 
 msgid "Delete Translation"
-msgstr ""
+msgstr "Xóa bản dịch"
 
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Sao chép tất cả plugin"
 
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "từ %s"
 
 #, python-format
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Bạn có chắc chắn muốn sao chép tất cả plugin từ %s không?"
 
 msgid "Pages"
-msgstr ""
+msgstr "Các trang"
 
 msgid "Page"
-msgstr ""
+msgstr "Trang"
 
 msgid "Create Page"
-msgstr ""
+msgstr "Tạo trang"
 
 msgid "New Page"
-msgstr ""
+msgstr "Trang mới"
 
 msgid "New Sub Page"
-msgstr ""
+msgstr "Trang con mới"
 
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "Nhân bản trang này"
 
 msgid "Page settings"
-msgstr ""
+msgstr "Cài đặt trang"
 
 msgid "Advanced settings"
-msgstr ""
+msgstr "Cài đặt nâng cao"
 
 msgid "Templates"
-msgstr ""
+msgstr "Mẫu (template)"
 
 msgid "Placeholders"
 msgstr ""
 
 msgid "Hide in navigation"
-msgstr ""
+msgstr "Ẩn khỏi điều hướng"
 
 msgid "Display in navigation"
-msgstr ""
+msgstr "Hiển thị trong điều hướng"
 
 msgid "Delete page"
-msgstr ""
+msgstr "Xóa trang"
 
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "Tạo một trang mới bên cạnh trang hiện tại."
 
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "Tạo một trang bên dưới trang hiện tại."
 
 msgid "Select a valid site"
-msgstr ""
+msgstr "Chọn một trang web hợp lệ"
 
 msgid "Select a valid page"
+msgstr "Chọn một trang hợp lệ"
+
+msgid "Enter a valid relative or absolute URL."
 msgstr ""
 
 #, python-format
@@ -484,291 +518,309 @@ msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
+"Trang %(conflict_page)s có cùng url '%(url)s' với trang hiện tại "
+"\"%(instance)s\"."
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "Trang %(conflict_page)s có cùng url '%(url)s' với trang hiện tại."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
+"Tùy chọn. Nếu được cung cấp, sẽ tự động được thêm vào trong một plugin văn "
+"bản mới."
 
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "Cung cấp tiêu đề cho trang mới."
 
 msgid "Leave empty for automatic slug, or override as required."
-msgstr ""
+msgstr "Để trống để tạo slug tự động, hoặc ghi đè nếu cần."
 
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "Không thể tự động tạo slug. Vui lòng cung cấp thủ công."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "Vui lòng cung cấp một slug hợp lệ."
 
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Bạn không có quyền cần thiết để thêm trang."
 
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 msgid "position"
-msgstr ""
+msgstr "vị trí"
 
 msgid "language"
-msgstr ""
+msgstr "ngôn ngữ"
 
 msgid "plugin_name"
-msgstr ""
+msgstr "tên plugin"
 
 msgid "creation date"
-msgstr ""
+msgstr "ngày tạo"
 
 msgid "can edit"
-msgstr ""
+msgstr "có thể chỉnh sửa"
 
 msgid "can add"
-msgstr ""
+msgstr "có thể thêm"
 
 msgid "can delete"
-msgstr ""
+msgstr "có thể xóa"
 
 msgid "can change advanced settings"
-msgstr ""
+msgstr "có thể thay đổi cài đặt nâng cao"
 
 msgid "can publish"
-msgstr ""
+msgstr "có thể xuất bản"
 
 msgid "can change permissions"
-msgstr ""
+msgstr "có thể thay đổi quyền"
 
 msgid "can move"
-msgstr ""
+msgstr "có thể di chuyển"
 
 msgid "view restricted"
-msgstr ""
+msgstr "bị hạn chế xem"
 
 msgid "can recover pages"
-msgstr ""
+msgstr "có thể khôi phục trang"
 
 msgid "group"
-msgstr ""
+msgstr "nhóm"
 
 msgid "sites"
-msgstr ""
+msgstr "các trang web"
 
 msgid "created by"
-msgstr ""
+msgstr "được tạo bởi"
 
 msgid "changed by"
-msgstr ""
+msgstr "được thay đổi bởi"
 
 msgid "publication date"
-msgstr ""
+msgstr "ngày xuất bản"
 
 msgid "publication end date"
-msgstr ""
+msgstr "ngày kết thúc xuất bản"
 
 msgid "in navigation"
-msgstr ""
+msgstr "trong điều hướng"
 
 msgid "soft root"
-msgstr ""
+msgstr "gốc mềm"
 
 msgid "id"
-msgstr ""
+msgstr "id"
 
 msgid "attached menu"
-msgstr ""
+msgstr "menu đính kèm"
 
 msgid "template"
-msgstr ""
+msgstr "template"
 
 msgid "login required"
-msgstr ""
+msgstr "yêu cầu đăng nhập"
 
 msgid "application"
-msgstr ""
+msgstr "ứng dụng"
 
 msgid "application instance name"
-msgstr ""
+msgstr "tên thực thể ứng dụng"
 
 msgid "site"
-msgstr ""
+msgstr "trang web"
 
 msgid "Grant on"
-msgstr ""
+msgstr "Cấp quyền cho"
 
 msgid "page"
-msgstr ""
+msgstr "trang"
 
 msgid "no limit set"
-msgstr ""
+msgstr "không đặt giới hạn"
 
 msgid "for logged in users only"
-msgstr ""
+msgstr "chỉ dành cho người dùng đã đăng nhập"
 
 msgid "for anonymous users only"
-msgstr ""
+msgstr "chỉ dành cho người dùng ẩn danh"
 
 msgid "Inherit from parent page"
-msgstr ""
+msgstr "Kế thừa từ trang cha"
 
 msgid "Deny"
-msgstr ""
+msgstr "Từ chối"
 
 msgid "Only this website"
-msgstr ""
+msgstr "Chỉ website này"
 
 msgid "Allow"
-msgstr ""
+msgstr "Cho phép"
 
 msgid "title"
-msgstr ""
+msgstr "tiêu đề"
 
 msgid "The default title"
-msgstr ""
+msgstr "Tiêu đề mặc định"
 
 msgid "Page Title"
-msgstr ""
+msgstr "Tiêu đề trang"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Ghi đè nội dung hiển thị ở phía trên trình duyệt hoặc trong dấu trang"
 
 msgid "Menu Title"
-msgstr ""
+msgstr "Tiêu đề menu"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Ghi đè nội dung hiển thị trong menu"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "Thẻ meta mô tả"
 
 msgid "A description of the page used by search engines."
-msgstr ""
+msgstr "Mô tả của trang được các công cụ tìm kiếm sử dụng."
 
 msgid "redirect"
-msgstr ""
+msgstr "chuyển hướng"
 
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Chuyển hướng đến URL này."
 
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "Tất cả các trang tổ tiên sẽ không được hiển thị trong điều hướng"
 
 msgid "The template used to render the content."
-msgstr ""
+msgstr "Template được sử dụng để hiển thị nội dung."
 
 msgid "page content"
-msgstr ""
+msgstr "nội dung trang"
 
 msgid "page contents"
-msgstr ""
+msgstr "các nội dung trang"
 
 msgid "default"
-msgstr ""
+msgstr "mặc định"
 
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
+"Một mã định danh duy nhất được sử dụng với templatetag page_url để liên kết "
+"đến trang này"
 
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "Đánh dấu trang này là một loại trang"
 
 msgid "pages"
-msgstr ""
+msgstr "các trang"
 
 msgid "No available title"
-msgstr ""
+msgstr "Không có tiêu đề"
 
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 msgid "Path"
-msgstr ""
+msgstr "Đường dẫn"
 
 msgid "Current page"
-msgstr ""
+msgstr "Trang hiện tại"
 
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "Trang con (trực tiếp)"
 
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "Trang và các trang con (trực tiếp)"
 
 msgid "Page descendants"
-msgstr ""
+msgstr "Các trang hậu duệ"
 
 msgid "Page and descendants"
-msgstr ""
+msgstr "Trang và các trang hậu duệ"
 
 msgid "on page level"
-msgstr ""
+msgstr "ở cấp trang"
 
 msgid "frontend view restriction"
-msgstr ""
+msgstr "hạn chế xem ở giao diện người dùng"
 
 msgid "Please select user or group."
-msgstr ""
+msgstr "Vui lòng chọn người dùng hoặc nhóm."
 
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"Người dùng không thể xuất bản trang nếu không có quyền thay đổi trang. Yêu "
+"cầu quyền chỉnh sửa."
 
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
 msgstr ""
+"Người dùng không thể thay đổi cài đặt nâng cao của trang nếu không có quyền "
+"thay đổi trang. Yêu cầu quyền chỉnh sửa."
 
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
 msgstr ""
+"Người dùng không thể thay đổi quyền của trang nếu không có quyền thay đổi "
+"trang. Yêu cầu quyền chỉnh sửa."
 
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"Người dùng không thể di chuyển trang nếu không có quyền thay đổi trang. Yêu "
+"cầu quyền chỉnh sửa."
 
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "có thể khôi phục bất kỳ trang nào đã xóa"
 
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr ""
+"Nếu không chọn gì, người dùng được cấp quyền cho tất cả các trang web."
 
 msgid "Page global permission"
-msgstr ""
+msgstr "Quyền toàn cục của trang"
 
 msgid "Pages global permissions"
-msgstr ""
+msgstr "Các quyền toàn cục của trang"
 
 msgid "Page permission"
-msgstr ""
+msgstr "Quyền của trang"
 
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
+"Thêm quyền cho trang cũng yêu cầu quyền truy cập vào các trang con hoặc "
+"trang hậu duệ, nếu không trang được thêm sẽ không thể được thay đổi bởi "
+"người tạo nó."
 
 msgid "User (page)"
-msgstr ""
+msgstr "Người dùng (trang)"
 
 msgid "Users (page)"
-msgstr ""
+msgstr "Người dùng (trang)"
 
 msgid "User group (page)"
-msgstr ""
+msgstr "Nhóm người dùng (trang)"
 
 msgid "User groups (page)"
-msgstr ""
+msgstr "Các nhóm người dùng (trang)"
 
 msgid "slot"
-msgstr ""
+msgstr "khe"
 
 msgid "width"
-msgstr ""
+msgstr "chiều rộng"
 
 msgid "Edit object"
 msgstr ""
@@ -783,16 +835,16 @@ msgid "plugins"
 msgstr ""
 
 msgid "<Empty>"
-msgstr ""
+msgstr "<Trống>"
 
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "Ngôn ngữ cho giao diện quản trị và thanh công cụ"
 
 msgid "user setting"
-msgstr ""
+msgstr "cài đặt người dùng"
 
 msgid "user settings"
-msgstr ""
+msgstr "các cài đặt người dùng"
 
 msgid "by template"
 msgstr ""
@@ -830,203 +882,205 @@ msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
 msgid "Advanced options"
-msgstr ""
+msgstr "Tùy chọn nâng cao"
 
 msgid "Generic"
-msgstr ""
+msgstr "Chung"
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" đã được thay đổi thành công."
 
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "Không còn cài đặt nào khác cho plugin này. Vui lòng nhấn lưu."
 
 msgid "Moved"
-msgstr ""
+msgstr "Đã di chuyển"
 
 msgid "Changed"
-msgstr ""
+msgstr "Đã thay đổi"
 
 msgid "Deleted"
-msgstr ""
+msgstr "Đã xóa"
 
 msgid "Added Page Translation"
-msgstr ""
+msgstr "Đã thêm bản dịch trang"
 
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "Đã thay đổi bản dịch trang"
 
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "Đã xóa bản dịch trang"
 
 msgid "Added Plugin"
-msgstr ""
+msgstr "Đã thêm plugin"
 
 msgid "Changed Plugin"
-msgstr ""
+msgstr "Đã thay đổi plugin"
 
 msgid "Moved Plugin"
-msgstr ""
+msgstr "Đã di chuyển plugin"
 
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "Đã xóa plugin"
 
 msgid "Cut Plugin"
-msgstr ""
+msgstr "Đã cắt plugin"
 
 msgid "Paste Plugin"
-msgstr ""
+msgstr "Đã dán plugin"
 
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "Đã dán vào placeholder"
 
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "Đã thêm plugin vào placeholder từ bộ nhớ tạm"
 
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "Đã xóa nội dung placeholder"
 
 msgid "Save"
-msgstr ""
+msgstr "Lưu"
 
 msgid "Some fields cannot be changed since they are read-only content."
-msgstr ""
+msgstr "Một số trường không thể thay đổi vì chúng là nội dung chỉ đọc."
 
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Đăng nhập vào trang quản trị <a href=\"%(login_url)s\">tại đây</a>."
 
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "URL đăng nhập: %(login_url)s"
 
 msgid "Username:"
-msgstr ""
+msgstr "Tên đăng nhập:"
 
 msgid "Password:"
-msgstr ""
+msgstr "Mật khẩu:"
 
 msgid "Add a page"
-msgstr ""
+msgstr "Thêm một trang"
 
 msgid "Change a page"
-msgstr ""
+msgstr "Thay đổi một trang"
 
 msgid "Home"
-msgstr ""
+msgstr "Trang chủ"
 
 msgid "View on site"
-msgstr ""
+msgstr "Xem trên trang web"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
+msgstr[0] "Vui lòng sửa các lỗi bên dưới."
 
 msgid "All permissions"
-msgstr ""
+msgstr "Tất cả quyền"
 
 msgid "Loading..."
-msgstr ""
+msgstr "Đang tải..."
 
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Lưu và tiếp tục chỉnh sửa"
 
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Bạn có chắc chắn muốn xóa %(object_name)s \"%(escaped_object)s\" không? Tất "
+"cả các mục liên quan sau đây sẽ bị xóa:"
 
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Có, tôi chắc chắn"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Không, đưa tôi quay lại"
 
 msgid "Summary"
-msgstr ""
+msgstr "Tóm tắt"
 
 msgid "User"
-msgstr ""
+msgstr "Người dùng"
 
 msgid "Group"
-msgstr ""
+msgstr "Nhóm"
 
 msgid "Can edit"
-msgstr ""
+msgstr "Có thể chỉnh sửa"
 
 msgid "Can add"
-msgstr ""
+msgstr "Có thể thêm"
 
 msgid "Can delete"
-msgstr ""
+msgstr "Có thể xóa"
 
 msgid "Can publish"
-msgstr ""
+msgstr "Có thể xuất bản"
 
 msgid "Can change permissions"
-msgstr ""
+msgstr "Có thể thay đổi quyền"
 
 msgid "Can move"
-msgstr ""
+msgstr "Có thể di chuyển"
 
 msgid "Can view"
-msgstr ""
+msgstr "Có thể xem"
 
 msgid "(global)"
-msgstr ""
+msgstr "(toàn cục)"
 
 msgid "(current)"
-msgstr ""
+msgstr "(hiện tại)"
 
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "Trang không kế thừa bất kỳ quyền nào."
 
 msgid "Edit model"
-msgstr ""
+msgstr "Chỉnh sửa model"
 
 msgid "Save as new"
-msgstr ""
+msgstr "Lưu thành mới"
 
 msgid "Save and add another"
-msgstr ""
+msgstr "Lưu và thêm cái khác"
 
 msgid "Copy"
-msgstr ""
+msgstr "Sao chép"
 
 msgid "Cut"
-msgstr ""
+msgstr "Cắt"
 
 msgid "Paste"
-msgstr ""
+msgstr "Dán"
 
 msgid "Set as home"
-msgstr ""
+msgstr "Đặt làm trang chủ"
 
 msgid "is restricted"
-msgstr ""
+msgstr "bị hạn chế"
 
 msgid "last change by"
-msgstr ""
+msgstr "thay đổi cuối bởi"
 
 msgid "last change on"
-msgstr ""
+msgstr "thay đổi cuối vào"
 
 msgid "meta"
-msgstr ""
+msgstr "meta"
 
 msgid "List of pages"
-msgstr ""
+msgstr "Danh sách các trang"
 
 msgid "Search"
-msgstr ""
+msgstr "Tìm kiếm"
 
 msgid "Page Tree"
-msgstr ""
+msgstr "Cây trang"
 
 msgid "Reset filter"
-msgstr ""
+msgstr "Đặt lại bộ lọc"
 
 #, python-format
 msgid ""
@@ -1034,44 +1088,49 @@ msgid ""
 "                                                Restore deleted %(name)s\n"
 "                                            "
 msgstr ""
+"\n"
+"                                                Khôi phục %(name)s đã xóa\n"
+"                                            "
 
 msgid "Main Navigation"
-msgstr ""
+msgstr "Điều hướng chính"
 
 msgid "Options"
-msgstr ""
+msgstr "Tùy chọn"
 
 msgid "Successfully moved"
-msgstr ""
+msgstr "Đã di chuyển thành công"
 
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "Các thay đổi trong cây có thể yêu cầu làm mới."
 
 msgid "Error:"
-msgstr ""
+msgstr "Lỗi:"
 
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
 msgstr ""
+"Không thể sao chép trang này vì có một ứng dụng được gắn vào nó. Xem Cài đặt"
+" nâng cao của trang để quản lý apphook."
 
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "Bạn có chắc chắn muốn § trang này không?"
 
 msgid "Reload"
-msgstr ""
+msgstr "Tải lại"
 
 msgid "New node"
-msgstr ""
+msgstr "Nút mới"
 
 msgid "nodes"
-msgstr ""
+msgstr "các nút"
 
 msgid "View"
-msgstr ""
+msgstr "Xem"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #, python-format
 msgid ""
@@ -1081,252 +1140,267 @@ msgid ""
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
+"\n"
+"                            <em>Chưa có %(object)s nào.</em>\n"
+"                            <br>\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Thêm %(object)s</a> ngay.\n"
+"                        "
 
 msgid "Copy options"
-msgstr ""
+msgstr "Tùy chọn sao chép"
 
 msgid "Choose copy options"
-msgstr ""
+msgstr "Chọn tùy chọn sao chép"
 
 msgid "Close"
-msgstr ""
+msgstr "Đóng"
 
 msgid "Legend"
-msgstr ""
+msgstr "Chú thích"
 
 msgid "In menu"
-msgstr ""
+msgstr "Trong menu"
 
 msgid "Not in menu"
-msgstr ""
+msgstr "Không trong menu"
 
 msgid "View page"
-msgstr ""
+msgstr "Xem trang"
 
 msgid "Softroot"
-msgstr ""
+msgstr "Gốc mềm"
 
 msgid "Apphook"
-msgstr ""
+msgstr "Apphook"
 
 #, python-format
 msgid "Application: %(apphook)s"
-msgstr ""
+msgstr "Ứng dụng: %(apphook)s"
 
 msgid "in menu"
-msgstr ""
+msgstr "trong menu"
 
 msgid "not in menu"
-msgstr ""
+msgstr "không trong menu"
 
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "Cài đặt trang (nhấn SHIFT để xem cài đặt nâng cao)"
 
 msgid "Permissions"
-msgstr ""
+msgstr "Quyền"
 
 msgid "inherited"
-msgstr ""
+msgstr "được kế thừa"
 
 msgid "This page has no preview!"
-msgstr ""
+msgstr "Trang này không có bản xem trước!"
 
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
-msgstr ""
+msgstr "Có thể apphook được gắn không cung cấp nội dung cho gốc của nó."
 
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "Đang được chuyển hướng đến:"
 
 msgid "Clipboard"
-msgstr ""
+msgstr "Bộ nhớ tạm"
 
 msgid "Add plugin"
-msgstr ""
+msgstr "Thêm plugin"
 
 msgid "Copy all"
-msgstr ""
+msgstr "Sao chép tất cả"
 
 msgid "Copy from"
-msgstr ""
+msgstr "Sao chép từ"
 
 msgid "Empty all"
-msgstr ""
+msgstr "Làm trống tất cả"
 
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Lọc plugin..."
 
 msgid "Expand all"
-msgstr ""
+msgstr "Mở rộng tất cả"
 
 msgid "Collapse all"
-msgstr ""
+msgstr "Thu gọn tất cả"
 
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "Bạn không thể thêm plugin vào plugin này."
 
 msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr ""
+"Plugin này không thể được di chuyển hoặc chỉnh sửa bên ngoài plugin cha"
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Bộ nhớ tạm trống."
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr ""
+msgstr "Plugin này không cho phép plugin loại này làm plugin lồng nhau."
 
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "Plugin này không thể có plugin lồng nhau."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Làm nổi bật"
 
 msgid "Available plugins"
-msgstr ""
+msgstr "Các plugin có sẵn"
 
 msgid "Toggle structure"
-msgstr ""
+msgstr "Bật/tắt cấu trúc"
 
 msgid "Login"
-msgstr ""
+msgstr "Đăng nhập"
 
 msgid "Add plugin to"
-msgstr ""
+msgstr "Thêm plugin vào"
 
 msgid "More"
-msgstr ""
+msgstr "Thêm"
 
 #, python-format
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
 msgstr ""
+"Phiên bản phát triển sử dụng django CMS %(cms_version)s, Django "
+"%(django_version)s, Python %(python_version)s"
 
 msgid "Cancel"
-msgstr ""
+msgstr "Hủy"
 
 msgid "The following error occurred:"
-msgstr ""
+msgstr "Đã xảy ra lỗi sau:"
 
 msgid "Action successful."
-msgstr ""
+msgstr "Hành động thành công."
 
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "Bạn có chắc chắn muốn xóa plugin này không?"
 
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "Bạn có chắc chắn muốn xuất bản trang này không?"
 
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Plugin sẽ được thêm vào đây"
 
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Bạn có những thay đổi chưa được lưu."
 
 msgid "Loading"
-msgstr ""
+msgstr "Đang tải"
 
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Bạn có chắc chắn muốn bỏ qua những thay đổi này không?"
 
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
 msgstr ""
+"Không thể tải biểu mẫu. Vui lòng kiểm tra xem máy chủ có đang chạy đúng cách"
+" không."
 
 msgid "Most used"
-msgstr ""
+msgstr "Được dùng nhiều nhất"
 
 msgid "Shortcuts"
-msgstr ""
+msgstr "Phím tắt"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "Trang đã bị thay đổi trong thời gian đó, đang tải lại..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "Phím tắt toàn CMS"
 
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Hiển thị hộp thoại trợ giúp này"
 
 msgid "Close/cancel"
-msgstr ""
+msgstr "Đóng/hủy"
 
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Bật/tắt chế độ cấu trúc"
 
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "Bật/tắt chế độ cấu trúc và làm nổi bật plugin đang di chuột qua"
 
 msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Tập trung vào thanh công cụ"
 
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "Tập trung vào các placeholder"
 
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Chuyển đến phần tử tiếp theo/trước đó"
 
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "Tập trung vào các plugin của placeholder"
 
 msgid "Edit plugin"
-msgstr ""
+msgstr "Chỉnh sửa plugin"
 
 msgid "Open actions menu"
-msgstr ""
+msgstr "Mở menu hành động"
 
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Mở rộng/thu gọn"
 
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
+"<strong>Đăng nhập thất bại.</strong> Vui lòng kiểm tra thông tin đăng nhập "
+"và thử lại."
 
 msgid "Double-click to edit"
-msgstr ""
+msgstr "Nhấp đúp để chỉnh sửa"
 
 msgid "Tap to edit"
-msgstr ""
+msgstr "Chạm để chỉnh sửa"
 
 msgid "Click to go back"
-msgstr ""
+msgstr "Nhấp để quay lại"
 
 msgid "Click to go forward"
-msgstr ""
+msgstr "Nhấp để tiến tới"
 
 msgid "Minimize"
-msgstr ""
+msgstr "Thu nhỏ"
 
 msgid "Maximize"
-msgstr ""
+msgstr "Phóng to"
 
 msgid "Placeholder not editable"
 msgstr ""
 
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "Thả một plugin vào đây"
 
 msgid "Welcome to your new django CMS installation!"
 msgstr ""
 
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "Phiên bản %(cms_version)s"
 
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "Hãy cùng nhau xây dựng điều gì đó tuyệt vời!"
 
 msgid "Please log in"
-msgstr ""
+msgstr "Vui lòng đăng nhập"
 
 msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
+"\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Thêm trang đầu tiên của bạn</a>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1341,6 +1415,17 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Hỗ trợ tài chính</h2>\n"
+"                    <p>\n"
+"                        Sự đóng góp của bạn mang lại lợi ích trực tiếp cho sản phẩm, chủ yếu thông qua\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">Chương trình Fellowship của django CMS</a>!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Một cách nhanh chóng để bạn hoặc tổ chức của bạn quyên góp là tại\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1355,6 +1440,17 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Tham gia với chúng tôi</h2>\n"
+"                    <p>\n"
+"                        Hiệp hội django CMS là một tổ chức phi lợi nhuận tài trợ và định hướng cho sự phát triển của\n"
+"                        django CMS.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Bạn có thể <a href=\"https://www.django-cms.org/en/memberships/\">tham gia với tư cách cá nhân hoặc\n"
+"                        tổ chức</a>.\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1369,21 +1465,32 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Đóng góp</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Đóng góp mã nguồn:</a> sửa lỗi hoặc\n"
+"                            triển khai một tính năng mới!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Tình nguyện:</a>\n"
+"                            Chúng tôi mang đến công việc nhóm vui vẻ và hiệu quả!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Mã nguồn mở công việc của bạn:</a>\n"
+"                            Làm cho hệ sinh thái thêm vững mạnh.</li>\n"
+"                    </ul>\n"
+"                "
 
 msgid "Installation Notes"
-msgstr ""
+msgstr "Ghi chú cài đặt"
 
 msgid "Support"
-msgstr ""
+msgstr "Hỗ trợ"
 
 msgid "Documentation"
-msgstr ""
+msgstr "Tài liệu"
 
 msgid "User guide"
-msgstr ""
+msgstr "Hướng dẫn người dùng"
 
 msgid "Give back"
-msgstr ""
+msgstr "Đóng góp lại"
 
 msgid ""
 "\n"
@@ -1392,6 +1499,11 @@ msgid ""
 "                    static files.</p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">Nếu bạn không thấy logo django CMS ở phía trên, hãy chắc chắn\n"
+"                    rằng bạn đã liên kết thư mục <code>static/cms</code> với các tệp\n"
+"                    tĩnh của bạn.</p>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1401,217 +1513,236 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">Bạn đang thấy thông báo này vì bạn có\n"
+"                        <code>DEBUG = True</code> trong tệp cài đặt django của bạn và\n"
+"                        chưa thêm bất kỳ trang nào.\n"
+"                    </p>\n"
+"                "
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Chào mừng đến với django CMS"
 
 msgid "Add Another"
-msgstr ""
+msgstr "Thêm cái khác"
 
 msgid "Back"
-msgstr ""
+msgstr "Quay lại"
 
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "Vui lòng chọn một tùy chọn bên dưới để tiếp tục sang bước tiếp theo."
 
 msgid "Next"
-msgstr ""
+msgstr "Tiếp theo"
+
+msgid "Select what you would like to create"
+msgstr "Chọn nội dung bạn muốn tạo"
 
 msgid "Unknown"
-msgstr ""
+msgstr "Không xác định"
 
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "Không tìm thấy trang trên %(domain)s"
 
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"Một template tag không thể tìm thấy trang với các đối số tra cứu `%(page_lookup)s\n"
+"`. URL của yêu cầu là: http://%(host)s%(path)s"
 
 msgid "Two columns"
-msgstr ""
+msgstr "Hai cột"
 
 msgid "Three columns"
-msgstr ""
+msgstr "Ba cột"
 
 msgid "username"
-msgstr ""
+msgstr "tên đăng nhập"
 
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
+"Bắt buộc. Tối đa 300 ký tự. Chỉ gồm chữ cái, số và các ký tự @/./+/-/_"
 
 msgid "Enter a valid username."
-msgstr ""
+msgstr "Nhập một tên đăng nhập hợp lệ."
 
 msgid "email address"
-msgstr ""
+msgstr "địa chỉ email"
 
 msgid "staff status"
-msgstr ""
+msgstr "trạng thái nhân viên"
 
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
+"Xác định liệu người dùng có thể đăng nhập vào trang quản trị này hay không."
 
 msgid "active"
-msgstr ""
+msgstr "đang hoạt động"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Xác định liệu người dùng này có được coi là đang hoạt động hay không. Bỏ "
+"chọn mục này thay vì xóa tài khoản."
 
 msgid "users"
-msgstr ""
+msgstr "người dùng"
 
 msgid "Title Extension"
-msgstr ""
+msgstr "Phần mở rộng tiêu đề"
 
 msgid "Page Extension"
-msgstr ""
+msgstr "Phần mở rộng trang"
 
 msgid "object ID"
-msgstr ""
+msgstr "ID đối tượng"
 
 msgid "Example1 App"
-msgstr ""
+msgstr "Ứng dụng Example1"
 
 msgid "MultilingualExample1 App"
-msgstr ""
+msgstr "Ứng dụng MultilingualExample1"
 
 msgid "Example1"
-msgstr ""
+msgstr "Example1"
 
 msgid "Examples"
-msgstr ""
+msgstr "Các ví dụ"
 
 msgid "Extra Context"
-msgstr ""
+msgstr "Ngữ cảnh bổ sung"
 
 msgid "Articles"
-msgstr ""
+msgstr "Bài viết"
 
 msgid "Sample App"
-msgstr ""
+msgstr "Ứng dụng mẫu"
 
 msgid "Sample App with config"
-msgstr ""
+msgstr "Ứng dụng mẫu có cấu hình"
 
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "Ứng dụng mẫu với các quyền bị loại trừ"
 
 msgid "Sample App 2"
-msgstr ""
+msgstr "Ứng dụng mẫu 2"
 
 msgid "Sample App 3"
-msgstr ""
+msgstr "Ứng dụng mẫu 3"
 
 msgid "Sample App Without Landing Page"
 msgstr ""
 
 msgid "Namespaced App"
-msgstr ""
+msgstr "Ứng dụng có namespace"
 
 msgid "Parent app"
-msgstr ""
+msgstr "Ứng dụng cha"
 
 msgid "Child app"
-msgstr ""
+msgstr "Ứng dụng con"
 
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "Ứng dụng urls-menus biến đổi"
 
 msgid "sample root page"
-msgstr ""
+msgstr "trang gốc mẫu"
 
 msgid "sample settings page"
-msgstr ""
+msgstr "trang cài đặt mẫu"
 
 msgid "sample account page"
-msgstr ""
+msgstr "trang tài khoản mẫu"
 
 msgid "sample my profile page"
-msgstr ""
+msgstr "trang hồ sơ của tôi mẫu"
 
 msgid "Static Menu"
-msgstr ""
+msgstr "Menu tĩnh"
 
 msgid "Static Menu2"
-msgstr ""
+msgstr "Menu tĩnh 2"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "Menu tĩnh 3"
 
 msgid "Static Menu4"
-msgstr ""
+msgstr "Menu tĩnh 4"
 
 msgid "Category"
-msgstr ""
+msgstr "Danh mục"
 
 msgid "Categories"
-msgstr ""
+msgstr "Các danh mục"
 
 msgid "Add Category"
-msgstr ""
+msgstr "Thêm danh mục"
 
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
 msgid "Change Category"
-msgstr ""
+msgstr "Thay đổi danh mục"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "Cảm ơn bạn đã dành thời gian quý báu với trang web hôm nay."
 
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Kế thừa template của trang tổ tiên gần nhất"
 
 msgid "UserSettings"
-msgstr ""
+msgstr "Cài đặt người dùng"
 
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "Thêm plugin vào placeholder \"%(placeholder_label)s\""
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "Thêm plugin vào %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr ""
 
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - tài khoản người dùng của bạn đã được tạo."
 
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - tài khoản người dùng của bạn đã được thay đổi."
 
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Placeholder này đã có số lượng plugin tối đa (%s)."
 
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr ""
+"Placeholder này đã có số lượng tối đa (%(limit)s) plugin %(plugin_name)s "
+"được phép."
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "Không thể tìm thấy module CMS_REQUEST_IP_RESOLVER được chỉ định: \"{0}\"."
 
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
 msgstr ""
+"Không thể tìm thấy hàm CMS_REQUEST_IP_RESOLVER được chỉ định: \"{0}\" trong "
+"module \"{1}\"."
 
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "Tạo một thực thể %s mới."
 
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "Một wizard đã được đăng ký cho model: %s"

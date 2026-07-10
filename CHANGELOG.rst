@@ -1,3 +1,37 @@
+5.0.9 (2026-07-10)
+==================
+
+Features:
+---------
+* Accessibility update for wizards (#8674) (#8679) (c91db51ce) -- Fabian Braun
+* Support django 6.1+ breadcrumb styles (#8689) (#8714) (ffd05c4f8) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Corrupted plugin positions are now automatically healed (#8667) (#8670) (5a71802c9) -- Fabian Braun
+* Harden page duplication, group permissions and URL validator (#8704) (#8713) (3e1ccf757) -- Fabian Braun
+* Language selector triggered wrong toolbar (#8687) (#8693) (2b5de9f19) -- Fabian Braun
+* Missing authorization in `render_object_structure` disclosed non-PageContent placeholder structure (#8692) (#8703) (9c82abfeb) -- Fabian Braun
+* Page title leaked unescaped into rendering error message, clipboard could be cleared by get request (#8699) (#8711) (b56a56884) -- Fabian Braun
+* Replace left-over inline JS/CSS that might be blocked by CSP (#8690) (#8715) (3edf89a0a) -- Fabian Braun
+* Subpage wizard failed (#8698) (#8710) (27b1f6313) -- Fabian Braun
+* get_child_classes was always cached (#8677) (#8680) (330d4a36d) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 14 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (10 pull requests)
+
+With the review help of the following contributors:
+
+* Github Release Action
+* Vinit Kumar
+* sourcery-ai[bot]
+
+Thanks to all contributors for their efforts!
+
 5.0.8 (2026-06-09)
 ==================
 

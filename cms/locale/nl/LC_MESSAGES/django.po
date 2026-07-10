@@ -4,17 +4,17 @@
 # 
 # Translators:
 # kurdyma <transifex.com@kurdyenviolien.nl>, 2023
-# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2023
 # Koen Molenaar <koen.molenaar26@gmail.com>, 2025
 # 9b534940ba88da102a8b2023ae8b0a5c_833de33 <6eff1839cb13e50fd6e97f7bd38c9dda_152118>, 2025
 # Stefan van den Eertwegh <stefan@corebyte.nl>, 2026
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Dutch (https://app.transifex.com/divio/teams/58664/nl/)\n"
@@ -39,8 +39,14 @@ msgstr "Het gedeelte van de titel dat gebruikt wordt voor de URL"
 msgid "Page type"
 msgstr "Paginatype"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Paginatypes"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Overschrijf URL"
@@ -225,6 +231,9 @@ msgid ""
 msgstr ""
 "(om dit te wijzigen, maak eerst de momenteel gepubliceerde versie van deze "
 "pagina ongepubliceerd)"
+
+msgid "Add Translation"
+msgstr "Voeg vertaling toe"
 
 msgid "Add Page Copy"
 msgstr "Kopie van pagina toevoegen"
@@ -445,9 +454,6 @@ msgstr "Uitloggen"
 msgid "Language"
 msgstr "Taal"
 
-msgid "Add Translation"
-msgstr "Voeg vertaling toe"
-
 msgid "Delete Translation"
 msgstr "Verwijder vertaling"
 
@@ -512,6 +518,9 @@ msgstr "Selecteer een geldige site"
 
 msgid "Select a valid page"
 msgstr "Selecteer een geldige pagina"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1542,6 +1551,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Volgende"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Onbekend"

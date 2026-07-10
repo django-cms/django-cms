@@ -7,6 +7,7 @@
 # angularcircle, 2012
 # angularcircle, 2012
 # Maciej Olko <maciej.olko@gmail.com>, 2016
+# Maciej Olko <maciej.olko@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"

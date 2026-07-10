@@ -19,4 +19,4 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Are you sure you want to change tabs without saving the page first?"
-msgstr ""
+msgstr "Bạn có chắc chắn muốn chuyển tab mà không lưu trang trước không?"

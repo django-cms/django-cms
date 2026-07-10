@@ -4,15 +4,15 @@
 # 
 # Translators:
 # Dino Ilic <dino.ilic@gmail.com>, 2022
-# Damir <damir.arbula@gmail.com>, 2025
 # Aleks Acimovic, 2026
+# Damir <damir.arbula@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Croatian (https://app.transifex.com/divio/teams/58664/hr/)\n"
@@ -37,8 +37,14 @@ msgstr "Dio naslova koji je korišten u URL-u"
 msgid "Page type"
 msgstr "Tip stranice"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipovi stranica"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Pregazi URL"
@@ -222,6 +228,9 @@ msgid ""
 msgstr ""
 "(da biste to promijenili, prvo poništite objavu trenutno objavljene verzije "
 "ove stranice)"
+
+msgid "Add Translation"
+msgstr "Dodaj prijevod"
 
 msgid "Add Page Copy"
 msgstr "Dodaj kopiju stranice"
@@ -442,9 +451,6 @@ msgstr "Odjavi se"
 msgid "Language"
 msgstr "Jezik"
 
-msgid "Add Translation"
-msgstr "Dodaj prijevod"
-
 msgid "Delete Translation"
 msgstr "Izbriši prijevod"
 
@@ -509,6 +515,9 @@ msgstr "Izaberite ispravnu web stranicu"
 
 msgid "Select a valid page"
 msgstr "Izaberite ispravnu stranicu"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1540,6 +1549,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Sljedeći"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Nepoznato"

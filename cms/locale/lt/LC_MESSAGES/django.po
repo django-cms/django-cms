@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Matas Dailyda <matas@dailyda.com>, 2025
+# Matas Dailyda <matas@dailyda.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Lithuanian (https://app.transifex.com/divio/teams/58664/lt/)\n"
@@ -35,8 +35,14 @@ msgstr "Pavadinimo dalis, kuri yra naudojama URL"
 msgid "Page type"
 msgstr "Puslapio tipas"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Puslapio tipai"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Perrašyti URL"
@@ -220,6 +226,9 @@ msgid ""
 msgstr ""
 "(norėdami tai pakeisti, pirma nuimkite nuo publikavimo dabar publikuotą šio "
 "puslapio versiją)"
+
+msgid "Add Translation"
+msgstr "Pridėti vertimą"
 
 msgid "Add Page Copy"
 msgstr "Pridėti puslapio kopiją"
@@ -440,9 +449,6 @@ msgstr "Atsijungti"
 msgid "Language"
 msgstr "Kalba"
 
-msgid "Add Translation"
-msgstr "Pridėti vertimą"
-
 msgid "Delete Translation"
 msgstr "Pašalinti vertimą"
 
@@ -507,6 +513,9 @@ msgstr "Pasirinkite tinkamą svetainę"
 
 msgid "Select a valid page"
 msgstr "Pasirinkite tinkamą puslapį"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1543,6 +1552,9 @@ msgstr "Pasirinkite žemiau esantį nustatymą kad pereiti prie kito žingsnio."
 
 msgid "Next"
 msgstr "Kitas"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Nežinoma"

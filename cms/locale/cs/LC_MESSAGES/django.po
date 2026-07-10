@@ -3,17 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Martin S. <marhac@seznam.cz>, 2023
-# yedpodtrzitko <yed@vanyli.net>, 2023
-# Jakub Dorňák <jakub.dornak@misli.cz>, 2025
 # koren <honza@kekorenum.com>, 2025
+# Martin S. <marhac@seznam.cz>, 2026
+# Jakub Dorňák <jakub.dornak@misli.cz>, 2026
+# yedpodtrzitko <yed@vanyli.net>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Czech (https://app.transifex.com/divio/teams/58664/cs/)\n"
@@ -38,8 +38,14 @@ msgstr "Část názvu, který je použit v URL"
 msgid "Page type"
 msgstr "Typ stránky"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Typy stránek"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Přepsat URL"
@@ -222,6 +228,9 @@ msgid ""
 msgstr ""
 "(chcete-li to změnit, nejprve zrušte publikování aktuálně publikované verze "
 "této stránky)"
+
+msgid "Add Translation"
+msgstr "Přidat překlad"
 
 msgid "Add Page Copy"
 msgstr "Přidat kopii stránky"
@@ -441,9 +450,6 @@ msgstr "Odhlásit"
 msgid "Language"
 msgstr "Jazyk"
 
-msgid "Add Translation"
-msgstr "Přidat překlad"
-
 msgid "Delete Translation"
 msgstr "Odstranit překlad"
 
@@ -508,6 +514,9 @@ msgstr "Vybrat platnou stránku"
 
 msgid "Select a valid page"
 msgstr "Vybrat platnou stránku"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1537,6 +1546,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Další"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Neznámé"

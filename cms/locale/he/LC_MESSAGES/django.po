@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fabian Braun <fsbraun@gmx.de>, 2022
-# Fishfur A Banter <fishfurbanter@gmail.com>, 2023
+# Fabian Braun <fsbraun@gmx.de>, 2026
+# Fishfur A Banter <fishfurbanter@gmail.com>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:10+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fishfur A Banter <fishfurbanter@gmail.com>, 2023\n"
+"Last-Translator: Fishfur A Banter <fishfurbanter@gmail.com>, 2026\n"
 "Language-Team: Hebrew (https://app.transifex.com/divio/teams/58664/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;\n"
 
 msgid "All"
-msgstr ""
+msgstr "הכול"
 
 msgid "Copy permissions"
 msgstr "הרשאות העתקה"
@@ -35,8 +35,14 @@ msgstr "החלק מהכותרת בשימוש ב-URL"
 msgid "Page type"
 msgstr "סוג דף"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "סוגי דף"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "שכתב URL"
@@ -48,54 +54,56 @@ msgid "Start typing..."
 msgstr "התחל לכתוב..."
 
 msgid "menu visibility"
-msgstr ""
+msgstr "נראות תפריט"
 
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "הגבל מתי דף זה מוצג בתפריט"
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "אפשרויות X-Frame"
 
 msgid "Whether this page can be embedded in other pages or websites."
-msgstr ""
+msgstr "האם ניתן להטמיע דף זה בדפים או באתרים אחרים."
 
 msgid "URL options"
-msgstr ""
+msgstr "אפשרויות כתובת URL"
 
 msgid "Menu options"
-msgstr ""
+msgstr "אפשרויות תפריט"
 
 msgid "Headers"
-msgstr ""
+msgstr "כותרות"
 
 msgid "Application"
 msgstr "יישום"
 
 msgid "Hook application to this page."
-msgstr ""
+msgstr "חבר יישום לדף זה."
 
 msgid "Application configurations"
 msgstr "הגדרות אפליקציה"
 
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "כבר קיים דף עם מזהה כתובת URL הפוך זה."
 
 msgid "Invalid application config value"
-msgstr ""
+msgstr "ערך תצורת יישום לא חוקי"
 
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "כבר קיים מופע יישום המשתמש בתצורה זו."
 
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "כבר קיים מופע יישום בשם זה."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "לא ניתן להעביר את דף הבית לתוך דף אחר"
 
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"לא ניתן שיהיו שני דפים עם אותו slug באותה רמת דף. שנה את ה-slug של אחד הדפים"
+" לפני שתנסה להעביר שוב."
 
 msgid "Yes"
 msgstr "כן"
@@ -107,7 +115,7 @@ msgid "user"
 msgstr "משתמש"
 
 msgid "can_view"
-msgstr ""
+msgstr "ניתן לצפייה"
 
 msgid "Add"
 msgstr "הוספה"
@@ -162,7 +170,7 @@ msgstr ""
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "סוג פלאגין לא חוקי '%s'"
 
 msgid "Language must be set to a supported language!"
 msgstr "השפה חייבת להיות שפה הנתמכת על ידי המערכת!"
@@ -171,55 +179,58 @@ msgid "Parent plugin language must be same as language!"
 msgstr "שפת התוסף ההורה חייב להיות זהה לשפה!"
 
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "מציין המיקום של פלאגין האב חייב להיות זהה למציין המיקום!"
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "מיקום הפלאגין חייב להיות גדול מ-%(position)d"
 
 msgid "Translations"
-msgstr ""
+msgstr "תרגומים"
 
 msgid "Advanced Settings"
 msgstr "אפשרויות מתקדמות"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "הדף אינו כשיר להיות דף הבית."
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "האובייקט %(name)s עם המפתח הראשי %(key)r אינו קיים."
 
 msgid "error"
-msgstr ""
+msgstr "שגיאה"
 
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "אזהרה! אין לך הרשאות להזיז את הדף הזה. טען מחדש את הדף."
 
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "שגיאה! אין לך הרשאות להעתיק דף זה."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "שגיאה! הדף שאתה מדביק אינו מתורגם לאף אחת מהשפות המוגדרות באתר היעד."
 
 msgid "You do not have permission to edit this page"
 msgstr "אין לך הרשאה לערוך את הדף הזה"
 
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
-msgstr ""
+msgstr "(כדי לשנות זאת, בטל תחילה את פרסום הגרסה המפורסמת הנוכחית של דף זה)"
+
+msgid "Add Translation"
+msgstr "הוסף תרגום"
 
 msgid "Add Page Copy"
-msgstr ""
+msgstr "הוסף עותק דף"
 
 msgid "New sub page"
-msgstr ""
+msgstr "תת-דף חדש"
 
 msgid "New page"
-msgstr ""
+msgstr "דף חדש"
 
 msgid "Database error"
 msgstr "שגיאת מסד נתונים"
@@ -228,43 +239,43 @@ msgid "Template not valid"
 msgstr "התבנית לא חוקית"
 
 msgid "Placeholder selection not valid"
-msgstr ""
+msgstr "בחירת מציין מיקום אינה חוקית"
 
 msgid "The template was successfully changed"
 msgstr "התבנית שונתה בהצלחה"
 
 #, python-format
 msgid "Placeholder '%s' does not exist in target language"
-msgstr ""
+msgstr "מציין המיקום '%s' אינו קיים בשפת היעד"
 
 msgid "You do not have permission to copy these plugins."
 msgstr "אין לך הרשאה להעתיק את התוסף האלה"
 
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "אין לך הרשאה למחוק דף זה"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "הכותרת והפלאגינים בשפה %(language)s נמחקו"
 
 msgid "Public content"
-msgstr ""
+msgstr "תוכן ציבורי"
 
 msgid "Empty"
-msgstr ""
+msgstr "ריק"
 
 msgid "Create Content"
-msgstr ""
+msgstr "צור תוכן"
 
 msgid "View restriction"
-msgstr ""
+msgstr "הגבלת צפייה"
 
 msgid "View restrictions"
-msgstr ""
+msgstr "הגבלות צפייה"
 
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "השדה %s לא נמצא"
 
 msgid "You do not have permission to edit this item"
 msgstr "אין לך הרשאה לערוך פריט זה"
@@ -273,7 +284,7 @@ msgid "You do not have permission to add a plugin"
 msgstr "אין לך הרשאה להוסיף תוספים"
 
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "אין לך הרשאה להעתיק מציין מיקום זה."
 
 msgid "Plugin not found"
 msgstr "תוסף לא נמצא"
@@ -285,103 +296,105 @@ msgid "You have no permission to paste this plugin"
 msgstr "אין לך הרשאה להדביק את התוסף הזה"
 
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "אין לך הרשאה להדביק מציין מיקום זה"
 
 msgid "You have no permission to move this plugin"
 msgstr "אין לך הרשאה להזיז את התוסף הזה"
 
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "אין לך הרשאה לגזור פלאגין זה"
 
 msgid "You do not have permission to delete this plugin"
 msgstr "אין לך הרשאות למחוק את התוסף הזה"
 
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "הפלאגין %(name)s \"%(obj)s\" נמחק בהצלחה."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "לא ניתן למחוק את %(name)s"
 
 msgid "Are you sure?"
 msgstr "האם אתה בטוח?"
 
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "אין לך הרשאה לרוקן מציין מיקום זה"
 
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "מציין המיקום \"%(obj)s\" רוקן בהצלחה."
 
 msgid "placeholder"
-msgstr ""
+msgstr "מציין מיקום"
 
 msgid "Page permissions"
-msgstr ""
+msgstr "הרשאות דף"
 
 msgid "User & Group permissions"
-msgstr ""
+msgstr "הרשאות משתמש וקבוצה"
 
 msgid "Page permissions management"
-msgstr ""
+msgstr "ניהול הרשאות דף"
 
 msgid "Actions"
-msgstr ""
+msgstr "פעולות"
 
 msgid "Empty content"
-msgstr ""
+msgstr "תוכן ריק"
 
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "מאפייני %(object_name)s"
 
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "הוסף %(object_name)s חדש"
 
 msgid "Add content"
-msgstr ""
+msgstr "הוסף תוכן"
 
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"התוכן עבור השפה הנוכחית השתנה. לחץ \"ביטול\" כדי לחזור לטופס ולשמור את "
+"השינויים. לחץ \"אישור\" כדי לבטל את השינויים."
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "הוסף תוכן %(language)s"
 
 msgid "Preview"
 msgstr "תצוגה מקדימה"
 
 msgid "Settings"
-msgstr ""
+msgstr "הגדרות"
 
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
-msgstr ""
+msgstr "שפה לא חוקית %(value)s. לא ניתן לעבד טופס זה. נסה לשנות שפה."
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<לא צוין>"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "לא נמצא apphook רשום \"%r\""
 
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
 msgid "Placeholder"
-msgstr ""
+msgstr "מציין מיקום"
 
 msgid "Create"
 msgstr "צור"
 
 msgid "Edit"
-msgstr ""
+msgstr "עריכה"
 
 msgid "Structure"
 msgstr "מבנה"
@@ -396,29 +409,29 @@ msgid "Admin Sites"
 msgstr "אתר אדמין"
 
 msgid "Administration"
-msgstr ""
+msgstr "ניהול"
 
 msgid "User settings"
 msgstr "הגדרות משתמש"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "לוח גזירים..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "נקה את לוח הגזירים"
 
 msgid "Disable toolbar"
-msgstr ""
+msgstr "השבת סרגל כלים"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "קיצורי דרך..."
 
 msgid "Users"
 msgstr "משתמשים"
 
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "התנתק %s"
 
 msgid "Logout"
 msgstr "יציאת משתמש"
@@ -426,22 +439,19 @@ msgstr "יציאת משתמש"
 msgid "Language"
 msgstr "שפה"
 
-msgid "Add Translation"
-msgstr "הוסף תרגום"
-
 msgid "Delete Translation"
 msgstr "מחק תרגום"
 
 msgid "Copy all plugins"
-msgstr ""
+msgstr "העתק את כל הפלאגינים"
 
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "מ-%s"
 
 #, python-format
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "האם אתה בטוח שברצונך להעתיק את כל הפלאגינים מ-%s?"
 
 msgid "Pages"
 msgstr "דפים"
@@ -471,27 +481,30 @@ msgid "Templates"
 msgstr "תבניות"
 
 msgid "Placeholders"
-msgstr ""
+msgstr "מצייני מיקום"
 
 msgid "Hide in navigation"
-msgstr ""
+msgstr "הסתר בניווט"
 
 msgid "Display in navigation"
-msgstr ""
+msgstr "הצג בניווט"
 
 msgid "Delete page"
 msgstr "מחק דף"
 
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "צור דף חדש לצד הדף הנוכחי."
 
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "צור דף מתחת לדף הנוכחי."
 
 msgid "Select a valid site"
-msgstr ""
+msgstr "בחר אתר חוקי"
 
 msgid "Select a valid page"
+msgstr "בחר דף חוקי"
+
+msgid "Enter a valid relative or absolute URL."
 msgstr ""
 
 #, python-format
@@ -499,44 +512,46 @@ msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
+"לדף %(conflict_page)s יש אותה כתובת '%(url)s' כמו לדף הנוכחי "
+"\"%(instance)s\"."
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "לדף %(conflict_page)s יש אותה כתובת '%(url)s' כמו לדף הנוכחי."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
-msgstr ""
+msgstr "אופציונלי. אם יסופק, יתווסף אוטומטית בתוך פלאגין טקסט חדש."
 
 msgid "Provide a title for the new page."
 msgstr "תן כותרת לדף החדש"
 
 msgid "Leave empty for automatic slug, or override as required."
-msgstr ""
+msgstr "השאר ריק עבור slug אוטומטי, או דרוס לפי הצורך."
 
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "לא ניתן ליצור slug אוטומטית. אנא ספק אחד באופן ידני."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "אנא ספק slug חוקי."
 
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "אין לך את ההרשאות הנדרשות להוספת דף."
 
 msgid "ID"
-msgstr ""
+msgstr "מזהה"
 
 msgid "position"
-msgstr ""
+msgstr "מיקום"
 
 msgid "language"
 msgstr "שפה"
 
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
 msgid "creation date"
-msgstr ""
+msgstr "תאריך יצירה"
 
 msgid "can edit"
 msgstr "יכול לערוך"
@@ -557,10 +572,10 @@ msgid "can change permissions"
 msgstr "יכול לשנות הרשאות"
 
 msgid "can move"
-msgstr ""
+msgstr "יכול להעביר"
 
 msgid "view restricted"
-msgstr ""
+msgstr "צפייה מוגבלת"
 
 msgid "can recover pages"
 msgstr "יכול לשחזר דפים"
@@ -584,58 +599,58 @@ msgid "publication end date"
 msgstr "תאריך אחרון לפובליקציה"
 
 msgid "in navigation"
-msgstr ""
+msgstr "בניווט"
 
 msgid "soft root"
-msgstr ""
+msgstr "שורש רך"
 
 msgid "id"
 msgstr "מזהה"
 
 msgid "attached menu"
-msgstr ""
+msgstr "תפריט מצורף"
 
 msgid "template"
 msgstr "תבנית"
 
 msgid "login required"
-msgstr ""
+msgstr "נדרשת התחברות"
 
 msgid "application"
 msgstr "יישום"
 
 msgid "application instance name"
-msgstr ""
+msgstr "שם מופע היישום"
 
 msgid "site"
 msgstr "אתר"
 
 msgid "Grant on"
-msgstr ""
+msgstr "הענק על"
 
 msgid "page"
 msgstr "עמוד"
 
 msgid "no limit set"
-msgstr ""
+msgstr "לא הוגדרה הגבלה"
 
 msgid "for logged in users only"
-msgstr ""
+msgstr "למשתמשים מחוברים בלבד"
 
 msgid "for anonymous users only"
 msgstr "למשתמשים אנונימיים בלבד"
 
 msgid "Inherit from parent page"
-msgstr ""
+msgstr "ירש מדף האב"
 
 msgid "Deny"
-msgstr ""
+msgstr "דחה"
 
 msgid "Only this website"
-msgstr ""
+msgstr "רק אתר זה"
 
 msgid "Allow"
-msgstr ""
+msgstr "אפשר"
 
 msgid "title"
 msgstr "כותרת"
@@ -669,16 +684,16 @@ msgid "Redirects to this URL."
 msgstr "מנתב ל-URL הבא"
 
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "כל אבות הקדמון לא יוצגו בניווט"
 
 msgid "The template used to render the content."
-msgstr ""
+msgstr "התבנית המשמשת לעיבוד התוכן."
 
 msgid "page content"
-msgstr ""
+msgstr "תוכן דף"
 
 msgid "page contents"
-msgstr ""
+msgstr "תכני דף"
 
 msgid "default"
 msgstr "ברירת מחדל"
@@ -686,37 +701,37 @@ msgstr "ברירת מחדל"
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
+msgstr "מזהה ייחודי המשמש עם תג התבנית page_url לקישור לדף זה"
 
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "סמן דף זה כסוג דף"
 
 msgid "pages"
-msgstr ""
+msgstr "דפים"
 
 msgid "No available title"
-msgstr ""
+msgstr "אין כותרת זמינה"
 
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 msgid "Path"
-msgstr ""
+msgstr "נתיב"
 
 msgid "Current page"
 msgstr "עמוד נוכחי"
 
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "צאצאי דף (ישירים)"
 
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "דף וצאצאים (ישירים)"
 
 msgid "Page descendants"
-msgstr ""
+msgstr "צאצאי דף"
 
 msgid "Page and descendants"
-msgstr ""
+msgstr "דף וצאצאיו"
 
 msgid "on page level"
 msgstr ""
@@ -725,7 +740,7 @@ msgid "frontend view restriction"
 msgstr ""
 
 msgid "Please select user or group."
-msgstr ""
+msgstr "אנא בחר משתמש או קבוצה."
 
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
@@ -758,63 +773,65 @@ msgid "can recover any deleted page"
 msgstr "יכול לשחזר כל דף שנמחק"
 
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "אם לא נבחר אף אחד, למשתמש יוענקו הרשאות לכל האתרים."
 
 msgid "Page global permission"
-msgstr ""
+msgstr "הרשאה גלובלית לדף"
 
 msgid "Pages global permissions"
-msgstr ""
+msgstr "הרשאות גלובליות לדפים"
 
 msgid "Page permission"
-msgstr ""
+msgstr "הרשאת דף"
 
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
+"הוספת הרשאת דף דורשת גם גישה לצאצאים או לצאצאים העקיפים, אחרת היוצר לא יוכל "
+"לשנות את הדף שנוסף."
 
 msgid "User (page)"
-msgstr ""
+msgstr "משתמש (דף)"
 
 msgid "Users (page)"
-msgstr ""
+msgstr "משתמשים (דף)"
 
 msgid "User group (page)"
-msgstr ""
+msgstr "קבוצת משתמשים (דף)"
 
 msgid "User groups (page)"
-msgstr ""
+msgstr "קבוצות משתמשים (דף)"
 
 msgid "slot"
-msgstr ""
+msgstr "חריץ"
 
 msgid "width"
 msgstr "רוחב"
 
 msgid "Edit object"
-msgstr ""
+msgstr "ערוך אובייקט"
 
 msgid "This is an external placeholder"
-msgstr ""
+msgstr "זהו מציין מיקום חיצוני"
 
 msgid "plugin"
-msgstr ""
+msgstr "פלאגין"
 
 msgid "plugins"
-msgstr ""
+msgstr "פלאגינים"
 
 msgid "<Empty>"
-msgstr ""
+msgstr "<ריק>"
 
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "השפה עבור ממשק הניהול וסרגל הכלים"
 
 msgid "user setting"
-msgstr ""
+msgstr "הגדרת משתמש"
 
 msgid "user settings"
-msgstr ""
+msgstr "הגדרות משתמש"
 
 msgid "by template"
 msgstr ""
@@ -855,73 +872,73 @@ msgid "Advanced options"
 msgstr "אפשרויות מתקדמות"
 
 msgid "Generic"
-msgstr ""
+msgstr "כללי"
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" שונה בהצלחה."
 
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "אין הגדרות נוספות עבור פלאגין זה. אנא לחץ על שמירה."
 
 msgid "Moved"
-msgstr ""
+msgstr "הועבר"
 
 msgid "Changed"
-msgstr ""
+msgstr "שונה"
 
 msgid "Deleted"
-msgstr ""
+msgstr "נמחק"
 
 msgid "Added Page Translation"
-msgstr ""
+msgstr "נוסף תרגום דף"
 
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "שונה תרגום דף"
 
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "נמחק תרגום דף"
 
 msgid "Added Plugin"
-msgstr ""
+msgstr "נוסף פלאגין"
 
 msgid "Changed Plugin"
-msgstr ""
+msgstr "שונה פלאגין"
 
 msgid "Moved Plugin"
-msgstr ""
+msgstr "הועבר פלאגין"
 
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "נמחק פלאגין"
 
 msgid "Cut Plugin"
 msgstr ""
 
 msgid "Paste Plugin"
-msgstr ""
+msgstr "הדבק פלאגין"
 
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "הדבק למציין מיקום"
 
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "נוספו פלאגינים למציין המיקום מלוח הגזירים"
 
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "מציין מיקום רוקן"
 
 msgid "Save"
 msgstr "שמור"
 
 msgid "Some fields cannot be changed since they are read-only content."
-msgstr ""
+msgstr "לא ניתן לשנות חלק מהשדות מכיוון שהם תוכן לקריאה בלבד."
 
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "התחבר לניהול <a href=\"%(login_url)s\">כאן</a>."
 
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "כתובת התחברות: %(login_url)s"
 
 msgid "Username:"
 msgstr "שם משתמש:"
@@ -930,7 +947,7 @@ msgid "Password:"
 msgstr "סיסמה:"
 
 msgid "Add a page"
-msgstr ""
+msgstr "הוסף דף"
 
 msgid "Change a page"
 msgstr "שנה דף"
@@ -943,9 +960,9 @@ msgstr "הצג באתר"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "אנא תקן את השגיאה שלהלן."
+msgstr[1] "אנא תקן את שתי השגיאות שלהלן."
+msgstr[2] "אנא תקן את השגיאות שלהלן."
 
 msgid "All permissions"
 msgstr "כל ההרשאות"
@@ -961,15 +978,17 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"האם אתה בטוח שברצונך למחוק את %(object_name)s \"%(escaped_object)s\"? כל "
+"הפריטים הקשורים הבאים יימחקו:"
 
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "כן, אני בטוח"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "לא, החזר אותי"
 
 msgid "Summary"
-msgstr ""
+msgstr "סיכום"
 
 msgid "User"
 msgstr "משתמש"
@@ -999,10 +1018,10 @@ msgid "Can view"
 msgstr "יכול לראות"
 
 msgid "(global)"
-msgstr ""
+msgstr "(גלובלי)"
 
 msgid "(current)"
-msgstr ""
+msgstr "(נוכחי)"
 
 msgid "Page doesn't inherit any permissions."
 msgstr "הדף לא יורש הרשאות."
@@ -1014,7 +1033,7 @@ msgid "Save as new"
 msgstr "שמור בשם"
 
 msgid "Save and add another"
-msgstr ""
+msgstr "שמור והוסף עוד"
 
 msgid "Copy"
 msgstr "העתק"
@@ -1026,19 +1045,19 @@ msgid "Paste"
 msgstr "הדבק"
 
 msgid "Set as home"
-msgstr ""
+msgstr "הגדר כדף בית"
 
 msgid "is restricted"
-msgstr ""
+msgstr "מוגבל"
 
 msgid "last change by"
 msgstr "לאחרונה שונה על ידי"
 
 msgid "last change on"
-msgstr ""
+msgstr "השינוי האחרון בתאריך"
 
 msgid "meta"
-msgstr ""
+msgstr "מטא"
 
 msgid "List of pages"
 msgstr "רשימת עמודים"
@@ -1047,10 +1066,10 @@ msgid "Search"
 msgstr "חפש"
 
 msgid "Page Tree"
-msgstr ""
+msgstr "עץ הדפים"
 
 msgid "Reset filter"
-msgstr ""
+msgstr "אפס מסנן"
 
 #, python-format
 msgid ""
@@ -1058,9 +1077,12 @@ msgid ""
 "                                                Restore deleted %(name)s\n"
 "                                            "
 msgstr ""
+"\n"
+"                                                שחזר %(name)s שנמחק\n"
+"                                            "
 
 msgid "Main Navigation"
-msgstr ""
+msgstr "ניווט ראשי"
 
 msgid "Options"
 msgstr "אפשרויות"
@@ -1069,27 +1091,29 @@ msgid "Successfully moved"
 msgstr "הועבר בהצלחה"
 
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "שינויים בתוך העץ עשויים לדרוש רענון."
 
 msgid "Error:"
-msgstr ""
+msgstr "שגיאה:"
 
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
 msgstr ""
+"לא ניתן להעתיק דף זה מכיוון שמצורף אליו יישום. עיין בהגדרות המתקדמות של הדף "
+"לניהול apphooks."
 
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "האם אתה בטוח שברצונך ל-§ דף זה?"
 
 msgid "Reload"
 msgstr "טען מחדש"
 
 msgid "New node"
-msgstr ""
+msgstr "צומת חדש"
 
 msgid "nodes"
-msgstr ""
+msgstr "צמתים"
 
 msgid "View"
 msgstr "הצג"
@@ -1105,116 +1129,121 @@ msgid ""
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
+"\n"
+"                            <em>אין עדיין %(object)s.</em>\n"
+"<br>\n"
+"<a href=\"%(add_url)s\" class=\"addlink\">הוסף %(object)s</a> כעת.\n"
+"                        "
 
 msgid "Copy options"
 msgstr "העתק הגדרות"
 
 msgid "Choose copy options"
-msgstr ""
+msgstr "בחר אפשרויות העתקה"
 
 msgid "Close"
 msgstr "סגור"
 
 msgid "Legend"
-msgstr ""
+msgstr "מקרא"
 
 msgid "In menu"
-msgstr ""
+msgstr "בתפריט"
 
 msgid "Not in menu"
-msgstr ""
+msgstr "לא בתפריט"
 
 msgid "View page"
 msgstr "הצג דף"
 
 msgid "Softroot"
-msgstr ""
+msgstr "שורש רך"
 
 msgid "Apphook"
-msgstr ""
+msgstr "Apphook"
 
 #, python-format
 msgid "Application: %(apphook)s"
-msgstr ""
+msgstr "יישום: %(apphook)s"
 
 msgid "in menu"
-msgstr ""
+msgstr "בתפריט"
 
 msgid "not in menu"
-msgstr ""
+msgstr "לא בתפריט"
 
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "הגדרות דף (לחיצת SHIFT להגדרות מתקדמות)"
 
 msgid "Permissions"
 msgstr "הרשאות"
 
 msgid "inherited"
-msgstr ""
+msgstr "בירושה"
 
 msgid "This page has no preview!"
-msgstr ""
+msgstr "לדף זה אין תצוגה מקדימה!"
 
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
-msgstr ""
+msgstr "ייתכן שה-apphook המצורף אינו מספק תוכן עבור השורש שלו."
 
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "מתבצעת הפניה אל:"
 
 msgid "Clipboard"
-msgstr ""
+msgstr "לוח גזירים"
 
 msgid "Add plugin"
-msgstr ""
+msgstr "הוסף פלאגין"
 
 msgid "Copy all"
-msgstr ""
+msgstr "העתק הכול"
 
 msgid "Copy from"
-msgstr ""
+msgstr "העתק מ-"
 
 msgid "Empty all"
-msgstr ""
+msgstr "רוקן הכול"
 
 msgid "Filter plugins..."
-msgstr ""
+msgstr "סנן פלאגינים..."
 
 msgid "Expand all"
-msgstr ""
+msgstr "הרחב הכול"
 
 msgid "Collapse all"
-msgstr ""
+msgstr "כווץ הכול"
 
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "לא ניתן להוסיף פלאגינים לפלאגין זה."
 
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "לא ניתן להעביר או לערוך פלאגין זה מחוץ לאב שלו"
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "לוח הגזירים ריק."
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr ""
+msgstr "פלאגין זה אינו מאפשר פלאגינים מסוג זה כפלאגינים מקוננים."
 
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "לפלאגין זה לא יכולים להיות פלאגינים מקוננים."
 
 msgid "Highlight"
-msgstr ""
+msgstr "הדגש"
 
 msgid "Available plugins"
-msgstr ""
+msgstr "פלאגינים זמינים"
 
 msgid "Toggle structure"
-msgstr ""
+msgstr "החלף מבנה"
 
 msgid "Login"
-msgstr ""
+msgstr "התחברות"
 
 msgid "Add plugin to"
-msgstr ""
+msgstr "הוסף פלאגין אל"
 
 msgid "More"
 msgstr "עוד"
@@ -1224,15 +1253,17 @@ msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
 msgstr ""
+"גרסת פיתוח המשתמשת ב-django CMS %(cms_version)s, Django %(django_version)s, "
+"Python %(python_version)s"
 
 msgid "Cancel"
-msgstr ""
+msgstr "ביטול"
 
 msgid "The following error occurred:"
-msgstr ""
+msgstr "אירעה השגיאה הבאה:"
 
 msgid "Action successful."
-msgstr ""
+msgstr "הפעולה הצליחה."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "האם אתה בטוח שברצונך למחוק את התוסף הזה?"
@@ -1241,33 +1272,33 @@ msgid "Are you sure you want to publish this page?"
 msgstr "האם אתה בטוח שברצונך לפרסם דף זה?"
 
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "הפלאגין יתווסף כאן"
 
 msgid "You have unsaved changes."
 msgstr "ישנם שינוים שלא נשמרו."
 
 msgid "Loading"
-msgstr ""
+msgstr "טוען"
 
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "האם אתה בטוח שברצונך לנטוש שינויים אלה?"
 
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr ""
+msgstr "לא ניתן היה לטעון את הטופס. אנא בדוק שהשרת פועל כראוי."
 
 msgid "Most used"
-msgstr ""
+msgstr "הנפוצים ביותר"
 
 msgid "Shortcuts"
 msgstr "קיצורי דרך"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "הדף שונה בינתיים, טוען מחדש..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "קיצורי דרך בכל ה-CMS"
 
 msgid "Bring up this help dialog"
 msgstr "הצג את דיאלוג העזרה הזה"
@@ -1276,25 +1307,25 @@ msgid "Close/cancel"
 msgstr "סגור/בטל"
 
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "החלף מצב מבנה"
 
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "החלף מצב מבנה והדגש את הפלאגין שמעליו מרחפים"
 
 msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "התמקד בסרגל הכלים"
 
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "התמקד במצייני המיקום"
 
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "עבור לאלמנט הבא/הקודם"
 
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "התמקד בפלאגינים של מציין המיקום"
 
 msgid "Edit plugin"
 msgstr "ערוך תוסף"
@@ -1303,54 +1334,58 @@ msgid "Open actions menu"
 msgstr "פתח תפריט פעולות"
 
 msgid "Expand/collapse"
-msgstr ""
+msgstr "הרחב/כווץ"
 
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
+"<strong>ההתחברות נכשלה.</strong> אנא בדוק את פרטי הכניסה שלך ונסה שוב."
 
 msgid "Double-click to edit"
-msgstr ""
+msgstr "לחיצה כפולה לעריכה"
 
 msgid "Tap to edit"
-msgstr ""
+msgstr "הקש לעריכה"
 
 msgid "Click to go back"
-msgstr ""
+msgstr "לחץ כדי לחזור אחורה"
 
 msgid "Click to go forward"
-msgstr ""
+msgstr "לחץ כדי להתקדם"
 
 msgid "Minimize"
 msgstr "מזער"
 
 msgid "Maximize"
-msgstr ""
+msgstr "הגדל"
 
 msgid "Placeholder not editable"
-msgstr ""
+msgstr "מציין המיקום אינו ניתן לעריכה"
 
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "שחרר כאן פלאגין"
 
 msgid "Welcome to your new django CMS installation!"
-msgstr ""
+msgstr "ברוך הבא להתקנת django CMS החדשה שלך!"
 
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "גרסה %(cms_version)s"
 
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "בוא נבנה יחד משהו נהדר!"
 
 msgid "Please log in"
-msgstr ""
+msgstr "אנא התחבר"
 
 msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
+"\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">הוסף את הדף הראשון שלך</a>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1365,6 +1400,17 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>סיוע במימון</h2>\n"
+"<p>\n"
+"המימון שלך מועיל ישירות למוצר, בעיקר באמצעות\n"
+"<a href=\"https://www.django-cms.org/en/fellowship-program/\">תוכנית העמיתים של django CMS</a>!\n"
+"</p>\n"
+"<p>\n"
+"דרך מהירה עבורך או עבור הארגון שלך לתרום היא דרך\n"
+"<a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"</p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1379,6 +1425,16 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>הצטרפו אלינו</h2>\n"
+"<p>\n"
+"עמותת django CMS היא ארגון ללא מטרות רווח שמממן ומכוון את פיתוחו של\n"
+"django CMS.\n"
+"</p>\n"
+"<p>\n"
+"תוכלו <a href=\"https://www.django-cms.org/en/memberships/\">להצטרף הן כיחיד והן כארגון</a>.\n"
+"</p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1393,21 +1449,32 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>תרומה</h2>\n"
+"<ul>\n"
+"<li><a href=\"https://www.django-cms.org/en/contribute/\">תרמו קוד:</a> תקנו באג או\n"
+"ממשו תכונה חדשה!</li>\n"
+"<li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">התנדבו:</a>\n"
+"אנו מציעים עבודת צוות מהנה ויעילה!</li>\n"
+"<li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">פתחו את עבודתכם כקוד פתוח:</a>\n"
+"חזקו את האקוסיסטם.</li>\n"
+"</ul>\n"
+"                "
 
 msgid "Installation Notes"
-msgstr ""
+msgstr "הערות התקנה"
 
 msgid "Support"
 msgstr "תמיכה"
 
 msgid "Documentation"
-msgstr ""
+msgstr "תיעוד"
 
 msgid "User guide"
-msgstr ""
+msgstr "מדריך למשתמש"
 
 msgid "Give back"
-msgstr ""
+msgstr "תרום בחזרה"
 
 msgid ""
 "\n"
@@ -1416,6 +1483,10 @@ msgid ""
 "                    static files.</p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">אם אינך רואה את הלוגו של django CMS למעלה, ודא\n"
+"שקישרת את התיקייה <code>static/cms</code> לקבצים הסטטיים שלך.</p>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1425,24 +1496,33 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">אתה רואה הודעה זו מכיוון שיש לך\n"
+"<code>DEBUG = True</code> בקובץ ההגדרות של django ועדיין\n"
+"לא הוספת אף דף.\n"
+"</p>\n"
+"                "
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "ברוך הבא ל-django CMS"
 
 msgid "Add Another"
-msgstr ""
+msgstr "הוסף עוד"
 
 msgid "Back"
-msgstr ""
+msgstr "חזרה"
 
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "אנא בחר אפשרות מלמטה כדי להמשיך לשלב הבא."
 
 msgid "Next"
 msgstr "הבא"
 
-msgid "Unknown"
+msgid "Select what you would like to create"
 msgstr ""
+
+msgid "Unknown"
+msgstr "לא ידוע"
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1453,6 +1533,8 @@ msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"תג תבנית לא הצליח למצוא את הדף עם ארגומנטי החיפוש `%(page_lookup)s\n"
+"`. כתובת הבקשה הייתה: http://%(host)s%(path)s"
 
 msgid "Two columns"
 msgstr "שני עמודות"
@@ -1461,11 +1543,11 @@ msgid "Three columns"
 msgstr "שלושה עמודות"
 
 msgid "username"
-msgstr ""
+msgstr "שם משתמש"
 
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "חובה. 300 תווים או פחות. אותיות, מספרים והתווים @/./+/-/_"
 
 msgid "Enter a valid username."
 msgstr "הכנס שם משתמש חוקי."
@@ -1474,36 +1556,37 @@ msgid "email address"
 msgstr "כתובת אימייל"
 
 msgid "staff status"
-msgstr ""
+msgstr "סטטוס צוות"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "מציין אם המשתמש יכול להתחבר לאתר ניהול זה."
 
 msgid "active"
-msgstr ""
+msgstr "פעיל"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"מציין אם יש להתייחס למשתמש זה כפעיל. בטל את הבחירה במקום למחוק חשבונות."
 
 msgid "users"
-msgstr ""
+msgstr "משתמשים"
 
 msgid "Title Extension"
-msgstr ""
+msgstr "הרחבת כותרת"
 
 msgid "Page Extension"
-msgstr ""
+msgstr "הרחבת דף"
 
 msgid "object ID"
-msgstr ""
+msgstr "מזהה אובייקט"
 
 msgid "Example1 App"
-msgstr ""
+msgstr "אפליקציית Example1"
 
 msgid "MultilingualExample1 App"
-msgstr ""
+msgstr "אפליקציית MultilingualExample1"
 
 msgid "Example1"
 msgstr "דוגמא1"
@@ -1518,58 +1601,58 @@ msgid "Articles"
 msgstr "מאמרים"
 
 msgid "Sample App"
-msgstr ""
+msgstr "אפליקציה לדוגמה"
 
 msgid "Sample App with config"
-msgstr ""
+msgstr "אפליקציה לדוגמה עם תצורה"
 
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "אפליקציה לדוגמה עם הרשאות מוחרגות"
 
 msgid "Sample App 2"
-msgstr ""
+msgstr "אפליקציה לדוגמה 2"
 
 msgid "Sample App 3"
-msgstr ""
+msgstr "אפליקציה לדוגמה 2"
 
 msgid "Sample App Without Landing Page"
-msgstr ""
+msgstr "אפליקציה לדוגמה ללא דף נחיתה"
 
 msgid "Namespaced App"
-msgstr ""
+msgstr "אפליקציה עם מרחב שמות"
 
 msgid "Parent app"
-msgstr ""
+msgstr "אפליקציית אב"
 
 msgid "Child app"
-msgstr ""
+msgstr "אפליקציית צאצא"
 
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "אפליקציית urls-menus משתנה"
 
 msgid "sample root page"
-msgstr ""
+msgstr "דף שורש לדוגמה"
 
 msgid "sample settings page"
-msgstr ""
+msgstr "דף הגדרות לדוגמה"
 
 msgid "sample account page"
-msgstr ""
+msgstr "דף חשבון לדוגמה"
 
 msgid "sample my profile page"
-msgstr ""
+msgstr "דף הפרופיל שלי לדוגמה"
 
 msgid "Static Menu"
-msgstr ""
+msgstr "תפריט סטטי"
 
 msgid "Static Menu2"
-msgstr ""
+msgstr "תפריט סטטי 2"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "תפריט סטטי 3"
 
 msgid "Static Menu4"
-msgstr ""
+msgstr "תפריט סטטי"
 
 msgid "Category"
 msgstr "קטגוריה"
@@ -1581,30 +1664,30 @@ msgid "Add Category"
 msgstr "הוסף קטגוריה"
 
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
 msgid "Change Category"
 msgstr "שנה קטגוריה"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "תודה שהקדשת זמן איכות לאתר היום."
 
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "ירש את התבנית של האב הקרוב ביותר"
 
 msgid "UserSettings"
-msgstr ""
+msgstr "הגדרות משתמש"
 
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "הוסף פלאגין למציין המיקום \"%(placeholder_label)s\""
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "הוסף פלאגין אל %(plugin_name)s"
 
 msgid "Single placeholder"
-msgstr ""
+msgstr "מציין מיקום יחיד"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - חשבון המשתמש שלך נוצר."
@@ -1614,28 +1697,32 @@ msgstr "CMS - חשבון המשתמש שלך השתנה."
 
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "למציין מיקום זה כבר יש את המספר המרבי של פלאגינים (%s)."
 
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr ""
+"למציין מיקום זה כבר יש את המספר המרבי (%(limit)s) של פלאגיני %(plugin_name)s"
+" המותרים."
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "לא ניתן למצוא את מודול CMS_REQUEST_IP_RESOLVER שצוין: \"{0}\"."
 
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
 msgstr ""
+"לא ניתן למצוא את פונקציית CMS_REQUEST_IP_RESOLVER שצוינה: \"{0}\" במודול "
+"\"{1}\"."
 
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "צור מופע %s חדש."
 
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "אשף כבר נרשם עבור המודל: %s"

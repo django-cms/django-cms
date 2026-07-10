@@ -12,15 +12,15 @@
 # da27e4edd0c28b0ec121570dac46e169_947ca9c, 2025
 # Robin Durner, 2025
 # Corentin Bettiol, 2026
-# Sylvain Chiron <chironsylvain@orange.fr>, 2026
 # François Palmier <fp@kapt.mobi>, 2026
+# Sylvain Chiron <chironsylvain@orange.fr>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: French (https://app.transifex.com/divio/teams/58664/fr/)\n"
@@ -45,8 +45,14 @@ msgstr "Partie du titre qui doit être utilisée dans l'URL"
 msgid "Page type"
 msgstr "Type de page"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Types de pages"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Écraser l'URL"
@@ -239,6 +245,9 @@ msgid ""
 msgstr ""
 "(pour le modifier, dépubliez d’abord la version actuellement publiée de "
 "cette page)"
+
+msgid "Add Translation"
+msgstr "Ajouter une traduction"
 
 msgid "Add Page Copy"
 msgstr "Ajouter une copie de la page"
@@ -459,9 +468,6 @@ msgstr "Se déconnecter"
 msgid "Language"
 msgstr "Langue"
 
-msgid "Add Translation"
-msgstr "Ajouter une traduction"
-
 msgid "Delete Translation"
 msgstr "Supprimer une traduction"
 
@@ -526,6 +532,9 @@ msgstr "Choisissez un site valide"
 
 msgid "Select a valid page"
 msgstr "Choisissez une page valide"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1555,6 +1564,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Suivant"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Inconnu"

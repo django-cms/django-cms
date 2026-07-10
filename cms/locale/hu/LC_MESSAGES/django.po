@@ -4,14 +4,14 @@
 # 
 # Translators:
 # Tibor Balogh, 2025
-# Alexander Blomberg, 2025
+# Alexander Blomberg, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Hungarian (https://app.transifex.com/divio/teams/58664/hu/)\n"
@@ -36,8 +36,14 @@ msgstr "A cím része, ami az URL-ben használandó"
 msgid "Page type"
 msgstr "Oldal típus"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Oldal típusok"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "URL felülírása"
@@ -221,6 +227,9 @@ msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr ""
 "(a módosításához először vonja vissza az oldal jelenleg közzétett verzióját)"
+
+msgid "Add Translation"
+msgstr "Fordítás hozzáadása"
 
 msgid "Add Page Copy"
 msgstr "Oldal másolat hozzáadása"
@@ -441,9 +450,6 @@ msgstr "Kilépés"
 msgid "Language"
 msgstr "Nyelv"
 
-msgid "Add Translation"
-msgstr "Fordítás hozzáadása"
-
 msgid "Delete Translation"
 msgstr "Fordítás törlése"
 
@@ -508,6 +514,9 @@ msgstr "Válasszon egy érvényes webhelyet"
 
 msgid "Select a valid page"
 msgstr "Válasszon egy érvényes oldalt"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1548,6 +1557,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Tovább"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Ismeretlen"

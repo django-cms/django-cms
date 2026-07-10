@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# André Cruz <transifex@cabine.org>, 2025
 # Vítor Figueiró <vfigueiro@gmail.com>, 2025
+# André Cruz <transifex@cabine.org>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Portuguese (https://app.transifex.com/divio/teams/58664/pt/)\n"
@@ -36,8 +36,14 @@ msgstr "A parte do título que é usada na URL"
 msgid "Page type"
 msgstr "Tipo de página"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipos de Página"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sobrescreva URL"
@@ -221,6 +227,9 @@ msgid ""
 msgstr ""
 "(para a alterar, primeiro despublique a versão actualmente publicada desta "
 "página)"
+
+msgid "Add Translation"
+msgstr "Adicionar Tradução"
 
 msgid "Add Page Copy"
 msgstr "Adicionar Cópia de Página"
@@ -441,9 +450,6 @@ msgstr "Sair"
 msgid "Language"
 msgstr "Língua"
 
-msgid "Add Translation"
-msgstr "Adicionar Tradução"
-
 msgid "Delete Translation"
 msgstr "Apagar Tradução"
 
@@ -508,6 +514,9 @@ msgstr "Selecione um site válido"
 
 msgid "Select a valid page"
 msgstr "Selecione uma página válida"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1542,6 +1551,9 @@ msgstr "Escolha uma opção abaixo para avançar para o passo seguinte."
 
 msgid "Next"
 msgstr "Próximo"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Desconhecido"

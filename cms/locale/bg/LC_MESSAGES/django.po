@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Bulgarian (https://app.transifex.com/divio/teams/58664/bg/)\n"
@@ -35,8 +35,14 @@ msgstr "Частта от заглавието, която се използва
 msgid "Page type"
 msgstr "Тип страница"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Типове страници"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Напиши URL адрес"
@@ -224,6 +230,9 @@ msgid ""
 msgstr ""
 "(за да я промените, първо премахнете публикуването на текущо публикуваната "
 "версия на тази страница)"
+
+msgid "Add Translation"
+msgstr "Добави превод"
 
 msgid "Add Page Copy"
 msgstr "Добави копие на страница"
@@ -444,9 +453,6 @@ msgstr "Изход"
 msgid "Language"
 msgstr "Език"
 
-msgid "Add Translation"
-msgstr "Добави превод"
-
 msgid "Delete Translation"
 msgstr "Изтрий превод"
 
@@ -511,6 +517,9 @@ msgstr "Изберете валиден сайт"
 
 msgid "Select a valid page"
 msgstr "Изберете валидна страница"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -849,32 +858,30 @@ msgid "by template"
 msgstr "по шаблон"
 
 msgid "by code"
-msgstr "по код"
+msgstr ""
 
 msgid "static placeholder name"
-msgstr "име на статичен плейсхолдър"
+msgstr ""
 
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr ""
-"Описателно име за идентифициране на този статичен плейсхолдър. Не се показва"
-" на потребителите."
 
 msgid "placeholder code"
-msgstr "код на плейсхолдъра"
+msgstr ""
 
 msgid "To render the static placeholder in templates."
 msgstr "За изобразяване на статичния плейсхолдър в шаблоните."
 
 msgid "placeholder content"
-msgstr "съдържание на плейсхолдъра"
+msgstr ""
 
 msgid "creation_method"
-msgstr "creation_method"
+msgstr ""
 
 msgid "static placeholder"
-msgstr "статичен плейсхолдър"
+msgstr ""
 
 msgid "static placeholders"
 msgstr "статични плейсхолдъри"
@@ -1541,6 +1548,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Напред"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Неизвестно"

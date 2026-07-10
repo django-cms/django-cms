@@ -7,17 +7,17 @@
 # Luis Montiel <luis@aztlansoft.com>, 2023
 # Pier Jose Gotta Perez <piegope@protonmail.com>, 2023
 # Alexandre Filgueira <faidoc@gmail.com>, 2023
-# jorlugaqui <jorlugaqui@gmail.com>, 2023
 # Luis Zárate <luisza@visualcon.net>, 2025
 # Adolfo Gómez <dkmaster@dkmon.com>, 2025
 # Diego Alejandro Romero Mercado, 2025
+# jorlugaqui <jorlugaqui@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/divio/teams/58664/es/)\n"
@@ -42,8 +42,14 @@ msgstr "La parte del título que se usa en la URL"
 msgid "Page type"
 msgstr "Tipo de página"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipos de Página"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sobreescribir la URL"
@@ -228,6 +234,9 @@ msgid ""
 msgstr ""
 "(para cambiarlo, primero despublique la versión actualmente publicada de "
 "esta página)"
+
+msgid "Add Translation"
+msgstr "Agregar Traducción"
 
 msgid "Add Page Copy"
 msgstr "Añadir Copia de Página"
@@ -449,9 +458,6 @@ msgstr "Salir"
 msgid "Language"
 msgstr "Idioma"
 
-msgid "Add Translation"
-msgstr "Agregar Traducción"
-
 msgid "Delete Translation"
 msgstr "Eliminar Traducción"
 
@@ -516,6 +522,9 @@ msgstr "Elija un sitio válido"
 
 msgid "Select a valid page"
 msgstr "Elija una página válida"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1554,6 +1563,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Siguiente"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Desconocido"
