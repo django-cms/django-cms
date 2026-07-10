@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import difflib
+import io
 import json
 import os
 import re
@@ -8,8 +9,10 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tarfile
 import urllib.error
 import urllib.request
+import zipfile
 
 from django.core.checks.security.base import SECRET_KEY_INSECURE_PREFIX
 from django.core.management import CommandError
@@ -497,6 +500,59 @@ class ExistingProjectMixin:
             f"{self.major_minor}/{self.INSTALL_RULES_FILENAME}"
         )
 
+    @staticmethod
+    def _command_line_option(name):
+        """Return an option value from ``sys.argv`` before argparse runs."""
+        for index, argument in enumerate(sys.argv[1:]):
+            if argument.startswith(name + "="):
+                return argument.split("=", 1)[1]
+            if argument == name and index + 2 < len(sys.argv):
+                return sys.argv[index + 2]
+        return None
+
+    def load_template_install_rules(self, template):
+        """Load install rules stored at the root of a custom project template."""
+        if os.path.isdir(template):
+            path = os.path.join(template, self.INSTALL_RULES_FILENAME)
+            if not os.path.isfile(path):
+                return None
+            return json.loads(self._read(path))
+
+        if os.path.isfile(template):
+            with open(template, "rb") as template_file:
+                content = template_file.read()
+        else:
+            with urllib.request.urlopen(template, timeout=15) as response:  # noqa: S310 (user-provided template URL)
+                content = response.read()
+
+        archive = io.BytesIO(content)
+        try:
+            with zipfile.ZipFile(archive) as template_zip:
+                matches = [
+                    name
+                    for name in template_zip.namelist()
+                    if name.rsplit("/", 1)[-1] == self.INSTALL_RULES_FILENAME
+                ]
+                if not matches:
+                    return None
+                return json.loads(template_zip.read(min(matches, key=lambda name: name.count("/"))).decode("utf-8"))
+        except zipfile.BadZipFile:
+            archive.seek(0)
+
+        try:
+            with tarfile.open(fileobj=archive, mode="r:*") as template_tar:
+                matches = [
+                    member
+                    for member in template_tar.getmembers()
+                    if member.isfile() and member.name.rsplit("/", 1)[-1] == self.INSTALL_RULES_FILENAME
+                ]
+                if not matches:
+                    return None
+                rules_file = template_tar.extractfile(min(matches, key=lambda member: member.name.count("/")))
+                return json.loads(rules_file.read().decode("utf-8"))
+        except tarfile.TarError as exc:
+            raise ValueError("custom template is not a supported directory, ZIP, or tar archive") from exc
+
     def add_to_existing_project(self, options):
         """Add django CMS to the existing Django project in the current directory.
 
@@ -636,24 +692,43 @@ class ExistingProjectMixin:
         self._finish_existing_project(apps, rules.get("packages", {}), options)
 
     def load_install_rules(self):
-        """Fetch the install rules from GitHub, falling back to the bundled file."""
+        """Load custom-template rules, or use the official and bundled fallbacks."""
         cached = getattr(self, "_install_rules", None)
         if cached is not None:
             return cached
         if getattr(self, "_use_bundled_install_rules", False):
             rules = self.load_bundled_install_rules()
         else:
-            url = self.get_install_rules_url()
-            try:
-                with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 (https URL)
-                    rules = json.loads(response.read().decode("utf-8"))
-            except (urllib.error.URLError, OSError, ValueError) as exc:
-                self.stderr.write(
-                    self.style.WARNING(
-                        f"Could not fetch installation rules from {url} ({exc}); using bundled defaults."
+            rules = None
+            template = getattr(self, "_requested_template", None)
+            if template:
+                try:
+                    rules = self.load_template_install_rules(template)
+                except (urllib.error.URLError, OSError, ValueError) as exc:
+                    self.stderr.write(
+                        self.style.WARNING(
+                            f"Could not load installation rules from custom template {template} ({exc})."
+                        )
                     )
-                )
-                rules = self.load_bundled_install_rules()
+                if rules is None:
+                    self.stderr.write(
+                        self.style.WARNING(
+                            f"Custom template {template} does not provide {self.INSTALL_RULES_FILENAME}; "
+                            "using the official installation rules."
+                        )
+                    )
+            if rules is None:
+                url = self.get_install_rules_url()
+                try:
+                    with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 (https URL)
+                        rules = json.loads(response.read().decode("utf-8"))
+                except (urllib.error.URLError, OSError, ValueError) as exc:
+                    self.stderr.write(
+                        self.style.WARNING(
+                            f"Could not fetch installation rules from {url} ({exc}); using bundled defaults."
+                        )
+                    )
+                    rules = self.load_bundled_install_rules()
         if not isinstance(rules, dict):
             raise CommandError("Invalid installation rules: expected a JSON object.")
         # Metadata keys such as "$schema" or "comment" carry no rules.
@@ -1062,6 +1137,7 @@ class Command(PromptMixin, NewProjectMixin, ExistingProjectMixin, SourceEditorMi
     def add_arguments(self, parser):  # pragma: no cover -- argparse wiring; tests call handle() directly
         super().add_arguments(parser)
         self._use_bundled_install_rules = self.BUNDLED_RULES_OPTION in sys.argv
+        self._requested_template = self._command_line_option("--template")
         # Make the project name optional so it can be asked for in interactive
         # mode; a missing name is reported by handle() otherwise.
         for action in parser._actions:
@@ -1139,6 +1215,10 @@ class Command(PromptMixin, NewProjectMixin, ExistingProjectMixin, SourceEditorMi
         self._use_bundled_install_rules = use_bundled_install_rules or getattr(
             self, "_use_bundled_install_rules", False
         )
+        requested_template = options.get("template")
+        if requested_template and requested_template != getattr(self, "_requested_template", None):
+            self._requested_template = requested_template
+            self._install_rules = None
 
         # Interactively ask for the project name and any option not provided.
         # Prompting is enabled explicitly via --interactive, or implicitly when

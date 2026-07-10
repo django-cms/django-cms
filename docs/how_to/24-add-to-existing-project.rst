@@ -58,6 +58,25 @@ HTML pages) and skips content versioning. See the
 :ref:`djangocms command reference <djangocms-command>` for all options and
 their defaults.
 
+Using custom project rules
+--------------------------
+
+The ``--template`` option can point to a local template directory, a local ZIP
+or tar archive, or a remote template archive. If that template contains
+``djangocms_install_rules.json``, the command uses its options, packages, and
+project-editing rules instead of those from the official ``cms-template``::
+
+    djangocms . --template https://example.com/agency-template.tar.gz --dry-run
+
+Place the rules file at the template root. A single enclosing archive directory
+is also supported. This lets an organization keep project generation and
+existing-project integration in the same versioned template.
+
+If the custom template does not contain a rules file, the command reports that
+fact and falls back to the official rules. Use
+``--use-bundled-install-rules`` to explicitly ignore template and remote rules
+and use the rules bundled with django CMS.
+
 Review the changes
 ------------------
 

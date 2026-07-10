@@ -224,10 +224,12 @@ anything::
 
     djangocms . --dry-run
 
-The rules that govern these edits are fetched from the ``cms-template``
-repository (matching your installed django CMS version), with a bundled copy
-serving as an offline fallback, so the integration can keep up with the
-ecosystem without a new django CMS release.
+By default, the rules that govern these edits are fetched from the
+``cms-template`` repository matching your installed django CMS version, with a
+bundled copy serving as an offline fallback. A custom ``--template`` can
+provide its own ``djangocms_install_rules.json`` so organizations can keep
+project generation and existing-project integration in the same versioned
+template.
 
 See :ref:`tutorial_install` for a step-by-step walkthrough.
 
