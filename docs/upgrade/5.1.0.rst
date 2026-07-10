@@ -18,10 +18,49 @@ Django and Python compatibility
 *******************************
 
 django CMS 5.1 supports **Django 5.2, 6.0, and 6.1**. Django 4.2, 5.0, and
-5.1 are no longer supported. We highly recommend and only support the latest
-release of each supported series.
+5.1 are no longer supported because those series no longer receive upstream
+maintenance. We highly recommend and only support the latest release of each
+supported series.
 
 It supports **Python 3.10, 3.11, 3.12, 3.13, and 3.14**.
+
+******************
+Release highlights
+******************
+
+django CMS 5.1 focuses on easier project setup, more flexible deployments,
+more precise plugin configuration, and a modernized editing interface.
+
+* **Create projects for different use cases.** The improved ``djangocms``
+  command can create traditional, headless, or hybrid projects. Optional
+  components such as versioning, moderation, aliases, and stories can be
+  selected interactively or through command-line options.
+
+* **Integrate django CMS into an existing Django project.** Running
+  ``djangocms .`` updates an existing project using reviewable, idempotent
+  changes. ``djangocms . --dry-run`` previews the proposed changes without
+  modifying files or installing packages.
+
+* **Run multiple sites from one configuration.** Projects can omit
+  ``SITE_ID`` and resolve the current site from the request host, or supply
+  custom site-selection logic through middleware.
+
+* **Control where plugins are available.** Plugins can be restricted by
+  content model, placeholder slot, and parent or child plugin type. Glob
+  patterns and automatic child restrictions make these rules easier to
+  maintain in larger plugin libraries.
+
+* **Use a modernized editing interface.** The new design improves contrast,
+  spacing, visual consistency, and light/dark color-scheme support. The
+  previous theme remains available as a migration aid.
+
+* **Deploy on all maintained platform versions.** django CMS 5.1 supports Django
+  5.2, 6.0, and 6.1 and Python 3.10 through 3.14.
+
+* **Benefit from security and reliability improvements.** The release
+  strengthens authorization around editing and clipboard operations, improves
+  Content Security Policy compatibility, repairs inconsistent plugin
+  positions, and addresses deadlock and query-performance issues.
 
 ***********************
 How to upgrade to 5.1.0
@@ -296,7 +335,8 @@ Dependencies, settings, and migrations
 ======================================
 
 * The minimum supported Django version is now 5.2. Support for Django 4.2,
-  5.0, and 5.1 has been removed.
+  5.0, and 5.1 has been removed because those series no longer receive
+  upstream maintenance.
 * The obsolete ``CMS_CONFIRM_VERSION4`` setting has been removed and should be
   deleted from project settings.
 * The ``admin-style`` optional dependency now installs
