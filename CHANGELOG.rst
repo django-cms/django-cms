@@ -4,50 +4,119 @@
 
 Features:
 ---------
-* Support django 6.1+ breadcrumb styles (#8689) (fa220cd79) -- Fabian Braun
+* Extend the ``djangocms`` command for creating new projects and integrating django CMS into existing Django projects
+  (#8671) -- Fabian Braun
+* Add ``CMSPluginBase.allowed_slots`` to restrict plugins to specific placeholder slots (#8709) -- Fabian Braun
+* Allow glob patterns in plugin parent/child restrictions and add ``child_classes = "auto"`` (#8675) -- Fabian Braun
+* Add ``Placeholder.delete_plugins()`` for efficient bulk plugin deletion -- Fabian Braun
+* Add ``CMS_MENU_CACHE_BACKEND`` for selecting a dedicated menu cache (#8475) -- 사재혁
+* Add support for Django 5.2, 6.0, and 6.1 (#8299, #8689) -- Fabian Braun
 * Introduce contracts for django CMS Extensions (#8455) -- Fabian Braun
-* Avoid database access when registering apphook urls to make them async-safe (#8460) -- Fabian Braun
+* Avoid database access when registering apphook URLs to make them async-safe (#8460) -- Fabian Braun
 * Make page content placeholders available to apphook root pages (#8456) -- Fabian Braun
+* Allow ``CMSApp`` implementations to provide a root template for apphooks (#8619) -- Fabian Braun
 * Preserve GET params when switching to preview or edit mode (#8444) -- Fabian Braun
 * Add icon for redirected pages in page tree (#8437) -- Fabian Braun
 * Improved UX for external placeholders (e.g., static aliases) (#8416) -- Fabian Braun
 * Allow page permission change from advanced settings (#8387) -- Fabian Braun
 * Allow plugins to restrict themselves to specific models (#8395) -- Fabian Braun
+* Provide editor UI for plugins acting as placeholder slots (#8540) -- Fabian Braun
 * Let the "eye" icon in the page tree directly go to edit endpoints for editable content (#8414) -- Fabian Braun
 * Refactor site handling, and allow single-instance multi-site configurations (#8303) -- Stefan Wehrmeyer
 * Implement new Django CMS design language for Django CMS 5.1 (#8320) -- Fabian Braun and Vinit Kumar
 * Optimize placeholder and plugin utilities (#8319) -- Fabian Braun
-* Re-introduced help menu (#8300) (#8301) -- Florian Schieder
-* Django 6 compatibility (#8299) -- Fabian Braun
+* Re-introduce the help menu (#8300, #8301) -- Florian Schieder
+* Allow toolbar AJAX items to return a data bridge structure (#8694) -- Fabian Braun
+* Improve wizard accessibility (#8674) -- Fabian Braun
+* Explain why fields are read-only in grouper administration (#8673) -- Fabian Braun
+
+
+Backward incompatible changes:
+------------------------------
+* Require Django 5.2 or newer; support for Django 4.2, 5.0, and 5.1 has been removed (#8708)
+* Remove APIs and functionality deprecated for removal in django CMS 5.1, including ``StaticPlaceholder``,
+  ``PlaceholderField``, ``cms.api.create_title()``, and deprecated permission helpers
+* Remove the obsolete ``CMS_CONFIRM_VERSION4`` setting (#8686)
+* Replace the deprecated ``djangocms-admin-style`` optional dependency with ``djangocms-simple-admin-style`` (#8548)
+* Add a squashed initial migration covering migrations 0001 through 0022 (#8484)
 
 
 Bug Fixes:
 ----------
-* get_permissions failed for missing global permissions (#8468) (65d84a929) -- Fabian Braun
+* Enforce authorization when rendering frontend object structures (#8692) -- Fabian Braun
+* Harden page duplication, group permission handling, and URL validation (#8704) -- Fabian Braun
+* Prevent page titles from being inserted unescaped into rendering errors and prevent clipboard clearing through GET
+  requests (#8699) -- Fabian Braun
+* Prevent toolbar login from following an unverified redirect (#8642) -- Fabian Braun
+* Enforce authorization on structure, move, and clipboard endpoints (#8644) -- Fabian Braun
+* Prevent inline editing from circumventing permissions (#8542) -- Fabian Braun
+* Automatically repair corrupted plugin positions (#8667) -- Fabian Braun
+* Cascade-delete plugins belonging to detached placeholders (#8622) -- Granth Agarwal
+* Prevent deadlocks when moving large page subtrees (#8529) -- Fabian Braun
+* Avoid locking the entire page tree while editing a page (#8612) -- Fabian Braun
+* Fix migrations when using a custom user model (#8606) -- Fabian Braun
+* Fix copying clipboard content into a different language (#8664) -- Fabian Braun
+* Fix fallback-language rendering returning empty content (#8557) -- Fabian Braun
+* Honour plugin-declared ``Vary`` headers in page cache keys (#8646) -- Fabian Braun
+* Fix an N+1 regression when fetching URLs for the page tree (#8716) -- Fabian Braun
+* Fix N+1 queries in ``cms check`` and ``delete-orphaned-plugins`` (#8701) -- Fabian Braun
+* Show all applicable content versions in ``GrouperModelAdmin`` (#8700) -- Fabian Braun
+* Remove remaining inline JavaScript and CSS that could violate Content Security Policy (#8690) -- Fabian Braun
+* Fix ``get_permissions`` for missing global permissions (#8468) (65d84a929) -- Fabian Braun
 * Create page wizard not available on empty install (#8463) -- Fabian Braun
-* Make Placeholder.add_plugin() set plugin.instance to self (#8442) (#8447) -- Jasper Bok
-* Resolve empty page_title in frontend edit mode for apphooks (#8449) -- 김주희
-* Improve anti-aliasing of django CMS logo png (#8452)  -- Fabian Braun
-* Use PageContent.template_choices attribute for template choices instead of settings (#8441)  -- Fabian Braun
-* Existing child plugin restriction cannot be reduced to an empty list (which implies all plugins allowed) (#8433) -- Fabian Braun
+* Make ``Placeholder.add_plugin()`` set ``plugin.instance`` to itself (#8442, #8447) -- Jasper Bok
+* Resolve an empty ``page_title`` in frontend edit mode for apphooks (#8449) -- 김주희
+* Improve anti-aliasing of the django CMS logo PNG (#8452) -- Fabian Braun
+* Use ``PageContent.template_choices`` for template choices instead of settings (#8441) -- Fabian Braun
+* Allow existing child plugin restrictions to be reduced to an empty list, meaning no plugins are allowed (#8433)
+  -- Fabian Braun
 * Gracefully handle unresolvable extends variables in placeholder scanning (#8420) -- Vincent Ngobeh
 * Allow frontend-editable models to omit get_template method (#8406) -- Fabian Braun
 * Safe fallback for includes when scanning for placeholders (#8405) -- Fabian Braun
 * Fix ApphookReloadMiddleware not handling new language variants (#8401) -- Moritz Pietzschke
-* Copying failed if a target placeholders was missing (#8399) -- Moritz Pietzschke
-* Grouper admin kept read-only fields as prepopulated fields (#8471) (fd4aac915) -- Fabian Braun
+* Fix copying when a target placeholder is missing (#8399) -- Moritz Pietzschke
+* Prevent grouper administration from retaining read-only fields as prepopulated fields (#8471) (fd4aac915)
+  -- Fabian Braun
 
 
 Statistics:
 -----------
 
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 142 changelog entries, created with the help of the following contributors
+(in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
+* Abdulwasiu Apalowo (1 changelog entry)
+* Daniel (2 changelog entries)
+* entuziaz (1 changelog entry)
+* Fabian Braun (112 changelog entries)
+* Florian Schieder (1 changelog entry)
+* Granth Agarwal (1 changelog entry)
+* Jacob Rief (1 changelog entry)
+* Jasper (2 changelog entries)
+* Moritz Pietzschke (2 changelog entries)
+* Muhammad Hassan Siddiqi (2 changelog entries)
+* Peter Wischer (2 changelog entries)
+* Stefan Wehrmeyer (5 changelog entries)
+* Thiago Chaves de Oliveira Horta (1 changelog entry)
+* Vašek Chalupníček (1 changelog entry)
+* Vincent Ngobeh (2 changelog entries)
+* Vinit Kumar (1 changelog entry)
+* Wesley B (1 changelog entry)
+* Wolfgang Fehr (1 changelog entry)
+* Zdeněk Böhm (1 changelog entry)
+* 김주희 (1 changelog entry)
+* 사재혁 (1 changelog entry)
 
 With the review help of the following contributors:
 
+* Fabian Braun
+* fsbraun
+* keni
+* Petr Klus
+* Ralph
+* Thiago Chaves de Oliveira Horta
+* Vinit Kumar
+* [Aaditya1273]
 
 Thanks to all contributors for their efforts!
 

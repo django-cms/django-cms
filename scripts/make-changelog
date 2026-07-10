@@ -8,17 +8,43 @@ SCRIPTS=$(dirname "$(realpath "$0")")
 #shellcheck disable=SC1090
 source "${SCRIPTS}/functions"
 
-# Scope used in this script
-declare -A SCOPES_HEADINGS
-declare -a SCOPES
+# Scopes used in this script. Keep this compatible with the Bash 3 version
+# shipped by macOS, which does not support associative arrays.
+SCOPES=("feat" "security" "fix" "perf" "style" "refactor" "docs" "tools")
 
-SCOPES=("feat" "security" "fix" "style" "refactor" "tools")
-SCOPES_HEADINGS["feat"]="Features:"
-SCOPES_HEADINGS["fix"]="Bug Fixes:"
-SCOPES_HEADINGS["security"]="Security Updates:"
-SCOPES_HEADINGS["style"]="Styles:"
-SCOPES_HEADINGS["refactor"]="Refactoring and Cleanups:"
-SCOPES_HEADINGS["tools"]="Internal Tools:"
+scope_heading() {
+    case "$1" in
+        feat) echo "Features:" ;;
+        security) echo "Security Updates:" ;;
+        fix) echo "Bug Fixes:" ;;
+        perf) echo "Performance Improvements:" ;;
+        style) echo "Styles:" ;;
+        refactor) echo "Refactoring and Cleanups:" ;;
+        docs) echo "Documentation:" ;;
+        tools) echo "Internal Tools:" ;;
+        *) error "Unknown changelog scope: $1"; return 1 ;;
+    esac
+}
+
+# Conventional commit types included in the generated changelog. Backward
+# incompatible changes deliberately remain a manually maintained section.
+CHANGELOG_TYPES=$(IFS='|'; echo "${SCOPES[*]}")
+VERSION_FIELD_RE='^[0-9]+\.[0-9]+\.[0-9]+'
+
+changelog_check_version() {
+    if ! echo "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+[^ ]*$'; then
+        error "Incorrect version format '$1', must be X.Y.Z[suffix]"
+        exit 1
+    fi
+}
+
+changelog_main_version() {
+    echo "$1" | sed -E 's/^(([0-9]+\.){2}[0-9]+).*$/\1/'
+}
+
+changelog_version_suffix() {
+    echo "$1" | sed -E 's/^([0-9]+\.){2}[0-9]+//'
+}
 
 
 # argument checks
@@ -36,24 +62,20 @@ FULL_VERSION="$1"
 OLD_FULL_VERSION="$2"
 
 # extracting version from the FULL_VERSION, and sanity checks
-check_version_string "${FULL_VERSION}"
+changelog_check_version "${FULL_VERSION}"
 
-VERSION=$(get_main_version "${FULL_VERSION}")
-VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
+VERSION=$(changelog_main_version "${FULL_VERSION}")
+VERSUFFIX=$(changelog_version_suffix "${FULL_VERSION}")
 
 
 # extracting the base version from changelog
 if [ -z "${OLD_FULL_VERSION}" ]; then
-    OLD_FULL_VERSION=$(grep -vi "unreleased\|unpublished" CHANGELOG.rst | awk '/^[0-9]+\.[0-9]+\.[0-9] \(.+\)$/ { print $1; nextfile }')
+    OLD_FULL_VERSION=$(awk -v version_re="${VERSION_FIELD_RE}" '
+        $1 ~ version_re && $2 ~ /^\(/ && $2 != "(unpublished)" { print $1; exit }
+    ' CHANGELOG.rst)
 else
-    check_version_string "${OLD_FULL_VERSION}"
+    changelog_check_version "${OLD_FULL_VERSION}"
 fi
-
-# shellcheck disable=SC2001
-OLD_VERSION=$(get_main_version "${OLD_FULL_VERSION}")
-
-# shellcheck disable=SC2001
-
 
 # Sanity checks
 if [ -z "$(git tag -l "${OLD_FULL_VERSION}")" ]; then
@@ -61,7 +83,7 @@ if [ -z "$(git tag -l "${OLD_FULL_VERSION}")" ]; then
     exit 1
 fi
 
-if [ "${FULL_VERSION}" = "${OLD_VERSION}" ]; then
+if [ "${FULL_VERSION}" = "${OLD_FULL_VERSION}" ]; then
     error "New version must be different than old version!"
     exit 1
 fi
@@ -77,16 +99,46 @@ title="${FULL_VERSION} (${DATE})"
 #shellcheck disable=SC2001
 line=$(echo "${title}" | sed 's/./=/g')
 
+# When promoting a prerelease, retain its accumulated changelog content and
+# split the legacy changelog at the preceding release line instead.
+CUT_VERSION="${OLD_FULL_VERSION}"
+if [ "$(changelog_main_version "${OLD_FULL_VERSION}")" = "${VERSION}" ]; then
+    CUT_VERSION=$(awk -v version_re="${VERSION_FIELD_RE}" -v version="${VERSION}" '
+        $1 ~ version_re && $2 ~ /^\(/ {
+            candidate=$1
+            normalized=candidate
+            sub(/[^0-9.].*$/, "", normalized)
+            if (normalized != version) { print candidate; exit }
+        }
+    ' CHANGELOG.rst)
+fi
+if [ -z "${CUT_VERSION}" ] || [ -z "$(git tag -l "${CUT_VERSION}")" ]; then
+    error "Can not determine the previous release tag for ${FULL_VERSION}"
+    exit 1
+fi
 
 # Cutting the Changelog into OLD and CURRENT
 legacy="$(mktemp)"
 current="$(mktemp)"
 
-awk -e "BEGIN {show=0} /^${OLD_FULL_VERSION} \([0-9]{4}-[0-9]{2}-[0-9]{2}\)\$/ {show=1} {if (show==1) print; }" < CHANGELOG.rst > "${legacy}"
-awk -e "/^${OLD_FULL_VERSION} \([0-9]{4}-[0-9]{2}-[0-9]{2}\)\$/ {nextfile} {print; }" < CHANGELOG.rst | awk -e '/^Statistics:$/ {nextfile} {print}' > "${current}"
+awk -v version="${CUT_VERSION}" '
+    $1 == version && $2 ~ /^\(/ { show=1 }
+    show { print }
+' CHANGELOG.rst > "${legacy}"
+awk -v version="${CUT_VERSION}" '
+    $1 == version && $2 ~ /^\(/ { exit }
+    /^Statistics:$/ { exit }
+    { print }
+' CHANGELOG.rst > "${current}"
 
-LAST_FULL_VERSION=$(awk -e '/^[0-9]+\.[0-9]+\.[0-9].* \(.+\)$/ { print $1; nextfile }' < CHANGELOG.rst )
-LAST_VERSION=$(get_main_version "${LAST_FULL_VERSION}")
+LAST_FULL_VERSION=$(awk -v version_re="${VERSION_FIELD_RE}" '
+    $1 ~ version_re && $2 ~ /^\(/ { print $1; exit }
+' CHANGELOG.rst)
+LAST_VERSION=$(changelog_main_version "${LAST_FULL_VERSION}")
+
+# Statistics cover the complete release line, including all prereleases. Find
+# the first preceding changelog version with a different normalized version.
+RELEASE_BASE_VERSION="${CUT_VERSION}"
 
 # Sanity checks
 if [ -z "$(git tag -l "${LAST_FULL_VERSION}")" ]; then
@@ -97,35 +149,56 @@ fi
 # making sure the headings are right:
 
 if [ "${VERSION}" = "${LAST_VERSION}" ]; then
-    # releasing a golden release from RC, so we just change the version RC to the new one
-    sed -i "${current}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${title}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${line}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/,+1d" \
-        -e "s/(unpublished)/(${DATE})/"
+    # Releasing a final version from a prerelease: replace its heading while
+    # preserving the entries accumulated by earlier prereleases.
+    updated=$(mktemp)
+    awk -v previous="${LAST_FULL_VERSION}" -v title="${title}" -v line="${line}" '
+        $1 == previous && $2 ~ /^\(/ {
+            print title
+            print line
+            getline
+            next
+        }
+        { print }
+    ' "${current}" > "${updated}"
+    mv "${updated}" "${current}"
 else
-
-    # This is a first release (RC or equivalent),
-    # let's add some headings to be sure we got all of them right for next steps
-    sed -i "${current}" \
-        -e "/^unreleased$/a${title}" \
-        -e "/^unreleased$/a${line}" \
-        -e "/^unreleased$/a
-" \
-        -e "/^unreleased$/aHighlights:" \
-        -e "/^unreleased$/a-----------" \
-        -e "/^unreleased$/,+1d" \
-        -e "s/(unpublished)/(${DATE})/"
+    # This is the first release for a new version line. Discard a legacy
+    # "unreleased" marker if present and prepend a deterministic heading.
+    previous=$(mktemp)
+    awk '
+        /^unreleased$/ { getline; next }
+        { print }
+    ' "${current}" > "${previous}"
+    {
+        echo "${title}"
+        echo "${line}"
+        echo
+        echo "Highlights:"
+        echo "-----------"
+        echo
+        cat "${previous}"
+    } > "${current}"
+    rm "${previous}"
 fi
 
 # computing / updating each section
 
 for scope in "${SCOPES[@]}"; do
     content=$(mktemp)
-    heading="${SCOPES_HEADINGS[$scope]}"
+    heading=$(scope_heading "${scope}")
 
     # only checking on the last version *in the changelog" (ex:rc1 to rc2, the changelog already includes old to rc1)
-    git log "${LAST_FULL_VERSION}.." --pretty="format:%s (%h) -- %aN" | grep -i "^${scope}:" | sed -e "s/^${scope}:/*/i" > "${content}"
+    # Accept conventional commit scopes and breaking-change markers, for
+    # example feat(admin): and fix!:, not only the unscoped "feat:" form.
+    git log "${LAST_FULL_VERSION}..HEAD" --pretty="format:%s (%h) -- %aN" \
+        | awk -v scope="${scope}" '
+            BEGIN { pattern="^" scope "(\\([^)]*\\))?!?:[[:space:]]*" }
+            tolower($0) ~ pattern {
+                sub(/^[^:]*:[[:space:]]*/, "", $0)
+                print "* " $0
+            }
+        ' > "${content}"
     if [ -z "$(cat "${content}")" ]; then
         continue
     fi
@@ -139,34 +212,63 @@ for scope in "${SCOPES[@]}"; do
         echo "" >> "${current}"
     fi
 
-    sed -i "${current}" -e "/^${heading}\$/{N
-r${content}
-}"
+    updated=$(mktemp)
+    awk -v heading="${heading}" -v content="${content}" '
+        $0 == heading {
+            print
+            if (getline > 0) print
+            while ((getline entry < content) > 0) print entry
+            close(content)
+            next
+        }
+        { print }
+    ' "${current}" > "${updated}"
+    mv "${updated}" "${current}"
 
    rm "${content}"
 done
 
-# generating statistics
-
-PR_NUMBER=$(git log --pretty=oneline "${OLD_FULL_VERSION}.." | wc -l)
+# Generate statistics from the same conventional commits that produce the
+# changelog. Calling every commit a pull request caused incorrect totals when
+# release commits, merges, or uncategorized maintenance commits were present.
+statistics=$(mktemp)
+git log "${RELEASE_BASE_VERSION}..HEAD" --pretty="format:%s%x09%aN" \
+    | awk -F '\t' -v types="${CHANGELOG_TYPES}" '
+        BEGIN { pattern="^(" types ")(\\([^)]*\\))?!?:[[:space:]]*" }
+        function automated(name, normalized) {
+            normalized=tolower(name)
+            return normalized ~ /\[bot\]/ || normalized ~ /(^|[^a-z])copilot([^a-z]|$)/ \
+                || normalized ~ /(^|[^a-z])claude([^a-z]|$)/ || normalized ~ /sourcery/ \
+                || normalized ~ /dependabot/ || normalized ~ /github release action/ \
+                || normalized ~ /django cms release/ || normalized == "unknown"
+        }
+        tolower($1) ~ pattern && !automated($2) { print $2 }
+    ' > "${statistics}"
+CHANGE_NUMBER=$(wc -l < "${statistics}" | tr -d ' ')
+if [ "${CHANGE_NUMBER}" -eq 1 ]; then
+    CHANGE_LABEL="entry"
+else
+    CHANGE_LABEL="entries"
+fi
 
 cat >> "${current}" << EOF
 Statistics:
 -----------
 
-This release includes ${PR_NUMBER} pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes ${CHANGE_NUMBER} changelog ${CHANGE_LABEL}, created with the help of the following contributors
+(in alphabetical order):
 
 EOF
 
 while read -r name; do
-    count=$( git log "${OLD_FULL_VERSION}.." --pretty=format:"%aN" | grep -c "${name}" )
+    count=$(grep -Fxc "${name}" "${statistics}")
     if [ "${count}" -gt 1 ]; then
         pl="s"
-     else
-         pl=""
+    else
+        pl=""
     fi
-    echo "* ${name} (${count} pull request${pl})" >> "${current}"
-done < <( git log "${OLD_FULL_VERSION}.." --pretty=format:"%aN" | sort -u)
+    echo "* ${name} (${count} changelog entr${pl:+ies}${pl:-y})" >> "${current}"
+done < <(sort -u "${statistics}")
 
 # shellcheck disable=SC2129
 cat >> "${current}" << EOF
@@ -175,7 +277,22 @@ With the review help of the following contributors:
 
 EOF
 
-git log "${OLD_FULL_VERSION}.." | grep Co-authored-by | sed -e 's/^ *Co-authored-by: /* /;s/ <.*//' | sort -u >> "${current}"
+git log "${RELEASE_BASE_VERSION}..HEAD" | awk '
+    function automated(name, normalized) {
+        normalized=tolower(name)
+        return normalized ~ /\[bot\]/ || normalized ~ /(^|[^a-z])copilot([^a-z]|$)/ \
+            || normalized ~ /(^|[^a-z])claude([^a-z]|$)/ || normalized ~ /sourcery/ \
+            || normalized ~ /dependabot/ || normalized ~ /github release action/ \
+            || normalized ~ /django cms release/ || normalized == "unknown"
+    }
+    tolower($0) ~ /^[[:space:]]*co-authored-by:/ {
+        sub(/^[^:]*:[[:space:]]*/, "* ")
+        sub(/ <.*$/, "")
+        name=$0
+        sub(/^\* /, "", name)
+        if (!automated(name)) print
+    }
+' | sort -fu >> "${current}"
 
 cat >> "${current}" << EOF
 
@@ -184,6 +301,6 @@ Thanks to all contributors for their efforts!
 EOF
 
 cat "${current}" "${legacy}" > CHANGELOG.rst
-rm "${current}" "${legacy}"
+rm "${current}" "${legacy}" "${statistics}"
 
 # now computing sections
