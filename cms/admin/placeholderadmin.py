@@ -43,6 +43,7 @@ from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
     copy_plugins_to_placeholder,
     downcast_plugins,
+    get_plugin_disallowed_in_slot,
     has_reached_plugin_limit,
 )
 from cms.views import (
@@ -491,6 +492,16 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             )
             new_plugins = [new_plugin]
         else:
+            source_language = request.POST['source_language']
+            source_plugins = source_placeholder.get_plugins_list(language=source_language)
+            disallowed = get_plugin_disallowed_in_slot(
+                (plugin.plugin_type for plugin in source_plugins),
+                target_placeholder.slot,
+            )
+            if disallowed:
+                return HttpResponseBadRequest(
+                    f"Plugin {disallowed} is not allowed in placeholder '{target_placeholder.slot}'."
+                )
             new_plugins = self._add_plugins_from_placeholder(
                 request,
                 source_placeholder,
@@ -735,6 +746,15 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         source_placeholder = plugin.placeholder
 
         if placeholder and placeholder != source_placeholder:
+            if not move_to_clipboard:
+                # The whole subtree moves with the plugin, so every descendant must
+                # also be allowed in the target slot, not just the moved plugin itself.
+                moved_types = [plugin.plugin_type, *plugin.get_descendants().values_list("plugin_type", flat=True)]
+                disallowed = get_plugin_disallowed_in_slot(moved_types, placeholder.slot)
+                if disallowed:
+                    return HttpResponseBadRequest(
+                        f"Plugin {disallowed} is not allowed in placeholder '{placeholder.slot}'."
+                    )
             try:
                 template = self.get_placeholder_template(request, placeholder)
                 has_reached_plugin_limit(placeholder, plugin.plugin_type,

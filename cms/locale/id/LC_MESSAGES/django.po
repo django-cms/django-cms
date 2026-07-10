@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fabian Braun <fsbraun@gmx.de>, 2022
-# Prasasto Adi <prasastoadi@gmail.com>, 2025
+# Prasasto Adi <prasastoadi@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-30 19:36+0100\n"
+"POT-Creation-Date: 2026-06-26 20:08+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Prasasto Adi <prasastoadi@gmail.com>, 2025\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Indonesian (https://app.transifex.com/divio/teams/58664/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,155 +20,104 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin/forms.py:85 admin/forms.py:92 admin/forms.py:1060
-#: templates/admin/cms/page/permissions.html:45
 msgid "All"
-msgstr ""
+msgstr "Semua"
 
-#: admin/forms.py:146
 msgid "Copy permissions"
 msgstr "Izin menyalin"
 
-#: admin/forms.py:204
 msgid "Slug"
 msgstr "Slug"
 
-#: admin/forms.py:206
 msgid "The part of the title that is used in the URL"
 msgstr "Bagian dari judul yang digunakan di dalam URL"
 
-#: admin/forms.py:248
 msgid "Page type"
 msgstr "Tipe halaman"
 
-#: admin/forms.py:471
 msgid "Page Types"
-msgstr ""
+msgstr "Tipe Halaman"
 
-#: admin/forms.py:523
 msgid "Overwrite URL"
 msgstr "Mengganti URL"
 
-#: admin/forms.py:526
 msgid "Keep this field empty if standard path should be used."
 msgstr "Biarkan kolom ini kosong jika path standar harus digunakan."
 
-#: admin/forms.py:537
 msgid "Start typing..."
 msgstr "Mulai mengetik..."
 
-#: admin/forms.py:542 migrations/0001_initial.py:96
-#: models/contentmodels.py:120
-msgid "menu visibility"
-msgstr ""
-
-#: admin/forms.py:543 models/contentmodels.py:126
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "batasi kapan halaman ini terlihat di menu"
 
-#: admin/forms.py:551 models/contentmodels.py:133
 msgid "X Frame Options"
-msgstr ""
+msgstr "Opsi X Frame"
 
-#: admin/forms.py:552
 msgid "Whether this page can be embedded in other pages or websites."
-msgstr ""
+msgstr "Apakah halaman ini dapat disematkan di halaman atau situs web lain."
 
-#: admin/forms.py:570
 msgid "URL options"
-msgstr ""
+msgstr "Opsi URL"
 
-#: admin/forms.py:577
 msgid "Menu options"
-msgstr ""
+msgstr "Opsi Menu"
 
-#: admin/forms.py:584
 msgid "Headers"
-msgstr ""
+msgstr "Header"
 
-#: admin/forms.py:712
 msgid "Application"
 msgstr "Aplikasi"
 
-#: admin/forms.py:715
 msgid "Hook application to this page."
 msgstr "Hubungkan aplikasi ke halaman ini."
 
-#: admin/forms.py:720
 msgid "Application configurations"
 msgstr "Konfigurasi aplikasi"
 
-#: admin/forms.py:798
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Halaman dengan id reverse URL ini sudah ada."
 
-#: admin/forms.py:817 admin/forms.py:823
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Nilai konfigurasi aplikasi tidak valid"
 
-#: admin/forms.py:830
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "Instans aplikasi yang menggunakan konfigurasi ini sudah ada."
 
-#: admin/forms.py:838 admin/forms.py:849
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "Instans aplikasi dengan nama ini sudah ada."
 
-#: admin/forms.py:955
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Anda tidak dapat memindahkan halaman beranda ke dalam halaman lain"
 
-#: admin/forms.py:1010 admin/forms.py:1026
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"Anda tidak dapat memiliki dua halaman dengan slug yang sama pada tingkat "
+"halaman yang sama. Harap ubah slug salah satu halaman sebelum mencoba "
+"memindahkan lagi."
 
-#: admin/forms.py:1061 templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:87
 msgid "Yes"
-msgstr ""
+msgstr "Ya"
 
-#: admin/forms.py:1062 templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:89
 msgid "No"
-msgstr ""
+msgstr "Tidak"
 
-#: admin/forms.py:1117 admin/forms.py:1190 migrations/0001_initial.py:72
-#: migrations/0001_initial.py:135 models/permissionmodels.py:71
-#: test_utils/project/customuserapp/models.py:70
 msgid "user"
 msgstr "pengguna"
 
-#: admin/forms.py:1195
 msgid "can_view"
-msgstr ""
+msgstr "dapat melihat"
 
-#: admin/forms.py:1236 admin/forms.py:1242 admin/forms.py:1246
-#: templates/admin/cms/page/change_form.html:11
-#: templates/admin/cms/usersettings/change_form.html:33
-#: templatetags/cms_tags.py:544
 msgid "Add"
 msgstr "Tambah"
 
-#: admin/forms.py:1237 admin/forms.py:1243 admin/forms.py:1247
 msgid "Change"
 msgstr "Ubah"
 
-#: admin/forms.py:1238 admin/forms.py:1244 admin/forms.py:1248
-#: templates/admin/cms/extensions/change_form.html:9
-#: templates/admin/cms/page/plugin/submit_line.html:5
-#: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/actions_dropdown.html:42
-#: templates/admin/cms/page/tree/actions_dropdown.html:47
-#: templates/admin/cms/page/tree/menu.html:203
-#: templates/admin/cms/page/tree/menu.html:205
-#: templates/cms/toolbar/dragitem.html:46
-#: templates/cms/toolbar/dragitem.html:54
 msgid "Delete"
 msgstr "Hapus"
 
-#: admin/forms.py:1267 models/permissionmodels.py:109
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
@@ -176,7 +125,6 @@ msgstr ""
 "Pengguna tidak dapat membuat halaman tanpa izin untuk mengubah halaman yang "
 "dibuat. Diperlukan penyuntingan izin."
 
-#: admin/forms.py:1274 models/permissionmodels.py:114
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
@@ -184,7 +132,6 @@ msgstr ""
 "Pengguna tidak dapat menghapus halaman tanpa izin untuk mengubah halaman. "
 "Diperlukan penyuntingan izin."
 
-#: admin/forms.py:1280
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
@@ -192,7 +139,6 @@ msgstr ""
 "Pengguna tidak dapat mengatur perizinan halaman tanpa izin untuk mengubah "
 "halaman. Diperlukan penyuntingan izin."
 
-#: admin/forms.py:1286
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
@@ -200,7 +146,6 @@ msgstr ""
 "Pengguna tidak dapat menghapus perizinan halaman tanpa izin untuk mengubah "
 "halaman. Diperlukan penyuntingan izin."
 
-#: admin/forms.py:1295
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
@@ -208,7 +153,6 @@ msgstr ""
 "Pengguna tidak dapat membuat perizinan halaman tanpa izin untuk mengubah "
 "izin yang dibuat. Diperlukan penyuntingan izin."
 
-#: admin/forms.py:1302
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
@@ -216,1264 +160,972 @@ msgstr ""
 "Pengguna tidak dapat menghapus perizinan halaman tanpa izin untuk mengubah "
 "perizinan. Diperlukan penyuntingan izin."
 
-#: admin/forms.py:1420
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Tipe plugin '%s' tidak valid"
 
-#: admin/forms.py:1438 admin/pageadmin.py:1217 admin/placeholderadmin.py:467
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "Bahasa harus diatur ke bahasa yang didukung!"
 
-#: admin/forms.py:1444
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "Bahasa plugin induk harus sama dengan bahasa!"
 
-#: admin/forms.py:1449
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Placeholder plugin induk harus sama dengan placeholder!"
 
-#: admin/forms.py:1454
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
+msgstr "Posisi plugin harus lebih besar dari %(position)d"
+
+msgid "Translations"
 msgstr ""
 
-#: admin/pageadmin.py:320
 msgid "Advanced Settings"
 msgstr "Pengaturan Lanjutan"
 
-#: admin/pageadmin.py:320 cms_toolbars.py:664
 msgid "Change Permissions"
 msgstr "Ubah Perizinan"
 
-#: admin/pageadmin.py:355
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "Halaman ini tidak memenuhi syarat untuk menjadi beranda."
 
-#: admin/pageadmin.py:502 admin/pageadmin.py:990
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objek %(name)s dengan primary key %(key)r tidak ada."
+
+msgid "error"
 msgstr ""
 
-#: admin/pageadmin.py:574
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 "Kesalahan! Anda tidak memiliki izin untuk memindahkan halaman ini. Silahkan "
 "memuat kembali halaman ini"
 
-#: admin/pageadmin.py:677
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Kesalahan! Anda tidak memiliki izin untuk menyalin halaman ini."
 
-#: admin/pageadmin.py:685
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
+"Kesalahan! Halaman yang Anda tempel tidak diterjemahkan ke salah satu bahasa"
+" yang dikonfigurasi oleh situs tujuan."
 
-#: admin/pageadmin.py:698
 msgid "You do not have permission to edit this page"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menyunting halaman ini"
 
-#: admin/pageadmin.py:907
+msgid ""
+"(to change it, first unpublish the currently published version of this page)"
+msgstr ""
+"(untuk mengubahnya, terlebih dahulu batalkan penerbitan versi halaman ini "
+"yang saat ini diterbitkan)"
+
+msgid "Add Translation"
+msgstr "Tambah Terjemahan"
+
 msgid "Add Page Copy"
 msgstr "Tambah Salinan Halaman"
 
-#: admin/pageadmin.py:913 cms_wizards.py:50
-#: templates/admin/cms/page/tree/menu.html:159
-#: templates/admin/cms/page/tree/menu.html:166
 msgid "New sub page"
 msgstr "Subhalaman baru"
 
-#: admin/pageadmin.py:919 cms_wizards.py:42
 msgid "New page"
 msgstr "Halaman baru"
 
-#: admin/pageadmin.py:1127
-msgid "Database error"
+msgid ""
+"You do not have permission to access this site. Please contact your "
+"administrator."
 msgstr ""
 
-#: admin/pageadmin.py:1192
+msgid "Database error"
+msgstr "Kesalahan basis data"
+
 msgid "Template not valid"
 msgstr "Template tidak valid"
 
-#: admin/pageadmin.py:1200
+msgid "Placeholder selection not valid"
+msgstr "Pemilihan placeholder tidak valid"
+
 msgid "The template was successfully changed"
 msgstr "Template berhasil diganti"
 
-#: admin/pageadmin.py:1227 admin/placeholderadmin.py:507
-#: admin/placeholderadmin.py:511 admin/placeholderadmin.py:578
-#: admin/placeholderadmin.py:582
+#, python-format
+msgid "Placeholder '%s' does not exist in target language"
+msgstr "Placeholder '%s' tidak ada dalam bahasa target"
+
 msgid "You do not have permission to copy these plugins."
 msgstr "Anda tidak memiliki izin untuk menyalin plugin ini."
 
-#: admin/pageadmin.py:1236
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menghapus halaman ini"
 
-#: admin/pageadmin.py:1264
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "Judul dan plugin dengan bahasa %(language)s telah dihapus"
 
-#: admin/pageadmin.py:1412
 msgid "Public content"
-msgstr ""
+msgstr "Konten publik"
 
-#: admin/pageadmin.py:1413 templatetags/cms_admin.py:112
 msgid "Empty"
-msgstr ""
+msgstr "Kosong"
 
-#: admin/pageadmin.py:1422
 msgid "Create Content"
-msgstr ""
+msgstr "Buat Konten"
 
-#: admin/permissionadmin.py:119
 msgid "View restriction"
-msgstr ""
+msgstr "Pembatasan tampilan"
 
-#: admin/permissionadmin.py:120
 msgid "View restrictions"
-msgstr ""
+msgstr "Pembatasan tampilan"
 
-#: admin/placeholderadmin.py:102
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "Kolom %s tidak ditemukan"
 
-#: admin/placeholderadmin.py:108 templates/cms/toolbar/dragbar.html:5
-#: templates/cms/toolbar/dragitem.html:14
-#: templates/cms/toolbar/dragitem.html:24
 msgid "You do not have permission to edit this item"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menyunting item ini"
 
-#: admin/placeholderadmin.py:388 admin/placeholderadmin.py:392
 msgid "You do not have permission to add a plugin"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menambahkan plugin"
 
-#: admin/placeholderadmin.py:532 admin/placeholderadmin.py:536
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menyalin placeholder ini."
 
-#: admin/placeholderadmin.py:627
 msgid "Plugin not found"
-msgstr ""
+msgstr "Plugin tidak ditemukan"
 
-#: admin/placeholderadmin.py:635 admin/placeholderadmin.py:638
 msgid "You do not have permission to edit this plugin"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menyunting plugin ini"
 
-#: admin/placeholderadmin.py:797 admin/placeholderadmin.py:801
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menempel plugin ini"
 
-#: admin/placeholderadmin.py:857 admin/placeholderadmin.py:861
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menempel placeholder ini"
 
-#: admin/placeholderadmin.py:914 admin/placeholderadmin.py:918
-#: admin/placeholderadmin.py:922 admin/placeholderadmin.py:926
 msgid "You have no permission to move this plugin"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk memindahkan plugin ini"
 
-#: admin/placeholderadmin.py:977 admin/placeholderadmin.py:981
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk memotong plugin ini"
 
-#: admin/placeholderadmin.py:1026 admin/placeholderadmin.py:1030
-#: admin/placeholderadmin.py:1042
 msgid "You do not have permission to delete this plugin"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menghapus plugin ini"
 
-#: admin/placeholderadmin.py:1059
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "Plugin %(name)s \"%(obj)s\" berhasil dihapus."
 
-#: admin/placeholderadmin.py:1079 admin/placeholderadmin.py:1170
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Tidak dapat menghapus %(name)s"
 
-#: admin/placeholderadmin.py:1081 admin/placeholderadmin.py:1172
 msgid "Are you sure?"
 msgstr "Anda yakin?"
 
-#: admin/placeholderadmin.py:1117 admin/placeholderadmin.py:1121
-#: admin/placeholderadmin.py:1138
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk mengosongkan placeholder ini"
 
-#: admin/placeholderadmin.py:1151
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "Placeholder \"%(obj)s\" berhasil dikosongkan."
 
-#: admin/placeholderadmin.py:1176
 msgid "placeholder"
-msgstr ""
+msgstr "placeholder"
 
-#: admin/useradmin.py:126 models/permissionmodels.py:260
 msgid "Page permissions"
-msgstr ""
+msgstr "Izin halaman"
 
-#: admin/useradmin.py:127
 msgid "User & Group permissions"
-msgstr ""
+msgstr "Izin Pengguna & Grup"
 
-#: admin/useradmin.py:128
 msgid "Page permissions management"
-msgstr ""
+msgstr "Pengelolaan izin halaman"
 
-#: admin/utils.py:90
 msgid "Actions"
-msgstr ""
+msgstr "Tindakan"
 
-#: admin/utils.py:262
 msgid "Empty content"
+msgstr "Konten kosong"
+
+msgid "You do not have permission to change this content."
 msgstr ""
 
-#: admin/utils.py:503
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "Properti %(object_name)s"
 
-#: admin/utils.py:507
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "Tambah %(object_name)s baru"
 
-#: admin/utils.py:512 admin/utils.py:583
 msgid "Add content"
-msgstr ""
+msgstr "Tambah konten"
 
-#: admin/utils.py:516
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"Konten untuk bahasa saat ini telah diubah. Klik \"Batal\" untuk kembali ke "
+"formulir dan menyimpan perubahan. Klik \"OK\" untuk membuang perubahan."
 
-#: admin/utils.py:536
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "Tambah konten %(language)s"
 
-#: admin/utils.py:570 cms_toolbars.py:199
-#: templates/cms/toolbar/items/live_draft.html:6 tests/test_views.py:324
 msgid "Preview"
-msgstr ""
+msgstr "Pratinjau"
 
-#: admin/utils.py:583
 msgid "Settings"
-msgstr ""
+msgstr "Pengaturan"
 
-#: admin/utils.py:809
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
+"Bahasa %(value)s tidak valid. Formulir ini tidak dapat diproses. Coba ganti "
+"bahasa."
 
-#: admin/utils.py:810
 msgid "<unspecified>"
-msgstr ""
+msgstr "<tidak ditentukan>"
 
-#: apphook_pool.py:98
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "Tidak ditemukan apphook terdaftar \"%r\""
 
-#: apps.py:7 templates/cms/noapphook.html:6
-#: templates/cms/toolbar/items/logo.html:2 templates/cms/welcome.html:6
-#: templates/cms/welcome.html:23 templates/cms/welcome.html:86
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
-#: cms_plugins.py:9
 msgid "Placeholder"
-msgstr ""
+msgstr "Placeholder"
 
-#: cms_toolbars.py:76
 msgid "Getting started developer guide"
-msgstr ""
+msgstr "Panduan memulai untuk pengembang"
 
-#: cms_toolbars.py:77 templates/cms/welcome.html:88 utils/conf.py:102
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentasi"
 
-#: cms_toolbars.py:78 templates/cms/welcome.html:89
 msgid "User guide"
-msgstr ""
+msgstr "Panduan pengguna"
 
-#: cms_toolbars.py:79
 msgid "Discord community"
-msgstr ""
+msgstr "Komunitas Discord"
 
-#: cms_toolbars.py:80
 msgid "What's new"
-msgstr ""
+msgstr "Apa yang baru"
 
-#: cms_toolbars.py:100 templates/cms/wizards/create.html:5
-#: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
-msgstr ""
+msgstr "Buat"
 
-#: cms_toolbars.py:187 templates/cms/toolbar/dragbar.html:17
-#: templates/cms/toolbar/dragitem.html:18
-#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:534
-#: templatetags/cms_tags.py:537 tests/test_views.py:338
 msgid "Edit"
-msgstr ""
+msgstr "Sunting"
 
-#: cms_toolbars.py:217 templates/admin/cms/page/delete_confirmation.html:49
 msgid "Structure"
-msgstr ""
+msgstr "Struktur"
 
-#: cms_toolbars.py:224 forms/wizards.py:31
 msgid "Content"
-msgstr ""
+msgstr "Konten"
 
-#: cms_toolbars.py:262
 msgid "Help"
-msgstr ""
+msgstr "Bantuan"
 
-#: cms_toolbars.py:306 templates/admin/cms/page/tree/base.html:107
 msgid "Sites"
-msgstr ""
+msgstr "Situs"
 
-#: cms_toolbars.py:307
 msgid "Admin Sites"
-msgstr ""
+msgstr "Situs Admin"
 
-#: cms_toolbars.py:314
 msgid "Administration"
-msgstr ""
+msgstr "Administrasi"
 
-#: cms_toolbars.py:318
 msgid "User settings"
-msgstr ""
+msgstr "Pengaturan pengguna"
 
-#: cms_toolbars.py:327
 msgid "Clipboard..."
-msgstr ""
+msgstr "Papan klip..."
 
-#: cms_toolbars.py:332
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Bersihkan papan klip"
 
-#: cms_toolbars.py:340
 msgid "Disable toolbar"
-msgstr ""
+msgstr "Nonaktifkan bilah alat"
 
-#: cms_toolbars.py:344
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Pintasan..."
 
-#: cms_toolbars.py:360
 msgid "Users"
-msgstr ""
+msgstr "Pengguna"
 
-#: cms_toolbars.py:378 tests/test_toolbar.py:1009 tests/test_toolbar.py:1026
-#: tests/test_toolbar.py:1060
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "Keluar %s"
 
-#: cms_toolbars.py:378
 msgid "Logout"
-msgstr ""
+msgstr "Keluar"
 
-#: cms_toolbars.py:394 models/settingmodels.py:20
-#: templates/admin/cms/grouper/change_list.html:4
 msgid "Language"
 msgstr "Bahasa"
 
-#: cms_toolbars.py:520
-msgid "Add Translation"
-msgstr ""
-
-#: cms_toolbars.py:533
 msgid "Delete Translation"
-msgstr ""
+msgstr "Hapus Terjemahan"
 
-#: cms_toolbars.py:545 tests/test_toolbar.py:961 tests/test_toolbar.py:968
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Salin semua plugin"
 
-#: cms_toolbars.py:547
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "dari %s"
 
-#: cms_toolbars.py:548
 #, python-format
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Apakah Anda yakin ingin menyalin semua plugin dari %s?"
 
-#: cms_toolbars.py:576
 msgid "Pages"
-msgstr ""
+msgstr "Halaman"
 
-#: cms_toolbars.py:596 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:92 tests/test_wizards.py:115
-#: tests/test_wizards.py:172
 msgid "Page"
-msgstr ""
+msgstr "Halaman"
 
-#: cms_toolbars.py:628
 msgid "Create Page"
-msgstr ""
+msgstr "Buat Halaman"
 
-#: cms_toolbars.py:632 templates/admin/cms/page/tree/base.html:140
 msgid "New Page"
-msgstr ""
+msgstr "Halaman Baru"
 
-#: cms_toolbars.py:633
 msgid "New Sub Page"
-msgstr ""
+msgstr "Subhalaman Baru"
 
-#: cms_toolbars.py:645
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "Duplikasikan Halaman Ini"
 
-#: cms_toolbars.py:656
 msgid "Page settings"
-msgstr ""
+msgstr "Pengaturan halaman"
 
-#: cms_toolbars.py:664 templates/admin/cms/page/tree/actions_dropdown.html:67
-#: templates/admin/cms/page/tree/actions_dropdown.html:72
-#: templates/admin/cms/page/tree/menu.html:209
-#: templates/admin/cms/page/tree/menu.html:211
 msgid "Advanced settings"
-msgstr ""
+msgstr "Pengaturan lanjutan"
 
-#: cms_toolbars.py:674
 msgid "Templates"
+msgstr "Template"
+
+msgid "Placeholders"
 msgstr ""
 
-#: cms_toolbars.py:694
 msgid "Hide in navigation"
-msgstr ""
+msgstr "Sembunyikan di navigasi"
 
-#: cms_toolbars.py:694
 msgid "Display in navigation"
-msgstr ""
+msgstr "Tampilkan di navigasi"
 
-#: cms_toolbars.py:707
 msgid "Delete page"
-msgstr ""
+msgstr "Hapus halaman"
 
-#: cms_wizards.py:46
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "Buat halaman baru di samping halaman saat ini."
 
-#: cms_wizards.py:54
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "Buat halaman di bawah halaman saat ini."
 
-#: forms/fields.py:24
 msgid "Select a valid site"
-msgstr ""
+msgstr "Pilih situs yang valid"
 
-#: forms/fields.py:25
 msgid "Select a valid page"
-msgstr ""
+msgstr "Pilih halaman yang valid"
 
-#: forms/validators.py:77
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
+"Halaman %(conflict_page)s memiliki url '%(url)s' yang sama dengan halaman "
+"saat ini \"%(instance)s\"."
 
-#: forms/validators.py:79
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
+"Halaman %(conflict_page)s memiliki url '%(url)s' yang sama dengan halaman "
+"saat ini."
 
-#: forms/wizards.py:32
+msgid "Add another"
+msgstr ""
+
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
+"Opsional. Jika diisi, akan ditambahkan secara otomatis ke dalam plugin teks "
+"baru."
 
-#: forms/wizards.py:45
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "Berikan judul untuk halaman baru."
 
-#: forms/wizards.py:47
 msgid "Leave empty for automatic slug, or override as required."
-msgstr ""
+msgstr "Biarkan kosong untuk slug otomatis, atau ganti sesuai kebutuhan."
 
-#: forms/wizards.py:83
 msgid "Cannot automatically create slug. Please provide one manually."
 msgstr ""
+"Tidak dapat membuat slug secara otomatis. Harap masukkan secara manual."
 
-#: forms/wizards.py:99
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "Harap masukkan slug yang valid."
 
-#: forms/wizards.py:123
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Anda tidak memiliki izin yang diperlukan untuk menambahkan halaman."
 
-#: migrations/0001_initial.py:26 migrations/0001_initial.py:60
-#: migrations/0001_initial.py:83 migrations/0001_initial.py:123
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
-#: migrations/0001_initial.py:27 models/pluginmodel.py:172
 msgid "position"
-msgstr ""
+msgstr "posisi"
 
-#: migrations/0001_initial.py:28 models/contentmodels.py:40
-#: models/pagemodel.py:1098 models/pluginmodel.py:174
 msgid "language"
 msgstr "bahasa"
 
-#: migrations/0001_initial.py:29 models/pluginmodel.py:176
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
-#: migrations/0001_initial.py:30 models/contentmodels.py:82
-#: models/pluginmodel.py:178
 msgid "creation date"
 msgstr "tanggal pembuatan"
 
-#: migrations/0001_initial.py:61 migrations/0001_initial.py:124
-#: models/permissionmodels.py:84
 msgid "can edit"
-msgstr ""
+msgstr "dapat menyunting"
 
-#: migrations/0001_initial.py:62 migrations/0001_initial.py:125
-#: models/permissionmodels.py:85
 msgid "can add"
-msgstr ""
+msgstr "dapat menambah"
 
-#: migrations/0001_initial.py:63 migrations/0001_initial.py:126
-#: models/permissionmodels.py:86
 msgid "can delete"
-msgstr ""
+msgstr "dapat menghapus"
 
-#: migrations/0001_initial.py:64 migrations/0001_initial.py:127
-#: models/permissionmodels.py:88
 msgid "can change advanced settings"
-msgstr ""
+msgstr "dapat mengubah pengaturan lanjutan"
 
-#: migrations/0001_initial.py:65 migrations/0001_initial.py:128
-#: models/permissionmodels.py:87
 msgid "can publish"
-msgstr ""
+msgstr "dapat menerbitkan"
 
-#: migrations/0001_initial.py:66 migrations/0001_initial.py:129
-#: models/permissionmodels.py:90
 msgid "can change permissions"
-msgstr ""
+msgstr "dapat mengubah izin"
 
-#: migrations/0001_initial.py:67 migrations/0001_initial.py:130
-#: models/permissionmodels.py:92
 msgid "can move"
-msgstr ""
+msgstr "dapat memindahkan"
 
-#: migrations/0001_initial.py:68 migrations/0001_initial.py:131
-#: models/permissionmodels.py:93
 msgid "view restricted"
-msgstr ""
+msgstr "tampilan dibatasi"
 
-#: migrations/0001_initial.py:69 models/permissionmodels.py:196
 msgid "can recover pages"
-msgstr ""
+msgstr "dapat memulihkan halaman"
 
-#: migrations/0001_initial.py:70 migrations/0001_initial.py:133
-#: models/permissionmodels.py:78
 msgid "group"
-msgstr ""
+msgstr "grup"
 
-#: migrations/0001_initial.py:71 models/permissionmodels.py:204
 msgid "sites"
-msgstr ""
+msgstr "situs"
 
-#: migrations/0001_initial.py:84 models/contentmodels.py:90
-#: models/pagemodel.py:65
 msgid "created by"
-msgstr ""
+msgstr "dibuat oleh"
 
-#: migrations/0001_initial.py:85 models/contentmodels.py:95
-#: models/pagemodel.py:70
 msgid "changed by"
-msgstr ""
+msgstr "diubah oleh"
 
-#: migrations/0001_initial.py:88
-#: templates/admin/cms/page/tree/actions_dropdown.html:79
 msgid "publication date"
-msgstr ""
+msgstr "tanggal penerbitan"
 
-#: migrations/0001_initial.py:89
-#: templates/admin/cms/page/tree/actions_dropdown.html:82
 msgid "publication end date"
-msgstr ""
+msgstr "tanggal berakhir penerbitan"
 
-#: migrations/0001_initial.py:90 models/contentmodels.py:102
 msgid "in navigation"
-msgstr ""
+msgstr "di navigasi"
 
-#: migrations/0001_initial.py:91 models/contentmodels.py:107
 msgid "soft root"
-msgstr ""
+msgstr "akar lunak"
 
-#: migrations/0001_initial.py:92 models/pagemodel.py:82
 msgid "id"
-msgstr ""
+msgstr "id"
 
-#: migrations/0001_initial.py:93 models/pagemodel.py:90
 msgid "attached menu"
-msgstr ""
+msgstr "menu terlampir"
 
-#: migrations/0001_initial.py:94 models/contentmodels.py:113
-#: templates/admin/cms/page/tree/actions_dropdown.html:99
 msgid "template"
-msgstr ""
+msgstr "template"
 
-#: migrations/0001_initial.py:95 models/pagemodel.py:97
 msgid "login required"
-msgstr ""
+msgstr "perlu masuk"
 
-#: migrations/0001_initial.py:98 models/pagemodel.py:106
+msgid "menu visibility"
+msgstr "visibilitas menu"
+
 msgid "application"
-msgstr ""
+msgstr "aplikasi"
 
-#: migrations/0001_initial.py:99 models/pagemodel.py:113
 msgid "application instance name"
-msgstr ""
+msgstr "nama instans aplikasi"
 
-#: migrations/0001_initial.py:110 models/pagemodel.py:60
-#: templates/admin/cms/page/tree/actions_dropdown.html:105
 msgid "site"
-msgstr ""
+msgstr "situs"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:253
-#: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
-msgstr ""
+msgstr "Berikan pada"
 
-#: migrations/0001_initial.py:134 models/contentmodels.py:78
-#: models/pagemodel.py:133 models/pagemodel.py:1102
-#: models/permissionmodels.py:254 templates/admin/cms/page/tree/base.html:298
-#: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
 msgstr "halaman"
 
-#: models/contentmodels.py:14
 msgid "no limit set"
-msgstr ""
+msgstr "tidak ada batas yang diatur"
 
-#: models/contentmodels.py:15
 msgid "for logged in users only"
-msgstr ""
+msgstr "hanya untuk pengguna yang masuk"
 
-#: models/contentmodels.py:16
 msgid "for anonymous users only"
-msgstr ""
+msgstr "hanya untuk pengguna anonim"
 
-#: models/contentmodels.py:22
 msgid "Inherit from parent page"
-msgstr ""
+msgstr "Warisi dari halaman induk"
 
-#: models/contentmodels.py:23
 msgid "Deny"
-msgstr ""
+msgstr "Tolak"
 
-#: models/contentmodels.py:24
 msgid "Only this website"
-msgstr ""
+msgstr "Hanya situs web ini"
 
-#: models/contentmodels.py:25
 msgid "Allow"
-msgstr ""
+msgstr "Izinkan"
 
-#: models/contentmodels.py:42
 msgid "title"
 msgstr "judul"
 
-#: models/contentmodels.py:44
 msgid "The default title"
 msgstr "Judul default"
 
-#: models/contentmodels.py:47
 msgid "Page Title"
 msgstr "Judul Halaman"
 
-#: models/contentmodels.py:52
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
 "Mengganti apa yang terpampang di atas browser anda atau di dalam bookmarks"
 
-#: models/contentmodels.py:56
 msgid "Menu Title"
 msgstr "Judul Menu"
 
-#: models/contentmodels.py:60
 msgid "Overwrite what is displayed in the menu"
 msgstr "Mengganti apa yang tertulis di menu"
 
-#: models/contentmodels.py:63
 msgid "Description meta tag"
 msgstr "Deskripsi meta tag"
 
-#: models/contentmodels.py:66
 msgid "A description of the page used by search engines."
 msgstr "Deskripsi dari halaman yang digunakan oleh mesin pencari."
 
-#: models/contentmodels.py:69
 msgid "redirect"
-msgstr ""
+msgstr "pengalihan"
 
-#: models/contentmodels.py:73
 msgid "Redirects to this URL."
 msgstr "Mengalihkan ke URL ini."
 
-#: models/contentmodels.py:110
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "Semua leluhur tidak akan ditampilkan di navigasi"
 
-#: models/contentmodels.py:116
 msgid "The template used to render the content."
-msgstr ""
+msgstr "Template yang digunakan untuk merender konten."
 
-#: models/contentmodels.py:146
 msgid "page content"
-msgstr ""
+msgstr "konten halaman"
 
-#: models/contentmodels.py:147
 msgid "page contents"
-msgstr ""
+msgstr "konten halaman"
 
-#: models/contentmodels.py:289 models/pagemodel.py:985
 msgid "default"
-msgstr ""
+msgstr "bawaan"
 
-#: models/pagemodel.py:87
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
+"Pengenal unik yang digunakan dengan templatetag page_url untuk menautkan ke "
+"halaman ini"
 
-#: models/pagemodel.py:120
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "Tandai halaman ini sebagai tipe halaman"
 
-#: models/pagemodel.py:134
 msgid "pages"
-msgstr ""
+msgstr "halaman"
 
-#: models/pagemodel.py:153
 msgid "No available title"
-msgstr ""
+msgstr "Tidak ada judul yang tersedia"
 
-#: models/pagemodel.py:1096
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
-#: models/pagemodel.py:1097
 msgid "Path"
-msgstr ""
+msgstr "Jalur"
 
-#: models/permissionmodels.py:55
 msgid "Current page"
-msgstr ""
+msgstr "Halaman saat ini"
 
-#: models/permissionmodels.py:56
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "Anak halaman (langsung)"
 
-#: models/permissionmodels.py:57
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "Halaman dan anak (langsung)"
 
-#: models/permissionmodels.py:58
 msgid "Page descendants"
-msgstr ""
+msgstr "Keturunan halaman"
 
-#: models/permissionmodels.py:59
 msgid "Page and descendants"
-msgstr ""
+msgstr "Halaman dan keturunan"
 
-#: models/permissionmodels.py:90
 msgid "on page level"
-msgstr ""
+msgstr "pada tingkat halaman"
 
-#: models/permissionmodels.py:93
 msgid "frontend view restriction"
-msgstr ""
+msgstr "pembatasan tampilan frontend"
 
-#: models/permissionmodels.py:103
 msgid "Please select user or group."
-msgstr ""
+msgstr "Harap pilih pengguna atau grup."
 
-#: models/permissionmodels.py:119
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"Pengguna tidak dapat menerbitkan halaman tanpa izin untuk mengubah halaman. "
+"Izin penyuntingan diperlukan."
 
-#: models/permissionmodels.py:124
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
 msgstr ""
+"Pengguna tidak dapat mengubah pengaturan lanjutan halaman tanpa izin untuk "
+"mengubah halaman. Izin penyuntingan diperlukan."
 
-#: models/permissionmodels.py:129
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
 msgstr ""
+"Pengguna tidak dapat mengubah izin halaman tanpa izin untuk mengubah "
+"halaman. Izin penyuntingan diperlukan."
 
-#: models/permissionmodels.py:134
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"Pengguna tidak dapat memindahkan halaman tanpa izin untuk mengubah halaman. "
+"Izin penyuntingan diperlukan."
 
-#: models/permissionmodels.py:198
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "dapat memulihkan halaman yang dihapus"
 
-#: models/permissionmodels.py:203
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "Jika tidak ada yang dipilih, pengguna diberi izin untuk semua situs."
 
-#: models/permissionmodels.py:210
 msgid "Page global permission"
-msgstr ""
+msgstr "Izin global halaman"
 
-#: models/permissionmodels.py:211
 msgid "Pages global permissions"
-msgstr ""
+msgstr "Izin global halaman"
 
-#: models/permissionmodels.py:259
 msgid "Page permission"
-msgstr ""
+msgstr "Izin halaman"
 
-#: models/permissionmodels.py:274
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
+"Penambahan izin halaman juga memerlukan akses ke anak, atau keturunan, jika "
+"tidak halaman yang ditambahkan tidak dapat diubah oleh pembuatnya."
 
-#: models/permissionmodels.py:320
 msgid "User (page)"
-msgstr ""
+msgstr "Pengguna (halaman)"
 
-#: models/permissionmodels.py:321
 msgid "Users (page)"
-msgstr ""
+msgstr "Pengguna (halaman)"
 
-#: models/permissionmodels.py:336
 msgid "User group (page)"
-msgstr ""
+msgstr "Grup pengguna (halaman)"
 
-#: models/permissionmodels.py:337
 msgid "User groups (page)"
-msgstr ""
+msgstr "Grup pengguna (halaman)"
 
-#: models/placeholdermodel.py:30
 msgid "slot"
-msgstr ""
+msgstr "slot"
 
-#: models/placeholdermodel.py:32
 msgid "width"
 msgstr "lebar"
 
-#: models/pluginmodel.py:212
+msgid "Edit object"
+msgstr ""
+
+msgid "This is an external placeholder"
+msgstr ""
+
+msgid "plugin"
+msgstr ""
+
+msgid "plugins"
+msgstr ""
+
 msgid "<Empty>"
-msgstr ""
+msgstr "<Kosong>"
 
-#: models/settingmodels.py:21
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "Bahasa untuk antarmuka admin dan bilah alat"
 
-#: models/settingmodels.py:31
 msgid "user setting"
-msgstr ""
+msgstr "pengaturan pengguna"
 
-#: models/settingmodels.py:32
 msgid "user settings"
-msgstr ""
+msgstr "pengaturan pengguna"
 
-#: plugin_base.py:70
 msgid "Advanced options"
-msgstr ""
+msgstr "Opsi lanjutan"
 
-#: plugin_base.py:125
 msgid "Generic"
-msgstr ""
+msgstr "Generik"
 
-#: plugin_base.py:612
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" berhasil diubah."
 
-#: plugin_base.py:700
 msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
+"Tidak ada pengaturan lebih lanjut untuk plugin ini. Silakan tekan simpan."
 
-#: signals/log_entries.py:12 tests/test_log_entries.py:141
 msgid "Moved"
-msgstr ""
+msgstr "Dipindahkan"
 
-#: signals/log_entries.py:16
 msgid "Changed"
-msgstr ""
+msgstr "Diubah"
 
-#: signals/log_entries.py:20 tests/test_log_entries.py:171
 msgid "Deleted"
-msgstr ""
+msgstr "Dihapus"
 
-#: signals/log_entries.py:24
 msgid "Added Page Translation"
-msgstr ""
+msgstr "Terjemahan Halaman Ditambahkan"
 
-#: signals/log_entries.py:28 tests/test_log_entries.py:201
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "Terjemahan Halaman Diubah"
 
-#: signals/log_entries.py:32 tests/test_log_entries.py:234
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "Terjemahan Halaman Dihapus"
 
-#: signals/log_entries.py:39 tests/test_log_entries.py:301
 msgid "Added Plugin"
-msgstr ""
+msgstr "Plugin Ditambahkan"
 
-#: signals/log_entries.py:44 tests/test_log_entries.py:362
 msgid "Changed Plugin"
-msgstr ""
+msgstr "Plugin Diubah"
 
-#: signals/log_entries.py:49 tests/test_log_entries.py:334
 msgid "Moved Plugin"
-msgstr ""
+msgstr "Plugin Dipindahkan"
 
-#: signals/log_entries.py:54 tests/test_log_entries.py:390
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "Plugin Dihapus"
 
-#: signals/log_entries.py:59 tests/test_log_entries.py:427
 msgid "Cut Plugin"
-msgstr ""
+msgstr "Plugin Dipotong"
 
-#: signals/log_entries.py:64 tests/test_log_entries.py:466
 msgid "Paste Plugin"
-msgstr ""
+msgstr "Tempel Plugin"
 
-#: signals/log_entries.py:69 tests/test_log_entries.py:546
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "Tempel ke Placeholder"
 
-#: signals/log_entries.py:74 tests/test_log_entries.py:499
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "Plugin ditambahkan ke placeholder dari papan klip"
 
-#: signals/log_entries.py:79 tests/test_log_entries.py:573
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "Placeholder Dikosongkan"
 
-#: templates/admin/cms/extensions/change_form.html:5
-#: templates/admin/cms/page/change_form.html:84
-#: templates/admin/cms/page/plugin/submit_line.html:3
-#: templates/admin/cms/page/submit_row.html:4
-#: templates/admin/cms/page/tree/copy_premissions.html:10
-#: templates/admin/cms/usersettings/change_form.html:41
 msgid "Save"
-msgstr ""
+msgstr "Simpan"
 
-#: templates/admin/cms/grouper/change_form.html:17
 msgid "Some fields cannot be changed since they are read-only content."
-msgstr ""
+msgstr "Beberapa kolom tidak dapat diubah karena merupakan konten hanya-baca."
 
-#: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Masuk ke administrasi <a href=\"%(login_url)s\">di sini</a>."
 
-#: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "URL masuk: %(login_url)s"
 
-#: templates/admin/cms/mail/page_user_change.html:7
-#: templates/admin/cms/mail/page_user_change.txt:5
 msgid "Username:"
-msgstr ""
+msgstr "Nama pengguna:"
 
-#: templates/admin/cms/mail/page_user_change.html:11
-#: templates/admin/cms/mail/page_user_change.txt:6
 msgid "Password:"
-msgstr ""
+msgstr "Kata sandi:"
 
-#: templates/admin/cms/page/change_form.html:4
 msgid "Add a page"
-msgstr ""
+msgstr "Tambah halaman"
 
-#: templates/admin/cms/page/change_form.html:4
 msgid "Change a page"
-msgstr ""
+msgstr "Ubah halaman"
 
-#: templates/admin/cms/page/change_form.html:8
-#: templates/admin/cms/page/tree/base.html:23
-#: templates/admin/cms/page/tree/legend.html:34
-#: templates/admin/cms/page/tree/menu.html:41
-#: templates/admin/cms/usersettings/change_form.html:30
 msgid "Home"
-msgstr ""
+msgstr "Beranda"
 
-#: templates/admin/cms/page/change_form.html:28
-#: templates/admin/cms/page/tree/menu.html:80
-#: templates/admin/cms/page/tree/menu.html:83
 msgid "View on site"
-msgstr ""
+msgstr "Lihat di situs"
 
-#: templates/admin/cms/page/change_form.html:56
-#: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
+msgstr[0] "Harap perbaiki kesalahan di bawah ini."
 
-#: templates/admin/cms/page/change_form.html:73
 msgid "All permissions"
-msgstr ""
+msgstr "Semua izin"
 
-#: templates/admin/cms/page/change_form.html:74
-#: templates/admin/cms/page/tree/base.html:206
-#: templates/admin/cms/page/tree/base.html:270
 msgid "Loading..."
-msgstr ""
+msgstr "Memuat..."
 
-#: templates/admin/cms/page/change_form.html:85
-#: templates/admin/cms/page/plugin/submit_line.html:9
-#: templates/admin/cms/page/submit_row.html:12
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Simpan dan lanjutkan penyuntingan"
 
-#: templates/admin/cms/page/delete_confirmation.html:39
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Apakah Anda yakin ingin menghapus %(object_name)s \"%(escaped_object)s\"? "
+"Semua item terkait berikut akan dihapus:"
 
-#: templates/admin/cms/page/delete_confirmation.html:57
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Ya, saya yakin"
 
-#: templates/admin/cms/page/delete_confirmation.html:58
 msgid "No, take me back"
-msgstr ""
+msgstr "Tidak, kembalikan saya"
 
-#: templates/admin/cms/page/delete_summary.html:2
 msgid "Summary"
-msgstr ""
+msgstr "Ringkasan"
 
-#: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "Pengguna"
 
-#: templates/admin/cms/page/permissions.html:7
 msgid "Group"
-msgstr ""
+msgstr "Grup"
 
-#: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr ""
+msgstr "Dapat menyunting"
 
-#: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr ""
+msgstr "Dapat menambah"
 
-#: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr ""
+msgstr "Dapat menghapus"
 
-#: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr ""
+msgstr "Dapat menerbitkan"
 
-#: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "Dapat mengubah izin"
 
-#: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "Dapat memindahkan"
 
-#: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
-msgstr ""
+msgstr "Dapat melihat"
 
-#: templates/admin/cms/page/permissions.html:23
-#: templates/admin/cms/page/permissions.html:24
 msgid "(global)"
-msgstr ""
+msgstr "(global)"
 
-#: templates/admin/cms/page/permissions.html:28
 msgid "(current)"
-msgstr ""
+msgstr "(saat ini)"
 
-#: templates/admin/cms/page/permissions.html:54
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "Halaman tidak mewarisi izin apa pun."
 
-#: templates/admin/cms/page/plugin/error_form.html:4
 msgid "Edit model"
-msgstr ""
+msgstr "Sunting model"
 
-#: templates/admin/cms/page/plugin/submit_line.html:7
-#: templates/admin/cms/page/submit_row.html:10
 msgid "Save as new"
-msgstr ""
+msgstr "Simpan sebagai baru"
 
-#: templates/admin/cms/page/plugin/submit_line.html:8
-#: templates/admin/cms/page/submit_row.html:11
 msgid "Save and add another"
-msgstr ""
+msgstr "Simpan dan tambah lainnya"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:13
-#: templates/admin/cms/page/tree/actions_dropdown.html:15
-#: templates/admin/cms/page/tree/menu.html:185
-#: templates/admin/cms/page/tree/menu.html:187
-#: templates/cms/toolbar/dragitem.html:41
 msgid "Copy"
-msgstr ""
+msgstr "Salin"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:26
-#: templates/admin/cms/page/tree/actions_dropdown.html:28
-#: templates/admin/cms/page/tree/menu.html:191
-#: templates/admin/cms/page/tree/menu.html:193
-#: templates/cms/toolbar/dragitem.html:40
 msgid "Cut"
-msgstr ""
+msgstr "Potong"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:37
-#: templates/admin/cms/page/tree/base.html:170
-#: templates/admin/cms/page/tree/menu.html:199
-#: templates/cms/toolbar/dragbar.html:25 templates/cms/toolbar/dragbar.html:28
-#: templates/cms/toolbar/dragitem.html:44
-#: templates/cms/toolbar/dragitem.html:49
 msgid "Paste"
-msgstr ""
+msgstr "Tempel"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:52
-#: templates/admin/cms/page/tree/actions_dropdown.html:54
-#: templates/admin/cms/page/tree/actions_dropdown.html:61
 msgid "Set as home"
-msgstr ""
+msgstr "Atur sebagai beranda"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:84
-#: templates/admin/cms/page/tree/actions_dropdown.html:85
 msgid "is restricted"
-msgstr ""
+msgstr "dibatasi"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:93
 msgid "last change by"
-msgstr ""
+msgstr "perubahan terakhir oleh"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:96
 msgid "last change on"
-msgstr ""
+msgstr "perubahan terakhir pada"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:102
 msgid "meta"
-msgstr ""
+msgstr "meta"
 
-#: templates/admin/cms/page/tree/base.html:5
 msgid "List of pages"
-msgstr ""
+msgstr "Daftar halaman"
 
-#: templates/admin/cms/page/tree/base.html:28
-#: templates/admin/cms/page/tree/base.html:58
-#: templates/admin/cms/page/tree/base.html:60
-#: templates/admin/cms/page/tree/base.html:89
 msgid "Search"
-msgstr ""
+msgstr "Cari"
 
-#: templates/admin/cms/page/tree/base.html:46
 msgid "Page Tree"
-msgstr ""
+msgstr "Pohon Halaman"
 
-#: templates/admin/cms/page/tree/base.html:52
 msgid "Reset filter"
-msgstr ""
+msgstr "Atur ulang filter"
 
-#: templates/admin/cms/page/tree/base.html:118
 #, python-format
 msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
 msgstr ""
+"\n"
+"                                                Pulihkan %(name)s yang dihapus\n"
+"                                            "
 
-#: templates/admin/cms/page/tree/base.html:150
 msgid "Main Navigation"
-msgstr ""
+msgstr "Navigasi Utama"
 
-#: templates/admin/cms/page/tree/base.html:162
-#: templates/admin/cms/page/tree/menu.html:176
 msgid "Options"
-msgstr ""
+msgstr "Opsi"
 
-#: templates/admin/cms/page/tree/base.html:200
-#: templates/admin/cms/page/tree/base.html:264
 msgid "Successfully moved"
-msgstr ""
+msgstr "Berhasil dipindahkan"
 
-#: templates/admin/cms/page/tree/base.html:201
-#: templates/admin/cms/page/tree/base.html:265
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "Perubahan dalam pohon mungkin memerlukan penyegaran."
 
-#: templates/admin/cms/page/tree/base.html:202
-#: templates/admin/cms/page/tree/base.html:266
 msgid "Error:"
-msgstr ""
+msgstr "Kesalahan:"
 
-#: templates/admin/cms/page/tree/base.html:203
-#: templates/admin/cms/page/tree/base.html:267
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
 msgstr ""
+"Halaman ini tidak dapat disalin karena ada aplikasi yang terlampir. Lihat "
+"Pengaturan lanjutan halaman untuk mengelola apphook."
 
-#: templates/admin/cms/page/tree/base.html:204
-#: templates/admin/cms/page/tree/base.html:268
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "Apakah Anda yakin ingin § halaman ini?"
 
-#: templates/admin/cms/page/tree/base.html:205
-#: templates/admin/cms/page/tree/base.html:269
 msgid "Reload"
-msgstr ""
+msgstr "Muat ulang"
 
-#: templates/admin/cms/page/tree/base.html:207
-#: templates/admin/cms/page/tree/base.html:271
 msgid "New node"
-msgstr ""
+msgstr "Node baru"
 
-#: templates/admin/cms/page/tree/base.html:208
-#: templates/admin/cms/page/tree/base.html:272
 msgid "nodes"
-msgstr ""
+msgstr "node"
 
-#: templates/admin/cms/page/tree/base.html:219
-#: templates/admin/cms/page/tree/base.html:283
 msgid "View"
-msgstr ""
+msgstr "Lihat"
 
-#: templates/admin/cms/page/tree/base.html:225
-#: templates/admin/cms/page/tree/base.html:289
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
-#: templates/admin/cms/page/tree/base.html:298
 #, python-format
 msgid ""
 "\n"
@@ -1482,336 +1134,271 @@ msgid ""
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
+"\n"
+"                            <em>Belum ada %(object)s.</em>\n"
+"                            <br>\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Tambah %(object)s</a> sekarang.\n"
+"                        "
 
-#: templates/admin/cms/page/tree/copy_premissions.html:4
 msgid "Copy options"
-msgstr ""
+msgstr "Opsi penyalinan"
 
-#: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Choose copy options"
-msgstr ""
+msgstr "Pilih opsi penyalinan"
 
-#: templates/admin/cms/page/tree/copy_premissions.html:11
-#: templates/cms/toolbar/toolbar_with_structure.html:12
-#: templates/cms/toolbar/toolbar_with_structure.html:49
 msgid "Close"
-msgstr ""
+msgstr "Tutup"
 
-#: templates/admin/cms/page/tree/legend.html:7
 msgid "Legend"
-msgstr ""
+msgstr "Legenda"
 
-#: templates/admin/cms/page/tree/legend.html:16
 msgid "In menu"
-msgstr ""
+msgstr "Di menu"
 
-#: templates/admin/cms/page/tree/legend.html:22
 msgid "Not in menu"
-msgstr ""
+msgstr "Tidak di menu"
 
-#: templates/admin/cms/page/tree/legend.html:28
 msgid "View page"
-msgstr ""
+msgstr "Lihat halaman"
 
-#: templates/admin/cms/page/tree/legend.html:40
-#: templates/admin/cms/page/tree/menu.html:51
 msgid "Softroot"
-msgstr ""
+msgstr "Akar lunak"
 
-#: templates/admin/cms/page/tree/legend.html:46
 msgid "Apphook"
-msgstr ""
+msgstr "Apphook"
 
-#: templates/admin/cms/page/tree/menu.html:63
+msgid "Redirect"
+msgstr "Mengalihkan"
+
 #, python-format
 msgid "Application: %(apphook)s"
-msgstr ""
+msgstr "Aplikasi: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu.html:118
 msgid "in menu"
-msgstr ""
+msgstr "di menu"
 
-#: templates/admin/cms/page/tree/menu.html:123
 msgid "not in menu"
-msgstr ""
+msgstr "tidak di menu"
 
-#: templates/admin/cms/page/tree/menu.html:140
-#: templates/admin/cms/page/tree/menu.html:151
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "Pengaturan halaman (klik SHIFT untuk pengaturan lanjutan)"
 
-#: templates/admin/cms/page/tree/menu.html:218
 msgid "Permissions"
-msgstr ""
+msgstr "Izin"
 
-#: templates/cms/headless/placeholder.html:17
 msgid "inherited"
-msgstr ""
+msgstr "diwarisi"
 
-#: templates/cms/noapphook.html:18
-#: templates/cms/toolbar/toolbar_with_structure.html:90
 msgid "This page has no preview!"
-msgstr ""
+msgstr "Halaman ini tidak memiliki pratinjau!"
 
-#: templates/cms/noapphook.html:19
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
 msgstr ""
+"Kemungkinan apphook yang terlampir tidak menyediakan konten untuk root-nya."
 
-#: templates/cms/noapphook.html:20
-#: templates/cms/toolbar/toolbar_with_structure.html:91
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "Sedang dialihkan ke:"
 
-#: templates/cms/toolbar/clipboard.html:3
 msgid "Clipboard"
-msgstr ""
+msgstr "Papan klip"
 
-#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:28
-#: templates/cms/toolbar/toolbar_javascript.html:91
 msgid "Add plugin"
-msgstr ""
+msgstr "Tambah plugin"
 
-#: templates/cms/toolbar/dragbar.html:20
 msgid "Copy all"
-msgstr ""
+msgstr "Salin semua"
 
-#: templates/cms/toolbar/dragbar.html:22
 msgid "Copy from"
-msgstr ""
+msgstr "Salin dari"
 
-#: templates/cms/toolbar/dragbar.html:26 templates/cms/toolbar/dragbar.html:29
 msgid "Empty all"
-msgstr ""
+msgstr "Kosongkan semua"
 
-#: templates/cms/toolbar/dragbar.html:35
-#: templates/cms/toolbar/dragitem.html:61
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Filter plugin..."
 
-#: templates/cms/toolbar/dragbar.html:41
-msgid "This is a static placeholder"
-msgstr ""
-
-#: templates/cms/toolbar/dragbar.html:43
 msgid "Expand all"
-msgstr ""
+msgstr "Bentangkan semua"
 
-#: templates/cms/toolbar/dragbar.html:44
 msgid "Collapse all"
-msgstr ""
+msgstr "Ciutkan semua"
 
-#: templates/cms/toolbar/dragitem.html:26
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "Anda tidak dapat menambahkan plugin ke plugin ini."
 
-#: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "Plugin ini tidak dapat dipindahkan atau disunting di luar induknya"
 
-#: templates/cms/toolbar/dragitem.html:50
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Papan klip kosong."
 
-#: templates/cms/toolbar/dragitem.html:51
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr ""
+"Plugin ini tidak mengizinkan plugin tipe ini sebagai plugin bersarang."
 
-#: templates/cms/toolbar/dragitem.html:52
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "Plugin ini tidak dapat memiliki plugin bersarang."
 
-#: templates/cms/toolbar/dragitem_extra_menu.html:2
 msgid "Highlight"
-msgstr ""
+msgstr "Sorot"
 
-#: templates/cms/toolbar/dragitem_menu.html:4
 msgid "Available plugins"
-msgstr ""
+msgstr "Plugin yang tersedia"
 
-#: templates/cms/toolbar/items/button_list.html:4
 msgid "Toggle structure"
-msgstr ""
+msgstr "Alihkan struktur"
 
-#: templates/cms/toolbar/items/login.html:16
 msgid "Login"
-msgstr ""
+msgstr "Masuk"
 
-#: templates/cms/toolbar/plugin.html:24
 msgid "Add plugin to"
-msgstr ""
+msgstr "Tambah plugin ke"
 
-#: templates/cms/toolbar/toolbar.html:28
 msgid "More"
-msgstr ""
+msgstr "Lainnya"
 
-#: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
 msgstr ""
+"Versi pengembangan menggunakan django CMS %(cms_version)s, Django "
+"%(django_version)s, Python %(python_version)s"
 
-#: templates/cms/toolbar/toolbar_javascript.html:27
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
-#: templates/cms/toolbar/toolbar_javascript.html:28
 msgid "The following error occurred:"
-msgstr ""
+msgstr "Kesalahan berikut terjadi:"
 
-#: templates/cms/toolbar/toolbar_javascript.html:29
 msgid "Action successful."
-msgstr ""
+msgstr "Tindakan berhasil."
 
-#: templates/cms/toolbar/toolbar_javascript.html:30
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "Apakah Anda yakin ingin menghapus plugin ini?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:31
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "Apakah Anda yakin ingin menerbitkan halaman ini?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:32
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Plugin akan ditambahkan di sini"
 
-#: templates/cms/toolbar/toolbar_javascript.html:33
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Anda memiliki perubahan yang belum disimpan."
 
-#: templates/cms/toolbar/toolbar_javascript.html:34
 msgid "Loading"
-msgstr ""
+msgstr "Memuat"
 
-#: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Apakah Anda yakin ingin membuang perubahan ini?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:36
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
 msgstr ""
+"Formulir tidak dapat dimuat. Harap periksa bahwa server berjalan dengan "
+"benar."
 
-#: templates/cms/toolbar/toolbar_javascript.html:37
 msgid "Most used"
-msgstr ""
+msgstr "Paling sering digunakan"
 
-#: templates/cms/toolbar/toolbar_javascript.html:38
 msgid "Shortcuts"
-msgstr ""
+msgstr "Pintasan"
 
-#: templates/cms/toolbar/toolbar_javascript.html:39
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "Halaman telah diubah sementara itu, memuat ulang..."
 
-#: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "Pintasan seluruh CMS"
 
-#: templates/cms/toolbar/toolbar_javascript.html:46
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Tampilkan dialog bantuan ini"
 
-#: templates/cms/toolbar/toolbar_javascript.html:50
 msgid "Close/cancel"
-msgstr ""
+msgstr "Tutup/batal"
 
-#: templates/cms/toolbar/toolbar_javascript.html:54
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Alihkan mode struktur"
 
-#: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "Alihkan mode struktur dan sorot plugin yang ditunjuk kursor"
 
-#: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Open \\"
-msgstr ""
+msgstr "Buka \\"
 
-#: templates/cms/toolbar/toolbar_javascript.html:66
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Fokus pada Bilah Alat"
 
-#: templates/cms/toolbar/toolbar_javascript.html:75
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "Fokus pada placeholder"
 
-#: templates/cms/toolbar/toolbar_javascript.html:79
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Pindah ke elemen berikutnya/sebelumnya"
 
-#: templates/cms/toolbar/toolbar_javascript.html:83
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "Fokus pada plugin placeholder"
 
-#: templates/cms/toolbar/toolbar_javascript.html:87
 msgid "Edit plugin"
-msgstr ""
+msgstr "Sunting plugin"
 
-#: templates/cms/toolbar/toolbar_javascript.html:95
 msgid "Open actions menu"
-msgstr ""
+msgstr "Buka menu tindakan"
 
-#: templates/cms/toolbar/toolbar_javascript.html:99
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Bentangkan/ciutkan"
 
-#: templates/cms/toolbar/toolbar_javascript.html:126
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
+"<strong>Gagal masuk.</strong> Harap periksa kredensial Anda dan coba lagi."
 
-#: templates/cms/toolbar/toolbar_with_structure.html:5
 msgid "Double-click to edit"
-msgstr ""
+msgstr "Klik dua kali untuk menyunting"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:6
 msgid "Tap to edit"
-msgstr ""
+msgstr "Ketuk untuk menyunting"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:25
 msgid "Click to go back"
-msgstr ""
+msgstr "Klik untuk kembali"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:26
 msgid "Click to go forward"
-msgstr ""
+msgstr "Klik untuk maju"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:47
 msgid "Minimize"
-msgstr ""
+msgstr "Perkecil"
 
-#: templates/cms/toolbar/toolbar_with_structure.html:48
 msgid "Maximize"
+msgstr "Perbesar"
+
+msgid "Placeholder not editable"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_with_structure.html:74
 msgid "Drop a plugin here"
+msgstr "Letakkan plugin di sini"
+
+msgid "Welcome to your new django CMS installation!"
 msgstr ""
 
-#: templates/cms/welcome.html:26
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "Versi %(cms_version)s"
 
-#: templates/cms/welcome.html:30
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "Mari bangun sesuatu yang hebat bersama!"
 
-#: templates/cms/welcome.html:32
 msgid "Please log in"
-msgstr ""
+msgstr "Harap masuk"
 
-#: templates/cms/welcome.html:36
 msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
+"\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">Tambah halaman pertama Anda</a>\n"
+"            "
 
-#: templates/cms/welcome.html:43
 msgid ""
 "\n"
 "                    <h2>Help Funding</h2>\n"
@@ -1825,8 +1412,18 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Bantu Pendanaan</h2>\n"
+"                    <p>\n"
+"                        Pendanaan Anda secara langsung bermanfaat bagi produk, terutama melalui\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">Program Fellowship django CMS</a>!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Cara cepat bagi Anda atau organisasi Anda untuk berdonasi adalah melalui\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>.\n"
+"                    </p>\n"
+"                "
 
-#: templates/cms/welcome.html:56
 msgid ""
 "\n"
 "                    <h2>Join Us</h2>\n"
@@ -1840,8 +1437,18 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Bergabunglah Dengan Kami</h2>\n"
+"                    <p>\n"
+"                        django CMS Association adalah organisasi nirlaba yang mendanai dan mengarahkan pengembangan\n"
+"                        django CMS.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Anda dapat <a href=\"https://www.django-cms.org/en/memberships/\">bergabung baik sebagai individu maupun sebagai\n"
+"                        organisasi</a>.\n"
+"                    </p>\n"
+"                "
 
-#: templates/cms/welcome.html:69
 msgid ""
 "\n"
 "                    <h2>Contribute</h2>\n"
@@ -1855,20 +1462,27 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>Berkontribusi</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">Berkontribusi kode:</a> perbaiki bug atau\n"
+"                            implementasikan fitur baru!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">Menjadi relawan:</a>\n"
+"                            Kami menawarkan kerja tim yang menyenangkan dan efisien!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">Jadikan pekerjaan Anda sumber terbuka:</a>\n"
+"                            Perkuat ekosistem.</li>\n"
+"                    </ul>\n"
+"                "
 
-#: templates/cms/welcome.html:84
 msgid "Installation Notes"
-msgstr ""
+msgstr "Catatan Instalasi"
 
-#: templates/cms/welcome.html:87
 msgid "Support"
-msgstr ""
+msgstr "Dukungan"
 
-#: templates/cms/welcome.html:90
 msgid "Give back"
-msgstr ""
+msgstr "Beri kembali"
 
-#: templates/cms/welcome.html:92
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1876,8 +1490,12 @@ msgid ""
 "                    static files.</p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">Jika Anda tidak melihat logo django CMS di bagian atas, pastikan\n"
+"                    Anda menautkan folder <code>static/cms</code> ke\n"
+"                    berkas statis Anda.</p>\n"
+"            "
 
-#: templates/cms/welcome.html:98
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1886,396 +1504,248 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">Anda melihat pesan ini karena Anda memiliki\n"
+"                        <code>DEBUG = True</code> di berkas pengaturan django Anda dan\n"
+"                        belum menambahkan halaman apa pun.\n"
+"                    </p>\n"
+"                "
 
-#: templates/cms/welcome.html:120
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Selamat datang di django CMS"
 
-#: templates/cms/widgets/applicationconfigselect.html:6
 msgid "Add Another"
-msgstr ""
+msgstr "Tambah Lainnya"
 
-#: templates/cms/wizards/create.html:25
 msgid "Back"
-msgstr ""
+msgstr "Kembali"
 
-#: templates/cms/wizards/start.html:15
 msgid "Please choose an option from below to proceed to the next step."
 msgstr ""
+"Harap pilih opsi di bawah ini untuk melanjutkan ke langkah berikutnya."
 
-#: templates/cms/wizards/start.html:23
 msgid "Next"
-msgstr ""
+msgstr "Berikutnya"
 
-#: templatetags/cms_admin.py:129
+msgid "Select what you would like to create"
+msgstr "Pilih apa yang ingin Anda buat"
+
 msgid "Unknown"
-msgstr ""
+msgstr "Tidak diketahui"
 
-#: templatetags/cms_tags.py:87
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "Halaman tidak ditemukan di %(domain)s"
 
-#: templatetags/cms_tags.py:89
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"Sebuah template tag tidak dapat menemukan halaman dengan argumen pencarian `%(page_lookup)s\n"
+"`. URL dari permintaan adalah: http://%(host)s%(path)s"
 
-#: test_utils/project/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:4
 msgid "Two columns"
-msgstr ""
+msgstr "Dua kolom"
 
-#: test_utils/project/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:5
 msgid "Three columns"
-msgstr ""
+msgstr "Tiga kolom"
 
-#: test_utils/project/customuserapp/models.py:44
 msgid "username"
-msgstr ""
+msgstr "nama pengguna"
 
-#: test_utils/project/customuserapp/models.py:45
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "Wajib. 300 karakter atau kurang. Huruf, angka, dan karakter @/./+/-/_"
 
-#: test_utils/project/customuserapp/models.py:48
 msgid "Enter a valid username."
-msgstr ""
+msgstr "Masukkan nama pengguna yang valid."
 
-#: test_utils/project/customuserapp/models.py:51
 msgid "email address"
-msgstr ""
+msgstr "alamat email"
 
-#: test_utils/project/customuserapp/models.py:53
 msgid "staff status"
-msgstr ""
+msgstr "status staf"
 
-#: test_utils/project/customuserapp/models.py:54
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "Menentukan apakah pengguna dapat masuk ke situs admin ini."
 
-#: test_utils/project/customuserapp/models.py:58
 msgid "active"
-msgstr ""
+msgstr "aktif"
 
-#: test_utils/project/customuserapp/models.py:59
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Menentukan apakah pengguna ini harus diperlakukan sebagai aktif. Batal pilih"
+" ini alih-alih menghapus akun."
 
-#: test_utils/project/customuserapp/models.py:71
 msgid "users"
-msgstr ""
+msgstr "pengguna"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:44
 msgid "Title Extension"
-msgstr ""
+msgstr "Ekstensi Judul"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:75
 msgid "Page Extension"
-msgstr ""
+msgstr "Ekstensi Halaman"
 
-#: test_utils/project/objectpermissionsapp/models.py:45
 msgid "object ID"
-msgstr ""
+msgstr "ID objek"
 
-#: test_utils/project/placeholderapp/cms_apps.py:8
 msgid "Example1 App"
-msgstr ""
+msgstr "Aplikasi Example1"
 
-#: test_utils/project/placeholderapp/cms_apps.py:15
 msgid "MultilingualExample1 App"
-msgstr ""
+msgstr "Aplikasi MultilingualExample1"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:25
 msgid "Example1"
-msgstr ""
+msgstr "Example1"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:26
 msgid "Examples"
-msgstr ""
+msgstr "Contoh"
 
-#: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:10
 msgid "Extra Context"
-msgstr ""
+msgstr "Konteks Tambahan"
 
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:16
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:35
 msgid "Articles"
-msgstr ""
+msgstr "Artikel"
 
-#: test_utils/project/sampleapp/cms_apps.py:25
 msgid "Sample App"
-msgstr ""
+msgstr "Aplikasi Contoh"
 
-#: test_utils/project/sampleapp/cms_apps.py:36
 msgid "Sample App with config"
-msgstr ""
+msgstr "Aplikasi Contoh dengan konfigurasi"
 
-#: test_utils/project/sampleapp/cms_apps.py:56
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "Aplikasi Contoh dengan izin yang dikecualikan"
 
-#: test_utils/project/sampleapp/cms_apps.py:65
 msgid "Sample App 2"
-msgstr ""
+msgstr "Aplikasi Contoh 2"
 
-#: test_utils/project/sampleapp/cms_apps.py:76
 msgid "Sample App 3"
+msgstr "Aplikasi Contoh 3"
+
+msgid "Sample App Without Landing Page"
 msgstr ""
 
-#: test_utils/project/sampleapp/cms_apps.py:97
 msgid "Namespaced App"
-msgstr ""
+msgstr "Aplikasi Ber-namespace"
 
-#: test_utils/project/sampleapp/cms_apps.py:111
 msgid "Parent app"
-msgstr ""
+msgstr "Aplikasi induk"
 
-#: test_utils/project/sampleapp/cms_apps.py:118
 msgid "Child app"
-msgstr ""
+msgstr "Aplikasi anak"
 
-#: test_utils/project/sampleapp/cms_apps.py:125
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "Aplikasi urls-menus Variabel"
 
-#: test_utils/project/sampleapp/cms_menus.py:18
 msgid "sample root page"
-msgstr ""
+msgstr "contoh halaman root"
 
-#: test_utils/project/sampleapp/cms_menus.py:19
 msgid "sample settings page"
-msgstr ""
+msgstr "contoh halaman pengaturan"
 
-#: test_utils/project/sampleapp/cms_menus.py:20
 msgid "sample account page"
-msgstr ""
+msgstr "contoh halaman akun"
 
-#: test_utils/project/sampleapp/cms_menus.py:21
 msgid "sample my profile page"
-msgstr ""
+msgstr "contoh halaman profil saya"
 
-#: test_utils/project/sampleapp/cms_menus.py:35
 msgid "Static Menu"
-msgstr ""
+msgstr "Menu Statis"
 
-#: test_utils/project/sampleapp/cms_menus.py:54
 msgid "Static Menu2"
-msgstr ""
+msgstr "Menu Statis2"
 
-#: test_utils/project/sampleapp/cms_menus.py:61
 msgid "Static Menu3"
-msgstr ""
+msgstr "Menu Statis3"
 
-#: test_utils/project/sampleapp/cms_menus.py:68
 msgid "Static Menu4"
-msgstr ""
+msgstr "Menu Statis4"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:21
-#: test_utils/project/sampleapp/views.py:30
 msgid "Category"
-msgstr ""
+msgstr "Kategori"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:22
 msgid "Categories"
-msgstr ""
+msgstr "Kategori"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:23
 msgid "Add Category"
-msgstr ""
+msgstr "Tambah Kategori"
 
-#: test_utils/project/sampleapp/urls.py:14
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
-#: test_utils/project/sampleapp/views.py:32
 msgid "Change Category"
-msgstr ""
+msgstr "Ubah Kategori"
 
-#: test_utils/project/templates/registration/logged_out.html:7
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
+"Terima kasih telah meluangkan waktu berkualitas bersama situs web ini hari "
+"ini."
 
-#: tests/test_templates.py:57 utils/conf.py:186
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Warisi template dari leluhur terdekat"
 
-#: tests/test_wizards.py:104
 msgid "UserSettings"
-msgstr ""
+msgstr "UserSettings"
 
-#: toolbar/utils.py:30
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "Tambah plugin ke placeholder \"%(placeholder_label)s\""
 
-#: toolbar/utils.py:50
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
+msgstr "Tambah plugin ke %(plugin_name)s"
+
+msgid "Single placeholder"
 msgstr ""
 
-#: utils/conf.py:101
 msgid "Community forum"
-msgstr ""
+msgstr "Forum komunitas"
 
-#: utils/conf.py:103
 msgid "Getting started"
-msgstr ""
+msgstr "Memulai"
 
-#: utils/conf.py:104
 msgid "Talk to us"
-msgstr ""
+msgstr "Hubungi kami"
 
-#: utils/mail.py:37
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - akun pengguna Anda telah dibuat."
 
-#: utils/mail.py:39
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - akun pengguna Anda telah diubah."
 
-#: utils/plugins.py:520
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Placeholder ini sudah memiliki jumlah plugin maksimum (%s)."
 
-#: utils/plugins.py:526
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr ""
+"Placeholder ini sudah memiliki jumlah maksimum (%(limit)s) plugin "
+"%(plugin_name)s yang diizinkan."
 
-#: utils/request_ip_resolvers.py:22
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
 msgstr ""
+"Tidak dapat menemukan modul CMS_REQUEST_IP_RESOLVER yang ditentukan: "
+"\"{0}\"."
 
-#: utils/request_ip_resolvers.py:26
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
 msgstr ""
+"Tidak dapat menemukan fungsi CMS_REQUEST_IP_RESOLVER yang ditentukan: "
+"\"{0}\" di modul \"{1}\"."
 
-#: wizards/wizard_base.py:145
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "Buat instans %s baru."
 
-#: wizards/wizard_pool.py:54
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
-
-#~ msgid "by template"
-#~ msgstr ""
-
-#~ msgid "by code"
-#~ msgstr ""
-
-#~ msgid "static placeholder name"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Descriptive name to identify this static placeholder. Not displayed to "
-#~ "users."
-#~ msgstr ""
-
-#~ msgid "placeholder code"
-#~ msgstr ""
-
-#~ msgid "To render the static placeholder in templates."
-#~ msgstr ""
-
-#~ msgid "placeholder content"
-#~ msgstr ""
-
-#~ msgid "creation_method"
-#~ msgstr ""
-
-#~ msgid "static placeholder"
-#~ msgstr ""
-
-#~ msgid "static placeholders"
-#~ msgstr ""
-
-#~ msgid "A static placeholder with the same site and code already exists"
-#~ msgstr ""
-
-#~ msgid "Title"
-#~ msgstr "Judul"
-
-#~ msgid "Soft root"
-#~ msgstr ""
-
-#~ msgid "Redirect"
-#~ msgstr "Mengalihkan"
-
-#~ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-#~ msgstr ""
-
-#~ msgid "Alias"
-#~ msgstr ""
-
-#~ msgid "Create Alias"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This is an alias reference, you can edit the content only on the <a "
-#~ "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-#~ msgstr ""
-
-#~ msgid "Edit this Page"
-#~ msgstr ""
-
-#~ msgid "overwrite the title (html title tag)"
-#~ msgstr ""
-
-#~ msgid "overwrite the title in the menu"
-#~ msgstr ""
-
-#~ msgid "description"
-#~ msgstr ""
-
-#~ msgid "The text displayed in search engines."
-#~ msgstr ""
-
-#~ msgid "Open \"Create\" dialog"
-#~ msgstr ""
-
-#~ msgid "Installation successful!"
-#~ msgstr ""
-
-#~ msgid "Add your first page"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
-#~ "                "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "                        JavaScript seems to be disabled so please\n"
-#~ "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
-#~ "                    "
-#~ msgstr ""
-
-#~ msgid "You do not have permission to change a page's navigation status"
-#~ msgstr ""
-
-#~ msgid "You cannot change this page's navigation status"
-#~ msgstr ""
-
-#~ msgid "Slug must not be empty."
-#~ msgstr "Slug tidak boleh kosong"
+msgstr "Sebuah wizard sudah terdaftar untuk model: %s"

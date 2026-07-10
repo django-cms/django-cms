@@ -151,7 +151,7 @@ class Page(MP_Node):
         #: Internal cache for page urls
         self.page_content_cache = {}
         #: Internal cache for page content objects visible publicly
-        self.admin_content_cache = AdminCacheDict()
+        self.admin_content_cache = None
         #: Internal cache for page content objects visible in the admin (i.e. to staff users.)
         #: Might be larger than the page_content_cache
 
@@ -211,7 +211,7 @@ class Page(MP_Node):
     def _clear_internal_cache(self):
         self.urls_cache = {}
         self.page_content_cache = {}
-        self.admin_content_cache = AdminCacheDict()
+        self.admin_content_cache = None
 
         if hasattr(self, "_prefetched_objects_cache"):
             del self._prefetched_objects_cache
@@ -703,7 +703,7 @@ class Page(MP_Node):
     def get_languages(self, admin_manager=True):
         """Returns available languages for the page. This is potentially costly."""
         if admin_manager:
-            if not self.admin_content_cache:
+            if self.admin_content_cache is None:
                 self.set_admin_content_cache()
             return list(self.admin_content_cache.keys())
         if not self.page_content_cache:
@@ -750,7 +750,7 @@ class Page(MP_Node):
     def get_admin_content(self, language, fallback=False):
         from cms.models.contentmodels import EmptyPageContent
 
-        if not self.admin_content_cache:
+        if self.admin_content_cache is None:
             self.set_admin_content_cache()
         page_content = self.admin_content_cache.get(language, EmptyPageContent(language=language, page=self))
         if not page_content and fallback:

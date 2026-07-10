@@ -7,6 +7,7 @@
 # Daniel Braun <dbraun86@gmail.com>, 2013
 # Daniel Braun <dbraun86@gmail.com>, 2013
 # Fishfur A Banter <fishfurbanter@gmail.com>, 2016
+# Fishfur A Banter <fishfurbanter@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"

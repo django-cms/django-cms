@@ -1,34 +1,90 @@
 .. _upgrade-to-5.1.0:
 
-#####################
-5.1.0a1 release notes
-#####################
+###################
+5.1.0 release notes
+###################
 
-*February 14, 2026*
+*July 10, 2026*
 
-Welcome to django CMS 5.1.0a1!
+Welcome to django CMS 5.1.0!
 
 These release notes cover the new features, as well as some backwards
-incompatible changes you'll want to be aware of when upgrading from
-django CMS 4.0 or earlier. We've begun the deprecation process for some
-features.
-
-See the How to upgrade to 5.1.0a1 to a newer version guide if you’re
-updating an existing project.
+incompatible changes you need to consider when upgrading from django CMS
+5.0.x or earlier. Read the upgrade instructions and removed-functionality
+section before updating an existing project.
 
 *******************************
 Django and Python compatibility
 *******************************
 
-django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
-support the latest release of each series.
+django CMS 5.1 supports **Django 5.2, 6.0, and 6.1**. Django 4.2, 5.0, and
+5.1 are no longer supported because those series no longer receive upstream
+maintenance. We highly recommend and only support the latest release of each
+supported series.
 
-It supports **Python 3.11, 3.12, 3.13, and 3.14**. As for Django we highly recommend and only
-support the latest release of each series.
+It supports **Python 3.10, 3.11, 3.12, 3.13, and 3.14**.
+
+******************
+Release highlights
+******************
+
+django CMS 5.1 focuses on easier project setup, more flexible deployments,
+more precise plugin configuration, and a modernized editing interface.
+
+* **Create projects for different use cases.** The improved ``djangocms``
+  command can create traditional, headless, or hybrid projects. Optional
+  components such as versioning, moderation, aliases, and stories can be
+  selected interactively or through command-line options.
+
+* **Integrate django CMS into an existing Django project.** Running
+  ``djangocms .`` updates an existing project using reviewable, idempotent
+  changes. ``djangocms . --dry-run`` previews the proposed changes without
+  modifying files or installing packages.
+
+* **Run multiple sites from one configuration.** Projects can omit
+  ``SITE_ID`` and resolve the current site from the request host, or supply
+  custom site-selection logic through middleware.
+
+* **Control where plugins are available.** Plugins can be restricted by
+  content model, placeholder slot, and parent or child plugin type. Glob
+  patterns and automatic child restrictions make these rules easier to
+  maintain in larger plugin libraries.
+
+* **Use a modernized editing interface.** The new design improves contrast,
+  spacing, visual consistency, and light/dark color-scheme support. The
+  previous theme remains available as a migration aid.
+
+* **Deploy on all maintained platform versions.** django CMS 5.1 supports Django
+  5.2, 6.0, and 6.1 and Python 3.10 through 3.14.
+
+* **Benefit from security and reliability improvements.** The release
+  strengthens authorization around editing and clipboard operations, improves
+  Content Security Policy compatibility, repairs inconsistent plugin
+  positions, and addresses deadlock and query-performance issues.
 
 ***********************
 How to upgrade to 5.1.0
 ***********************
+
+Before upgrading, back up your database and uploaded media and review the
+:ref:`backward-incompatible changes <upgrade-5.1-backward-incompatible>` below.
+In particular, django CMS 5.1 requires Django 5.2 or newer and removes APIs
+that were previously deprecated.
+
+Upgrade django CMS and ensure that your environment contains a compatible
+Django version::
+
+    python -m pip install --upgrade "django-cms==5.1.0" "Django>=5.2"
+
+Then apply migrations, collect static files, and run the django CMS checks::
+
+    python manage.py migrate
+    python manage.py collectstatic --noinput
+    python manage.py cms check
+
+Test custom plugins, apphooks, permissions, frontend editing, and all templates
+in a staging environment before deploying. Projects that customize or replace
+django CMS migrations should also review the new squashed initial migration.
 
 *******************
 What's new in 5.1.0
@@ -43,12 +99,14 @@ contrast, and more consistency between the frontend editor and Django's admin in
 
 Key changes include:
 
-* More Django-like green based color prefers-color-scheme
-* Modern design with round corners and updated icons
+* A Django-like green-based color palette with automatic light and dark modes
+* A modern design with rounded corners and updated icons
 * Improved visual hierarchy and spacing
 
 It is active by default, but the legacy design can be re-enabled by adding the ``data-cms-theme``
-attribute with the value ``4`` to the ``<html>`` tag in your templates.
+attribute with the value ``4`` to the ``<html>`` tag in your templates, for example
+``<html data-cms-theme="4">``. This is intended as a migration aid while adapting
+custom styling to the new design.
 
 More flexible site configurations
 =================================
@@ -83,7 +141,7 @@ Plugins can now be restricted to specific models using two complementary filters
 - Model-level: ``Model.allowed_plugins`` — list of plugin class names, with the special
   value ``None`` (all plugins allowed, subject to their own ``allowed_models``).
 
-Both filters must pass for the frontend editor offer plugins to the users.
+Both filters must pass for the frontend editor to offer a plugin to users.
 This is particularly useful for plugins that are bound to specific Django models and should
 not be available to editors on other models - or to restrict certain models to a curated set
 of plugins.
@@ -166,15 +224,22 @@ anything::
 
     djangocms . --dry-run
 
-The rules that govern these edits are fetched from the ``cms-template``
-repository (matching your installed django CMS version), with a bundled copy
-serving as an offline fallback, so the integration can keep up with the
-ecosystem without a new django CMS release.
+By default, the rules that govern these edits are fetched from the
+``cms-template`` repository matching your installed django CMS version, with a
+bundled copy serving as an offline fallback. A custom ``--template`` can
+provide its own ``djangocms_install_rules.json`` so organizations can keep
+project generation and existing-project integration in the same versioned
+template.
 
 See :ref:`tutorial_install` for a step-by-step walkthrough.
 
 Minor features
 ==============
+
+* Plugins can restrict themselves to placeholder slots with
+  ``CMSPluginBase.allowed_slots``. It accepts slot names or glob patterns and
+  is enforced when plugins are added, copied, or moved. See
+  :attr:`~cms.plugin_base.CMSPluginBase.allowed_slots`.
 
 * Plugin parent/child restrictions are more expressive. The ``child_classes`` and
   ``parent_classes`` attributes (and their ``CMS_PLACEHOLDER_CONF`` counterparts) now accept
@@ -191,12 +256,18 @@ Minor features
   method which efficiently bulk-deletes multiple plugins from the placeholder. It takes an iterable
   of plugin objects as a parameter.
 
-* Async support: User middleware and apphook registration support async setups
-  and now let you run django CMS using asgi. Database access is avoided when
-  registering apphook URLs to make them async-safe.
+* User middleware and apphook registration are now async-compatible, allowing
+  django CMS projects to be deployed under ASGI. Database access is avoided
+  while registering apphook URLs. Database-backed request handling remains
+  subject to Django's synchronous ORM behavior.
 
 * Apphooks now by default allow access to the page content object's placeholders on
   the apphook's root page.
+
+* ``CMSApp`` implementations can provide a root template for their apphooks.
+
+* Menu caching can use a dedicated Django cache through the new
+  :setting:`CMS_MENU_CACHE_BACKEND` setting.
 
 * Allow page permission change from advanced settings with appropriate permissions
 
@@ -212,7 +283,7 @@ Minor features
 
 * Re-introduced help menu
 
-* Django 6 compatibility support
+* Django 5.2, 6.0, and 6.1 compatibility
 
 * Introduce contracts for django CMS Extensions
 
@@ -227,23 +298,57 @@ Minor features
 Bug Fixes
 =========
 
-* Get_permissions failed for missing global permissions
-* Create page wizard not available on empty install
-* Make Placeholder.add_plugin() set plugin.instance to self
-* Resolve empty page_title in frontend edit mode for apphooks
-* Improve anti-aliasing of django CMS logo png
-* Use PageContent.template_choices attribute for template choices instead of settings
-* Existing child plugin restriction cannot be reduced to an empty list (which implies all plugins allowed)
+* Enforce authorization on structure rendering, plugin movement, and clipboard endpoints
+* Prevent inline editing from bypassing permissions
+* Prevent toolbar login from following an unverified redirect
+* Prevent page titles from being inserted unescaped into rendering errors
+* Prevent clipboard-clearing operations from being triggered by GET requests
+* Harden page duplication, group permission handling, and URL validation
+* Automatically repair corrupted plugin positions
+* Cascade-delete plugins belonging to detached placeholders
+* Prevent deadlocks when moving large page subtrees
+* Avoid locking the entire page tree while editing a page
+* Fix migrations when using a custom user model
+* Fix copying clipboard content into a different language
+* Honour plugin-declared ``Vary`` headers in page cache keys
+* Fix N+1 queries in the page tree, ``cms check``, and ``delete-orphaned-plugins``
+* Remove remaining inline JavaScript and CSS that could violate Content Security Policy
+* Fix ``get_permissions`` for missing global permissions
+* Make the create-page wizard available on an empty installation
+* Make ``Placeholder.add_plugin()`` set ``plugin.instance`` to itself
+* Resolve an empty ``page_title`` in frontend edit mode for apphooks
+* Improve anti-aliasing of the django CMS logo PNG
+* Use ``PageContent.template_choices`` for template choices instead of settings
+* Allow existing child plugin restrictions to be reduced to an empty list, meaning no plugins are allowed
 * Gracefully handle unresolvable extends variables in placeholder scanning
 * Allow frontend-editable models to omit get_template method
 * Safe fallback for includes when scanning for placeholders
 * Fix ApphookReloadMiddleware not handling new language variants
-* Copying failed if a target placeholders was missing
-* Grouper admin kept read-only fields as prepopulated fields
+* Fix copying when a target placeholder is missing
+* Prevent grouper administration from retaining read-only fields as prepopulated fields
+
+.. _upgrade-5.1-backward-incompatible:
 
 **************************************
 Backward incompatible changes in 5.1.0
 **************************************
+
+Dependencies, settings, and migrations
+======================================
+
+* The minimum supported Django version is now 5.2. Support for Django 4.2,
+  5.0, and 5.1 has been removed because those series no longer receive
+  upstream maintenance.
+* The obsolete ``CMS_CONFIRM_VERSION4`` setting has been removed and should be
+  deleted from project settings.
+* The ``admin-style`` optional dependency now installs
+  ``djangocms-simple-admin-style`` instead of the deprecated
+  ``djangocms-admin-style`` package. Review ``INSTALLED_APPS`` if your project
+  explicitly configured the old package.
+* A squashed initial migration covering migrations 0001 through 0022 has been
+  added. Normal installations can run ``migrate`` as usual. Projects that
+  replace, import, or otherwise customize django CMS migrations should review
+  their migration dependencies before upgrading.
 
 Features deprecated in 5.1.0
 ============================
@@ -251,24 +356,34 @@ Features deprecated in 5.1.0
 Page model
 ----------
 
-* The manager method ``Page.objects.get_title(page, language, language_fallback=False)`` will be removed in django CMS 6.0.
-  Use ``page.get_content_obj()`` or ``page.get_admin_content()`` instead.
+* The manager method
+  ``Page.objects.get_title(page, language, language_fallback=False)`` will be
+  removed in django CMS 6.0. Use ``page.get_content_obj()`` or
+  ``page.get_admin_content()`` instead.
 * ``Page`` attribute ``page.parent_page`` is deprecated. Instead use the attribute ``page.parent``.
-* ``Page`` method ``page.get_parent_page()`` is deprecated and will be removed in django CMS 6.0. Instead use the `page.parent` attribute.
-* ``Page`` attribute ``page.languages`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_languages()`` instead.
-* ``Page`` methods ``page.remove_language()`` and ``page.update_languages()`` are deprecated and will be removed in django CMS 6.0.
-  They have no effect any more.
-* ``Page`` method ``page.get_published_languages()`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_languages(admin_manager=False)`` instead.
-* ``Page`` method ``page.set_translations_cache()`` is deprecated and will be removed in django CMS 6.0. Use ``page.get_content_obj()`` instead - it leaves the translations
-  cache populated. For admin views use ``page.set_admin_content_cache()`` instead.
-* ``Page`` methods ``page.copy()`` and ``page.copy_descendant()``have a keyword argument ``parent_node`` which has been renamed
-  to ``parent_page``. ``parent_node`` is deprecated and will be removed in django CMS 6.0.
+* ``Page`` method ``page.get_parent_page()`` is deprecated and will be removed
+  in django CMS 6.0. Use the ``page.parent`` attribute instead.
+* ``Page`` attribute ``page.languages`` is deprecated and will be removed in
+  django CMS 6.0. Use ``page.get_languages()`` instead.
+* ``Page`` methods ``page.remove_language()`` and ``page.update_languages()``
+  are deprecated and will be removed in django CMS 6.0. They have no effect.
+* ``Page`` method ``page.get_published_languages()`` is deprecated and will be
+  removed in django CMS 6.0. Use ``page.get_languages(admin_manager=False)``
+  instead.
+* ``Page`` method ``page.set_translations_cache()`` is deprecated and will be
+  removed in django CMS 6.0. Use ``page.get_content_obj()`` instead; it leaves
+  the translations cache populated. For admin views, use
+  ``page.set_admin_content_cache()``.
+* The ``parent_node`` keyword argument to ``Page.copy()`` and
+  ``Page.copy_descendant()`` has been renamed to ``parent_page``.
+  ``parent_node`` is deprecated and will be removed in django CMS 6.0.
 
 Page permissions
 ----------------
 
-* ``PagePermission``method ``permission.get_page_ids()`` is deprecated and will be removed in django CMS 6.0.
-  Use ``permission.get_page_permission_tuple()`` instead for faster permission checks by path and not id.
+* The ``PagePermission.get_page_ids()`` method is deprecated and will be
+  removed in django CMS 6.0. Use ``get_page_permission_tuple()`` instead for
+  faster permission checks by path rather than ID.
 
 Plugin rendering
 ----------------
@@ -287,14 +402,16 @@ Utility functions
 * Most ``cms.utils.i18n`` utility functions accepting an optional ``site_id`` argument will require this argument
   in django CMS 6.0. These functions are ``get_languages()``, ``get_language_code()``, ``get_language_list()``,
   ``get_language_tuple()``, ``get_language_dict()``, ``get_public_languages()``, ``get_language_object()``,
-  ``get_language_objects()``, ``get_default_language()``, ``get_fallback_languages()``, ``get_redirect_on_fallback()``, and
+  ``get_language_objects()``, ``get_default_language()``,
+  ``get_fallback_languages()``, ``get_redirect_on_fallback()``, and
   ``hide_untranslated()``.
 * ``cms.utils.page_permissions.user_can_add_page()`` and ``cms.utils.page_permissions.has_generic_permission``
   accepting an optional ``site`` argument will require this argument in django CMS 6.0.
-* ``cms.utils.page.get_page_queryset()`` is deprecated and will be removed in django CMS 6.0. Use ``Page.objects.on_site(site)``
-  instead.
-* ``cms.utils.placeholder.get_toolbar_plugin_struct()`` has a keyword argument ``page`` which has been renamed to ``obj``.
-  ``page`` is deprecated and will be removed in django CMS 6.0.
+* ``cms.utils.page.get_page_queryset()`` is deprecated and will be removed in
+  django CMS 6.0. Use ``Page.objects.on_site(site)`` instead.
+* ``cms.utils.placeholder.get_toolbar_plugin_struct()`` has a keyword argument
+  ``page`` which has been renamed to ``obj``. ``page`` is deprecated and will
+  be removed in django CMS 6.0.
 
 Wizard helpers
 --------------
@@ -324,13 +441,17 @@ API
 Placeholders
 ------------
 
-* ``PlaceholderField`` has been removed from ``cms.fields``. Use :class:`~cms.models.fields.PlaceholderRelationField` in conjunction with
-  :meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see :ref:`placeholders_outside_cms`).
+* ``PlaceholderField`` has been removed from ``cms.fields``. Use
+  :class:`~cms.models.fields.PlaceholderRelationField` with
+  :meth:`~cms.utils.placeholder.get_placeholder_from_slot` instead (also see
+  :ref:`placeholders_outside_cms`).
 
-* ``PlaceholderAdminMixin`` has been removed from ``cms.admin``. It is not needed anymore and can be safely removed from your code.
+* ``PlaceholderAdminMixin`` has been removed from ``cms.admin``. It is no
+  longer needed and can be safely removed from your code.
 
-* A placeholder's ``actions`` property (deprecated in django CMS 5) has been removed. This also includes the removal of the two classes
-  ``cms.utils.placeholder.PlaceholderNoAction`` and ``cms.utils.placeholder.MLNGPlaceholderActions``. If you need these classes,
+* A placeholder's ``actions`` property (deprecated in django CMS 5) has been
+  removed. This also removes ``cms.utils.placeholder.PlaceholderNoAction`` and
+  ``cms.utils.placeholder.MLNGPlaceholderActions``. If you need these classes,
   move them to your own codebase.
 
 Permissions
@@ -358,18 +479,19 @@ Menus
 
 * ``cms.cms_menus.get_visible_nodes`` has been removed. Use ``cms.cms_menus.get_visible_page_contents`` instead.
 
-* ``cms.cms_menus.get_menu_node_for_page`` has been removed. Use ``cms.cms_menus.get_menu_node_for_page_content`` instead.
+* ``cms.cms_menus.get_menu_node_for_page`` has been removed. Use
+  ``cms.cms_menus.get_menu_node_for_page_content`` instead.
 
 Miscellaneous
 -------------
 
 * The ``title`` property has been removed from ``cms.cms_toolbars.PageToolbar``.
-  Use ``cms.cms_toolbars.PageTooolbar.page_content`` instead.
+  Use ``cms.cms_toolbars.PageToolbar.page_content`` instead.
 
 * ``cms.forms.get_root_nodes`` has been removed. Use ``cms.cms_menus.get_root_pages`` instead.
 
 * ``cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin`` has been removed.
   Use ``cms.extensions.toolbar.ExtensionToolbar.get_page_content_extension_admin`` instead.
 
-* ``cms.toolbar.utils.get_plugin_tree_as_json`` has been removed. Use ``cms.toolbar.utils.get_plugin_tree`` and convert the result
-  to JSON instead.
+* ``cms.toolbar.utils.get_plugin_tree_as_json`` has been removed. Use
+  ``cms.toolbar.utils.get_plugin_tree`` and convert the result to JSON instead.
