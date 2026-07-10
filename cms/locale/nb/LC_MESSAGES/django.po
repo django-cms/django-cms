@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Norwegian Bokmål (https://app.transifex.com/divio/teams/58664/nb/)\n"
@@ -36,8 +36,14 @@ msgstr "Delen av tittelen som brukes i adressen"
 msgid "Page type"
 msgstr "Sidetype"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sidetyper"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Overstyr adresse"
@@ -219,6 +225,9 @@ msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr ""
 "(for å endre den, avpubliser først den publiserte versjonen av denne siden)"
+
+msgid "Add Translation"
+msgstr "Legg til oversettelse"
 
 msgid "Add Page Copy"
 msgstr "Legg til kopi av side"
@@ -439,9 +448,6 @@ msgstr "Logg ut"
 msgid "Language"
 msgstr "Språk"
 
-msgid "Add Translation"
-msgstr "Legg til oversettelse"
-
 msgid "Delete Translation"
 msgstr "Slett oversettelse"
 
@@ -506,6 +512,9 @@ msgstr "Velg et gyldig nettsted"
 
 msgid "Select a valid page"
 msgstr "Velg en gyldig side"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -920,7 +929,7 @@ msgid "Deleted Plugin"
 msgstr "Slettet plugin"
 
 msgid "Cut Plugin"
-msgstr "Klipp ut plugin"
+msgstr "Klipp ut programtillegg"
 
 msgid "Paste Plugin"
 msgstr "Lim inn plugin"
@@ -1527,6 +1536,9 @@ msgstr ""
 msgid "Next"
 msgstr "Neste"
 
+msgid "Select what you would like to create"
+msgstr ""
+
 msgid "Unknown"
 msgstr "Ukjent"
 
@@ -1620,7 +1632,7 @@ msgid "Sample App 2"
 msgstr "Demonstrasjons-app 2"
 
 msgid "Sample App 3"
-msgstr "Demonstrasjons-app 2"
+msgstr "Sample App 3"
 
 msgid "Sample App Without Landing Page"
 msgstr "Eksempelapp uten landingsside"
@@ -1659,7 +1671,7 @@ msgid "Static Menu3"
 msgstr "Statisk Meny3"
 
 msgid "Static Menu4"
-msgstr "Statisk Meny"
+msgstr "Statisk Meny4"
 
 msgid "Category"
 msgstr "Kategori"

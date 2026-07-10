@@ -3,20 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Bashar Ghadanfar <10.tens@gmail.com>, 2023
 # Ali Khalel <ali.khalel@gmail.com>, 2025
 # SHENKAR <sheeennn@gmail.com>, 2025
-# Bashar Al-Abdulhadi, 2026
 # Mohammad Alsakhawy, 2026
+# Bashar Al-Abdulhadi, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
+# Bashar Ghadanfar <10.tens@gmail.com>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
+"Last-Translator: Bashar Ghadanfar <10.tens@gmail.com>, 2026\n"
 "Language-Team: Arabic (https://app.transifex.com/divio/teams/58664/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,8 +39,14 @@ msgstr "الجزء من العنوان الذي يستخدم في الرابط"
 msgid "Page type"
 msgstr "نوع الصفحة"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "أنواع الصفحة"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "الكتابة على عنوان الـ URL"
@@ -219,6 +225,9 @@ msgstr "ليس لديك الصلاحية لتعديل هذه الصفحة"
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr "(لتغييره، قم أولاً بإلغاء نشر النسخة المنشورة حالياً من هذه الصفحة)"
+
+msgid "Add Translation"
+msgstr "إضافة ترجمة"
 
 msgid "Add Page Copy"
 msgstr "إضافة نسخة للصفحة"
@@ -437,9 +446,6 @@ msgstr "تسجيل خروج"
 msgid "Language"
 msgstr "اللغة"
 
-msgid "Add Translation"
-msgstr "إضافة ترجمة"
-
 msgid "Delete Translation"
 msgstr "حذف ترجمة"
 
@@ -504,6 +510,9 @@ msgstr "حدد موقع صحيح"
 
 msgid "Select a valid page"
 msgstr "حدد صفحة صحيحة"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -838,30 +847,30 @@ msgid "by template"
 msgstr "بواسطة القالب"
 
 msgid "by code"
-msgstr "بواسطة الرمز"
+msgstr ""
 
 msgid "static placeholder name"
-msgstr "اسم الموضع الثابت"
+msgstr ""
 
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
-msgstr "اسم وصفي لتحديد هذا الموضع الثابت. لا يُعرض للمستخدمين."
+msgstr ""
 
 msgid "placeholder code"
-msgstr "رموز الموضع"
+msgstr ""
 
 msgid "To render the static placeholder in templates."
 msgstr "لتَصْيير الموضع الثابت في قوالب."
 
 msgid "placeholder content"
-msgstr "محتوى الموضع"
+msgstr ""
 
 msgid "creation_method"
-msgstr "طريقة الإنشاء"
+msgstr ""
 
 msgid "static placeholder"
-msgstr "موضع ثابت"
+msgstr ""
 
 msgid "static placeholders"
 msgstr "مواضع ثابتة"
@@ -1520,6 +1529,9 @@ msgstr "لطفاً اختر خياراً أدناه من أجل المتابعة
 
 msgid "Next"
 msgstr "التالي"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "مجهول"

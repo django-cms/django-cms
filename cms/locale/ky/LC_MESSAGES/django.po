@@ -4,15 +4,15 @@
 # 
 # Translators:
 # Fabian Braun <fsbraun@gmx.de>, 2022
-# Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2025
+# Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:10+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2025\n"
+"Last-Translator: Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2026\n"
 "Language-Team: Kyrgyz (https://app.transifex.com/divio/teams/58664/ky/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,8 +35,14 @@ msgstr "Баштыктын бир бөлүгү УРЛ да колдонулат"
 msgid "Page type"
 msgstr "Барак тиби"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Барак типтери"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Урл ду кайрадан жазуу"
@@ -200,6 +206,9 @@ msgstr ""
 
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
+msgstr ""
+
+msgid "Add Translation"
 msgstr ""
 
 msgid "Add Page Copy"
@@ -416,9 +425,6 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-msgid "Add Translation"
-msgstr ""
-
 msgid "Delete Translation"
 msgstr ""
 
@@ -482,6 +488,9 @@ msgid "Select a valid site"
 msgstr ""
 
 msgid "Select a valid page"
+msgstr ""
+
+msgid "Enter a valid relative or absolute URL."
 msgstr ""
 
 #, python-format
@@ -1420,6 +1429,9 @@ msgid "Please choose an option from below to proceed to the next step."
 msgstr ""
 
 msgid "Next"
+msgstr ""
+
+msgid "Select what you would like to create"
 msgstr ""
 
 msgid "Unknown"

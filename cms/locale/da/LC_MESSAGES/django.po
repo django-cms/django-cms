@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Jonas Hyatt <jonas@hyatt.space>, 2025
 # valberg <valberg@orn.li>, 2025
+# Jonas Hyatt <jonas@hyatt.space>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:10+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Danish (https://app.transifex.com/divio/teams/58664/da/)\n"
@@ -36,8 +36,14 @@ msgstr "Del af titlen der bliver brugt i adressen"
 msgid "Page type"
 msgstr "Sidetype"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sidetyper"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Overskriv adresse"
@@ -212,6 +218,9 @@ msgstr "Du har ikke rettigheder til at redigere denne side"
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr ""
+
+msgid "Add Translation"
+msgstr "Tilføj oversættelse"
 
 msgid "Add Page Copy"
 msgstr "Tilføj Side Kopi"
@@ -427,9 +436,6 @@ msgstr "Log ud"
 msgid "Language"
 msgstr "Sprog"
 
-msgid "Add Translation"
-msgstr "Tilføj oversættelse"
-
 msgid "Delete Translation"
 msgstr "Slet oversættelse"
 
@@ -494,6 +500,9 @@ msgstr "Vælg et gyldigt website"
 
 msgid "Select a valid page"
 msgstr "Vælg en gyldig side"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1442,6 +1451,9 @@ msgid "Please choose an option from below to proceed to the next step."
 msgstr ""
 
 msgid "Next"
+msgstr ""
+
+msgid "Select what you would like to create"
 msgstr ""
 
 msgid "Unknown"

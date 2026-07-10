@@ -5,17 +5,17 @@
 # Translators:
 # Andrii Vozniuk, 2023
 # tarasyyyk <taras.korzhak96@gmail.com>, 2023
-# Volodymyr Bergman <wowkalucky@gmail.com>, 2023
 # Петро Романчук <ixer@ixer.org.ua>, 2025
 # Panasoft, 2025
 # Anton Linevich <linevich@swebion.com>, 2026
+# Volodymyr Bergman <wowkalucky@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Ukrainian (https://app.transifex.com/divio/teams/58664/uk/)\n"
@@ -40,8 +40,14 @@ msgstr "Частина назви, що використовується у ад
 msgid "Page type"
 msgstr "Тип сторінки"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Типи Сторінок"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Перезаписати URL"
@@ -225,6 +231,9 @@ msgid ""
 msgstr ""
 "(щоб змінити це, спочатку скасуйте публікацію поточної опублікованої версії "
 "цієї сторінки)"
+
+msgid "Add Translation"
+msgstr "Додати Переклад"
 
 msgid "Add Page Copy"
 msgstr "Додати Копію Сторінки"
@@ -445,9 +454,6 @@ msgstr "Вийти"
 msgid "Language"
 msgstr "Мова"
 
-msgid "Add Translation"
-msgstr "Додати Переклад"
-
 msgid "Delete Translation"
 msgstr "Видалити Переклад"
 
@@ -512,6 +518,9 @@ msgstr "Виберіть чинний сайт"
 
 msgid "Select a valid page"
 msgstr "Виберіть чинну сторінку"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1541,6 +1550,9 @@ msgstr "Будь ласка, оберіть опцію нижче для пер�
 
 msgid "Next"
 msgstr "Далі"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Невідомо"

@@ -4,15 +4,15 @@
 # 
 # Translators:
 # Nazir Ahmed Sabbir <na.sb1151@gmail.com>, 2022
-# Fabian Braun <fsbraun@gmx.de>, 2022
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:10+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Bengali (https://app.transifex.com/divio/teams/58664/bn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,10 +21,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "All"
-msgstr ""
+msgstr "সব"
 
 msgid "Copy permissions"
-msgstr ""
+msgstr "অনুমতিসমূহ কপি করুন"
 
 msgid "Slug"
 msgstr "স্লাগ"
@@ -33,81 +33,90 @@ msgid "The part of the title that is used in the URL"
 msgstr "শিরোনামের যে অংশ ইউআরএল-এ ব্যবহৃত হবে"
 
 msgid "Page type"
+msgstr "পৃষ্ঠার ধরন"
+
+msgid "You do not have permission to change this page."
 msgstr ""
 
 msgid "Page Types"
+msgstr "পৃষ্ঠার ধরনসমূহ"
+
+msgid "You do not have permission to copy this page."
 msgstr ""
 
 msgid "Overwrite URL"
-msgstr ""
+msgstr "ইউআরএল ওভাররাইট করুন"
 
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "স্ট্যান্ডার্ড পাথ ব্যবহার করতে চাইলে এই ঘরটি খালি রাখুন।"
 
 msgid "Start typing..."
-msgstr ""
+msgstr "টাইপ করা শুরু করুন..."
 
 msgid "menu visibility"
-msgstr ""
+msgstr "মেনুর দৃশ্যমানতা"
 
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "এই পৃষ্ঠাটি মেনুতে কখন দৃশ্যমান হবে তা সীমাবদ্ধ করুন"
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "X Frame অপশনসমূহ"
 
 msgid "Whether this page can be embedded in other pages or websites."
-msgstr ""
+msgstr "এই পৃষ্ঠাটি অন্যান্য পৃষ্ঠা বা ওয়েবসাইটে এম্বেড করা যাবে কিনা।"
 
 msgid "URL options"
-msgstr ""
+msgstr "ইউআরএল অপশনসমূহ"
 
 msgid "Menu options"
-msgstr ""
+msgstr "মেনু অপশনসমূহ"
 
 msgid "Headers"
-msgstr ""
+msgstr "হেডারসমূহ"
 
 msgid "Application"
 msgstr "এ্যাপ্লিকেশন"
 
 msgid "Hook application to this page."
-msgstr ""
+msgstr "এই পৃষ্ঠায় এ্যাপ্লিকেশন হুক করুন।"
 
 msgid "Application configurations"
-msgstr ""
+msgstr "এ্যাপ্লিকেশন কনফিগারেশনসমূহ"
 
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "এই রিভার্স ইউআরএল আইডি সহ একটি পৃষ্ঠা ইতিমধ্যেই বিদ্যমান।"
 
 msgid "Invalid application config value"
-msgstr ""
+msgstr "অবৈধ এ্যাপ্লিকেশন কনফিগ মান"
 
 msgid "An application instance using this configuration already exists."
 msgstr ""
+"এই কনফিগারেশন ব্যবহার করে একটি এ্যাপ্লিকেশন ইনস্ট্যান্স ইতিমধ্যেই বিদ্যমান।"
 
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "এই নামের একটি এ্যাপ্লিকেশন ইনস্ট্যান্স ইতিমধ্যেই বিদ্যমান।"
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "আপনি হোম পৃষ্ঠাটিকে অন্য একটি পৃষ্ঠার ভিতরে সরাতে পারবেন না"
 
 msgid ""
 "You cannot have two pages with the same slug at the same page level. Please "
 "alter the slug of one of the pages before trying to move again."
 msgstr ""
+"একই পৃষ্ঠা স্তরে একই স্লাগ সহ দুটি পৃষ্ঠা থাকতে পারে না। আবার সরানোর চেষ্টা "
+"করার আগে অনুগ্রহ করে পৃষ্ঠাগুলোর একটির স্লাগ পরিবর্তন করুন।"
 
 msgid "Yes"
-msgstr ""
+msgstr "হ্যাঁ"
 
 msgid "No"
-msgstr ""
+msgstr "না"
 
 msgid "user"
-msgstr ""
+msgstr "ব্যবহারকারী"
 
 msgid "can_view"
-msgstr ""
+msgstr "দেখতে_পারে"
 
 msgid "Add"
 msgstr "যুক্ত করুন"
@@ -122,61 +131,74 @@ msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
+"তৈরি করা পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা তৈরি করতে "
+"পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা মুছতে পারবেন না। "
+"সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি নির্ধারণ করতে "
+"পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি মুছতে পারবেন না।"
+" সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
+"তৈরি করা অনুমতি পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি তৈরি "
+"করতে পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
 msgstr ""
+"অনুমতি পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি মুছতে পারবেন না।"
+" সম্পাদনার অনুমতি প্রয়োজন।"
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "অবৈধ প্লাগ-ইন ধরন '%s'"
 
 msgid "Language must be set to a supported language!"
-msgstr ""
+msgstr "ভাষা একটি সমর্থিত ভাষায় নির্ধারণ করতে হবে!"
 
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "প্যারেন্ট প্লাগ-ইনের ভাষা অবশ্যই ভাষার সাথে অভিন্ন হতে হবে!"
 
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
+"প্যারেন্ট প্লাগ-ইনের প্লেসহোল্ডার অবশ্যই প্লেসহোল্ডারের সাথে অভিন্ন হতে হবে!"
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "প্লাগ-ইনের অবস্থান অবশ্যই %(position)d-এর চেয়ে বড় হতে হবে"
 
 msgid "Translations"
 msgstr ""
 
 msgid "Advanced Settings"
-msgstr ""
+msgstr "উন্নত সেটিংস"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "পৃষ্ঠাটি হোম হওয়ার যোগ্য নয়।"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "প্রাইমারি কী %(key)r সহ %(name)s অবজেক্ট বিদ্যমান নেই।"
 
 msgid "error"
 msgstr ""
@@ -184,302 +206,316 @@ msgstr ""
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
+"ত্রুটি! এই পৃষ্ঠাটি সরানোর অনুমতি আপনার নেই। অনুগ্রহ করে পৃষ্ঠাটি পুনরায় "
+"লোড করুন"
 
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "ত্রুটি! এই পৃষ্ঠাটি কপি করার অনুমতি আপনার নেই।"
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
+"ত্রুটি! আপনি যে পৃষ্ঠাটি পেস্ট করছেন তা টার্গেট সাইটে কনফিগার করা ভাষাগুলোর "
+"কোনোটিতেই অনুবাদ করা হয়নি।"
 
 msgid "You do not have permission to edit this page"
-msgstr ""
+msgstr "এই পৃষ্ঠাটি সম্পাদনার অনুমতি আপনার নেই"
 
 msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr ""
+"(এটি পরিবর্তন করতে, প্রথমে এই পৃষ্ঠার বর্তমানে প্রকাশিত সংস্করণটি অপ্রকাশিত "
+"করুন)"
+
+msgid "Add Translation"
+msgstr "অনুবাদ যুক্ত করুন"
 
 msgid "Add Page Copy"
-msgstr ""
+msgstr "পৃষ্ঠার কপি যুক্ত করুন"
 
 msgid "New sub page"
-msgstr ""
+msgstr "নতুন সাব পৃষ্ঠা"
 
 msgid "New page"
-msgstr ""
+msgstr "নতুন পৃষ্ঠা"
 
 msgid "Database error"
 msgstr "ডাটাবেজ ত্রুটি"
 
 msgid "Template not valid"
-msgstr ""
+msgstr "টেমপ্লেট বৈধ নয়"
 
 msgid "Placeholder selection not valid"
-msgstr ""
+msgstr "প্লেসহোল্ডার নির্বাচন বৈধ নয়"
 
 msgid "The template was successfully changed"
-msgstr ""
+msgstr "টেমপ্লেট সফলভাবে পরিবর্তন করা হয়েছে"
 
 #, python-format
 msgid "Placeholder '%s' does not exist in target language"
-msgstr ""
+msgstr "প্লেসহোল্ডার '%s' লক্ষ্য ভাষায় বিদ্যমান নেই"
 
 msgid "You do not have permission to copy these plugins."
-msgstr ""
+msgstr "এই প্লাগ-ইনগুলো কপি করার অনুমতি আপনার নেই।"
 
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "এই পৃষ্ঠাটি মুছে ফেলার অনুমতি আপনার নেই"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
+msgstr "%(language)s ভাষার শিরোনাম এবং প্লাগ-ইনগুলো মুছে ফেলা হয়েছে"
 
 msgid "Public content"
-msgstr ""
+msgstr "পাবলিক কন্টেন্ট"
 
 msgid "Empty"
-msgstr ""
+msgstr "খালি"
 
 msgid "Create Content"
-msgstr ""
+msgstr "কন্টেন্ট তৈরি করুন"
 
 msgid "View restriction"
-msgstr ""
+msgstr "দেখার সীমাবদ্ধতা"
 
 msgid "View restrictions"
-msgstr ""
+msgstr "দেখার সীমাবদ্ধতাসমূহ"
 
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "ঘর %s পাওয়া যায়নি"
 
 msgid "You do not have permission to edit this item"
-msgstr ""
+msgstr "এই আইটেমটি সম্পাদনার অনুমতি আপনার নেই"
 
 msgid "You do not have permission to add a plugin"
-msgstr ""
+msgstr "প্লাগ-ইন যুক্ত করার অনুমতি আপনার নেই"
 
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "এই প্লেসহোল্ডারটি কপি করার অনুমতি আপনার নেই।"
 
 msgid "Plugin not found"
-msgstr ""
+msgstr "প্লাগ-ইন পাওয়া যায়নি"
 
 msgid "You do not have permission to edit this plugin"
-msgstr ""
+msgstr "এই প্লাগ-ইনটি সম্পাদনার অনুমতি আপনার নেই"
 
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "এই প্লাগ-ইনটি পেস্ট করার অনুমতি আপনার নেই"
 
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "এই প্লেসহোল্ডারটি পেস্ট করার অনুমতি আপনার নেই"
 
 msgid "You have no permission to move this plugin"
-msgstr ""
+msgstr "এই প্লাগ-ইনটি সরানোর অনুমতি আপনার নেই"
 
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "এই প্লাগ-ইনটি কাট করার অনুমতি আপনার নেই"
 
 msgid "You do not have permission to delete this plugin"
-msgstr ""
+msgstr "এই প্লাগ-ইনটি মুছে ফেলার অনুমতি আপনার নেই"
 
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "%(name)s প্লাগ-ইন \"%(obj)s\" সফলভাবে মুছে ফেলা হয়েছে।"
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s মুছে ফেলা যাবে না"
 
 msgid "Are you sure?"
 msgstr "আপনি কি নিশ্চিত?"
 
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "এই প্লেসহোল্ডারটি খালি করার অনুমতি আপনার নেই"
 
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "প্লেসহোল্ডার \"%(obj)s\" সফলভাবে খালি করা হয়েছে।"
 
 msgid "placeholder"
-msgstr ""
+msgstr "প্লেসহোল্ডার"
 
 msgid "Page permissions"
-msgstr ""
+msgstr "পৃষ্ঠার অনুমতিসমূহ"
 
 msgid "User & Group permissions"
-msgstr ""
+msgstr "ব্যবহারকারী ও গ্রুপের অনুমতিসমূহ"
 
 msgid "Page permissions management"
-msgstr ""
+msgstr "পৃষ্ঠার অনুমতি ব্যবস্থাপনা"
 
 msgid "Actions"
-msgstr ""
+msgstr "অ্যাকশনসমূহ"
 
 msgid "Empty content"
-msgstr ""
+msgstr "খালি কন্টেন্ট"
 
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "%(object_name)s প্রোপার্টিসমূহ"
 
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "নতুন %(object_name)s যুক্ত করুন"
 
 msgid "Add content"
-msgstr ""
+msgstr "কন্টেন্ট যুক্ত করুন"
 
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"বর্তমান ভাষার কন্টেন্ট পরিবর্তন করা হয়েছে। ফর্মে ফিরে গিয়ে পরিবর্তনগুলো "
+"সংরক্ষণ করতে \"Cancel\" ক্লিক করুন। পরিবর্তনগুলো বাতিল করতে \"OK\" ক্লিক "
+"করুন।"
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "%(language)s কন্টেন্ট যুক্ত করুন"
 
 msgid "Preview"
-msgstr ""
+msgstr "প্রিভিউ"
 
 msgid "Settings"
-msgstr ""
+msgstr "সেটিংস"
 
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
+"অবৈধ ভাষা %(value)s। এই ফর্মটি প্রক্রিয়া করা যাবে না। ভাষা পরিবর্তন করে "
+"দেখুন।"
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<অনির্দিষ্ট>"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "নিবন্ধিত কোনো apphook \"%r\" পাওয়া যায়নি"
 
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
 msgid "Placeholder"
-msgstr ""
+msgstr "প্লেসহোল্ডার"
 
 msgid "Create"
-msgstr ""
+msgstr "তৈরি করুন"
 
 msgid "Edit"
-msgstr ""
+msgstr "সম্পাদনা"
 
 msgid "Structure"
-msgstr ""
+msgstr "স্ট্রাকচার"
 
 msgid "Content"
-msgstr ""
+msgstr "কন্টেন্ট"
 
 msgid "Sites"
-msgstr ""
+msgstr "সাইটসমূহ"
 
 msgid "Admin Sites"
-msgstr ""
+msgstr "অ্যাডমিন সাইটসমূহ"
 
 msgid "Administration"
-msgstr ""
+msgstr "প্রশাসন"
 
 msgid "User settings"
-msgstr ""
+msgstr "ব্যবহারকারী সেটিংস"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "ক্লিপবোর্ড..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "ক্লিপবোর্ড খালি করুন"
 
 msgid "Disable toolbar"
-msgstr ""
+msgstr "টুলবার নিষ্ক্রিয় করুন"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "শর্টকাট..."
 
 msgid "Users"
-msgstr ""
+msgstr "ব্যবহারকারীগণ"
 
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "লগআউট %s"
 
 msgid "Logout"
-msgstr ""
+msgstr "লগআউট"
 
 msgid "Language"
 msgstr "ভাষা"
 
-msgid "Add Translation"
-msgstr ""
-
 msgid "Delete Translation"
-msgstr ""
+msgstr "অনুবাদ মুছে ফেলুন"
 
 msgid "Copy all plugins"
-msgstr ""
+msgstr "সব প্লাগ-ইন কপি করুন"
 
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "%s থেকে"
 
 #, python-format
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "আপনি কি নিশ্চিত যে আপনি %s থেকে সব প্লাগ-ইন কপি করতে চান?"
 
 msgid "Pages"
-msgstr ""
+msgstr "পৃষ্ঠাসমূহ"
 
 msgid "Page"
 msgstr "পৃষ্ঠা"
 
 msgid "Create Page"
-msgstr ""
+msgstr "পৃষ্ঠা তৈরি করুন"
 
 msgid "New Page"
-msgstr ""
+msgstr "নতুন পৃষ্ঠা"
 
 msgid "New Sub Page"
-msgstr ""
+msgstr "নতুন সাব পৃষ্ঠা"
 
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "এই পৃষ্ঠাটির অনুলিপি তৈরি করুন"
 
 msgid "Page settings"
-msgstr ""
+msgstr "পৃষ্ঠার সেটিংস"
 
 msgid "Advanced settings"
-msgstr ""
+msgstr "উন্নত সেটিংস"
 
 msgid "Templates"
-msgstr ""
+msgstr "টেমপ্লেটসমূহ"
 
 msgid "Placeholders"
 msgstr ""
 
 msgid "Hide in navigation"
-msgstr ""
+msgstr "নেভিগেশনে লুকান"
 
 msgid "Display in navigation"
-msgstr ""
+msgstr "নেভিগেশনে দেখান"
 
 msgid "Delete page"
-msgstr ""
+msgstr "পৃষ্ঠা মুছে ফেলুন"
 
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "বর্তমান পৃষ্ঠার পাশে একটি নতুন পৃষ্ঠা তৈরি করুন।"
 
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "বর্তমান পৃষ্ঠার নিচে একটি পৃষ্ঠা তৈরি করুন।"
 
 msgid "Select a valid site"
-msgstr ""
+msgstr "একটি বৈধ সাইট নির্বাচন করুন"
 
 msgid "Select a valid page"
+msgstr "একটি বৈধ পৃষ্ঠা নির্বাচন করুন"
+
+msgid "Enter a valid relative or absolute URL."
 msgstr ""
 
 #, python-format
@@ -487,143 +523,151 @@ msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
+"পৃষ্ঠা %(conflict_page)s-এর ইউআরএল '%(url)s' বর্তমান পৃষ্ঠা "
+"\"%(instance)s\"-এর সাথে অভিন্ন।"
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
+"পৃষ্ঠা %(conflict_page)s-এর ইউআরএল '%(url)s' বর্তমান পৃষ্ঠার সাথে অভিন্ন।"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
+"ঐচ্ছিক। প্রদান করা হলে, এটি স্বয়ংক্রিয়ভাবে একটি নতুন টেক্সট প্লাগ-ইনে "
+"যুক্ত হবে।"
 
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "নতুন পৃষ্ঠার জন্য একটি শিরোনাম প্রদান করুন।"
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr ""
+"স্বয়ংক্রিয় স্লাগের জন্য খালি রাখুন, অথবা প্রয়োজন অনুযায়ী ওভাররাইড করুন।"
 
 msgid "Cannot automatically create slug. Please provide one manually."
 msgstr ""
+"স্বয়ংক্রিয়ভাবে স্লাগ তৈরি করা যাবে না। অনুগ্রহ করে একটি ম্যানুয়ালি প্রদান"
+" করুন।"
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "অনুগ্রহ করে একটি বৈধ স্লাগ প্রদান করুন।"
 
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "পৃষ্ঠা যুক্ত করার জন্য প্রয়োজনীয় অনুমতি আপনার নেই।"
 
 msgid "ID"
-msgstr ""
+msgstr "আইডি"
 
 msgid "position"
-msgstr ""
+msgstr "অবস্থান"
 
 msgid "language"
-msgstr ""
+msgstr "ভাষা"
 
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
 msgid "creation date"
-msgstr ""
+msgstr "তৈরির তারিখ"
 
 msgid "can edit"
-msgstr ""
+msgstr "সম্পাদনা করতে পারে"
 
 msgid "can add"
-msgstr ""
+msgstr "যুক্ত করতে পারে"
 
 msgid "can delete"
-msgstr ""
+msgstr "মুছতে পারে"
 
 msgid "can change advanced settings"
-msgstr ""
+msgstr "উন্নত সেটিংস পরিবর্তন করতে পারে"
 
 msgid "can publish"
-msgstr ""
+msgstr "প্রকাশ করতে পারে"
 
 msgid "can change permissions"
-msgstr ""
+msgstr "অনুমতি পরিবর্তন করতে পারে"
 
 msgid "can move"
-msgstr ""
+msgstr "সরাতে পারে"
 
 msgid "view restricted"
-msgstr ""
+msgstr "দেখা সীমাবদ্ধ"
 
 msgid "can recover pages"
-msgstr ""
+msgstr "পৃষ্ঠা পুনরুদ্ধার করতে পারে"
 
 msgid "group"
-msgstr ""
+msgstr "গ্রুপ"
 
 msgid "sites"
-msgstr ""
+msgstr "সাইটসমূহ"
 
 msgid "created by"
-msgstr ""
+msgstr "তৈরি করেছেন"
 
 msgid "changed by"
-msgstr ""
+msgstr "পরিবর্তন করেছেন"
 
 msgid "publication date"
-msgstr ""
+msgstr "প্রকাশের তারিখ"
 
 msgid "publication end date"
-msgstr ""
+msgstr "প্রকাশের সমাপ্তির তারিখ"
 
 msgid "in navigation"
-msgstr ""
+msgstr "নেভিগেশনে"
 
 msgid "soft root"
-msgstr ""
+msgstr "সফট রুট"
 
 msgid "id"
-msgstr ""
+msgstr "আইডি"
 
 msgid "attached menu"
-msgstr ""
+msgstr "সংযুক্ত মেনু"
 
 msgid "template"
-msgstr ""
+msgstr "টেমপ্লেট"
 
 msgid "login required"
-msgstr ""
+msgstr "লগইন প্রয়োজন"
 
 msgid "application"
-msgstr ""
+msgstr "এ্যাপ্লিকেশন"
 
 msgid "application instance name"
-msgstr ""
+msgstr "এ্যাপ্লিকেশন ইনস্ট্যান্সের নাম"
 
 msgid "site"
-msgstr ""
+msgstr "সাইট"
 
 msgid "Grant on"
-msgstr ""
+msgstr "অনুমতি দিন"
 
 msgid "page"
 msgstr "পৃষ্ঠা"
 
 msgid "no limit set"
-msgstr ""
+msgstr "কোনো সীমা নির্ধারিত নেই"
 
 msgid "for logged in users only"
-msgstr ""
+msgstr "শুধুমাত্র লগইন করা ব্যবহারকারীদের জন্য"
 
 msgid "for anonymous users only"
-msgstr ""
+msgstr "শুধুমাত্র বেনামী ব্যবহারকারীদের জন্য"
 
 msgid "Inherit from parent page"
-msgstr ""
+msgstr "প্যারেন্ট পৃষ্ঠা থেকে উত্তরাধিকার সূত্রে গ্রহণ করুন"
 
 msgid "Deny"
-msgstr ""
+msgstr "অস্বীকার করুন"
 
 msgid "Only this website"
-msgstr ""
+msgstr "শুধুমাত্র এই ওয়েবসাইট"
 
 msgid "Allow"
-msgstr ""
+msgstr "অনুমতি দিন"
 
 msgid "title"
 msgstr "শিরোনাম"
@@ -636,139 +680,152 @@ msgstr "পৃষ্ঠার শিরোনাম"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "আপনার ব্রাউজারের উপরে অথবা বুকমার্কে যা প্রদর্শিত হয় তা ওভাররাইট করে"
 
 msgid "Menu Title"
-msgstr ""
+msgstr "মেনু শিরোনাম"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "মেনুতে যা প্রদর্শিত হয় তা ওভাররাইট করুন"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "বিবরণ মেটা ট্যাগ"
 
 msgid "A description of the page used by search engines."
-msgstr ""
+msgstr "সার্চ ইঞ্জিন কর্তৃক ব্যবহৃত পৃষ্ঠার একটি বিবরণ।"
 
 msgid "redirect"
-msgstr ""
+msgstr "পুনঃনির্দেশ"
 
 msgid "Redirects to this URL."
 msgstr "এই ইউআরএল-এ পুনঃনির্দেশ করে"
 
 msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+msgstr "সকল পূর্বপুরুষ নেভিগেশনে প্রদর্শিত হবে না"
 
 msgid "The template used to render the content."
-msgstr ""
+msgstr "কন্টেন্ট রেন্ডার করতে ব্যবহৃত টেমপ্লেট।"
 
 msgid "page content"
-msgstr ""
+msgstr "পৃষ্ঠার কন্টেন্ট"
 
 msgid "page contents"
-msgstr ""
+msgstr "পৃষ্ঠার কন্টেন্টসমূহ"
 
 msgid "default"
-msgstr ""
+msgstr "ডিফল্ট"
 
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
+"একটি অনন্য আইডেন্টিফায়ার যা এই পৃষ্ঠার সাথে লিঙ্ক করার জন্য page_url "
+"templatetag-এর সাথে ব্যবহৃত হয়"
 
 msgid "Mark this page as a page type"
-msgstr ""
+msgstr "এই পৃষ্ঠাটিকে একটি পৃষ্ঠার ধরন হিসেবে চিহ্নিত করুন"
 
 msgid "pages"
-msgstr ""
+msgstr "পৃষ্ঠাসমূহ"
 
 msgid "No available title"
-msgstr ""
+msgstr "কোনো শিরোনাম উপলব্ধ নেই"
 
 msgid "slug"
-msgstr ""
+msgstr "স্লাগ"
 
 msgid "Path"
-msgstr ""
+msgstr "পাথ"
 
 msgid "Current page"
-msgstr ""
+msgstr "বর্তমান পৃষ্ঠা"
 
 msgid "Page children (immediate)"
-msgstr ""
+msgstr "পৃষ্ঠার সন্তান (তাৎক্ষণিক)"
 
 msgid "Page and children (immediate)"
-msgstr ""
+msgstr "পৃষ্ঠা এবং সন্তান (তাৎক্ষণিক)"
 
 msgid "Page descendants"
-msgstr ""
+msgstr "পৃষ্ঠার বংশধর"
 
 msgid "Page and descendants"
-msgstr ""
+msgstr "পৃষ্ঠা এবং বংশধর"
 
 msgid "on page level"
-msgstr ""
+msgstr "পৃষ্ঠা স্তরে"
 
 msgid "frontend view restriction"
-msgstr ""
+msgstr "ফ্রন্টএন্ড দেখার সীমাবদ্ধতা"
 
 msgid "Please select user or group."
-msgstr ""
+msgstr "অনুগ্রহ করে ব্যবহারকারী অথবা গ্রুপ নির্বাচন করুন।"
 
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা প্রকাশ করতে পারবেন না। "
+"সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
 msgstr ""
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার উন্নত সেটিংস পরিবর্তন "
+"করতে পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
 msgstr ""
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠার অনুমতি পরিবর্তন করতে "
+"পারবেন না। সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
+"পৃষ্ঠা পরিবর্তনের অনুমতি ছাড়া ব্যবহারকারীরা পৃষ্ঠা সরাতে পারবেন না। "
+"সম্পাদনার অনুমতি প্রয়োজন।"
 
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "মুছে ফেলা যেকোনো পৃষ্ঠা পুনরুদ্ধার করতে পারে"
 
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr ""
+"কোনোটি নির্বাচন না করা হলে, ব্যবহারকারীকে সকল সাইটে অনুমতি প্রদান করা হয়।"
 
 msgid "Page global permission"
-msgstr ""
+msgstr "পৃষ্ঠার গ্লোবাল অনুমতি"
 
 msgid "Pages global permissions"
-msgstr ""
+msgstr "পৃষ্ঠাসমূহের গ্লোবাল অনুমতিসমূহ"
 
 msgid "Page permission"
-msgstr ""
+msgstr "পৃষ্ঠার অনুমতি"
 
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr ""
+"পৃষ্ঠা যোগের অনুমতির জন্য সন্তান বা বংশধরের অ্যাক্সেসও প্রয়োজন, অন্যথায় "
+"যোগ করা পৃষ্ঠা এর প্রস্তুতকারক পরিবর্তন করতে পারবেন না।"
 
 msgid "User (page)"
-msgstr ""
+msgstr "ব্যবহারকারী (পৃষ্ঠা)"
 
 msgid "Users (page)"
-msgstr ""
+msgstr "ব্যবহারকারীগণ (পৃষ্ঠা)"
 
 msgid "User group (page)"
-msgstr ""
+msgstr "ব্যবহারকারী গ্রুপ (পৃষ্ঠা)"
 
 msgid "User groups (page)"
-msgstr ""
+msgstr "ব্যবহারকারী গ্রুপসমূহ (পৃষ্ঠা)"
 
 msgid "slot"
-msgstr ""
+msgstr "স্লট"
 
 msgid "width"
 msgstr "প্রস্থ"
@@ -786,16 +843,16 @@ msgid "plugins"
 msgstr ""
 
 msgid "<Empty>"
-msgstr ""
+msgstr "<খালি>"
 
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "অ্যাডমিন ইন্টারফেস এবং টুলবারের জন্য ভাষা"
 
 msgid "user setting"
-msgstr ""
+msgstr "ব্যবহারকারী সেটিং"
 
 msgid "user settings"
-msgstr ""
+msgstr "ব্যবহারকারী সেটিংস"
 
 msgid "by template"
 msgstr ""
@@ -833,204 +890,206 @@ msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
 msgid "Advanced options"
-msgstr ""
+msgstr "উন্নত অপশনসমূহ"
 
 msgid "Generic"
-msgstr ""
+msgstr "জেনেরিক"
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" সফলভাবে পরিবর্তন করা হয়েছে।"
 
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "এই প্লাগ-ইনের জন্য আর কোনো সেটিংস নেই। অনুগ্রহ করে সংরক্ষণ চাপুন।"
 
 msgid "Moved"
-msgstr ""
+msgstr "সরানো হয়েছে"
 
 msgid "Changed"
-msgstr ""
+msgstr "পরিবর্তন করা হয়েছে"
 
 msgid "Deleted"
-msgstr ""
+msgstr "মুছে ফেলা হয়েছে"
 
 msgid "Added Page Translation"
-msgstr ""
+msgstr "পৃষ্ঠার অনুবাদ যুক্ত করা হয়েছে"
 
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "পৃষ্ঠার অনুবাদ পরিবর্তন করা হয়েছে"
 
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "পৃষ্ঠার অনুবাদ মুছে ফেলা হয়েছে"
 
 msgid "Added Plugin"
-msgstr ""
+msgstr "প্লাগ-ইন যুক্ত করা হয়েছে"
 
 msgid "Changed Plugin"
-msgstr ""
+msgstr "প্লাগ-ইন পরিবর্তন করা হয়েছে"
 
 msgid "Moved Plugin"
-msgstr ""
+msgstr "প্লাগ-ইন সরানো হয়েছে"
 
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "প্লাগ-ইন মুছে ফেলা হয়েছে"
 
 msgid "Cut Plugin"
-msgstr ""
+msgstr "প্লাগ-ইন কাট করা হয়েছে"
 
 msgid "Paste Plugin"
-msgstr ""
+msgstr "প্লাগ-ইন পেস্ট করা হয়েছে"
 
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "প্লেসহোল্ডারে পেস্ট করুন"
 
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "ক্লিপবোর্ড থেকে প্লেসহোল্ডারে প্লাগ-ইন যুক্ত করা হয়েছে"
 
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "প্লেসহোল্ডার খালি করা হয়েছে"
 
 msgid "Save"
-msgstr ""
+msgstr "সংরক্ষণ করুন"
 
 msgid "Some fields cannot be changed since they are read-only content."
-msgstr ""
+msgstr "কিছু ঘর পরিবর্তন করা যাবে না কারণ সেগুলো কেবল-পঠনযোগ্য কন্টেন্ট।"
 
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "প্রশাসনে লগইন করতে <a href=\"%(login_url)s\">এখানে</a> ক্লিক করুন।"
 
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "লগইন ইউআরএল: %(login_url)s"
 
 msgid "Username:"
-msgstr ""
+msgstr "ব্যবহারকারীর নাম:"
 
 msgid "Password:"
-msgstr ""
+msgstr "পাসওয়ার্ড:"
 
 msgid "Add a page"
-msgstr ""
+msgstr "একটি পৃষ্ঠা যুক্ত করুন"
 
 msgid "Change a page"
-msgstr ""
+msgstr "একটি পৃষ্ঠা পরিবর্তন করুন"
 
 msgid "Home"
-msgstr ""
+msgstr "হোম"
 
 msgid "View on site"
-msgstr ""
+msgstr "সাইটে দেখুন"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "অনুগ্রহ করে নিচের ত্রুটিটি সংশোধন করুন।"
+msgstr[1] "অনুগ্রহ করে নিচের ত্রুটিগুলো সংশোধন করুন।"
 
 msgid "All permissions"
-msgstr ""
+msgstr "সকল অনুমতি"
 
 msgid "Loading..."
-msgstr ""
+msgstr "লোড হচ্ছে..."
 
 msgid "Save and continue editing"
-msgstr ""
+msgstr "সংরক্ষণ করুন এবং সম্পাদনা চালিয়ে যান"
 
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"আপনি কি নিশ্চিত যে আপনি %(object_name)s \"%(escaped_object)s\" মুছে ফেলতে "
+"চান? নিম্নলিখিত সম্পর্কিত সকল আইটেম মুছে ফেলা হবে:"
 
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "হ্যাঁ, আমি নিশ্চিত"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "না, আমাকে ফিরিয়ে নিন"
 
 msgid "Summary"
-msgstr ""
+msgstr "সারসংক্ষেপ"
 
 msgid "User"
 msgstr "ব্যবহারকারী"
 
 msgid "Group"
-msgstr ""
+msgstr "গ্রুপ"
 
 msgid "Can edit"
-msgstr ""
+msgstr "সম্পাদনা করতে পারে"
 
 msgid "Can add"
-msgstr ""
+msgstr "যুক্ত করতে পারে"
 
 msgid "Can delete"
-msgstr ""
+msgstr "মুছতে পারে"
 
 msgid "Can publish"
-msgstr ""
+msgstr "প্রকাশ করতে পারে"
 
 msgid "Can change permissions"
-msgstr ""
+msgstr "অনুমতি পরিবর্তন করতে পারে"
 
 msgid "Can move"
-msgstr ""
+msgstr "সরাতে পারে"
 
 msgid "Can view"
-msgstr ""
+msgstr "দেখতে পারে"
 
 msgid "(global)"
-msgstr ""
+msgstr "(গ্লোবাল)"
 
 msgid "(current)"
-msgstr ""
+msgstr "(বর্তমান)"
 
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "পৃষ্ঠাটি কোনো অনুমতি উত্তরাধিকার সূত্রে গ্রহণ করে না।"
 
 msgid "Edit model"
-msgstr ""
+msgstr "মডেল সম্পাদনা করুন"
 
 msgid "Save as new"
-msgstr ""
+msgstr "নতুন হিসেবে সংরক্ষণ করুন"
 
 msgid "Save and add another"
-msgstr ""
+msgstr "সংরক্ষণ করুন এবং আরেকটি যুক্ত করুন"
 
 msgid "Copy"
-msgstr ""
+msgstr "কপি করুন"
 
 msgid "Cut"
-msgstr ""
+msgstr "কাট করুন"
 
 msgid "Paste"
-msgstr ""
+msgstr "পেস্ট করুন"
 
 msgid "Set as home"
-msgstr ""
+msgstr "হোম হিসেবে নির্ধারণ করুন"
 
 msgid "is restricted"
-msgstr ""
+msgstr "সীমাবদ্ধ"
 
 msgid "last change by"
-msgstr ""
+msgstr "সর্বশেষ পরিবর্তন করেছেন"
 
 msgid "last change on"
-msgstr ""
+msgstr "সর্বশেষ পরিবর্তন হয়েছে"
 
 msgid "meta"
-msgstr ""
+msgstr "মেটা"
 
 msgid "List of pages"
-msgstr ""
+msgstr "পৃষ্ঠাসমূহের তালিকা"
 
 msgid "Search"
-msgstr ""
+msgstr "অনুসন্ধান"
 
 msgid "Page Tree"
-msgstr ""
+msgstr "পৃষ্ঠা ট্রি"
 
 msgid "Reset filter"
-msgstr ""
+msgstr "ফিল্টার রিসেট করুন"
 
 #, python-format
 msgid ""
@@ -1038,44 +1097,49 @@ msgid ""
 "                                                Restore deleted %(name)s\n"
 "                                            "
 msgstr ""
+"\n"
+"                                                মুছে ফেলা %(name)s পুনরুদ্ধার করুন\n"
+"                                            "
 
 msgid "Main Navigation"
-msgstr ""
+msgstr "প্রধান নেভিগেশন"
 
 msgid "Options"
-msgstr ""
+msgstr "অপশনসমূহ"
 
 msgid "Successfully moved"
-msgstr ""
+msgstr "সফলভাবে সরানো হয়েছে"
 
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "ট্রির মধ্যে করা পরিবর্তনের জন্য রিফ্রেশ প্রয়োজন হতে পারে।"
 
 msgid "Error:"
-msgstr ""
+msgstr "ত্রুটি:"
 
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
 msgstr ""
+"এই পৃষ্ঠাটি কপি করা যাবে না কারণ এতে একটি এ্যাপ্লিকেশন সংযুক্ত আছে। apphook "
+"পরিচালনা করতে পৃষ্ঠার উন্নত সেটিংস দেখুন।"
 
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "আপনি কি নিশ্চিত যে আপনি এই পৃষ্ঠাটি § করতে চান?"
 
 msgid "Reload"
-msgstr ""
+msgstr "পুনরায় লোড করুন"
 
 msgid "New node"
-msgstr ""
+msgstr "নতুন নোড"
 
 msgid "nodes"
-msgstr ""
+msgstr "নোডসমূহ"
 
 msgid "View"
-msgstr ""
+msgstr "দেখুন"
 
 msgid "Menu"
-msgstr ""
+msgstr "মেনু"
 
 #, python-format
 msgid ""
@@ -1085,252 +1149,266 @@ msgid ""
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
+"\n"
+"                            <em>এখনও কোনো %(object)s নেই।</em>\n"
+"                            <br>\n"
+"                            এখন <a href=\"%(add_url)s\" class=\"addlink\">%(object)s যুক্ত করুন</a>।\n"
+"                        "
 
 msgid "Copy options"
-msgstr ""
+msgstr "কপি অপশনসমূহ"
 
 msgid "Choose copy options"
-msgstr ""
+msgstr "কপি অপশন নির্বাচন করুন"
 
 msgid "Close"
-msgstr ""
+msgstr "বন্ধ করুন"
 
 msgid "Legend"
-msgstr ""
+msgstr "লেজেন্ড"
 
 msgid "In menu"
-msgstr ""
+msgstr "মেনুতে"
 
 msgid "Not in menu"
-msgstr ""
+msgstr "মেনুতে নেই"
 
 msgid "View page"
-msgstr ""
+msgstr "পৃষ্ঠা দেখুন"
 
 msgid "Softroot"
-msgstr ""
+msgstr "সফটরুট"
 
 msgid "Apphook"
-msgstr ""
+msgstr "Apphook"
 
 #, python-format
 msgid "Application: %(apphook)s"
-msgstr ""
+msgstr "এ্যাপ্লিকেশন: %(apphook)s"
 
 msgid "in menu"
-msgstr ""
+msgstr "মেনুতে"
 
 msgid "not in menu"
-msgstr ""
+msgstr "মেনুতে নেই"
 
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "পৃষ্ঠার সেটিংস (উন্নত সেটিংসের জন্য SHIFT ক্লিক করুন)"
 
 msgid "Permissions"
-msgstr ""
+msgstr "অনুমতিসমূহ"
 
 msgid "inherited"
-msgstr ""
+msgstr "উত্তরাধিকারসূত্রে প্রাপ্ত"
 
 msgid "This page has no preview!"
-msgstr ""
+msgstr "এই পৃষ্ঠার কোনো প্রিভিউ নেই!"
 
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
-msgstr ""
+msgstr "সম্ভবত সংযুক্ত apphook তার রুটের জন্য কোনো কন্টেন্ট প্রদান করে না।"
 
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "এটি পুনঃনির্দেশিত হচ্ছে:"
 
 msgid "Clipboard"
-msgstr ""
+msgstr "ক্লিপবোর্ড"
 
 msgid "Add plugin"
-msgstr ""
+msgstr "প্লাগ-ইন যুক্ত করুন"
 
 msgid "Copy all"
-msgstr ""
+msgstr "সব কপি করুন"
 
 msgid "Copy from"
-msgstr ""
+msgstr "যেখান থেকে কপি করবেন"
 
 msgid "Empty all"
-msgstr ""
+msgstr "সব খালি করুন"
 
 msgid "Filter plugins..."
-msgstr ""
+msgstr "প্লাগ-ইন ফিল্টার করুন..."
 
 msgid "Expand all"
-msgstr ""
+msgstr "সব প্রসারিত করুন"
 
 msgid "Collapse all"
-msgstr ""
+msgstr "সব সংকুচিত করুন"
 
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "আপনি এই প্লাগ-ইনে প্লাগ-ইন যুক্ত করতে পারবেন না।"
 
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "এই প্লাগ-ইনটি এর প্যারেন্টের বাইরে সরানো বা সম্পাদনা করা যাবে না"
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "ক্লিপবোর্ড খালি।"
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr ""
+"এই প্লাগ-ইনটি এই ধরনের প্লাগ-ইনকে নেস্টেড প্লাগ-ইন হিসেবে অনুমতি দেয় না।"
 
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "এই প্লাগ-ইনে নেস্টেড প্লাগ-ইন থাকতে পারে না।"
 
 msgid "Highlight"
-msgstr ""
+msgstr "হাইলাইট"
 
 msgid "Available plugins"
-msgstr ""
+msgstr "উপলব্ধ প্লাগ-ইনসমূহ"
 
 msgid "Toggle structure"
-msgstr ""
+msgstr "স্ট্রাকচার টগল করুন"
 
 msgid "Login"
-msgstr ""
+msgstr "লগইন"
 
 msgid "Add plugin to"
-msgstr ""
+msgstr "প্লাগ-ইন যুক্ত করুন এতে"
 
 msgid "More"
-msgstr ""
+msgstr "আরও"
 
 #, python-format
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
 msgstr ""
+"django CMS %(cms_version)s, Django %(django_version)s, Python "
+"%(python_version)s ব্যবহার করে ডেভেলপমেন্ট সংস্করণ"
 
 msgid "Cancel"
-msgstr ""
+msgstr "বাতিল করুন"
 
 msgid "The following error occurred:"
-msgstr ""
+msgstr "নিম্নলিখিত ত্রুটি ঘটেছে:"
 
 msgid "Action successful."
-msgstr ""
+msgstr "অ্যাকশন সফল।"
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "আপনি নিশ্চিত যে, আপনি প্লাগ-ইনটি মুছতে চান?"
 
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "আপনি কি নিশ্চিত যে আপনি এই পৃষ্ঠাটি প্রকাশ করতে চান?"
 
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "এখানে প্লাগ-ইন যুক্ত করা হবে"
 
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "আপনার অসংরক্ষিত পরিবর্তন রয়েছে।"
 
 msgid "Loading"
-msgstr ""
+msgstr "লোড হচ্ছে"
 
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "আপনি কি নিশ্চিত যে আপনি এই পরিবর্তনগুলো পরিত্যাগ করতে চান?"
 
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
 msgstr ""
+"ফর্মটি লোড করা যায়নি। অনুগ্রহ করে নিশ্চিত করুন যে সার্ভারটি সঠিকভাবে চলছে।"
 
 msgid "Most used"
-msgstr ""
+msgstr "সর্বাধিক ব্যবহৃত"
 
 msgid "Shortcuts"
-msgstr ""
+msgstr "শর্টকাটসমূহ"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "ইতিমধ্যে পৃষ্ঠাটি পরিবর্তিত হয়েছে, পুনরায় লোড হচ্ছে..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "CMS-ব্যাপী শর্টকাটসমূহ"
 
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "এই সহায়তা ডায়ালগটি দেখান"
 
 msgid "Close/cancel"
-msgstr ""
+msgstr "বন্ধ করুন/বাতিল করুন"
 
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "স্ট্রাকচার মোড টগল করুন"
 
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "স্ট্রাকচার মোড টগল করুন এবং হোভার করা প্লাগ-ইন হাইলাইট করুন"
 
 msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "টুলবারে ফোকাস করুন"
 
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "প্লেসহোল্ডারে ফোকাস করুন"
 
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "পরবর্তী/পূর্ববর্তী এলিমেন্টে যান"
 
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "প্লেসহোল্ডারের প্লাগ-ইনে ফোকাস করুন"
 
 msgid "Edit plugin"
-msgstr ""
+msgstr "প্লাগ-ইন সম্পাদনা করুন"
 
 msgid "Open actions menu"
-msgstr ""
+msgstr "অ্যাকশন মেনু খুলুন"
 
 msgid "Expand/collapse"
-msgstr ""
+msgstr "প্রসারিত/সংকুচিত করুন"
 
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
+"<strong>লগইন ব্যর্থ হয়েছে।</strong> অনুগ্রহ করে আপনার শংসাপত্র যাচাই করে "
+"আবার চেষ্টা করুন।"
 
 msgid "Double-click to edit"
-msgstr ""
+msgstr "সম্পাদনা করতে ডাবল-ক্লিক করুন"
 
 msgid "Tap to edit"
-msgstr ""
+msgstr "সম্পাদনা করতে ট্যাপ করুন"
 
 msgid "Click to go back"
-msgstr ""
+msgstr "পেছনে যেতে ক্লিক করুন"
 
 msgid "Click to go forward"
-msgstr ""
+msgstr "সামনে যেতে ক্লিক করুন"
 
 msgid "Minimize"
-msgstr ""
+msgstr "মিনিমাইজ করুন"
 
 msgid "Maximize"
-msgstr ""
+msgstr "ম্যাক্সিমাইজ করুন"
 
 msgid "Placeholder not editable"
 msgstr ""
 
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "এখানে একটি প্লাগ-ইন ছেড়ে দিন"
 
 msgid "Welcome to your new django CMS installation!"
 msgstr ""
 
 #, python-format
 msgid "Version %(cms_version)s"
-msgstr ""
+msgstr "সংস্করণ %(cms_version)s"
 
 msgid "Let’s build something great together!"
-msgstr ""
+msgstr "চলুন একসাথে দুর্দান্ত কিছু তৈরি করি!"
 
 msgid "Please log in"
-msgstr ""
+msgstr "অনুগ্রহ করে লগইন করুন"
 
 msgid ""
 "\n"
 "                <a class=\"js-welcome-add cms-btn cms-btn-action\">Add your first page</a>\n"
 "            "
 msgstr ""
+"\n"
+"                <a class=\"js-welcome-add cms-btn cms-btn-action\">আপনার প্রথম পৃষ্ঠা যুক্ত করুন</a>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1345,6 +1423,17 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>তহবিল সহায়তা করুন</h2>\n"
+"                    <p>\n"
+"                        আপনার তহবিল সরাসরি পণ্যের উপকার করে, মূলত\n"
+"                        <a href=\"https://www.django-cms.org/en/fellowship-program/\">django CMS Fellowship Program</a>-এর মাধ্যমে!\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        আপনার নিজের বা আপনার প্রতিষ্ঠানের দান করার একটি দ্রুত উপায় হলো\n"
+"                        <a href=\"https://github.com/sponsors/django-cms\">Github Sponsors</a>।\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1359,6 +1448,16 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>আমাদের সাথে যোগ দিন</h2>\n"
+"                    <p>\n"
+"                        django CMS Association একটি অলাভজনক প্রতিষ্ঠান যা django CMS-এর উন্নয়নে তহবিল প্রদান করে এবং পরিচালনা করে।\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        আপনি <a href=\"https://www.django-cms.org/en/memberships/\">একজন ব্যক্তি হিসেবে অথবা একটি\n"
+"                        প্রতিষ্ঠান হিসেবে যোগ দিতে পারেন</a>।\n"
+"                    </p>\n"
+"                "
 
 msgid ""
 "\n"
@@ -1373,21 +1472,32 @@ msgid ""
 "                    </ul>\n"
 "                "
 msgstr ""
+"\n"
+"                    <h2>অবদান রাখুন</h2>\n"
+"                    <ul>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/contribute/\">কোডে অবদান রাখুন:</a> একটি বাগ ঠিক করুন অথবা\n"
+"                            একটি নতুন ফিচার বাস্তবায়ন করুন!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/volunteering-opportunities/\">স্বেচ্ছাসেবক হন:</a>\n"
+"                            আমরা আনন্দদায়ক ও কার্যকর টিম ওয়ার্কের সুযোগ দিই!</li>\n"
+"                        <li><a href=\"https://www.django-cms.org/en/repositories-plugins/\">আপনার কাজ ওপেন-সোর্স করুন:</a>\n"
+"                            ইকোসিস্টেমকে শক্তিশালী করুন।</li>\n"
+"                    </ul>\n"
+"                "
 
 msgid "Installation Notes"
-msgstr ""
+msgstr "ইনস্টলেশন নোটসমূহ"
 
 msgid "Support"
-msgstr ""
+msgstr "সহায়তা"
 
 msgid "Documentation"
-msgstr ""
+msgstr "ডকুমেন্টেশন"
 
 msgid "User guide"
-msgstr ""
+msgstr "ব্যবহারকারী গাইড"
 
 msgid "Give back"
-msgstr ""
+msgstr "ফিরিয়ে দিন"
 
 msgid ""
 "\n"
@@ -1396,6 +1506,11 @@ msgid ""
 "                    static files.</p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">যদি আপনি উপরে django CMS লোগো না দেখেন, তাহলে নিশ্চিত করুন\n"
+"                    যে আপনি <code>static/cms</code> ফোল্ডারটি আপনার\n"
+"                    স্ট্যাটিক ফাইলের সাথে লিঙ্ক করেছেন।</p>\n"
+"            "
 
 msgid ""
 "\n"
@@ -1405,217 +1520,234 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">আপনি এই বার্তাটি দেখছেন কারণ আপনার\n"
+"                        django সেটিংস ফাইলে <code>DEBUG = True</code> আছে এবং\n"
+"                        আপনি এখনও কোনো পৃষ্ঠা যুক্ত করেননি।\n"
+"                    </p>\n"
+"                "
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "django CMS-এ স্বাগতম"
 
 msgid "Add Another"
-msgstr ""
+msgstr "আরেকটি যুক্ত করুন"
 
 msgid "Back"
-msgstr ""
+msgstr "পেছনে"
 
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "পরবর্তী ধাপে এগোতে অনুগ্রহ করে নিচ থেকে একটি অপশন নির্বাচন করুন।"
 
 msgid "Next"
-msgstr ""
+msgstr "পরবর্তী"
+
+msgid "Select what you would like to create"
+msgstr "আপনি কী তৈরি করতে চান তা নির্বাচন করুন"
 
 msgid "Unknown"
-msgstr ""
+msgstr "অজানা"
 
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "%(domain)s-এ পৃষ্ঠা পাওয়া যায়নি"
 
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
+"একটি template tag `%(page_lookup)s\n"
+"` লুকআপ আর্গুমেন্ট সহ পৃষ্ঠাটি খুঁজে পায়নি। অনুরোধের ইউআরএল ছিল: http://%(host)s%(path)s"
 
 msgid "Two columns"
-msgstr ""
+msgstr "দুটি কলাম"
 
 msgid "Three columns"
-msgstr ""
+msgstr "তিনটি কলাম"
 
 msgid "username"
-msgstr ""
+msgstr "ব্যবহারকারীর নাম"
 
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "আবশ্যক। ৩০০ অক্ষর বা তার কম। অক্ষর, সংখ্যা এবং @/./+/-/_ অক্ষরসমূহ"
 
 msgid "Enter a valid username."
-msgstr ""
+msgstr "একটি বৈধ ব্যবহারকারীর নাম লিখুন।"
 
 msgid "email address"
 msgstr "ইমেইল ঠিকানা"
 
 msgid "staff status"
-msgstr ""
+msgstr "স্টাফ স্ট্যাটাস"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "ব্যবহারকারী এই অ্যাডমিন সাইটে লগইন করতে পারবেন কিনা তা নির্দেশ করে।"
 
 msgid "active"
-msgstr ""
+msgstr "সক্রিয়"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"এই ব্যবহারকারীকে সক্রিয় হিসেবে গণ্য করা হবে কিনা তা নির্দেশ করে। অ্যাকাউন্ট"
+" মুছে ফেলার পরিবর্তে এটি অনির্বাচিত করুন।"
 
 msgid "users"
-msgstr ""
+msgstr "ব্যবহারকারীগণ"
 
 msgid "Title Extension"
-msgstr ""
+msgstr "শিরোনাম এক্সটেনশন"
 
 msgid "Page Extension"
-msgstr ""
+msgstr "পৃষ্ঠা এক্সটেনশন"
 
 msgid "object ID"
-msgstr ""
+msgstr "অবজেক্ট আইডি"
 
 msgid "Example1 App"
-msgstr ""
+msgstr "Example1 অ্যাপ"
 
 msgid "MultilingualExample1 App"
-msgstr ""
+msgstr "MultilingualExample1 অ্যাপ"
 
 msgid "Example1"
-msgstr ""
+msgstr "Example1"
 
 msgid "Examples"
-msgstr ""
+msgstr "উদাহরণসমূহ"
 
 msgid "Extra Context"
-msgstr ""
+msgstr "অতিরিক্ত কনটেক্সট"
 
 msgid "Articles"
-msgstr ""
+msgstr "নিবন্ধসমূহ"
 
 msgid "Sample App"
-msgstr ""
+msgstr "নমুনা অ্যাপ"
 
 msgid "Sample App with config"
-msgstr ""
+msgstr "কনফিগ সহ নমুনা অ্যাপ"
 
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "বাদ দেওয়া অনুমতি সহ নমুনা অ্যাপ"
 
 msgid "Sample App 2"
-msgstr ""
+msgstr "নমুনা অ্যাপ ২"
 
 msgid "Sample App 3"
-msgstr ""
+msgstr "নমুনা অ্যাপ ৩"
 
 msgid "Sample App Without Landing Page"
 msgstr ""
 
 msgid "Namespaced App"
-msgstr ""
+msgstr "নেমস্পেসড অ্যাপ"
 
 msgid "Parent app"
-msgstr ""
+msgstr "প্যারেন্ট অ্যাপ"
 
 msgid "Child app"
-msgstr ""
+msgstr "চাইল্ড অ্যাপ"
 
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "Variable urls-menus অ্যাপ"
 
 msgid "sample root page"
-msgstr ""
+msgstr "নমুনা রুট পৃষ্ঠা"
 
 msgid "sample settings page"
-msgstr ""
+msgstr "নমুনা সেটিংস পৃষ্ঠা"
 
 msgid "sample account page"
-msgstr ""
+msgstr "নমুনা অ্যাকাউন্ট পৃষ্ঠা"
 
 msgid "sample my profile page"
-msgstr ""
+msgstr "নমুনা আমার প্রোফাইল পৃষ্ঠা"
 
 msgid "Static Menu"
-msgstr ""
+msgstr "স্ট্যাটিক মেনু"
 
 msgid "Static Menu2"
-msgstr ""
+msgstr "স্ট্যাটিক মেনু২"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "স্ট্যাটিক মেনু৩"
 
 msgid "Static Menu4"
-msgstr ""
+msgstr "স্ট্যাটিক মেনু৪"
 
 msgid "Category"
-msgstr ""
+msgstr "ক্যাটাগরি"
 
 msgid "Categories"
-msgstr ""
+msgstr "ক্যাটাগরিসমূহ"
 
 msgid "Add Category"
-msgstr ""
+msgstr "ক্যাটাগরি যুক্ত করুন"
 
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
 msgid "Change Category"
-msgstr ""
+msgstr "ক্যাটাগরি পরিবর্তন করুন"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "আজ ওয়েব সাইটের সাথে কিছু মূল্যবান সময় কাটানোর জন্য ধন্যবাদ।"
 
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "নিকটতম পূর্বপুরুষের টেমপ্লেট উত্তরাধিকার সূত্রে গ্রহণ করুন"
 
 msgid "UserSettings"
-msgstr ""
+msgstr "UserSettings"
 
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "\"%(placeholder_label)s\" প্লেসহোল্ডারে প্লাগ-ইন যুক্ত করুন"
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "%(plugin_name)s-এ প্লাগ-ইন যুক্ত করুন"
 
 msgid "Single placeholder"
 msgstr ""
 
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - আপনার ব্যবহারকারী অ্যাকাউন্ট তৈরি করা হয়েছে।"
 
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - আপনার ব্যবহারকারী অ্যাকাউন্ট পরিবর্তন করা হয়েছে।"
 
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "এই প্লেসহোল্ডারে ইতিমধ্যেই সর্বোচ্চ সংখ্যক প্লাগ-ইন (%s) রয়েছে।"
 
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr ""
+"এই প্লেসহোল্ডারে ইতিমধ্যেই অনুমোদিত %(plugin_name)s প্লাগ-ইনের সর্বোচ্চ "
+"সংখ্যা (%(limit)s) রয়েছে।"
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "নির্দিষ্ট CMS_REQUEST_IP_RESOLVER মডিউল খুঁজে পাওয়া যায়নি: \"{0}\"।"
 
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
 msgstr ""
+"\"{1}\" মডিউলে নির্দিষ্ট CMS_REQUEST_IP_RESOLVER ফাংশন খুঁজে পাওয়া যায়নি: "
+"\"{0}\"।"
 
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "একটি নতুন %s ইনস্ট্যান্স তৈরি করুন।"
 
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "মডেলের জন্য ইতিমধ্যেই একটি উইজার্ড নিবন্ধিত হয়েছে: %s"

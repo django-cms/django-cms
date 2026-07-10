@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Hamza SARI <hamza.sari@gmail.com>, 2025
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2025
+# Hamza SARI <hamza.sari@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Turkish (https://app.transifex.com/divio/teams/58664/tr/)\n"
@@ -36,8 +36,14 @@ msgstr "Başlığın URL'de kullanılan kısmı"
 msgid "Page type"
 msgstr "Sayfa tipi"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sayfa Tipleri"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "URL'nin üzerine yaz"
@@ -220,6 +226,9 @@ msgid ""
 msgstr ""
 "(değiştirmek için, önce bu sayfanın şu anda yayınlanmış sürümünü yayından "
 "kaldırın)"
+
+msgid "Add Translation"
+msgstr "Çeviri Ekle"
 
 msgid "Add Page Copy"
 msgstr "Sayfa Kopyası Ekle"
@@ -438,9 +447,6 @@ msgstr "Çıkış"
 msgid "Language"
 msgstr "Dil"
 
-msgid "Add Translation"
-msgstr "Çeviri Ekle"
-
 msgid "Delete Translation"
 msgstr "Çeviri Sil"
 
@@ -506,6 +512,9 @@ msgstr "Geçerli bir site seç"
 
 msgid "Select a valid page"
 msgstr "Geçerli bir sayfa seç"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1534,6 +1543,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Sonraki"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Bilinmeyen"

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Catalan (https://app.transifex.com/divio/teams/58664/ca/)\n"
@@ -35,8 +35,14 @@ msgstr "La part del títol que s'utilitza en la direcció URL"
 msgid "Page type"
 msgstr "Tipus de Pàgina"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipus de Pàgina"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sobreescriu URL"
@@ -218,6 +224,9 @@ msgid ""
 msgstr ""
 "(per canviar-ho, primer despubliqueu la versió actualment publicada "
 "d'aquesta pàgina)"
+
+msgid "Add Translation"
+msgstr "Afegir Traducció"
 
 msgid "Add Page Copy"
 msgstr "Afegir Còpia de Pàgina"
@@ -438,9 +447,6 @@ msgstr "Sortir"
 msgid "Language"
 msgstr "Idioma"
 
-msgid "Add Translation"
-msgstr "Afegir Traducció"
-
 msgid "Delete Translation"
 msgstr "Esborrar Traducció"
 
@@ -505,6 +511,9 @@ msgstr "Seleccionar un lloc vàlid"
 
 msgid "Select a valid page"
 msgstr "Seleccionar una pàgina vàlida"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -848,32 +857,30 @@ msgid "by template"
 msgstr "per plantilla"
 
 msgid "by code"
-msgstr "per codi"
+msgstr ""
 
 msgid "static placeholder name"
-msgstr "nom de marcador de posició estàtic"
+msgstr ""
 
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr ""
-"Nom descriptiu per identificar aquest marcador de posició estàtic. No es "
-"mostrarà als usuaris."
 
 msgid "placeholder code"
-msgstr "codi de marcador de posició"
+msgstr ""
 
 msgid "To render the static placeholder in templates."
 msgstr "Representar el marcador de posició estàtic a les plantilles"
 
 msgid "placeholder content"
-msgstr "contingut del marcador de posició"
+msgstr ""
 
 msgid "creation_method"
-msgstr "mètode de creació"
+msgstr ""
 
 msgid "static placeholder"
-msgstr "marcador de posició estàtic"
+msgstr ""
 
 msgid "static placeholders"
 msgstr "marcadors de posició estàtics"
@@ -926,7 +933,7 @@ msgid "Deleted Plugin"
 msgstr "Plugin Esborrat"
 
 msgid "Cut Plugin"
-msgstr "Plugin Tallat"
+msgstr "Tallar Plugin"
 
 msgid "Paste Plugin"
 msgstr "Enganxar Plugin"
@@ -1540,6 +1547,9 @@ msgstr "Trieu una opció de sota per anar al següent pas."
 msgid "Next"
 msgstr "Següent"
 
+msgid "Select what you would like to create"
+msgstr ""
+
 msgid "Unknown"
 msgstr "Desconegut"
 
@@ -1636,7 +1646,7 @@ msgid "Sample App 2"
 msgstr "App de prova 2"
 
 msgid "Sample App 3"
-msgstr "App de prova 2"
+msgstr "Sample App 3"
 
 msgid "Sample App Without Landing Page"
 msgstr "Aplicació d'exemple sense pàgina d'inici"
@@ -1675,7 +1685,7 @@ msgid "Static Menu3"
 msgstr "Menú Static3"
 
 msgid "Static Menu4"
-msgstr "Menú estàtic"
+msgstr "Static Menu4"
 
 msgid "Category"
 msgstr "Categoria"

@@ -3,19 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Piotr Wojcik <pwwpww@gmail.com>, 2022
 # Grzegorz Biały <grzegorz@elcodo.pl>, 2023
-# filip klosowski <filip@geoida.pl>, 2023
 # Maciej Kostuch <kostuchmaciek@gmail.com>, 2023
-# Maciej Olko <maciej.olko@gmail.com>, 2025
 # ar4s <arkadiusz.adamski@gmail.com>, 2025
+# Maciej Olko <maciej.olko@gmail.com>, 2026
+# filip klosowski <filip@geoida.pl>, 2026
+# Piotr Wojcik <pwwpww@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Polish (https://app.transifex.com/divio/teams/58664/pl/)\n"
@@ -40,8 +40,14 @@ msgstr "Fragment tytułu, który jest używany w adresie URL"
 msgid "Page type"
 msgstr "Typ strony"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Typy Stron"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Nadpisz URL"
@@ -225,6 +231,9 @@ msgid ""
 msgstr ""
 "(aby to zmienić, najpierw cofnij publikację aktualnie opublikowanej wersji "
 "tej strony)"
+
+msgid "Add Translation"
+msgstr "Dodaj tłumaczenie"
 
 msgid "Add Page Copy"
 msgstr "Dodaj Kopię Strony"
@@ -444,9 +453,6 @@ msgstr "Wyloguj"
 msgid "Language"
 msgstr "Język"
 
-msgid "Add Translation"
-msgstr "Dodaj tłumaczenie"
-
 msgid "Delete Translation"
 msgstr "Usuń tłumaczenie"
 
@@ -511,6 +517,9 @@ msgstr "Wybierz poprawną domenę"
 
 msgid "Select a valid page"
 msgstr "Wybierz poprawną podstronę"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1538,6 +1547,9 @@ msgstr "Wybierz jedną z poniższych opcji by przejść do kolejnego kroku."
 
 msgid "Next"
 msgstr "Dalej"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Nieznane"

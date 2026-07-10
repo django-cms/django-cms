@@ -8,17 +8,17 @@
 # SAG <andrschwartz@gmail.com>, 2023
 # Vadim Sikora <vadim.sikora@gmail.com>, 2023
 # Kirill Artemenko <4322221@gmail.com>, 2023
-# Oleg Fish <okfish@yandex.ru>, 2025
 # Dmitrii Kurskov, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2026
+# Oleg Fish <okfish@yandex.ru>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
+"Last-Translator: Oleg Fish <okfish@yandex.ru>, 2026\n"
 "Language-Team: Russian (https://app.transifex.com/divio/teams/58664/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,8 +41,14 @@ msgstr "Часть заголовка, используемая в URL"
 msgid "Page type"
 msgstr "Тип страницы"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Типы страниц"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Переписать URL"
@@ -225,6 +231,9 @@ msgid ""
 msgstr ""
 "(чтобы изменить это, сначала снимите с публикации текущую опубликованную "
 "версию этой страницы)"
+
+msgid "Add Translation"
+msgstr "Добавить перевод"
 
 msgid "Add Page Copy"
 msgstr "Добавить копию Страницы"
@@ -445,9 +454,6 @@ msgstr "Выход"
 msgid "Language"
 msgstr "Язык"
 
-msgid "Add Translation"
-msgstr "Добавить перевод"
-
 msgid "Delete Translation"
 msgstr "Удалить перевод"
 
@@ -512,6 +518,9 @@ msgstr "Выбрать правильный сайт"
 
 msgid "Select a valid page"
 msgstr "Выбрать правильную страницу"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1548,6 +1557,9 @@ msgstr "Пожалуйста, выберите опцию ниже, чтобы �
 
 msgid "Next"
 msgstr "Далее"
+
+msgid "Select what you would like to create"
+msgstr ""
 
 msgid "Unknown"
 msgstr "Неизвестно"

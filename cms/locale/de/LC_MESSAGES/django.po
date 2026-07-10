@@ -4,18 +4,18 @@
 # 
 # Translators:
 # djangoger <thomas.meitz@retailify.de>, 2023
-# Alexander Elvers <transifex@alex.kandru.de>, 2023
 # Angelo Dini <angelo.dini@divio.ch>, 2023
-# Jannik Vieten <me@exploide.net>, 2023
 # Hendrik Richter <hendrikr@gnome.org>, 2025
-# Peter Wischer <peter.wischer@lwl.org>, 2025
+# Peter Wischer <peter.wischer@lwl.org>, 2026
+# Jannik Vieten <me@exploide.net>, 2026
+# Alexander Elvers <transifex@alex.kandru.de>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: German (https://app.transifex.com/divio/teams/58664/de/)\n"
@@ -40,8 +40,14 @@ msgstr "Die Kurzform des Titels, die in URLs verwendet wird"
 msgid "Page type"
 msgstr "Seitentyp"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Seitentypen"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Manuelle URL"
@@ -133,44 +139,42 @@ msgid ""
 "Edit permissions required."
 msgstr ""
 "Benutzer können keine Seite erstellen, ohne die Berechtigung zu haben, die "
-"erstellte Seite zu editieren. Eine Anpassung der Berechtigungen ist nötig."
+"erstellte Seite zu editieren."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
 "Benutzer können keine Seite löschen, ohne die Berechtigung zu haben, die "
-"Seite zu editieren. Eine Anpassung der Berechtigungen ist nötig."
+"Seite zu editieren."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
 "Benutzer können keine Seitenberechtigungen setzen, ohne die Berechtigung zu "
-"haben, Seiten zu editieren. Eine Anpassung der Berechtigungen ist nötig."
+"haben, Seiten zu editieren."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
 "Benutzer können keine Seitenberechtigungen löschen, ohne die Berechtigung zu"
-" haben, Seiten zu editieren. Eine Anpassung der Berechtigungen ist nötig."
+" haben, Seiten zu editieren."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
 "Benutzer können keine Seitenberechtigungen erstellen, ohne die Berechtigung "
-"zu haben, die erstellte Berechtigung zu editieren. Eine Anpassung der "
-"Berechtigungen ist nötig."
+"zu haben, die erstellte Berechtigung zu editieren."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
 msgstr ""
 "Benutzer können keine Seitenberechtigungen löschen, ohne die Berechtigung zu"
-" haben, Berechtigungen zu editieren. Eine Anpassung der Berechtigungen ist "
-"nötig."
+" haben, Berechtigungen zu editieren."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
@@ -230,6 +234,9 @@ msgid ""
 msgstr ""
 "(für Änderungen zunächst die Veröffentlichung dieser Seite rückgängig "
 "machen)"
+
+msgid "Add Translation"
+msgstr "Übersetzung hinzufügen"
 
 msgid "Add Page Copy"
 msgstr "Seitenkopie hinzufügen"
@@ -450,9 +457,6 @@ msgstr "Abmelden"
 msgid "Language"
 msgstr "Sprache"
 
-msgid "Add Translation"
-msgstr "Übersetzung hinzufügen"
-
 msgid "Delete Translation"
 msgstr "Übersetzung löschen"
 
@@ -517,6 +521,9 @@ msgstr "Wählen Sie eine gültige Webseite"
 
 msgid "Select a valid page"
 msgstr "Wählen Sie eine gültige Seite"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -740,10 +747,10 @@ msgid "Current page"
 msgstr "Aktuelle Seite"
 
 msgid "Page children (immediate)"
-msgstr "Direkt untergeordnete Seite"
+msgstr "Direkt untergeordnete Seiten"
 
 msgid "Page and children (immediate)"
-msgstr "Aktuelle und direkt untergeordnete Seite"
+msgstr "Aktuelle Seite und direkt untergeordnete Seiten"
 
 msgid "Page descendants"
 msgstr "Alle untergeordnete Seiten"
@@ -765,29 +772,28 @@ msgid ""
 "permissions required."
 msgstr ""
 "Benutzer können keine Seite veröffentlichen, ohne die Berechtigung zu haben,"
-" die Seite zu editieren. Eine Anpassung der Berechtigungen ist nötig."
+" die Seite zu editieren."
 
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
 msgstr ""
 "Benutzer können nicht die erweiterten Einstellungen einer Seite ändern, ohne"
-" die Berechtigung zu haben, die Seite zu editieren. Eine Anpassung der "
-"Berechtigungen ist nötig."
+" die Berechtigung zu haben, die Seite zu editieren."
 
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
 msgstr ""
 "Benutzer können keine Seitenberechtigungen ändern, ohne die Berechtigung zu "
-"haben, die Seite zu editieren. Eine Anpassung der Berechtigungen ist nötig."
+"haben, die Seite zu editieren."
 
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
 "Benutzer können eine Seite nicht verschieben, ohne die Berechtigung zu "
-"haben, die Seite zu editieren. Eine Anpassung der Berechtigungen ist nötig."
+"haben, die Seite zu editieren."
 
 msgid "can recover any deleted page"
 msgstr "Kann alle gelöschten Seiten wiederherstellen"
@@ -1553,6 +1559,9 @@ msgstr ""
 
 msgid "Next"
 msgstr "Weiter"
+
+msgid "Select what you would like to create"
+msgstr "Wählen Sie aus, was Sie erstellen möchten"
 
 msgid "Unknown"
 msgstr "Unbekannt"

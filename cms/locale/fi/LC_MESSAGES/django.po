@@ -4,17 +4,17 @@
 # 
 # Translators:
 # 6e24184c9f8092a67bcd413cbcf598da_29fd2b5 <08b9fabf956572ae43d0b31e4effa6b5_821440>, 2022
-# Kusti Hämäläinen <kusti.hamalainen@aalto.fi>, 2023
 # Ville-Eemeli Käkelä <ville-eemeli.kakela@bitfactor.fi>, 2025
 # Niklas Jerva <niklas.jerva@gmail.com>, 2025
 # Teemu Gratschev <teemu.gratschev@gmail.com>, 2026
+# Kusti Hämäläinen <kusti.hamalainen@aalto.fi>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Finnish (https://app.transifex.com/divio/teams/58664/fi/)\n"
@@ -39,8 +39,14 @@ msgstr "Osa otsikosta jota käytetään URL:ssa"
 msgid "Page type"
 msgstr "Sivutyyppi"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sivutyypit"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Yliaja URL"
@@ -223,6 +229,9 @@ msgid ""
 msgstr ""
 "(muuttaaksesi tätä, poista ensin tämän sivun tällä hetkellä julkaistun "
 "version julkaisu)"
+
+msgid "Add Translation"
+msgstr "Lisää käännös"
 
 msgid "Add Page Copy"
 msgstr "Lisää kopio sivusta"
@@ -443,9 +452,6 @@ msgstr "Kirjaudu ulos"
 msgid "Language"
 msgstr "Kieli"
 
-msgid "Add Translation"
-msgstr "Lisää käännös"
-
 msgid "Delete Translation"
 msgstr "Poista käännös"
 
@@ -510,6 +516,9 @@ msgstr "Valitse kelvollinen sivusto"
 
 msgid "Select a valid page"
 msgstr "Valitse kelvollinen sivu"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1541,6 +1550,9 @@ msgstr "Valitse valinta alapuolelta jatkaaksesi seuraavaan vaiheeseen."
 msgid "Next"
 msgstr "Seuraava"
 
+msgid "Select what you would like to create"
+msgstr ""
+
 msgid "Unknown"
 msgstr "Tuntematon"
 
@@ -1674,7 +1686,7 @@ msgid "Static Menu3"
 msgstr "Staattinen valikko3"
 
 msgid "Static Menu4"
-msgstr "Staattinen valikko4"
+msgstr "Staattinen valikko"
 
 msgid "Category"
 msgstr "Kategoria"
