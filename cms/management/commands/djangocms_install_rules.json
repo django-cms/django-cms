@@ -104,7 +104,6 @@
     "settings": [
         {"name": "SITE_ID", "snippet": "SITE_ID = 1"},
         {"name": "X_FRAME_OPTIONS", "snippet": "X_FRAME_OPTIONS = \"SAMEORIGIN\""},
-        {"name": "CMS_CONFIRM_VERSION4", "snippet": "CMS_CONFIRM_VERSION4 = True"},
         {"name": "LANGUAGES", "snippet": "LANGUAGES = [\n    (\"{language_code}\", \"{language_name}\"),\n]"},
         {"name": "CMS_TEMPLATES", "snippet": "CMS_TEMPLATES = [\n    (\"cms-base.html\", \"Default\"),\n]", "when": {"mode": ["traditional", "hybrid"]}},
         {"name": "CMS_PLACEHOLDERS", "snippet": "CMS_PLACEHOLDERS = [\n    (\"cms-base.html\", (\"content\",), \"Content\"),\n]", "when": {"mode": ["headless"]}}

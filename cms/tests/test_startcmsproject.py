@@ -1,6 +1,8 @@
+import io
 import json
 import os
 import sys
+import tarfile
 import tempfile
 import urllib.error
 from io import StringIO
@@ -148,6 +150,37 @@ def make_command():
 
 
 class LoadInstallRulesTests(SimpleTestCase):
+    def test_loads_rules_from_custom_template_directory(self):
+        rules = bundled_rules()
+        rules["installed_apps"] = [{"items": ["agency_app"]}]
+        with tempfile.TemporaryDirectory() as template:
+            with open(os.path.join(template, Command.INSTALL_RULES_FILENAME), "w", encoding="utf-8") as rules_file:
+                json.dump(rules, rules_file)
+            command = make_command()
+            command._requested_template = template
+            with mock.patch("urllib.request.urlopen") as urlopen:
+                loaded = command.load_install_rules()
+        self.assertEqual(loaded["installed_apps"], [{"items": ["agency_app"]}])
+        urlopen.assert_not_called()
+
+    def test_loads_rules_from_custom_remote_template_archive(self):
+        rules = bundled_rules()
+        rules["installed_apps"] = [{"items": ["remote_agency_app"]}]
+        archive = io.BytesIO()
+        payload = json.dumps(rules).encode()
+        with tarfile.open(fileobj=archive, mode="w:gz") as template_tar:
+            member = tarfile.TarInfo(f"agency-template/{Command.INSTALL_RULES_FILENAME}")
+            member.size = len(payload)
+            template_tar.addfile(member, io.BytesIO(payload))
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = archive.getvalue()
+        command = make_command()
+        command._requested_template = "https://example.com/agency-template.tar.gz"
+        with mock.patch("urllib.request.urlopen", return_value=response) as urlopen:
+            loaded = command.load_install_rules()
+        self.assertEqual(loaded["installed_apps"], [{"items": ["remote_agency_app"]}])
+        urlopen.assert_called_once_with("https://example.com/agency-template.tar.gz", timeout=15)
+
     def test_metadata_keys_are_ignored(self):
         """A ``$schema`` entry (and any other ``$``-prefixed key) is dropped."""
         payload = json.dumps(bundled_rules(**{"$schema": "https://example.com/schema.json"})).encode()
@@ -206,6 +239,23 @@ class LoadInstallRulesTests(SimpleTestCase):
 
 
 class ParserOptionTests(SimpleTestCase):
+    def test_custom_template_defines_command_options(self):
+        rules = bundled_rules()
+        rules["options"]["agency_feature"] = {
+            "type": "boolean",
+            "default": False,
+            "label": "Agency feature",
+            "help": "Install the agency feature.",
+        }
+        with tempfile.TemporaryDirectory() as template:
+            with open(os.path.join(template, Command.INSTALL_RULES_FILENAME), "w", encoding="utf-8") as rules_file:
+                json.dump(rules, rules_file)
+            command = make_command()
+            with mock.patch.object(sys, "argv", ["djangocms", "mysite", "--template", template]):
+                parser = command.create_parser("djangocms", "")
+            parsed = parser.parse_args(["mysite", "--template", template, "--agency-feature"])
+        self.assertTrue(parsed.agency_feature)
+
     def test_template_options_are_added_from_rules(self):
         command = make_command()
         command.load_install_rules = mock.Mock(return_value=bundled_rules())
