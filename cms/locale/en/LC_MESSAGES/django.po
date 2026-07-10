@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -34,8 +34,14 @@ msgstr "The part of the title that is used in the URL"
 msgid "Page type"
 msgstr "Page type"
 
+msgid "You do not have permission to change this page."
+msgstr "You do not have permission to change this page."
+
 msgid "Page Types"
 msgstr "Page Types"
+
+msgid "You do not have permission to copy this page."
+msgstr "You do not have permission to copy this page."
 
 msgid "Overwrite URL"
 msgstr "Overwrite URL"
@@ -216,6 +222,9 @@ msgid ""
 "(to change it, first unpublish the currently published version of this page)"
 msgstr ""
 "(to change it, first unpublish the currently published version of this page)"
+
+msgid "Add Translation"
+msgstr "Add Translation"
 
 msgid "Add Page Copy"
 msgstr "Add Page Copy"
@@ -435,9 +444,6 @@ msgstr "Logout"
 msgid "Language"
 msgstr "Language"
 
-msgid "Add Translation"
-msgstr "Add Translation"
-
 msgid "Delete Translation"
 msgstr "Delete Translation"
 
@@ -502,6 +508,9 @@ msgstr "Select a valid site"
 
 msgid "Select a valid page"
 msgstr "Select a valid page"
+
+msgid "Enter a valid relative or absolute URL."
+msgstr "Enter a valid relative or absolute URL."
 
 #, python-format
 msgid ""
@@ -1548,6 +1557,9 @@ msgstr "Please choose an option from below to proceed to the next step."
 
 msgid "Next"
 msgstr "Next"
+
+msgid "Select what you would like to create"
+msgstr "Select what you would like to create"
 
 msgid "Unknown"
 msgstr "Unknown"
