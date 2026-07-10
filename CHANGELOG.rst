@@ -1,12 +1,11 @@
-5.1.0a1 (2025-11-12)
-====================
+5.1.0 (2026-07-10)
+==================
 
 
 Features:
 ---------
 * Support django 6.1+ breadcrumb styles (#8689) (fa220cd79) -- Fabian Braun
-
-* introduce contracts for django CMS Extensions (#8455) -- Fabian Braun
+* Introduce contracts for django CMS Extensions (#8455) -- Fabian Braun
 * Avoid database access when registering apphook urls to make them async-safe (#8460) -- Fabian Braun
 * Make page content placeholders available to apphook root pages (#8456) -- Fabian Braun
 * Preserve GET params when switching to preview or edit mode (#8444) -- Fabian Braun
@@ -49,6 +48,111 @@ This release includes 5 pull requests, and was created with the help of the foll
 
 With the review help of the following contributors:
 
+
+Thanks to all contributors for their efforts!
+
+5.0.8 (2026-06-09)
+==================
+
+Bug Fixes:
+----------
+* Enforce authorization on structure, move and clipboard endpoints (#8644) (#8645) (7642a98ab) -- Fabian Braun
+* GrouperModelAdmin shadowed prepopulated_fields class attribute (#8636) (#8639) (1b164a488) -- Fabian Braun
+* Honour plugin-declared Vary headers in the page cache key (#8646) (#8647) (d5dc1efa1) -- Fabian Braun
+* Missing redirect_url in CMSNavigationNode.attr (#8625) (f975cace5) -- Venelin Stoykov
+* Release script dropped changes (#8655) (23df299bd) -- Fabian Braun
+* Slugs of published pages could be changed (#8640) (#8654) (9fed876a0) -- Fabian Braun
+* Transifex upload script failed (#8656) (936a620ef) -- Fabian Braun
+* template-specific CMS_PLACEHOLDER_CONF keys ignored when rendering page placeholders (#8652) (c7424f7f2) -- Ralph
+* Correct lookup prefix and register length lookup in PermissionTuple.allow_list()
+* Use loop variable instead of queryset in user_can_delete_page placeholder check
+* Return 404 instead of 500 for missing objects in delete_view and edit_title_fields
+* Use target language for position shift and cache clearing in _paste_placeholder
+
+Statistics:
+-----------
+
+This release includes 14 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (8 pull requests)
+* Ralph (1 pull request)
+* Venelin Stoykov (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.7 (2026-05-05)
+==================
+
+Bug Fixes:
+----------
+
+* Keep GET params when toggling structure mode by @petrklus in https://github.com/django-cms/django-cms/pull/8497
+* slug and overwrite_url caching failed in read-only change_views (#8507) by @fsbraun in https://github.com/django-cms/django-cms/pull/8509
+* Add missing pin icon for external placeholders by @fsbraun in https://github.com/django-cms/django-cms/pull/8520
+* Chunk size was missing for plugin queryset.iterator() (#8532) by @fsbraun in https://github.com/django-cms/django-cms/pull/8533
+* Proxy models of `CMSPlugin` were not downcasted correctly (#8539) by @fsbraun in https://github.com/django-cms/django-cms/pull/8541
+* Inline editing could circumvent permissions (#8542) by @fsbraun in https://github.com/django-cms/django-cms/pull/8553
+* Fallback languages rendered empty (when not redirecting) by @fsbraun in https://github.com/django-cms/django-cms/pull/8558
+* DiffDOM sometimes left garbled head section by @fsbraun in https://github.com/django-cms/django-cms/pull/8562
+* Add `page_title` parameter to `cms.api.create_page` function (#8567) by @fsbraun in https://github.com/django-cms/django-cms/pull/8572
+* XSS vulnerability in validator error message (#8576) by @fsbraun in https://github.com/django-cms/django-cms/pull/8580
+* Deleting a non-local plugin did not refresh the screen (#8582) by @fsbraun in https://github.com/django-cms/django-cms/pull/8586
+* Compatibility shim for Page.objects.order_by used non-existing fields by @fsbraun in https://github.com/django-cms/django-cms/pull/8598
+* Convert value to string in ApplicationConfigSelect. (#8594) by @fsbraun in https://github.com/django-cms/django-cms/pull/8601
+* Migrations with a custom user model caused a Programming error (#8606) by @fsbraun in https://github.com/django-cms/django-cms/pull/8608
+* deadlock could happen on moving large pagesubtrees (#8529) by @fsbraun in https://github.com/django-cms/django-cms/pull/8610
+* resolve empty page_title in frontend edit mode for apphooks (#8449) by @fsbraun in https://github.com/django-cms/django-cms/pull/8617
+
+Statistics:
+-----------
+
+This release includes 15 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (15 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+5.0.6 (2026-02-22)
+==================
+
+Features:
+---------
+* Add button for django CMS chat (#8478) (8c383c9e6) -- Fabian Braun
+* Preserve GET params when switching to preview or edit mode (#8444) (#8446) (9bcfb0871) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Fix ApphookReloadMiddleware not handling new language variants #2 (#8401) (#8412) (4fc76cff0) -- Fabian Braun
+* Improved UX for external placeholders (e.g., static aliases) (#8416) (#8435) (19f8c9dcf) -- Fabian Braun
+* Migrations failed for django-treebeard >= 5.0.3 (#8485) (a5f73980a) -- Fabian Braun
+* Save fallback for includes when scanning for placeholders (#8405) (#8407) (3afd42bf7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8402) (1e8a3f9c7) -- Fabian Braun
+* copying failed if a target placeholders was missing (#8399) (#8410) (15cebb33c) -- Fabian Braun
+* get_permissions failed for missing global permissions (#8468) (#8469) (132736417) -- Fabian Braun
+* make-changelog script (#8492) (e4751d605) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes       15 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (10 pull requests)
+
+With the review help of the following contributors:
+
+* Django CMS Release
+* Moritz Pietzschke
+* Vinit Kumar
+* [Aaditya1273]
 
 Thanks to all contributors for their efforts!
 
