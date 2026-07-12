@@ -723,6 +723,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
         """Save/create both grouper and content object"""
         super().save_model(request, obj or form.instance, form, change)
+        if not hasattr(form, "_content_fields"):
+            # list_editable fields
+            return
         content_dict = {
             field: form.cleaned_data[CONTENT_PREFIX + field]
             for field in form._content_fields
