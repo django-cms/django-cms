@@ -43,6 +43,7 @@ Backward incompatible changes:
 
 Bug Fixes:
 ----------
+* Correct inaccurate and stale keyword arguments sent with placeholder operation signals (#8668) -- Fabian Braun
 * Enforce authorization when rendering frontend object structures (#8692) -- Fabian Braun
 * Harden page duplication, group permission handling, and URL validation (#8704) -- Fabian Braun
 * Prevent page titles from being inserted unescaped into rendering errors and prevent clipboard clearing through GET
