@@ -1,6 +1,7 @@
 import re
 import typing
 from copy import copy
+from functools import partial
 from urllib.parse import parse_qsl
 
 from django import forms
@@ -10,17 +11,18 @@ from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
+from django.core import checks
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models import DateField, OuterRef, Subquery, functions
 from django.db.models.functions import Cast
-from django.forms import modelform_factory
+from django.forms import modelform_factory, modelformset_factory
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, path
 from django.utils.decorators import method_decorator
-from django.utils.html import format_html_join
+from django.utils.html import format_html, format_html_join
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
@@ -179,6 +181,35 @@ class GrouperChangeListBase(ChangeList):
 
 
 class GrouperModelAdminChecks(ModelAdminChecks):
+    def _check_list_editable_item(self, obj, field_name, label):
+        """Check content model fields against the content model."""
+        if field_name.startswith(CONTENT_PREFIX) and obj.content_model:
+            content_field_name = field_name[len(CONTENT_PREFIX) :]
+            if content_field_name == obj.grouper_field_name or content_field_name in obj.extra_grouping_fields:
+                return [
+                    checks.Error(
+                        f"The value of '{label}' refers to '{field_name}', which cannot be edited "
+                        "from the changelist.",
+                        obj=obj.__class__,
+                        id="admin.E125",
+                    )
+                ]
+            content_obj = copy(obj)
+            content_obj.model = obj.content_model
+            content_obj.list_display = tuple(
+                item[len(CONTENT_PREFIX) :] if isinstance(item, str) and item.startswith(CONTENT_PREFIX) else item
+                for item in obj.list_display
+            )
+            if obj.list_display_links:
+                content_obj.list_display_links = tuple(
+                    item[len(CONTENT_PREFIX) :]
+                    if isinstance(item, str) and item.startswith(CONTENT_PREFIX)
+                    else item
+                    for item in obj.list_display_links
+                )
+            return super()._check_list_editable_item(content_obj, content_field_name, label)
+        return super()._check_list_editable_item(obj, field_name, label)
+
     def _check_prepopulated_fields_value_item(self, obj, field_name, label):
         """For `prepopulated_fields` equal to {"slug": ("content__title",)},
         `field_name` is "content__title"."""
@@ -674,6 +705,50 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     )
         return form_class
 
+    def get_changelist_form(self, request: HttpRequest, **kwargs) -> type:
+        """Return a grouper form capable of editing grouper and content fields."""
+        self.get_grouping_from_request(request)
+        content_id_field = forms.ModelChoiceField(
+            queryset=self.content_model.admin_manager.all(),
+            required=False,
+            widget=forms.HiddenInput(),
+        )
+        editable_content_fields = {
+            field for field in self.list_editable if field.startswith(CONTENT_PREFIX)
+        }
+        form_attributes = {
+            "_admin": self,
+            "_request": request,
+            "_content_object_id": content_id_field,
+        }
+        form_attributes.update(
+            {
+                CONTENT_PREFIX + field: None
+                for field in self.form._content_fields
+                if CONTENT_PREFIX + field not in editable_content_fields
+            }
+        )
+        form_class = type(self.form)(
+            self.form.__name__,
+            (self.form,),
+            form_attributes,
+        )
+        return super().get_changelist_form(request, form=form_class, **kwargs)
+
+    def get_changelist_formset(self, request: HttpRequest, **kwargs) -> type:
+        """Include the hidden content identity in the changelist formset."""
+        defaults = {
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+            **kwargs,
+        }
+        return modelformset_factory(
+            self.model,
+            self.get_changelist_form(request),
+            extra=0,
+            fields=(*self.list_editable, "_content_object_id"),
+            **defaults,
+        )
+
     # Admin list actions defined below:
     # * View button that takes the user to the preview endpoint of the content model
     # * Settings button that lets the user change the grouper AND the content model
@@ -846,13 +921,18 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
         """Save/create both grouper and content object"""
         super().save_model(request, obj or form.instance, form, change)
+        if not hasattr(form, "_content_fields"):
+            return
         content_dict = {
             field: form.cleaned_data[CONTENT_PREFIX + field]
             for field in form._content_fields
             if CONTENT_PREFIX + field in form.cleaned_data
         }
+        if not content_dict:
+            return
         if form._content_instance is None or form._content_instance.pk is None:
             content_dict[self.grouper_field_name] = form.instance
+            content_dict.update(self.current_content_filters)
             if hasattr(form._content_model.objects, "with_user"):
                 # Create new using with_user syntax if available ...
                 form._content_model.objects.with_user(request.user).create(**content_dict)
@@ -912,6 +992,39 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return search_result_from_content, False
 
 
+class _ContentIdentityWidget(forms.Widget):
+    """Render a content field together with its changelist content identity."""
+
+    def __init__(self, widget, content_field_name):
+        super().__init__(attrs=widget.attrs)
+        self.widget = widget
+        self.content_field_name = content_field_name
+        self.content_object_id = None
+
+    @property
+    def media(self):
+        return self.widget.media
+
+    def id_for_label(self, id_):
+        return self.widget.id_for_label(id_)
+
+    def value_from_datadict(self, data, files, name):
+        return self.widget.value_from_datadict(data, files, name)
+
+    def value_omitted_from_data(self, data, files, name):
+        return self.widget.value_omitted_from_data(data, files, name)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        field = self.widget.render(name, value, attrs=attrs, renderer=renderer)
+        prefix = name[: -len(self.content_field_name)]
+        identity = forms.HiddenInput().render(
+            f"{prefix}_content_object_id",
+            self.content_object_id,
+            renderer=renderer,
+        )
+        return format_html("{}{}", field, identity)
+
+
 class _GrouperAdminFormMixin:
     _content_fields: list = []
 
@@ -935,6 +1048,8 @@ class _GrouperAdminFormMixin:
                     },
                     **kwargs.get("initial", {}),
                 }
+                if "_content_object_id" in self.base_fields:
+                    kwargs["initial"]["_content_object_id"] = self._content_instance
         else:
             self._content_instance = None
 
@@ -947,10 +1062,21 @@ class _GrouperAdminFormMixin:
         # The actual init
         super().__init__(*args, **kwargs)
 
+        editable_content_fields = [
+            field for field in self.fields if field.startswith(CONTENT_PREFIX)
+        ]
+        if "_content_object_id" in self.fields and editable_content_fields:
+            field_name = editable_content_fields[0]
+            widget = _ContentIdentityWidget(self.fields[field_name].widget, field_name)
+            widget.content_object_id = self._content_instance.pk if self._content_instance else None
+            self.fields[field_name].widget = widget
+
         # Hide grouper foreign key
-        self.fields[CONTENT_PREFIX + self._admin.grouper_field_name].widget = forms.HiddenInput()
-        # Will be set on admin model save
-        self.fields[CONTENT_PREFIX + self._admin.grouper_field_name].required = False
+        grouper_field_name = CONTENT_PREFIX + self._admin.grouper_field_name
+        if grouper_field_name in self.fields:
+            self.fields[grouper_field_name].widget = forms.HiddenInput()
+            # Will be set on admin model save
+            self.fields[grouper_field_name].required = False
         self.update_labels(self._content_fields)
 
     def update_labels(self, fields: list[str]) -> None:
@@ -982,7 +1108,23 @@ class _GrouperAdminFormMixin:
                 params=dict(value=self.cleaned_data.get("language", _("<unspecified>"))),
                 code="invalid-language",
             )
-        return super().clean()
+        cleaned_data = super().clean()
+        if "_content_object_id" in cleaned_data:
+            content_obj = cleaned_data["_content_object_id"]
+            if content_obj is not None:
+                grouper_id = getattr(content_obj, f"{self._admin.grouper_field_name}_id")
+                grouping_matches = all(
+                    getattr(content_obj, field) == value
+                    for field, value in self._admin.current_content_filters.items()
+                )
+                if grouper_id != self.instance.pk or not grouping_matches:
+                    raise ValidationError(_("The selected content does not match this object and grouping."))
+                self._content_instance = content_obj
+            if any(field.startswith(CONTENT_PREFIX) for field in self.changed_data) and not self._admin.can_change_content(
+                self._request, content_obj
+            ):
+                raise ValidationError(_("You do not have permission to change this content."))
+        return cleaned_data
 
 
 class GrouperAdminFormMixin:

@@ -153,6 +153,121 @@ class ChangeListActionsTestCase(SetupMixin, SimpleChangeListActionsTestCase):
 
 
 class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
+    def get_list_editable_post_data(self, response, **values):
+        formset = response.context["cl"].formset
+        data = {
+            "form-TOTAL_FORMS": formset.total_form_count(),
+            "form-INITIAL_FORMS": formset.initial_form_count(),
+            "form-MIN_NUM_FORMS": formset.min_num,
+            "form-MAX_NUM_FORMS": formset.max_num,
+            "_save": "Save",
+        }
+        for index, form in enumerate(formset.forms):
+            data[f"form-{index}-id"] = form.instance.pk
+            for field_name in self.admin.list_editable:
+                data[f"form-{index}-{field_name}"] = values.get(field_name, form[field_name].value())
+            data[f"form-{index}-_content_object_id"] = form["_content_object_id"].value() or ""
+        return data
+
+    def test_list_editable_saves_grouper_field(self):
+        with (
+            patch.object(self.admin, "list_display", ("category_name",)),
+            patch.object(self.admin, "list_display_links", None),
+            patch.object(self.admin, "list_editable", ("category_name",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=en")
+            data = self.get_list_editable_post_data(response, category_name="Changed grouper")
+            response = self.client.post(f"{self.changelist_url}?language=en", data)
+
+        self.assertEqual(response.status_code, 302)
+        self.grouper_instance.refresh_from_db()
+        self.assertEqual(self.grouper_instance.category_name, "Changed grouper")
+
+    def test_list_editable_saves_content_field_for_current_grouping(self):
+        english_content = self.createContentInstance("en")
+        german_content = self.createContentInstance("de")
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_editable", ("content__secret_greeting",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=de")
+            self.assertContains(response, 'name="form-0-_content_object_id"')
+            data = self.get_list_editable_post_data(response, content__secret_greeting="Guten Tag")
+            response = self.client.post(f"{self.changelist_url}?language=de", data)
+
+        self.assertEqual(response.status_code, 302)
+        english_content.refresh_from_db()
+        german_content.refresh_from_db()
+        self.assertNotEqual(english_content.secret_greeting, "Guten Tag")
+        self.assertEqual(german_content.secret_greeting, "Guten Tag")
+
+    def test_list_editable_saves_grouper_and_content_fields(self):
+        content = self.createContentInstance("en")
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_display_links", None),
+            patch.object(self.admin, "list_editable", ("category_name", "content__secret_greeting")),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=en")
+            data = self.get_list_editable_post_data(
+                response,
+                category_name="Changed grouper",
+                content__secret_greeting="Changed content",
+            )
+            response = self.client.post(f"{self.changelist_url}?language=en", data)
+
+        self.assertEqual(response.status_code, 302)
+        self.grouper_instance.refresh_from_db()
+        content.refresh_from_db()
+        self.assertEqual(self.grouper_instance.category_name, "Changed grouper")
+        self.assertEqual(content.secret_greeting, "Changed content")
+
+    def test_list_editable_creates_content_for_current_grouping(self):
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_editable", ("content__secret_greeting",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=de")
+            data = self.get_list_editable_post_data(response, content__secret_greeting="Guten Tag")
+            response = self.client.post(f"{self.changelist_url}?language=de", data)
+
+        self.assertEqual(response.status_code, 302)
+        content = GrouperModelContent.objects.get(grouper_model=self.grouper_instance)
+        self.assertEqual(content.language, "de")
+        self.assertEqual(content.secret_greeting, "Guten Tag")
+
+    def test_list_editable_rejects_content_from_another_grouper(self):
+        self.createContentInstance("en")
+        other_grouper = GrouperModel.objects.create(category_name="Other")
+        other_content = GrouperModelContent.objects.create(
+            grouper_model=other_grouper,
+            language="en",
+            secret_greeting="Other greeting",
+        )
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_editable", ("content__secret_greeting",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=en")
+            data = self.get_list_editable_post_data(response, content__secret_greeting="Tampered")
+            form_index = next(
+                index
+                for index, form in enumerate(response.context["cl"].formset.forms)
+                if form.instance.pk == self.grouper_instance.pk
+            )
+            data[f"form-{form_index}-_content_object_id"] = other_content.pk
+            response = self.client.post(f"{self.changelist_url}?language=en", data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The selected content does not match this object and grouping.")
+        other_content.refresh_from_db()
+        self.assertEqual(other_content.secret_greeting, "Other greeting")
+
     def test_form_class_created(self):
         """The form class has automatically been enhanced with the GrouperAdminFormMixin for
         the appropriate content model (actually its parent class _GrouperAdminFormMixin)"""
@@ -162,6 +277,22 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         # Assert
         self.assertTrue(issubclass(self.admin.form, _GrouperAdminFormMixin))
         self.assertEqual(self.admin.form._content_model, GrouperModelContent)
+
+    def test_content_field_is_valid_in_list_editable(self):
+        admin = copy.copy(self.admin)
+        admin.list_display = ("category_name", "content__secret_greeting")
+        admin.list_editable = ("content__secret_greeting",)
+
+        self.assertEqual(admin.check(), [])
+
+    def test_grouping_field_is_invalid_in_list_editable(self):
+        admin = copy.copy(self.admin)
+        admin.list_display = ("category_name", "content__language")
+        admin.list_editable = ("content__language",)
+
+        errors = admin.check()
+
+        self.assertIn("admin.E125", [error.id for error in errors])
 
     def test_form_class_content_fields(self):
         """The content fields appear in the admin form with a prefix"""
