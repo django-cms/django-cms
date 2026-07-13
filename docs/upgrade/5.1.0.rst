@@ -298,6 +298,7 @@ Minor features
 Bug Fixes
 =========
 
+* Correct inaccurate and stale keyword arguments sent with placeholder operation signals
 * Enforce authorization on structure rendering, plugin movement, and clipboard endpoints
 * Prevent inline editing from bypassing permissions
 * Prevent toolbar login from following an unverified redirect
@@ -332,6 +333,20 @@ Bug Fixes
 **************************************
 Backward incompatible changes in 5.1.0
 **************************************
+
+Placeholder operation signals
+=============================
+
+Placeholder operation signal keyword arguments now consistently describe the
+state at the time of the signal: pre-operation signals describe the state before
+the operation, post-operation signals describe the resulting state, and
+``source_*`` arguments retain their original source values. Consequently,
+``*_order`` and source-related arguments can differ from the previously empty,
+stale, or target-side values.
+
+The ``ADD_PLUGIN`` post-operation signal also now includes a ``tree_order``
+keyword argument. Custom signal receivers must accept ``**kwargs``, as recommended
+for Django signal receivers, and must not rely on the previous incorrect values.
 
 Dependencies, settings, and migrations
 ======================================

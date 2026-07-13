@@ -32,11 +32,12 @@ class PagePlaceholderTestCase(CMSTestCase):
         )
         return plugin
 
-    def _get_add_plugin_uri(self, language='en'):
+    def _get_add_plugin_uri(self, language='en', parent=None):
         uri = self.get_add_plugin_uri(
             placeholder=self._placeholder_1,
             plugin_type='LinkPlugin',
             language=language,
+            parent=parent,
         )
         return uri
 
@@ -52,8 +53,19 @@ class PagePlaceholderTestCase(CMSTestCase):
         self._placeholder_2 = self._cms_page.get_placeholders("en").get(slot='right-column')
 
     def test_pre_add_plugin(self):
+        parent = self._add_plugin()
+        existing_plugin = add_plugin(
+            self._placeholder_1,
+            'LinkPlugin',
+            'en',
+            target=parent,
+            position='last-child',
+            name='A Link',
+            external_link='https://www.django-cms.org',
+        )
+
         with signal_tester(pre_placeholder_operation) as env:
-            endpoint = self._get_add_plugin_uri()
+            endpoint = self._get_add_plugin_uri(parent=parent)
             data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
 
             with self.login_user_context(self._admin_user):
@@ -71,10 +83,22 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(call_kwargs['placeholder'], self._placeholder_1)
             self.assertEqual(call_kwargs['plugin'].name, data['name'])
             self.assertEqual(call_kwargs['plugin'].external_link, data['external_link'])
+            self.assertEqual(call_kwargs['tree_order'], [existing_plugin.pk])
 
     def test_post_add_plugin(self):
+        parent = self._add_plugin()
+        existing_plugin = add_plugin(
+            self._placeholder_1,
+            'LinkPlugin',
+            'en',
+            target=parent,
+            position='last-child',
+            name='A Link',
+            external_link='https://www.django-cms.org',
+        )
+
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
-            endpoint = self._get_add_plugin_uri()
+            endpoint = self._get_add_plugin_uri(parent=parent)
             data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
 
             with self.login_user_context(self._admin_user):
@@ -96,6 +120,11 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertTrue(post_call_kwargs['plugin'].pk)
             self.assertEqual(post_call_kwargs['plugin'].name, data['name'])
             self.assertEqual(post_call_kwargs['plugin'].external_link, data['external_link'])
+            self.assertEqual(pre_call_kwargs['tree_order'], [existing_plugin.pk])
+            self.assertEqual(
+                post_call_kwargs['tree_order'],
+                [existing_plugin.pk, post_call_kwargs['plugin'].pk],
+            )
 
     def test_pre_edit_plugin(self):
         plugin = self._add_plugin()
@@ -175,6 +204,7 @@ class PagePlaceholderTestCase(CMSTestCase):
 
     def test_post_delete_plugin(self):
         plugin = self._add_plugin()
+        remaining_plugin = self._add_plugin()
         endpoint = self.get_delete_plugin_uri(plugin)
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
@@ -198,6 +228,8 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(post_call_kwargs['placeholder'], self._placeholder_1)
             self.assertEqual(post_call_kwargs['plugin'].name, 'A Link')
             self.assertEqual(post_call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
+            self.assertEqual(pre_call_kwargs['tree_order'], [plugin.pk, remaining_plugin.pk])
+            self.assertEqual(post_call_kwargs['tree_order'], [remaining_plugin.pk])
 
     def test_pre_move_plugin(self):
         plugin = self._add_plugin()
@@ -235,7 +267,16 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(call_kwargs['target_parent_id'], None)
 
     def test_post_move_plugin(self):
-        plugin = self._add_plugin()
+        parent = self._add_plugin()
+        plugin = add_plugin(
+            self._placeholder_1,
+            'LinkPlugin',
+            'en',
+            target=parent,
+            position='last-child',
+            name='A Link',
+            external_link='https://www.django-cms.org',
+        )
         endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
 
@@ -267,7 +308,7 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(post_call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
             self.assertEqual(post_call_kwargs['source_language'], 'en')
             self.assertEqual(post_call_kwargs['source_placeholder'], source_placeholder)
-            self.assertEqual(post_call_kwargs['source_parent_id'], plugin.parent_id)
+            self.assertEqual(post_call_kwargs['source_parent_id'], parent.pk)
             self.assertEqual(post_call_kwargs['target_language'], 'en')
             self.assertEqual(post_call_kwargs['target_placeholder'], self._placeholder_2)
             self.assertEqual(post_call_kwargs['target_parent_id'], None)
@@ -279,6 +320,7 @@ class PagePlaceholderTestCase(CMSTestCase):
             clipboard=Placeholder.objects.create(slot='clipboard'),
         )
         plugin = self._add_plugin()
+        remaining_plugin = self._add_plugin()
         endpoint = self.get_move_plugin_uri(plugin)
 
         data = {
@@ -308,6 +350,7 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(call_kwargs['source_language'], 'en')
             self.assertEqual(call_kwargs['source_placeholder'], self._placeholder_1)
             self.assertEqual(call_kwargs['source_parent_id'], plugin.parent_id)
+            self.assertEqual(call_kwargs['source_order'], [plugin.pk, remaining_plugin.pk])
 
     def test_post_cut_plugin(self):
         user_settings = UserSettings.objects.create(
@@ -316,6 +359,7 @@ class PagePlaceholderTestCase(CMSTestCase):
             clipboard=Placeholder.objects.create(slot='clipboard'),
         )
         plugin = self._add_plugin()
+        remaining_plugin = self._add_plugin()
         endpoint = self.get_move_plugin_uri(plugin)
 
         data = {
@@ -348,6 +392,8 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(post_call_kwargs['source_language'], 'en')
             self.assertEqual(post_call_kwargs['source_placeholder'], self._placeholder_1)
             self.assertEqual(post_call_kwargs['source_parent_id'], plugin.parent_id)
+            self.assertEqual(pre_call_kwargs['source_order'], [plugin.pk, remaining_plugin.pk])
+            self.assertEqual(post_call_kwargs['source_order'], [remaining_plugin.pk])
 
     def test_pre_paste_plugin(self):
         user_settings = UserSettings.objects.create(
@@ -554,6 +600,7 @@ class PagePlaceholderTestCase(CMSTestCase):
 
     def test_post_add_plugins_from_placeholder(self):
         plugin = self._add_plugin()
+        existing_target_plugin = self._add_plugin(placeholder=self._placeholder_2, language='de')
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
 
@@ -590,6 +637,11 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(post_call_kwargs['source_placeholder'], source_placeholder)
             self.assertEqual(post_call_kwargs['target_language'], 'de')
             self.assertEqual(post_call_kwargs['target_placeholder'], self._placeholder_2)
+            self.assertEqual(pre_call_kwargs['target_order'], [existing_target_plugin.pk])
+            self.assertEqual(
+                post_call_kwargs['target_order'],
+                [existing_target_plugin.pk, new_plugin.pk],
+            )
 
     def test_pre_clear_placeholder(self):
         plugin = self._add_plugin()
