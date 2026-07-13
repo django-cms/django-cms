@@ -3,20 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# kurdyma <transifex.com@kurdyenviolien.nl>, 2023
 # Koen Molenaar <koen.molenaar26@gmail.com>, 2025
 # 9b534940ba88da102a8b2023ae8b0a5c_833de33 <6eff1839cb13e50fd6e97f7bd38c9dda_152118>, 2025
-# kurdyma <transifex.com@kurdyenviolien.nl>, 2026
 # Stefan van den Eertwegh <stefan@corebyte.nl>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Dutch (https://app.transifex.com/divio/teams/58664/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,8 +39,14 @@ msgstr "Het gedeelte van de titel dat gebruikt wordt voor de URL"
 msgid "Page type"
 msgstr "Paginatype"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Paginatypes"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Overschrijf URL"
@@ -50,6 +56,9 @@ msgstr "Laat dit veld leeg als het standaard-pad gebruikt moet worden."
 
 msgid "Start typing..."
 msgstr "Begin met typen..."
+
+msgid "menu visibility"
+msgstr "menu zichtbaarheid"
 
 msgid "limit when this page is visible in the menu"
 msgstr "beperk wanneer deze pagina zichtbaar is in het menu"
@@ -188,9 +197,6 @@ msgstr "Vertalingen"
 msgid "Advanced Settings"
 msgstr "Geavanceerde instellingen"
 
-msgid "Change Permissions"
-msgstr "Rechten aanpassen"
-
 msgid "The page is not eligible to be home."
 msgstr "De pagina is niet geschikt om de startpagina te zijn."
 
@@ -237,13 +243,6 @@ msgstr "Nieuwe subpagina"
 
 msgid "New page"
 msgstr "Nieuwe pagina"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"U hebt geen toestemming om toegang te krijgen tot deze site. Neem contact op"
-" met uw beheerder."
 
 msgid "Database error"
 msgstr "Databasefout"
@@ -356,9 +355,6 @@ msgstr "Acties"
 msgid "Empty content"
 msgstr "Content legen"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)s Eigenschappen"
@@ -409,21 +405,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Placeholder"
 
-msgid "Getting started developer guide"
-msgstr "Aan de slag met de ontwikkel handleiding"
-
-msgid "Documentation"
-msgstr "Documentatie"
-
-msgid "User guide"
-msgstr "Gebruikershandleiding"
-
-msgid "Discord community"
-msgstr "Discord-community"
-
-msgid "What's new"
-msgstr "Wat is nieuw"
-
 msgid "Create"
 msgstr "Maken"
 
@@ -435,9 +416,6 @@ msgstr "Structuur"
 
 msgid "Content"
 msgstr "Inhoud"
-
-msgid "Help"
-msgstr "Help"
 
 msgid "Sites"
 msgstr "Sites"
@@ -541,6 +519,9 @@ msgstr "Selecteer een geldige site"
 msgid "Select a valid page"
 msgstr "Selecteer een geldige pagina"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -553,9 +534,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Pagina %(conflict_page)s heeft dezelfde url '%(url)s' als de huidige pagina."
-
-msgid "Add another"
-msgstr "Nog een toevoegen"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -655,9 +633,6 @@ msgstr "sjabloon"
 
 msgid "login required"
 msgstr "inloggen vereist"
-
-msgid "menu visibility"
-msgstr "menu zichtbaarheid"
 
 msgid "application"
 msgstr "applicatie"
@@ -881,6 +856,43 @@ msgstr "gebruikers instelling"
 
 msgid "user settings"
 msgstr "gebruikers instellingen"
+
+msgid "by template"
+msgstr "per sjabloon"
+
+msgid "by code"
+msgstr "per code"
+
+msgid "static placeholder name"
+msgstr "Statische placeholder naam"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Beschrijvende naam om statische placeholder te identificeren. Wordt niet "
+"getoond aan gebruikers."
+
+msgid "placeholder code"
+msgstr "placeholder code"
+
+msgid "To render the static placeholder in templates."
+msgstr "Om de statische placeholder in sjablonen te renderen."
+
+msgid "placeholder content"
+msgstr "placeholder inhoud"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "statische placeholder"
+
+msgid "static placeholders"
+msgstr "statische placeholders"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Er bestaat al een statische placeholder met dezelfde site en code"
 
 msgid "Advanced options"
 msgstr "Geavanceerde opties"
@@ -1179,9 +1191,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Doorsturen"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Applicatie: %(apphook)s"
@@ -1333,8 +1342,8 @@ msgstr "Zet structuurmodus aan of uit"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Zet structuurmodus aan of uit en accentueer gehoverde plugin"
 
-msgid "Open \\"
-msgstr "Openen \\"
+msgid "Open \"Create\" dialog"
+msgstr "Open \"Aanmaken\"-dialoog"
 
 msgid "Focus on Toolbar"
 msgstr "Focus op toolbar"
@@ -1489,6 +1498,12 @@ msgstr "Installatie Aantekeningen"
 
 msgid "Support"
 msgstr "Ondersteuning"
+
+msgid "Documentation"
+msgstr "Documentatie"
+
+msgid "User guide"
+msgstr "Gebruikershandleiding"
 
 msgid "Give back"
 msgstr "Geef iets terug"
@@ -1708,15 +1723,6 @@ msgstr "Voeg plugin toe aan %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Enkele placeholder"
-
-msgid "Community forum"
-msgstr "Gemeenschapsforum"
-
-msgid "Getting started"
-msgstr "Aan de slag"
-
-msgid "Talk to us"
-msgstr "Praat met ons"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - je gebruikersaccount is aangemaakt."

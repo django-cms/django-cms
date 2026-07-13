@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Indonesian (https://app.transifex.com/divio/teams/58664/id/)\n"
@@ -35,8 +35,14 @@ msgstr "Bagian dari judul yang digunakan di dalam URL"
 msgid "Page type"
 msgstr "Tipe halaman"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipe Halaman"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Mengganti URL"
@@ -46,6 +52,9 @@ msgstr "Biarkan kolom ini kosong jika path standar harus digunakan."
 
 msgid "Start typing..."
 msgstr "Mulai mengetik..."
+
+msgid "menu visibility"
+msgstr "visibilitas menu"
 
 msgid "limit when this page is visible in the menu"
 msgstr "batasi kapan halaman ini terlihat di menu"
@@ -183,9 +192,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "Pengaturan Lanjutan"
 
-msgid "Change Permissions"
-msgstr "Ubah Perizinan"
-
 msgid "The page is not eligible to be home."
 msgstr "Halaman ini tidak memenuhi syarat untuk menjadi beranda."
 
@@ -232,11 +238,6 @@ msgstr "Subhalaman baru"
 
 msgid "New page"
 msgstr "Halaman baru"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
 
 msgid "Database error"
 msgstr "Kesalahan basis data"
@@ -349,9 +350,6 @@ msgstr "Tindakan"
 msgid "Empty content"
 msgstr "Konten kosong"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Properti %(object_name)s"
@@ -401,21 +399,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Placeholder"
 
-msgid "Getting started developer guide"
-msgstr "Panduan memulai untuk pengembang"
-
-msgid "Documentation"
-msgstr "Dokumentasi"
-
-msgid "User guide"
-msgstr "Panduan pengguna"
-
-msgid "Discord community"
-msgstr "Komunitas Discord"
-
-msgid "What's new"
-msgstr "Apa yang baru"
-
 msgid "Create"
 msgstr "Buat"
 
@@ -427,9 +410,6 @@ msgstr "Struktur"
 
 msgid "Content"
 msgstr "Konten"
-
-msgid "Help"
-msgstr "Bantuan"
 
 msgid "Sites"
 msgstr "Situs"
@@ -533,6 +513,9 @@ msgstr "Pilih situs yang valid"
 msgid "Select a valid page"
 msgstr "Pilih halaman yang valid"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -546,9 +529,6 @@ msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Halaman %(conflict_page)s memiliki url '%(url)s' yang sama dengan halaman "
 "saat ini."
-
-msgid "Add another"
-msgstr ""
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -649,9 +629,6 @@ msgstr "template"
 
 msgid "login required"
 msgstr "perlu masuk"
-
-msgid "menu visibility"
-msgstr "visibilitas menu"
 
 msgid "application"
 msgstr "aplikasi"
@@ -873,6 +850,41 @@ msgstr "pengaturan pengguna"
 
 msgid "user settings"
 msgstr "pengaturan pengguna"
+
+msgid "by template"
+msgstr ""
+
+msgid "by code"
+msgstr ""
+
+msgid "static placeholder name"
+msgstr ""
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+msgid "placeholder code"
+msgstr ""
+
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+msgid "placeholder content"
+msgstr ""
+
+msgid "creation_method"
+msgstr ""
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
 
 msgid "Advanced options"
 msgstr "Opsi lanjutan"
@@ -1167,9 +1179,6 @@ msgstr "Akar lunak"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Mengalihkan"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikasi: %(apphook)s"
@@ -1324,8 +1333,8 @@ msgstr "Alihkan mode struktur"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Alihkan mode struktur dan sorot plugin yang ditunjuk kursor"
 
-msgid "Open \\"
-msgstr "Buka \\"
+msgid "Open \"Create\" dialog"
+msgstr ""
 
 msgid "Focus on Toolbar"
 msgstr "Fokus pada Bilah Alat"
@@ -1479,6 +1488,12 @@ msgstr "Catatan Instalasi"
 
 msgid "Support"
 msgstr "Dukungan"
+
+msgid "Documentation"
+msgstr "Dokumentasi"
+
+msgid "User guide"
+msgstr "Panduan pengguna"
 
 msgid "Give back"
 msgstr "Beri kembali"
@@ -1700,15 +1715,6 @@ msgstr "Tambah plugin ke %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr ""
-
-msgid "Community forum"
-msgstr "Forum komunitas"
-
-msgid "Getting started"
-msgstr "Memulai"
-
-msgid "Talk to us"
-msgstr "Hubungi kami"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - akun pengguna Anda telah dibuat."

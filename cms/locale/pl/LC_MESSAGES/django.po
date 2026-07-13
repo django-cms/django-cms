@@ -3,22 +3,21 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Piotr Wojcik <pwwpww@gmail.com>, 2022
 # Grzegorz Biały <grzegorz@elcodo.pl>, 2023
 # Maciej Kostuch <kostuchmaciek@gmail.com>, 2023
 # ar4s <arkadiusz.adamski@gmail.com>, 2025
-# Ziemowit Płaszaj <roninrallegro@gmail.com>, 2026
-# filip klosowski <filip@geoida.pl>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Maciej Olko <maciej.olko@gmail.com>, 2026
+# filip klosowski <filip@geoida.pl>, 2026
+# Piotr Wojcik <pwwpww@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Maciej Olko <maciej.olko@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Polish (https://app.transifex.com/divio/teams/58664/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,8 +40,14 @@ msgstr "Fragment tytułu, który jest używany w adresie URL"
 msgid "Page type"
 msgstr "Typ strony"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Typy Stron"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Nadpisz URL"
@@ -52,6 +57,9 @@ msgstr "Pozostaw to pole puste jeśli ma zostać użyta standardowa ścieżka"
 
 msgid "Start typing..."
 msgstr "Zacznij pisać..."
+
+msgid "menu visibility"
+msgstr "widoczność w menu"
 
 msgid "limit when this page is visible in the menu"
 msgstr "określa kiedy strona jest widoczna w men"
@@ -189,9 +197,6 @@ msgstr "Tłumaczenia"
 msgid "Advanced Settings"
 msgstr "Ustawienia zaawansowane"
 
-msgid "Change Permissions"
-msgstr "Zmiana uprawnień"
-
 msgid "The page is not eligible to be home."
 msgstr "Ta strona nie nadaje się na stronę główną."
 
@@ -238,12 +243,6 @@ msgstr "Nowa podstrona"
 
 msgid "New page"
 msgstr "Nowa strona"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Nie masz uprawnień dostępu do tej witryny. Skontaktuj się z administratorem."
 
 msgid "Database error"
 msgstr "Błąd bazy danych"
@@ -356,9 +355,6 @@ msgstr "Akcje"
 msgid "Empty content"
 msgstr "Pusta zawartość"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Właściwości: %(object_name)s"
@@ -408,21 +404,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Symbol zastępczy"
 
-msgid "Getting started developer guide"
-msgstr "Przewodnik dla programistów na początek"
-
-msgid "Documentation"
-msgstr "Dokumentacja"
-
-msgid "User guide"
-msgstr "Przewodnik użytkownika"
-
-msgid "Discord community"
-msgstr "Społeczność Discord"
-
-msgid "What's new"
-msgstr "Co nowego"
-
 msgid "Create"
 msgstr "Utwórz"
 
@@ -434,9 +415,6 @@ msgstr "Struktura"
 
 msgid "Content"
 msgstr "Zawartość"
-
-msgid "Help"
-msgstr "Pomoc"
 
 msgid "Sites"
 msgstr "Strony"
@@ -540,6 +518,9 @@ msgstr "Wybierz poprawną domenę"
 msgid "Select a valid page"
 msgstr "Wybierz poprawną podstronę"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -552,9 +533,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Strona %(conflict_page)s ma taki sam URL '%(url)s' jak bieżąca strona."
-
-msgid "Add another"
-msgstr "Dodaj kolejny"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -654,9 +632,6 @@ msgstr "szablon"
 
 msgid "login required"
 msgstr "trzeba być zalogowanym"
-
-msgid "menu visibility"
-msgstr "widoczność w menu"
 
 msgid "application"
 msgstr "aplikacja"
@@ -881,6 +856,43 @@ msgstr "ustawienia użytkownika"
 
 msgid "user settings"
 msgstr "ustawienia użytkownika"
+
+msgid "by template"
+msgstr "za pomocą szablonu"
+
+msgid "by code"
+msgstr "za pomocą kodu"
+
+msgid "static placeholder name"
+msgstr "nazwa statycznego placeholder'a"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Nadaj nazwę dla identyfikacji tego statycznego placeholdera. Nie zostanie "
+"wyświetlone użytkownikom."
+
+msgid "placeholder code"
+msgstr "zastępczy kod"
+
+msgid "To render the static placeholder in templates."
+msgstr "Wygeneruj ten statyczny placeholder w szablonach."
+
+msgid "placeholder content"
+msgstr "zawartość placeholder'a"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "statyczny placeholder"
+
+msgid "static placeholders"
+msgstr "statyczne placeholder'y"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Statyczny placeholder z tą samą stroną i kodem już istnieje."
 
 msgid "Advanced options"
 msgstr "Ustawienia zaawansowane"
@@ -1178,9 +1190,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Przekierowanie"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikacja: %(apphook)s"
@@ -1337,8 +1346,8 @@ msgstr "Włącz tryb struktury"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Włącz tryb struktura i podświetl wtyczkę pod kursorem"
 
-msgid "Open \\"
-msgstr "Otwórz \\"
+msgid "Open \"Create\" dialog"
+msgstr "Otwór okno \"Utwórz\""
 
 msgid "Focus on Toolbar"
 msgstr "Zaznacz pasek narzędzi"
@@ -1493,6 +1502,12 @@ msgstr "Wskazówki Instalacyjne"
 
 msgid "Support"
 msgstr "Wsparcie"
+
+msgid "Documentation"
+msgstr "Dokumentacja"
+
+msgid "User guide"
+msgstr "Przewodnik użytkownika"
 
 msgid "Give back"
 msgstr "Wesprzyj nas"
@@ -1706,15 +1721,6 @@ msgstr "Dodaj wtyczkę do %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Pojedynczy placeholder"
-
-msgid "Community forum"
-msgstr "Forum społeczności"
-
-msgid "Getting started"
-msgstr "Pierwsze kroki"
-
-msgid "Talk to us"
-msgstr "Napisz do nas"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - twoje konto użytkownika zostało utworzone."

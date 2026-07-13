@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# daeyong <daeyong@gmail.com>, 2026
+# daeyong <daeyong@gmail.com>, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Korean (Korea) (https://app.transifex.com/divio/teams/58664/ko_KR/)\n"
@@ -35,8 +35,14 @@ msgstr "URL 에서 사용되는 제목의 일부분"
 msgid "Page type"
 msgstr "페이지 종류"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "페이지 종류들"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "URL을 덮어 씀"
@@ -46,6 +52,9 @@ msgstr "기본 경로가 사용되면 이 항목을 비워 둠"
 
 msgid "Start typing..."
 msgstr "타이핑 시작..."
+
+msgid "menu visibility"
+msgstr "메뉴 가시성"
 
 msgid "limit when this page is visible in the menu"
 msgstr "페이지가 메뉴에서 보여질 때만 제한 함"
@@ -168,9 +177,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "고급 설정"
 
-msgid "Change Permissions"
-msgstr "권한 수정"
-
 msgid "The page is not eligible to be home."
 msgstr ""
 
@@ -210,11 +216,6 @@ msgid "New sub page"
 msgstr ""
 
 msgid "New page"
-msgstr ""
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
 msgstr ""
 
 msgid "Database error"
@@ -328,9 +329,6 @@ msgstr ""
 msgid "Empty content"
 msgstr ""
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr ""
@@ -376,21 +374,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "영역"
 
-msgid "Getting started developer guide"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
-msgstr ""
-
-msgid "Discord community"
-msgstr ""
-
-msgid "What's new"
-msgstr ""
-
 msgid "Create"
 msgstr ""
 
@@ -402,9 +385,6 @@ msgstr "구조"
 
 msgid "Content"
 msgstr "내용"
-
-msgid "Help"
-msgstr ""
 
 msgid "Sites"
 msgstr "사이트들"
@@ -508,6 +488,9 @@ msgstr "유효한 사이트를 선택하세요"
 msgid "Select a valid page"
 msgstr "유효한 페이지를 선택하세요"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -516,9 +499,6 @@ msgstr ""
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add another"
 msgstr ""
 
 msgid ""
@@ -617,9 +597,6 @@ msgstr "템플릿"
 
 msgid "login required"
 msgstr "로그인이 필요함"
-
-msgid "menu visibility"
-msgstr "메뉴 가시성"
 
 msgid "application"
 msgstr "어플리케이션"
@@ -828,6 +805,41 @@ msgstr "사용자 설정"
 
 msgid "user settings"
 msgstr "사용자 설정"
+
+msgid "by template"
+msgstr "템플릿에 의한"
+
+msgid "by code"
+msgstr "코드에 의한"
+
+msgid "static placeholder name"
+msgstr "정적 영역 이름"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr "설명이 잘된 이름은 이 정적 영역을 식별합니다. 사용자에게 표시되지 않습니다."
+
+msgid "placeholder code"
+msgstr "영역 코드"
+
+msgid "To render the static placeholder in templates."
+msgstr "템플리트에 있는 정적 영역을 렌더링"
+
+msgid "placeholder content"
+msgstr "영역 내용"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "정적 영역"
+
+msgid "static placeholders"
+msgstr "정적 영역들"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "같은 사이트와 코드의 정적 영역이 이미 존재 합니다."
 
 msgid "Advanced options"
 msgstr "고급 옵션"
@@ -1109,9 +1121,6 @@ msgstr ""
 msgid "Apphook"
 msgstr ""
 
-msgid "Redirect"
-msgstr "리다이렉트"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Application: %(apphook)s"
@@ -1260,7 +1269,7 @@ msgstr ""
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
-msgid "Open \\"
+msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
@@ -1377,6 +1386,12 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
 msgstr ""
 
 msgid "Give back"
@@ -1583,15 +1598,6 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
 msgid "Single placeholder"
-msgstr ""
-
-msgid "Community forum"
-msgstr ""
-
-msgid "Getting started"
-msgstr ""
-
-msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

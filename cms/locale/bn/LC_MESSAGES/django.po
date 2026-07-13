@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Bengali (https://app.transifex.com/divio/teams/58664/bn/)\n"
@@ -35,8 +35,14 @@ msgstr "শিরোনামের যে অংশ ইউআরএল-এ ব�
 msgid "Page type"
 msgstr "পৃষ্ঠার ধরন"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "পৃষ্ঠার ধরনসমূহ"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "ইউআরএল ওভাররাইট করুন"
@@ -46,6 +52,9 @@ msgstr "স্ট্যান্ডার্ড পাথ ব্যবহার 
 
 msgid "Start typing..."
 msgstr "টাইপ করা শুরু করুন..."
+
+msgid "menu visibility"
+msgstr "মেনুর দৃশ্যমানতা"
 
 msgid "limit when this page is visible in the menu"
 msgstr "এই পৃষ্ঠাটি মেনুতে কখন দৃশ্যমান হবে তা সীমাবদ্ধ করুন"
@@ -184,9 +193,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "উন্নত সেটিংস"
 
-msgid "Change Permissions"
-msgstr "অনুমতি পরিবর্তন করুন"
-
 msgid "The page is not eligible to be home."
 msgstr "পৃষ্ঠাটি হোম হওয়ার যোগ্য নয়।"
 
@@ -233,11 +239,6 @@ msgstr "নতুন সাব পৃষ্ঠা"
 
 msgid "New page"
 msgstr "নতুন পৃষ্ঠা"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
 
 msgid "Database error"
 msgstr "ডাটাবেজ ত্রুটি"
@@ -350,9 +351,6 @@ msgstr "অ্যাকশনসমূহ"
 msgid "Empty content"
 msgstr "খালি কন্টেন্ট"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)s প্রোপার্টিসমূহ"
@@ -403,21 +401,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "প্লেসহোল্ডার"
 
-msgid "Getting started developer guide"
-msgstr "শুরু করার ডেভেলপার গাইড"
-
-msgid "Documentation"
-msgstr "ডকুমেন্টেশন"
-
-msgid "User guide"
-msgstr "ব্যবহারকারী গাইড"
-
-msgid "Discord community"
-msgstr "Discord কমিউনিটি"
-
-msgid "What's new"
-msgstr "নতুন কী আছে"
-
 msgid "Create"
 msgstr "তৈরি করুন"
 
@@ -429,9 +412,6 @@ msgstr "স্ট্রাকচার"
 
 msgid "Content"
 msgstr "কন্টেন্ট"
-
-msgid "Help"
-msgstr "সহায়তা"
 
 msgid "Sites"
 msgstr "সাইটসমূহ"
@@ -535,6 +515,9 @@ msgstr "একটি বৈধ সাইট নির্বাচন করু�
 msgid "Select a valid page"
 msgstr "একটি বৈধ পৃষ্ঠা নির্বাচন করুন"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -547,9 +530,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "পৃষ্ঠা %(conflict_page)s-এর ইউআরএল '%(url)s' বর্তমান পৃষ্ঠার সাথে অভিন্ন।"
-
-msgid "Add another"
-msgstr ""
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -652,9 +632,6 @@ msgstr "টেমপ্লেট"
 
 msgid "login required"
 msgstr "লগইন প্রয়োজন"
-
-msgid "menu visibility"
-msgstr "মেনুর দৃশ্যমানতা"
 
 msgid "application"
 msgstr "এ্যাপ্লিকেশন"
@@ -876,6 +853,41 @@ msgstr "ব্যবহারকারী সেটিং"
 
 msgid "user settings"
 msgstr "ব্যবহারকারী সেটিংস"
+
+msgid "by template"
+msgstr ""
+
+msgid "by code"
+msgstr ""
+
+msgid "static placeholder name"
+msgstr ""
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+msgid "placeholder code"
+msgstr ""
+
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+msgid "placeholder content"
+msgstr ""
+
+msgid "creation_method"
+msgstr ""
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
 
 msgid "Advanced options"
 msgstr "উন্নত অপশনসমূহ"
@@ -1170,9 +1182,6 @@ msgstr "সফটরুট"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "পুনঃনির্দেশ"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "এ্যাপ্লিকেশন: %(apphook)s"
@@ -1325,8 +1334,8 @@ msgstr "স্ট্রাকচার মোড টগল করুন"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "স্ট্রাকচার মোড টগল করুন এবং হোভার করা প্লাগ-ইন হাইলাইট করুন"
 
-msgid "Open \\"
-msgstr "খুলুন \\"
+msgid "Open \"Create\" dialog"
+msgstr ""
 
 msgid "Focus on Toolbar"
 msgstr "টুলবারে ফোকাস করুন"
@@ -1480,6 +1489,12 @@ msgstr "ইনস্টলেশন নোটসমূহ"
 
 msgid "Support"
 msgstr "সহায়তা"
+
+msgid "Documentation"
+msgstr "ডকুমেন্টেশন"
+
+msgid "User guide"
+msgstr "ব্যবহারকারী গাইড"
 
 msgid "Give back"
 msgstr "ফিরিয়ে দিন"
@@ -1698,15 +1713,6 @@ msgstr "%(plugin_name)s-এ প্লাগ-ইন যুক্ত করুন"
 
 msgid "Single placeholder"
 msgstr ""
-
-msgid "Community forum"
-msgstr "কমিউনিটি ফোরাম"
-
-msgid "Getting started"
-msgstr "শুরু করা"
-
-msgid "Talk to us"
-msgstr "আমাদের সাথে কথা বলুন"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - আপনার ব্যবহারকারী অ্যাকাউন্ট তৈরি করা হয়েছে।"

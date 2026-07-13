@@ -4,18 +4,18 @@
 # 
 # Translators:
 # koren <honza@kekorenum.com>, 2025
-# Jakub Dorňák <jakub.dornak@misli.cz>, 2026
 # Martin S. <marhac@seznam.cz>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
+# Jakub Dorňák <jakub.dornak@misli.cz>, 2026
 # yedpodtrzitko <yed@vanyli.net>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: yedpodtrzitko <yed@vanyli.net>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Czech (https://app.transifex.com/divio/teams/58664/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,8 +38,14 @@ msgstr "Část názvu, který je použit v URL"
 msgid "Page type"
 msgstr "Typ stránky"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Typy stránek"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Přepsat URL"
@@ -49,6 +55,9 @@ msgstr "Ponechejte toto políčko prázdné, pokud se má použít standardní c
 
 msgid "Start typing..."
 msgstr "Začněte psát ..."
+
+msgid "menu visibility"
+msgstr "viditelnost nabídky"
 
 msgid "limit when this page is visible in the menu"
 msgstr "omezuje zobrazení této stránky v menu"
@@ -185,9 +194,6 @@ msgstr "Překlady"
 msgid "Advanced Settings"
 msgstr "Rozšířené možnosti"
 
-msgid "Change Permissions"
-msgstr "Změnit oprávnění"
-
 msgid "The page is not eligible to be home."
 msgstr "Stránka nemůže být domovská."
 
@@ -234,12 +240,6 @@ msgstr "Nová podstránka"
 
 msgid "New page"
 msgstr "Nová stránka"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Nemáte oprávnění pro přístup na tento web. Obraťte se na svého správce."
 
 msgid "Database error"
 msgstr "Databázová chyba"
@@ -352,9 +352,6 @@ msgstr "Akce"
 msgid "Empty content"
 msgstr "Prázdný obsah"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Vlastnosti %(object_name)s"
@@ -404,21 +401,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Umístěnka"
 
-msgid "Getting started developer guide"
-msgstr "Příručka pro vývojáře k zahájení"
-
-msgid "Documentation"
-msgstr "Dokumentace"
-
-msgid "User guide"
-msgstr "Uživatelská příručka"
-
-msgid "Discord community"
-msgstr "Komunita na Discordu"
-
-msgid "What's new"
-msgstr "Co je nového"
-
 msgid "Create"
 msgstr "Vytvořit"
 
@@ -430,9 +412,6 @@ msgstr "Struktura"
 
 msgid "Content"
 msgstr "Obsah"
-
-msgid "Help"
-msgstr "Nápověda"
 
 msgid "Sites"
 msgstr "Weby"
@@ -536,6 +515,9 @@ msgstr "Vybrat platnou stránku"
 msgid "Select a valid page"
 msgstr "Vybrat platnou stránku"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -548,9 +530,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Stránka %(conflict_page)s má stejnou url '%(url)s' jako aktuální stránka."
-
-msgid "Add another"
-msgstr "Přidat další"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -651,9 +630,6 @@ msgstr "šablona"
 
 msgid "login required"
 msgstr "vyžaduje přihlášení"
-
-msgid "menu visibility"
-msgstr "viditelnost nabídky"
 
 msgid "application"
 msgstr "aplikace"
@@ -876,6 +852,42 @@ msgstr "uživatelské nastavení"
 
 msgid "user settings"
 msgstr "uživatelská nastavení"
+
+msgid "by template"
+msgstr "podle šablony"
+
+msgid "by code"
+msgstr "podlé kódu"
+
+msgid "static placeholder name"
+msgstr "statické jméno umístěnky"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Popisné jméno identifikující tuto umístěnku. Není zobrazováno uživatelům."
+
+msgid "placeholder code"
+msgstr "kód umístěnky"
+
+msgid "To render the static placeholder in templates."
+msgstr "Generuj statické umístěnky v šablonách."
+
+msgid "placeholder content"
+msgstr "obsah umístěnky"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "statická umístěnka"
+
+msgid "static placeholders"
+msgstr "statické umístěnky"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Statická umístěnka se stejným kódem pro tento web již existuje"
 
 msgid "Advanced options"
 msgstr "Pokročilá nastavení"
@@ -1174,9 +1186,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Přípojka aplikace"
 
-msgid "Redirect"
-msgstr "Přesměrování"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikace: %(apphook)s"
@@ -1328,8 +1337,8 @@ msgstr "Přepnout režim struktury"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Přepnout režim struktury a zvýraznit ukazatel myši nad pluginem"
 
-msgid "Open \\"
-msgstr "Otevřít \\"
+msgid "Open \"Create\" dialog"
+msgstr "Otevřít dialog pro Vytvoření"
 
 msgid "Focus on Toolbar"
 msgstr "Zaměřte se na panel nástrojů"
@@ -1484,6 +1493,12 @@ msgstr "Poznámky instalace"
 
 msgid "Support"
 msgstr "Podpora"
+
+msgid "Documentation"
+msgstr "Dokumentace"
+
+msgid "User guide"
+msgstr "Uživatelská příručka"
 
 msgid "Give back"
 msgstr "Přispějte zpět"
@@ -1703,15 +1718,6 @@ msgstr "Přidat plugin k  %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Jeden placeholder"
-
-msgid "Community forum"
-msgstr "Fórum komunity"
-
-msgid "Getting started"
-msgstr "Začínáme"
-
-msgid "Talk to us"
-msgstr "Napište nám"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - Váš uživatelský účet byl vytvořen."

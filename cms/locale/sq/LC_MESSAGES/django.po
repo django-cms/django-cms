@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2026\n"
 "Language-Team: Albanian (https://app.transifex.com/divio/teams/58664/sq/)\n"
@@ -35,8 +35,14 @@ msgstr "Pjesa e titullit që përdoret te URL-ja"
 msgid "Page type"
 msgstr "Lloj faqeje"
 
+msgid "You do not have permission to change this page."
+msgstr "S’keni leje për ndryshim të kësaj faqeje"
+
 msgid "Page Types"
 msgstr "Lloje Faqesh"
+
+msgid "You do not have permission to copy this page."
+msgstr "S’keni leje për të kopjuar këtë faqe"
 
 msgid "Overwrite URL"
 msgstr "Mbishkruaje URL-në"
@@ -46,6 +52,9 @@ msgstr "Mbajeni të zbrazët këtë fushë, nëse duhet përdorur shtegu standar
 
 msgid "Start typing..."
 msgstr "Filloni të shtypni…"
+
+msgid "menu visibility"
+msgstr "dukshmëri menush"
 
 msgid "limit when this page is visible in the menu"
 msgstr "kufizo kur kjo faqe është e dukshme te menuja"
@@ -184,9 +193,6 @@ msgstr "Përkthime"
 msgid "Advanced Settings"
 msgstr "Rregullime të Mëtejshme"
 
-msgid "Change Permissions"
-msgstr "Ndryshoni Leje"
-
 msgid "The page is not eligible to be home."
 msgstr "Faqja s’kualifikohet për të qenë faqe kreu."
 
@@ -232,13 +238,6 @@ msgstr "Nënfaqe e re"
 
 msgid "New page"
 msgstr "Faqe e re"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Nuk keni leje për të hyrë në këtë sajt. Ju lutemi kontaktoni administratorin"
-" tuaj."
 
 msgid "Database error"
 msgstr "Gabim baze të dhënash"
@@ -351,9 +350,6 @@ msgstr "Veprime"
 msgid "Empty content"
 msgstr "Lëndë e zbrazët"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Veti %(object_name)s"
@@ -404,21 +400,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Vendmbajtëse"
 
-msgid "Getting started developer guide"
-msgstr "Udhërrëfyes si t’ia fillohet për zhvillues"
-
-msgid "Documentation"
-msgstr "Dokumentim"
-
-msgid "User guide"
-msgstr "Udhërrëfyes përdoruesish"
-
-msgid "Discord community"
-msgstr "Bashkësi Discord"
-
-msgid "What's new"
-msgstr "Ç’ka të re"
-
 msgid "Create"
 msgstr "Krijoje"
 
@@ -430,9 +411,6 @@ msgstr "Strukturë"
 
 msgid "Content"
 msgstr "Lëndë"
-
-msgid "Help"
-msgstr "Ndihmë"
 
 msgid "Sites"
 msgstr "Sajte"
@@ -536,6 +514,9 @@ msgstr "Përzgjidhni sajt të vlefshëm"
 msgid "Select a valid page"
 msgstr "Përzgjidhni faqe të vlefshme"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr "Jepni një URL relative, ose absolute të vlefshme."
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -548,9 +529,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Faqja %(conflict_page)s ka të njëjtën URL '%(url)s' me faqen e tanishme."
-
-msgid "Add another"
-msgstr "Shto një tjetër"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -653,9 +631,6 @@ msgstr "gjedhe"
 
 msgid "login required"
 msgstr "lypset hyrje"
-
-msgid "menu visibility"
-msgstr "dukshmëri menush"
 
 msgid "application"
 msgstr "aplikacion"
@@ -876,6 +851,43 @@ msgstr "rregullim përdoruesi"
 
 msgid "user settings"
 msgstr "rregullime përdoruesi"
+
+msgid "by template"
+msgstr "sipas gjedheje"
+
+msgid "by code"
+msgstr "sipas kodi"
+
+msgid "static placeholder name"
+msgstr "emër vendmbajtëseje statike"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Emër përshkrues për identifikim të kësaj vendmbajtëse statike. S’u shfaqet "
+"përdoruesve."
+
+msgid "placeholder code"
+msgstr "kod vendmbajtëseje"
+
+msgid "To render the static placeholder in templates."
+msgstr "Për vizatim të vendmbajtëses statike në gjedhe."
+
+msgid "placeholder content"
+msgstr "lëndë vendmbajtëseje"
+
+msgid "creation_method"
+msgstr "metodë_krijimi"
+
+msgid "static placeholder"
+msgstr "vendmbajtëse statike"
+
+msgid "static placeholders"
+msgstr "vendmbajtëse statike"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Ka tashmë një vendmbajtëse statike me të njëjtin sajt dhe kod"
 
 msgid "Advanced options"
 msgstr "Mundësi të mëtejshme"
@@ -1171,9 +1183,6 @@ msgstr "Rrënjë e butë"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Ridrejtoje"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikacion: %(apphook)s"
@@ -1330,8 +1339,8 @@ msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 "Këmbe mënyrë strukture dhe nxirr në pah shtojcën që ka kursorin përsipër"
 
-msgid "Open \\"
-msgstr "Hap \\"
+msgid "Open \"Create\" dialog"
+msgstr "Hap dialogun “Krijoni”"
 
 msgid "Focus on Toolbar"
 msgstr "Fokusi te Paneli"
@@ -1487,6 +1496,12 @@ msgstr "Shënime Instalimi"
 msgid "Support"
 msgstr "Asistencë"
 
+msgid "Documentation"
+msgstr "Dokumentim"
+
+msgid "User guide"
+msgstr "Udhërrëfyes përdoruesish"
+
 msgid "Give back"
 msgstr "Jepni një ndihmesë"
 
@@ -1535,7 +1550,7 @@ msgid "Next"
 msgstr "Pasuesi"
 
 msgid "Select what you would like to create"
-msgstr ""
+msgstr "Përzgjidhni ç’do të donit të krijoni"
 
 msgid "Unknown"
 msgstr "E panjohur"
@@ -1707,15 +1722,6 @@ msgstr "Shtoje shtojcën te %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Vendmbajtëse e vetme"
-
-msgid "Community forum"
-msgstr "Forum bashkësie"
-
-msgid "Getting started"
-msgstr "Si t’ia fillohet"
-
-msgid "Talk to us"
-msgstr "Flisni me ne"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - llogaria juaj e përdoruesit u krijua."

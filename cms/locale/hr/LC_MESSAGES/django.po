@@ -5,16 +5,16 @@
 # Translators:
 # Dino Ilic <dino.ilic@gmail.com>, 2022
 # Aleks Acimovic, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Damir <damir.arbula@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Damir <damir.arbula@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Croatian (https://app.transifex.com/divio/teams/58664/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,8 +37,14 @@ msgstr "Dio naslova koji je korišten u URL-u"
 msgid "Page type"
 msgstr "Tip stranice"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipovi stranica"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Pregazi URL"
@@ -48,6 +54,9 @@ msgstr "Ostavite ovo polje prazno ako treba koristiti standardnu putanju."
 
 msgid "Start typing..."
 msgstr "Započnite pisati..."
+
+msgid "menu visibility"
+msgstr "vidljivost izbornika"
 
 msgid "limit when this page is visible in the menu"
 msgstr "ograniči kada je ova stranica vidljiva u izborniku"
@@ -185,9 +194,6 @@ msgstr "Prijevodi"
 msgid "Advanced Settings"
 msgstr "Napredne postavke"
 
-msgid "Change Permissions"
-msgstr "Promijena ovlasti"
-
 msgid "The page is not eligible to be home."
 msgstr "Stranica nije raspoloživa za postavljanje u ulogu početne stranice."
 
@@ -234,12 +240,6 @@ msgstr "Nova podstranica"
 
 msgid "New page"
 msgstr "Nova stranica"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Nemate dozvolu za pristup ovom web-mjestu. Obratite se svom administratoru."
 
 msgid "Database error"
 msgstr "Greška baze podataka"
@@ -352,9 +352,6 @@ msgstr "Akcije"
 msgid "Empty content"
 msgstr "Prazan sadržaj"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Svojstva %(object_name)s"
@@ -405,21 +402,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Placeholder"
 
-msgid "Getting started developer guide"
-msgstr "Priručnik za programere: Kako započeti"
-
-msgid "Documentation"
-msgstr "Dokumentacija"
-
-msgid "User guide"
-msgstr "Korisnički priručnik"
-
-msgid "Discord community"
-msgstr "Discord zajednica"
-
-msgid "What's new"
-msgstr "Što je novo"
-
 msgid "Create"
 msgstr "Stvori"
 
@@ -431,9 +413,6 @@ msgstr "Struktura"
 
 msgid "Content"
 msgstr "Sadržaj"
-
-msgid "Help"
-msgstr "Pomoć"
 
 msgid "Sites"
 msgstr "Sjedišta"
@@ -537,6 +516,9 @@ msgstr "Izaberite ispravnu web stranicu"
 msgid "Select a valid page"
 msgstr "Izaberite ispravnu stranicu"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -549,9 +531,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Stranica %(conflict_page)s ima isti url '%(url)s' kao trenutna stranica."
-
-msgid "Add another"
-msgstr "Dodaj još"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -649,9 +628,6 @@ msgstr "predložak"
 
 msgid "login required"
 msgstr "potrebno prijavljivanje"
-
-msgid "menu visibility"
-msgstr "vidljivost izbornika"
 
 msgid "application"
 msgstr "aplikacija"
@@ -875,6 +851,43 @@ msgstr "korisnička postavka"
 
 msgid "user settings"
 msgstr "korisničke postavke"
+
+msgid "by template"
+msgstr "prema predlošku"
+
+msgid "by code"
+msgstr "prema kôdu"
+
+msgid "static placeholder name"
+msgstr "ime statičkog placeholdera"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Opisno ime za identifikaciju ovog statičkog placeholdera. Ne prikazuje se "
+"korisnicima."
+
+msgid "placeholder code"
+msgstr "kôd placeholdera"
+
+msgid "To render the static placeholder in templates."
+msgstr "Za prikaz statičkog placeholdera u predlošcima."
+
+msgid "placeholder content"
+msgstr "sadržaj placeholdera"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "statički placeholder"
+
+msgid "static placeholders"
+msgstr "statički placeholderi"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Statički placeholder s istim kôdom za isto sjedište već postoji"
 
 msgid "Advanced options"
 msgstr "Napredna svojstva"
@@ -1172,9 +1185,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Redirekcija"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikacija: %(apphook)s"
@@ -1329,8 +1339,8 @@ msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 "Prebaci u prikaz strukture i označi plugin iznad kojeg se nalazi pokazivač"
 
-msgid "Open \\"
-msgstr "Otvori \\"
+msgid "Open \"Create\" dialog"
+msgstr "Otvori dijalog za izradu"
 
 msgid "Focus on Toolbar"
 msgstr "Fokusiraj na toolbar"
@@ -1485,6 +1495,12 @@ msgstr "Zabilješke za instalaciju"
 
 msgid "Support"
 msgstr "Podrška"
+
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+msgid "User guide"
+msgstr "Korisnički priručnik"
 
 msgid "Give back"
 msgstr "Uzvratite"
@@ -1706,15 +1722,6 @@ msgstr "Dodaj plugin u %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Jedan placeholder"
-
-msgid "Community forum"
-msgstr "Forum zajednice"
-
-msgid "Getting started"
-msgstr "Kako započeti"
-
-msgid "Talk to us"
-msgstr "Kontaktirajte nas"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - Vaš korisnički račun je kreiran."

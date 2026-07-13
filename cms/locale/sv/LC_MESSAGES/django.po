@@ -4,17 +4,16 @@
 # 
 # Translators:
 # Christofer Huynh <christofer.huynh@gmail.com>, 2025
-# Jakob Hedman <jakob.hedman@gmail.com>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # joelbitar <joel@joelbitar.se>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: joelbitar <joel@joelbitar.se>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Swedish (https://app.transifex.com/divio/teams/58664/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,8 +36,14 @@ msgstr "Den del av rubriken som används i webbadressen"
 msgid "Page type"
 msgstr "Sidtyp"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sidtyp"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Ändra URL"
@@ -48,6 +53,9 @@ msgstr "Lämna tomt om den vanliga sökvägen ska användas."
 
 msgid "Start typing..."
 msgstr "Börja skriv ..."
+
+msgid "menu visibility"
+msgstr "menysynlighet"
 
 msgid "limit when this page is visible in the menu"
 msgstr "begränsa när denna sida ska vara synlig i menyn"
@@ -185,9 +193,6 @@ msgstr "Översättningar"
 msgid "Advanced Settings"
 msgstr "Avancerade inställningar"
 
-msgid "Change Permissions"
-msgstr "Ändra rättigheter"
-
 msgid "The page is not eligible to be home."
 msgstr "Sidan kan inte vara startsida."
 
@@ -233,13 +238,6 @@ msgstr "Ny undersida"
 
 msgid "New page"
 msgstr "Ny sida"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Du har inte behörighet att komma åt den här webbplatsen. Kontakta din "
-"administratör."
 
 msgid "Database error"
 msgstr "Databaserror"
@@ -352,9 +350,6 @@ msgstr "Åtgärder"
 msgid "Empty content"
 msgstr "Tomt innehåll"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Egenskaper för %(object_name)s"
@@ -405,21 +400,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Placeholder"
 
-msgid "Getting started developer guide"
-msgstr "Kom igång-guide för utvecklare"
-
-msgid "Documentation"
-msgstr "Dokumentation"
-
-msgid "User guide"
-msgstr "Användarguide"
-
-msgid "Discord community"
-msgstr "Discord-community"
-
-msgid "What's new"
-msgstr "Vad är nytt"
-
 msgid "Create"
 msgstr "Skapa"
 
@@ -431,9 +411,6 @@ msgstr "Struktur"
 
 msgid "Content"
 msgstr "Innehåll"
-
-msgid "Help"
-msgstr "Hjälp"
 
 msgid "Sites"
 msgstr "Siter"
@@ -537,6 +514,9 @@ msgstr "Välj en giltig webbplats"
 msgid "Select a valid page"
 msgstr "Välj en giltig sida"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -549,9 +529,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Sidan %(conflict_page)s har samma url '%(url)s' som den aktuella sidan."
-
-msgid "Add another"
-msgstr "Lägg till ännu en"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -650,9 +627,6 @@ msgstr "mall"
 
 msgid "login required"
 msgstr "login krävs"
-
-msgid "menu visibility"
-msgstr "menysynlighet"
 
 msgid "application"
 msgstr "applikation"
@@ -873,6 +847,43 @@ msgstr "användarinställning"
 
 msgid "user settings"
 msgstr "användarinställningar"
+
+msgid "by template"
+msgstr "Efter mall"
+
+msgid "by code"
+msgstr "Efter kod"
+
+msgid "static placeholder name"
+msgstr "statiskt placeholder-namn"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Beskrivande namn för att identifiera denna statiska placeholder. Visas inte "
+"för besökare."
+
+msgid "placeholder code"
+msgstr "Placeholder-kod"
+
+msgid "To render the static placeholder in templates."
+msgstr "För att rendera statiska placeholders i mall."
+
+msgid "placeholder content"
+msgstr "innehåll för placeholder"
+
+msgid "creation_method"
+msgstr "skapandemetod"
+
+msgid "static placeholder"
+msgstr "statiskt placeholder"
+
+msgid "static placeholders"
+msgstr "statiska placeholders"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "En statisk placeholder med samam sajt och kod finns redan"
 
 msgid "Advanced options"
 msgstr "Avancerade inställningar"
@@ -1169,9 +1180,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Omdirigera"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Applikation: %(apphook)s"
@@ -1327,8 +1335,8 @@ msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 "Växla strukturläge och markera det plugin som muspekaren befinner sig över"
 
-msgid "Open \\"
-msgstr "Öppna \\"
+msgid "Open \"Create\" dialog"
+msgstr "Visa \"Skapa\"-dialog"
 
 msgid "Focus on Toolbar"
 msgstr "Fokusera på Verktygsfält"
@@ -1483,6 +1491,12 @@ msgstr "Installationsanteckningar"
 
 msgid "Support"
 msgstr "Support"
+
+msgid "Documentation"
+msgstr "Dokumentation"
+
+msgid "User guide"
+msgstr "Användarguide"
 
 msgid "Give back"
 msgstr "Ge tillbaka"
@@ -1701,15 +1715,6 @@ msgstr "Lägg till plugins till %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Enkel placeholder"
-
-msgid "Community forum"
-msgstr "Communityforum"
-
-msgid "Getting started"
-msgstr "Kom igång"
-
-msgid "Talk to us"
-msgstr "Kontakta oss"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - ditt användarkonto har skapats."

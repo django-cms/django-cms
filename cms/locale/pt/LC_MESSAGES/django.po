@@ -3,17 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Vítor Figueiró <vfigueiro@gmail.com>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
+# Vítor Figueiró <vfigueiro@gmail.com>, 2025
 # André Cruz <transifex@cabine.org>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: André Cruz <transifex@cabine.org>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Portuguese (https://app.transifex.com/divio/teams/58664/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,8 +36,14 @@ msgstr "A parte do título que é usada na URL"
 msgid "Page type"
 msgstr "Tipo de página"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipos de Página"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sobrescreva URL"
@@ -47,6 +53,9 @@ msgstr "Deixe este campo em branco para usar o caminho padrão"
 
 msgid "Start typing..."
 msgstr "Comece a digitar..."
+
+msgid "menu visibility"
+msgstr "visibilidade no menu"
 
 msgid "limit when this page is visible in the menu"
 msgstr "limitar a visibilidade desta página no menu"
@@ -184,9 +193,6 @@ msgstr "Traduções"
 msgid "Advanced Settings"
 msgstr "Configurações Avançadas"
 
-msgid "Change Permissions"
-msgstr "Alterar as Permissões"
-
 msgid "The page is not eligible to be home."
 msgstr "Esta página não é elegível para ser a página de entrada."
 
@@ -233,12 +239,6 @@ msgstr "Nova subpágina"
 
 msgid "New page"
 msgstr "Nova página"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Não tem permissão para aceder a este site. Contacte o seu administrador."
 
 msgid "Database error"
 msgstr "Erro na base de dados"
@@ -351,9 +351,6 @@ msgstr "Acções"
 msgid "Empty content"
 msgstr "Conteúdo vazio"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Propriedades de %(object_name)s"
@@ -404,21 +401,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Espaço"
 
-msgid "Getting started developer guide"
-msgstr "Guia de introdução para programadores"
-
-msgid "Documentation"
-msgstr "Documentação"
-
-msgid "User guide"
-msgstr "Guia do utilizador"
-
-msgid "Discord community"
-msgstr "Comunidade do Discord"
-
-msgid "What's new"
-msgstr "Novidades"
-
 msgid "Create"
 msgstr "Criar"
 
@@ -430,9 +412,6 @@ msgstr "Estrutura"
 
 msgid "Content"
 msgstr "Conteúdo"
-
-msgid "Help"
-msgstr "Ajuda"
 
 msgid "Sites"
 msgstr "Sites"
@@ -536,6 +515,9 @@ msgstr "Selecione um site válido"
 msgid "Select a valid page"
 msgstr "Selecione uma página válida"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -548,9 +530,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "A página %(conflict_page)s tem o mesmo url '%(url)s' que a página actual."
-
-msgid "Add another"
-msgstr "Adicionar outro"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -651,9 +630,6 @@ msgstr "modelo"
 
 msgid "login required"
 msgstr "login requerido"
-
-msgid "menu visibility"
-msgstr "visibilidade no menu"
 
 msgid "application"
 msgstr "aplicação"
@@ -880,6 +856,43 @@ msgstr "definição do utilizador"
 
 msgid "user settings"
 msgstr "definições do utilizador"
+
+msgid "by template"
+msgstr "por modelo"
+
+msgid "by code"
+msgstr "por código"
+
+msgid "static placeholder name"
+msgstr "nome do espaço estático"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Nome descritivo para identificar este espaço estático. Não é mostrado aos "
+"utilizadores."
+
+msgid "placeholder code"
+msgstr "código do espaço"
+
+msgid "To render the static placeholder in templates."
+msgstr "Para apresentar o espaço estático nos modelos."
+
+msgid "placeholder content"
+msgstr "conteúdo do espaço"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "espaço estático"
+
+msgid "static placeholders"
+msgstr "espaços estáticos"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Um placeholder estático com o mesmo site e código já existe"
 
 msgid "Advanced options"
 msgstr "Opções avançadas"
@@ -1177,9 +1190,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Redirecionar"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplicação: %(apphook)s"
@@ -1333,8 +1343,8 @@ msgstr "Alternar modo de estrutura"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Alternar modo de estrutura e realçar o plugin sob o cursor"
 
-msgid "Open \\"
-msgstr "Abrir \\"
+msgid "Open \"Create\" dialog"
+msgstr "Abrir diálogo de \"Criação\""
 
 msgid "Focus on Toolbar"
 msgstr "Focar na Barra de Ferramentas"
@@ -1489,6 +1499,12 @@ msgstr "Notas de Instalação"
 
 msgid "Support"
 msgstr "Suporte"
+
+msgid "Documentation"
+msgstr "Documentação"
+
+msgid "User guide"
+msgstr "Guia do utilizador"
 
 msgid "Give back"
 msgstr "Retribua"
@@ -1708,15 +1724,6 @@ msgstr "Adicionar plugin a %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Espaço reservado único"
-
-msgid "Community forum"
-msgstr "Fórum da comunidade"
-
-msgid "Getting started"
-msgstr "Introdução"
-
-msgid "Talk to us"
-msgstr "Fale connosco"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - sua conta de utilizador foi criada."
