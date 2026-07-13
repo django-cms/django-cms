@@ -70,6 +70,11 @@ packages = { find = {} }
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "cms.tests.settings"
+python_files = [ "test_*.py", "*_test.py", "tests.py" ]
+testpaths = [ "cms/tests", "menus" ]
+
 [tool.flake8]
 max-line-length = 119
 exclude = [
