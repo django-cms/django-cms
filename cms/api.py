@@ -375,16 +375,6 @@ def create_page_content(
         except ValidationError as e:
             raise IntegrityError(e)
 
-        page.urls.update_or_create(
-            page=page,
-            language=language,
-            defaults=dict(
-                slug=slug,
-                path=path,
-                managed=not bool(overwrite_url),
-            ),
-        )
-
         # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
         user = _current_user.get(None)
         page_content = PageContent.objects.with_user(user).create(
@@ -402,8 +392,24 @@ def create_page_content(
             template=template,
             limit_visibility_in_menu=limit_visibility_in_menu,
             xframe_options=xframe_options,
+            slug=slug,
+            overwrite_url=overwrite_url.strip("/") if overwrite_url else None,
         )
         page_content.rescan_placeholders()
+
+        if page_content.is_public():
+            # The page URL is derived from public content only. With a versioning
+            # package installed the new content is created as a draft and gets
+            # its URL on first publish.
+            page.urls.update_or_create(
+                page=page,
+                language=language,
+                defaults=dict(
+                    slug=slug,
+                    path=path,
+                    managed=not bool(overwrite_url),
+                ),
+            )
         page._clear_internal_cache()
 
         return page_content

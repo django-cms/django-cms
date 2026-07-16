@@ -5,7 +5,7 @@ from django.db import transaction
 
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import EmptyPageContent, Page, PageContent, PageUrl
+from cms.models import EmptyPageContent, Page, PageContent
 from cms.utils import get_language_list
 from cms.utils.page import get_available_slug
 
@@ -87,30 +87,29 @@ class CopyLangCommand(SubcommandsCommand):
                     new_title.pop("id", None)  # No PK
                     new_title["language"] = to_lang
                     new_title["page"] = page
-                    PageContent.objects.with_user(user).create(**new_title)
+
+                    # inspired from pagemodels.Page.copy() - possibly refactorable
+                    parent_page = page.parent
+                    if parent_page:
+                        base = parent_page.get_path(to_lang)
+                        path = f'{base}/{title.slug}' if base else title.slug
+                    else:
+                        base = ''
+                        path = title.slug
+
+                    new_title["slug"] = get_available_slug(site, path, to_lang)
+                    if title.overwrite_url:
+                        new_title["overwrite_url"] = '{}/{}'.format(base, new_title["slug"]) if base \
+                            else new_title["slug"]
+                    new_content = PageContent.objects.with_user(user).create(**new_title)
 
                     if to_lang not in page.get_languages():
                         page.update_languages(page.get_languages() + [to_lang])
 
-                    # copy PageUrls - inspired from pagemodels.Page.copy() - possibly refactorable
-                    page_url = page.urls.get(language=from_lang)
-                    parent_page = page.parent
-
-                    new_url = model_to_dict(page_url)
-                    new_url.pop("id", None)  # No PK
-                    new_url["page"] = page
-                    new_url["language"] = to_lang
-
-                    if parent_page:
-                        base = parent_page.get_path(to_lang)
-                        path = f'{base}/{page_url.slug}' if base else page_url.slug
-                    else:
-                        base = ''
-                        path = page_url.slug
-
-                    new_url["slug"] = get_available_slug(site, path, to_lang)
-                    new_url["path"] = '{}/{}'.format(base, new_url["slug"]) if base else new_url["slug"]
-                    PageUrl.objects.with_user(user).create(**new_url)
+                    if new_content.is_public():
+                        # The page URL is derived from public content only; drafts
+                        # created by a versioning package get theirs on publish.
+                        page.update_urls_from_content(to_lang)
 
                 if copy_content:
                     # copy plugins using API
