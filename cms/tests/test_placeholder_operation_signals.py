@@ -591,6 +591,145 @@ class PagePlaceholderTestCase(CMSTestCase):
             self.assertEqual(post_call_kwargs['target_language'], 'de')
             self.assertEqual(post_call_kwargs['target_placeholder'], self._placeholder_2)
 
+    def test_add_plugin_pre_tree_order_uses_language(self):
+        # Regression: the pre ADD_PLUGIN signal computed ``tree_order`` by
+        # passing the parent id as the language argument, producing garbage.
+        # Add a plugin in another language first; its pk must NOT leak into
+        # the English tree order.
+        de_plugin = self._add_plugin(language='de')
+        existing = self._add_plugin(language='en')
+
+        with signal_tester(pre_placeholder_operation) as env:
+            endpoint = self._get_add_plugin_uri()
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+
+            with self.login_user_context(self._admin_user):
+                response = self.client.post(endpoint, data)
+                self.assertEqual(response.status_code, 200)
+
+            call_kwargs = env.calls[0][1]
+
+            self.assertEqual(call_kwargs['operation'], ADD_PLUGIN)
+            tree_order = call_kwargs['tree_order']
+            self.assertIn(existing.pk, tree_order)
+            self.assertNotIn(de_plugin.pk, tree_order)
+
+    def test_post_delete_plugin_tree_order_excludes_deleted(self):
+        # Regression: the post DELETE_PLUGIN signal reused the tree order
+        # captured before the delete, so it still contained the deleted pk.
+        plugin = self._add_plugin()
+        sibling = self._add_plugin()
+        endpoint = self.get_delete_plugin_uri(plugin)
+
+        with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
+            with self.login_user_context(self._admin_user):
+                response = self.client.post(endpoint, {'post': True})
+                self.assertContains(response, '<div class="success"></div>')
+
+            pre_call_kwargs = env.calls[0][1]
+            post_call_kwargs = env.calls[1][1]
+
+            self.assertIn(plugin.pk, pre_call_kwargs['tree_order'])
+            self.assertNotIn(plugin.pk, post_call_kwargs['tree_order'])
+            self.assertEqual(post_call_kwargs['tree_order'], [sibling.pk])
+
+    def test_cut_plugin_source_order_is_populated(self):
+        # Regression: source_order was hard-coded to [] for both signals.
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=self._admin_user,
+            clipboard=Placeholder.objects.create(slot='clipboard'),
+        )
+        plugin = self._add_plugin()
+        sibling = self._add_plugin()
+        endpoint = self.get_move_plugin_uri(plugin)
+
+        data = {
+            'plugin_id': plugin.pk,
+            'target_language': 'en',
+            'placeholder_id': user_settings.clipboard_id,
+        }
+
+        with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
+            with self.login_user_context(self._admin_user):
+                response = self.client.post(endpoint, data)
+                self.assertEqual(response.status_code, 200)
+
+            pre_call_kwargs = env.calls[0][1]
+            post_call_kwargs = env.calls[1][1]
+
+            # Before the cut the source order still contains the plugin.
+            self.assertIn(plugin.pk, pre_call_kwargs['source_order'])
+            # After the cut only the remaining sibling is left in the source.
+            self.assertEqual(post_call_kwargs['source_order'], [sibling.pk])
+
+    def test_move_plugin_post_source_parent_id_is_source(self):
+        # Regression: the post MOVE_PLUGIN signal reported the post-move
+        # (target) parent, duplicating target_parent_id and losing the source.
+        parent = self._add_plugin()
+        child = self._add_plugin()
+        # Nest ``child`` under ``parent`` in placeholder 1.
+        with self.login_user_context(self._admin_user):
+            nest_endpoint = self.get_move_plugin_uri(child)
+            # No ``placeholder_id`` => move within the source placeholder.
+            self.client.post(nest_endpoint, {
+                'plugin_id': child.pk,
+                'target_language': 'en',
+                'plugin_parent': parent.pk,
+                'target_position': 2,
+            })
+        child = child.reload()
+        self.assertEqual(child.parent_id, parent.pk)
+
+        endpoint = self.get_move_plugin_uri(child)
+        data = {
+            'plugin_id': child.pk,
+            'target_language': 'en',
+            'placeholder_id': self._placeholder_2.pk,
+            'target_position': 1,
+        }
+
+        with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
+            with self.login_user_context(self._admin_user):
+                response = self.client.post(endpoint, data)
+                self.assertEqual(response.status_code, 200)
+
+            pre_call_kwargs = env.calls[0][1]
+            post_call_kwargs = env.calls[1][1]
+
+            # Both signals describe the same (source) parent, not the target.
+            self.assertEqual(pre_call_kwargs['source_parent_id'], parent.pk)
+            self.assertEqual(post_call_kwargs['source_parent_id'], parent.pk)
+            self.assertIsNone(post_call_kwargs['target_parent_id'])
+
+    def test_post_add_plugins_from_placeholder_target_order_includes_new(self):
+        # Regression: the post ADD_PLUGINS_FROM_PLACEHOLDER signal reused the
+        # target order captured before the copy, so it excluded new plugins.
+        plugin = self._add_plugin()
+        endpoint = self.get_copy_plugin_uri(plugin)
+
+        data = {
+            'source_language': 'en',
+            'source_placeholder_id': self._placeholder_1.pk,
+            'target_language': 'de',
+            'target_placeholder_id': self._placeholder_2.pk,
+        }
+
+        with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
+            with self.login_user_context(self._admin_user):
+                response = self.client.post(endpoint, data)
+                self.assertEqual(response.status_code, 200)
+
+            pre_call_kwargs = env.calls[0][1]
+            post_call_kwargs = env.calls[1][1]
+
+            new_plugin = post_call_kwargs['plugins'][0].get_bound_plugin()
+
+            # The target placeholder was empty before the copy...
+            self.assertEqual(pre_call_kwargs['target_order'], [])
+            # ...and contains the freshly copied plugin afterwards.
+            self.assertEqual(post_call_kwargs['target_order'], [new_plugin.pk])
+
     def test_pre_clear_placeholder(self):
         plugin = self._add_plugin()
         endpoint = self.get_clear_placeholder_url(self._placeholder_1)

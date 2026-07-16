@@ -580,7 +580,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             operation_kwargs["operation"] = operations.CHANGE_PLUGIN
         else:
             parent_id = obj.parent.pk if obj.parent else None
-            tree_order = obj.placeholder.get_plugin_tree_order(parent_id)
+            tree_order = obj.placeholder.get_plugin_tree_order(obj.language, parent_id)
             operation_kwargs["plugin"] = obj
             operation_kwargs["operation"] = operations.ADD_PLUGIN
             operation_kwargs["tree_order"] = tree_order
