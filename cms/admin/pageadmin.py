@@ -84,7 +84,7 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.permissions import clear_permission_lru_caches
-from cms.utils.plugins import copy_plugins_to_placeholder
+from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
@@ -1240,10 +1240,12 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             placeholder.slot: placeholder
             for placeholder in target_page_content.get_placeholders()
         }
-        source_plugins = CMSPlugin.objects.filter(
-            placeholder_id__in=[placeholder.pk for placeholder in source_placeholders],
-            language=source_page_content.language,
-        ).order_by("position")
+        source_plugins = downcast_plugins(
+            CMSPlugin.objects.filter(
+                placeholder_id__in=[placeholder.pk for placeholder in source_placeholders],
+                language=source_page_content.language,
+            ).order_by("position")
+        )
         plugins_by_placeholder = defaultdict(list)
         for plugin in source_plugins:
             plugins_by_placeholder[plugin.placeholder_id].append(plugin)
@@ -1257,7 +1259,12 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
             if not target.has_add_plugins_permission(request.user, plugins):
                 return HttpResponseForbidden(_("You do not have permission to copy these plugins."))
-            copy_plugins_to_placeholder(plugins, target, language=target_language)
+            copy_plugins_to_placeholder(
+                plugins,
+                target,
+                language=target_language,
+                plugins_are_downcast=True,
+            )
         return HttpResponse("ok")
 
     def delete_view(self, request, object_id, extra_context=None):

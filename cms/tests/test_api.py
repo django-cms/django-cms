@@ -52,13 +52,21 @@ class PythonAPITests(CMSTestCase):
             copy_plugins_to_language(page, "en", "de")
 
         plugin_batch_queries = []
+        concrete_plugin_queries = []
         for query in queries:
             sql = query["sql"].replace('"', "").replace("`", "")
             if "FROM cms_cmsplugin" in sql and "placeholder_id IN" in sql:
                 plugin_batch_queries.append(query)
+            if f"FROM {Text._meta.db_table}" in sql:
+                concrete_plugin_queries.append(query)
 
         # One batched source-plugin query and one batched target-plugin count query.
         self.assertEqual(len(plugin_batch_queries), 2)
+        # Concrete plugins are downcast in one query across all source placeholders.
+        self.assertEqual(len(concrete_plugin_queries), 1)
+        self.assertCountEqual(
+            Text.objects.filter(language="de").values_list("body", flat=True), ["Body", "Right column"]
+        )
 
     def test_invalid_apphook_type(self):
         self.assertRaises(TypeError, create_page, apphook=1, **self._get_default_create_page_arguments())

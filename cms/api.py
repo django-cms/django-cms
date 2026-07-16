@@ -67,7 +67,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
 from cms.utils.permissions import _current_user
-from cms.utils.plugins import copy_plugins_to_placeholder
+from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 from menus.menu_pool import menu_pool
 
 # ===============================================================================
@@ -653,10 +653,12 @@ def copy_plugins_to_language(page, source_language, target_language, only_empty=
     """
     source_placeholders = list(page.get_placeholders(source_language))
     placeholder_ids = [placeholder.pk for placeholder in source_placeholders]
-    source_plugins = CMSPlugin.objects.filter(
-        placeholder_id__in=placeholder_ids,
-        language=source_language,
-    ).order_by("position")
+    source_plugins = downcast_plugins(
+        CMSPlugin.objects.filter(
+            placeholder_id__in=placeholder_ids,
+            language=source_language,
+        ).order_by("position")
+    )
     target_plugin_counts = dict(
         CMSPlugin.objects.filter(
             placeholder_id__in=placeholder_ids,
@@ -677,6 +679,7 @@ def copy_plugins_to_language(page, source_language, target_language, only_empty=
                 plugins_by_placeholder[placeholder.pk],
                 placeholder,
                 language=target_language,
+                plugins_are_downcast=True,
             )
             copied += len(copied_plugins)
     return copied
