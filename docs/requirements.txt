@@ -42,7 +42,7 @@ coverage==7.14.1
     #   docstrfmt
 datetime==6.0
     # via -r requirements.in
-django==5.2.14
+django==5.2.15
     # via
     #   -r requirements.in
     #   django-classy-tags
