@@ -6,7 +6,9 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.test.utils import CaptureQueriesContext
 from djangocms_text.cms_plugins import TextPlugin
 from djangocms_text.models import Text
 
@@ -14,6 +16,7 @@ from cms.api import (
     _verify_plugin_type,
     add_plugin,
     assign_user_to_page,
+    copy_plugins_to_language,
     create_page,
     create_page_content,
 )
@@ -36,6 +39,26 @@ def _grant_page_permission(user, codename):
 class PythonAPITests(CMSTestCase):
     def _get_default_create_page_arguments(self):
         return {"title": "Test", "template": "nav_playground.html", "language": "en"}
+
+    def test_copy_plugins_to_language_does_not_query_per_placeholder(self):
+        page = create_page(**self._get_default_create_page_arguments())
+        create_page_content("de", "Test", page, template="nav_playground.html")
+        body = page.get_placeholders("en").get(slot="body")
+        right_column = page.get_placeholders("en").get(slot="right-column")
+        add_plugin(body, TextPlugin, "en", body="Body")
+        add_plugin(right_column, TextPlugin, "en", body="Right column")
+
+        with CaptureQueriesContext(connection) as queries:
+            copy_plugins_to_language(page, "en", "de")
+
+        plugin_batch_queries = []
+        for query in queries:
+            sql = query["sql"].replace('"', "").replace("`", "")
+            if "FROM cms_cmsplugin" in sql and "placeholder_id IN" in sql:
+                plugin_batch_queries.append(query)
+
+        # One batched source-plugin query and one batched target-plugin count query.
+        self.assertEqual(len(plugin_batch_queries), 2)
 
     def test_invalid_apphook_type(self):
         self.assertRaises(TypeError, create_page, apphook=1, **self._get_default_create_page_arguments())

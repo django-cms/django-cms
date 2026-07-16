@@ -38,11 +38,12 @@ Also, the functions defined in this module do sanity checks on arguments.
 """
 
 import warnings
+from collections import defaultdict
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError, ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, models, transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 
@@ -650,14 +651,33 @@ def copy_plugins_to_language(page, source_language, target_language, only_empty=
      plugins exists in the target language (on a placeholder basis).
     :return int: number of copied plugins
     """
+    source_placeholders = list(page.get_placeholders(source_language))
+    placeholder_ids = [placeholder.pk for placeholder in source_placeholders]
+    source_plugins = CMSPlugin.objects.filter(
+        placeholder_id__in=placeholder_ids,
+        language=source_language,
+    ).order_by("position")
+    target_plugin_counts = dict(
+        CMSPlugin.objects.filter(
+            placeholder_id__in=placeholder_ids,
+            language=target_language,
+        )
+        .values("placeholder_id")
+        .annotate(count=models.Count("pk"))
+        .values_list("placeholder_id", "count")
+    )
+    plugins_by_placeholder = defaultdict(list)
+    for plugin in source_plugins:
+        plugins_by_placeholder[plugin.placeholder_id].append(plugin)
+
     copied = 0
-    placeholders = page.get_placeholders(source_language)
-    for placeholder in placeholders:
-        # only_empty is True we check if the placeholder already has plugins and
-        # we skip it if has some
-        if not only_empty or not placeholder.get_plugins(language=target_language).exists():
-            plugins = list(placeholder.get_plugins(language=source_language))
-            copied_plugins = copy_plugins_to_placeholder(plugins, placeholder, language=target_language)
+    for placeholder in source_placeholders:
+        if not only_empty or not target_plugin_counts.get(placeholder.pk):
+            copied_plugins = copy_plugins_to_placeholder(
+                plugins_by_placeholder[placeholder.pk],
+                placeholder,
+                language=target_language,
+            )
             copied += len(copied_plugins)
     return copied
 
