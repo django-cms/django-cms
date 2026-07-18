@@ -837,8 +837,11 @@ class Page(MP_Node):
         from cms.models import PageContent
 
         content = PageContent.objects.filter(page=self, language=language).first()
+        url = self.urls.filter(language=language).first()
 
         if content is None:
+            if url is None or url.path is None:
+                return
             self.urls.filter(language=language).update(path=None)
         else:
             if content.overwrite_url and not self.is_home:
@@ -851,7 +854,11 @@ class Page(MP_Node):
                 "path": path,
                 "managed": not bool(content.overwrite_url),
             }
-            if self.urls.filter(language=language).exists():
+            if url is not None:
+                if (url.slug, url.path, url.managed) == (data["slug"], data["path"], data["managed"]):
+                    # the URL already reflects the content; descendant paths derive
+                    # from this page's path, so they are up to date as well
+                    return
                 self.update_urls(language, **data)  # includes the path collision check
             else:
                 collision = (

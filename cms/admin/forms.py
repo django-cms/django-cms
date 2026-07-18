@@ -642,7 +642,7 @@ class ChangePageForm(BasePageContentForm):
         page = self.instance.page
 
         if page.is_home:
-            data["path"] = ""
+            # the home page always lives at the root path
             return data
 
         slug = data["slug"]
@@ -650,18 +650,9 @@ class ChangePageForm(BasePageContentForm):
 
         if path_override:
             path = path_override.strip("/")
-        elif page.parent:
-            if page.parent.is_home:
-                path = slug
-            else:
-                base_path = page.parent.get_path(self._language)
-                path = f"{base_path}/{slug}" if base_path else None
         else:
-            path = slug
-
-        if path is None:
-            data["path"] = None
-            return data
+            # the same derivation Page.update_urls_from_content applies on save
+            path = page.get_path_for_slug(slug, self._language)
 
         user_language = get_site_language_from_request(self._request, site_id=self._site.pk)
 
@@ -677,8 +668,6 @@ class ChangePageForm(BasePageContentForm):
         except ValidationError as error:
             field = "overwrite_url" if path_override else "slug"
             self.add_error(field, error)
-        else:
-            data["path"] = path
         return data
 
     def clean_xframe_options(self):
@@ -700,7 +689,6 @@ class ChangePageForm(BasePageContentForm):
 
         data = self.cleaned_data.copy()
         page = self.instance.page
-        data.pop("path", None)  # the PageUrl path is derived from the content, never stored on it
         data["overwrite_url"] = (data.get("overwrite_url") or "").strip("/") or None
         page_content = super().save(commit=False)
         page_content.update(

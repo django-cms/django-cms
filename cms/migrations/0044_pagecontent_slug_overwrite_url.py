@@ -1,4 +1,5 @@
 from django.db import migrations, models
+from django.db.models import Case, Exists, F, OuterRef, Subquery, Value, When
 
 
 def _copy_urls_to_content(apps, schema_editor):
@@ -12,21 +13,19 @@ def _copy_urls_to_content(apps, schema_editor):
     PageContent = apps.get_model("cms", "PageContent")
     PageUrl = apps.get_model("cms", "PageUrl")
 
-    urls = {(url.page_id, url.language): url for url in PageUrl.objects.all().iterator()}
-
-    batch = []
-    for content in PageContent.objects.all().iterator(chunk_size=1000):
-        url = urls.get((content.page_id, content.language))
-        if url is None:
-            continue
-        content.slug = url.slug
-        content.overwrite_url = None if url.managed else url.path
-        batch.append(content)
-        if len(batch) >= 1000:
-            PageContent.objects.bulk_update(batch, ["slug", "overwrite_url"])
-            batch = []
-    if batch:
-        PageContent.objects.bulk_update(batch, ["slug", "overwrite_url"])
+    url_qs = PageUrl.objects.filter(page_id=OuterRef("page_id"), language=OuterRef("language"))
+    PageContent.objects.filter(Exists(url_qs)).update(
+        slug=Subquery(url_qs.values("slug")[:1]),
+        overwrite_url=Subquery(
+            url_qs.annotate(
+                overwrite=Case(
+                    When(managed=True, then=Value(None)),
+                    default=F("path"),
+                    output_field=models.CharField(),
+                )
+            ).values("overwrite")[:1]
+        ),
+    )
 
 
 def _noop(apps, schema_editor):
