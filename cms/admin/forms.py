@@ -546,26 +546,6 @@ class DuplicatePageForm(AddPageForm):
         return source
 
 
-def url_is_locked(page_content: PageContent) -> bool:
-    """Return whether ``page_content``'s URL is shared with a published
-    (publicly visible) version of the same page and language.
-
-    With a versioning package installed the slug and path live on the
-    (unversioned) :class:`~cms.models.pagemodel.PageUrl` and are therefore
-    shared across all versions of a page. Editing the slug of a draft would
-    silently change the URL of the already published version. Without versioning
-    the content being edited *is* the public version, so the URL is never
-    locked.
-    """
-    if page_content is None or page_content.pk is None:
-        return False
-    return (
-        PageContent.objects.filter(page=page_content.page_id, language=page_content.language)
-        .values_list("pk", flat=True)
-        .exclude(pk=page_content.pk).exists()
-    )
-
-
 class ChangePageForm(BasePageContentForm):
     overwrite_url = forms.CharField(
         label=_("Overwrite URL"),
@@ -640,26 +620,12 @@ class ChangePageForm(BasePageContentForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.url_obj = self.instance.page.get_url(self._language)
-        self.fields["slug"].initial = self.url_obj.slug
+        self.fields["slug"].initial = self.instance.slug
         self.fields["redirect"].widget.language = self._language
         self.fields["redirect"].initial = self.instance.redirect
 
-        if not self.url_obj.managed:
-            self.fields["overwrite_url"].initial = self.url_obj.path
-
-        if self._url_is_locked:
-            # The URL is shared with a published version of this page (only
-            # possible with a versioning package installed). Changing the slug
-            # or overwrite URL would silently change the live URL, so drop those
-            # fields from the editable form. PageContentAdmin renders them as
-            # read-only instead (see PageContentAdmin.get_readonly_fields()).
-            self.fields.pop("slug", None)
-            self.fields.pop("overwrite_url", None)
-
-    @cached_property
-    def _url_is_locked(self):
-        return url_is_locked(self.instance)
+        if self.instance.overwrite_url:
+            self.fields["overwrite_url"].initial = self.instance.overwrite_url
 
     @cached_property
     def _language(self):
@@ -675,12 +641,8 @@ class ChangePageForm(BasePageContentForm):
 
         page = self.instance.page
 
-        if self._url_is_locked:
-            # The slug and overwrite URL are read-only; the URL must not change.
-            return data
-
         if page.is_home:
-            data["path"] = ""
+            # the home page always lives at the root path
             return data
 
         slug = data["slug"]
@@ -688,18 +650,9 @@ class ChangePageForm(BasePageContentForm):
 
         if path_override:
             path = path_override.strip("/")
-        elif page.parent:
-            if page.parent.is_home:
-                path = slug
-            else:
-                base_path = page.parent.get_path(self._language)
-                path = f"{base_path}/{slug}" if base_path else None
         else:
-            path = slug
-
-        if path is None:
-            data["path"] = None
-            return data
+            # the same derivation Page.update_urls_from_content applies on save
+            path = page.get_path_for_slug(slug, self._language)
 
         user_language = get_site_language_from_request(self._request, site_id=self._site.pk)
 
@@ -715,8 +668,6 @@ class ChangePageForm(BasePageContentForm):
         except ValidationError as error:
             field = "overwrite_url" if path_override else "slug"
             self.add_error(field, error)
-        else:
-            data["path"] = path
         return data
 
     def clean_xframe_options(self):
@@ -738,30 +689,23 @@ class ChangePageForm(BasePageContentForm):
 
         data = self.cleaned_data.copy()
         page = self.instance.page
-        page_slug = data.pop("slug", None)
-        page_path = data.pop("path", None)
-        page_overwrite_url = data.pop("overwrite_url", None)
+        data["overwrite_url"] = (data.get("overwrite_url") or "").strip("/") or None
         page_content = super().save(commit=False)
         page_content.update(
             changed_by=get_clean_username(self._request.user),
             changed_date=timezone.now(),
             **data,
         )
-        if not self._url_is_locked:
-            # When the URL is shared with a published version the slug/path must
-            # not change, so the (read-only) URL fields are ignored on save.
-            page.update_urls(
-                self._language,
-                path=page_path,
-                slug=page_slug,
-                managed=not bool(page_overwrite_url),
-            )
-            page._update_url_path_recursive(self._language)
-        page.clear_cache(menu=True)
+        if page_content.is_public():
+            # This content is what visitors see (nothing like a versioning
+            # package hides it), so the page URL follows the change right away.
+            # Otherwise the URL is only updated once this content is published.
+            page.update_urls_from_content(self._language)
 
-        if not self._url_is_locked and page.application_urls and "slug" in self.changed_data:
-            # Connects the apphook restart handler to the request finished signal
-            set_restart_trigger()
+            if page.application_urls and "slug" in self.changed_data:
+                # Connects the apphook restart handler to the request finished signal
+                set_restart_trigger()
+        page.clear_cache(menu=True)
         send_post_page_operation(
             request=self._request,
             operation=CHANGE_PAGE_TRANSLATION,

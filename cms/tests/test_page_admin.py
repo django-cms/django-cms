@@ -2,7 +2,6 @@ import datetime
 import json
 import re
 import sys
-from contextlib import contextmanager
 from unittest import skipUnless
 from unittest.mock import patch
 
@@ -22,7 +21,6 @@ from django.utils.translation import override as force_language
 from djangocms_text.models import Text
 
 from cms import constants
-from cms.admin.forms import ChangePageForm
 from cms.admin.pageadmin import PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.appresolver import clear_app_resolvers
@@ -1222,51 +1220,37 @@ class PageTest(PageTestBase):
             self.assertContains(response, expected, html=True)
 
     @override_settings(CMS_PERMISSION=False)
-    def test_slug_readonly_when_url_locked(self):
-        # When the page URL is shared with a published version (only possible
-        # with a versioning package installed), the slug and overwrite URL are
-        # rendered read-only: they are dropped from the editable form and shown
-        # as static text by PageContentAdmin instead.
+    def test_slug_stored_on_page_content(self):
+        # The slug and overwrite URL are authored on the PageContent object;
+        # the PageUrl is derived from it.
         superuser = self.get_superuser()
         cms_page = create_page("page", "nav_playground.html", "en")
+        translation = cms_page.get_content_obj("en", fallback=False)
+        changelist = self.get_pages_admin_list_uri()
         endpoint = self.get_page_change_uri("en", cms_page)
 
-        with self.login_user_context(superuser), self._url_locked():
-            response = self.client.get(endpoint)
-
-            self.assertEqual(response.status_code, 200)
-            adminform = response.context["adminform"]
-            # Rendered read-only by the admin (so no editable form field) ...
-            self.assertIn("slug", adminform.readonly_fields)
-            self.assertIn("overwrite_url", adminform.readonly_fields)
-            self.assertNotIn("slug", adminform.form.fields)
-            self.assertNotIn("overwrite_url", adminform.form.fields)
-            # ... while still displaying the current value ...
-            self.assertContains(response, "page")
-            # ... and explaining in the label how to make it editable.
-            self.assertContains(response, "first unpublish the currently published version")
-
-    @override_settings(CMS_PERMISSION=False)
-    def test_slug_editable_when_url_not_locked(self):
-        # Without a published version sharing the URL (the default in core
-        # django-CMS) the slug stays editable.
-        superuser = self.get_superuser()
-        cms_page = create_page("page", "nav_playground.html", "en")
-        endpoint = self.get_page_change_uri("en", cms_page)
+        self.assertEqual(translation.slug, "page")
 
         with self.login_user_context(superuser):
-            response = self.client.get(endpoint)
+            page_data = {
+                "title": translation.title,
+                "slug": "new-slug",
+                "overwrite_url": "",
+                "template": translation.template,
+            }
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, changelist)
 
-            self.assertEqual(response.status_code, 200)
-            adminform = response.context["adminform"]
-            self.assertNotIn("slug", adminform.readonly_fields)
-            self.assertIn("slug", adminform.form.fields)
-            self.assertIn("overwrite_url", adminform.form.fields)
+        translation.refresh_from_db()
+        self.assertEqual(translation.slug, "new-slug")
+        # The content is public (no versioning package), so the URL follows.
+        self.assertEqual(cms_page.reload().get_slug("en"), "new-slug")
 
     @override_settings(CMS_PERMISSION=False)
-    def test_locked_url_unchanged_on_save(self):
-        # A locked URL must not change even if a different slug is posted, but
-        # other (non-URL) page content fields are still saved.
+    def test_url_not_synced_for_non_public_content(self):
+        # When the edited content is not publicly visible (as with a draft
+        # version created by a versioning package), saving a new slug is stored
+        # on the content but must not touch the page's published URL.
         superuser = self.get_superuser()
         cms_page = create_page("page", "nav_playground.html", "en")
         translation = cms_page.get_content_obj("en", fallback=False)
@@ -1280,28 +1264,52 @@ class PageTest(PageTestBase):
                 "overwrite_url": "",
                 "template": translation.template,
             }
-            with self._url_locked():
+            with patch.object(PageContent, "is_public", return_value=False):
                 response = self.client.post(endpoint, page_data)
             self.assertRedirects(response, changelist)
 
-        # The slug/path are untouched ...
+        # The published URL is untouched ...
         self.assertEqual(cms_page.get_slug("en"), "page")
         self.assertFalse(cms_page.urls.filter(slug="a-changed-slug").exists())
-        # ... while other content fields were saved.
+        # ... while the content carries the new slug and other saved fields.
         translation.refresh_from_db()
+        self.assertEqual(translation.slug, "a-changed-slug")
         self.assertEqual(translation.title, "A new title")
 
-    @staticmethod
-    @contextmanager
-    def _url_locked():
-        # Simulate a shared, published page URL (as a versioning package would
-        # produce) without versioning installed. The helper is imported into
-        # both the forms and the pageadmin namespaces, so both must be patched.
-        with (
-            patch("cms.admin.forms.url_is_locked", return_value=True),
-            patch("cms.admin.pageadmin.url_is_locked", return_value=True),
-        ):
-            yield
+    @override_settings(CMS_PERMISSION=False)
+    def test_update_urls_from_content(self):
+        # The publish-time hook of versioning packages: derives the PageUrl
+        # from the publicly visible content and updates descendant paths.
+        cms_page = create_page("page", "nav_playground.html", "en", slug="page")
+        child = create_page("child", "nav_playground.html", "en", parent=cms_page, slug="child")
+        translation = cms_page.get_content_obj("en", fallback=False)
+
+        translation.update(slug="renamed")
+        cms_page.update_urls_from_content("en")
+
+        self.assertEqual(cms_page.reload().get_slug("en"), "renamed")
+        self.assertEqual(child.reload().get_path("en"), "renamed/child")
+
+        # An overwrite URL on the content wins over the derived path.
+        translation.update(overwrite_url="somewhere/else")
+        cms_page.update_urls_from_content("en")
+
+        url = cms_page.reload().get_url("en")
+        self.assertEqual(url.path, "somewhere/else")
+        self.assertFalse(url.managed)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_update_urls_from_content_without_public_content(self):
+        # Without publicly visible content the path is invalidated so the page
+        # stops resolving, but the slug stays reserved.
+        cms_page = create_page("page", "nav_playground.html", "en", slug="page")
+
+        with patch.object(PageContent.objects, "filter", return_value=PageContent.objects.none()):
+            cms_page.update_urls_from_content("en")
+
+        url = cms_page.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertEqual(url.slug, "page")
 
     @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):
@@ -1481,32 +1489,17 @@ class PageTest(PageTestBase):
             self.assertTrue("form_url" in response.context_data)
             self.assertEqual(response.context_data["form_url"], form_url)
 
-    def test_pagecontent_change_view_uses_cached_url_obj(self):
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            content_admin = PageContentAdmin(PageContent, admin.site)
-            page1 = self.get_page()
-            content1 = self.get_pagecontent_obj(page1, "en")
-            content1.page = page1
-            page2 = self.get_page()
-            content2 = self.get_pagecontent_obj(page2, "en")
+    def test_pagecontent_slug_needs_no_extra_queries(self):
+        # slug and overwrite_url live on the PageContent object itself, so
+        # read-only admin rendering needs no PageUrl lookups.
+        page1 = self.get_page()
+        content1 = self.get_pagecontent_obj(page1, "en")
+        page2 = self.get_page()
+        content2 = self.get_pagecontent_obj(page2, "en")
 
-            content_admin.slug(content1)
-            content_admin.overwrite_url(content1)
-
-            with self.assertNumQueries(0):
-                # Slugs and overwrite urls are cached
-                slug = content_admin.slug(content1)
-                content_admin.overwrite_url(content1)
-
-            self.assertNotEqual(slug, content_admin.slug(content2))
-
-            with self.assertNumQueries(0):
-                # Both still cached
-                content_admin.overwrite_url(content1)
-                content_admin.slug(content1)
-                content_admin.slug(content2)
-                content_admin.overwrite_url(content2)
+        with self.assertNumQueries(0):
+            self.assertNotEqual(content1.slug, content2.slug)
+            self.assertIsNone(content1.overwrite_url)
 
     def test_change_view_shows_language_tabs_for_latest_content(self):
         """The page content change view offers the language selector for the latest content."""
