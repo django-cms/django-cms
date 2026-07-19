@@ -384,8 +384,8 @@ class Page(MP_Node):
         return not self.is_home and bool(self.is_root())
 
     def get_absolute_url(self, language=None, fallback=True):
-        """Return the absolute URL of the page for the given language, or an
-        empty string if the page has no reachable path (e.g. it or an ancestor
+        """Return the absolute URL of the page for the given language, or
+        ``None`` if the page has no reachable path (e.g. it or an ancestor
         is unpublished)."""
         if not language:
             language = get_current_language()
@@ -1245,7 +1245,7 @@ class PageUrl(models.Model):
                     return reverse("pages-root")
                 return reverse("pages-details-by-slug", kwargs={"slug": self.path})
             except NoReverseMatch:
-                return ""
+                return None
 
     def get_path_for_base(self, base_path=""):
         old_base, sep, slug = self.path.rpartition("/")

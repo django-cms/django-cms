@@ -151,9 +151,6 @@ This changes URL behavior in a few user-visible ways:
 * Unpublishing a page content removes the URL's path, so the page — and its
   descendant pages — stop resolving. The slug stays reserved for the page and
   the path is restored on the next publish.
-* ``Page.get_absolute_url()`` returns an empty string for pages without a
-  reachable path (for example, when an ancestor is unpublished) instead of
-  fabricating a URL from the bare slug.
 * Publishing a version whose derived URL collides with the URL of another page
   on the same site raises an ``IntegrityError`` and the publish is not applied.
 * Path uniqueness per site and language is now also enforced by a database
@@ -381,6 +378,24 @@ stale, or target-side values.
 The ``ADD_PLUGIN`` post-operation signal also now includes a ``tree_order``
 keyword argument. Custom signal receivers must accept ``**kwargs``, as recommended
 for Django signal receivers, and must not rely on the previous incorrect values.
+
+``get_absolute_url()`` of unreachable pages
+===========================================
+
+``Page.get_absolute_url()`` (and consequently
+``PageContent.get_absolute_url()``) now returns ``None`` for pages without a
+reachable path — for example, while the page or one of its ancestors is
+unpublished. Previously a URL was fabricated from the bare slug, which pointed
+to a location that never resolved (or resolved to a different page).
+
+Python code that consumes the result without checking it should be reviewed;
+django CMS's own toolbar helpers already handle the ``None`` case. In
+templates, rendering the value unchecked now produces ``href="None"`` —
+use Django's ``default`` filter to render a safe fallback instead:
+
+.. code-block:: html+django
+
+    <a href="{{ page.get_absolute_url|default:'' }}">{{ page.get_title }}</a>
 
 Dependencies, settings, and migrations
 ======================================
