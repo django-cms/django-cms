@@ -1326,7 +1326,7 @@ class PageTest(PageTestBase):
         url = child.urls.get(language="en")
         self.assertIsNone(url.path)
         self.assertEqual(url.slug, "child")
-        self.assertIsNone(child.get_absolute_url("en"))
+        self.assertEqual(child.get_absolute_url("en"), "")
 
         # Saving or publishing the child while the parent has no path keeps
         # the child unreachable instead of exposing it at a slug-only path.
@@ -1334,7 +1334,7 @@ class PageTest(PageTestBase):
 
         url = child.urls.get(language="en")
         self.assertIsNone(url.path)
-        self.assertIsNone(child.get_absolute_url("en"))
+        self.assertEqual(child.get_absolute_url("en"), "")
 
     @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):

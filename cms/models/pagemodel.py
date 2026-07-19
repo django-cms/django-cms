@@ -361,6 +361,9 @@ class Page(MP_Node):
         return not self.is_home and bool(self.is_root())
 
     def get_absolute_url(self, language=None, fallback=True):
+        """Return the absolute URL of the page for the given language, or an
+        empty string if the page has no reachable path (e.g. it or an ancestor
+        is unpublished)."""
         if not language:
             language = get_current_language()
 
@@ -368,12 +371,10 @@ class Page(MP_Node):
             try:
                 if self.is_home:
                     return reverse("pages-root")
-                # no path (e.g. unpublished parent) means the page is not
-                # reachable under any URL
                 path = self.get_path(language, fallback)
-                return reverse("pages-details-by-slug", kwargs={"slug": path}) if path else None
+                return reverse("pages-details-by-slug", kwargs={"slug": path}) if path else ""
             except NoReverseMatch:
-                return None
+                return ""
 
     def set_tree_node(self, site, target=None, position="first-child"):
         warnings.warn(
@@ -1202,9 +1203,9 @@ class PageUrl(models.Model):
             try:
                 if self.path == "":
                     return reverse("pages-root")
-                return reverse("pages-details-by-slug", kwargs={"slug": self.path})
+                return reverse("pages-details-by-slug", kwargs={"slug": self.path}) if self.path else ""
             except NoReverseMatch:
-                return None
+                return ""
 
     def get_path_for_base(self, base_path=""):
         old_base, sep, slug = self.path.rpartition("/")

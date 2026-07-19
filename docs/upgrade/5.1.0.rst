@@ -151,9 +151,9 @@ This changes URL behavior in a few user-visible ways:
 * Unpublishing a page content removes the URL's path, so the page — and its
   descendant pages — stop resolving. The slug stays reserved for the page and
   the path is restored on the next publish.
-* ``Page.get_absolute_url()`` returns ``None`` for pages without a reachable
-  path (for example, when an ancestor is unpublished) instead of fabricating a
-  URL from the bare slug.
+* ``Page.get_absolute_url()`` returns an empty string for pages without a
+  reachable path (for example, when an ancestor is unpublished) instead of
+  fabricating a URL from the bare slug.
 * Publishing a version whose derived URL collides with the URL of another page
   on the same site raises an ``IntegrityError`` and the publish is not applied.
 
