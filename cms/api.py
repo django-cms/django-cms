@@ -422,6 +422,7 @@ def create_page_content(
                     slug=slug,
                     path=path,
                     managed=not bool(overwrite_url),
+                    site_id=page.site_id,
                 ),
             )
         page._clear_internal_cache()

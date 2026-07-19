@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.db import connection
+from django.db import IntegrityError, connection, transaction
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
@@ -1310,6 +1310,42 @@ class PageTest(PageTestBase):
         url = cms_page.urls.get(language="en")
         self.assertIsNone(url.path)
         self.assertEqual(url.slug, "page")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_update_urls_from_content_updates_deep_descendants(self):
+        # The level-based descendant update covers the whole subtree; pages
+        # below an overwritten URL derive from its fixed path.
+        cms_page = create_page("page", "nav_playground.html", "en", slug="page")
+        child = create_page("child", "nav_playground.html", "en", parent=cms_page, slug="child")
+        grandchild = create_page("grandchild", "nav_playground.html", "en", parent=child, slug="grandchild")
+        overwritten = create_page(
+            "fixed", "nav_playground.html", "en", parent=child, slug="fixed", overwrite_url="fixed/url"
+        )
+        under_overwritten = create_page("leaf", "nav_playground.html", "en", parent=overwritten, slug="leaf")
+
+        cms_page.get_content_obj("en", fallback=False).update(slug="renamed")
+        cms_page.update_urls_from_content("en")
+
+        self.assertEqual(child.reload().get_path("en"), "renamed/child")
+        self.assertEqual(grandchild.reload().get_path("en"), "renamed/child/grandchild")
+        self.assertEqual(overwritten.reload().get_path("en"), "fixed/url")
+        self.assertEqual(under_overwritten.reload().get_path("en"), "fixed/url/leaf")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_page_url_path_unique_per_site_in_database(self):
+        # The database enforces path uniqueness per site and language ...
+        create_page("page", "nav_playground.html", "en", slug="page")
+        other = create_page("other", "nav_playground.html", "en", slug="other")
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            # a queryset update bypasses the application-level checks
+            other.urls.filter(language="en").update(path="page")
+
+        # ... while any number of unreachable pages (path=None) may coexist
+        third = create_page("third", "nav_playground.html", "en", slug="third")
+        other.urls.filter(language="en").update(path=None)
+        third.urls.filter(language="en").update(path=None)
+        self.assertEqual(PageUrl.objects.filter(path__isnull=True, language="en").count(), 2)
 
     @override_settings(CMS_PERMISSION=False)
     def test_unpublished_parent_invalidates_child_urls(self):

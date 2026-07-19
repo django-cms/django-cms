@@ -156,6 +156,13 @@ This changes URL behavior in a few user-visible ways:
   fabricating a URL from the bare slug.
 * Publishing a version whose derived URL collides with the URL of another page
   on the same site raises an ``IntegrityError`` and the publish is not applied.
+* Path uniqueness per site and language is now also enforced by a database
+  constraint. ``PageUrl`` carries a denormalized ``site`` foreign key for this
+  purpose; a data migration fills it and resolves any pre-existing duplicate
+  paths (of each set, only one page was actually served — it keeps the path,
+  the others become unreachable until their next publish).
+* Updating the URLs of a page's descendants (e.g. after a rename) now runs one
+  query per tree level instead of two queries per descendant page.
 
 Model-specific plugins
 ======================

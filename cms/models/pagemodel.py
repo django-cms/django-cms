@@ -309,19 +309,42 @@ class Page(MP_Node):
         )  # TODO: Update or create?
 
     def _update_url_path_recursive(self, language):
+        """Rebuild the managed URL paths of all descendant pages for
+        ``language``, level by level: each page's path derives from its
+        parent's effective path. Unmanaged (overwritten) URLs keep their fixed
+        path but still serve as the base for their own descendants.
+
+        Costs one SELECT and at most one bulk UPDATE per tree level instead of
+        two queries per descendant page.
+        """
         if self.is_leaf() or language not in self.get_languages():
             return
 
-        pages = self.get_child_pages()
-        base_path = self.get_path(language)
-        new_path = self._get_path_sql_value(base_path)
+        base_paths = {self.pk: self.get_path(language)}
 
-        (
-            PageUrl.objects.filter(language=language, page__in=pages).exclude(managed=False).update(path=new_path)
-        )  # TODO: Update or create?
-
-        for child in pages.filter(urls__language=language).iterator():
-            child._update_url_path_recursive(language)
+        while base_paths:
+            urls = PageUrl.objects.filter(page__parent_id__in=base_paths, language=language).values_list(
+                "pk", "page_id", "page__parent_id", "slug", "managed", "path"
+            )
+            changed = []
+            next_base_paths = {}
+            for pk, page_id, parent_id, slug, managed, path in urls:
+                if managed:
+                    base = base_paths[parent_id]
+                    if base is None:
+                        # an unreachable parent makes the page unreachable too
+                        new_path = None
+                    else:
+                        # an empty base means the parent is the home page
+                        new_path = f"{base}/{slug}" if base else slug
+                    if new_path != path:
+                        changed.append(PageUrl(pk=pk, path=new_path))
+                    next_base_paths[page_id] = new_path
+                else:
+                    next_base_paths[page_id] = path
+            if changed:
+                PageUrl.objects.bulk_update(changed, ["path"])
+            base_paths = next_base_paths
 
     def _set_title_root_path(self):
         page_tree = self.__class__.get_tree(self)
@@ -818,7 +841,7 @@ class Page(MP_Node):
                     PageUrl.objects.filter(
                         language=lang,
                         path=new_path,
-                        page__site=self.site,
+                        site=self.site_id,
                     )
                     .exclude(pk__in=page_urls_qs.filter(language=lang).values("pk"))
                     .exists()
@@ -875,14 +898,14 @@ class Page(MP_Node):
             else:
                 collision = (
                     path is not None
-                    and PageUrl.objects.filter(language=language, path=path, page__site=self.site_id).exists()
+                    and PageUrl.objects.filter(language=language, path=path, site=self.site_id).exists()
                 )
                 if collision:
                     raise IntegrityError(
                         f"Cannot create URL. A page URL with path='{path}' and "
                         f"language='{language}' already exists for another page on the same site."
                     )
-                self.urls.create(page=self, language=language, **data)
+                self.urls.create(page=self, site_id=self.site_id, language=language, **data)
 
         self.urls_cache = {}
         self._update_url_path_recursive(language)
@@ -1182,6 +1205,15 @@ class PageUrl(models.Model):
         verbose_name=_("page"),
         related_name="urls",
     )
+    #: Denormalized from ``page.site`` so path uniqueness per site can be
+    #: enforced by the database.
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        verbose_name=_("site"),
+        related_name="djangocms_urls",
+        editable=False,
+    )
     managed = models.BooleanField(default=False)
     objects = PageUrlManager()
 
@@ -1190,10 +1222,18 @@ class PageUrl(models.Model):
         default_permissions = []
         constraints = [
             UniqueConstraint(fields=["page", "language"], name="unique_together_page_language"),
+            # NULL paths (unreachable pages) are distinct on all supported
+            # backends, so any number of them may coexist.
+            UniqueConstraint(fields=["site", "language", "path"], name="unique_site_language_path"),
         ]
 
     def __str__(self):
         return f"{self.path or self.slug} ({self.language})"
+
+    def save(self, *args, **kwargs):
+        if self.site_id is None:
+            self.site_id = self.page.site_id
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
