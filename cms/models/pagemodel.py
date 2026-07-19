@@ -1243,7 +1243,7 @@ class PageUrl(models.Model):
             try:
                 if self.path == "":
                     return reverse("pages-root")
-                return reverse("pages-details-by-slug", kwargs={"slug": self.path}) if self.path else ""
+                return reverse("pages-details-by-slug", kwargs={"slug": self.path})
             except NoReverseMatch:
                 return ""
 
