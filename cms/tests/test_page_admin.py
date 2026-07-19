@@ -18,6 +18,7 @@ from django.urls import clear_url_caches
 from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
+from djangocms_text.models import Text
 
 from cms import constants
 from cms.admin.pageadmin import PageContentAdmin
@@ -3620,6 +3621,35 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 200)
             new_plugins = target_placeholder.get_plugins()
             self.assertEqual(new_plugins.count(), len(plugins))
+
+    def test_copy_language_downcasts_plugins_across_placeholders_in_one_query(self):
+        page = self.get_permissions_test_page()
+        source_translation = self.get_pagecontent_obj(page, "en")
+        target_translation = self._add_translation_to_page(page)
+        source_placeholders = page.get_placeholders("en")
+        add_plugin(source_placeholders.get(slot="body"), "TextPlugin", "en", body="Body")
+        add_plugin(source_placeholders.get(slot="right-column"), "TextPlugin", "en", body="Right column")
+        endpoint = self.get_admin_url(PageContent, "copy_language", source_translation.pk)
+
+        with self.login_user_context(self.get_superuser()):
+            with CaptureQueriesContext(connection) as queries:
+                response = self.client.post(endpoint, {"target_language": target_translation.language})
+
+        plugin_batch_queries = []
+        concrete_plugin_queries = []
+        for query in queries:
+            sql = query["sql"].replace('"', "").replace("`", "")
+            if "FROM cms_cmsplugin" in sql and "placeholder_id IN" in sql:
+                plugin_batch_queries.append(query)
+            if f"FROM {Text._meta.db_table}" in sql:
+                concrete_plugin_queries.append(query)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(plugin_batch_queries), 1)
+        self.assertEqual(len(concrete_plugin_queries), 1)
+        self.assertCountEqual(
+            Text.objects.filter(language="de").values_list("body", flat=True), ["Body", "Right column"]
+        )
 
     def test_user_cant_copy_plugins_to_language(self):
         """

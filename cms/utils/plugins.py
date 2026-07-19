@@ -247,7 +247,14 @@ def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_l
 
 
 @transaction.atomic
-def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin=None, start_positions=None):
+def copy_plugins_to_placeholder(
+    plugins,
+    placeholder,
+    language=None,
+    root_plugin=None,
+    start_positions=None,
+    plugins_are_downcast=False,
+):
     """Copies an iterable of plugins to a placeholder
 
     :param iterable plugins: Plugins to be copied
@@ -257,6 +264,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
     :param root_plugin:
     :type placeholder: :class:`cms.models.pluginmodel.CMSPlugin` instance
     :param int start_positions: Cache for start positions by language
+    :param bool plugins_are_downcast: Whether the plugins are already concrete plugin instances
 
     The logic of this method is the following:
 
@@ -283,7 +291,8 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
     if root_plugin:
         language = root_plugin.language
 
-    for source_plugin in get_bound_plugins(plugins):
+    source_plugins = plugins if plugins_are_downcast else get_bound_plugins(plugins)
+    for source_plugin in source_plugins:
         parent = plugins_by_id.get(source_plugin.parent_id, root_plugin)
         plugin_model = source_plugin.__class__  # get_plugin_model(source_plugin.plugin_type)
 
