@@ -395,7 +395,7 @@ class Page(MP_Node):
                 if self.is_home:
                     return reverse("pages-root")
                 path = self.get_path(language, fallback)
-                return reverse("pages-details-by-slug", kwargs={"slug": path}) if path else ""
+                return reverse("pages-details-by-slug", kwargs={"slug": path}) if path else None
             except NoReverseMatch:
                 return None
 
