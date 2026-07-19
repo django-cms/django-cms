@@ -779,6 +779,20 @@ class Page(MP_Node):
             path = slug
         return path
 
+    def get_url_data(self, slug, overwrite_url, language):
+        """Derive the :class:`~cms.models.pagemodel.PageUrl` fields (``slug``,
+        ``path``, ``managed``) from an authored slug and overwrite URL."""
+        if overwrite_url and not self.is_home:
+            path = overwrite_url.strip("/")
+        else:
+            # the home page always lives at the root path
+            path = self.get_path_for_slug(slug, language)
+        return {
+            "slug": slug,
+            "path": path,
+            "managed": not bool(overwrite_url),
+        }
+
     def get_url(self, language):
         return self.get_urls().get(language=language)
 
@@ -849,16 +863,8 @@ class Page(MP_Node):
                 return
             self.urls.filter(language=language).update(path=None)
         else:
-            if content.overwrite_url and not self.is_home:
-                path = content.overwrite_url.strip("/")
-            else:
-                # the home page always lives at the root path
-                path = self.get_path_for_slug(content.slug, language)
-            data = {
-                "slug": content.slug,
-                "path": path,
-                "managed": not bool(content.overwrite_url),
-            }
+            data = self.get_url_data(content.slug, content.overwrite_url, language)
+            path = data["path"]
             if url is not None:
                 if (url.slug, url.path, url.managed) == (data["slug"], data["path"], data["managed"]):
                     # the URL already reflects the content; descendant paths derive

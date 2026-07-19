@@ -648,11 +648,8 @@ class ChangePageForm(BasePageContentForm):
         slug = data["slug"]
         path_override = self.cleaned_data.get("overwrite_url")
 
-        if path_override:
-            path = path_override.strip("/")
-        else:
-            # the same derivation Page.update_urls_from_content applies on save
-            path = page.get_path_for_slug(slug, self._language)
+        # the same derivation Page.update_urls_from_content applies on save
+        path = page.get_url_data(slug, path_override, self._language)["path"]
 
         if path is None:
             # the page has no reachable path (e.g. unpublished parent),
