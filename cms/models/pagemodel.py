@@ -397,7 +397,7 @@ class Page(MP_Node):
                 path = self.get_path(language, fallback)
                 return reverse("pages-details-by-slug", kwargs={"slug": path}) if path else ""
             except NoReverseMatch:
-                return ""
+                return None
 
     def set_tree_node(self, site, target=None, position="first-child"):
         warnings.warn(
