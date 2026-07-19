@@ -95,6 +95,7 @@ The two-part pattern is most visible on the page model:
      ├── PageContent rows       (content, per language × version)
      │    ├── language="en"
      │    │    ├── title="About us"
+     │    │    ├── slug="about-us"
      │    │    ├── template="base.html"
      │    │    ├── placeholders → plugins
      │    │    └── in_navigation, soft_root, meta_description, …
@@ -102,8 +103,8 @@ The two-part pattern is most visible on the page model:
      │    └── language="de"
      │         └── …
      │
-     └── PageUrl rows           (per-language URL, kept separate
-                                 from content for cache reasons)
+     └── PageUrl rows           (per-language routing table, derived
+                                 from the published content)
 
 The `Page <cms.models.pagemodel.Page>` docstring puts it plainly:
 

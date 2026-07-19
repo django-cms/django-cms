@@ -368,9 +368,9 @@ class Page(MP_Node):
             try:
                 if self.is_home:
                     return reverse("pages-root")
-                path = self.get_path(language, fallback) or self.get_slug(
-                    language, fallback
-                )  # TODO: Disallow get_slug
+                # no path (e.g. unpublished parent) means the page is not
+                # reachable under any URL
+                path = self.get_path(language, fallback)
                 return reverse("pages-details-by-slug", kwargs={"slug": path}) if path else None
             except NoReverseMatch:
                 return None
@@ -767,9 +767,14 @@ class Page(MP_Node):
             return ""
 
         if self.parent:
-            base = self.parent.get_path(language, fallback=True)
-            # base can be empty when the parent is a home-page
-            path = f"{base}/{slug}" if base else slug
+            if self.parent.is_home:
+                # children of the home page live directly at the root
+                path = slug
+            else:
+                base = self.parent.get_path(language, fallback=True)
+                # a non-home parent without a path (e.g. unpublished) means
+                # this page has no reachable path either
+                path = f"{base}/{slug}" if base else None
         else:
             path = slug
         return path

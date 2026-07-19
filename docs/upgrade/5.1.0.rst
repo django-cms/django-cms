@@ -130,6 +130,33 @@ notes on apphook isolation and URL conflicts). For management commands that run 
 an HTTP request, consult :doc:`../reference/cli` for options like ``--site`` to select the
 target site context.
 
+Page URLs
+=========
+
+The slug and the overwrite URL of a page are now stored on the
+:class:`~cms.models.contentmodels.PageContent` model, so they are versioned
+together with the rest of the content when a versioning package such as
+djangocms-versioning is installed. The ``PageUrl`` model remains the routing
+table, but its entries are derived from the *published* content only. A data
+migration copies the currently effective slug and overwrite URL from the
+existing ``PageUrl`` objects onto every page content.
+
+This changes URL behavior in a few user-visible ways:
+
+* Changing the slug or overwrite URL of a draft no longer affects the live URL;
+  the change takes effect when the draft is published. Consequently, these
+  fields are no longer locked in the page admin while a published version
+  exists. Without a versioning package every save remains public and updates
+  the URL immediately, as before.
+* Unpublishing a page content removes the URL's path, so the page — and its
+  descendant pages — stop resolving. The slug stays reserved for the page and
+  the path is restored on the next publish.
+* ``Page.get_absolute_url()`` returns ``None`` for pages without a reachable
+  path (for example, when an ancestor is unpublished) instead of fabricating a
+  URL from the bare slug.
+* Publishing a version whose derived URL collides with the URL of another page
+  on the same site raises an ``IntegrityError`` and the publish is not applied.
+
 Model-specific plugins
 ======================
 

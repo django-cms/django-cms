@@ -1311,6 +1311,31 @@ class PageTest(PageTestBase):
         self.assertEqual(url.slug, "page")
 
     @override_settings(CMS_PERMISSION=False)
+    def test_unpublished_parent_invalidates_child_urls(self):
+        # When a parent loses its path (e.g. it is unpublished), its children
+        # become unreachable too: their paths are invalidated and
+        # get_absolute_url returns None instead of a fabricated slug-only url.
+        parent = create_page("parent", "nav_playground.html", "en", slug="parent")
+        child = create_page("child", "nav_playground.html", "en", parent=parent, slug="child")
+
+        with patch.object(PageContent.objects, "filter", return_value=PageContent.objects.none()):
+            parent.update_urls_from_content("en")
+
+        child = child.reload()
+        url = child.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertEqual(url.slug, "child")
+        self.assertIsNone(child.get_absolute_url("en"))
+
+        # Saving or publishing the child while the parent has no path keeps
+        # the child unreachable instead of exposing it at a slug-only path.
+        child.update_urls_from_content("en")
+
+        url = child.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertIsNone(child.get_absolute_url("en"))
+
+    @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):
         superuser = self.get_superuser()
         cms_page = create_page("app", "nav_playground.html", "en")

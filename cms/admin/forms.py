@@ -654,6 +654,11 @@ class ChangePageForm(BasePageContentForm):
             # the same derivation Page.update_urls_from_content applies on save
             path = page.get_path_for_slug(slug, self._language)
 
+        if path is None:
+            # the page has no reachable path (e.g. unpublished parent),
+            # so there is no URL to validate
+            return data
+
         user_language = get_site_language_from_request(self._request, site_id=self._site.pk)
 
         try:

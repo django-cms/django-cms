@@ -30,8 +30,9 @@ That means:
 * each translation has its **own placeholders** and its own
   plugins, *and* its own ``title``, ``meta_description``, ``template``
   choice, and ``in_navigation`` setting,
-* slugs are also per language — they live in a separate ``PageUrl``
-  row keyed by ``(page, language)``, which is why the German URL
+* slugs are also per language — they are authored on each
+  ``PageContent`` and served from a ``PageUrl`` row keyed by
+  ``(page, language)``, which is why the German URL
   ``/de/ueber-uns/`` and the English URL ``/en/about-us/`` can be
   completely independent words.
 

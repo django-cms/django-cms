@@ -347,8 +347,11 @@ def create_page_content(
 
     # set default slug:
     if not slug:
-        base = page.get_path_for_slug(slugify(title), language)
-        slug = get_available_slug(page.site, base, language)
+        candidate = slugify(title)
+        base = page.get_path_for_slug(candidate, language)
+        # without a reachable path (e.g. unpublished parent) check the bare
+        # slug for availability instead
+        slug = get_available_slug(page.site, base if base is not None else candidate, language)
 
     if overwrite_url:
         path = overwrite_url.strip("/")
@@ -369,9 +372,12 @@ def create_page_content(
 
     try:
         try:
-            from cms.forms.validators import validate_url_uniqueness
+            if path is not None:
+                # pages without a reachable path (e.g. unpublished parent)
+                # cannot conflict with any URL
+                from cms.forms.validators import validate_url_uniqueness
 
-            validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+                validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
         except ValidationError as e:
             raise IntegrityError(e)
 
