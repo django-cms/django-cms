@@ -484,39 +484,35 @@ class Page(MP_Node):
         new_page._clear_internal_cache()
 
         if language and translations:
-            page_urls = self.urls.filter(language=language)
             translations = self.pagecontent_set(manager="admin_manager").filter(language=language)
         elif translations:
-            page_urls = self.urls.all()
             translations = self.pagecontent_set(manager="admin_manager")
         else:
-            page_urls = self.urls.none()
             translations = self.pagecontent_set(manager="admin_manager").none()
         translations = translations.prefetch_related("placeholders")
-
-        for page_url in page_urls:
-            new_url = model_to_dict(page_url)
-            new_url.pop("id", None)  # No PK
-            new_url.pop("site", None)  # Let the save method handle this
-            new_url["page"] = new_page
-
-            if parent_page:
-                base = parent_page.get_path(page_url.language)
-                path = f"{base}/{page_url.slug}" if base else page_url.slug
-            else:
-                base = ""
-                path = page_url.slug
-
-            new_url["slug"] = get_available_slug(site, path, page_url.language)
-            new_url["path"] = "{}/{}".format(base, new_url["slug"]) if base else new_url["slug"]
-            PageUrl.objects.with_user(user).create(**new_url)
 
         # copy titles of this page
         for title in translations.current_content():
             new_title = model_to_dict(title)
             new_title.pop("id", None)  # No PK
             new_title["page"] = new_page
+
+            if parent_page:
+                base = parent_page.get_path(title.language)
+                path = f"{base}/{title.slug}" if base else title.slug
+            else:
+                base = ""
+                path = title.slug
+
+            new_title["slug"] = get_available_slug(site, path, title.language)
+            if title.overwrite_url:
+                new_title["overwrite_url"] = "{}/{}".format(base, new_title["slug"]) if base else new_title["slug"]
             new_title = PageContent.objects.with_user(user).create(**new_title)
+            if new_title.is_public():
+                # The page URL is derived from public content only. With a
+                # versioning package installed the copy is created as a draft
+                # and gets its URL on first publish.
+                new_page.update_urls_from_content(new_title.language)
 
             for placeholder in title.placeholders.all():
                 # copy the placeholders (and plugins on those placeholders!)
@@ -820,6 +816,64 @@ class Page(MP_Node):
 
         # If no collision detected, proceed with the update
         return page_urls_qs.update(**data)
+
+    def update_urls_from_content(self, language):
+        """Derive this page's :class:`~cms.models.pagemodel.PageUrl` for ``language``
+        from the publicly visible :class:`~cms.models.contentmodels.PageContent`
+        object, then update the paths of all descendant pages.
+
+        The slug and overwrite URL are authored on the page content object.
+        ``PageUrl`` is a routing table that must only ever reflect published
+        content: without a versioning package every saved content is public and
+        this runs on every save; with a versioning package installed it must be
+        called when a version is published or unpublished.
+
+        When no public content exists, the URL's path is set to ``None`` so the
+        page stops resolving while the slug stays reserved for the page.
+
+        Raises ``IntegrityError`` if the derived path collides with the URL of
+        another page on the same site.
+        """
+        from cms.models import PageContent
+
+        content = PageContent.objects.filter(page=self, language=language).first()
+        url = self.urls.filter(language=language).first()
+
+        if content is None:
+            if url is None or url.path is None:
+                return
+            self.urls.filter(language=language).update(path=None)
+        else:
+            if content.overwrite_url and not self.is_home:
+                path = content.overwrite_url.strip("/")
+            else:
+                # the home page always lives at the root path
+                path = self.get_path_for_slug(content.slug, language)
+            data = {
+                "slug": content.slug,
+                "path": path,
+                "managed": not bool(content.overwrite_url),
+            }
+            if url is not None:
+                if (url.slug, url.path, url.managed) == (data["slug"], data["path"], data["managed"]):
+                    # the URL already reflects the content; descendant paths derive
+                    # from this page's path, so they are up to date as well
+                    return
+                self.update_urls(language, **data)  # includes the path collision check
+            else:
+                collision = (
+                    path is not None
+                    and PageUrl.objects.filter(language=language, path=path, page__site=self.site_id).exists()
+                )
+                if collision:
+                    raise IntegrityError(
+                        f"Cannot create URL. A page URL with path='{path}' and "
+                        f"language='{language}' already exists for another page on the same site."
+                    )
+                self.urls.create(page=self, language=language, **data)
+
+        self.urls_cache = {}
+        self._update_url_path_recursive(language)
 
     def get_fallbacks(self, language):
         return i18n.get_fallback_languages(language, site_id=self.site_id)

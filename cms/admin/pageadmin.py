@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 
 import django
 from django.conf import settings
@@ -34,11 +34,9 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
-from django.utils.functional import lazy
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import gettext as _, gettext_lazy
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from cms import operations
@@ -51,7 +49,6 @@ from cms.admin.forms import (
     CopyPermissionForm,
     DuplicatePageForm,
     MovePageForm,
-    url_is_locked,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
@@ -84,14 +81,10 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.permissions import clear_permission_lru_caches
-from cms.utils.plugins import copy_plugins_to_placeholder
+from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
-
-# Lazily-evaluated format_html so translatable admin labels containing markup are
-# resolved at render time (and in the active language), not at import time.
-format_html_lazy = lazy(format_html, str)
 
 
 class PageDeleteMessageMixin:
@@ -855,44 +848,6 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         form._request = request
         return form
 
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        if obj is not None and url_is_locked(obj):
-            # The page's URL is shared with a published version (only possible
-            # with a versioning package installed). Editing the slug here would
-            # silently change the live URL, so render the slug and overwrite URL
-            # read-only. The values are supplied by the matching display methods.
-            readonly_fields = (*readonly_fields, "slug", "overwrite_url")
-        return readonly_fields
-
-    @admin.display(
-        description=format_html_lazy(
-            '{} <small class="help">{}</small>',
-            gettext_lazy("Slug"),
-            gettext_lazy("(to change it, first unpublish the currently published version of this page)"),
-        )
-    )
-    def slug(self, obj):
-        # For read-only views: Get slug from the page content object
-        if not hasattr(obj, "_url_obj"):
-            obj._url_obj = obj.page.get_url(obj.language)
-        return obj._url_obj.slug
-
-    @admin.display(
-        description=format_html_lazy(
-            '{} <small class="help">{}</small>',
-            gettext_lazy("Overwrite URL"),
-            gettext_lazy("(to change it, first unpublish the currently published version of this page)"),
-        )
-    )
-    def overwrite_url(self, obj):
-        # For read-only views: Get the overwrite URL from the page content object
-        if not hasattr(obj, "_url_obj"):
-            obj._url_obj = obj.page.get_url(obj.language)
-        if obj._url_obj.managed:
-            return ""
-        return obj._url_obj.path
-
     def duplicate(self, request, object_id):
         """
         Leverages the add view logic to duplicate the page.
@@ -1235,17 +1190,36 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         target_page_content = page.get_content_obj(target_language, fallback=False)
 
-        for placeholder in source_page_content.get_placeholders():
-            try:
-                target = target_page_content.get_placeholders().get(slot=placeholder.slot)
-            except Placeholder.DoesNotExist:
+        source_placeholders = list(source_page_content.get_placeholders())
+        target_placeholders = {
+            placeholder.slot: placeholder
+            for placeholder in target_page_content.get_placeholders()
+        }
+        source_plugins = downcast_plugins(
+            CMSPlugin.objects.filter(
+                placeholder_id__in=[placeholder.pk for placeholder in source_placeholders],
+                language=source_page_content.language,
+            ).order_by("position")
+        )
+        plugins_by_placeholder = defaultdict(list)
+        for plugin in source_plugins:
+            plugins_by_placeholder[plugin.placeholder_id].append(plugin)
+
+        for placeholder in source_placeholders:
+            target = target_placeholders.get(placeholder.slot)
+            if target is None:
                 messages.warning(request, _("Placeholder '%s' does not exist in target language") % placeholder.slot)
                 continue
-            plugins = placeholder.get_plugins_list(source_page_content.language)
+            plugins = plugins_by_placeholder[placeholder.pk]
 
             if not target.has_add_plugins_permission(request.user, plugins):
                 return HttpResponseForbidden(_("You do not have permission to copy these plugins."))
-            copy_plugins_to_placeholder(plugins, target, language=target_language)
+            copy_plugins_to_placeholder(
+                plugins,
+                target,
+                language=target_language,
+                plugins_are_downcast=True,
+            )
         return HttpResponse("ok")
 
     def delete_view(self, request, object_id, extra_context=None):

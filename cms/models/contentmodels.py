@@ -35,6 +35,8 @@ class PageContent(models.Model):
     # a PageContent object to know if it has changed.
     editable_fields = [
         "title",
+        "slug",
+        "overwrite_url",
         "redirect",
         "page_title",
         "menu_title",
@@ -73,6 +75,22 @@ class PageContent(models.Model):
         blank=True,
         null=True,
         help_text=_("Redirects to this URL."),
+    )
+    #: The slug and overwrite URL are authored per page content object. The routable
+    #: :class:`~cms.models.pagemodel.PageUrl` objects are derived from the publicly
+    #: visible page content only (see :meth:`cms.models.pagemodel.Page.update_urls_from_content`),
+    #: so changing the slug of a draft version does not affect the published URL.
+    slug = models.SlugField(
+        verbose_name=_("slug"),
+        max_length=255,
+        help_text=_("The part of the title that is used in the URL"),
+    )
+    overwrite_url = models.CharField(
+        verbose_name=_("overwrite URL"),
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_("Keep this field empty if standard path should be used."),
     )
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
     creation_date = models.DateTimeField(verbose_name=_("creation date"), editable=False, default=timezone.now)
@@ -306,6 +324,19 @@ class PageContent(models.Model):
         """
         return True
 
+    def is_public(self):
+        """Return whether this content object is visible to the public, i.e. whether
+        the default manager returns it. Without a versioning package every saved
+        page content is public; with a versioning package installed only published
+        versions are. The page's URL is only derived from public content
+        (see :meth:`cms.models.pagemodel.Page.update_urls_from_content`).
+
+        :rtype: ``bool``
+        """
+        if self.pk is None:
+            return False
+        return self.__class__.objects.filter(pk=self.pk).exists()
+
     def content_indicator(self):
         """returns the content indicator status. Without additional packages like
         djangocms-versioning page content always is public.
@@ -346,6 +377,8 @@ class EmptyPageContent:
     """
 
     title = ""
+    slug = ""
+    overwrite_url = None
     meta_description = ""
     redirect = ""
     application_urls = ""
