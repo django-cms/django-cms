@@ -64,9 +64,10 @@ jobs:
         installed = sum(i.file_size for i in z.infolist()) / 1024 / 1024
         summary = (
             f"### Wheel check: `{os.path.basename(wheel)}`\n\n"
-            f"| | Size |\n|---|---|\n"
-            f"| Compressed | {compressed:.1f} MB |\n"
-            f"| Installed | {installed:.1f} MB |\n"
+            f"| Wheel      |       Size |\n"
+            f"|------------|------------|\n"
+            f"| Compressed | {compressed:7.1f} MB |\n"
+            f"| Installed  | {installed:7.1f} MB |\n"
         )
         print(summary)
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
