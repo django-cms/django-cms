@@ -37,6 +37,24 @@ jobs:
         --outdir dist/
         .
 
+    - name: Check wheel contents
+      run: |
+        python -m pip install check-wheel-contents --user
+        check-wheel-contents dist/*.whl
+        python - <<'EOF'
+        import glob, sys, zipfile
+        wheel = glob.glob("dist/*.whl")[0]
+        names = zipfile.ZipFile(wheel).namelist()
+        allowed = ("cms/", "menus/")
+        stray = sorted({n.split("/")[0] for n in names
+                        if not n.startswith(allowed) and ".dist-info/" not in n})
+        tests = [n for n in names if n.startswith("cms/tests/")]
+        if not any(n.startswith("cms/test_utils/") for n in names):
+            sys.exit("cms.test_utils missing from wheel - it is public API for third-party test suites")
+        if stray or tests:
+            sys.exit(f"Unexpected wheel contents - stray top-level: {stray}, cms/tests files: {len(tests)}")
+        EOF
+
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:

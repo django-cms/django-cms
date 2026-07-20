@@ -62,7 +62,11 @@ admin-style = ["djangocms-simple-admin-style"]
 djangocms = "cms.management.djangocms:execute_from_command_line"
 
 [tool.setuptools]
-packages = { find = {} }
+# Explicit allow-list: the empty find {} defaults to namespace-package discovery,
+# which sweeps any git-tracked top-level directory (docs, scripts, ...) into wheels.
+# cms.tests is excluded from wheels but remains in the sdist; cms.test_utils is
+# public API relied on by third-party packages and must stay included.
+packages = { find = { include = [ "cms*", "menus*" ], exclude = [ "cms.tests*" ] } }
 
 [tool.setuptools.package-data]
 "cms.management.commands" = [ "*.json" ]
