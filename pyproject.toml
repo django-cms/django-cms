@@ -71,6 +71,17 @@ packages = { find = { include = [ "cms*", "menus*" ], exclude = [ "cms.tests*" ]
 [tool.setuptools.package-data]
 "cms.management.commands" = [ "*.json" ]
 
+# The find exclude above only removes cms.tests from the package list; with
+# include-package-data its files would still ship as data of the cms package.
+[tool.setuptools.exclude-package-data]
+cms = [ "tests/**" ]
+
+[tool.check-wheel-contents]
+# W002: intentional duplicates (test templates, icon variants)
+# W004: Django migration modules have non-identifier names (0001_...)
+# W009: cms and menus are both intentional top-level packages
+ignore = [ "W002", "W004", "W009" ]
+
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }
 
