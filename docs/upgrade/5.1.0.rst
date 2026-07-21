@@ -130,6 +130,37 @@ notes on apphook isolation and URL conflicts). For management commands that run 
 an HTTP request, consult :doc:`../reference/cli` for options like ``--site`` to select the
 target site context.
 
+Page URLs
+=========
+
+The slug and the overwrite URL of a page are now stored on the
+:class:`~cms.models.contentmodels.PageContent` model, so they are versioned
+together with the rest of the content when a versioning package such as
+djangocms-versioning is installed. The ``PageUrl`` model remains the routing
+table, but its entries are derived from the *published* content only. A data
+migration copies the currently effective slug and overwrite URL from the
+existing ``PageUrl`` objects onto every page content.
+
+This changes URL behavior in a few user-visible ways:
+
+* Changing the slug or overwrite URL of a draft no longer affects the live URL;
+  the change takes effect when the draft is published. Consequently, these
+  fields are no longer locked in the page admin while a published version
+  exists. Without a versioning package every save remains public and updates
+  the URL immediately, as before.
+* Unpublishing a page content removes the URL's path, so the page — and its
+  descendant pages — stop resolving. The slug stays reserved for the page and
+  the path is restored on the next publish.
+* Publishing a version whose derived URL collides with the URL of another page
+  on the same site raises an ``IntegrityError`` and the publish is not applied.
+* Path uniqueness per site and language is now also enforced by a database
+  constraint. ``PageUrl`` carries a denormalized ``site`` foreign key for this
+  purpose; a data migration fills it and resolves any pre-existing duplicate
+  paths (of each set, only one page was actually served — it keeps the path,
+  the others become unreachable until their next publish).
+* Updating the URLs of a page's descendants (e.g. after a rename) now runs one
+  query per tree level instead of two queries per descendant page.
+
 Model-specific plugins
 ======================
 
@@ -347,6 +378,24 @@ stale, or target-side values.
 The ``ADD_PLUGIN`` post-operation signal also now includes a ``tree_order``
 keyword argument. Custom signal receivers must accept ``**kwargs``, as recommended
 for Django signal receivers, and must not rely on the previous incorrect values.
+
+``get_absolute_url()`` of unreachable pages
+===========================================
+
+``Page.get_absolute_url()`` (and consequently
+``PageContent.get_absolute_url()``) now returns ``None`` for pages without a
+reachable path — for example, while the page or one of its ancestors is
+unpublished. Previously a URL was fabricated from the bare slug, which pointed
+to a location that never resolved (or resolved to a different page).
+
+Python code that consumes the result without checking it should be reviewed;
+django CMS's own toolbar helpers already handle the ``None`` case. In
+templates, rendering the value unchecked now produces ``href="None"`` —
+use Django's ``default`` filter to render a safe fallback instead:
+
+.. code-block:: html+django
+
+    <a href="{{ page.get_absolute_url|default:'' }}">{{ page.get_title }}</a>
 
 Dependencies, settings, and migrations
 ======================================

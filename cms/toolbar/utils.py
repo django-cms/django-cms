@@ -306,6 +306,8 @@ def get_object_live_url(obj: models.Model, language: str | None = None, site: Si
 
     with force_language(language):
         absolute_url = obj.get_absolute_url()
+        if not absolute_url:
+            return None
         url_param = get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM")
         if params and url_param in params:
             params = params.copy()
