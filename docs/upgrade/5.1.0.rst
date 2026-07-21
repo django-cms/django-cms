@@ -483,6 +483,20 @@ Wizard helpers
 * The ``cms.wizards.helpers`` module has been deprecated and will be removed in django CMS 6.0. Use
   ``cms.wizards.wizard_base.get_entries()`` and ``cms.wizards.wizard_pool.get_entry()`` instead.
 
+Packaging
+---------
+
+* Shipping the internal test suite (``cms.tests``) in binary distributions (wheels) is
+  deprecated; a future release will no longer include it (#8733). The suite remains part
+  of the source distribution and stays available via
+  ``pip install --no-binary django-cms django-cms`` or the release tarballs. The public
+  testing utilities in ``cms.test_utils``, including
+  ``cms.test_utils.testcases.CMSTestCase``, are not affected and remain in the wheel.
+  Projects importing from ``cms.tests`` should switch to ``cms.test_utils``.
+* The 5.1.0 wheel erroneously included the top-level directories ``docs``, ``scripts``,
+  and ``test_requirements``. These are not part of django CMS's Python API and will be
+  removed from wheels in the next patch release without a deprecation period.
+
 Removal of deprecated functionality
 ===================================
 

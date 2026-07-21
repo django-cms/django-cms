@@ -62,10 +62,28 @@ admin-style = ["djangocms-simple-admin-style"]
 djangocms = "cms.management.djangocms:execute_from_command_line"
 
 [tool.setuptools]
-packages = { find = {} }
+# Explicit allow-list: the empty find {} defaults to namespace-package discovery,
+# which sweeps any git-tracked top-level directory (docs, scripts, ...) into wheels.
+# cms.test_utils is public API relied on by third-party packages and must stay included.
+# Step 2 (#8733): drop cms.tests from wheels (it remains in the sdist) by replacing
+# the packages line with the commented one below:
+# packages = { find = { include = [ "cms*", "menus*" ], exclude = [ "cms.tests*" ] } }
+packages = { find = { include = [ "cms*", "menus*" ] } }
 
 [tool.setuptools.package-data]
 "cms.management.commands" = [ "*.json" ]
+
+# Step 2 (#8733): uncomment together with the exclude above. The find exclude only
+# removes cms.tests from the package list; with include-package-data its files
+# would still ship as data of the cms package without this section.
+# [tool.setuptools.exclude-package-data]
+# cms = [ "tests/**" ]
+
+[tool.check-wheel-contents]
+# W002: intentional duplicates (test templates, icon variants)
+# W004: Django migration modules have non-identifier names (0001_...)
+# W009: cms and menus are both intentional top-level packages
+ignore = [ "W002", "W004", "W009" ]
 
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }

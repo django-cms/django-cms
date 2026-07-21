@@ -36,6 +36,42 @@ jobs:
         --outdir dist/
         .
 
+    - name: Check wheel contents
+      run: |
+        python -m pip install check-wheel-contents
+        python -m check_wheel_contents dist/*.whl
+        python - <<'EOF'
+        import glob, os, sys, zipfile
+        wheels = glob.glob("dist/*.whl")
+        if len(wheels) != 1:
+            sys.exit(f"Expected exactly one wheel in dist/, found: {wheels or 'none'}")
+        wheel = wheels[0]
+        z = zipfile.ZipFile(wheel)
+        names = z.namelist()
+        allowed = ("cms/", "menus/")
+        stray = sorted({n.split("/")[0] for n in names
+                        if not n.startswith(allowed) and ".dist-info/" not in n})
+        # Step 2 (#8733): uncomment to fail on cms.tests in the wheel, and drop the shim line:
+        # tests = [n for n in names if n.startswith("cms/tests/")]
+        tests = []
+        if not any(n.startswith("cms/test_utils/") for n in names):
+            sys.exit("cms.test_utils missing from wheel - it is public API for third-party test suites")
+        if stray or tests:
+            sys.exit(f"Unexpected wheel contents - stray top-level: {stray}, cms/tests files: {len(tests)}")
+        compressed = os.path.getsize(wheel) / 1024 / 1024
+        installed = sum(i.file_size for i in z.infolist()) / 1024 / 1024
+        summary = (
+            f"### Wheel check: `{os.path.basename(wheel)}`\n\n"
+            f"| Wheel      |       Size |\n"
+            f"|------------|------------|\n"
+            f"| Compressed | {compressed:7.1f} MB |\n"
+            f"| Installed  | {installed:7.1f} MB |\n"
+        )
+        print(summary)
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+            fh.write(summary)
+        EOF
+
     - name: Publish distribution 📦 to PyPI
       if: "!contains(github.ref_name, 'dev')"
       uses: pypa/gh-action-pypi-publish@release/v1
