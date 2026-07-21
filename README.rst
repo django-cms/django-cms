@@ -122,14 +122,10 @@ If your business depends on django CMS, consider supporting its long-term health
 Credits
 =======
 
-* Includes icons and adapted icons from `Bootstrap <https://icons.getbootstrap.com>`_.
-* Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
-* Python tree engine powered by
-  `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
-* JavaScript tree in admin uses `jsTree <https://www.jstree.com>`_.
-* Many thanks to
-  `all the contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_
-  to django CMS!
+Many thanks to `all the contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_
+to django CMS!
+
+See `LICENSE <LICENSE>`_ for credits to third-party contributions.
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
