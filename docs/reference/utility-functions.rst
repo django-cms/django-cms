@@ -27,6 +27,17 @@ Grouper admin
     :members:
     :show-inheritance:
 
+.. autoclass:: Grouping
+    :members:
+
+.. versionchanged:: 5.1
+
+    Request-dependent grouping values (e.g. the current language) are no longer stored
+    as attributes on the (shared) admin instance. Read them from
+    ``self.get_grouping(request)`` instead. The instance attributes (e.g.
+    ``self.language``) remain available as thread-safe, deprecated shims and will be
+    removed in django CMS 6.0.
+
 
 ************
 Placeholders

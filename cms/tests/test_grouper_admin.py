@@ -1,4 +1,5 @@
 import copy
+import threading
 from unittest.mock import MagicMock, patch
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.db import connection
 from django.templatetags.static import static
+from django.test import RequestFactory
 from django.test.utils import CaptureQueriesContext
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
@@ -20,6 +22,7 @@ from cms.test_utils.project.sampleapp.models import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.grouper import wo_content_permission
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse, static_with_version
 
@@ -51,6 +54,11 @@ class SetupMixin:
         )
         self.admin.clear_content_cache()  # The admin does this automatically for each new request.
         return instance
+
+    def publish_grouping(self, language):
+        """Publish grouping state for the current thread the way an admin request would."""
+        request = RequestFactory().get("/", {"language": language})
+        return self.admin.get_grouping_from_request(request)
 
 
 class SimpleSetupMixin:
@@ -307,10 +315,12 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         self.assertEqual(admin.content_model, GrouperModelContent)
 
     def test_extra_grouping_field_fixed(self):
-        """Extra grouping fields are retrieved correctly"""
+        """Extra grouping fields set through the legacy attribute API are retrieved correctly
+        (and the legacy attribute API warns about its deprecation)"""
         with force_language("en"):
             expected_language = "zh"
-            self.admin.language = expected_language
+            with self.assertWarns(RemovedInDjangoCMS60Warning):
+                self.admin.language = expected_language
 
             admin_language = self.admin.get_language()
             current_content_filters = self.admin.current_content_filters
@@ -320,7 +330,11 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
 
     def test_extra_grouping_field_current(self):
         """Extra grouping fields (language) when not set return current default correctly"""
-        del self.admin.language  # No pre-set language
+        with self.assertWarns(RemovedInDjangoCMS60Warning):
+            try:
+                del self.admin.language  # No pre-set language
+            except AttributeError:
+                pass  # was not set in the first place
         expected_language = get_language()
 
         admin_language = self.admin.get_language()
@@ -418,7 +432,7 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
 
     def test_get_content_obj_caches_on_grouper_object(self):
         content_instance = self.createContentInstance("en")
-        self.admin.language = "en"
+        self.publish_grouping("en")
         self.admin.clear_content_cache()
 
         self.assertFalse(hasattr(self.grouper_instance, "_grouper_admin_content_obj_cache"))
@@ -499,7 +513,7 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
 
         request = self.get_request()
         request.user = self.admin_user
-        self.admin.language = "en"
+        self.publish_grouping("en")
 
         # Act: mimic what the changelist does — materialize the queryset, then look up
         # each grouper's content object.
@@ -650,18 +664,15 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         """The latest content object is recognized as such, a stale one is not, and the
         add view (no content object) counts as latest."""
         content = self.createContentInstance("en")
-        self.admin.language = "en"
-        try:
-            # The actual content object is the latest
-            self.assertTrue(self.admin.is_latest_content_obj(content, self.grouper_instance))
-            # A stale content object (different pk) is not the latest
-            stale = copy.copy(content)
-            stale.pk = content.pk + 1000
-            self.assertFalse(self.admin.is_latest_content_obj(stale, self.grouper_instance))
-            # The add view (no content object) always counts as latest
-            self.assertTrue(self.admin.is_latest_content_obj(None))
-        finally:
-            del self.admin.language
+        self.publish_grouping("en")
+        # The actual content object is the latest
+        self.assertTrue(self.admin.is_latest_content_obj(content, self.grouper_instance))
+        # A stale content object (different pk) is not the latest
+        stale = copy.copy(content)
+        stale.pk = content.pk + 1000
+        self.assertFalse(self.admin.is_latest_content_obj(stale, self.grouper_instance))
+        # The add view (no content object) always counts as latest
+        self.assertTrue(self.admin.is_latest_content_obj(None))
 
     def test_language_selector_shown_for_latest_content(self) -> None:
         """The change form offers the language selector when the latest content is shown."""
@@ -1286,3 +1297,64 @@ class GrouperSearchTestCase(SimpleSetupMixin, CMSTestCase):
         query = "Greeting"
         self.admin.search_fields = ("content__secret_greeting",)
         self._test_expected_result_count(query, 2)
+
+
+class GroupingAPITestCase(SetupMixin, CMSTestCase):
+    """Tests for the request-scoped grouping API (``GrouperModelAdmin.get_grouping``)"""
+
+    def test_get_grouping_reads_request(self):
+        request = RequestFactory().get("/", {"language": "de"})
+        grouping = self.admin.get_grouping(request)
+
+        self.assertEqual(grouping.filters, {"language": "de"})
+        self.assertEqual(grouping.language, "de")
+        self.assertIsNone(grouping.requested_content_obj)
+
+    def test_get_grouping_is_cached_per_request(self):
+        request = RequestFactory().get("/", {"language": "de"})
+
+        self.assertIs(self.admin.get_grouping(request), self.admin.get_grouping(request))
+
+    def test_get_grouping_from_request_refreshes_cache(self):
+        request = RequestFactory().get("/", {"language": "de"})
+        grouping = self.admin.get_grouping(request)
+
+        self.assertIsNot(self.admin.get_grouping_from_request(request), grouping)
+
+    def test_get_grouping_aligns_with_requested_content_obj(self):
+        """A content object requested via the ``cms_content`` GET parameter takes precedence
+        over the language given in the request."""
+        content = self.createContentInstance("de")
+        request = RequestFactory().get("/", {"language": "en", "cms_content": content.pk})
+        grouping = self.admin.get_grouping(request)
+
+        self.assertEqual(grouping.requested_content_obj, content)
+        self.assertEqual(grouping.language, "de")
+
+    def test_grouping_is_isolated_between_threads(self):
+        """Regression test for the shared-instance anti-pattern: grouping state published
+        for one request (thread) must not leak into or be overwritten by another."""
+        Site.objects.get_current()  # Prime django's SITE_CACHE to avoid db access in threads
+        barrier = threading.Barrier(2)
+        results = {}
+
+        def worker(language):
+            request = RequestFactory().get("/", {"language": language})
+            self.admin.get_grouping_from_request(request)
+            barrier.wait(timeout=10)  # Both threads have published their grouping state
+            results[language] = self.admin.current_content_filters["language"]
+
+        threads = [threading.Thread(target=worker, args=(language,)) for language in ("en", "de")]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=10)
+
+        self.assertEqual(results, {"en": "en", "de": "de"})
+
+    def test_legacy_attribute_access_warns_and_reads_published_grouping(self):
+        """The deprecated attribute API keeps working, backed by the published grouping."""
+        self.publish_grouping("de")
+
+        with self.assertWarns(RemovedInDjangoCMS60Warning):
+            self.assertEqual(self.admin.language, "de")
