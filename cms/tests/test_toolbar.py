@@ -2291,6 +2291,22 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
 
 class ToolbarUtilsTestCase(ToolbarTestBase):
+    def test_get_plugin_content_uses_plugin_language(self):
+        page = create_page("test page", "col_two.html", "de")
+        placeholder = page.get_placeholders("de").get(slot="col_left")
+        plugin = add_plugin(placeholder, "TextPlugin", "de", body="test")
+        request = self.get_page_request(page, self.get_superuser(), "/de/")
+
+        with patch.object(
+            request.toolbar.content_renderer,
+            "render_plugin",
+            side_effect=lambda *args, **kwargs: get_language(),
+        ), override("en"):
+            content = utils.get_plugin_content(request, plugin)
+
+            self.assertEqual(content[0]["html"], "de")
+            self.assertEqual(get_language(), "en")
+
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
     def test_add_live_url_querystring_param_no_querystring(self):

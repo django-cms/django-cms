@@ -183,14 +183,15 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin]
     renderer._placeholders_are_editable = True
     sekizai_context = SekizaiContext({'request': request, **context})
     try:
-        return [{
-            "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
-            "js": "".join(sekizai_context[get_varname()].get("js", [])),
-            "css": "".join(sekizai_context[get_varname()].get("css", [])),
-            "position": plugin.position,
-            "placeholder_id": plugin.placeholder_id,
-            "pluginIds": get_plugin_tree_ids(plugin),
-        } for plugin in plugin_list]
+        with force_language(plugin_list[0].language):
+            return [{
+                "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
+                "js": "".join(sekizai_context[get_varname()].get("js", [])),
+                "css": "".join(sekizai_context[get_varname()].get("css", [])),
+                "position": plugin.position,
+                "placeholder_id": plugin.placeholder_id,
+                "pluginIds": get_plugin_tree_ids(plugin),
+            } for plugin in plugin_list]
     except Exception:
         return []  # do not deliver content if rendering fails
 
