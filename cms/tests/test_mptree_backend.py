@@ -17,21 +17,29 @@ Under treebeard it is skipped: those code paths belong to treebeard, are covered
 by the rest of the suite, and holding treebeard to this module's expectations
 means asserting on upstream behaviour we cannot fix.
 """
+import os
+import time
+from collections import defaultdict
+from unittest import skipIf
 
-from unittest import skipUnless
-
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from treebeard.mp_tree import MP_Node
 
 from cms.api import create_page
 from cms.models import Page
+from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.mptree import MaterializedPathMixin, get_tree_backend, get_tree_base
+from cms.utils.mptree import (
+    MaterializedPath,
+    MaterializedPathMixin,
+    get_tree_backend,
+    get_tree_base,
+)
 
 TEMPLATE = "nav_playground.html"
 
-mptree_only = skipUnless(
-    get_tree_backend() == "mptree",
+mptree_only = skipIf(
+    get_tree_backend() == "treebeard",
     "mptree backend only -- run with CMS_TREE_BACKEND=mptree",
 )
 
@@ -382,3 +390,481 @@ class PageQuerySetDeleteTests(CMSTestCase):
         )
         root.refresh_from_db()
         self.assertEqual(root.numchild, 1)
+
+
+
+@mptree_only
+class MaterializedPathDriverTests(TestCase):
+    def setUp(self):
+        self.mp = MaterializedPath(Category)
+
+    def test_tree_root_of_and_empty_ancestors(self):
+        r = self.mp.add_root(name="r")
+        c = self.mp.add_child(r, name="c")
+        g = self.mp.add_child(c, name="g")
+
+        self.assertEqual(self.mp.tree().count(), 3)                       # parent=None
+        self.assertEqual(
+            set(self.mp.tree(r).values_list("name", flat=True)),         # parent given
+            {"r", "c", "g"},
+        )
+        self.assertEqual(self.mp.root_of(g).pk, r.pk)
+        self.assertEqual(list(self.mp.ancestors(r)), [])                 # root has none
+
+    def test_add_child_first_child(self):
+        r = self.mp.add_root(name="r")
+        self.mp.add_child(r, name="a")
+        self.mp.add_child(r, name="b")
+        self.mp.add_child(r, position="first-child", name="c")
+        self.assertEqual(
+            list(self.mp.children(r).values_list("name", flat=True)),
+            ["c", "a", "b"],
+        )
+
+    def test_add_sibling_all_positions(self):
+        r = self.mp.add_root(name="r")
+        a = self.mp.add_child(r, name="a")
+        b = self.mp.add_child(r, name="b")
+
+        # child siblings -> _place_relative (after True/False) + last/first
+        self.mp.add_sibling(a, name="s_last")                  # default last-sibling
+        self.mp.add_sibling(a, position="right", name="s_right")
+        self.mp.add_sibling(b, position="left", name="s_left")
+        self.mp.add_sibling(b, position="first-sibling", name="s_first")
+
+        # root siblings -> parent-None branch (last + left/no-op)
+        self.mp.add_sibling(r, name="r2")
+        self.mp.add_sibling(r, position="left", name="r3")
+
+        self.assertEqual(self.mp.roots().count(), 3)
+        self.assertEqual(Category.objects.count(), 9)
+        # every node still has a path correctly nested under its parent
+        for cat in Category.objects.all():
+            if cat.parent_id:
+                self.assertTrue(cat.path.startswith(cat.parent.path))
+
+    def test_move_left_and_right_into_middle(self):
+        r = self.mp.add_root(name="r")
+        a = self.mp.add_child(r, name="a")
+        self.mp.add_child(r, name="b")
+        c = self.mp.add_child(r, name="c")
+
+        self.mp.move(c, a, "left")   # left, lands mid-group -> _layout
+        self.assertEqual(
+            list(self.mp.children(r).values_list("name", flat=True)), ["c", "a", "b"]
+        )
+        self.mp.move(c, a, "right")  # right, lands mid-group -> _layout
+        self.assertEqual(
+            list(self.mp.children(r).values_list("name", flat=True)), ["a", "c", "b"]
+        )
+
+    def test_positional_move_landing_at_end(self):
+        r = self.mp.add_root(name="r")
+        a = self.mp.add_child(r, name="a")
+        b = self.mp.add_child(r, name="b")
+
+        # 'right' of the last sibling -> append branch (siblings non-empty)
+        self.mp.move(a, b, "right")
+        self.assertEqual(
+            list(self.mp.children(r).values_list("name", flat=True)), ["b", "a"]
+        )
+        # 'first-child' of a leaf -> append branch with empty siblings
+        self.mp.move(b, a, "first-child")
+        self.assertEqual(self.mp.children(a).first().name, "b")
+
+    def test_move_out_from_under_a_shifted_sibling(self):
+        # Regression: the node being moved lives *inside* a sibling that the
+        # layout has to shift. Rewriting that sibling's subtree first used to
+        # drag the node along, so its own rewrite then matched nothing and it
+        # stayed buried (admin "move to root position N" hit exactly this).
+        gamma = self.mp.add_root(name="gamma")
+        delta = self.mp.add_child(gamma, name="delta")
+
+        self.mp.move(delta, gamma, "left")  # left of its own parent
+
+        delta.refresh_from_db()
+        gamma.refresh_from_db()
+        self.assertEqual(
+            list(self.mp.roots().values_list("name", flat=True)), ["delta", "gamma"]
+        )
+        self.assertEqual((delta.depth, delta.parent_id), (1, None))
+        self.assertEqual(self.mp.descendants(gamma).count(), 0)
+        self.assertEqual(gamma.numchild, 0)
+
+    def test_move_out_from_under_an_uncle(self):
+        # Same nesting hazard one level over: `c` sits under `b`, and landing it
+        # first-child of `r` shifts both `a` and `b` down a slot.
+        r = self.mp.add_root(name="r")
+        self.mp.add_child(r, name="a")
+        b = self.mp.add_child(r, name="b")
+        c = self.mp.add_child(b, name="c")
+
+        self.mp.move(c, r, "first-child")
+
+        c.refresh_from_db()
+        b.refresh_from_db()
+        self.assertEqual(
+            list(self.mp.children(r).values_list("name", flat=True)), ["c", "a", "b"]
+        )
+        self.assertEqual((c.depth, c.parent_id), (2, r.pk))
+        self.assertEqual(b.numchild, 0)
+
+    def test_move_into_own_subtree_raises(self):
+        r = self.mp.add_root(name="r")
+        c = self.mp.add_child(r, name="c")
+        with self.assertRaises(ValueError):
+            self.mp.move(r, c, "last-child")
+
+    def test_scope_sets_fields(self):
+        # `scope` filters the forest and is stamped onto new nodes (both the
+        # field-kwargs path and the explicit instance path).
+        mp = MaterializedPath(Category, scope={"name": "scoped"})
+        mp.add_root()
+        stamped = mp.add_root(instance=Category(name="ignored"))
+        self.assertEqual(stamped.name, "scoped")
+        self.assertEqual(mp.roots().count(), 2)
+
+    def test_lock_disabled(self):
+        mp = MaterializedPath(Category, lock=False)
+        r = mp.add_root(name="r")
+        mp.add_child(r, name="c")
+        self.assertEqual(mp.children(r).count(), 1)
+
+
+@mptree_only
+class MaterializedPathMixinCoverageTests(CMSTestCase):
+    def _page(self, name, parent=None, position="last-child"):
+        return create_page(name, TEMPLATE, "en", parent=parent, position=position)
+
+    def test_treebeard_compat_predicates(self):
+        root = self._page("root")
+        a = self._page("a", parent=root)
+        b = self._page("b", parent=a)
+        for page in (root, a, b):
+            page.refresh_from_db()
+
+        a2 = self._page("a2", parent=root)
+        a.refresh_from_db()
+        a2.refresh_from_db()
+
+        self.assertEqual(a.get_parent().pk, root.pk)
+        self.assertEqual(root.get_first_child().pk, a.pk)
+        self.assertTrue(a.is_sibling_of(a2))
+        self.assertFalse(a.is_sibling_of(b))
+        self.assertTrue(a.is_child_of(root))
+        self.assertFalse(b.is_child_of(root))
+        self.assertTrue(b.is_descendant_of(root))
+        self.assertFalse(root.is_descendant_of(b))
+        self.assertIn(root.pk, [s.pk for s in root.get_siblings()])   # root branch
+        self.assertIn(a.pk, [s.pk for s in a.get_siblings()])         # child branch
+
+        # get_root is overridden on Page -> exercise the mixin's directly
+        self.assertEqual(MaterializedPathMixin.get_root(b).pk, root.pk)
+
+    def test_add_sibling_via_position(self):
+        root = self._page("root")
+        a = self._page("a", parent=root)
+        # position "left" routes Page.add_to_tree -> Page.add_sibling -> mixin
+        self._page("left-of-a", parent=a, position="left")
+        root.refresh_from_db()
+        # first-child into a branch -> get_first_child().add_sibling(...)
+        self._page("first", parent=root, position="first-child")
+        self.assertGreaterEqual(root.get_child_pages().count(), 1)
+
+    def test_mixin_delete_decrements_numchild(self):
+        root = self._page("root")
+        leaf = self._page("leaf", parent=root)
+        leaf.refresh_from_db()
+        # Page overrides delete(); call the mixin implementation directly.
+        MaterializedPathMixin.delete(leaf)
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 0)
+
+
+def make_spec():
+    """A deterministic (name, parent_name) build order; parents precede children."""
+    spec = []
+    for r in range(3):  # roots
+        root = f"r{r}"
+        spec.append((root, None))
+        for c in range(4):  # children
+            child = f"{root}_c{c}"
+            spec.append((child, root))
+            for g in range(2):  # grandchildren
+                spec.append((f"{child}_g{g}", child))
+    return spec
+
+
+def snapshot():
+    return {
+        c.name: (c.path, c.depth, c.numchild)
+        for c in Category.objects.all()
+    }
+
+
+def build_with_treebeard(spec):
+    nodes = {}
+    for name, parent in spec:
+        if parent is None:
+            nodes[name] = Category.add_root(name=name)
+        else:
+            nodes[name] = nodes[parent].add_child(name=name)
+    return nodes
+
+
+def build_with_mptree(spec, mp):
+    nodes = {}
+    for name, parent in spec:
+        if parent is None:
+            nodes[name] = mp.add_root(name=name)
+        else:
+            nodes[name] = mp.add_child(nodes[parent], name=name)
+    return nodes
+
+
+def build_bulk(n, fanout=5):
+    """Fast-create a balanced ``fanout``-ary tree of ``n`` nodes (explicit pks)."""
+    mp = MaterializedPath(Category)
+    paths, depths = {}, {}
+    childcount = defaultdict(int)
+    for i in range(n):
+        parent = None if i == 0 else (i - 1) // fanout
+        childcount[parent] += 1
+        step = childcount[parent]
+        if parent is None:
+            paths[i], depths[i] = mp.segment(step), 1
+        else:
+            paths[i], depths[i] = paths[parent] + mp.segment(step), depths[parent] + 1
+    objs = [
+        Category(
+            pk=i + 1,
+            name=f"n{i}",
+            path=paths[i],
+            depth=depths[i],
+            numchild=childcount[i],
+            parent_id=None if i == 0 else ((i - 1) // fanout) + 1,
+        )
+        for i in range(n)
+    ]
+    Category.objects.bulk_create(objs, batch_size=1000)
+    return mp
+
+
+@mptree_only
+class MPTreeEquivalenceTests(TestCase):
+    """The prototype must match treebeard byte-for-byte where it claims to."""
+
+    def setUp(self):
+        self.mp = MaterializedPath(Category)
+        self.spec = make_spec()
+
+    def test_build_matches_treebeard(self):
+        build_with_treebeard(self.spec)
+        treebeard_snap = snapshot()
+
+        Category.objects.all().delete()
+
+        build_with_mptree(self.spec, self.mp)
+        mptree_snap = snapshot()
+
+        self.assertEqual(treebeard_snap, mptree_snap)
+        # spot-check the encoding itself
+        self.assertEqual(mptree_snap["r0"][0], "0001")
+        self.assertEqual(mptree_snap["r0_c0"][0], "00010001")
+        self.assertEqual(mptree_snap["r0_c0_g1"][0], "000100010002")
+
+    def test_move_last_child_matches_treebeard(self):
+        # treebeard reference: move a subtree to be the last child of another
+        # branch (same depth) and to a deeper target (depth changes).
+        nodes = build_with_treebeard(self.spec)
+        nodes["r0_c2"].move(Category.objects.get(name="r1"), "last-child")
+        nodes["r2_c0"].move(Category.objects.get(name="r1_c0"), "last-child")
+        treebeard_snap = snapshot()
+
+        Category.objects.all().delete()
+
+        nodes = build_with_mptree(self.spec, self.mp)
+        self.mp.move(nodes["r0_c2"], nodes["r1"], "last-child")
+        self.mp.move(nodes["r2_c0"], nodes["r1_c0"], "last-child")
+        mptree_snap = snapshot()
+
+        self.assertEqual(treebeard_snap, mptree_snap)
+
+    def test_descendants_children_ancestors(self):
+        nodes = build_with_mptree(self.spec, self.mp)
+        r0 = nodes["r0"]
+        self.assertEqual(
+            sorted(self.mp.children(r0).values_list("name", flat=True)),
+            ["r0_c0", "r0_c1", "r0_c2", "r0_c3"],
+        )
+        self.assertEqual(self.mp.descendants(r0).count(), 4 + 4 * 2)
+        g = nodes["r0_c2_g1"]
+        self.assertEqual(
+            list(self.mp.ancestors(g).values_list("name", flat=True)),
+            ["r0", "r0_c2"],
+        )
+
+
+@mptree_only
+class MPTreeInvariantTests(TestCase):
+    """Operations with no simple treebeard analogue are checked by invariants."""
+
+    def setUp(self):
+        self.mp = MaterializedPath(Category)
+
+    def assert_consistent_tree(self):
+        """Every node's path/depth must be a pure function of its parent chain,
+        paths must be unique, and ordering by path must be a valid DFS."""
+        by_pk = {c.pk: c for c in Category.objects.all()}
+        paths = [c.path for c in by_pk.values()]
+        self.assertEqual(len(paths), len(set(paths)), "paths must be unique")
+        for c in by_pk.values():
+            self.assertEqual(len(c.path), c.depth * self.mp.steplen)
+            if c.parent_id is None:
+                self.assertEqual(c.depth, 1)
+            else:
+                parent = by_pk[c.parent_id]
+                self.assertEqual(c.depth, parent.depth + 1)
+                self.assertTrue(
+                    c.path.startswith(parent.path),
+                    f"{c.name} path {c.path} not under parent {parent.path}",
+                )
+            # numchild cache matches reality
+            kids = sum(1 for o in by_pk.values() if o.parent_id == c.pk)
+            self.assertEqual(c.numchild, kids, f"numchild wrong on {c.name}")
+
+    def test_first_child_shift_keeps_tree_valid(self):
+        spec = make_spec()
+        nodes = build_with_mptree(spec, self.mp)
+        # r1 already has children c0..c3; insert r0_c2 (with its grandchildren)
+        # as the *first* child -> every existing child must shift up by one.
+        self.mp.move(nodes["r0_c2"], nodes["r1"], "first-child")
+        self.assert_consistent_tree()
+
+        r1 = Category.objects.get(name="r1")
+        first = self.mp.children(r1).first()
+        self.assertEqual(first.name, "r0_c2")
+        # the moved subtree came along
+        self.assertEqual(
+            sorted(self.mp.children(first).values_list("name", flat=True)),
+            ["r0_c2_g0", "r0_c2_g1"],
+        )
+        self.assertEqual(r1.numchild, 5)
+
+    def test_rebuild_from_parent_ids(self):
+        spec = make_spec()
+        nodes = build_with_mptree(spec, self.mp)
+
+        # Simulate the "parent_id is the source of truth" world: reparent purely
+        # by FK, leaving path/depth deliberately stale...
+        moved = nodes["r2_c0"]
+        Category.objects.filter(pk=moved.pk).update(parent=nodes["r0"])
+        Category.objects.filter(pk=moved.pk).update(path="ZZZZ", depth=99)  # garbage
+
+        # ...then rebuild reconstructs a fully consistent tree from parent_id.
+        self.mp.rebuild()
+        self.assert_consistent_tree()
+        self.assertEqual(
+            Category.objects.get(name="r2_c0").parent.name, "r0"
+        )
+
+
+@mptree_only
+@skipIf(
+    os.environ.get("GITHUB_ACTIONS") == "true",
+    "Benchmark is too slow for CI -- run locally instead.",
+)
+class MPTreeBenchmark(TransactionTestCase):
+    """Timing only -- prints results, asserts correctness of the big move."""
+
+    def test_benchmark_move_and_rebuild(self):
+        n = int(os.environ.get("MPTREE_BENCH_N", "10000"))
+        fanout = 5
+
+        # ----- subtree move on identical 10k trees -----------------------
+        mp = build_bulk(n, fanout)
+        node = Category.objects.get(pk=2)        # a root's first child
+        target = Category.objects.get(pk=6)      # a disjoint sibling branch
+        subtree_size = mp.descendants(node).count() + 1
+
+        t0 = time.perf_counter()
+        node.move(target, "last-child")          # treebeard
+        tb_move = time.perf_counter() - t0
+
+        Category.objects.all().delete()
+        mp = build_bulk(n, fanout)
+        node = Category.objects.get(pk=2)
+        target = Category.objects.get(pk=6)
+
+        t0 = time.perf_counter()
+        mp.move(node, target, "last-child")      # prototype (single UPDATE)
+        mp_move = time.perf_counter() - t0
+
+        # correctness of the prototype move at scale
+        node.refresh_from_db()
+        self.assertEqual(node.parent_id, target.pk)
+        self.assertEqual(Category.objects.count(), n)
+
+        # ----- full rebuild / fix_tree ----------------------------------
+        t0 = time.perf_counter()
+        Category.fix_tree()                      # treebeard
+        tb_fix = time.perf_counter() - t0
+
+        t0 = time.perf_counter()
+        mp.rebuild()                             # prototype
+        mp_rebuild = time.perf_counter() - t0
+
+        print(
+            f"\n[mptree benchmark] n={n}, moved subtree={subtree_size} nodes\n"
+            f"  move    treebeard={tb_move*1000:8.1f} ms   prototype={mp_move*1000:8.1f} ms\n"
+            f"  rebuild fix_tree ={tb_fix*1000:8.1f} ms   prototype={mp_rebuild*1000:8.1f} ms"
+        )
+
+    def test_benchmark_mid_insert(self):
+        # Worst case for _layout: a `first-child` move into a *wide* sibling
+        # group, which renumbers every existing sibling (unlike the last-child
+        # fast path, a single statement). Exercises the no-park shift.
+        width = int(os.environ.get("MPTREE_BENCH_WIDTH", "2000"))
+
+        def build():
+            Category.objects.all().delete()
+            mp = MaterializedPath(Category)
+            objs = [Category(pk=1, name="root", path=mp.segment(1), depth=1, numchild=width)]
+            pk = 2
+            for i in range(1, width + 1):
+                cpath = mp.segment(1) + mp.segment(i)
+                objs.append(Category(pk=pk, name=f"c{i}", path=cpath, depth=2, numchild=1, parent_id=1))
+                child_pk = pk
+                pk += 1
+                objs.append(Category(pk=pk, name=f"c{i}g", path=cpath + mp.segment(1), depth=3, parent_id=child_pk))
+                pk += 1
+            root2 = pk
+            objs.append(Category(pk=pk, name="root2", path=mp.segment(2), depth=1, numchild=1))
+            pk += 1
+            x = pk
+            objs.append(Category(pk=pk, name="X", path=mp.segment(2) + mp.segment(1), depth=2, parent_id=root2))
+            Category.objects.bulk_create(objs, batch_size=1000)
+            return mp, x
+
+        _, x_pk = build()
+        root = Category.objects.get(pk=1)
+        x = Category.objects.get(pk=x_pk)
+        t0 = time.perf_counter()
+        x.move(root, "first-child")              # treebeard
+        tb = time.perf_counter() - t0
+
+        mp, x_pk = build()
+        root = Category.objects.get(pk=1)
+        x = Category.objects.get(pk=x_pk)
+        t0 = time.perf_counter()
+        mp.move(x, root, "first-child")          # prototype (_layout, no-park shift)
+        mp_t = time.perf_counter() - t0
+
+        x.refresh_from_db()
+        self.assertEqual(x.parent_id, 1)
+        self.assertEqual(mp.children(root).first().pk, x_pk)  # X is now first child
+
+        print(
+            f"\n[mptree mid-insert] first-child move into width={width} sibling group\n"
+            f"  move    treebeard={tb*1000:8.1f} ms   prototype={mp_t*1000:8.1f} ms"
+        )
