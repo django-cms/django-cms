@@ -219,3 +219,143 @@ class PageTreeBackendTests(CMSTestCase):
         r1.refresh_from_db()
         self.assertEqual(r1.get_descendant_pages().count(), 1)
         self.assertEqual(set(Page.get_root_nodes().values_list("pk", flat=True)), roots)
+
+
+class PageQuerySetDeleteTests(CMSTestCase):
+    """``PageQuerySet.delete`` is the one queryset method with a backend-specific
+    implementation: treebeard walks ``path`` prefixes to remove subtrees, while
+    the mptree branch leans on the ``parent`` FK cascade and fixes the surviving
+    parents' ``numchild`` cache itself. ``delete_fast`` is the shared escape
+    hatch that skips all of that. Every assertion below must hold identically
+    under either backend."""
+
+    def _tree(self):
+        """``root -> (a -> (a1, a2), b)`` -- returns the pages top-down."""
+        root = create_page("root", TEMPLATE, "en")
+        a = create_page("a", TEMPLATE, "en", parent=root)
+        b = create_page("b", TEMPLATE, "en", parent=root)
+        a1 = create_page("a1", TEMPLATE, "en", parent=a)
+        a2 = create_page("a2", TEMPLATE, "en", parent=a)
+        return root, a, b, a1, a2
+
+    def test_delete_removes_the_whole_subtree(self):
+        # Deleting a branch must take its descendants with it -- no orphans
+        # pointing at a gone parent.
+        root, a, b, a1, a2 = self._tree()
+
+        Page.objects.filter(pk=a.pk).delete()
+
+        self.assertFalse(Page.objects.filter(pk__in=[a.pk, a1.pk, a2.pk]).exists())
+        self.assertEqual(
+            set(Page.objects.values_list("pk", flat=True)), {root.pk, b.pk}
+        )
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+
+    def test_delete_several_children_of_one_parent(self):
+        # Two children of the same parent in a single call -> numchild must drop
+        # by two, not by one.
+        root, a, b, a1, a2 = self._tree()
+
+        Page.objects.filter(pk__in=[a1.pk, a2.pk]).delete()
+
+        a.refresh_from_db()
+        self.assertEqual(a.numchild, 0)
+        self.assertTrue(a.is_leaf())
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 2)  # untouched
+
+    def test_delete_parent_and_child_in_one_queryset(self):
+        # `a1` is deleted twice over (explicitly, and as a descendant of `a`):
+        # only `root` may be decremented, and only once.
+        root, a, b, a1, a2 = self._tree()
+
+        Page.objects.filter(pk__in=[a.pk, a1.pk]).delete()
+
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+        self.assertEqual(
+            set(Page.objects.values_list("pk", flat=True)), {root.pk, b.pk}
+        )
+
+    def test_delete_root_pages(self):
+        # Roots have parent_id NULL -- there is nothing to decrement, and the
+        # NULL must not be mistaken for a parent to update.
+        r1 = create_page("r1", TEMPLATE, "en")
+        create_page("r1_child", TEMPLATE, "en", parent=r1)
+        create_page("r2", TEMPLATE, "en")
+
+        Page.objects.filter(depth=1).delete()
+
+        self.assertEqual(Page.objects.count(), 0)
+
+    def test_delete_never_makes_numchild_negative(self):
+        # A stale/corrupt numchild cache must not be driven below zero.
+        root, a, b, a1, a2 = self._tree()
+        Page.objects.filter(pk=root.pk).update(numchild=0)
+
+        Page.objects.filter(pk=a.pk).delete()
+
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 0)
+
+    def test_delete_on_empty_queryset_is_a_noop(self):
+        root, a, b, a1, a2 = self._tree()
+
+        Page.objects.filter(pk__in=[]).delete()
+
+        self.assertEqual(Page.objects.count(), 5)
+        root.refresh_from_db()
+        a.refresh_from_db()
+        self.assertEqual((root.numchild, a.numchild), (2, 2))
+
+    # --- delete_fast ----------------------------------------------------
+
+    def test_delete_fast_removes_rows_and_descendants(self):
+        # Plain Django delete: the rows go, and so do their descendants -- but
+        # via the parent FK cascade, in *both* backends (treebeard's path walk
+        # is bypassed entirely).
+        root, a, b, a1, a2 = self._tree()
+
+        Page.objects.filter(pk=a.pk).delete_fast()
+
+        self.assertEqual(
+            set(Page.objects.values_list("pk", flat=True)), {root.pk, b.pk}
+        )
+
+    def test_delete_fast_leaves_numchild_stale_on_purpose(self):
+        # The whole point of delete_fast: no tree bookkeeping. The caller is
+        # responsible for numchild -- compare with delete(), which fixes it.
+        root, a, b, a1, a2 = self._tree()
+
+        Page.objects.filter(pk=a.pk).delete_fast()
+
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 2)  # stale, not 1
+
+        # ...whereas the same removal through delete() does fix the cache.
+        Page.objects.filter(pk=b.pk).delete()
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+
+    def test_delete_fast_on_empty_queryset_is_a_noop(self):
+        root, a, b, a1, a2 = self._tree()
+
+        Page.objects.filter(pk__in=[]).delete_fast()
+
+        self.assertEqual(Page.objects.count(), 5)
+
+    def test_page_instance_delete_builds_on_delete_fast(self):
+        # Page.delete() is the real caller: it drops the subtree with
+        # delete_fast and then decrements the parent itself -- exactly once,
+        # no matter how large the subtree.
+        root, a, b, a1, a2 = self._tree()
+
+        a.refresh_from_db()
+        a.delete()
+
+        self.assertEqual(
+            set(Page.objects.values_list("pk", flat=True)), {root.pk, b.pk}
+        )
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)

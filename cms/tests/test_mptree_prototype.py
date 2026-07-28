@@ -18,12 +18,13 @@ Run just this module::
     python manage.py test cms.tests.test_mptree_prototype
 
 The benchmark prints timings; set ``MPTREE_BENCH_N`` to change the node count
-(default 10000).
+(default 10000). It is skipped on GitHub Actions (``GITHUB_ACTIONS=true``).
 """
 
 import os
 import time
 from collections import defaultdict
+from unittest import skipIf
 
 from django.test import TestCase, TransactionTestCase
 
@@ -217,6 +218,10 @@ class MPTreeInvariantTests(TestCase):
         )
 
 
+@skipIf(
+    os.environ.get("GITHUB_ACTIONS") == "true",
+    "Benchmark is too slow for CI -- run locally instead.",
+)
 class MPTreeBenchmark(TransactionTestCase):
     """Timing only -- prints results, asserts correctness of the big move."""
 
