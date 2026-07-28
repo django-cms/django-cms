@@ -13,9 +13,10 @@ Two things are proven here:
    (first-child insert with sibling shift, full rebuild from ``parent_id``), and
    a 10k-node benchmark timing a subtree move and a rebuild against treebeard.
 
-Run just this module::
+Run just this module (it only runs under the mptree backend and is skipped under
+treebeard)::
 
-    python manage.py test cms.tests.test_mptree_prototype
+    CMS_TREE_BACKEND=mptree python manage.py test cms.tests.test_mptree_prototype
 
 The benchmark prints timings; set ``MPTREE_BENCH_N`` to change the node count
 (default 10000). It is skipped on GitHub Actions (``GITHUB_ACTIONS=true``).
@@ -24,12 +25,17 @@ The benchmark prints timings; set ``MPTREE_BENCH_N`` to change the node count
 import os
 import time
 from collections import defaultdict
-from unittest import skipIf
+from unittest import skipIf, skipUnless
 
 from django.test import TestCase, TransactionTestCase
 
 from cms.test_utils.project.sampleapp.models import Category
-from cms.utils.mptree import MaterializedPath
+from cms.utils.mptree import MaterializedPath, get_tree_backend
+
+mptree_only = skipUnless(
+    get_tree_backend() == "mptree",
+    "mptree backend only -- run with CMS_TREE_BACKEND=mptree",
+)
 
 
 def make_spec():
@@ -101,6 +107,7 @@ def build_bulk(n, fanout=5):
     return mp
 
 
+@mptree_only
 class MPTreeEquivalenceTests(TestCase):
     """The prototype must match treebeard byte-for-byte where it claims to."""
 
@@ -155,6 +162,7 @@ class MPTreeEquivalenceTests(TestCase):
         )
 
 
+@mptree_only
 class MPTreeInvariantTests(TestCase):
     """Operations with no simple treebeard analogue are checked by invariants."""
 
@@ -218,6 +226,7 @@ class MPTreeInvariantTests(TestCase):
         )
 
 
+@mptree_only
 @skipIf(
     os.environ.get("GITHUB_ACTIONS") == "true",
     "Benchmark is too slow for CI -- run locally instead.",

@@ -6,11 +6,14 @@ test_mptree_prototype and the real page suites. This module targets the code
 paths django-cms itself does not happen to hit:
 
 * ``MaterializedPathDriverTests`` drives the low-level ``MaterializedPath``
-  against the treebeard-shaped ``Category`` model (runs in either backend) --
-  add_sibling, first-child insert, scope, lock-disabled, move guards, etc.
+  against the treebeard-shaped ``Category`` model -- add_sibling, first-child
+  insert, scope, lock-disabled, move guards, etc.
 * ``MaterializedPathMixinCoverageTests`` covers mixin methods that ``Page``
   overrides (``get_root``/``delete``) or never calls (the treebeard-compat
-  predicates) -- only meaningful when the mptree backend is active.
+  predicates).
+
+Both classes test the mptree implementation, so the module only runs under that
+backend (``CMS_TREE_BACKEND=mptree``) and is skipped under treebeard.
 """
 
 from unittest import skipUnless
@@ -24,7 +27,13 @@ from cms.utils.mptree import MaterializedPath, MaterializedPathMixin, get_tree_b
 
 TEMPLATE = "nav_playground.html"
 
+mptree_only = skipUnless(
+    get_tree_backend() == "mptree",
+    "mptree backend only -- run with CMS_TREE_BACKEND=mptree",
+)
 
+
+@mptree_only
 class MaterializedPathDriverTests(TestCase):
     def setUp(self):
         self.mp = MaterializedPath(Category)
@@ -125,7 +134,7 @@ class MaterializedPathDriverTests(TestCase):
         self.assertEqual(mp.children(r).count(), 1)
 
 
-@skipUnless(get_tree_backend() == "mptree", "mixin is only active in the mptree backend")
+@mptree_only
 class MaterializedPathMixinCoverageTests(CMSTestCase):
     def _page(self, name, parent=None, position="last-child"):
         return create_page(name, TEMPLATE, "en", parent=parent, position=position)

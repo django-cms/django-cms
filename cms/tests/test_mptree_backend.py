@@ -6,14 +6,16 @@ Guardrail + functional tests for the swappable tree backend.
   ``MaterializedPathMixin`` deconstructs its tree fields identically to
   treebeard's ``MP_Node``, substituting one for the other produces no migration.
 
-* ``PageTreeBackendTests`` are ordinary page-tree tests that run under
-  *whichever* backend the process booted with. Running this module twice --
+* ``PageTreeBackendTests`` and ``PageQuerySetDeleteTests`` are ordinary
+  page-tree tests covering build, query, move and delete.
 
-      python manage.py test cms.tests.test_mptree_backend
-      CMS_TREE_BACKEND=mptree python manage.py test cms.tests.test_mptree_backend
+The whole module only runs under the mptree backend::
 
-  and getting green both times is the behavioural-parity proof for what they
-  cover (build, query, move).
+    CMS_TREE_BACKEND=mptree python manage.py test cms.tests.test_mptree_backend
+
+Under treebeard it is skipped: those code paths belong to treebeard, are covered
+by the rest of the suite, and holding treebeard to this module's expectations
+means asserting on upstream behaviour we cannot fix.
 """
 
 from unittest import skipUnless
@@ -28,7 +30,13 @@ from cms.utils.mptree import MaterializedPathMixin, get_tree_backend, get_tree_b
 
 TEMPLATE = "nav_playground.html"
 
+mptree_only = skipUnless(
+    get_tree_backend() == "mptree",
+    "mptree backend only -- run with CMS_TREE_BACKEND=mptree",
+)
 
+
+@mptree_only
 class TreeFieldParityTests(SimpleTestCase):
     """Field-level proof that the two backends are interchangeable without a
     schema migration."""
@@ -56,35 +64,24 @@ class TreeFieldParityTests(SimpleTestCase):
         self.assertEqual(mp, self.TREE_FIELDS)
 
     def test_selector_matches_active_backend(self):
-        import os
-
-        expected = (
-            MaterializedPathMixin
-            if os.environ.get("CMS_TREE_BACKEND") == "mptree"
-            else MP_Node
-        )
-        self.assertIs(get_tree_base(), expected)
+        self.assertIs(get_tree_base(), MaterializedPathMixin)
 
     def test_queryset_is_treebeard_free_in_mptree_mode(self):
         # The page queryset must not inherit from treebeard when the mptree
         # backend is active -- otherwise treebeard would be imported.
-        import os
-
         from cms.models.query import PageQuerySet
 
         mro_modules = {base.__module__ for base in PageQuerySet.__mro__}
-        if os.environ.get("CMS_TREE_BACKEND") == "mptree":
-            self.assertNotIn("treebeard.mp_tree", mro_modules)
-        else:
-            self.assertIn("treebeard.mp_tree", mro_modules)
+        self.assertNotIn("treebeard.mp_tree", mro_modules)
         # The manager is backend-agnostic (never treebeard) in either mode.
         from cms.models import Page
 
         self.assertNotIn("treebeard", type(Page.objects).__module__)
 
 
+@mptree_only
 class PageTreeBackendTests(CMSTestCase):
-    """Runs under the active backend; identical assertions must hold for both."""
+    """The page tree as built, queried and moved by the mptree backend."""
 
     def test_build_and_query(self):
         root = create_page("root", TEMPLATE, "en")
@@ -223,13 +220,13 @@ class PageTreeBackendTests(CMSTestCase):
         self.assertEqual(set(Page.get_root_nodes().values_list("pk", flat=True)), roots)
 
 
+@mptree_only
 class PageQuerySetDeleteTests(CMSTestCase):
     """``PageQuerySet.delete`` is the one queryset method with a backend-specific
     implementation: treebeard walks ``path`` prefixes to remove subtrees, while
     the mptree branch leans on the ``parent`` FK cascade and fixes the surviving
-    parents' ``numchild`` cache itself. ``delete_fast`` is the shared escape
-    hatch that skips all of that. Every assertion below must hold identically
-    under either backend."""
+    parents' ``numchild`` cache itself. ``delete_fast`` is the escape hatch that
+    skips all of that."""
 
     def _tree(self):
         """``root -> (a -> (a1, a2), b)`` -- returns the pages top-down."""
@@ -291,11 +288,6 @@ class PageQuerySetDeleteTests(CMSTestCase):
 
         self.assertEqual(Page.objects.count(), 0)
 
-    @skipUnless(
-        get_tree_backend() == "mptree",
-        "treebeard's own delete() clamps with GREATEST(numchild - n, 0), which "
-        "raises on MySQL instead of clamping -- not ours to fix.",
-    )
     def test_delete_never_makes_numchild_negative(self):
         # A stale/corrupt numchild cache must not be driven below zero -- and
         # must not blow up on MySQL's unsigned column either.

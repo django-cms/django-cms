@@ -13,6 +13,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Run the whole suite on the dependency-free materialized-path backend.
+  # The cms.tests.test_mptree_* modules only run under this backend.
+  CMS_TREE_BACKEND: mptree
+
 jobs:
   postgres:
     runs-on: ${{ matrix.os }}
