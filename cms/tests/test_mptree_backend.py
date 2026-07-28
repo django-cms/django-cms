@@ -24,7 +24,7 @@ from treebeard.mp_tree import MP_Node
 from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.mptree import MaterializedPathMixin, get_tree_base, get_tree_backend
+from cms.utils.mptree import MaterializedPathMixin, get_tree_backend, get_tree_base
 
 TEMPLATE = "nav_playground.html"
 
