@@ -6,7 +6,7 @@ django-app-helper  # required to run the server for integration tests
 django-classy-tags>=0.7.2
 django-formtools
 django-sekizai>=0.7
-django-treebeard>=4.3
+django-treebeard>=4.3,<6  # 6.0 deprecates the Page.get_ancestors() etc. node API still used here
 djangocms-admin-style>=1.5
 djangocms-text-ckeditor
 iptools

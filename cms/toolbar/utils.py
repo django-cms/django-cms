@@ -174,7 +174,7 @@ def get_plugin_tree(
     return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}
 
 
-def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict = None) -> dict[str, Any]:
+def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict|None = None) -> list[dict[str, Any]]:
     if context is None:
         context = {}
     plugin_list = plugin if isinstance(plugin, list) else [plugin]
@@ -185,17 +185,17 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin]
     renderer._placeholders_are_editable = True
     context = SekizaiContext({'request': request, **context})
     try:
-        return [{
-            "html": renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True),
-            "js": "".join(context[get_varname()].get("js", [])),
-            "css": "".join(context[get_varname()].get("css", [])),
-            "position": plugin.position,
-            "placeholder_id": plugin.placeholder_id,
-            "pluginIds": get_plugin_tree_ids(plugin),
-        } for plugin in plugin_list]
+        with force_language(plugin_list[0].language):
+            return [{
+                "html": renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True),
+                "js": "".join(context[get_varname()].get("js", [])),
+                "css": "".join(context[get_varname()].get("css", [])),
+                "position": plugin.position,
+                "placeholder_id": plugin.placeholder_id,
+                "pluginIds": get_plugin_tree_ids(plugin),
+            } for plugin in plugin_list]
     except Exception:
         return []  # do not deliver content if rendering fails
-
 
 
 def get_plugin_tree_ids(plugin: CMSPlugin) -> list[int]:
