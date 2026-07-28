@@ -866,7 +866,6 @@ class StructureBoard {
                     }
                     // getting restriction array
                     let bounds = [];
-                    let immediateParentType;
 
                     if (placeholder && placeholder.closest('.cms-clipboard-containers').length) {
                         return false;
@@ -891,10 +890,6 @@ class StructureBoard {
                         return false;
                     }
                     const originalItemData = original.data('cms');
-                    const parent_bounds = $.grep(originalItemData.plugin_parent_restriction, function(r) {
-                        // special case when PlaceholderPlugin has a parent restriction named "0"
-                        return r !== '0';
-                    });
                     const type = originalItemData.plugin_type;
                     // prepare variables for bound
                     const holderId = that.getId(placeholder.closest('.cms-dragarea'));
@@ -913,20 +908,15 @@ class StructureBoard {
                     // istanbul ignore else
                     if (holder.length) {
                         bounds = holder.data('cms').plugin_restriction;
-                        immediateParentType = holder.data('cms').plugin_type;
                     }
                     if (plugin.length) {
                         bounds = plugin.data('cms').plugin_restriction;
-                        immediateParentType = plugin.data('cms').plugin_type;
                     }
 
-                    // if restrictions is still empty, proceed
+                    // The target's child list (bounds) already encodes which plugins it accepts --
+                    // including the placeholder's root list, which excludes plugins that require a
+                    // parent. If restrictions is still empty, proceed.
                     that.state = !(bounds.length && $.inArray(type, bounds) === -1);
-
-                    // check if we have a parent restriction
-                    if (parent_bounds.length) {
-                        that.state = $.inArray(immediateParentType, parent_bounds) !== -1;
-                    }
 
                     return that.state;
                 }

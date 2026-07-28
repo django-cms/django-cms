@@ -539,7 +539,7 @@ class CMSEditableObject(InclusionTag):
                 if not context.get("attribute_name", None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context["attribute_name"] = (
-                        "-".join(edit_fields) if not isinstance("edit_fields", str) else edit_fields
+                        "-".join(edit_fields) if edit_fields and not isinstance(edit_fields, str) else edit_fields
                     )
             else:
                 instance.get_plugin_name = lambda: f"{smart_str(_('Add'))} {smart_str(opts.verbose_name)}"

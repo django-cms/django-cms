@@ -68,9 +68,11 @@ def _get_placeholder_settings():
         visited.add(key)
         if "inherit" in conf[key]:
             return resolve_inheritance(conf[key]["inherit"], visited) | {
-                k: v for k, v in conf.items() if k != "inherit"
+                k: v for k, v in conf[key].items() if k != "inherit"
             }
-        return conf[key]
+        # Return a copy: the caller updates the result in place, which must
+        # not leak into the inherited-from slot's own configuration.
+        return dict(conf[key])
 
     new_conf = {}
     for key, value in conf.items():

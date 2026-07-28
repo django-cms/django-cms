@@ -1,0 +1,120 @@
+.. _upgrade-to-5.0.8:
+
+###################
+5.0.8 release notes
+###################
+
+*June 9, 2026*
+
+Welcome to django CMS 5.0.8!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
+features.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, 5.2, and 6.0**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.0.8
+***********************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.8 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+*******************
+What's new in 5.0.8
+*******************
+
+Read-only slugs for shared URLs
+-------------------------------
+
+Previously, editing a page in the admin could silently change the URL of a
+published version when both versions shared the same slug or overwrite URL
+(#8640). To prevent this, the **slug** and **overwrite URL** fields are now
+rendered read-only whenever a page content's URL is shared with a published
+version. The fields display explanatory help text describing how to make them
+editable again, and locked URLs are no longer updated on save even if different
+slug data is posted (#8654).
+
+Security Fixes
+--------------
+
+This release fixes two security issues. We recommend that all users upgrade as
+soon as possible.
+
+* **Missing authorization on structure, move and clipboard endpoints (#8644).**
+  The placeholder structure, plugin move, and clipboard endpoints did not
+  consistently enforce permission checks. This could allow users without the
+  required permissions to read or manipulate plugins on a page. Authorization is
+  now enforced on these endpoints.
+* **Plugin-declared Vary headers ignored in the page cache key (#8646).**
+  The page cache key did not honour ``Vary`` headers declared by plugins. As a
+  result cached responses could be served to requests that should have received
+  a different, varied response (for example content that varies by cookie or
+  other request headers). Plugin-declared ``Vary`` headers are now included in
+  the cache key.
+
+Many thanks to the security researchers who responsibly reported these issues:
+`@mauriceng98 <https://github.com/mauriceng98>`_,
+`@lzhou1110 <https://github.com/lzhou1110>`_,
+`@Zyy0530 <https://github.com/Zyy0530>`_,
+`@Str1ckl4nd <https://github.com/Str1ckl4nd>`_, and
+`@7thParkk <https://github.com/7thParkk>`_.
+
+.. note::
+
+   As ever, we remind our users and contributors that all security reports,
+   patches and concerns be addressed only to our security team by email, at
+   `security@django-cms.org <mailto:security@django-cms.org>`_. Please do not
+   report security issues on the public issue tracker or any mailing list. See
+   our `security policy <https://github.com/django-cms/django-cms/blob/main/SECURITY.md>`_
+   for details.
+
+Bug Fixes:
+----------
+* Enforce authorization on structure, move and clipboard endpoints (#8644) (#8645) (7642a98ab) -- Fabian Braun
+* GrouperModelAdmin shadowed prepopulated_fields class attribute (#8636) (#8639) (1b164a488) -- Fabian Braun
+* Honour plugin-declared Vary headers in the page cache key (#8646) (#8647) (d5dc1efa1) -- Fabian Braun
+* Missing redirect_url in CMSNavigationNode.attr (#8625) (f975cace5) -- Venelin Stoykov
+* Release script dropped changes (#8655) (23df299bd) -- Fabian Braun
+* Slugs of published pages could be changed (#8640) (#8654) (9fed876a0) -- Fabian Braun
+* Transifex upload script failed (#8656) (936a620ef) -- Fabian Braun
+* template-specific CMS_PLACEHOLDER_CONF keys ignored when rendering page placeholders (#8652) (c7424f7f2) -- Ralph
+* Correct lookup prefix and register length lookup in PermissionTuple.allow_list()
+* Use loop variable instead of queryset in user_can_delete_page placeholder check
+* Return 404 instead of 500 for missing objects in delete_view and edit_title_fields
+* Use target language for position shift and cache clearing in _paste_placeholder
+
+Statistics:
+-----------
+
+This release includes 14 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (8 pull requests)
+* Ralph (1 pull request)
+* Venelin Stoykov (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!

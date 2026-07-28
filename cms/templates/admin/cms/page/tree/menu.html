@@ -15,8 +15,8 @@
             cms-tree-node-shared-false
         {% endif %}
     {% endblock %}
+    {% if is_popup %} js-cms-pagetree-node-select{% endif %}
     "
-    {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.pk|unlocalize }}); return false;"{% endif %}
     data-id="{{ page.pk|unlocalize }}"
     data-node-id="{{ page.pk|unlocalize }}"
     data-slug="{{ page_content.slug }}"

@@ -1,4 +1,5 @@
 import warnings
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -687,6 +688,43 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             returned = get_placeholder_conf("default_plugins", "layout/other.html main")
             self.assertEqual(returned, TEST_CONF["main"]["default_plugins"])
 
+    def test_get_placeholder_conf_chained_inheritance(self):
+        """
+        A two-level ``inherit`` chain resolves transitively without leaking
+        unrelated top-level conf keys into the slot config and without
+        mutating the inherited-from slot's own configuration.
+
+        Regression test for resolve_inheritance merging the whole top-level
+        CMS_PLACEHOLDER_CONF dict instead of the inherited slot's config, and
+        for the resolved base config being updated in place.
+        """
+        TEST_CONF = {
+            "base": {"plugins": ["TextPlugin"], "name": "Base"},
+            "middle": {"inherit": "base", "limits": {"global": 5}},
+            "leaf": {"inherit": "middle", "name": "Leaf"},
+        }
+        pristine = {
+            "base": {"plugins": ["TextPlugin"], "name": "Base"},
+            "middle": {"inherit": "base", "limits": {"global": 5}},
+            "leaf": {"inherit": "middle", "name": "Leaf"},
+        }
+
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=TEST_CONF):
+            # leaf inherits base's plugins through middle
+            self.assertEqual(get_placeholder_conf("plugins", "leaf"), ["TextPlugin"])
+            # leaf inherits middle's own limits
+            self.assertEqual(get_placeholder_conf("limits", "leaf"), {"global": 5})
+            # leaf keeps its own name
+            self.assertEqual(get_placeholder_conf("name", "leaf"), "Leaf")
+            # middle resolves to base's plugins plus its own limits
+            self.assertEqual(get_placeholder_conf("plugins", "middle"), ["TextPlugin"])
+            self.assertEqual(get_placeholder_conf("name", "middle"), "Base")
+            # base itself is untouched by the inheritance resolution
+            self.assertEqual(get_placeholder_conf("name", "base"), "Base")
+            self.assertIsNone(get_placeholder_conf("limits", "base"))
+            # resolution must not write into the user's settings dict
+            self.assertEqual(TEST_CONF, pristine)
+
     def test_placeholder_name_conf(self):
         page_en = create_page("page_en", "col_two.html", "en")
         placeholder_1 = page_en.get_placeholders("en").get(slot="col_left")
@@ -1247,6 +1285,60 @@ class PlaceholderConfTests(TestCase):
             plugins = list(plugin_pool.get_all_plugins(placeholder.slot, placeholder.source, root_plugin=True))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
+
+    def test_is_allowed_in_slot(self):
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+
+        # No restriction (default): allowed everywhere, including unbound (None) queries.
+        self.assertTrue(LinkPlugin.is_allowed_in_slot("content"))
+        self.assertTrue(LinkPlugin.is_allowed_in_slot(None))
+
+        with patch.object(LinkPlugin, "allowed_slots", ["content", "footer_*"]):
+            # Exact match and glob match are allowed; an unlisted slot is not.
+            self.assertTrue(LinkPlugin.is_allowed_in_slot("content"))
+            self.assertTrue(LinkPlugin.is_allowed_in_slot("footer_left"))
+            self.assertFalse(LinkPlugin.is_allowed_in_slot("sidebar"))
+            # An unbound query is always allowed, even with a restriction set.
+            self.assertTrue(LinkPlugin.is_allowed_in_slot(None))
+
+        with patch.object(LinkPlugin, "allowed_slots", []):
+            # An empty list forbids every slot.
+            self.assertFalse(LinkPlugin.is_allowed_in_slot("content"))
+
+        with patch.object(LinkPlugin, "allowed_slots", "content"):
+            # A bare string is treated as a single pattern, not iterated per character.
+            self.assertTrue(LinkPlugin.is_allowed_in_slot("content"))
+            self.assertFalse(LinkPlugin.is_allowed_in_slot("sidebar"))
+            self.assertFalse(LinkPlugin.is_allowed_in_slot("c"))
+
+    def test_get_all_plugins_respects_allowed_slots(self):
+        page = create_page("page", "col_two.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="col_left")
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+
+        with patch.object(LinkPlugin, "allowed_slots", ["col_right"]):
+            available = list(plugin_pool.get_all_plugins(placeholder.slot, placeholder.source))
+            self.assertNotIn(LinkPlugin, available)
+            # The plugin is available in a slot it allows.
+            allowed = list(plugin_pool.get_all_plugins("col_right", placeholder.source))
+            self.assertIn(LinkPlugin, allowed)
+
+    def test_get_plugin_disallowed_in_slot(self):
+        from cms.utils.plugins import get_plugin_disallowed_in_slot
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            # The offending plugin type is returned for a disallowed slot.
+            self.assertEqual(
+                get_plugin_disallowed_in_slot(["LinkPlugin"], "sidebar"), "LinkPlugin"
+            )
+            # Every plugin is allowed -> nothing is reported.
+            self.assertIsNone(get_plugin_disallowed_in_slot(["LinkPlugin"], "content"))
+            # Unregistered plugin types are skipped (treated as allowed).
+            self.assertIsNone(
+                get_plugin_disallowed_in_slot(["DoesNotExistPlugin"], "sidebar")
+            )
 
 
 class PlaceholderPluginTestsBase(CMSTestCase):

@@ -536,3 +536,164 @@ class EndpointTests(CMSTestCase):
 
             response = self.client.get(structure_endpoint_url)
             self.assertContains(response, "<strong>Text</strong>")
+
+
+class EndpointPermissionTests(CMSTestCase):
+    """Security tests for the object render endpoints (edit/preview/structure).
+
+    The structure endpoint must enforce the same page-view permission as the
+    edit and preview endpoints, which deny access to staff users that cannot
+    view a restricted page.
+    """
+
+    def setUp(self) -> None:
+        from cms.api import add_plugin, assign_user_to_page
+
+        self.page = create_page("restricted", "simple.html", "en")
+        self.page_content = self.page.get_content_obj("en")
+        placeholder = self.page_content.get_placeholders().first()
+        # Secret content that must not leak to unauthorized staff users.
+        add_plugin(
+            placeholder,
+            "LinkPlugin",
+            "en",
+            name="SuperSecretLinkName",
+            external_link="https://secret.example.com",
+        )
+        # Restrict the page to view: granting view to the superuser turns the
+        # page into a view-restricted page for everybody else.
+        assign_user_to_page(self.page, self.get_superuser(), can_view=True)
+        self.content_type = ContentType.objects.get_for_model(PageContent)
+
+    def _endpoint(self, name):
+        return admin_reverse(name, args=(self.content_type.id, self.page_content.pk))
+
+    def test_edit_and_preview_endpoints_deny_view_restricted_page(self):
+        """Baseline: edit and preview already deny access via render_page()."""
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            for name in (
+                "cms_placeholder_render_object_edit",
+                "cms_placeholder_render_object_preview",
+            ):
+                response = self.client.get(self._endpoint(name))
+                self.assertEqual(
+                    response.status_code,
+                    404,
+                    msg=f"{name} leaked a view-restricted page (status {response.status_code})",
+                )
+
+    def test_structure_endpoint_denies_view_restricted_page(self):
+        """The structure endpoint must not render a page the user cannot view."""
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            response = self.client.get(
+                self._endpoint("cms_placeholder_render_object_structure")
+            )
+        self.assertEqual(
+            response.status_code,
+            404,
+            msg="structure endpoint leaked a view-restricted page",
+        )
+        self.assertNotContains(
+            response, "SuperSecretLinkName", status_code=404
+        )
+
+    def test_structure_endpoint_allows_permitted_user(self):
+        """A user who may view the page still gets the structure board."""
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(
+                self._endpoint("cms_placeholder_render_object_structure")
+            )
+        self.assertContains(response, "SuperSecretLinkName")
+
+
+class NonPageContentStructureEndpointTests(CMSTestCase):
+    """The structure endpoint must also authorize non-PageContent objects.
+
+    Registered through ``admin_site.admin_view`` the endpoint only requires an
+    active staff user. Without an object-level check, any staff user could read
+    the placeholder/plugin structure of a frontend-editable object (e.g. a model
+    using ``PlaceholderRelationField``) without permission to view it.
+
+    Viewing the (read-only) structure board requires only *view* permission;
+    mutating the plugins stays gated by change permission at the plugin
+    endpoints. This supports headless reviewers inspecting structure without
+    edit rights.
+    """
+
+    def setUp(self) -> None:
+        from cms.test_utils.project.placeholder_relation_field_app.models import (
+            FancyPoll,
+        )
+        from cms.utils.placeholder import rescan_placeholders_for_obj
+
+        self.target = FancyPoll.objects.create(name="private-fancy-poll")
+        self.placeholder = rescan_placeholders_for_obj(self.target)["content"]
+
+    def _url(self):
+        return get_object_structure_url(self.target, language="en")
+
+    def _marker(self):
+        return f'"placeholder_id": "{self.placeholder.pk}"'
+
+    def _staff_with_perm(self, codename):
+        staff = self._create_user(f"staff_{codename}", is_staff=True, is_superuser=False)
+        staff.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="placeholder_relation_field_app",
+                codename=codename,
+            )
+        )
+        return staff
+
+    def test_denies_staff_without_view_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertEqual(
+            response.status_code,
+            404,
+            msg="structure endpoint leaked a non-PageContent object's structure",
+        )
+        self.assertNotContains(response, self._marker(), status_code=404)
+
+    def test_allows_staff_with_view_permission(self):
+        # Headless / read-only reviewers may inspect structure with view rights.
+        staff = self._staff_with_perm("view_fancypoll")
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+
+    def test_view_only_user_gets_read_only_structure_board(self):
+        """View permission opens the board, but the editing UX is disabled.
+
+        Mutations stay gated by change permission at the plugin endpoints, so
+        the structure board must render read-only (no drag/add/cut/delete) for a
+        user who may view but not change the object.
+        """
+        view_only = self._staff_with_perm("view_fancypoll")
+        with self.login_user_context(view_only):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+        # Read-only markers from toolbar_with_structure.html / dragbar / dragitem.
+        self.assertContains(response, "cms-drag-disabled")
+        self.assertContains(response, "Placeholder not editable")
+
+        # A user who may change the object still gets the editable board.
+        editor = self._staff_with_perm("change_fancypoll")
+        with self.login_user_context(editor):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+        self.assertNotContains(response, "Placeholder not editable")
+
+    def test_allows_staff_with_change_permission(self):
+        staff = self._staff_with_perm("change_fancypoll")
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+
+    def test_allows_superuser(self):
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())

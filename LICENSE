@@ -91,6 +91,14 @@ Note: Used for accessibility - traps focus within modals
 
 ================================================================================
 
+Package: Bootstrap Icons
+License: MIT License
+License URL: https://github.com/twbs/icons/blob/main/LICENSE
+Copyright (c) 2019-2024 The Bootstrap Authors
+Website: https://icons.getbootstrap.com
+
+================================================================================
+
 Package: local-storage
 Version: 2.0.0
 License: MIT
@@ -120,7 +128,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ================================================================================
 
 Package: lodash-es
-Version: 4.17.21
+Version: 4.18.1
 License: MIT
 
 Copyright OpenJS Foundation and other contributors <https://openjsf.org/>

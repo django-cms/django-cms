@@ -29,7 +29,7 @@ from cms.models import (
     PageContent,
     Placeholder,
 )
-from cms.templatetags.cms_admin import get_page_display_name
+from cms.templatetags.cms_admin import django_version_gte, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
@@ -37,6 +37,7 @@ from cms.templatetags.cms_tags import (
     render_plugin,
 )
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
@@ -88,6 +89,25 @@ class TemplatetagTests(CMSTestCase):
         self.assertIn(expected_for_page, output)
         self.assertIn(expected_for_german_content, output)
 
+    def test_get_preview_url_object_without_language(self):
+        """A frontend-editable object that has no ``language`` attribute falls back
+        to the active request language instead of raising ``AttributeError``."""
+        example = Example1.objects.create(char_1="a", char_2="b", char_3="c", char_4="d")
+        self.assertFalse(hasattr(example, "language"))
+
+        template = """
+            {% load cms_admin %}
+            preview={% get_preview_url example %}
+            edit={% get_edit_url example %}
+        """
+        with force_language("en"):
+            output = self.render_template_obj(template, {"example": example}, self.get_request())
+            expected_preview = f"preview={get_object_preview_url(example, language='en')}"
+            expected_edit = f"edit={get_object_edit_url(example, language='en')}"
+
+        self.assertIn(expected_preview, output)
+        self.assertIn(expected_edit, output)
+
     def test_get_edit_url(self):
         """The get_edit_url template tag returns the content edit url for its language:
         If a page is given, take the current language (en), if a page_content is given,
@@ -111,8 +131,8 @@ class TemplatetagTests(CMSTestCase):
     def test_placeholder_is_immutable_filter(self):
         template = """
             {% load cms_admin %}
-            non-placeholder={{ True|placeholder_is_immutable:request.user }}
-            placeholder={{ placeholder|placeholder_is_immutable:request.user }}
+            non-placeholder={{ True|placeholder_is_immutable:user }}
+            placeholder={{ placeholder|placeholder_is_immutable:user }}
         """
         from unittest.mock import patch
 
@@ -122,11 +142,25 @@ class TemplatetagTests(CMSTestCase):
         placeholder = page.get_placeholders("en").first()
         request = self.get_request()
 
+        # A placeholder is mutable only if the source permits editing *and* the
+        # user may change it: a user with change permission gets the editable
+        # board (placeholder=False).
         with patch.object(Placeholder, "check_source", wraps=placeholder.check_source) as mock_check_source:
-            output = self.render_template_obj(template, {"placeholder": placeholder}, request=request)
+            output = self.render_template_obj(
+                template, {"placeholder": placeholder, "user": self.get_superuser()}, request=request
+            )
             self.assertIn("non-placeholder=True", output)
             self.assertIn("placeholder=False", output)
             self.assertEqual(mock_check_source.call_count, 1)
+
+        # A user without change permission only gets a read-only board, even
+        # though the source itself permits editing (placeholder=True).
+        output = self.render_template_obj(
+            template,
+            {"placeholder": placeholder, "user": self.get_staff_user_with_no_permissions()},
+            request=request,
+        )
+        self.assertIn("placeholder=True", output)
 
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en", slug="slug-test2")
@@ -814,3 +848,66 @@ class CmsTagTemplateTagTests(CMSTestCase):
             self.fail("NoReverseMatch should not be raised.")
 
         self.assertEqual(rendered.strip(), "")
+
+
+class AdminBreadcrumbMarkupTests(CMSTestCase):
+    """Django 6.1 changed the admin breadcrumbs markup from
+    ``<div class="breadcrumbs">`` (with ``&rsaquo;`` separators) to a semantic
+    ``<ol class="breadcrumbs">`` whose CSS is element-qualified
+    (``ol.breadcrumbs``) and no longer styles a ``<div>``. The cms admin
+    overrides switch markup on the running Django version via the
+    ``{% django_version_gte %}`` tag, so they render correctly on both the
+    legacy (4.2-6.0) and the new (6.1+) admin.
+    """
+
+    # Plausible version tuples mirroring ``django.VERSION`` for both branches.
+    DJANGO_5_2 = (5, 2, 0, "final", 0)
+    DJANGO_6_1 = (6, 1, 0, "final", 0)
+
+    def test_django_version_gte_tag(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            self.assertFalse(django_version_gte(6, 1))
+            self.assertTrue(django_version_gte(5, 2))
+            self.assertTrue(django_version_gte(4, 2))
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            self.assertTrue(django_version_gte(6, 1))
+            self.assertTrue(django_version_gte(6))
+            self.assertFalse(django_version_gte(7))
+
+    def _get_admin_html(self, uri):
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(uri)
+        self.assertEqual(response.status_code, 200)
+        return response.content.decode("utf-8")
+
+    # -- page tree changelist: admin/cms/page/tree/base.html --
+
+    def test_pagetree_breadcrumbs_legacy_div_below_6_1(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
+        self.assertIn('<div class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+        self.assertNotIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+
+    def test_pagetree_breadcrumbs_ol_on_6_1(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
+        self.assertIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+        self.assertIn('<li aria-current="page">Pages</li>', html)
+        self.assertNotIn('<div class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+
+    # -- page change form: admin/cms/page/change_form.html --
+
+    def test_page_change_form_breadcrumbs_legacy_div_below_6_1(self):
+        page = create_page("Home", "nav_playground.html", "en")
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            html = self._get_admin_html(self.get_page_change_uri("en", page))
+        self.assertIn('<div class="breadcrumbs">', html)
+        self.assertNotIn('<ol class="breadcrumbs">', html)
+
+    def test_page_change_form_breadcrumbs_ol_on_6_1(self):
+        page = create_page("Home", "nav_playground.html", "en")
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            html = self._get_admin_html(self.get_page_change_uri("en", page))
+        self.assertIn('<ol class="breadcrumbs">', html)
+        self.assertIn('aria-current="page"', html)
+        self.assertNotIn('<div class="breadcrumbs">', html)

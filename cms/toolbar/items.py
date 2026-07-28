@@ -7,7 +7,6 @@ from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 from cms.constants import LEFT, REFRESH_PAGE, RIGHT, URL_CHANGE
-from cms.utils.compat import DJANGO_4_2
 
 
 class ItemSearchResult:
@@ -42,18 +41,26 @@ class ItemSearchResult:
         return self.index
 
 
-if DJANGO_4_2:
-    def may_be_lazy(thing):
-        if isinstance(thing, Promise):
-            return thing._proxy____args[0]
-        else:
-            return thing
-else:
-    def may_be_lazy(thing):
-        if isinstance(thing, Promise):
+def may_be_lazy(thing):
+    """Normalise a (possibly lazy) attribute value for comparison in the find APIs.
+
+    Toolbar item names are frequently ``gettext_lazy`` strings. To let callers
+    -- including third-party apps -- look items up by their *source* (English)
+    string regardless of the active language, we compare against the lazy
+    callable's source argument rather than its resolved/translated value.
+
+    ``Promise._args`` is a private Django internal; there is no public API to
+    recover a lazy's source argument. Only single-argument lazies such as
+    ``_("label")`` have a meaningful source string, so anything else (e.g.
+    ``format_lazy``) falls back to its resolved value instead of raising -- the
+    find APIs run this over *every* candidate, so a crash here would break
+    unrelated lookups too.
+    """
+    if isinstance(thing, Promise):
+        if len(thing._args) == 1:
             return thing._args[0]
-        else:
-            return thing
+        return force_str(thing)
+    return thing
 
 
 class ToolbarAPIMixin(metaclass=ABCMeta):
@@ -116,7 +123,18 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
 
     def find_items(self, item_type, **attributes):
         """Returns a list of :class:`~cms.toolbar.items.ItemSearchResult` objects matching all items of ``item_type``
-        (e.g. ``LinkItem``)."""
+        (e.g. ``LinkItem``).
+
+        Items whose attributes are lazy (e.g. a ``gettext_lazy`` ``name``) are matched by their
+        *source* string, not their translation. Search for an item by the original (untranslated,
+        usually English) string -- e.g. ``find_items(LinkItem, name="Save")`` -- so the lookup works
+        regardless of the active language. Passing the lazy itself or a translated string is not
+        reliable across languages.
+
+        This source matching only works for single-argument lazies such as ``_("Save")``. Composite
+        lazy values -- e.g. ``format_lazy("Save {}", model_name)`` -- have no single source string and
+        are matched by their *resolved* (translated) value, so they cannot be looked up
+        language-independently. Give such items a stable ``identifier`` and search by that instead."""
         results = []
         attr_items = attributes.items()
         notfound = object()
@@ -208,12 +226,27 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
     def add_ajax_item(self, name, action, active=False, disabled=False,
                       extra_classes=None, data=None, question=None,
                       side=LEFT, position=None, on_success=None, method='POST'):
-        """Adds :class:`~cms.toolbar.items.AjaxItem` that sends a POST request to ``action`` with ``data``, and returns
-        it. ``data`` should be ``None`` or a dictionary. The CSRF token will automatically be added
-        to the item.
+        """Adds :class:`~cms.toolbar.items.AjaxItem` that sends a request to ``action`` with ``data``, and returns
+        it. ``data`` should be ``None`` or a dictionary. By default a ``POST`` request is sent; pass ``method`` to use
+        a different HTTP method. For unsafe methods (anything other than ``GET``, ``HEAD``, ``OPTIONS`` and ``TRACE``)
+        the CSRF token is automatically added to the item.
 
         If a string is provided for ``question``, it will be presented to the user to allow
-        confirmation before the request is sent."""
+        confirmation before the request is sent.
+
+        Once the request succeeds, the response is inspected:
+
+        * If ``on_success`` is given, the browser navigates to that URL. The special values
+          ``REFRESH_PAGE`` reloads the current page and ``"FOLLOW_REDIRECT"`` redirects to the ``url``
+          returned in the (JSON) response instead.
+        * Otherwise, if the response carries a *data bridge* -- either an HTML document containing a
+          ``<script id="data-bridge">`` element or a JSON object with an ``action`` key -- the data bridge is
+          evaluated and the structure board is updated in place, without a full page reload.
+        * If neither applies, the page is reloaded.
+
+        ..  versionadded:: 5.1
+            Evaluating a *data bridge* returned by the AJAX response, updating the structure board in
+            place instead of reloading the page."""
 
         item = AjaxItem(
             name, action, self.csrf_token,

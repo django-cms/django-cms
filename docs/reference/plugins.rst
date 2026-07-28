@@ -25,12 +25,25 @@ Plugins
         See also: :meth:`render_plugin` , :meth:`render_template`
 
   .. attribute:: allowed_models
+        :noindex:
 
         A list of model identifiers (in the format ``"app_label.modelname"``) that
         restricts where this plugin can be used. If ``None`` (default), the plugin
         is available for all models with placeholders.
 
         See :ref:`plugin-model-restrictions` for details.
+
+  .. attribute:: allowed_slots
+        :noindex:
+
+        A list of placeholder slot names that restricts where this plugin can be
+        added. Entries may be exact slot names or glob patterns (e.g. ``"content"``
+        or ``"footer_*"``). If ``None`` (default), the plugin is available in every
+        slot; an empty list ``[]`` forbids every slot.
+
+        This is the plugin-side counterpart to the ``plugins``/``excluded_plugins``
+        keys of :setting:`CMS_PLACEHOLDER_CONF`. Both filters must pass for the
+        plugin to be available in a slot.
 
 
 .. autoclass:: cms.plugin_base.PluginMenuItem

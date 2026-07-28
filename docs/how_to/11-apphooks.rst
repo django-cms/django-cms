@@ -191,7 +191,7 @@ This works because django CMS sets ``request.current_page`` for apphook requests
     that custom model rather than on the page.
 
 Telling the structure board which template the root view uses
-.............................................................
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 When a content editor opens the structure board on an apphooked page, django CMS
 needs to know *which* template the apphook's root view renders, should it be different

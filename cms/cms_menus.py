@@ -291,6 +291,7 @@ class CMSMenu(Menu):
                 "redirect",
                 "page__site_id",
                 "page__parent_id",
+                "page__path",  # needed by the view-restriction check in get_visible_page_contents
                 "page__is_home",
                 "page__login_required",
                 "page__reverse_id",

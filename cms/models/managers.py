@@ -75,7 +75,7 @@ class WithUserMixin:
 
 class PageUrlManager(WithUserMixin, models.Manager):
     def get_for_site(self, site, **kwargs):
-        kwargs['page__site'] = site
+        kwargs['site'] = site
         return self.filter(**kwargs)
 
 

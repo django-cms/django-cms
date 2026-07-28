@@ -413,6 +413,15 @@ class PageTree {
             that._paste(e);
         });
 
+        // related-object lookup popup: clicking a node returns its id to the opener
+        this.ui.container.on(this.click, '.js-cms-pagetree-node-select', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.opener) {
+                window.opener.dismissRelatedLookupPopup(window, $(this).data('id'));
+            }
+        });
+
         // advanced settings link handling
         this.ui.container.on(this.click, '.js-cms-tree-advanced-settings', function(e) {
             if (e.shiftKey) {

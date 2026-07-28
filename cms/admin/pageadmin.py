@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 
 import django
 from django.conf import settings
@@ -62,6 +62,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
+from cms.models.pagemodel import AdminCacheDict
 from cms.models.permissionmodels import PermissionTuple
 from cms.operations.helpers import (
     send_post_page_operation,
@@ -80,8 +81,8 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.permissions import clear_permission_lru_caches
-from cms.utils.plugins import copy_plugins_to_placeholder
-from cms.utils.urlutils import admin_reverse
+from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
 
@@ -368,12 +369,17 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             query_term = request.GET.get("q", "").strip("/")
 
             language_code = request.GET.get("language_code", settings.LANGUAGE_CODE)
-            matching_published_pages = self.model.objects.on_site(site).filter(
-                Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
-            ).distinct()
+            matching_published_pages = (
+                self.model.objects.on_site(site)
+                .filter(
+                    Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
+                    | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
+                    | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
+                    | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
+                )
+                .prefetch_related("urls", "pagecontent_set")
+                .distinct()
+            )
 
             results = []
             for page in matching_published_pages:
@@ -669,13 +675,14 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(request, object_id=page_id)
-        translation = page.get_admin_content(language)
+
+        if page is None:
+            raise self._get_404_exception(page_id)
 
         if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(_("You do not have permission to edit this page"))
 
-        if page is None:
-            raise self._get_404_exception(page_id)
+        translation = page.get_admin_content(language)
 
         if not translation:
             raise Http404("No translation matches requested language.")
@@ -746,6 +753,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = "admin/cms/page/tree/actions_dropdown.html"
     page_tree_row_template = "admin/cms/page/tree/menu.html"
+
+    class Media:
+        css = {"all": (static_with_version("cms/css/cms.admin.css"),)}
 
     form = AddPageForm
     add_form = form
@@ -838,20 +848,6 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         form._request = request
         return form
 
-    def slug(self, obj):
-        # For read-only views: Get slug from the page content object
-        if not hasattr(obj, "_url_obj"):
-            obj._url_obj = obj.page.get_url(obj.language)
-        return obj._url_obj.slug
-
-    def overwrite_url(self, obj):
-        # For read-only views: Get slug from the page content object
-        if not hasattr(obj, "_url_obj"):
-            obj._url_obj = obj.page.get_url(obj.language)
-        if obj._url_obj.managed:
-            return None
-        return obj._url_obj.path
-
     def duplicate(self, request, object_id):
         """
         Leverages the add view logic to duplicate the page.
@@ -876,31 +872,22 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if extra_context is None:
             extra_context = {}
 
-        if "duplicate" in request.path_info:
-            extra_context.update(
-                {
-                    "title": _("Add Page Copy"),
-                }
-            )
-        elif "parent_page" in request.GET:
-            extra_context.update(
-                {
-                    "title": _("New sub page"),
-                }
-            )
-        else:
-            extra_context.update(
-                {
-                    "title": _("New page"),
-                }
-            )
-
         try:
             page_id = request.GET.get("cms_page") or request.POST.get("cms_page")
             page_id = IntegerField().clean(page_id)
             cms_page = Page.objects.get(pk=page_id)
         except (ValidationError, Page.DoesNotExist):
             cms_page = None
+
+        if cms_page:
+            # Adding content for an existing page in a language it does not have yet
+            extra_context["title"] = _("Add Translation")
+        elif "duplicate" in request.path_info:
+            extra_context["title"] = _("Add Page Copy")
+        elif "parent_page" in request.GET:
+            extra_context["title"] = _("New sub page")
+        else:
+            extra_context["title"] = _("New page")
 
         if cms_page:
             extra_context["cms_page"] = cms_page
@@ -931,7 +918,13 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             "language_tabs": get_language_tuple(site.pk),
             "filled_languages": self.get_filled_languages(request, obj.page),
         }
-        context["show_language_tabs"] = len(context["language_tabs"])
+        # Only offer the language selector for the latest content. Switching the language always
+        # navigates to the latest content of the target language, so for an older content object
+        # (e.g. an outdated version) switching languages back and forth would silently bring up a
+        # different (the latest) content object - confusing UX.
+        latest = obj.page.get_admin_content(obj.language)
+        is_latest_content = getattr(latest, "pk", None) == obj.pk
+        context["show_language_tabs"] = len(context["language_tabs"]) if is_latest_content else 0
         context.update(extra_context or {})
 
         if "basic_info" in extra_context:
@@ -1114,6 +1107,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 to_attr="filtered_translations",
                 queryset=page_contents,
             ),
+            "urls",  # rendering a tree row resolves the page's URLs
         )
 
         if changelist_form.is_filtered():
@@ -1196,28 +1190,48 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         target_page_content = page.get_content_obj(target_language, fallback=False)
 
-        for placeholder in source_page_content.get_placeholders():
-            try:
-                target = target_page_content.get_placeholders().get(slot=placeholder.slot)
-            except Placeholder.DoesNotExist:
+        source_placeholders = list(source_page_content.get_placeholders())
+        target_placeholders = {
+            placeholder.slot: placeholder
+            for placeholder in target_page_content.get_placeholders()
+        }
+        source_plugins = downcast_plugins(
+            CMSPlugin.objects.filter(
+                placeholder_id__in=[placeholder.pk for placeholder in source_placeholders],
+                language=source_page_content.language,
+            ).order_by("position")
+        )
+        plugins_by_placeholder = defaultdict(list)
+        for plugin in source_plugins:
+            plugins_by_placeholder[plugin.placeholder_id].append(plugin)
+
+        for placeholder in source_placeholders:
+            target = target_placeholders.get(placeholder.slot)
+            if target is None:
                 messages.warning(request, _("Placeholder '%s' does not exist in target language") % placeholder.slot)
                 continue
-            plugins = placeholder.get_plugins_list(source_page_content.language)
+            plugins = plugins_by_placeholder[placeholder.pk]
 
             if not target.has_add_plugins_permission(request.user, plugins):
                 return HttpResponseForbidden(_("You do not have permission to copy these plugins."))
-            copy_plugins_to_placeholder(plugins, target, language=target_language)
+            copy_plugins_to_placeholder(
+                plugins,
+                target,
+                language=target_language,
+                plugins_are_downcast=True,
+            )
         return HttpResponse("ok")
 
     def delete_view(self, request, object_id, extra_context=None):
         page_content = self.get_object(request, object_id=object_id)
+
+        if page_content is None:
+            raise self._get_404_exception(object_id)
+
         page = page_content.page
 
         if not self.has_delete_translation_permission(request, page_content.language, page):
             return HttpResponseForbidden(_("You do not have permission to delete this page"))
-
-        if page is None:
-            raise self._get_404_exception(object_id)
 
         if not len(list(page.get_languages())) > 1:
             return HttpResponseBadRequest("There only exists one translation for this page")
@@ -1246,7 +1260,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             "language": force_str(get_language_object(obj.language, site_id=obj.page.site_id)["name"])
         }
         messages.success(request, message)
-        if obj.language in obj.page.admin_content_cache:
+        if obj.page.admin_content_cache and obj.language in obj.page.admin_content_cache:
             del obj.page.admin_content_cache[obj.language]
         if obj.language in obj.page.page_content_cache:
             del obj.page.page_content_cache[obj.language]
@@ -1315,6 +1329,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 to_attr="filtered_translations",
                 queryset=PageContent.admin_manager.get_queryset().latest_content(),
             ),
+            "urls",  # rendering a tree row resolves the page's URLs
         )
         rows = self.get_tree_rows(
             request,
@@ -1343,7 +1358,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         user_can_change_permissions = page_permissions.user_can_change_page_permissions
 
         def render_page_row(page):
-            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations}
+            page.admin_content_cache = AdminCacheDict(
+                (trans.language, trans) for trans in page.filtered_translations
+            )
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
             if permissions_on and not has_move_page_permission:

@@ -1,7 +1,8 @@
 /*
- * Copyright https://github.com/divio/django-cms
+ * Copyright https://github.com/django-cms/django-cms
  */
 
+/* global DOMParser */
 import $ from 'jquery';
 import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
@@ -523,6 +524,9 @@ class Toolbar {
                     } else {
                         Helpers.reloadBrowser(onSuccess);
                     }
+                } else if (that._evaluateDataBridge(response)) {
+                    // response carried a data bridge that was evaluated in-place
+                    hideLoader();
                 } else {
                     // reload
                     Helpers.reloadBrowser();
@@ -536,6 +540,45 @@ class Toolbar {
                     error: true
                 });
             });
+    }
+
+    /**
+     * Checks whether an ajax response carries a valid data bridge - either as
+     * an HTML document containing a `script#data-bridge` element or as a JSON
+     * object that is itself the data bridge - and, if so, triggers its
+     * evaluation (in-place structure/content update) instead of a full reload.
+     *
+     * @method _evaluateDataBridge
+     * @private
+     * @param {Object|String} response ajax response (parsed JSON or HTML string)
+     * @returns {Boolean} true if a valid data bridge was found and evaluated
+     */
+    _evaluateDataBridge(response) {
+        var dataBridge;
+
+        if (typeof response === 'string') {
+            // response is HTML - look for the embedded data bridge script
+            var node = new DOMParser()
+                .parseFromString(response, 'text/html')
+                .querySelector('script#data-bridge');
+
+            if (node) {
+                try {
+                    dataBridge = JSON.parse(node.textContent);
+                } catch {
+                    return false;
+                }
+            }
+        } else if (response && typeof response === 'object' && response.action) {
+            // response is already parsed JSON and looks like a data bridge
+            dataBridge = response;
+        }
+
+        if (!dataBridge || !dataBridge.action) {
+            return false;
+        }
+        CMS.API.StructureBoard.invalidateState(dataBridge.action.toUpperCase(), dataBridge);
+        return true;
     }
 
     /**

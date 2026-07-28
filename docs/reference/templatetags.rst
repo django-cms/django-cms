@@ -8,7 +8,7 @@ Template Tags
 CMS template tags
 *****************
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 To use any of the following template tags you first need to load them at the
 top of your template::
@@ -802,7 +802,7 @@ If the current URL has no CMS Page and is handled by a navigation extender and
 the URL changes based on the language, you will need to set a ``language_changer``
 function with the ``set_language_changer`` function in ``menus.utils``.
 
-For more information, see :doc:`/topics/i18n`.
+For more information, see :doc:`/explanation/multiple_languages`.
 
 
 ..  templatetag:: language_chooser
@@ -836,7 +836,7 @@ If the current URL has no CMS Page and is handled by a navigation extender and
 the URL changes based on the language, you will need to set a ``language_changer``
 function with the ``set_language_changer`` function in ``menus.utils``.
 
-For more information, see :doc:`/topics/i18n`.
+For more information, see :doc:`/explanation/multiple_languages`.
 
 
 ..  templatetag:: cms_toolbar
@@ -845,7 +845,7 @@ For more information, see :doc:`/topics/i18n`.
 Toolbar template tags
 *********************
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the required
 CSS and javascript to the sekizai blocks in the base template. The template tag must be placed

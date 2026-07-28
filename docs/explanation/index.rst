@@ -21,11 +21,13 @@ explore how that philosophy is reflected throughout the CMS.
    :maxdepth: 1
 
    philosophy
+   composition
+   content_objects
    plugins
    apphooks
+   request_lifecycle
    publishing
    multiple_languages
-   i18n
    permissions
    menu_system
    frontend-integration

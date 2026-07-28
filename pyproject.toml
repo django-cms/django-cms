@@ -30,11 +30,9 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Framework :: Django",
-  "Framework :: Django :: 4.2",
-  "Framework :: Django :: 5.0",
-  "Framework :: Django :: 5.1",
   "Framework :: Django :: 5.2",
   "Framework :: Django :: 6.0",
+  "Framework :: Django :: 6.1",
   "Topic :: Internet :: WWW/HTTP",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
   "Topic :: Software Development",
@@ -43,7 +41,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 dependencies = [
-  "Django >= 4.2.26",
+  "Django >= 5.2",
   "django-classy-tags >=0.7.2",
   "django-formtools >=2.1",
   "django-treebeard >=4.3",
@@ -64,10 +62,36 @@ admin-style = ["djangocms-simple-admin-style"]
 djangocms = "cms.management.djangocms:execute_from_command_line"
 
 [tool.setuptools]
-packages = { find = {} }
+# Explicit allow-list: the empty find {} defaults to namespace-package discovery,
+# which sweeps any git-tracked top-level directory (docs, scripts, ...) into wheels.
+# cms.test_utils is public API relied on by third-party packages and must stay included.
+# Step 2 (#8733): drop cms.tests from wheels (it remains in the sdist) by replacing
+# the packages line with the commented one below:
+# packages = { find = { include = [ "cms*", "menus*" ], exclude = [ "cms.tests*" ] } }
+packages = { find = { include = [ "cms*", "menus*" ] } }
+
+[tool.setuptools.package-data]
+"cms.management.commands" = [ "*.json" ]
+
+# Step 2 (#8733): uncomment together with the exclude above. The find exclude only
+# removes cms.tests from the package list; with include-package-data its files
+# would still ship as data of the cms package without this section.
+# [tool.setuptools.exclude-package-data]
+# cms = [ "tests/**" ]
+
+[tool.check-wheel-contents]
+# W002: intentional duplicates (test templates, icon variants)
+# W004: Django migration modules have non-identifier names (0001_...)
+# W009: cms and menus are both intentional top-level packages
+ignore = [ "W002", "W004", "W009" ]
 
 [tool.setuptools.dynamic]
 version = { attr = "cms.__version__" }
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "cms.tests.settings"
+python_files = [ "test_*.py", "*_test.py", "tests.py" ]
+testpaths = [ "cms/tests", "menus" ]
 
 [tool.flake8]
 max-line-length = 119
@@ -108,6 +132,7 @@ extend-ignore = [
   "PLR0912",  # Too many branches
   "PLR0913",  # Too many arguments to function call
   "PLR0915",  # Too many statements
+  "PLR0917",  # Too many positional arguments
 
   # TODO fix separately
   "B006",

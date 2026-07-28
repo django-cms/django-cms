@@ -59,6 +59,39 @@ ACCESS_CHOICES = (
     (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
 )
 
+#: Validation messages raised when a permission is granted without the
+#: prerequisite "can edit" (``can_change``) permission. Defined once here so the
+#: model's ``clean()`` and the admin ``PagePermissionInlineAdminForm`` cannot
+#: drift apart. Each value is a complete sentence (rather than assembled from
+#: translated fragments) so translators receive the whole string and per-language
+#: word order is preserved. Keys are the permission flags that trigger them.
+EDIT_PERMISSION_REQUIRED_MESSAGES = {
+    "can_add": _(
+        "Users can't create a page without also being able to change it. "
+        "Please also enable 'Can edit'."
+    ),
+    "can_delete": _(
+        "Users can't delete a page without also being able to change it. "
+        "Please also enable 'Can edit'."
+    ),
+    "can_publish": _(
+        "Users can't publish a page without also being able to change it. "
+        "Please also enable 'Can edit'."
+    ),
+    "can_change_advanced_settings": _(
+        "Users can't change a page's advanced settings without also being able "
+        "to change it. Please also enable 'Can edit'."
+    ),
+    "can_change_permissions": _(
+        "Users can't change a page's permissions without also being able to "
+        "change it. Please also enable 'Can edit'."
+    ),
+    "can_move_page": _(
+        "Users can't move a page without also being able to change it. "
+        "Please also enable 'Can edit'."
+    ),
+}
+
 
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
@@ -87,10 +120,20 @@ class AbstractPagePermission(models.Model):
     can_publish = models.BooleanField(_("can publish"), default=True)
     can_change_advanced_settings = models.BooleanField(_("can change advanced settings"), default=False)
     can_change_permissions = models.BooleanField(
-        _("can change permissions"), default=False, help_text=_("on page level")
+        _("can change permissions"),
+        default=False,
+        help_text=_("Allows this user to grant and revoke page permissions for other users."),
     )
     can_move_page = models.BooleanField(_("can move"), default=True)
-    can_view = models.BooleanField(_("view restricted"), default=False, help_text=_("frontend view restriction"))
+    can_view = models.BooleanField(
+        _("can view restricted pages"),
+        default=False,
+        help_text=_(
+            "Grants frontend view access. Note: as soon as any user or group is "
+            "given view access to a page, that page becomes restricted — only "
+            "users/groups with view access can then see it on the frontend."
+        ),
+    )
 
     class Meta:
         abstract = True
@@ -105,35 +148,9 @@ class AbstractPagePermission(models.Model):
         if self.can_change:
             return
 
-        if self.can_add:
-            message = _("Users can't create a page without permissions "
-                        "to change the created page. Edit permissions required.")
-            raise ValidationError(message)
-
-        if self.can_delete:
-            message = _("Users can't delete a page without permissions "
-                        "to change the page. Edit permissions required.")
-            raise ValidationError(message)
-
-        if self.can_publish:
-            message = _("Users can't publish a page without permissions "
-                        "to change the page. Edit permissions required.")
-            raise ValidationError(message)
-
-        if self.can_change_advanced_settings:
-            message = _("Users can't change page advanced settings without permissions "
-                        "to change the page. Edit permissions required.")
-            raise ValidationError(message)
-
-        if self.can_change_permissions:
-            message = _("Users can't change page permissions without permissions "
-                        "to change the page. Edit permissions required.")
-            raise ValidationError(message)
-
-        if self.can_move_page:
-            message = _("Users can't move a page without permissions "
-                        "to change the page. Edit permissions required.")
-            raise ValidationError(message)
+        for flag, message in EDIT_PERMISSION_REQUIRED_MESSAGES.items():
+            if getattr(self, flag):
+                raise ValidationError(message)
 
     @property
     def audience(self):
@@ -145,7 +162,7 @@ class AbstractPagePermission(models.Model):
     def save(self, *args, **kwargs):
         if not self.user and not self.group:
             # don't allow `empty` objects
-            return
+            raise TypeError(_('Please select user or group.'))
         return super().save(*args, **kwargs)
 
     def get_configured_actions(self):
@@ -260,16 +277,17 @@ class PermissionTuple(tuple):
         if filter != "":
             filter = f"{filter}__"
         grant_on, path = self
+        depth = len(path) // steplen
         if grant_on == ACCESS_PAGE:
             return Q(**{f"{filter}path": path})
         elif grant_on == ACCESS_CHILDREN:
-            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length": len(path) + steplen})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}depth": depth + 1})
         elif grant_on == ACCESS_DESCENDANTS:
-            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__gt": len(path)})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}depth__gt": depth})
         elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
             return Q(**{f"{filter}path__startswith": path})
         elif grant_on == ACCESS_PAGE_AND_CHILDREN:
-            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}depth__lte": depth + 1})
         return Q()
 
 

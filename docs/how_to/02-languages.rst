@@ -5,9 +5,9 @@ How to serve multiple languages
 ###############################
 
 If you used `django CMS quickstart <https://github.com/django-cms/django-cms-quickstart>`_ to start your project, you'll find
-that it's already set up for serving multilingual content. Our :ref:`installation` guide also does the same.
+that it's already set up for serving multilingual content. Our :ref:`installation guide <install-django-cms-tutorial>` also does the same.
 
-This guide specifically describes the steps required to enable multilingual support, in case you need to it manually.
+This guide specifically describes the steps required to enable multilingual support, in case you need to do it manually.
 
 
 .. _multilingual_urls:
@@ -137,14 +137,20 @@ ambiguity for multilingual pages.
 Configuring language-handling behaviour
 ***************************************
 
-:setting:`CMS_LANGUAGES` describes the all options available for determining how django CMS serves content across multiple
-languages.
+:setting:`CMS_LANGUAGES` is the setting that controls how django CMS
+serves content across multiple languages — per-language fallbacks,
+``redirect_on_fallback``, ``hide_untranslated``, the ``public`` flag,
+and per-site language configuration in multi-site projects. For the
+authoritative options, see :doc:`/reference/configuration`; for the
+*why* behind each option (fallback semantics, URL strategies,
+per-language menus), see :ref:`multilingual support
+<determining_language_preference>` in the Explanation section.
 
 
 .. _documentation: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
 
 Custom Language Resolution
----------------------------
+==========================
 
 You can override django-cms's language resolution by setting ``request.LANGUAGE_CODE`` in your own middleware. Common use cases include:
 

@@ -143,10 +143,10 @@ class FileSectionWrapper(FileOutputWrapper):
 
     def finish_warning(self, message):
         self.wrapper.write_line()
-        self.wrapper.warning(message)
+        self.wrapper.warn(message)
 
     def finish_skip(self, message):
-        self.wrapper.write_lin()
+        self.wrapper.write_line()
         self.wrapper.skip(message)
 
 

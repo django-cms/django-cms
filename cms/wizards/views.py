@@ -56,6 +56,10 @@ class WizardCreateView(SessionWizardView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # The wizard is always shown inside the CMS modal. Surface ``is_popup`` to the
+        # template context so that ``admin/base.html`` natively omits the header.
+        context['is_popup'] = True
+
         if self.is_second_step():
             context['wizard_entry'] = self.get_selected_entry()
         return context
@@ -90,12 +94,22 @@ class WizardCreateView(SessionWizardView):
 
         # We need to grab the page from pre-validated data so that the wizard
         # has it to prepare the list of valid entries.
+        #
+        # ``get_form`` is re-entered while a form is built: resolving the step-2
+        # form list (``get_form_list``) calls ``get_cleaned_data_for_step('0')``,
+        # which rebuilds the step-0 form -- and, with empty storage, would reset
+        # ``page_pk`` to ``None``. Save and restore it so the inner call can't
+        # clobber the value the outer call still needs in ``get_form_kwargs``.
+        previous_page_pk = getattr(self, 'page_pk', None)
         if data:
             page_key = f"{step}-page"
             self.page_pk = data.get(page_key, None)
         else:
             self.page_pk = None
-        return super().get_form(step, data, files)
+        try:
+            return super().get_form(step, data, files)
+        finally:
+            self.page_pk = previous_page_pk
 
     def get_form_kwargs(self, step=None):
         """This is called by self.get_form()"""

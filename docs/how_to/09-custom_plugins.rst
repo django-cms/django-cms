@@ -682,6 +682,9 @@ functionality:
         # You can also specify a list of plugins that are accepted as children,
         # or leave it away completely to accept all
         # child_classes = ['ChildCMSPlugin']
+        # Entries may be glob patterns, e.g. child_classes = ['Bootstrap*'].
+        # As a special case, child_classes = 'auto' accepts exactly those plugins
+        # that name this plugin in their parent_classes (the children opt in).
 
         def render(self, context, instance, placeholder):
             context = super().render(context, instance, placeholder)
@@ -693,12 +696,16 @@ functionality:
         render_template = "child.html"
         name = "Child"
         model = ChildPlugin
-        require_parent = (
-            True  # Is it required that this plugin is a child of another plugin?
-        )
-        # You can also specify a list of plugins that are accepted as parents,
-        # or leave it away completely to accept all
-        # parent_classes = ['ParentCMSPlugin']
+        # Restricting which plugins are accepted as parents is preferred over
+        # setting require_parent = True: naming concrete parent_classes already
+        # forces the plugin to have a parent, so the two together are redundant.
+        # Here "*" expands to every registered plugin, meaning any plugin is an
+        # acceptable parent -- but the plugin must have one (it cannot be added
+        # directly to a placeholder).
+        parent_classes = ['*']
+        # Narrow this down to specific parents whenever you can, e.g.
+        # parent_classes = ['ParentCMSPlugin']. Entries may be glob patterns,
+        # e.g. parent_classes = ['Bootstrap*'].
 
         def render(self, context, instance, placeholder):
             context = super(ChildCMSPlugin, self).render(context, instance, placeholder)
@@ -752,7 +759,7 @@ Django CMS allows you to control which plugins can be used with which models thr
 two complementary filtering mechanisms:
 
 Plugin-level filtering (``allowed_models``)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++++++++++++++++++++++++++++++++++++++++++++
 
 The ``allowed_models`` attribute on a plugin class restricts where that plugin can be
 used. This is useful when you have a plugin that only makes sense in specific contexts.
@@ -794,7 +801,7 @@ Use plugin-based restrictions (``allowed_models``) when:
 
 
 Model-level filtering (``allowed_plugins``)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++++++++++++++++++++++++++++++++++++++++++++
 
 The ``allowed_plugins`` attribute on a model class restricts which plugins can be added
 to placeholders on that model. This is useful when you want to limit the available
@@ -835,7 +842,7 @@ Use model-level filtering (``allowed_plugins``) when:
 - You want to simplify the plugin selection for content editors
 
 Combined filtering
-^^^^^^^^^^^^^^^^^^
+++++++++++++++++++
 
 When both ``allowed_models`` (on the plugin) and ``allowed_plugins`` (on the model) are
 defined, **both filters must pass** for a plugin to be available:
@@ -866,8 +873,7 @@ In this example:
   ``allowed_plugins``)
 
 
-Example: Blog with restricted plugins
-.....................................
+**Example: Blog with restricted plugins**
 
 .. code-block:: python
 
@@ -1097,7 +1103,7 @@ This is useful for plugins that have no configurable fields or that are fully ma
 their parent plugin.
 
 Marking third-party plugins as slots
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can also mark plugins provided by third-party apps as slots without modifying
 their source code. To do so, set :attr:`~cms.plugin_base.CMSPluginBase.is_slot` on
@@ -1128,7 +1134,7 @@ an ``add_structureboard_classes`` method on the plugin's **model** (i.e. the
 return value is added as CSS classes to the ``cms-draggable`` container that wraps the
 plugin in the structure board.
 
-Combined with custom CSS — for example loaded via a :ref:`custom toolbar <admin-style-customisation>` or
+Combined with custom CSS — for example loaded via a custom toolbar or
 admin stylesheet — this lets you visually distinguish plugins based on their state or
 configuration.
 

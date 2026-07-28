@@ -1,6 +1,6 @@
 {% load i18n l10n cms_tags %}
 
-{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins is_slot=plugin.get_plugin_class.is_slot %}
+{% with allow_children=plugin.child_class_restrictions|join:"" disable_child_plugins=plugin.get_plugin_class.disable_child_plugins is_slot=plugin.get_plugin_class.is_slot %}
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
     {% if is_slot %}cms-slot{% endif %}
     {{ plugin.add_structureboard_classes|default:'' }}

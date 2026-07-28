@@ -26,10 +26,10 @@ The basic workflow for a code contribution will typically run as follows:
 
 #. Install its dependencies::
 
-    pip install -r test_requirements/django-X.Y.txt
+    pip install -r test_requirements/django-5.2.txt
 
-   Replace ``X.Y`` with whichever version of Django you want to work with.
-   Check the supported versions in the "test_requirements/" directory
+   Choose the requirements file for the supported Django version you want to test.
+   The available versions are listed in the ``test_requirements/`` directory.
 
 #. Create a new branch for your work::
 
@@ -185,4 +185,3 @@ provided by django CMS. Before attempting to write a test, take your time to exp
 ``cms.test_utils`` package and check the shipped templates, example applications and, most of all,
 the base ``testcases`` defined in ``cms.test_utils.testscases`` which provide *a lot* of useful
 methods to prepare the environment for our tests or to create useful test data.
-

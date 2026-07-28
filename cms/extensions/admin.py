@@ -6,11 +6,15 @@ from django.urls import reverse
 
 from cms.models import Page, PageContent
 from cms.utils.page_permissions import user_can_change_page
+from cms.utils.urlutils import static_with_version
 
 
 class ExtensionAdmin(admin.ModelAdmin):
     change_form_template = "admin/cms/extensions/change_form.html"
     add_form_template = "admin/cms/extensions/change_form.html"
+
+    class Media:
+        css = {"all": (static_with_version("cms/css/cms.admin.css"),)}
 
 
 class PageExtensionAdmin(ExtensionAdmin):

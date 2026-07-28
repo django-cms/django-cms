@@ -22,8 +22,19 @@ def set_current_user(user):
     """
     Assigns current user from request to context variable, used by
     CurrentUserMiddleware.
+
+    Returns the ``contextvars.Token`` for the change, so callers can restore
+    the previous value with :func:`reset_current_user`.
     """
-    _current_user.set(user)
+    return _current_user.set(user)
+
+
+def reset_current_user(token):
+    """
+    Restores the current user context variable to the value it held before the
+    ``set_current_user`` call that produced ``token``.
+    """
+    _current_user.reset(token)
 
 
 def get_current_user():
@@ -55,6 +66,28 @@ def current_user(user):
 def get_model_permission_codename(model, action):
     opts = model._meta
     return opts.app_label + '.' + get_permission_codename(action, opts)
+
+
+def user_can_view_placeholder_source(user, source):
+    """Whether ``user`` may view the placeholders attached to ``source``.
+
+    Viewing the (read-only) structure board of a frontend-editable object
+    requires only *view* permission; mutating its plugins stays gated by
+    change permission at the plugin endpoints. This lets headless reviewers
+    inspect content structure without edit rights.
+
+    Honours a custom ``has_placeholder_view_permission`` hook on the object
+    and otherwise grants access to users holding the model/object ``view`` or
+    ``change`` permission (change implies the right to view).
+    """
+    if hasattr(source, "has_placeholder_view_permission"):
+        return source.has_placeholder_view_permission(user)
+    model = type(source)
+    perms = (
+        get_model_permission_codename(model, "view"),
+        get_model_permission_codename(model, "change"),
+    )
+    return any(user.has_perm(perm) or user.has_perm(perm, source) for perm in perms)
 
 
 def _has_global_permission(user, site, action):

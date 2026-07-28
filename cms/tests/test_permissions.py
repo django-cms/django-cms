@@ -1,21 +1,33 @@
 from unittest.mock import patch
 
+from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db import OperationalError, ProgrammingError
 from django.test.utils import override_settings
 
 from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
-from cms.api import assign_user_to_page, create_page
+from cms.api import add_plugin, assign_user_to_page, create_page
 from cms.cache.permissions import (
     clear_user_permission_cache,
     get_permission_cache,
     set_permission_cache,
 )
-from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
+from cms.models import Page
+from cms.models.permissionmodels import (
+    ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_CHILDREN,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
+    PermissionTuple,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
+    user_can_delete_page,
     user_can_publish_page,
 )
 
@@ -144,3 +156,155 @@ class PermissionAdminMigrationSafetyTests(CMSTestCase):
             with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
                 # Falls back to the unfiltered list_filter (still includes 'user')
                 self.assertIn('user', admin_instance.get_list_filter(request=None))
+
+
+class PermissionTupleTests(CMSTestCase):
+    """
+    Regression tests for ``PermissionTuple.allow_list()`` building invalid
+    lookups (``page____path__length``) for ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS and ACCESS_PAGE_AND_CHILDREN (#8661).
+    """
+
+    def setUp(self):
+        self.root = create_page("root", "nav_playground.html", "en")
+        self.child = create_page("child", "nav_playground.html", "en", parent=self.root)
+        self.grandchild = create_page("grandchild", "nav_playground.html", "en", parent=self.child)
+        self.sibling = create_page("sibling", "nav_playground.html", "en")
+
+    def test_allow_list_scopes(self):
+        cases = (
+            (ACCESS_PAGE, {self.root}),
+            (ACCESS_CHILDREN, {self.child}),
+            (ACCESS_PAGE_AND_CHILDREN, {self.root, self.child}),
+            (ACCESS_DESCENDANTS, {self.child, self.grandchild}),
+            (ACCESS_PAGE_AND_DESCENDANTS, {self.root, self.child, self.grandchild}),
+        )
+        for grant_on, expected in cases:
+            with self.subTest(grant_on=grant_on):
+                perm = PermissionTuple((grant_on, self.root.path))
+                allowed = Page.objects.filter(perm.allow_list())
+                self.assertEqual(set(allowed), expected)
+
+    def test_allow_list_matches_contains(self):
+        pages = list(Page.objects.all())
+        grants = (ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
+                  ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS)
+        for grant_on in grants:
+            with self.subTest(grant_on=grant_on):
+                perm = PermissionTuple((grant_on, self.root.path))
+                expected = {page.pk for page in pages if perm.contains(page.path)}
+                allowed = Page.objects.filter(perm.allow_list()).values_list("pk", flat=True)
+                self.assertEqual(set(allowed), expected)
+
+    def test_allow_list_with_related_field_prefix(self):
+        user = self._create_user("perm-user", is_staff=True)
+        for page in (self.root, self.child, self.grandchild, self.sibling):
+            PagePermission.objects.create(page=page, user=user, grant_on=ACCESS_PAGE)
+        perm = PermissionTuple((ACCESS_PAGE_AND_CHILDREN, self.root.path))
+        matched = PagePermission.objects.filter(perm.allow_list("page"))
+        self.assertEqual({pp.page_id for pp in matched}, {self.root.pk, self.child.pk})
+@override_settings(CMS_PERMISSION=True)
+
+
+class DeletePagePlaceholderPermissionTests(CMSTestCase):
+    """
+    ``user_can_delete_page`` must evaluate the delete permission of the
+    plugins in each of the page's placeholders.
+
+    Regression tests for issue 03: the placeholder loop accessed ``.source``
+    on the queryset instead of the loop variable (``AttributeError``), and
+    the placeholder lookup filtered on the ``Placeholder`` content type
+    instead of ``PageContent``, so the loop never ran at all.
+    """
+
+    def _get_page_with_plugin(self):
+        page = self.get_permissions_test_page()
+        placeholder = page.get_placeholders("en").get(slot="body")
+        add_plugin(
+            placeholder,
+            "LinkPlugin",
+            "en",
+            name="A link",
+            external_link="https://www.django-cms.org",
+        )
+        return page
+
+    def test_user_with_plugin_permissions_can_delete_page(self):
+        page = self._get_page_with_plugin()
+        # add_default_permissions grants add/change/delete on the Link plugin model
+        user = self._create_user(
+            "page-deleter",
+            is_staff=True,
+            add_default_permissions=True,
+            permissions=["change_page", "delete_page"],
+        )
+        self.add_global_permission(user, can_change=True, can_delete=True)
+
+        self.assertTrue(user_can_delete_page(user, page))
+
+    def test_user_without_plugin_permissions_cannot_delete_page(self):
+        page = self._get_page_with_plugin()
+        # No plugin model permissions: deleting the page would delete the
+        # Link plugin in its placeholder, which this user may not do.
+        user = self._create_user(
+            "page-deleter-no-plugin-perms",
+            is_staff=True,
+            permissions=["change_page", "delete_page"],
+        )
+        self.add_global_permission(user, can_change=True, can_delete=True)
+
+        self.assertFalse(user_can_delete_page(user, page))
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_CACHE_DURATIONS={
+        'menus': 60,
+        'content': 60,
+        'permissions': 60,
+    },
+)
+class PermissionCacheInvalidationTests(CMSTestCase):
+    """
+    Saving or deleting users and changing their group memberships must
+    invalidate the permission cache.
+
+    Regression tests for issue 10: the signal handlers were connected to the
+    hardcoded ``django.contrib.auth.models.User``, so projects with a custom
+    ``AUTH_USER_MODEL`` got no cache invalidation. These tests exercise the
+    handlers through the model returned by ``get_user_model()`` and fail in
+    test runs with a custom user model (``--auth-user-model``) if the
+    binding regresses.
+    """
+
+    def setUp(self):
+        self.user_super = self._create_user("super", is_staff=True, is_superuser=True)
+        self.user_normal = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        self.home_page = create_page("home", "nav_playground.html", "en", created_by=self.user_super)
+
+    def _fill_permission_cache(self):
+        set_permission_cache(self.user_normal, "change_page", [self.home_page.id])
+        self.assertIsNotNone(get_permission_cache(self.user_normal, "change_page"))
+
+    def test_user_save_clears_permission_cache(self):
+        self._fill_permission_cache()
+        self.user_normal.save()
+        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+
+    def test_user_delete_clears_permission_cache(self):
+        self._fill_permission_cache()
+        self.user_normal.delete()
+        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+
+    def test_group_membership_change_clears_permission_cache(self):
+        group = Group.objects.create(name="permission-cache-group")
+        self._fill_permission_cache()
+        self.user_normal.groups.add(group)
+        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+
+    def test_group_delete_clears_permission_cache_of_members(self):
+        group = Group.objects.create(name="permission-cache-group")
+        self.user_normal.groups.add(group)
+        self._fill_permission_cache()
+        group.delete()
+        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))

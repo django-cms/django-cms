@@ -53,15 +53,25 @@ Start with the demo link above.
 Installation & Quickstart
 =========================
 
-Get a working setup by following the official guide (recommended).
-If you already have a Django project, you can still use the same steps and integrate django CMS incrementally.
+Create a fully configured django CMS project with a single command:
 
 .. code-block:: console
 
     python -m pip install django-cms
+    djangocms mysite --interactive
+    cd mysite
+    python -m manage runserver
+
+The ``djangocms`` command clones the official project template, installs the
+requirements, runs the migrations and creates a superuser for you. Run it
+without arguments to be guided through the available options (such as the
+headless mode) interactively.
+
+Already have a Django project? Run ``djangocms .`` in its root directory to
+add django CMS to it.
 
 Next, follow the official installation guide and tutorials:
-`Installation <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_
+`Installation <https://docs.django-cms.org/en/latest/tutorials/00-installing-django-cms.html>`_
 
 Using Docker? Check out our `django-cms-quickstart project <https://github.com/django-cms/django-cms-quickstart>`_.
 
@@ -112,14 +122,10 @@ If your business depends on django CMS, consider supporting its long-term health
 Credits
 =======
 
-* Includes icons and adapted icons from `Bootstrap <https://icons.getbootstrap.com>`_.
-* Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
-* Python tree engine powered by
-  `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
-* JavaScript tree in admin uses `jsTree <https://www.jstree.com>`_.
-* Many thanks to
-  `all the contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_
-  to django CMS!
+Many thanks to `all the contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_
+to django CMS!
+
+See `LICENSE <LICENSE>`_ for credits to third-party contributions.
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/

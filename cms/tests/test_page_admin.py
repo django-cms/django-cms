@@ -3,19 +3,22 @@ import json
 import re
 import sys
 from unittest import skipUnless
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.db import IntegrityError, connection, transaction
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
-from django.test.utils import override_settings
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.urls import clear_url_caches
 from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
+from djangocms_text.models import Text
 
 from cms import constants
 from cms.admin.pageadmin import PageContentAdmin
@@ -35,7 +38,6 @@ from cms.test_utils.util.context_managers import (
     override_placeholder_conf,
 )
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -305,18 +307,11 @@ class PageTest(PageTestBase):
 
             response = self.client.post(add_endpoint, page_data)
             new_page = Page.objects.only("id").latest("id")
-            if DJANGO_5_1:
-                expected_error = (
-                    '<ul class="errorlist"><li>Page '
-                    '<a href="{}" target="_blank">test page 1</a> '
-                    "has the same url 'test-page-1' as current page.</li></ul>"
-                ).format(self.get_page_change_uri("en", new_page))
-            else:
-                expected_error = (
-                    '<ul class="errorlist" id="id_slug_error"><li>Page '
-                    '<a href="{}" target="_blank">test page 1</a> '
-                    "has the same url 'test-page-1' as current page.</li></ul>"
-                ).format(self.get_page_change_uri("en", new_page))
+            expected_error = (
+                '<ul class="errorlist" id="id_slug_error"><li>Page '
+                '<a href="{}" target="_blank">test page 1</a> '
+                "has the same url 'test-page-1' as current page.</li></ul>"
+            ).format(self.get_page_change_uri("en", new_page))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error)
 
@@ -336,18 +331,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data(page.pk)
                 page_data["slug"] = "subpage"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">subpage</a> '
-                        "has the same url 'page/subpage' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", sub_page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">subpage</a> '
-                        "has the same url 'page/subpage' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", sub_page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">subpage</a> '
+                    "has the same url 'page/subpage' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", sub_page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -356,18 +344,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data()
                 page_data["slug"] = "child-page"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">child-page</a> '
-                        "has the same url 'child-page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", child_page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">child-page</a> '
-                        "has the same url 'child-page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", child_page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">child-page</a> '
+                    "has the same url 'child-page' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", child_page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -376,18 +357,11 @@ class PageTest(PageTestBase):
                 page_data = self.get_new_page_data()
                 page_data["slug"] = "page"
                 response = self.client.post(add_endpoint, page_data)
-                if DJANGO_5_1:
-                    expected_markup = (
-                        '<ul class="errorlist">'
-                        '<li>Page <a href="{}" target="_blank">page</a> '
-                        "has the same url 'page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page))
-                else:
-                    expected_markup = (
-                        '<ul class="errorlist" id="id_slug_error">'
-                        '<li>Page <a href="{}" target="_blank">page</a> '
-                        "has the same url 'page' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page))
+                expected_markup = (
+                    '<ul class="errorlist" id="id_slug_error">'
+                    '<li>Page <a href="{}" target="_blank">page</a> '
+                    "has the same url 'page' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", page))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
@@ -423,10 +397,7 @@ class PageTest(PageTestBase):
         data["template"] = page.template
         endpoint = self.get_page_change_uri("en", page)
         redirect_to = self.get_pages_admin_list_uri("en")
-        if DJANGO_5_1:
-            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
-        else:
-            validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
+        validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
 
         with self.subTest("Test that a redirect to the root page (valid)"):
             with self.login_user_context(superuser):
@@ -1167,13 +1138,9 @@ class PageTest(PageTestBase):
         cms_page = create_page("page", "nav_playground.html", "en")
         translation = cms_page.get_content_obj("en", fallback=False)
         expected = (
-            ('<input id="id_overwrite_url" maxlength="255" ' 'value="new-url" name="overwrite_url" type="text" />')
-            if DJANGO_4_2
-            else (
-                '<input type="text" name="overwrite_url" value="new-url" '
-                'maxlength="255" aria-describedby="id_overwrite_url_helptext" '
-                'id="id_overwrite_url">'
-            )
+            '<input type="text" name="overwrite_url" value="new-url" '
+            'maxlength="255" aria-describedby="id_overwrite_url_helptext" '
+            'id="id_overwrite_url">'
         )
         changelist = self.get_pages_admin_list_uri()
         endpoint = self.get_page_change_uri("en", cms_page)
@@ -1200,18 +1167,11 @@ class PageTest(PageTestBase):
         boo = create_page("boo", "nav_playground.html", "en")
         hoo = create_page("hoo", "nav_playground.html", "en")
         translation = hoo.get_content_obj("en", fallback=False)
-        if DJANGO_5_1:
-            expected_error = (
-                '<ul class="errorlist"><li>Page '
-                '<a href="{}" target="_blank">boo</a> '
-                "has the same url 'boo' as current page \"hoo\".</li></ul>"
-            ).format(self.get_page_change_uri("en", boo))
-        else:
-            expected_error = (
-                '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
-                '<a href="{}" target="_blank">boo</a> '
-                "has the same url 'boo' as current page \"hoo\".</li></ul>"
-            ).format(self.get_page_change_uri("en", boo))
+        expected_error = (
+            '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
+            '<a href="{}" target="_blank">boo</a> '
+            "has the same url 'boo' as current page \"hoo\".</li></ul>"
+        ).format(self.get_page_change_uri("en", boo))
 
         with self.login_user_context(superuser):
             endpoint = self.get_page_change_uri("en", hoo)
@@ -1236,12 +1196,8 @@ class PageTest(PageTestBase):
         )
         translation = cms_page.get_content_obj("en", fallback=False)
         expected = (
-            ('<input id="id_overwrite_url" maxlength="255" ' 'name="overwrite_url" type="text" />')
-            if DJANGO_4_2
-            else (
-                '<input type="text" name="overwrite_url" maxlength="255" '
-                'aria-describedby="id_overwrite_url_helptext" id="id_overwrite_url">'
-            )
+            '<input type="text" name="overwrite_url" maxlength="255" '
+            'aria-describedby="id_overwrite_url_helptext" id="id_overwrite_url">'
         )
         changelist = self.get_pages_admin_list_uri()
         endpoint = self.get_page_change_uri("en", cms_page)
@@ -1262,6 +1218,159 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
             self.assertContains(response, expected, html=True)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_slug_stored_on_page_content(self):
+        # The slug and overwrite URL are authored on the PageContent object;
+        # the PageUrl is derived from it.
+        superuser = self.get_superuser()
+        cms_page = create_page("page", "nav_playground.html", "en")
+        translation = cms_page.get_content_obj("en", fallback=False)
+        changelist = self.get_pages_admin_list_uri()
+        endpoint = self.get_page_change_uri("en", cms_page)
+
+        self.assertEqual(translation.slug, "page")
+
+        with self.login_user_context(superuser):
+            page_data = {
+                "title": translation.title,
+                "slug": "new-slug",
+                "overwrite_url": "",
+                "template": translation.template,
+            }
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, changelist)
+
+        translation.refresh_from_db()
+        self.assertEqual(translation.slug, "new-slug")
+        # The content is public (no versioning package), so the URL follows.
+        self.assertEqual(cms_page.reload().get_slug("en"), "new-slug")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_url_not_synced_for_non_public_content(self):
+        # When the edited content is not publicly visible (as with a draft
+        # version created by a versioning package), saving a new slug is stored
+        # on the content but must not touch the page's published URL.
+        superuser = self.get_superuser()
+        cms_page = create_page("page", "nav_playground.html", "en")
+        translation = cms_page.get_content_obj("en", fallback=False)
+        changelist = self.get_pages_admin_list_uri()
+        endpoint = self.get_page_change_uri("en", cms_page)
+
+        with self.login_user_context(superuser):
+            page_data = {
+                "title": "A new title",
+                "slug": "a-changed-slug",
+                "overwrite_url": "",
+                "template": translation.template,
+            }
+            with patch.object(PageContent, "is_public", return_value=False):
+                response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, changelist)
+
+        # The published URL is untouched ...
+        self.assertEqual(cms_page.get_slug("en"), "page")
+        self.assertFalse(cms_page.urls.filter(slug="a-changed-slug").exists())
+        # ... while the content carries the new slug and other saved fields.
+        translation.refresh_from_db()
+        self.assertEqual(translation.slug, "a-changed-slug")
+        self.assertEqual(translation.title, "A new title")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_update_urls_from_content(self):
+        # The publish-time hook of versioning packages: derives the PageUrl
+        # from the publicly visible content and updates descendant paths.
+        cms_page = create_page("page", "nav_playground.html", "en", slug="page")
+        child = create_page("child", "nav_playground.html", "en", parent=cms_page, slug="child")
+        translation = cms_page.get_content_obj("en", fallback=False)
+
+        translation.update(slug="renamed")
+        cms_page.update_urls_from_content("en")
+
+        self.assertEqual(cms_page.reload().get_slug("en"), "renamed")
+        self.assertEqual(child.reload().get_path("en"), "renamed/child")
+
+        # An overwrite URL on the content wins over the derived path.
+        translation.update(overwrite_url="somewhere/else")
+        cms_page.update_urls_from_content("en")
+
+        url = cms_page.reload().get_url("en")
+        self.assertEqual(url.path, "somewhere/else")
+        self.assertFalse(url.managed)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_update_urls_from_content_without_public_content(self):
+        # Without publicly visible content the path is invalidated so the page
+        # stops resolving, but the slug stays reserved.
+        cms_page = create_page("page", "nav_playground.html", "en", slug="page")
+
+        with patch.object(PageContent.objects, "filter", return_value=PageContent.objects.none()):
+            cms_page.update_urls_from_content("en")
+
+        url = cms_page.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertEqual(url.slug, "page")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_update_urls_from_content_updates_deep_descendants(self):
+        # The level-based descendant update covers the whole subtree; pages
+        # below an overwritten URL derive from its fixed path.
+        cms_page = create_page("page", "nav_playground.html", "en", slug="page")
+        child = create_page("child", "nav_playground.html", "en", parent=cms_page, slug="child")
+        grandchild = create_page("grandchild", "nav_playground.html", "en", parent=child, slug="grandchild")
+        overwritten = create_page(
+            "fixed", "nav_playground.html", "en", parent=child, slug="fixed", overwrite_url="fixed/url"
+        )
+        under_overwritten = create_page("leaf", "nav_playground.html", "en", parent=overwritten, slug="leaf")
+
+        cms_page.get_content_obj("en", fallback=False).update(slug="renamed")
+        cms_page.update_urls_from_content("en")
+
+        self.assertEqual(child.reload().get_path("en"), "renamed/child")
+        self.assertEqual(grandchild.reload().get_path("en"), "renamed/child/grandchild")
+        self.assertEqual(overwritten.reload().get_path("en"), "fixed/url")
+        self.assertEqual(under_overwritten.reload().get_path("en"), "fixed/url/leaf")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_page_url_path_unique_per_site_in_database(self):
+        # The database enforces path uniqueness per site and language ...
+        create_page("page", "nav_playground.html", "en", slug="page")
+        other = create_page("other", "nav_playground.html", "en", slug="other")
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            # a queryset update bypasses the application-level checks
+            other.urls.filter(language="en").update(path="page")
+
+        # ... while any number of unreachable pages (path=None) may coexist
+        third = create_page("third", "nav_playground.html", "en", slug="third")
+        other.urls.filter(language="en").update(path=None)
+        third.urls.filter(language="en").update(path=None)
+        self.assertEqual(PageUrl.objects.filter(path__isnull=True, language="en").count(), 2)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_unpublished_parent_invalidates_child_urls(self):
+        # When a parent loses its path (e.g. it is unpublished), its children
+        # become unreachable too: their paths are invalidated and
+        # get_absolute_url returns None instead of a fabricated slug-only url.
+        parent = create_page("parent", "nav_playground.html", "en", slug="parent")
+        child = create_page("child", "nav_playground.html", "en", parent=parent, slug="child")
+
+        with patch.object(PageContent.objects, "filter", return_value=PageContent.objects.none()):
+            parent.update_urls_from_content("en")
+
+        child = child.reload()
+        url = child.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertEqual(url.slug, "child")
+        self.assertIsNone(child.get_absolute_url("en"))
+
+        # Saving or publishing the child while the parent has no path keeps
+        # the child unreachable instead of exposing it at a slug-only path.
+        child.update_urls_from_content("en")
+
+        url = child.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertIsNone(child.get_absolute_url("en"))
 
     @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):
@@ -1441,32 +1550,43 @@ class PageTest(PageTestBase):
             self.assertTrue("form_url" in response.context_data)
             self.assertEqual(response.context_data["form_url"], form_url)
 
-    def test_pagecontent_change_view_uses_cached_url_obj(self):
+    def test_pagecontent_slug_needs_no_extra_queries(self):
+        # slug and overwrite_url live on the PageContent object itself, so
+        # read-only admin rendering needs no PageUrl lookups.
+        page1 = self.get_page()
+        content1 = self.get_pagecontent_obj(page1, "en")
+        page2 = self.get_page()
+        content2 = self.get_pagecontent_obj(page2, "en")
+
+        with self.assertNumQueries(0):
+            self.assertNotEqual(content1.slug, content2.slug)
+            self.assertIsNone(content1.overwrite_url)
+
+    def test_change_view_shows_language_tabs_for_latest_content(self):
+        """The page content change view offers the language selector for the latest content."""
         superuser = self.get_superuser()
+        page = self.get_page()
+        content = self.get_pagecontent_obj(page, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
         with self.login_user_context(superuser):
-            content_admin = PageContentAdmin(PageContent, admin.site)
-            page1 = self.get_page()
-            content1 = self.get_pagecontent_obj(page1, "en")
-            content1.page = page1
-            page2 = self.get_page()
-            content2 = self.get_pagecontent_obj(page2, "en")
+            response = self.client.get(change_url)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
 
-            content_admin.slug(content1)
-            content_admin.overwrite_url(content1)
-
-            with self.assertNumQueries(0):
-                # Slugs and overwrite urls are cached
-                slug = content_admin.slug(content1)
-                content_admin.overwrite_url(content1)
-
-            self.assertNotEqual(slug, content_admin.slug(content2))
-
-            with self.assertNumQueries(0):
-                # Both still cached
-                content_admin.overwrite_url(content1)
-                content_admin.slug(content1)
-                content_admin.slug(content2)
-                content_admin.overwrite_url(content2)
+    def test_change_view_drops_language_tabs_for_non_latest_content(self):
+        """The page content change view drops the language selector when an older (non-latest)
+        content object is shown. Switching languages back and forth would otherwise silently bring
+        up the latest content instead - confusing UX."""
+        superuser = self.get_superuser()
+        page = self.get_page()
+        content = self.get_pagecontent_obj(page, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        # Simulate a versioning package: the latest content for this language differs from the
+        # content object being shown.
+        fake_latest = type("FakeContent", (), {"pk": content.pk + 1000})()
+        with patch("cms.models.pagemodel.Page.get_admin_content", return_value=fake_latest):
+            with self.login_user_context(superuser):
+                response = self.client.get(change_url)
+        self.assertNotContains(response, 'id="page_form_lang_tabs"')
 
     def _parse_page_tree(self, response, parser_class):
         content = response.content
@@ -1585,6 +1705,75 @@ class PageTest(PageTestBase):
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
             content = force_str(parsed)
             self.assertIn(tree, content)
+
+    def test_page_tree_prefetches_page_urls(self):
+        """
+        Regression test: the page tree endpoints must fetch the ``PageUrl``
+        objects of all pages in bulk instead of issuing one query per page
+        row (triggered by ``Page.get_url_obj`` filling ``urls_cache`` from
+        ``self.urls.all()`` for every rendered row).
+        """
+        superuser = self.get_superuser()
+
+        create_page("Home", "nav_playground.html", "en")
+        for index in range(4):
+            create_page(f"Page {index}", "nav_playground.html", "en")
+
+        endpoints = (
+            self.get_admin_url(PageContent, "get_tree"),
+            self.get_admin_url(PageContent, "changelist"),
+        )
+
+        with self.login_user_context(superuser):
+            for endpoint in endpoints:
+                with self.subTest(endpoint=endpoint):
+                    with CaptureQueriesContext(connection) as queries:
+                        response = self.client.get(endpoint)
+                    self.assertEqual(response.status_code, 200)
+                    page_url_queries = [
+                        query["sql"] for query in queries.captured_queries if '"cms_pageurl"' in query["sql"]
+                    ]
+                    self.assertLessEqual(
+                        len(page_url_queries),
+                        1,
+                        "The page tree issued one PageUrl query per page instead "
+                        "of prefetching them:\n" + "\n".join(page_url_queries),
+                    )
+
+    def test_page_tree_does_not_requery_content_less_pages(self):
+        """
+        Regression test: pages without any (filtered) translations must not
+        trigger a fresh ``set_admin_content_cache`` query per row. An empty
+        admin content cache used to be indistinguishable from an unpopulated
+        one, so ``get_admin_content`` / ``get_languages`` re-queried the
+        database for every content-less page in the tree.
+        """
+        superuser = self.get_superuser()
+        endpoint = self.get_admin_url(PageContent, "get_tree")
+
+        def add_content_less_pages(count, prefix):
+            for index in range(count):
+                page = create_page(f"{prefix}-{index}", "nav_playground.html", "en")
+                PageContent.admin_manager.filter(page=page).delete()
+
+        create_page("Home", "nav_playground.html", "en")
+        add_content_less_pages(2, "empty-a")
+
+        with self.login_user_context(superuser):
+            self.client.get(endpoint)  # warm up caches (content types, permissions, ...)
+            with CaptureQueriesContext(connection) as first:
+                self.assertEqual(self.client.get(endpoint).status_code, 200)
+
+            add_content_less_pages(3, "empty-b")
+            with CaptureQueriesContext(connection) as second:
+                self.assertEqual(self.client.get(endpoint).status_code, 200)
+
+        self.assertEqual(
+            len(second.captured_queries),
+            len(first.captured_queries),
+            "The page tree issued extra queries for content-less pages:\n"
+            + "\n".join(query["sql"] for query in second.captured_queries),
+        )
 
     def test_page_tree_redirect_icon_display(self):
         """Test that redirect icon is displayed in page tree when page has redirect"""
@@ -1889,6 +2078,44 @@ class PageActionsTestCase(PageTestBase):
         titles = {result["title"] for result in results}
         self.assertIn("Bravo Site 1", titles)
         self.assertNotIn("Bravo Site 2", titles)
+
+    def test_get_list_prefetches_page_urls(self):
+        """
+        Regression test: the smart-link autocomplete endpoint resolves the
+        path/title/URL of every matching page. It must prefetch ``urls`` (and
+        ``pagecontent_set``) in bulk instead of issuing one ``PageUrl`` query
+        per matched page.
+        """
+        for index in range(4):
+            create_page(
+                f"Bravo {index}",
+                "nav_playground.html",
+                "en",
+                site=self.site,
+                slug=f"bravo-{index}",
+                created_by=self.admin,
+            )
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            with CaptureQueriesContext(connection) as queries:
+                response = self.client.get(
+                    endpoint,
+                    data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                    HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.content.decode("utf-8"))), 4)
+        page_url_queries = [
+            query["sql"] for query in queries.captured_queries if 'FROM "cms_pageurl"' in query["sql"]
+        ]
+        self.assertLessEqual(
+            len(page_url_queries),
+            1,
+            "The smart-link endpoint issued one PageUrl query per matched page:\n"
+            + "\n".join(page_url_queries),
+        )
 
     def test_actions_menu_superuser(self):
         """Test actions_menu view returns correct context for superuser"""
@@ -3430,6 +3657,35 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 200)
             new_plugins = target_placeholder.get_plugins()
             self.assertEqual(new_plugins.count(), len(plugins))
+
+    def test_copy_language_downcasts_plugins_across_placeholders_in_one_query(self):
+        page = self.get_permissions_test_page()
+        source_translation = self.get_pagecontent_obj(page, "en")
+        target_translation = self._add_translation_to_page(page)
+        source_placeholders = page.get_placeholders("en")
+        add_plugin(source_placeholders.get(slot="body"), "TextPlugin", "en", body="Body")
+        add_plugin(source_placeholders.get(slot="right-column"), "TextPlugin", "en", body="Right column")
+        endpoint = self.get_admin_url(PageContent, "copy_language", source_translation.pk)
+
+        with self.login_user_context(self.get_superuser()):
+            with CaptureQueriesContext(connection) as queries:
+                response = self.client.post(endpoint, {"target_language": target_translation.language})
+
+        plugin_batch_queries = []
+        concrete_plugin_queries = []
+        for query in queries:
+            sql = query["sql"].replace('"', "").replace("`", "")
+            if "FROM cms_cmsplugin" in sql and "placeholder_id IN" in sql:
+                plugin_batch_queries.append(query)
+            if f"FROM {Text._meta.db_table}" in sql:
+                concrete_plugin_queries.append(query)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(plugin_batch_queries), 1)
+        self.assertEqual(len(concrete_plugin_queries), 1)
+        self.assertCountEqual(
+            Text.objects.filter(language="de").values_list("body", flat=True), ["Body", "Right column"]
+        )
 
     def test_user_cant_copy_plugins_to_language(self):
         """

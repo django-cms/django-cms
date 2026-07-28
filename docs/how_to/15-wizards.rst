@@ -40,7 +40,8 @@ Then, simply subclass ``Wizard`` and instantiate it.
 
 .. note::
 
-    .. versionadded::4.0
+    .. versionadded:: 4.0
+
     Registering a wizard with the wizard_pool is no longer the preferred way to register a wizard.
     Since django CMS version 4 django CMS keeps track of wizard using ``cms_config.py``.
 
@@ -70,7 +71,7 @@ do this for ``MyApp``, it might look like this::
 .. note::
 
     If your model doesn't define a ``get_absolute_url`` function then your wizard
-    will require a :ref:`get_success_url` method.
+    will require a ``get_success_url`` method.
 
     ..  code-block:: python
 
