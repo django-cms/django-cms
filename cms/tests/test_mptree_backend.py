@@ -151,6 +151,29 @@ class PageTreeBackendTests(CMSTestCase):
         )
         self.assertTrue(beta.path < alpha.path)
 
+    def test_move_page_out_to_the_left_of_its_own_parent(self):
+        # What the admin does for "move to root position N": the target sibling
+        # is the page's own parent, so the page has to climb out of a subtree
+        # that the same layout is shifting.
+        home = create_page("Home", TEMPLATE, "en")
+        gamma = create_page("Gamma", TEMPLATE, "en")
+        delta = create_page("Delta", TEMPLATE, "en", parent=gamma)
+
+        gamma.refresh_from_db()
+        delta.refresh_from_db()
+        delta.move_page(gamma, position="left")
+
+        gamma.refresh_from_db()
+        delta.refresh_from_db()
+        self.assertEqual(delta.parent_id, None)
+        self.assertEqual(delta.depth, 1)
+        self.assertEqual(gamma.numchild, 0)
+        self.assertEqual(gamma.get_descendant_pages().count(), 0)
+        self.assertEqual(
+            list(Page.get_root_nodes().values_list("pk", flat=True)),
+            [home.pk, delta.pk, gamma.pk],
+        )
+
     def test_delete_updates_parent_numchild(self):
         page1 = create_page("home", TEMPLATE, "en")
         page2 = create_page("page2", TEMPLATE, "en", parent=page1)

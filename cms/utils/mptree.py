@@ -210,6 +210,13 @@ class MaterializedPath:
           occupied), so a single pass suffices -- halving the statements.
           A genuine down-move (e.g. moving a later sibling to an earlier slot)
           falls back to the always-safe park-then-write.
+
+        Both shortcuts assume the movers are *disjoint* subtrees. One mover can
+        sit inside another -- moving a node to a slot relative to its own parent
+        or uncle -- and then rewriting the outer subtree first would drag the
+        inner one along and leave its recorded ``old_path`` matching nothing.
+        Those layouts always park, deepest path first, so that by the time an
+        ancestor is rewritten its nested mover is already out of the way.
         """
         known = dict(info or {})
         missing = [pk for pk in ordered_pks if pk not in known]
@@ -234,8 +241,19 @@ class MaterializedPath:
             movers.append((pk, step, target_prefix, obj.path, target_depth - obj.depth, old_slot))
 
         needs_park = any(slot is not None and step < slot for _, step, _, _, _, slot in movers)
+        if not needs_park:
+            # Nested movers (one mover's subtree contains another's) cannot be
+            # rewritten in place either. If a path is a proper prefix of another
+            # every path sorting between them shares that prefix, so comparing
+            # sorted neighbours is enough to spot it.
+            in_order = sorted(m[3] for m in movers)
+            needs_park = any(
+                b.startswith(a) for a, b in zip(in_order, in_order[1:], strict=False)
+            )
         if needs_park:
-            for pk, _, _, old_path, _, _ in movers:
+            # Deepest first: parking a nested subtree before its ancestor keeps
+            # the ancestor's rewrite from touching it.
+            for pk, _, _, old_path, _, _ in sorted(movers, key=lambda m: len(m[3]), reverse=True):
                 self._reprefix(old_prefix=old_path, new_prefix=f"~{pk}~", depth_delta=0)
             for pk, _, target_prefix, _, depth_delta, _ in movers:
                 self._reprefix(old_prefix=f"~{pk}~", new_prefix=target_prefix, depth_delta=depth_delta)

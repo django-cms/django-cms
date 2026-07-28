@@ -112,6 +112,43 @@ class MaterializedPathDriverTests(TestCase):
         self.mp.move(b, a, "first-child")
         self.assertEqual(self.mp.children(a).first().name, "b")
 
+    def test_move_out_from_under_a_shifted_sibling(self):
+        # Regression: the node being moved lives *inside* a sibling that the
+        # layout has to shift. Rewriting that sibling's subtree first used to
+        # drag the node along, so its own rewrite then matched nothing and it
+        # stayed buried (admin "move to root position N" hit exactly this).
+        gamma = self.mp.add_root(name="gamma")
+        delta = self.mp.add_child(gamma, name="delta")
+
+        self.mp.move(delta, gamma, "left")  # left of its own parent
+
+        delta.refresh_from_db()
+        gamma.refresh_from_db()
+        self.assertEqual(
+            list(self.mp.roots().values_list("name", flat=True)), ["delta", "gamma"]
+        )
+        self.assertEqual((delta.depth, delta.parent_id), (1, None))
+        self.assertEqual(self.mp.descendants(gamma).count(), 0)
+        self.assertEqual(gamma.numchild, 0)
+
+    def test_move_out_from_under_an_uncle(self):
+        # Same nesting hazard one level over: `c` sits under `b`, and landing it
+        # first-child of `r` shifts both `a` and `b` down a slot.
+        r = self.mp.add_root(name="r")
+        self.mp.add_child(r, name="a")
+        b = self.mp.add_child(r, name="b")
+        c = self.mp.add_child(b, name="c")
+
+        self.mp.move(c, r, "first-child")
+
+        c.refresh_from_db()
+        b.refresh_from_db()
+        self.assertEqual(
+            list(self.mp.children(r).values_list("name", flat=True)), ["c", "a", "b"]
+        )
+        self.assertEqual((c.depth, c.parent_id), (2, r.pk))
+        self.assertEqual(b.numchild, 0)
+
     def test_move_into_own_subtree_raises(self):
         r = self.mp.add_root(name="r")
         c = self.mp.add_child(r, name="c")
