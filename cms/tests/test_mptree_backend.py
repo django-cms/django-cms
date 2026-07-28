@@ -16,13 +16,15 @@ Guardrail + functional tests for the swappable tree backend.
   cover (build, query, move).
 """
 
+from unittest import skipUnless
+
 from django.test import SimpleTestCase
 from treebeard.mp_tree import MP_Node
 
 from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.mptree import MaterializedPathMixin, get_tree_base
+from cms.utils.mptree import MaterializedPathMixin, get_tree_base, get_tree_backend
 
 TEMPLATE = "nav_playground.html"
 
@@ -289,8 +291,14 @@ class PageQuerySetDeleteTests(CMSTestCase):
 
         self.assertEqual(Page.objects.count(), 0)
 
+    @skipUnless(
+        get_tree_backend() == "mptree",
+        "treebeard's own delete() clamps with GREATEST(numchild - n, 0), which "
+        "raises on MySQL instead of clamping -- not ours to fix.",
+    )
     def test_delete_never_makes_numchild_negative(self):
-        # A stale/corrupt numchild cache must not be driven below zero.
+        # A stale/corrupt numchild cache must not be driven below zero -- and
+        # must not blow up on MySQL's unsigned column either.
         root, a, b, a1, a2 = self._tree()
         Page.objects.filter(pk=root.pk).update(numchild=0)
 

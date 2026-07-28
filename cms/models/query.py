@@ -2,8 +2,7 @@ import warnings
 from collections import Counter
 
 from django.db import models
-from django.db.models import F
-from django.db.models.functions import Greatest
+from django.db.models import Case, F, When
 
 from cms.exceptions import NoHomeFound
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
@@ -38,7 +37,16 @@ class PageQuerySet(get_queryset_base()):
         result = models.QuerySet.delete(self, *args, **kwargs)
         for parent_id, num_lost in lost.items():
             self.model._base_manager.filter(pk=parent_id).update(
-                numchild=Greatest(F("numchild") - num_lost, 0)
+                # Floored at zero in case the cache was already stale. Not with
+                # Greatest(F("numchild") - n, 0): ``numchild`` is unsigned, so
+                # MySQL raises "value is out of range" on the subtraction before
+                # GREATEST ever sees it. CASE evaluates its branch lazily and so
+                # only subtracts where the result cannot underflow.
+                numchild=Case(
+                    When(numchild__gte=num_lost, then=F("numchild") - num_lost),
+                    default=0,
+                    output_field=models.PositiveIntegerField(),
+                )
             )
         return result
 
