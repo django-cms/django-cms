@@ -398,6 +398,17 @@ class MaterializedPathDriverTests(TestCase):
     def setUp(self):
         self.mp = MaterializedPath(Category)
 
+    def test_int2str(self):
+        test_matrix = (
+            (1, "1"),
+            (10, "A"),
+            (100, "2S"),
+            (1000, "RS"),
+            (10000, "7PS"),
+        )
+        for num, exp_str in test_matrix:
+            self.assertEqual(exp_str, self.mp._int2str(num))
+
     def test_tree_root_of_and_empty_ancestors(self):
         r = self.mp.add_root(name="r")
         c = self.mp.add_child(r, name="c")
