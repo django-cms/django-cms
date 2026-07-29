@@ -1,7 +1,7 @@
 """
-Dependency-free materialized-path tree backend (experimental).
+Dependency-free materialized-path tree backend
 
-This explores replacing the ``django-treebeard`` dependency for the page tree
+This replaces the ``django-treebeard`` dependency for the page tree
 by treating ``parent_id`` as the single source of truth and maintaining
 ``path``/``depth``/``numchild`` as a derived, set-based-recomputed cache.
 
@@ -634,7 +634,7 @@ def get_queryset_base():
 #
 # Status: NOT IMPLEMENTED. Deliberate future step. Requires a one-time data
 # migration and ends treebeard byte-compatibility (so it cannot be hot-swapped
-# back to treebeard). Captured here so the design isn't lost.
+# back to treebeard). Documented for potential future dev
 #
 # ----------------------------------------------------------------------
 # Why
