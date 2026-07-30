@@ -20,7 +20,7 @@ def validate_dependencies():
 
     # treebeard is only required for the (default) treebeard tree backend; the
     # dependency-free mptree backend neither imports nor needs it.
-    if get_tree_backend() == "treebeard" and not app_is_installed("treebeard"):
+    if get_tree_backend().uses_treebeard and not app_is_installed("treebeard"):
         raise ImproperlyConfigured(
             'django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.'
         )

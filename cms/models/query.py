@@ -10,7 +10,7 @@ from cms.utils.mptree import get_queryset_base, get_tree_backend
 
 # Resolved once at import time (same as the model base in pagemodel.py). In
 # mptree mode the base is a plain QuerySet and treebeard is never imported.
-_USING_TREEBEARD = get_tree_backend() == "treebeard"
+_USING_TREEBEARD = get_tree_backend().uses_treebeard
 
 
 class PageQuerySet(get_queryset_base()):

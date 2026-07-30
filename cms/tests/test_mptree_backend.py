@@ -22,7 +22,8 @@ import time
 from collections import defaultdict
 from unittest import skipIf
 
-from django.test import SimpleTestCase, TestCase, TransactionTestCase
+from django.db import models
+from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
 from treebeard.mp_tree import MP_Node
 
 from cms.api import create_page
@@ -32,6 +33,9 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.utils.mptree import (
     MaterializedPath,
     MaterializedPathMixin,
+    TreeBackend,
+    check_tree_backend,
+    get_queryset_base,
     get_tree_backend,
     get_tree_base,
 )
@@ -39,9 +43,28 @@ from cms.utils.mptree import (
 TEMPLATE = "nav_playground.html"
 
 mptree_only = skipIf(
-    get_tree_backend() == "treebeard",
+    get_tree_backend().uses_treebeard,
     "mptree backend only -- run with CMS_TREE_BACKEND=mptree",
 )
+
+
+class TreeBackendConfigurationTests(SimpleTestCase):
+    @override_settings(CMS_TREE_BACKEND="mptree")
+    def test_mptree_is_a_valid_backend(self):
+        self.assertEqual(check_tree_backend(), [])
+
+    @override_settings(CMS_TREE_BACKEND="treebeard")
+    def test_treebeard_is_a_valid_backend(self):
+        self.assertEqual(check_tree_backend(), [])
+
+    def test_invalid_backend_values_are_reported_by_django_checks(self):
+        for value in ("typo", "", "MPTREE"):
+            with self.subTest(value=value), override_settings(CMS_TREE_BACKEND=value):
+                errors = check_tree_backend()
+
+                self.assertEqual(len(errors), 1)
+                self.assertEqual(errors[0].id, "cms.E002")
+                self.assertIn(repr(value), errors[0].msg)
 
 
 @mptree_only
@@ -72,7 +95,9 @@ class TreeFieldParityTests(SimpleTestCase):
         self.assertEqual(mp, self.TREE_FIELDS)
 
     def test_selector_matches_active_backend(self):
+        self.assertIs(get_tree_backend(), TreeBackend.MPTREE)
         self.assertIs(get_tree_base(), MaterializedPathMixin)
+        self.assertIs(get_queryset_base(), models.QuerySet)
 
     def test_queryset_is_treebeard_free_in_mptree_mode(self):
         # The page queryset must not inherit from treebeard when the mptree

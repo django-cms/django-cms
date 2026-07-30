@@ -33,13 +33,78 @@ step, not part of this drop-in backend.
 """
 
 from collections import defaultdict
+from enum import Enum
 
+from django.conf import settings
+from django.core.checks import Error, register
 from django.db import models, transaction
 from django.db.models import F, Value
 from django.db.models.functions import Concat, Substr
 
 DEFAULT_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 DEFAULT_STEPLEN = 4
+_MISSING = object()
+
+
+class TreeBackend(str, Enum):
+    """Supported page-tree implementations."""
+
+    TREEBEARD = "treebeard"
+    MPTREE = "mptree"
+
+    @property
+    def uses_treebeard(self):
+        return self is self.TREEBEARD
+
+    @property
+    def model_base(self):
+        if self is self.MPTREE:
+            return MaterializedPathMixin
+
+        from treebeard.mp_tree import MP_Node
+
+        return MP_Node
+
+    @property
+    def queryset_base(self):
+        if self is self.MPTREE:
+            return models.QuerySet
+
+        from treebeard.mp_tree import MP_NodeQuerySet
+
+        return MP_NodeQuerySet
+
+
+def _configured_tree_backend():
+    """Return the explicit setting, or the environment/default fallback."""
+    import os
+
+    configured = getattr(settings, "CMS_TREE_BACKEND", _MISSING)
+    if configured is _MISSING:
+        return os.environ.get("CMS_TREE_BACKEND", TreeBackend.TREEBEARD.value)
+    return configured
+
+
+def _resolve_tree_backend(configured):
+    try:
+        return TreeBackend(configured)
+    except (TypeError, ValueError):
+        return None
+
+
+@register()
+def check_tree_backend(app_configs=None, **kwargs):
+    """Report invalid backend names without allowing selector disagreement."""
+    configured = _configured_tree_backend()
+    if _resolve_tree_backend(configured) is not None:
+        return []
+    return [
+        Error(
+            f"CMS_TREE_BACKEND has unsupported value {configured!r}.",
+            hint="Use 'treebeard' or 'mptree'.",
+            id="cms.E002",
+        )
+    ]
 
 
 class MaterializedPath:
@@ -583,49 +648,24 @@ class MaterializedPathMixin(models.Model):
         return result
 
 
+_ACTIVE_TREE_BACKEND = (
+    _resolve_tree_backend(_configured_tree_backend()) or TreeBackend.TREEBEARD
+)
+
+
 def get_tree_backend():
-    """
-    The active page-tree backend: ``"treebeard"`` (default) or ``"mptree"``,
-    from the ``CMS_TREE_BACKEND`` setting. An env var of the same name overrides
-    the setting only when the setting is not explicitly defined, which keeps the
-    backends swappable in CI / subprocess tests without touching the settings
-    module. Resolved at import time, so a change requires a process restart --
-    but no migration, because both backends declare identical fields.
-
-    ``treebeard`` is imported lazily (only by the selectors below, only when this
-    returns ``"treebeard"``), so the ``mptree`` backend never imports it.
-    """
-    import os
-
-    from django.conf import settings
-
-    return getattr(settings, "CMS_TREE_BACKEND", None) or os.environ.get(
-        "CMS_TREE_BACKEND", "treebeard"
-    )
+    """Return the process-wide, centrally resolved page-tree backend."""
+    return _ACTIVE_TREE_BACKEND
 
 
 def get_tree_base():
     """Base model class for ``Page`` -- treebeard's ``MP_Node`` or our mixin."""
-    if get_tree_backend() == "mptree":
-        return MaterializedPathMixin
-
-    from treebeard.mp_tree import MP_Node
-
-    return MP_Node
+    return get_tree_backend().model_base
 
 
 def get_queryset_base():
-    """
-    Base class for ``PageQuerySet``. Treebeard mode keeps ``MP_NodeQuerySet``
-    (its only contribution is a tree-fixup ``delete``); mptree mode uses a plain
-    Django ``QuerySet`` so treebeard is not imported at all.
-    """
-    if get_tree_backend() == "mptree":
-        return models.QuerySet
-
-    from treebeard.mp_tree import MP_NodeQuerySet
-
-    return MP_NodeQuerySet
+    """Return the queryset base supplied by the active backend."""
+    return get_tree_backend().queryset_base
 
 
 # ======================================================================
