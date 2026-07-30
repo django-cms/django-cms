@@ -812,6 +812,12 @@ class ExistingProjectMixin:
             flag = when.get("flag")
             if flag and flag not in declared_options:
                 raise CommandError(f"Invalid installation rules: unknown option flag '{flag}'.")
+            not_flag = when.get("not_flag")
+            if not_flag and not_flag not in declared_options:
+                raise CommandError(
+                    "Invalid installation rules: unknown negative option flag "
+                    f"'{not_flag}'."
+                )
             modes = when.get("mode")
             if modes is not None:
                 mode_definition = options.get("mode")
@@ -844,13 +850,15 @@ class ExistingProjectMixin:
     def _rule_applies(when, options):
         """Evaluate a rule condition against the command options.
 
-        ``when`` may contain a ``flag`` (the option must be truthy) and/or a
-        ``mode`` (a list of matching ``--mode`` values). A missing/empty
-        condition always applies.
+        ``when`` may contain a ``flag`` (the option must be truthy), a
+        ``not_flag`` (the option must be false), and/or a ``mode`` (a list of
+        matching ``--mode`` values). A missing/empty condition always applies.
         """
         if not when:
             return True
         if "flag" in when and not options.get(when["flag"]):
+            return False
+        if "not_flag" in when and options.get(when["not_flag"]):
             return False
         if "mode" in when and options.get("mode") not in when["mode"]:
             return False

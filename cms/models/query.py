@@ -1,12 +1,14 @@
 import warnings
-from collections import Counter
 
 from django.db import models, transaction
-from django.db.models import Case, F, When
 
 from cms.exceptions import NoHomeFound
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
-from cms.utils.mptree import get_queryset_base, get_tree_backend
+from cms.utils.mptree import (
+    get_queryset_base,
+    get_tree_backend,
+    lock_tree_namespace,
+)
 
 # Resolved once at import time (same as the model base in pagemodel.py). In
 # mptree mode the base is a plain QuerySet and treebeard is never imported.
@@ -30,25 +32,20 @@ class PageQuerySet(get_queryset_base()):
         # covers bulk ``Page.objects.filter(...).delete()``.)
         using = self.db
         with transaction.atomic(using=using):
+            lock_tree_namespace(self.model, using)
             rows = list(self.values_list("pk", "parent_id"))
             deleted = {pk for pk, _ in rows}
-            lost = Counter(
+            affected_parents = {
                 parent_id for _, parent_id in rows
                 if parent_id is not None and parent_id not in deleted
-            )
+            }
             result = models.QuerySet.delete(self, *args, **kwargs)
-            for parent_id, num_lost in lost.items():
+            for parent_id in affected_parents:
+                numchild = self.model._base_manager.using(using).filter(
+                    parent_id=parent_id
+                ).count()
                 self.model._base_manager.using(using).filter(pk=parent_id).update(
-                    # Floored at zero in case the cache was already stale. Not with
-                    # Greatest(F("numchild") - n, 0): ``numchild`` is unsigned, so
-                    # MySQL raises "value is out of range" on the subtraction before
-                    # GREATEST ever sees it. CASE evaluates its branch lazily and so
-                    # only subtracts where the result cannot underflow.
-                    numchild=Case(
-                        When(numchild__gte=num_lost, then=F("numchild") - num_lost),
-                        default=0,
-                        output_field=models.PositiveIntegerField(),
-                    )
+                    numchild=numchild
                 )
         return result
 

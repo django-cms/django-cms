@@ -237,6 +237,18 @@ class LoadInstallRulesTests(SimpleTestCase):
                 command.load_install_rules()
         self.assertIn("unknown option flag", str(raised.exception))
 
+    def test_unknown_negative_option_flag_raises(self):
+        rules = bundled_rules(
+            installed_apps=[{"items": ["cms"], "when": {"not_flag": "unknown"}}]
+        )
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = json.dumps(rules).encode()
+        command = make_command()
+        with mock.patch("urllib.request.urlopen", return_value=response):
+            with self.assertRaises(CommandError) as raised:
+                command.load_install_rules()
+        self.assertIn("unknown negative option flag", str(raised.exception))
+
 
 class ParserOptionTests(SimpleTestCase):
     def test_custom_template_defines_command_options(self):
@@ -374,6 +386,8 @@ class EditingHelperTests(SimpleTestCase):
         self.assertTrue(Command._rule_applies({"mode": ["headless", "hybrid"]}, options))
         self.assertFalse(Command._rule_applies({"mode": ["traditional"]}, options))
         self.assertFalse(Command._rule_applies({"flag": "versioning", "mode": ["traditional"]}, options))
+        self.assertTrue(Command._rule_applies({"not_flag": "stories"}, options))
+        self.assertFalse(Command._rule_applies({"not_flag": "versioning"}, options))
 
 
 class PackageDerivationTests(SimpleTestCase):

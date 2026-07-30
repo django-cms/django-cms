@@ -24,12 +24,6 @@ The module ships three things:
 The path encoding is byte-for-byte compatible with treebeard's defaults
 (base-36 alphabet, ``steplen=4``, no separators), so existing ``path`` values
 remain valid in either direction.
-
-A future redesign that removes sibling renumbering and the depth/width ceilings
-("fractional ordering") is sketched in the **PHASE 2 DESIGN NOTE** at the bottom
-of this module. It is intentionally *not* implemented: it requires a one-time
-migration and ends treebeard byte-compatibility, so it is a deliberate later
-step, not part of this drop-in backend.
 """
 
 from collections import defaultdict
@@ -39,6 +33,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.core.checks import Error, register
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models, router, transaction
 from django.db.models import F, Value
 from django.db.models.functions import Concat, Length, Substr
@@ -71,6 +66,10 @@ class TreeCorruptionError(ValueError):
         self.node_ids = set(node_ids)
 
 
+class TreeScopeError(ValueError):
+    """Raised when a mutation would cross a tree namespace such as a site."""
+
+
 @dataclass(frozen=True)
 class TreeIssue:
     code: str
@@ -93,6 +92,23 @@ def _atomic_on_driver(method):
             return method(self, *args, **kwargs)
 
     return wrapped
+
+
+def lock_tree_namespace(model, using):
+    """Lock the stable row that serializes a model's global page-path space."""
+    try:
+        site_field = model._meta.get_field("site")
+    except FieldDoesNotExist:
+        return False
+    site_model = site_field.remote_field.model
+    return (
+        site_model._base_manager.using(using)
+        .order_by("pk")
+        .select_for_update()
+        .values_list("pk", flat=True)
+        .first()
+        is not None
+    )
 
 
 class TreeBackend(str, Enum):
@@ -188,6 +204,10 @@ class MaterializedPath:
         self.alphabet = alphabet
         self.radix = len(alphabet)
         self.path_max_length = model._meta.get_field("path").max_length
+        self.has_site_namespace = any(
+            field.name == "site"
+            for field in model._meta.get_fields()
+        )
         self.scope = scope or {}
         self.lock = lock
         self.db_alias = using or router.db_for_write(model)
@@ -228,6 +248,24 @@ class MaterializedPath:
             raise TreePathOverflow(
                 f"Path requires {required} characters but "
                 f"{self.model._meta.label}.path allows {self.path_max_length}."
+            )
+
+    def _validate_namespace(self, reference, instance, attrs):
+        if not self.has_site_namespace:
+            return
+        if instance is not None:
+            site_id = instance.site_id
+        elif "site_id" in attrs:
+            site_id = attrs["site_id"]
+        elif "site" in attrs:
+            site = attrs["site"]
+            site_id = site.pk if hasattr(site, "pk") else site
+        else:
+            site_id = None
+        if site_id is not None and site_id != reference.site_id:
+            raise TreeScopeError(
+                f"Cannot place a {self.model._meta.label} from site {site_id} "
+                f"in the tree for site {reference.site_id}."
             )
 
     def step_of(self, path):
@@ -444,6 +482,11 @@ class MaterializedPath:
                 .select_for_update()
             )
 
+    def _lock_namespace(self):
+        if self.lock:
+            return lock_tree_namespace(self.model, self.db_alias)
+        return False
+
     # -- low-level subtree rewrite --------------------------------------
 
     def _reprefix(self, *, old_prefix, new_prefix, depth_delta):
@@ -577,7 +620,8 @@ class MaterializedPath:
 
     @_atomic_on_driver
     def add_root(self, instance=None, **attrs):
-        self._lock_rows(*self.roots().values_list("pk", flat=True))
+        if not self._lock_namespace():
+            self._lock_rows(*self.roots().values_list("pk", flat=True))
         step = self._last_root_step() + 1
         return self._materialise(
             instance, attrs, path=self.segment(step), depth=1, parent=None
@@ -586,7 +630,10 @@ class MaterializedPath:
     @_atomic_on_driver
     def add_child(self, parent, position="last-child", instance=None, **attrs):
         _validate_position(position, CHILD_POSITIONS)
+        self._validate_namespace(parent, instance, attrs)
+        self._lock_namespace()
         self._lock_rows(parent.pk)
+        parent.refresh_from_db(using=self.db_alias)
         step = self._last_child_step(parent.path, parent.depth) + 1
         node = self._materialise(
             instance,
@@ -606,6 +653,10 @@ class MaterializedPath:
     @_atomic_on_driver
     def add_sibling(self, node, position="last-sibling", instance=None, **attrs):
         _validate_position(position, SIBLING_POSITIONS)
+        self._validate_namespace(node, instance, attrs)
+        self._lock_namespace()
+        self._lock_rows(node.pk)
+        node.refresh_from_db(using=self.db_alias)
         parent = node.parent
         if parent is None:
             new = self.add_root(instance=instance, **attrs)
@@ -640,9 +691,15 @@ class MaterializedPath:
         ``left``/``right`` (relative to sibling ``target``).
         """
         _validate_position(pos, MOVE_POSITIONS)
+        self._lock_namespace()
         self._lock_rows(node.pk, target.pk)
         node.refresh_from_db(using=self.db_alias)
         target.refresh_from_db(using=self.db_alias)
+        if self.has_site_namespace and node.site_id != target.site_id:
+            raise TreeScopeError(
+                f"Cannot move a {self.model._meta.label} from site "
+                f"{node.site_id} to site {target.site_id}."
+            )
         old_parent_id = node.parent_id
         if pos in ("left", "right"):
             new_parent_id = target.parent_id
@@ -726,6 +783,7 @@ class MaterializedPath:
         not creation order -- so no separate ``position`` field is needed for
         order to survive a rebuild.
         """
+        self._lock_namespace()
         rows = list(
             self._scoped().order_by("path").values("pk", "parent_id")
         )
@@ -800,8 +858,16 @@ class MaterializedPathMixin(models.Model):
     # -- driver ----------------------------------------------------------
 
     @classmethod
-    def _tree(cls):
-        return MaterializedPath(cls, steplen=cls.steplen, alphabet=cls.alphabet)
+    def _tree(cls, using=None):
+        return MaterializedPath(
+            cls,
+            steplen=cls.steplen,
+            alphabet=cls.alphabet,
+            using=using,
+        )
+
+    def _instance_tree(self):
+        return type(self)._tree(using=self._state.db)
 
     # -- treebeard-compatible API ---------------------------------------
 
@@ -827,33 +893,38 @@ class MaterializedPathMixin(models.Model):
 
     def add_child(self, instance=None, **attrs):
         attrs.pop("parent", None)  # redundant: the parent is `self`
-        return self._tree().add_child(self, instance=instance, **attrs)
+        return self._instance_tree().add_child(self, instance=instance, **attrs)
 
     def add_sibling(self, pos="last-sibling", instance=None, **attrs):
         attrs.pop("parent", None)
         attrs.pop("parent_id", None)
-        return self._tree().add_sibling(self, position=pos, instance=instance, **attrs)
+        return self._instance_tree().add_sibling(
+            self,
+            position=pos,
+            instance=instance,
+            **attrs,
+        )
 
     def move(self, target, pos="last-child"):
-        self._tree().move(self, target, pos)
+        self._instance_tree().move(self, target, pos)
 
     def get_children(self):
-        return self._tree().children(self)
+        return self._instance_tree().children(self)
 
     def get_descendants(self):
-        return self._tree().descendants(self)
+        return self._instance_tree().descendants(self)
 
     def get_ancestors(self):
-        return self._tree().ancestors(self)
+        return self._instance_tree().ancestors(self)
 
     def get_root(self):
-        return self._tree().root_of(self)
+        return self._instance_tree().root_of(self)
 
     def get_parent(self, update=False):
         return self.parent
 
     def get_first_child(self):
-        return self._tree().children(self).first()
+        return self._instance_tree().children(self).first()
 
     def is_root(self):
         return self.depth == 1
@@ -872,8 +943,8 @@ class MaterializedPathMixin(models.Model):
 
     def get_siblings(self):
         if self.parent_id is None:
-            return self._tree().roots()
-        return self._tree().children(self.parent)
+            return self._instance_tree().roots()
+        return self._instance_tree().children(self.parent)
 
     def delete(self, *args, **kwargs):
         # Deleting a node removes it from its parent's child set; keep the
@@ -907,110 +978,3 @@ def get_tree_base():
 def get_queryset_base():
     """Return the queryset base supplied by the active backend."""
     return get_tree_backend().queryset_base
-
-
-# ======================================================================
-# PHASE 2 DESIGN NOTE -- FRACTIONAL ORDERING
-# ======================================================================
-#
-# Status: NOT IMPLEMENTED. Deliberate future step. Requires a one-time data
-# migration and ends treebeard byte-compatibility (so it cannot be hot-swapped
-# back to treebeard). Documented for potential future dev
-#
-# ----------------------------------------------------------------------
-# Why
-# ----------------------------------------------------------------------
-# This backend stores sibling order as contiguous base-36 steps inside `path`.
-# Two consequences follow from that single choice:
-#
-#   * Inserting/reordering in the middle of a sibling group renumbers the
-#     following siblings -- `_layout()` rewrites O(width) subtrees. (Benchmarked:
-#     a first-child move into a 2000-wide group is ~840 ms, on par with
-#     treebeard, because both renumber.) The `last-child` fast path is a single
-#     statement; only mid-inserts pay this.
-#   * Fixed `steplen=4` + `path <= 255` caps the tree at ~63 levels deep and
-#     36^4 (~1.6M) siblings per node.
-#
-# Fractional ordering removes BOTH by separating "structure" from "order" into
-# two explicit source-of-truth columns and demoting `path` to a pure read cache.
-#
-# ----------------------------------------------------------------------
-# Model
-# ----------------------------------------------------------------------
-#   class FractionalTreeMixin(models.Model):
-#       # --- source of truth ---
-#       parent   = FK("self", null=True, on_delete=CASCADE, related_name="children")
-#       position = CharField(max_length=255)   # fractional / LexoRank key, e.g.
-#                                               # "a0", "a0V", "a1"; sibling-local
-#       # --- derived read cache (rebuildable from parent_id + position) ---
-#       path      = TextField()                 # SEP-joined ancestor position keys
-#       path_hash = CharField(max_length=40, unique=True)   # sha1(path); see below
-#       depth     = PositiveIntegerField()
-#       numchild  = PositiveIntegerField(default=0)
-#
-#       class Meta:
-#           constraints = [UniqueConstraint(fields=["parent", "position"])]
-#           indexes = [Index(fields=["path_hash"])]  # + a prefix index for LIKE
-#
-# `(parent_id, position)` is the complete, minimal source of truth. `path`,
-# `depth`, `numchild` are ALL recomputable from it; `path` exists only so reads
-# stay indexed prefix scans (`path__startswith`) instead of recursion.
-#
-# Fractional key invariant: for any two sibling keys A < B there is always a key
-# strictly between them (densely-ordered strings -- append a digit when A and B
-# are adjacent). So `key_between(A, B)` lets you place/insert/reorder a node by
-# touching ONLY that node.
-#
-# ----------------------------------------------------------------------
-# Operation semantics (the payoff)
-# ----------------------------------------------------------------------
-#   * Insert between A and B: position = key_between(A.position, B.position);
-#     path = parent.path + SEP + position. ONE row. Siblings untouched -- no
-#     renumber, no `_layout`, no parking. The O(width) mid-insert -> ~O(1).
-#   * Reorder within siblings: recompute only the moved node's position between
-#     its new neighbours, then one `_reprefix` of its own subtree.
-#   * Move to a new parent: parent_id + a new position among the new siblings +
-#     one set-based subtree `_reprefix` -- same single statement as today.
-#   * Reads: unchanged. `path__startswith(prefix + SEP)` for strict descendants
-#     (the separator makes prefix matching unambiguous), `order_by("path")` for
-#     DFS order. `position` must not contain SEP.
-#
-# ----------------------------------------------------------------------
-# Gains
-# ----------------------------------------------------------------------
-#   * No sibling renumbering, ever -> mid-insert/reorder are single-node; the
-#     per-sibling loop (and any CTE written to speed it) becomes unnecessary.
-#   * No ceilings: variable-length path removes the ~63-level depth cap and the
-#     siblings-per-node cap.
-#   * Concurrency: concurrent inserts at different spots compute different keys
-#     with no shared "max+1" counter and no sibling-row locks; same-spot inserts
-#     collide only on the (parent, position) unique constraint and retry. This is
-#     the real write-concurrency win over treebeard.
-#
-# ----------------------------------------------------------------------
-# Costs / things to get right
-# ----------------------------------------------------------------------
-#   * `path` is effectively unbounded (fractional keys grow under adversarial
-#     repeated-between inserts) -> TextField. MySQL cannot put a UNIQUE index on
-#     a long/text column (767/3072-byte limit), so uniqueness lives on a
-#     `path_hash` (sha1) column, with a prefix index on `path` for LIKE.
-#   * One-time migration + end of treebeard byte-compat: backfill `position` from
-#     each node's current sibling (path-step) order, then recompute every `path`
-#     in the SEP encoding. After this, hot-swapping BACK to treebeard is no
-#     longer possible.
-#   * Own `key_between(a, b)`: ~100 lines, pure Python, no dependency (base-N
-#     midpoint, append a digit when neighbours are adjacent). It is the
-#     correctness core -- test it hard (adjacent keys, empty bounds, long chains).
-#   * Occasional key renormalisation: if a hot spot grows keys long, a rare
-#     maintenance pass reassigns short keys to a parent's children (same class as
-#     `rebuild()`, off the hot path).
-#
-# ----------------------------------------------------------------------
-# Net
-# ----------------------------------------------------------------------
-# parent_id = structure, position = order, path = indexed read cache (with depth
-# /numchild), all caches rebuildable from the first two. Deletes the renumber
-# problem and the depth/width ceilings; strongest concurrency story. Cost: one
-# irreversible migration, a TextField path + hash for MySQL uniqueness, and
-# owning key generation. Reads are unchanged.
-# ======================================================================

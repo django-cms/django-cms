@@ -138,14 +138,13 @@ Add to ``settings.py``:
 
     SITE_ID = 1
 
-    CMS_TREE_BACKEND = "mptree"
-
     X_FRAME_OPTIONS = "SAMEORIGIN"
 
-The native ``mptree`` backend does not require django-treebeard. Existing
-projects that need the compatibility backend can install it explicitly with
-``pip install "django-cms[treebeard]"``, add ``"treebeard"`` to
-``INSTALLED_APPS``, and set ``CMS_TREE_BACKEND = "treebeard"``.
+The stable page-tree backend requires ``pip install "django-cms[treebeard]"``
+and ``"treebeard"`` in ``INSTALLED_APPS``. To opt in to the experimental
+dependency-free backend, omit that app and set::
+
+    CMS_TREE_BACKEND = "mptree"
 
 Language settings
 =================

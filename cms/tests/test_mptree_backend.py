@@ -20,13 +20,22 @@ means asserting on upstream behaviour we cannot fix.
 import os
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from io import StringIO
+from threading import Barrier
 from unittest import skipIf
 
+from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
-from django.db import DatabaseError, connection, models
-from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
+from django.db import DatabaseError, close_old_connections, connection, models
+from django.test import (
+    SimpleTestCase,
+    TestCase,
+    TransactionTestCase,
+    override_settings,
+    skipUnlessDBFeature,
+)
 from treebeard.mp_tree import MP_Node
 
 from cms.api import create_page
@@ -41,6 +50,7 @@ from cms.utils.mptree import (
     TreeBackend,
     TreeCorruptionError,
     TreePathOverflow,
+    TreeScopeError,
     check_tree_backend,
     get_queryset_base,
     get_tree_backend,
@@ -171,6 +181,50 @@ class PageTreeBackendTests(CMSTestCase):
         self.assertIn(a.pk, b.get_descendant_pages().values_list("pk", flat=True))
         self.assertIn(
             a_child.pk, b.get_descendant_pages().values_list("pk", flat=True)
+        )
+
+    def test_move_rejects_cross_site_parent(self):
+        other_site = Site.objects.create(
+            domain="other.example.com",
+            name="Other",
+        )
+        source = create_page("source", TEMPLATE, "en")
+        child = create_page("child", TEMPLATE, "en", parent=source)
+        destination = create_page("destination", TEMPLATE, "de", site=other_site)
+
+        with self.assertRaises(TreeScopeError):
+            child.move_page(destination, position="last-child")
+
+        child.refresh_from_db()
+        self.assertEqual(child.parent_id, source.pk)
+        self.assertEqual(child.site_id, source.site_id)
+
+    def test_add_child_rejects_an_instance_from_another_site(self):
+        other_site = Site.objects.create(
+            domain="other.example.com",
+            name="Other",
+        )
+        parent = create_page("parent", TEMPLATE, "en")
+        child = Page(site=other_site)
+
+        with self.assertRaises(TreeScopeError):
+            parent.add_child(instance=child)
+
+        self.assertIsNone(child.pk)
+
+    def test_validate_reports_a_cross_site_parent(self):
+        other_site = Site.objects.create(
+            domain="other.example.com",
+            name="Other",
+        )
+        parent = create_page("parent", TEMPLATE, "en")
+        child = create_page("child", TEMPLATE, "en", parent=parent)
+        Page.objects.filter(pk=child.pk).update(site=other_site)
+
+        issues = Page.validate_tree()
+
+        self.assertTrue(
+            any(issue.node_id == child.pk and issue.code == "site" for issue in issues)
         )
 
     def test_move_left_orders_db_correctly(self):
@@ -405,16 +459,16 @@ class PageQuerySetDeleteTests(CMSTestCase):
 
         self.assertEqual(Page.objects.count(), 0)
 
-    def test_delete_never_makes_numchild_negative(self):
-        # A stale/corrupt numchild cache must not be driven below zero -- and
-        # must not blow up on MySQL's unsigned column either.
+    def test_delete_recomputes_a_stale_numchild_cache(self):
+        # Parent links are authoritative, so deletion repairs a stale cache
+        # instead of flooring it and hiding the corruption.
         root, a, b, a1, a2 = self._tree()
         Page.objects.filter(pk=root.pk).update(numchild=0)
 
         Page.objects.filter(pk=a.pk).delete()
 
         root.refresh_from_db()
-        self.assertEqual(root.numchild, 0)
+        self.assertEqual(root.numchild, 1)
 
     def test_delete_on_empty_queryset_is_a_noop(self):
         root, a, b, a1, a2 = self._tree()
@@ -450,10 +504,11 @@ class PageQuerySetDeleteTests(CMSTestCase):
         root.refresh_from_db()
         self.assertEqual(root.numchild, 2)  # stale, not 1
 
-        # ...whereas the same removal through delete() does fix the cache.
+        # ...whereas the next removal through delete() recomputes the cache
+        # from authoritative parent links and repairs the earlier stale value.
         Page.objects.filter(pk=b.pk).delete()
         root.refresh_from_db()
-        self.assertEqual(root.numchild, 1)
+        self.assertEqual(root.numchild, 0)
 
     def test_delete_fast_on_empty_queryset_is_a_noop(self):
         root, a, b, a1, a2 = self._tree()
@@ -477,10 +532,42 @@ class PageQuerySetDeleteTests(CMSTestCase):
         root.refresh_from_db()
         self.assertEqual(root.numchild, 1)
 
+    def test_page_instance_delete_recomputes_a_stale_numchild_cache(self):
+        root, a, b, a1, a2 = self._tree()
+        Page.objects.filter(pk=root.pk).update(numchild=99)
+
+        a.delete()
+
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+
 
 
 @mptree_only
 class PageTreeTransactionTests(TransactionTestCase):
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_concurrent_first_root_creation_uses_distinct_paths(self):
+        Page.objects.all().delete()
+        site_id = Site.objects.get_current().pk
+        barrier = Barrier(2)
+
+        def create_root():
+            close_old_connections()
+            try:
+                barrier.wait()
+                return Page.add_root(instance=Page(site_id=site_id)).pk
+            finally:
+                close_old_connections()
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            root_ids = list(executor.map(lambda _: create_root(), range(2)))
+
+        self.assertEqual(len(set(root_ids)), 2)
+        self.assertEqual(
+            Page.objects.filter(pk__in=root_ids).values("path").distinct().count(),
+            2,
+        )
+
     def test_delete_rolls_back_when_parent_cache_update_fails(self):
         if connection.vendor != "sqlite":
             self.skipTest("The failure trigger in this test uses SQLite syntax.")
@@ -551,6 +638,17 @@ class MaterializedPathDatabaseAliasTests(TransactionTestCase):
         self.assertEqual((root._state.db, child._state.db), ("other", "other"))
         self.assertEqual(Category.objects.using("other").count(), 2)
 
+    def test_instance_api_keeps_the_database_it_was_loaded_from(self):
+        site = Site.objects.using("other").get(pk=Site.objects.get_current().pk)
+        root = MaterializedPath(Page, using="other").add_root(
+            instance=Page(site=site)
+        )
+
+        child = root.add_child(site=site)
+
+        self.assertEqual((root._state.db, child._state.db), ("other", "other"))
+        self.assertTrue(Page.objects.using("other").filter(pk=child.pk).exists())
+
 
 @mptree_only
 class MaterializedPathDriverTests(TestCase):
@@ -583,6 +681,16 @@ class MaterializedPathDriverTests(TestCase):
 
         root.refresh_from_db()
         self.assertEqual((Category.objects.count(), root.numchild), (1, 0))
+
+    def test_add_child_refreshes_parent_after_acquiring_locks(self):
+        root = self.mp.add_root(name="root")
+        parent = self.mp.add_child(root, name="parent")
+        new_parent_path = root.path + self.mp.segment(2)
+        Category.objects.filter(pk=parent.pk).update(path=new_parent_path)
+
+        child = self.mp.add_child(parent, name="child")
+
+        self.assertEqual(child.path, new_parent_path + self.mp.segment(1))
 
     def test_rebuild_rejects_parent_cycles_without_partial_writes(self):
         root = self.mp.add_root(name="root")

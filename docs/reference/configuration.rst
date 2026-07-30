@@ -22,16 +22,16 @@ should come *after* ``cms``.
 CMS_TREE_BACKEND
 ================
 
-Selects the page-tree implementation. New projects should use the native
-backend::
+Selects the page-tree implementation. The native backend is experimental and
+must be enabled explicitly::
 
     CMS_TREE_BACKEND = "mptree"
 
-The compatibility value ``"treebeard"`` requires
+Projects that do not define the setting keep the stable ``"treebeard"``
+backend. It requires
 ``pip install "django-cms[treebeard]"`` and ``"treebeard"`` in
-:setting:`django:INSTALLED_APPS`. Projects that do not define the setting keep
-the treebeard backend for upgrade compatibility. Any other value is reported
-as a Django system-check error.
+:setting:`django:INSTALLED_APPS`. Any other value is reported as a Django
+system-check error.
 
 
 .. _middleware:

@@ -1,5 +1,5 @@
 {
-    "comment": "Rules used by `djangocms .` to add django CMS to an existing project. Fetched from the cms-template repository (branch matching the installed django CMS major.minor), with this file as the bundled fallback. Top-level keys starting with `$` (such as `$schema`) and this comment are ignored. The `options` object describes template-owned command options. Each `when` condition may contain a `flag` (truthy command option) and/or a `mode` (list of matching --mode values). For installed_apps and middleware a rule may also carry a `before` or `after` anchor (an existing entry) for positional insertion; otherwise items are appended. A url rule may carry `\"i18n\": true` to route its pattern through `i18n_patterns()` (so the CMS catch-all keeps its language prefix) when the project's urls.py already uses i18n_patterns; otherwise the pattern is added to the plain urlpatterns list. The `warnings` list holds `{message, when}` entries; each message whose condition matches is printed to the screen (for example, should djangocms-stories be discontinued, add {\"message\": \"The --stories option no longer has any effect: djangocms-stories has been discontinued.\", \"when\": {\"flag\": \"stories\"}}).",
+    "comment": "Rules used by `djangocms .` to add django CMS to an existing project. Fetched from the cms-template repository (branch matching the installed django CMS major.minor), with this file as the bundled fallback. Top-level keys starting with `$` (such as `$schema`) and this comment are ignored. The `options` object describes template-owned command options. Each `when` condition may contain a `flag` (truthy command option), a `not_flag` (false command option), and/or a `mode` (list of matching --mode values). For installed_apps and middleware a rule may also carry a `before` or `after` anchor (an existing entry) for positional insertion; otherwise items are appended. A url rule may carry `\"i18n\": true` to route its pattern through `i18n_patterns()` (so the CMS catch-all keeps its language prefix) when the project's urls.py already uses i18n_patterns; otherwise the pattern is added to the plain urlpatterns list. The `warnings` list holds `{message, when}` entries; each message whose condition matches is printed to the screen (for example, should djangocms-stories be discontinued, add {\"message\": \"The --stories option no longer has any effect: djangocms-stories has been discontinued.\", \"when\": {\"flag\": \"stories\"}}).",
     "options": {
         "mode": {
             "type": "choice",
@@ -38,6 +38,12 @@
             "default": false,
             "label": "Add undo/redo history",
             "help": "Adds djangocms-history to the project (default: off)."
+        },
+        "native_tree": {
+            "type": "boolean",
+            "default": false,
+            "label": "Use experimental native page tree",
+            "help": "Uses the dependency-free native page-tree backend (default: off)."
         }
     },
     "installed_apps": [
@@ -70,6 +76,7 @@
                 "djangocms_link"
             ]
         },
+        {"items": ["treebeard"], "after": "menus", "when": {"not_flag": "native_tree"}},
         {"items": ["djangocms_versioning"], "when": {"flag": "versioning"}},
         {"items": ["djangocms_moderation"], "when": {"flag": "moderation"}},
         {"items": ["djangocms_alias"], "when": {"flag": "alias"}},
@@ -101,7 +108,7 @@
         }
     ],
     "settings": [
-        {"name": "CMS_TREE_BACKEND", "snippet": "CMS_TREE_BACKEND = \"mptree\""},
+        {"name": "CMS_TREE_BACKEND", "snippet": "CMS_TREE_BACKEND = \"mptree\"", "when": {"flag": "native_tree"}},
         {"name": "SITE_ID", "snippet": "SITE_ID = 1"},
         {"name": "X_FRAME_OPTIONS", "snippet": "X_FRAME_OPTIONS = \"SAMEORIGIN\""},
         {"name": "LANGUAGES", "snippet": "LANGUAGES = [\n    (\"{language_code}\", \"{language_name}\"),\n]"},
@@ -113,6 +120,7 @@
         {"pattern": "path(\"\", include(\"cms.urls\"))", "i18n": true, "when": {"mode": ["traditional", "hybrid"]}}
     ],
     "packages": {
+        "treebeard": "django-treebeard>=4.3",
         "filer": "django-filer",
         "djangocms_history": "djangocms-history>=3",
         "rest_framework": "djangorestframework",

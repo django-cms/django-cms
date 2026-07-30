@@ -372,12 +372,22 @@ jobs:
         cache: 'pip'
     - name: Install django CMS without compatibility extra
       run: |
-        python -m pip install --upgrade pip uv
+        python -m pip install --upgrade pip uv build
         uv pip install --system -e .
-    - name: Check and migrate without treebeard
+    - name: Check source install without treebeard
       run: |
         python -c "import importlib.util; assert importlib.util.find_spec('treebeard') is None"
         python -m unittest cms.tests.test_mptree_packaging -v
+    - name: Check wheel install and migration upgrade without treebeard
+      run: |
+        python -m build --wheel
+        python -m venv /tmp/django-cms-native-wheel
+        /tmp/django-cms-native-wheel/bin/pip install dist/django_cms-*.whl
+        cd /tmp
+        CMS_TREE_BACKEND=mptree /tmp/django-cms-native-wheel/bin/python -m unittest \
+          cms.tests.test_mptree_packaging.NativeBackendPackagingTests.test_historical_migration_imports_without_treebeard \
+          cms.tests.test_mptree_packaging.NativeBackendPackagingTests.test_native_backend_checks_and_migrates_without_treebeard \
+          -v
 
   coverage:
     name: Coverage

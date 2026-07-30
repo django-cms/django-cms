@@ -21,7 +21,7 @@ from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
-from cms.utils.mptree import get_tree_base
+from cms.utils.mptree import get_tree_base, lock_tree_namespace
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
@@ -640,10 +640,14 @@ class Page(MP_Node):
             type(self), instance=self
         )
         with transaction.atomic(using=using):
+            lock_tree_namespace(type(self), using)
             Page.get_tree(self).using(using).delete_fast()
             if self.parent_id is not None:
+                numchild = Page.objects.using(using).filter(
+                    parent_id=self.parent_id
+                ).count()
                 Page.objects.using(using).filter(id=self.parent_id).update(
-                    numchild=models.F("numchild") - 1
+                    numchild=numchild
                 )
             transaction.on_commit(
                 lambda: self.clear_cache(menu=True),
