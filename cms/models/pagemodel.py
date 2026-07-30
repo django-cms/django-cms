@@ -198,7 +198,9 @@ class Page(MP_Node):
             kwargs["instance"].parent_id = self.parent_id
         else:
             kwargs["parent_id"] = self.parent_id
-        return super().add_sibling(*args, **kwargs)
+        if pos is None:
+            return super().add_sibling(*args, **kwargs)
+        return super().add_sibling(pos=pos, *args, **kwargs)
 
     def get_cached_ancestors(self):
         if self._has_cached_hierarchy():

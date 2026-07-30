@@ -31,6 +31,7 @@ from cms.models import Page
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.mptree import (
+    InvalidTreePosition,
     MaterializedPath,
     MaterializedPathMixin,
     TreeBackend,
@@ -457,6 +458,50 @@ class MaterializedPathDriverTests(TestCase):
             ["c", "a", "b"],
         )
 
+    def test_invalid_positions_fail_without_mutating_the_tree(self):
+        root = self.mp.add_root(name="root")
+        child = self.mp.add_child(root, name="child")
+        original = snapshot()
+
+        operations = (
+            lambda: self.mp.add_child(root, position="middle-child", name="new"),
+            lambda: self.mp.add_sibling(child, position="middle-sibling", name="new"),
+            lambda: self.mp.move(child, root, "middle-child"),
+        )
+        for operation in operations:
+            with self.subTest(operation=operation), self.assertRaises(InvalidTreePosition):
+                operation()
+            self.assertEqual(snapshot(), original)
+
+    def test_add_sibling_positions_produce_exact_non_root_order(self):
+        root = self.mp.add_root(name="root")
+        first = self.mp.add_child(root, name="first")
+        middle = self.mp.add_child(root, name="middle")
+
+        self.mp.add_sibling(first, position="last-sibling", name="last")
+        self.mp.add_sibling(middle, position="first-sibling", name="new-first")
+        self.mp.add_sibling(middle, position="left", name="left")
+        self.mp.add_sibling(middle, position="right", name="right")
+
+        self.assertEqual(
+            list(self.mp.children(root).values_list("name", flat=True)),
+            ["new-first", "first", "left", "middle", "right", "last"],
+        )
+
+    def test_add_sibling_positions_produce_exact_root_order(self):
+        first = self.mp.add_root(name="first")
+        middle = self.mp.add_root(name="middle")
+
+        self.mp.add_sibling(first, position="last-sibling", name="last")
+        self.mp.add_sibling(middle, position="first-sibling", name="new-first")
+        self.mp.add_sibling(middle, position="left", name="left")
+        self.mp.add_sibling(middle, position="right", name="right")
+
+        self.assertEqual(
+            list(self.mp.roots().values_list("name", flat=True)),
+            ["new-first", "first", "left", "middle", "right", "last"],
+        )
+
     def test_add_sibling_all_positions(self):
         r = self.mp.add_root(name="r")
         a = self.mp.add_child(r, name="a")
@@ -597,15 +642,19 @@ class MaterializedPathMixinCoverageTests(CMSTestCase):
         # get_root is overridden on Page -> exercise the mixin's directly
         self.assertEqual(MaterializedPathMixin.get_root(b).pk, root.pk)
 
-    def test_add_sibling_via_position(self):
+    def test_page_add_sibling_forwards_exact_position(self):
         root = self._page("root")
         a = self._page("a", parent=root)
-        # position "left" routes Page.add_to_tree -> Page.add_sibling -> mixin
-        self._page("left-of-a", parent=a, position="left")
-        root.refresh_from_db()
-        # first-child into a branch -> get_first_child().add_sibling(...)
-        self._page("first", parent=root, position="first-child")
-        self.assertGreaterEqual(root.get_child_pages().count(), 1)
+        b = self._page("b", parent=root)
+
+        left = self._page("left-of-b", parent=b, position="left")
+        right = self._page("right-of-a", parent=a, position="right")
+        first = self._page("first", parent=root, position="first-child")
+
+        self.assertEqual(
+            list(root.get_child_pages().values_list("pk", flat=True)),
+            [first.pk, a.pk, right.pk, left.pk, b.pk],
+        )
 
     def test_mixin_delete_decrements_numchild(self):
         root = self._page("root")

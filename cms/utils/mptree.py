@@ -43,7 +43,22 @@ from django.db.models.functions import Concat, Substr
 
 DEFAULT_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 DEFAULT_STEPLEN = 4
+CHILD_POSITIONS = frozenset({"first-child", "last-child"})
+SIBLING_POSITIONS = frozenset({"first-sibling", "last-sibling", "left", "right"})
+MOVE_POSITIONS = CHILD_POSITIONS | frozenset({"left", "right"})
 _MISSING = object()
+
+
+class InvalidTreePosition(ValueError):
+    """Raised when a tree mutation receives an unsupported position."""
+
+
+def _validate_position(position, supported):
+    if position not in supported:
+        choices = ", ".join(sorted(supported))
+        raise InvalidTreePosition(
+            f"Unsupported tree position {position!r}; expected one of: {choices}."
+        )
 
 
 class TreeBackend(str, Enum):
@@ -365,6 +380,7 @@ class MaterializedPath:
 
     @transaction.atomic
     def add_child(self, parent, position="last-child", instance=None, **attrs):
+        _validate_position(position, CHILD_POSITIONS)
         self._lock_rows(parent.pk)
         step = self._last_child_step(parent.path, parent.depth) + 1
         node = self._materialise(
@@ -384,30 +400,27 @@ class MaterializedPath:
 
     @transaction.atomic
     def add_sibling(self, node, position="last-sibling", instance=None, **attrs):
+        _validate_position(position, SIBLING_POSITIONS)
         parent = node.parent
         if parent is None:
             new = self.add_root(instance=instance, **attrs)
-            if position in ("first-sibling", "left"):
-                # rare: reorder roots is not exercised by django-cms; left to
-                # rebuild() which canonicalises root order.
-                pass
+            if position != "last-sibling":
+                self._place_relative(new, node, position=position)
             return new
         new = self.add_child(parent, instance=instance, **attrs)
-        if position in ("last-sibling", "right"):
-            # 'right' relative to an arbitrary sibling still lands at the end in
-            # this minimal implementation unless it must sit immediately after
-            # `node`; place precisely:
-            self._place_relative(new, node, after=(position == "right"))
-        elif position in ("first-sibling", "left"):
-            self._place_relative(new, node, after=False)
+        if position != "last-sibling":
+            self._place_relative(new, node, position=position)
         return new
 
-    def _place_relative(self, node, sibling, *, after):
+    def _place_relative(self, node, sibling, *, position):
         parent = sibling.parent
         parent_path = parent.path if parent else ""
         parent_depth = parent.depth if parent else 0
         order = [pk for pk in self._ordered_child_pks(parent_path, parent_depth) if pk != node.pk]
-        idx = order.index(sibling.pk) + (1 if after else 0)
+        if position == "first-sibling":
+            idx = 0
+        else:
+            idx = order.index(sibling.pk) + (1 if position == "right" else 0)
         order.insert(idx, node.pk)
         self._layout(parent_path, parent_depth, order)
         node.refresh_from_db()
@@ -421,6 +434,7 @@ class MaterializedPath:
         ``last-child``/``first-child`` (relative to ``target``) and
         ``left``/``right`` (relative to sibling ``target``).
         """
+        _validate_position(pos, MOVE_POSITIONS)
         old_parent_id = (
             self.model._base_manager.filter(pk=node.pk)
             .values_list("parent_id", flat=True)
