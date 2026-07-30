@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from django.core.management import CommandError
 from django.db import IntegrityError
 
 from cms.models.pagemodel import Page, PageUrl
@@ -108,3 +109,24 @@ class FixTreeCommand(SubcommandsCommand):
 
         for child in pages.filter(urls__language=language).iterator():
             self._update_url_path_recursive(child, language)
+
+
+class CheckTreeCommand(SubcommandsCommand):
+    help_string = 'Validate the page tree without modifying it'
+    command_name = 'check-tree'
+
+    def handle(self, *args, **options):
+        issues = Page.validate_tree()
+        if not issues:
+            self.stdout.write('page tree is valid')
+            return
+
+        for issue in issues:
+            self.stdout.write(
+                f"Page {issue.node_id}: {issue.code}: {issue.message}"
+            )
+        raise CommandError(
+            f"page tree has {len(issues)} invariant violation(s); "
+            "run 'manage.py cms fix-tree' to repair derived fields; "
+            "parent or site errors require manual correction"
+        )

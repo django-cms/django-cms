@@ -7,7 +7,7 @@ from .subcommands.check import CheckInstallation
 from .subcommands.copy import CopyCommand
 from .subcommands.delete_orphaned_plugins import DeleteOrphanedPluginsCommand
 from .subcommands.list import ListCommand
-from .subcommands.tree import FixTreeCommand
+from .subcommands.tree import CheckTreeCommand, FixTreeCommand
 from .subcommands.uninstall import UninstallCommand
 
 
@@ -15,6 +15,7 @@ class Command(SubcommandsCommand):
     command_name = 'cms'
     subcommands = OrderedDict((
         ('check', CheckInstallation),
+        ('check-tree', CheckTreeCommand),
         ('copy', CopyCommand),
         ('delete-orphaned-plugins', DeleteOrphanedPluginsCommand),
         ('fix-tree', FixTreeCommand),

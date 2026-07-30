@@ -33,6 +33,7 @@ step, not part of this drop-in backend.
 """
 
 from collections import defaultdict
+from dataclasses import dataclass
 from enum import Enum
 from functools import wraps
 
@@ -68,6 +69,13 @@ class TreeCorruptionError(ValueError):
     def __init__(self, message, *, node_ids):
         super().__init__(message)
         self.node_ids = set(node_ids)
+
+
+@dataclass(frozen=True)
+class TreeIssue:
+    code: str
+    node_id: object
+    message: str
 
 
 def _validate_position(position, supported):
@@ -264,6 +272,131 @@ class MaterializedPath:
 
     def root_of(self, node):
         return self._scoped().get(path=node.path[0 : self.steplen])
+
+    def validate(self):
+        """Return tree invariant violations without modifying any rows."""
+        field_names = {field.name for field in self.model._meta.get_fields()}
+        values = ["pk", "parent_id", "path", "depth", "numchild"]
+        if "site" in field_names:
+            values.append("site_id")
+        rows = list(self._scoped().order_by("path").values(*values))
+        by_pk = {row["pk"]: row for row in rows}
+        present = set(by_pk)
+        children = defaultdict(list)
+        issues = []
+        invalid_paths = set()
+
+        for row in rows:
+            node_id = row["pk"]
+            parent_id = row["parent_id"]
+            path = row["path"]
+            children[parent_id].append(node_id)
+
+            if parent_id is not None and parent_id not in present:
+                issues.append(
+                    TreeIssue(
+                        "parent",
+                        node_id,
+                        f"parent {parent_id} is outside the tree scope",
+                    )
+                )
+            elif (
+                "site_id" in row
+                and parent_id is not None
+                and row["site_id"] != by_pk[parent_id]["site_id"]
+            ):
+                issues.append(
+                    TreeIssue(
+                        "site",
+                        node_id,
+                        f"site {row['site_id']} differs from parent site "
+                        f"{by_pk[parent_id]['site_id']}",
+                    )
+                )
+
+            path_is_valid = (
+                bool(path)
+                and len(path) % self.steplen == 0
+                and (
+                    self.path_max_length is None
+                    or len(path) <= self.path_max_length
+                )
+                and all(char in self.alphabet for char in path)
+            )
+            if path_is_valid:
+                path_is_valid = all(
+                    self._str2int(path[index : index + self.steplen]) > 0
+                    for index in range(0, len(path), self.steplen)
+                )
+            if not path_is_valid:
+                invalid_paths.add(node_id)
+                issues.append(
+                    TreeIssue("path", node_id, f"invalid encoded path {path!r}")
+                )
+
+        structural_depth = {}
+        stack = [
+            (node_id, 1)
+            for node_id in reversed(children.get(None, []))
+        ]
+        while stack:
+            node_id, depth = stack.pop()
+            if node_id in structural_depth:
+                continue
+            structural_depth[node_id] = depth
+            stack.extend(
+                (child_id, depth + 1)
+                for child_id in reversed(children.get(node_id, []))
+            )
+
+        for node_id in present - structural_depth.keys():
+            issues.append(
+                TreeIssue(
+                    "parent",
+                    node_id,
+                    "node is unreachable from any root, likely due to a parent cycle",
+                )
+            )
+
+        for node_id, row in by_pk.items():
+            depth = structural_depth.get(node_id)
+            numchild = len(children.get(node_id, []))
+            parent = by_pk.get(row["parent_id"])
+            path_has_structure = (
+                len(row["path"]) == self.steplen
+                if parent is None
+                else (
+                    row["path"].startswith(parent["path"])
+                    and len(row["path"]) == len(parent["path"]) + self.steplen
+                )
+            )
+            if not path_has_structure and node_id not in invalid_paths:
+                issues.append(
+                    TreeIssue(
+                        "path",
+                        node_id,
+                        f"stored {row['path']!r} does not identify one step "
+                        "below its parent",
+                    )
+                )
+            if depth is not None and row["depth"] != depth:
+                issues.append(
+                    TreeIssue(
+                        "depth",
+                        node_id,
+                        f"stored {row['depth']}, expected {depth}",
+                    )
+                )
+            if row["numchild"] != numchild:
+                issues.append(
+                    TreeIssue(
+                        "numchild",
+                        node_id,
+                        f"stored {row['numchild']}, expected {numchild}",
+                    )
+                )
+
+        return sorted(issues, key=lambda issue: (str(issue.node_id), issue.code))
 
     def _children_rows(self, parent_path, parent_depth):
         # Ordered direct children as lightweight (deferred) instances, fetched
@@ -687,6 +820,10 @@ class MaterializedPathMixin(models.Model):
     @classmethod
     def fix_tree(cls, **kwargs):
         return cls._tree().rebuild()
+
+    @classmethod
+    def validate_tree(cls):
+        return cls._tree().validate()
 
     def add_child(self, instance=None, **attrs):
         attrs.pop("parent", None)  # redundant: the parent is `self`

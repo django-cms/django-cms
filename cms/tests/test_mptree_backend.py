@@ -20,8 +20,11 @@ means asserting on upstream behaviour we cannot fix.
 import os
 import time
 from collections import defaultdict
+from io import StringIO
 from unittest import skipIf
 
+from django.core import management
+from django.core.management import CommandError
 from django.db import DatabaseError, connection, models
 from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
 from treebeard.mp_tree import MP_Node
@@ -278,6 +281,60 @@ class PageTreeBackendTests(CMSTestCase):
         r1.refresh_from_db()
         self.assertEqual(r1.get_descendant_pages().count(), 1)
         self.assertEqual(set(Page.get_root_nodes().values_list("pk", flat=True)), roots)
+
+    def test_check_tree_reports_corruption_without_mutating_it(self):
+        root = create_page("root", TEMPLATE, "en")
+        child = create_page("child", TEMPLATE, "en", parent=root)
+        corrupt_path = "0009"
+        Page.objects.filter(pk=child.pk).update(
+            path=corrupt_path,
+            depth=99,
+            numchild=3,
+        )
+        output = StringIO()
+
+        with self.assertRaises(CommandError):
+            management.call_command("cms", "check-tree", stdout=output)
+
+        report = output.getvalue()
+        self.assertIn(f"Page {child.pk}: path", report)
+        self.assertIn(f"Page {child.pk}: depth", report)
+        self.assertIn(f"Page {child.pk}: numchild", report)
+        child.refresh_from_db()
+        self.assertEqual((child.path, child.depth, child.numchild), (corrupt_path, 99, 3))
+
+    def test_fix_tree_repairs_values_reported_by_check_tree(self):
+        root = create_page("root", TEMPLATE, "en")
+        child = create_page("child", TEMPLATE, "en", parent=root)
+        Page.objects.filter(pk=child.pk).update(
+            path="0009",
+            depth=99,
+            numchild=3,
+        )
+        with self.assertRaises(CommandError):
+            management.call_command("cms", "check-tree", stdout=StringIO())
+
+        management.call_command("cms", "fix-tree", stdout=StringIO())
+        output = StringIO()
+        management.call_command("cms", "check-tree", stdout=output)
+
+        self.assertEqual(output.getvalue(), "page tree is valid\n")
+        child.refresh_from_db()
+        self.assertEqual(
+            (child.path, child.depth, child.numchild),
+            (root.path + "0001", 2, 0),
+        )
+
+    def test_check_tree_accepts_valid_sibling_step_gaps(self):
+        root = create_page("root", TEMPLATE, "en")
+        first = create_page("first", TEMPLATE, "en", parent=root)
+        second = create_page("second", TEMPLATE, "en", parent=root)
+        first.move_page(second, position="right")
+        output = StringIO()
+
+        management.call_command("cms", "check-tree", stdout=output)
+
+        self.assertEqual(output.getvalue(), "page tree is valid\n")
 
 
 @mptree_only

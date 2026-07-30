@@ -296,6 +296,21 @@ Example::
 Maintenance and repair
 **********************
 
+.. _check-tree:
+
+``check-tree``
+==============
+
+Validates the page tree without changing it. The command checks path encoding
+and parent relationships, depth and child-count caches, parent cycles, and
+cross-site parent links::
+
+    python manage.py cms check-tree
+
+It exits with an error and lists every detected violation. Use ``fix-tree`` for
+derived ``path``, ``depth``, and ``numchild`` problems. Parent-cycle,
+out-of-scope-parent, and cross-site errors require explicit manual correction.
+
 .. _fix-tree:
 
 ``fix-tree``

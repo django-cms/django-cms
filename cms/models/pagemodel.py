@@ -186,6 +186,16 @@ class Page(MP_Node):
         paths = frozenset(self.path[0:pos] for pos in range(0, len(self.path), self.steplen)[1:])
         return paths
 
+    @classmethod
+    def validate_tree(cls):
+        from cms.utils.mptree import MaterializedPath
+
+        return MaterializedPath(
+            cls,
+            steplen=cls.steplen,
+            alphabet=cls.alphabet,
+        ).validate()
+
     def add_child(self, **kwargs):
         if len(kwargs) == 1 and "instance" in kwargs:
             kwargs["instance"].parent = self
