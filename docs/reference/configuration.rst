@@ -17,6 +17,22 @@ The ``INSTALLED_APPS`` setting
 The ordering of items in ``INSTALLED_APPS`` matters. Entries for applications with plugins
 should come *after* ``cms``.
 
+.. setting:: CMS_TREE_BACKEND
+
+CMS_TREE_BACKEND
+================
+
+Selects the page-tree implementation. New projects should use the native
+backend::
+
+    CMS_TREE_BACKEND = "mptree"
+
+The compatibility value ``"treebeard"`` requires
+``pip install "django-cms[treebeard]"`` and ``"treebeard"`` in
+:setting:`django:INSTALLED_APPS`. Projects that do not define the setting keep
+the treebeard backend for upgrade compatibility. Any other value is reported
+as a Django system-check error.
+
 
 .. _middleware:
 

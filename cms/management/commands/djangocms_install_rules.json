@@ -47,7 +47,6 @@
                 "django.contrib.sites",
                 "cms",
                 "menus",
-                "treebeard",
                 "sekizai",
                 "filer",
                 "easy_thumbnails",
@@ -102,6 +101,7 @@
         }
     ],
     "settings": [
+        {"name": "CMS_TREE_BACKEND", "snippet": "CMS_TREE_BACKEND = \"mptree\""},
         {"name": "SITE_ID", "snippet": "SITE_ID = 1"},
         {"name": "X_FRAME_OPTIONS", "snippet": "X_FRAME_OPTIONS = \"SAMEORIGIN\""},
         {"name": "LANGUAGES", "snippet": "LANGUAGES = [\n    (\"{language_code}\", \"{language_name}\"),\n]"},

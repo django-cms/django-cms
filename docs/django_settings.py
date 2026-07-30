@@ -11,11 +11,12 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'django.contrib.messages',
-    'treebeard',
     'cms',
     'menus',
     'sekizai',
 ]
+
+CMS_TREE_BACKEND = 'mptree'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

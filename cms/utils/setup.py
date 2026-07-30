@@ -22,7 +22,8 @@ def validate_dependencies():
     # dependency-free mptree backend neither imports nor needs it.
     if get_tree_backend().uses_treebeard and not app_is_installed("treebeard"):
         raise ImproperlyConfigured(
-            'django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.'
+            'The treebeard page-tree backend requires the "django-cms[treebeard]" '
+            'extra and "treebeard" in INSTALLED_APPS.'
         )
 
 

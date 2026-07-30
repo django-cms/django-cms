@@ -238,7 +238,6 @@ jobs:
 
     - name: Test with django test runner (coverage enabled)
       run: coverage run manage.py test
-      continue-on-error: true
       env:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
 
@@ -297,7 +296,6 @@ jobs:
       run: |
         python -c "from django import __version__ ; print(f'Django version {__version__}')"
         coverage run manage.py test
-      continue-on-error: true
       env:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
@@ -354,7 +352,6 @@ jobs:
     - name: Test with django test runner (coverage enabled)
       run: |
         coverage run manage.py test
-      continue-on-error: true
       env:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
 
@@ -364,6 +361,23 @@ jobs:
         name: coverage-data-${{ github.job }}-${{ matrix.python-version }}-${{ matrix.requirements-file }}-mysql${{ matrix.mysql-version }}
         include-hidden-files: true
         path: '.coverage*'
+
+  native-no-treebeard:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+    - name: Install django CMS without compatibility extra
+      run: |
+        python -m pip install --upgrade pip uv
+        uv pip install --system -e .
+    - name: Check and migrate without treebeard
+      run: |
+        python -c "import importlib.util; assert importlib.util.find_spec('treebeard') is None"
+        python -m unittest cms.tests.test_mptree_packaging -v
 
   coverage:
     name: Coverage

@@ -73,7 +73,6 @@ Add django CMS and its dependencies to your requirements file:
 
     django-cms>=4.1
     django-sekizai
-    django-treebeard
 
 Or install directly:
 
@@ -109,7 +108,6 @@ Add to ``INSTALLED_APPS`` (order matters):
         # django CMS core
         "cms",
         "menus",
-        "treebeard",
         "sekizai",
 
         # Recommended plugins (if installed)
@@ -129,7 +127,6 @@ Add to ``INSTALLED_APPS`` (order matters):
 
 - django CMS needs Django's :mod:`django:django.contrib.sites` framework
 - ``cms`` and ``menus`` are the core django CMS modules
-- `django-treebeard <http://django-treebeard.readthedocs.io>`_ manages the page tree
 - `django-sekizai <https://django-sekizai.readthedocs.io>`_ handles CSS/JS blocks in templates
 
 Required settings
@@ -141,7 +138,14 @@ Add to ``settings.py``:
 
     SITE_ID = 1
 
+    CMS_TREE_BACKEND = "mptree"
+
     X_FRAME_OPTIONS = "SAMEORIGIN"
+
+The native ``mptree`` backend does not require django-treebeard. Existing
+projects that need the compatibility backend can install it explicitly with
+``pip install "django-cms[treebeard]"``, add ``"treebeard"`` to
+``INSTALLED_APPS``, and set ``CMS_TREE_BACKEND = "treebeard"``.
 
 Language settings
 =================

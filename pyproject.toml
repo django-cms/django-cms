@@ -44,12 +44,12 @@ dependencies = [
   "Django >= 5.2",
   "django-classy-tags >=0.7.2",
   "django-formtools >=2.1",
-  "django-treebeard >=4.3",
   "django-sekizai >=0.7",
 ]
 
 [project.optional-dependencies]
 admin-style = ["djangocms-simple-admin-style"]
+treebeard = ["django-treebeard >=4.3"]
 
 [project.urls]
 "Homepage" = "https://www.django-cms.org/"

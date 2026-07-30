@@ -1,8 +1,6 @@
 from django.db import migrations
 from django.db.models import F
 
-from treebeard.numconv import NumConv
-
 
 STEPLEN = 4
 ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -14,18 +12,22 @@ class MP_AddHandler():
         self.stmts = []
 
 
-try:
-    NUM = NumConv(len(ALPHABET), ALPHABET)
-except TypeError:
-    NUM = NumConv(ALPHABET)
-
-
 def _int2str(num):
-    return NUM.int2str(num)
+    result = ''
+    radix = len(ALPHABET)
+    while True:
+        result = ALPHABET[num % radix] + result
+        if num < radix:
+            return result
+        num //= radix
 
 
 def _str2int(num):
-    return NUM.str2int(num)
+    result = 0
+    radix = len(ALPHABET)
+    for char in num:
+        result = result * radix + ALPHABET.index(char)
+    return result
 
 
 def _get_basepath(path, depth):
