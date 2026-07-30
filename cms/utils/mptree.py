@@ -34,10 +34,11 @@ step, not part of this drop-in backend.
 
 from collections import defaultdict
 from enum import Enum
+from functools import wraps
 
 from django.conf import settings
 from django.core.checks import Error, register
-from django.db import models, transaction
+from django.db import models, router, transaction
 from django.db.models import F, Value
 from django.db.models.functions import Concat, Length, Substr
 
@@ -75,6 +76,15 @@ def _validate_position(position, supported):
         raise InvalidTreePosition(
             f"Unsupported tree position {position!r}; expected one of: {choices}."
         )
+
+
+def _atomic_on_driver(method):
+    @wraps(method)
+    def wrapped(self, *args, **kwargs):
+        with transaction.atomic(using=self.db_alias):
+            return method(self, *args, **kwargs)
+
+    return wrapped
 
 
 class TreeBackend(str, Enum):
@@ -149,7 +159,16 @@ class MaterializedPath:
     one forest -- matching treebeard's behaviour for the page tree.
     """
 
-    def __init__(self, model, *, steplen=DEFAULT_STEPLEN, alphabet=DEFAULT_ALPHABET, scope=None, lock=True):
+    def __init__(
+        self,
+        model,
+        *,
+        steplen=DEFAULT_STEPLEN,
+        alphabet=DEFAULT_ALPHABET,
+        scope=None,
+        lock=True,
+        using=None,
+    ):
         if not isinstance(steplen, int) or isinstance(steplen, bool) or steplen < 1:
             raise InvalidTreeConfiguration("steplen must be a positive integer.")
         if not isinstance(alphabet, str) or len(alphabet) < 2:
@@ -163,6 +182,7 @@ class MaterializedPath:
         self.path_max_length = model._meta.get_field("path").max_length
         self.scope = scope or {}
         self.lock = lock
+        self.db_alias = using or router.db_for_write(model)
 
     # -- encoding (treebeard-compatible) ---------------------------------
 
@@ -209,7 +229,7 @@ class MaterializedPath:
     # -- read queries ----------------------------------------------------
 
     def _scoped(self):
-        return self.model._default_manager.filter(**self.scope)
+        return self.model._default_manager.using(self.db_alias).filter(**self.scope)
 
     def roots(self):
         return self._scoped().filter(depth=1).order_by("path")
@@ -232,7 +252,7 @@ class MaterializedPath:
             for pos in range(self.steplen, len(node.path), self.steplen)
         ]
         if not paths:
-            return self.model._default_manager.none()
+            return self.model._default_manager.using(self.db_alias).none()
         return self._scoped().filter(path__in=paths).order_by("path")
 
     def tree(self, parent=None):
@@ -286,7 +306,7 @@ class MaterializedPath:
         pks = sorted({pk for pk in pks if pk is not None})
         if pks:
             list(
-                self.model._base_manager.filter(pk__in=pks)
+                self.model._base_manager.using(self.db_alias).filter(pk__in=pks)
                 .order_by("pk")
                 .select_for_update()
             )
@@ -411,17 +431,18 @@ class MaterializedPath:
         instance.parent = parent
         for field, value in self.scope.items():
             setattr(instance, field, value)
-        instance.save()
+        instance.save(using=self.db_alias)
         return instance
 
-    @staticmethod
-    def _bump_numchild(model, pk, delta):
+    def _bump_numchild(self, pk, delta):
         if pk is not None:
-            model._base_manager.filter(pk=pk).update(numchild=F("numchild") + delta)
+            self.model._base_manager.using(self.db_alias).filter(pk=pk).update(
+                numchild=F("numchild") + delta
+            )
 
     # -- build (append + positional insert) ------------------------------
 
-    @transaction.atomic
+    @_atomic_on_driver
     def add_root(self, instance=None, **attrs):
         self._lock_rows(*self.roots().values_list("pk", flat=True))
         step = self._last_root_step() + 1
@@ -429,7 +450,7 @@ class MaterializedPath:
             instance, attrs, path=self.segment(step), depth=1, parent=None
         )
 
-    @transaction.atomic
+    @_atomic_on_driver
     def add_child(self, parent, position="last-child", instance=None, **attrs):
         _validate_position(position, CHILD_POSITIONS)
         self._lock_rows(parent.pk)
@@ -441,15 +462,15 @@ class MaterializedPath:
             depth=parent.depth + 1,
             parent=parent,
         )
-        self._bump_numchild(self.model, parent.pk, +1)
+        self._bump_numchild(parent.pk, +1)
         parent.numchild = (parent.numchild or 0) + 1  # keep caller's instance honest
         if position == "first-child":
             existing = [pk for pk in self._ordered_child_pks(parent.path, parent.depth) if pk != node.pk]
             self._layout(parent.path, parent.depth, [node.pk] + existing)
-            node.refresh_from_db()
+            node.refresh_from_db(using=self.db_alias)
         return node
 
-    @transaction.atomic
+    @_atomic_on_driver
     def add_sibling(self, node, position="last-sibling", instance=None, **attrs):
         _validate_position(position, SIBLING_POSITIONS)
         parent = node.parent
@@ -474,11 +495,11 @@ class MaterializedPath:
             idx = order.index(sibling.pk) + (1 if position == "right" else 0)
         order.insert(idx, node.pk)
         self._layout(parent_path, parent_depth, order)
-        node.refresh_from_db()
+        node.refresh_from_db(using=self.db_alias)
 
     # -- move (single statement for append; layout for insert) -----------
 
-    @transaction.atomic
+    @_atomic_on_driver
     def move(self, node, target, pos="last-child"):
         """
         Move ``node`` (and its whole subtree). Supported ``pos``:
@@ -486,22 +507,21 @@ class MaterializedPath:
         ``left``/``right`` (relative to sibling ``target``).
         """
         _validate_position(pos, MOVE_POSITIONS)
-        old_parent_id = (
-            self.model._base_manager.filter(pk=node.pk)
-            .values_list("parent_id", flat=True)
-            .first()
-        )
+        self._lock_rows(node.pk, target.pk)
+        node.refresh_from_db(using=self.db_alias)
+        target.refresh_from_db(using=self.db_alias)
+        old_parent_id = node.parent_id
         if pos in ("left", "right"):
-            new_parent = target.parent
-            self._lock_rows(node.pk, old_parent_id, new_parent.pk if new_parent else None)
+            new_parent_id = target.parent_id
+            self._lock_rows(old_parent_id, new_parent_id)
+            new_parent = (
+                self.model._base_manager.using(self.db_alias).get(pk=new_parent_id)
+                if new_parent_id is not None
+                else None
+            )
         else:
             new_parent = target
-            self._lock_rows(node.pk, old_parent_id, target.pk)
-
-        node.refresh_from_db()
-        target.refresh_from_db()
-        if new_parent is not None:
-            new_parent.refresh_from_db()
+            self._lock_rows(old_parent_id)
 
         if new_parent is not None and (
             target.path == node.path or new_parent.path.startswith(node.path)
@@ -544,19 +564,21 @@ class MaterializedPath:
                 self._layout(parent_path, parent_depth, order, info=info)
 
         new_parent_pk = new_parent.pk if new_parent else None
-        self.model._base_manager.filter(pk=node.pk).update(parent=new_parent)
+        self.model._base_manager.using(self.db_alias).filter(pk=node.pk).update(
+            parent=new_parent
+        )
         if old_parent_id != new_parent_pk:
-            self._bump_numchild(self.model, old_parent_id, -1)
-            self._bump_numchild(self.model, new_parent_pk, +1)
+            self._bump_numchild(old_parent_id, -1)
+            self._bump_numchild(new_parent_pk, +1)
         # Keep the caller's in-memory instances honest: `node` moved, and
         # `target` may have been renumbered (left/right) or had its numchild
         # change (first/last-child) -- treebeard updates these in place too.
-        node.refresh_from_db()
-        target.refresh_from_db()
+        node.refresh_from_db(using=self.db_alias)
+        target.refresh_from_db(using=self.db_alias)
 
     # -- rebuild (recompute everything from parent_id) -------------------
 
-    @transaction.atomic
+    @_atomic_on_driver
     def rebuild(self):
         """
         Recompute every ``path``/``depth``/``numchild`` in the scope from the
@@ -608,12 +630,12 @@ class MaterializedPath:
                 node_ids=unreachable,
             )
 
-        self.model._base_manager.bulk_update(
+        self.model._base_manager.using(self.db_alias).bulk_update(
             [self.model(pk=pk, path=f"~{pk}") for pk in computed],
             ["path"],
             batch_size=500,
         )
-        self.model._base_manager.bulk_update(
+        self.model._base_manager.using(self.db_alias).bulk_update(
             [
                 self.model(pk=pk, path=p, depth=d, numchild=n)
                 for pk, (p, d, n) in computed.items()

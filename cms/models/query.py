@@ -1,7 +1,7 @@
 import warnings
 from collections import Counter
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Case, F, When
 
 from cms.exceptions import NoHomeFound
@@ -28,26 +28,28 @@ class PageQuerySet(get_queryset_base()):
         # decrementing -- mirror treebeard's behaviour using parent_id instead
         # of path. (Instance .delete() is handled on the model mixin; this path
         # covers bulk ``Page.objects.filter(...).delete()``.)
-        rows = list(self.values_list("pk", "parent_id"))
-        deleted = {pk for pk, _ in rows}
-        lost = Counter(
-            parent_id for _, parent_id in rows
-            if parent_id is not None and parent_id not in deleted
-        )
-        result = models.QuerySet.delete(self, *args, **kwargs)
-        for parent_id, num_lost in lost.items():
-            self.model._base_manager.filter(pk=parent_id).update(
-                # Floored at zero in case the cache was already stale. Not with
-                # Greatest(F("numchild") - n, 0): ``numchild`` is unsigned, so
-                # MySQL raises "value is out of range" on the subtraction before
-                # GREATEST ever sees it. CASE evaluates its branch lazily and so
-                # only subtracts where the result cannot underflow.
-                numchild=Case(
-                    When(numchild__gte=num_lost, then=F("numchild") - num_lost),
-                    default=0,
-                    output_field=models.PositiveIntegerField(),
-                )
+        using = self.db
+        with transaction.atomic(using=using):
+            rows = list(self.values_list("pk", "parent_id"))
+            deleted = {pk for pk, _ in rows}
+            lost = Counter(
+                parent_id for _, parent_id in rows
+                if parent_id is not None and parent_id not in deleted
             )
+            result = models.QuerySet.delete(self, *args, **kwargs)
+            for parent_id, num_lost in lost.items():
+                self.model._base_manager.using(using).filter(pk=parent_id).update(
+                    # Floored at zero in case the cache was already stale. Not with
+                    # Greatest(F("numchild") - n, 0): ``numchild`` is unsigned, so
+                    # MySQL raises "value is out of range" on the subtraction before
+                    # GREATEST ever sees it. CASE evaluates its branch lazily and so
+                    # only subtracts where the result cannot underflow.
+                    numchild=Case(
+                        When(numchild__gte=num_lost, then=F("numchild") - num_lost),
+                        default=0,
+                        output_field=models.PositiveIntegerField(),
+                    )
+                )
         return result
 
     def get_descendants(self, parent=None):

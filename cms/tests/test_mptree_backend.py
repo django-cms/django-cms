@@ -22,7 +22,7 @@ import time
 from collections import defaultdict
 from unittest import skipIf
 
-from django.db import models
+from django.db import DatabaseError, connection, models
 from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
 from treebeard.mp_tree import MP_Node
 
@@ -423,6 +423,79 @@ class PageQuerySetDeleteTests(CMSTestCase):
 
 
 @mptree_only
+class PageTreeTransactionTests(TransactionTestCase):
+    def test_delete_rolls_back_when_parent_cache_update_fails(self):
+        if connection.vendor != "sqlite":
+            self.skipTest("The failure trigger in this test uses SQLite syntax.")
+        root = create_page("root", TEMPLATE, "en")
+        child = create_page("child", TEMPLATE, "en", parent=root)
+        trigger = "mptree_fail_numchild_update"
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                CREATE TRIGGER {trigger}
+                BEFORE UPDATE OF numchild ON cms_page
+                WHEN OLD.id = {root.pk}
+                BEGIN
+                    SELECT RAISE(FAIL, 'forced numchild failure');
+                END
+                """
+            )
+        try:
+            with self.assertRaises(DatabaseError):
+                Page.objects.filter(pk=child.pk).delete()
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute(f"DROP TRIGGER {trigger}")
+
+        self.assertTrue(Page.objects.filter(pk=child.pk).exists())
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+
+    def test_instance_delete_rolls_back_when_parent_cache_update_fails(self):
+        if connection.vendor != "sqlite":
+            self.skipTest("The failure trigger in this test uses SQLite syntax.")
+        root = create_page("root", TEMPLATE, "en")
+        child = create_page("child", TEMPLATE, "en", parent=root)
+        trigger = "mptree_fail_instance_numchild_update"
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                CREATE TRIGGER {trigger}
+                BEFORE UPDATE OF numchild ON cms_page
+                WHEN OLD.id = {root.pk}
+                BEGIN
+                    SELECT RAISE(FAIL, 'forced numchild failure');
+                END
+                """
+            )
+        try:
+            with self.assertRaises(DatabaseError):
+                child.delete()
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute(f"DROP TRIGGER {trigger}")
+
+        self.assertTrue(Page.objects.filter(pk=child.pk).exists())
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+
+
+@mptree_only
+class MaterializedPathDatabaseAliasTests(TransactionTestCase):
+    databases = {"default", "other"}
+
+    def test_explicit_database_alias_is_used_for_the_whole_operation(self):
+        mp = MaterializedPath(Category, using="other")
+
+        root = mp.add_root(name="root")
+        child = mp.add_child(root, name="child")
+
+        self.assertEqual((root._state.db, child._state.db), ("other", "other"))
+        self.assertEqual(Category.objects.using("other").count(), 2)
+
+
+@mptree_only
 class MaterializedPathDriverTests(TestCase):
     def setUp(self):
         self.mp = MaterializedPath(Category)
@@ -493,6 +566,24 @@ class MaterializedPathDriverTests(TestCase):
         branch.refresh_from_db()
         self.assertEqual(branch.parent_id, source_root.pk)
         self.assertEqual(snapshot(), original)
+
+    def test_move_replans_from_refreshed_target_parent(self):
+        source = self.mp.add_root(name="source")
+        moving = self.mp.add_child(source, name="moving")
+        target = self.mp.add_child(source, name="target")
+        destination = self.mp.add_root(name="destination")
+        stale_target = Category.objects.get(pk=target.pk)
+        self.assertEqual(stale_target.parent.pk, source.pk)
+        self.mp.move(target, destination, "last-child")
+
+        self.mp.move(moving, stale_target, "left")
+
+        moving.refresh_from_db()
+        self.assertEqual(moving.parent_id, destination.pk)
+        self.assertEqual(
+            list(self.mp.children(destination).values_list("name", flat=True)),
+            ["moving", "target"],
+        )
 
     def test_int2str(self):
         test_matrix = (

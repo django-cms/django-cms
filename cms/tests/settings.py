@@ -122,6 +122,10 @@ TEMPLATES = [
 DATABASES = {
     "default": dj_database_url.config(default="sqlite://localhost/local.sqlite")
 }
+DATABASES["other"] = {
+    **DATABASES["default"],
+    "TEST": {"MIRROR": "default"},
+}
 
 USE_TZ = bool(os.environ.get("USE_TZ"))
 
