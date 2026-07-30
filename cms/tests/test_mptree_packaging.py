@@ -7,6 +7,84 @@ from unittest import TestCase
 
 
 class NativeBackendPackagingTests(TestCase):
+    def test_invalid_backend_reports_check_error_without_importing_treebeard(self):
+        script = """
+import builtins
+import sys
+import types
+
+real_import = builtins.__import__
+
+def import_without_treebeard(name, *args, **kwargs):
+    if name == "treebeard" or name.startswith("treebeard."):
+        raise AssertionError(f"unexpected treebeard import: {name}")
+    return real_import(name, *args, **kwargs)
+
+builtins.__import__ = import_without_treebeard
+urls = types.ModuleType("invalid_backend_test_urls")
+urls.urlpatterns = []
+sys.modules[urls.__name__] = urls
+
+from django.conf import settings
+settings.configure(
+    SECRET_KEY="invalid-backend-test",
+    ROOT_URLCONF=urls.__name__,
+    CMS_TREE_BACKEND="typo",
+    SITE_ID=1,
+    CMS_TEMPLATES=[("base.html", "Base")],
+    INSTALLED_APPS=[
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.sites",
+        "cms",
+        "menus",
+        "sekizai",
+    ],
+    DATABASES={
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    },
+    TEMPLATES=[
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "context_processors": [
+                    "django.template.context_processors.request",
+                ],
+            },
+        }
+    ],
+    DEFAULT_AUTO_FIELD="django.db.models.AutoField",
+)
+
+import django
+django.setup()
+
+from django.core.management import call_command
+from django.core.management.base import SystemCheckError
+
+try:
+    call_command("check", verbosity=0)
+except SystemCheckError as error:
+    assert "cms.E002" in str(error), error
+else:
+    raise AssertionError("invalid backend passed system checks")
+"""
+        result = subprocess.run(
+            [sys.executable, "-c", script],
+            cwd=os.getcwd(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_historical_migration_imports_without_treebeard(self):
         script = """
 import builtins
@@ -149,6 +227,20 @@ call_command(
     interactive=False,
 )
 call_command("migrate", verbosity=0, interactive=False)
+
+from django.contrib.sites.models import Site
+from cms.models import Page
+
+site = Site.objects.get_current()
+root = Page.add_root(instance=Page(site=site))
+first = root.add_child(site=site)
+second = root.add_child(site=site)
+second.move(first, "left")
+Page.fix_tree()
+assert Page.validate_tree() == []
+first.delete()
+root.refresh_from_db()
+assert root.numchild == 1
 """
         result = subprocess.run(
             [sys.executable, "-c", script],

@@ -21,6 +21,7 @@ class PageQuerySet(get_queryset_base()):
                     "Use the related fields directly.")
 
     def delete(self, *args, **kwargs):
+        get_tree_backend().ensure_valid()
         if _USING_TREEBEARD:
             # treebeard's MP_NodeQuerySet.delete removes whole subtrees by path
             # and fixes parent numchild.

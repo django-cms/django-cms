@@ -541,32 +541,114 @@ class PageQuerySetDeleteTests(CMSTestCase):
         root.refresh_from_db()
         self.assertEqual(root.numchild, 1)
 
+    def test_page_instance_delete_refreshes_stale_parent_and_path_state(self):
+        root, a, b, a1, a2 = self._tree()
+        stale_a = Page.objects.get(pk=a.pk)
+        Page.objects.get(pk=a.pk).move(Page.objects.get(pk=b.pk), "last-child")
+
+        stale_a.delete()
+
+        root.refresh_from_db()
+        b.refresh_from_db()
+        self.assertEqual((root.numchild, b.numchild), (1, 0))
+        self.assertFalse(Page.objects.filter(pk__in=[a.pk, a1.pk, a2.pk]).exists())
+
 
 
 @mptree_only
 class PageTreeTransactionTests(TransactionTestCase):
+    def _run_concurrently(self, *operations):
+        barrier = Barrier(len(operations))
+
+        def run(operation):
+            close_old_connections()
+            try:
+                barrier.wait()
+                return operation()
+            finally:
+                close_old_connections()
+
+        with ThreadPoolExecutor(max_workers=len(operations)) as executor:
+            return list(executor.map(run, operations))
+
     @skipUnlessDBFeature("has_select_for_update")
     def test_concurrent_first_root_creation_uses_distinct_paths(self):
         Page.objects.all().delete()
         site_id = Site.objects.get_current().pk
-        barrier = Barrier(2)
 
         def create_root():
-            close_old_connections()
-            try:
-                barrier.wait()
-                return Page.add_root(instance=Page(site_id=site_id)).pk
-            finally:
-                close_old_connections()
+            return Page.add_root(instance=Page(site_id=site_id)).pk
 
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            root_ids = list(executor.map(lambda _: create_root(), range(2)))
+        root_ids = self._run_concurrently(create_root, create_root)
 
         self.assertEqual(len(set(root_ids)), 2)
         self.assertEqual(
             Page.objects.filter(pk__in=root_ids).values("path").distinct().count(),
             2,
         )
+
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_concurrent_appends_under_one_parent_use_distinct_paths(self):
+        site_id = Site.objects.get_current().pk
+        root = Page.add_root(instance=Page(site_id=site_id))
+
+        def append_child():
+            parent = Page.objects.get(pk=root.pk)
+            return parent.add_child(site_id=site_id).pk
+
+        child_ids = self._run_concurrently(append_child, append_child)
+
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 2)
+        self.assertEqual(
+            Page.objects.filter(pk__in=child_ids).values("path").distinct().count(),
+            2,
+        )
+        self.assertEqual(Page.validate_tree(), [])
+
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_repair_serializes_with_normal_writes(self):
+        site_id = Site.objects.get_current().pk
+        root = Page.add_root(instance=Page(site_id=site_id))
+
+        def rebuild():
+            return Page.fix_tree()
+
+        def append_child():
+            return Page.objects.get(pk=root.pk).add_child(site_id=site_id).pk
+
+        self._run_concurrently(rebuild, append_child)
+
+        self.assertEqual(Page.validate_tree(), [])
+        root.refresh_from_db()
+        self.assertEqual(root.numchild, 1)
+
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_instance_delete_refreshes_state_after_a_concurrent_move(self):
+        site_id = Site.objects.get_current().pk
+        root = Page.add_root(instance=Page(site_id=site_id))
+        moving = root.add_child(site_id=site_id)
+        destination = root.add_child(site_id=site_id)
+
+        def move():
+            try:
+                Page.objects.get(pk=moving.pk).move(
+                    Page.objects.get(pk=destination.pk),
+                    "last-child",
+                )
+            except Page.DoesNotExist:
+                pass
+
+        def delete():
+            try:
+                Page.objects.get(pk=moving.pk).delete()
+            except Page.DoesNotExist:
+                pass
+
+        self._run_concurrently(move, delete)
+
+        self.assertFalse(Page.objects.filter(pk=moving.pk).exists())
+        self.assertEqual(Page.validate_tree(), [])
 
     def test_delete_rolls_back_when_parent_cache_update_fails(self):
         if connection.vendor != "sqlite":
@@ -640,14 +722,25 @@ class MaterializedPathDatabaseAliasTests(TransactionTestCase):
 
     def test_instance_api_keeps_the_database_it_was_loaded_from(self):
         site = Site.objects.using("other").get(pk=Site.objects.get_current().pk)
-        root = MaterializedPath(Page, using="other").add_root(
-            instance=Page(site=site)
-        )
+        root_instance = Page(site=site)
+        root_instance._state.db = "other"
 
+        root = Page.add_root(instance=root_instance)
         child = root.add_child(site=site)
 
         self.assertEqual((root._state.db, child._state.db), ("other", "other"))
         self.assertTrue(Page.objects.using("other").filter(pk=child.pk).exists())
+
+    def test_class_validation_accepts_an_explicit_database_alias(self):
+        site = Site.objects.using("other").get(pk=Site.objects.get_current().pk)
+        root = MaterializedPath(Page, using="other").add_root(instance=Page(site=site))
+        Page.objects.using("other").filter(pk=root.pk).update(depth=99)
+
+        issues = Page.validate_tree(using="other")
+
+        self.assertTrue(
+            any(issue.node_id == root.pk and issue.code == "depth" for issue in issues)
+        )
 
 
 @mptree_only

@@ -187,13 +187,15 @@ class Page(MP_Node):
         return paths
 
     @classmethod
-    def validate_tree(cls):
-        from cms.utils.mptree import MaterializedPath
+    def validate_tree(cls, using=None):
+        from cms.utils.mptree import MaterializedPath, get_tree_backend
 
+        get_tree_backend().ensure_valid()
         return MaterializedPath(
             cls,
             steplen=cls.steplen,
             alphabet=cls.alphabet,
+            using=using,
         ).validate()
 
     def add_child(self, **kwargs):
@@ -641,6 +643,7 @@ class Page(MP_Node):
         )
         with transaction.atomic(using=using):
             lock_tree_namespace(type(self), using)
+            self.refresh_from_db(using=using)
             Page.get_tree(self).using(using).delete_fast()
             if self.parent_id is not None:
                 numchild = Page.objects.using(using).filter(
@@ -727,7 +730,9 @@ class Page(MP_Node):
         return self.get_descendants().order_by("path")
 
     def get_root(self):
-        return self.__class__.objects.get(path=self.path[0 : self.steplen])
+        return self.__class__.objects.using(self._state.db).get(
+            path=self.path[0 : self.steplen]
+        )
 
     def get_parent_page(self):
         warnings.warn(

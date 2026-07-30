@@ -386,6 +386,7 @@ jobs:
         cd /tmp
         CMS_TREE_BACKEND=mptree /tmp/django-cms-native-wheel/bin/python -m unittest \
           cms.tests.test_mptree_packaging.NativeBackendPackagingTests.test_historical_migration_imports_without_treebeard \
+          cms.tests.test_mptree_packaging.NativeBackendPackagingTests.test_invalid_backend_reports_check_error_without_importing_treebeard \
           cms.tests.test_mptree_packaging.NativeBackendPackagingTests.test_native_backend_checks_and_migrates_without_treebeard \
           -v
 

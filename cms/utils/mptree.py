@@ -33,7 +33,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.core.checks import Error, register
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db import models, router, transaction
 from django.db.models import F, Value
 from django.db.models.functions import Concat, Length, Substr
@@ -121,6 +121,9 @@ class TreeBackend(str, Enum):
     def uses_treebeard(self):
         return self is self.TREEBEARD
 
+    def ensure_valid(self):
+        return None
+
     @property
     def model_base(self):
         if self is self.MPTREE:
@@ -138,6 +141,25 @@ class TreeBackend(str, Enum):
         from treebeard.mp_tree import MP_NodeQuerySet
 
         return MP_NodeQuerySet
+
+
+@dataclass(frozen=True)
+class InvalidTreeBackend:
+    """Safe model-loading descriptor for an invalid configured backend."""
+
+    configured: object
+    uses_treebeard = False
+    queryset_base = models.QuerySet
+
+    @property
+    def model_base(self):
+        return MaterializedPathMixin
+
+    def ensure_valid(self):
+        raise ImproperlyConfigured(
+            f"CMS_TREE_BACKEND has unsupported value {self.configured!r}; "
+            "use 'treebeard' or 'mptree'."
+        )
 
 
 def _configured_tree_backend():
@@ -859,6 +881,7 @@ class MaterializedPathMixin(models.Model):
 
     @classmethod
     def _tree(cls, using=None):
+        get_tree_backend().ensure_valid()
         return MaterializedPath(
             cls,
             steplen=cls.steplen,
@@ -873,23 +896,31 @@ class MaterializedPathMixin(models.Model):
 
     @classmethod
     def add_root(cls, instance=None, **attrs):
-        return cls._tree().add_root(instance=instance, **attrs)
+        using = None
+        if instance is not None:
+            using = instance._state.db or router.db_for_write(
+                cls,
+                instance=instance,
+            )
+        return cls._tree(using=using).add_root(instance=instance, **attrs)
 
     @classmethod
-    def get_root_nodes(cls):
-        return cls._tree().roots()
+    def get_root_nodes(cls, using=None):
+        return cls._tree(using=using).roots()
 
     @classmethod
-    def get_tree(cls, parent=None):
-        return cls._tree().tree(parent)
+    def get_tree(cls, parent=None, using=None):
+        if using is None and parent is not None:
+            using = parent._state.db
+        return cls._tree(using=using).tree(parent)
 
     @classmethod
-    def fix_tree(cls, **kwargs):
-        return cls._tree().rebuild()
+    def fix_tree(cls, using=None, **kwargs):
+        return cls._tree(using=using).rebuild()
 
     @classmethod
-    def validate_tree(cls):
-        return cls._tree().validate()
+    def validate_tree(cls, using=None):
+        return cls._tree(using=using).validate()
 
     def add_child(self, instance=None, **attrs):
         attrs.pop("parent", None)  # redundant: the parent is `self`
@@ -960,9 +991,10 @@ class MaterializedPathMixin(models.Model):
         return result
 
 
-_ACTIVE_TREE_BACKEND = (
-    _resolve_tree_backend(_configured_tree_backend()) or TreeBackend.TREEBEARD
-)
+_CONFIGURED_TREE_BACKEND = _configured_tree_backend()
+_ACTIVE_TREE_BACKEND = _resolve_tree_backend(_CONFIGURED_TREE_BACKEND)
+if _ACTIVE_TREE_BACKEND is None:
+    _ACTIVE_TREE_BACKEND = InvalidTreeBackend(_CONFIGURED_TREE_BACKEND)
 
 
 def get_tree_backend():
