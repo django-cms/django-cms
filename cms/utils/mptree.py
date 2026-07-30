@@ -583,7 +583,7 @@ class MaterializedPathMixin(models.Model):
         return result
 
 
-def get_tree_backend():
+def get_tree_backend() -> str:
     """
     The active page-tree backend: ``"treebeard"`` (default) or ``"mptree"``,
     from the ``CMS_TREE_BACKEND`` setting. An env var of the same name overrides
@@ -600,11 +600,11 @@ def get_tree_backend():
     from django.conf import settings
 
     return getattr(settings, "CMS_TREE_BACKEND", None) or os.environ.get(
-        "CMS_TREE_BACKEND", "treebeard"
+        "CMS_TREE_BACKEND", "mptree"
     )
 
 
-def get_tree_base():
+def get_tree_base() -> type:
     """Base model class for ``Page`` -- treebeard's ``MP_Node`` or our mixin."""
     if get_tree_backend() == "mptree":
         return MaterializedPathMixin
@@ -614,7 +614,7 @@ def get_tree_base():
     return MP_Node
 
 
-def get_queryset_base():
+def get_queryset_base() -> type:
     """
     Base class for ``PageQuerySet``. Treebeard mode keeps ``MP_NodeQuerySet``
     (its only contribution is a tree-fixup ``delete``); mptree mode uses a plain
