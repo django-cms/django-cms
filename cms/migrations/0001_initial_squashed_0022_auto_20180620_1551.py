@@ -4,7 +4,14 @@ import django.contrib.auth.models
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import migrations, models
+
+# Handle custom AUTH_USER_MODEL as in 0002_auto_20140816_1918.py
+User = get_user_model()
+
+user_model_label = '{}.{}'.format(User._meta.app_label, User._meta.model_name)
+user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
 
 
 class Migration(migrations.Migration):
@@ -370,7 +377,7 @@ class Migration(migrations.Migration):
             name="PageUser",
             fields=[
                 (
-                    "user_ptr",
+                    user_ptr_name,
                     models.OneToOneField(
                         auto_created=True,
                         on_delete=django.db.models.deletion.CASCADE,
@@ -393,7 +400,7 @@ class Migration(migrations.Migration):
                 "verbose_name": "User (page)",
                 "verbose_name_plural": "Users (page)",
             },
-            bases=("auth.user",),
+            bases=(user_model_label,),
         ),
         migrations.CreateModel(
             name="AliasPluginModel",
