@@ -31,10 +31,13 @@ from cms.models import Page
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.mptree import (
+    InvalidTreeConfiguration,
     InvalidTreePosition,
     MaterializedPath,
     MaterializedPathMixin,
     TreeBackend,
+    TreeCorruptionError,
+    TreePathOverflow,
     check_tree_backend,
     get_queryset_base,
     get_tree_backend,
@@ -423,6 +426,73 @@ class PageQuerySetDeleteTests(CMSTestCase):
 class MaterializedPathDriverTests(TestCase):
     def setUp(self):
         self.mp = MaterializedPath(Category)
+
+    def test_invalid_path_encoding_configuration_is_rejected(self):
+        invalid_options = (
+            {"alphabet": ""},
+            {"alphabet": "001"},
+            {"steplen": 0},
+        )
+        for options in invalid_options:
+            with self.subTest(options=options), self.assertRaises(InvalidTreeConfiguration):
+                MaterializedPath(Category, **options)
+
+    def test_segment_overflow_is_rejected(self):
+        mp = MaterializedPath(Category, steplen=1, alphabet="01")
+
+        self.assertEqual(mp.segment(1), "1")
+        with self.assertRaises(TreePathOverflow):
+            mp.segment(2)
+
+    def test_path_field_overflow_is_rejected_before_writing(self):
+        mp = MaterializedPath(Category, steplen=128)
+        root = mp.add_root(name="root")
+
+        with self.assertRaises(TreePathOverflow):
+            mp.add_child(root, name="child")
+
+        root.refresh_from_db()
+        self.assertEqual((Category.objects.count(), root.numchild), (1, 0))
+
+    def test_rebuild_rejects_parent_cycles_without_partial_writes(self):
+        root = self.mp.add_root(name="root")
+        child = self.mp.add_child(root, name="child")
+        Category.objects.filter(pk=root.pk).update(parent=child)
+        original = snapshot()
+
+        with self.assertRaises(TreeCorruptionError) as caught:
+            self.mp.rebuild()
+
+        self.assertEqual(caught.exception.node_ids, {root.pk, child.pk})
+        self.assertEqual(snapshot(), original)
+
+    def test_rebuild_rejects_parent_outside_the_forest_scope(self):
+        outside = self.mp.add_root(name="outside")
+        inside = self.mp.add_child(outside, name="inside")
+        scoped = MaterializedPath(Category, scope={"name": "inside"})
+        original = snapshot()
+
+        with self.assertRaises(TreeCorruptionError) as caught:
+            scoped.rebuild()
+
+        self.assertEqual(caught.exception.node_ids, {inside.pk})
+        self.assertEqual(snapshot(), original)
+
+    def test_move_rejects_descendant_path_overflow_before_reprefixing(self):
+        mp = MaterializedPath(Category, steplen=80)
+        source_root = mp.add_root(name="source-root")
+        branch = mp.add_child(source_root, name="branch")
+        mp.add_child(branch, name="leaf")
+        target_root = mp.add_root(name="target-root")
+        target = mp.add_child(target_root, name="target")
+        original = snapshot()
+
+        with self.assertRaises(TreePathOverflow):
+            mp.move(branch, target, "last-child")
+
+        branch.refresh_from_db()
+        self.assertEqual(branch.parent_id, source_root.pk)
+        self.assertEqual(snapshot(), original)
 
     def test_int2str(self):
         test_matrix = (

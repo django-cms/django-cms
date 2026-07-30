@@ -39,7 +39,7 @@ from django.conf import settings
 from django.core.checks import Error, register
 from django.db import models, transaction
 from django.db.models import F, Value
-from django.db.models.functions import Concat, Substr
+from django.db.models.functions import Concat, Length, Substr
 
 DEFAULT_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 DEFAULT_STEPLEN = 4
@@ -51,6 +51,22 @@ _MISSING = object()
 
 class InvalidTreePosition(ValueError):
     """Raised when a tree mutation receives an unsupported position."""
+
+
+class InvalidTreeConfiguration(ValueError):
+    """Raised when materialized-path encoding options are unsafe."""
+
+
+class TreePathOverflow(ValueError):
+    """Raised when a tree position cannot fit its path representation."""
+
+
+class TreeCorruptionError(ValueError):
+    """Raised when parent relationships cannot form a complete forest."""
+
+    def __init__(self, message, *, node_ids):
+        super().__init__(message)
+        self.node_ids = set(node_ids)
 
 
 def _validate_position(position, supported):
@@ -134,10 +150,17 @@ class MaterializedPath:
     """
 
     def __init__(self, model, *, steplen=DEFAULT_STEPLEN, alphabet=DEFAULT_ALPHABET, scope=None, lock=True):
+        if not isinstance(steplen, int) or isinstance(steplen, bool) or steplen < 1:
+            raise InvalidTreeConfiguration("steplen must be a positive integer.")
+        if not isinstance(alphabet, str) or len(alphabet) < 2:
+            raise InvalidTreeConfiguration("alphabet must contain at least two symbols.")
+        if len(set(alphabet)) != len(alphabet):
+            raise InvalidTreeConfiguration("alphabet symbols must be unique.")
         self.model = model
         self.steplen = steplen
         self.alphabet = alphabet
         self.radix = len(alphabet)
+        self.path_max_length = model._meta.get_field("path").max_length
         self.scope = scope or {}
         self.lock = lock
 
@@ -160,8 +183,24 @@ class MaterializedPath:
 
     def segment(self, step):
         """The fixed-width path segment for a 1-based sibling ``step``."""
+        step = int(step)
+        if step < 1 or step >= self.radix ** self.steplen:
+            raise TreePathOverflow(
+                f"Sibling step {step} does not fit in a {self.steplen}-character "
+                f"base-{self.radix} path segment."
+            )
         key = self._int2str(step)
         return self.alphabet[0] * (self.steplen - len(key)) + key
+
+    def _ensure_path_fits(self, path):
+        self._ensure_path_length_fits(len(path))
+
+    def _ensure_path_length_fits(self, required):
+        if self.path_max_length is not None and required > self.path_max_length:
+            raise TreePathOverflow(
+                f"Path requires {required} characters but "
+                f"{self.model._meta.label}.path allows {self.path_max_length}."
+            )
 
     def step_of(self, path):
         """Decode the last (own) segment of ``path`` back to its integer step."""
@@ -263,6 +302,17 @@ class MaterializedPath:
         Never pulls descendant rows into Python.
         """
         qs = self._scoped().filter(path__startswith=old_prefix)
+        self._ensure_path_fits(new_prefix)
+        prefix_growth = len(new_prefix) - len(old_prefix)
+        if prefix_growth > 0:
+            longest = (
+                qs.annotate(_mptree_path_length=Length("path"))
+                .order_by("-_mptree_path_length")
+                .values_list("_mptree_path_length", flat=True)
+                .first()
+            )
+            if longest is not None:
+                self._ensure_path_length_fits(longest + prefix_growth)
         update = {"path": Concat(Value(new_prefix), Substr("path", len(old_prefix) + 1))}
         if depth_delta:
             update["depth"] = F("depth") + depth_delta
@@ -350,6 +400,7 @@ class MaterializedPath:
         # `parent`/`parent_id` are determined by the tree operation, not by the
         # caller's kwargs (treebeard's add_child/add_sibling accept them as
         # redundant field values) -- drop them so they can't conflict.
+        self._ensure_path_fits(path)
         attrs.pop("parent", None)
         attrs.pop("parent_id", None)
         if instance is None:
@@ -524,12 +575,21 @@ class MaterializedPath:
             self._scoped().order_by("path").values("pk", "parent_id")
         )
         present = {r["pk"] for r in rows}
+        outside_scope = {
+            r["pk"]
+            for r in rows
+            if r["parent_id"] is not None and r["parent_id"] not in present
+        }
+        if outside_scope:
+            raise TreeCorruptionError(
+                "Cannot rebuild nodes whose parents are outside the tree scope.",
+                node_ids=outside_scope,
+            )
         children = defaultdict(list)
         for r in rows:
             # rows are in path order, so each parent's children list is built in
             # sibling order
-            parent = r["parent_id"] if r["parent_id"] in present else None
-            children[parent].append(r["pk"])
+            children[r["parent_id"]].append(r["pk"])
 
         computed = {}
         stack = [(None, "", 1)]
@@ -537,8 +597,16 @@ class MaterializedPath:
             parent_pk, parent_path, depth = stack.pop()
             for step, pk in enumerate(children.get(parent_pk, []), start=1):
                 path = parent_path + self.segment(step)
+                self._ensure_path_fits(path)
                 computed[pk] = [path, depth, len(children.get(pk, []))]
                 stack.append((pk, path, depth + 1))
+
+        unreachable = present - computed.keys()
+        if unreachable:
+            raise TreeCorruptionError(
+                "Cannot rebuild a tree containing parent cycles or unreachable nodes.",
+                node_ids=unreachable,
+            )
 
         self.model._base_manager.bulk_update(
             [self.model(pk=pk, path=f"~{pk}") for pk in computed],
