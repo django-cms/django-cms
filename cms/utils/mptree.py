@@ -600,7 +600,7 @@ def get_tree_backend() -> str:
     from django.conf import settings
 
     return getattr(settings, "CMS_TREE_BACKEND", None) or os.environ.get(
-        "CMS_TREE_BACKEND", "mptree"
+        "CMS_TREE_BACKEND", "treebeard"
     )
 
 
