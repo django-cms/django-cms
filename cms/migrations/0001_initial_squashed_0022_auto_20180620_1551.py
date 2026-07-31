@@ -4,14 +4,11 @@ import django.contrib.auth.models
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import migrations, models
 
 # Handle custom AUTH_USER_MODEL as in 0002_auto_20140816_1918.py
-User = get_user_model()
-
-user_model_label = '{}.{}'.format(User._meta.app_label, User._meta.model_name)
-user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
+user_model_label = settings.AUTH_USER_MODEL.lower()
+user_ptr_name = f"{settings.AUTH_USER_MODEL.rsplit('.', 1)[1].lower()}_ptr"
 
 
 class Migration(migrations.Migration):
