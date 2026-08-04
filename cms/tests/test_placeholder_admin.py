@@ -5,6 +5,7 @@ from django.test.utils import CaptureQueriesContext, override_settings
 
 from cms.api import add_plugin, create_page
 from cms.models import CMSPlugin, Placeholder, UserSettings
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
 
@@ -437,3 +438,204 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertFalse(user_settings.clipboard.get_plugins("en").exists())
+
+    def test_copy_plugin_to_clipboard_requires_add_permission(self):
+        """Copying a plugin to the clipboard must check add permission for the
+        plugin type.
+
+        A staff user who is missing the plugin's add permission must not be
+        able to copy it into their own clipboard, even when the plugin lives
+        in a placeholder they would otherwise be allowed to read.
+        """
+        # No plugin permissions at all: cannot add a LinkPlugin anywhere.
+        user = self._create_user("editor", is_staff=True, is_superuser=False)
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=user,
+            clipboard=Placeholder.objects.create(),
+        )
+        user_settings.clipboard.source = user_settings
+        user_settings.clipboard.save()
+
+        source_placeholder = Placeholder.objects.create(slot="source")
+        source_plugin = add_plugin(
+            source_placeholder,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+        endpoint = self.get_copy_plugin_uri(source_plugin)
+        with self.login_user_context(user):
+            data = {
+                "source_language": "en",
+                "source_placeholder_id": source_placeholder.pk,
+                "source_plugin_id": source_plugin.pk,
+                "target_language": "en",
+                "target_placeholder_id": user_settings.clipboard.pk,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(user_settings.clipboard.get_plugins("en").exists())
+
+    def test_copy_placeholder_to_clipboard_requires_add_permission(self):
+        """Copying a whole placeholder to the clipboard must check add
+        permission for the contained plugin types as well."""
+        # No plugin permissions at all: cannot add a LinkPlugin anywhere.
+        user = self._create_user("editor", is_staff=True, is_superuser=False)
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=user,
+            clipboard=Placeholder.objects.create(),
+        )
+        user_settings.clipboard.source = user_settings
+        user_settings.clipboard.save()
+
+        source_placeholder = Placeholder.objects.create(slot="source")
+        add_plugin(
+            source_placeholder,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+        endpoint = self.get_copy_placeholder_uri(source_placeholder)
+        with self.login_user_context(user):
+            data = {
+                "source_language": "en",
+                "source_placeholder_id": source_placeholder.pk,
+                "target_language": "en",
+                "target_placeholder_id": user_settings.clipboard.pk,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(user_settings.clipboard.get_plugins("en").exists())
+
+    def _get_clipboard(self, user, with_source=True):
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=user,
+            clipboard=Placeholder.objects.create(slot="clipboard"),
+        )
+        if with_source:
+            user_settings.clipboard.source = user_settings
+            user_settings.clipboard.save()
+        return user_settings.clipboard
+
+    def test_paste_plugin_requires_source_permission(self):
+        """Pasting a plugin must check permission on the placeholder it is
+        pasted *from*.
+
+        The plugin to paste is identified by a client-supplied id, so a staff
+        user could otherwise name any plugin in the installation and have its
+        content copied into a placeholder they do control -- their own
+        clipboard, for instance.
+        """
+        attacker = self._create_user(
+            "attacker", is_staff=True, is_superuser=False, permissions=["add_link"]
+        )
+        clipboard = self._get_clipboard(attacker)
+
+        # A placeholder the attacker has no permission on.
+        victim_placeholder = Placeholder.objects.create(slot="secret")
+        victim_plugin = add_plugin(
+            victim_placeholder,
+            "LinkPlugin",
+            "en",
+            name="VictimSecretLink",
+            external_link="https://secret.example.com",
+        )
+        endpoint = self.get_move_plugin_uri(victim_plugin)
+        with self.login_user_context(attacker):
+            data = {
+                "plugin_id": victim_plugin.pk,
+                "placeholder_id": clipboard.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(clipboard.get_plugins("en").exists())
+
+    def test_paste_placeholder_requires_source_permission(self):
+        """Pasting a placeholder reference must check permission on the
+        placeholder holding it.
+
+        A clipboard belongs to a single user, so its contents must not be
+        pasteable by anybody else.
+        """
+        attacker = self._create_user(
+            "attacker", is_staff=True, is_superuser=False, permissions=["add_link"]
+        )
+        victim = self._create_user(
+            "victim", is_staff=True, is_superuser=False, permissions=["add_link"]
+        )
+        attacker_clipboard = self._get_clipboard(attacker)
+        victim_clipboard = self._get_clipboard(victim)
+
+        # The victim copied a whole placeholder into their clipboard.
+        reference = add_plugin(
+            victim_clipboard, "PlaceholderPlugin", "en", name="Victim clipboard"
+        )
+        add_plugin(
+            reference.placeholder_ref,
+            "LinkPlugin",
+            "en",
+            name="VictimSecretLink",
+            external_link="https://secret.example.com",
+        )
+
+        endpoint = self.get_move_plugin_uri(reference)
+        with self.login_user_context(attacker):
+            data = {
+                "plugin_id": reference.pk,
+                "placeholder_id": attacker_clipboard.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(attacker_clipboard.get_plugins("en").exists())
+
+    def test_paste_plugin_from_own_clipboard_without_source(self):
+        """A user may always paste from their own clipboard.
+
+        Clipboards created before they got a source object still have none by
+        the time the plugin to paste is fetched, so the source-side check must
+        not rely on the clipboard's source alone.
+        """
+        user = self.get_staff_user_with_no_permissions()
+        self.add_permission(user, "change_example1")
+        self.add_permission(user, "add_link")
+        clipboard = self._get_clipboard(user, with_source=False)
+
+        target = Example1.objects.create(
+            char_1="one", char_2="two", char_3="tree", char_4="four"
+        ).placeholder
+        plugin = add_plugin(
+            clipboard,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+
+        endpoint = self.get_move_plugin_uri(plugin)
+        with self.login_user_context(user):
+            data = {
+                "plugin_id": plugin.pk,
+                "placeholder_id": target.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(target.get_plugins("en").count(), 1)
