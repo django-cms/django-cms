@@ -56,13 +56,13 @@ from cms.toolbar.items import (
 from cms.toolbar.toolbar import CMSToolbar, EmptyToolbar
 from cms.toolbar.utils import (
     add_live_url_querystring_param,
-    get_toolbar_from_request,
     get_object_edit_url,
     get_object_for_language,
     get_object_live_url,
     get_object_preview_url,
     get_object_structure_url,
     get_plugin_tree,
+    get_toolbar_from_request,
 )
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
