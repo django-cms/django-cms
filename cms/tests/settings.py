@@ -122,6 +122,13 @@ TEMPLATES = [
 DATABASES = {
     "default": dj_database_url.config(default="sqlite://localhost/local.sqlite")
 }
+# A second alias for the tree backend's multi-database tests. Declared as a test
+# mirror, so no extra test database is created and only tests that opt in via
+# ``databases = {"default", "other"}`` ever touch the connection.
+DATABASES["other"] = {
+    **DATABASES["default"],
+    "TEST": {"MIRROR": "default"},
+}
 
 USE_TZ = bool(os.environ.get("USE_TZ"))
 

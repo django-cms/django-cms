@@ -4,7 +4,7 @@ from os.path import join
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.db import IntegrityError, connection, models
+from django.db import IntegrityError, connection, models, router
 from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.constraints import UniqueConstraint
@@ -14,7 +14,6 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.timezone import now
 from django.utils.translation import get_language, gettext_lazy as _, override as force_language
-from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.models.managers import PageManager, PageUrlManager
@@ -22,6 +21,7 @@ from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
+from cms.utils.mptree import get_tree_base
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
@@ -44,6 +44,8 @@ class AdminCacheDict(dict):
     def __setitem__(self, key, value):
         raise ValueError("Do not set individual items in the admin cache dict. Use the clear_cache method instead.")
 
+
+MP_Node = get_tree_base()
 
 class Page(MP_Node):
     """
@@ -622,10 +624,13 @@ class Page(MP_Node):
         return new_root_page
 
     def delete(self, *args, **kwargs):
-        Page.get_tree(self).delete_fast()
+        using = self._state.db or router.db_for_write(Page, instance=self)
+        Page.get_tree(self).using(using).delete_fast()
 
-        if self.parent:
-            Page.objects.filter(id=self.parent_id).update(numchild=models.F("numchild") - 1)
+        if self.parent_id:
+            Page.objects.using(using).filter(id=self.parent_id).update(
+                numchild=models.F("numchild") - 1
+            )
         self.clear_cache(menu=True)
 
     def delete_translations(self, language=None):
@@ -701,7 +706,9 @@ class Page(MP_Node):
         return self.get_descendants().order_by("path")
 
     def get_root(self):
-        return self.__class__.objects.get(path=self.path[0 : self.steplen])
+        return self.__class__.objects.using(self._state.db).get(
+            path=self.path[0 : self.steplen]
+        )
 
     def get_parent_page(self):
         warnings.warn(
