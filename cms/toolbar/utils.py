@@ -122,7 +122,7 @@ def get_plugin_tree(
     template = toolbar.templates.drag_item_template
     get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
-    copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
+    copy_to_clipboard = toolbar.clipboard and placeholder.pk == toolbar.clipboard.pk
     plugins = list(downcast_plugins(plugins, select_placeholder=True))
     root_plugins = create_child_plugin_references(plugins)
 
