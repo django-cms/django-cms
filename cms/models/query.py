@@ -34,9 +34,10 @@ class PageQuerySet(get_queryset_base()):
             parent_id for _, parent_id in rows
             if parent_id is not None and parent_id not in deleted
         )
+        using = self.db
         result = models.QuerySet.delete(self, *args, **kwargs)
         for parent_id, num_lost in lost.items():
-            self.model._base_manager.filter(pk=parent_id).update(
+            self.model._base_manager.using(using).filter(pk=parent_id).update(
                 # Floored at zero in case the cache was already stale. Not with
                 # Greatest(F("numchild") - n, 0): ``numchild`` is unsigned, so
                 # MySQL raises "value is out of range" on the subtraction before

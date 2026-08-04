@@ -32,6 +32,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.utils.mptree import (
     MaterializedPath,
     MaterializedPathMixin,
+    TreePathOverflow,
     get_tree_backend,
     get_tree_base,
 )
@@ -540,6 +541,179 @@ class MaterializedPathDriverTests(TestCase):
         r = mp.add_root(name="r")
         mp.add_child(r, name="c")
         self.assertEqual(mp.children(r).count(), 1)
+
+
+@mptree_only
+class MaterializedPathOverflowTests(TestCase):
+    """
+    ``steplen`` and the ``path`` column's ``max_length`` cap how wide and how
+    deep the tree can go. Both ceilings are checked in Python before any
+    statement runs, so hitting one raises ``TreePathOverflow`` and leaves the
+    tree untouched, rather than silently truncating a path or failing halfway
+    through a multi-statement rewrite.
+    """
+
+    def setUp(self):
+        self.mp = MaterializedPath(Category)
+        self.max_depth = self.mp.path_max_length // self.mp.steplen
+
+    def _node_at_max_depth(self, name, depth=None):
+        # Written directly: reaching depth 63 through add_child would be 63
+        # round trips to set up a test about the 64th. Step 9 keeps this chain
+        # off the step-1 branch that `add_root` hands out, so it is nobody's
+        # ancestor by path prefix.
+        depth = depth if depth is not None else self.max_depth
+        return Category.objects.create(
+            name=name, path=self.mp.segment(9) * depth, depth=depth, numchild=0
+        )
+
+    def test_sibling_step_wider_than_one_segment_is_rejected(self):
+        widest = self.mp.radix**self.mp.steplen - 1
+        self.assertEqual(len(self.mp.segment(widest)), self.mp.steplen)
+        for step in (0, widest + 1):
+            with self.assertRaises(TreePathOverflow):
+                self.mp.segment(step)
+
+    def test_add_child_below_the_deepest_level_is_rejected(self):
+        deepest = self._node_at_max_depth("deepest")
+        with self.assertRaises(TreePathOverflow):
+            self.mp.add_child(deepest, name="one-too-deep")
+        self.assertEqual(Category.objects.filter(name="one-too-deep").count(), 0)
+
+    def test_move_checks_the_deepest_descendant_before_rewriting(self):
+        # The subtree root itself would still fit under `deep`; its grandchild
+        # is what overflows. Guarding only the new prefix would let the rewrite
+        # start and truncate the descendants.
+        deep = self._node_at_max_depth("deep", depth=self.max_depth - 1)
+        root = self.mp.add_root(name="r")
+        child = self.mp.add_child(root, name="c")
+        self.mp.add_child(child, name="g")
+        before = dict(Category.objects.values_list("name", "path"))
+
+        with self.assertRaises(TreePathOverflow):
+            self.mp.move(root, deep, "last-child")
+
+        self.assertEqual(dict(Category.objects.values_list("name", "path")), before)
+
+
+@mptree_only
+class MaterializedPathStaleInstanceTests(TestCase):
+    """
+    Callers hand the driver model instances they may have been holding since
+    before a concurrent write. Every mutation re-reads their tree columns under
+    its locks, because the layout it plans from ``path``/``depth``/``parent``
+    would otherwise rewrite the rows the node used to occupy.
+    """
+
+    def setUp(self):
+        self.mp = MaterializedPath(Category)
+
+    def test_add_child_plans_from_the_refreshed_parent(self):
+        r1 = self.mp.add_root(name="r1")
+        r2 = self.mp.add_root(name="r2")
+        parent = self.mp.add_child(r1, name="p")
+        stale = Category.objects.get(pk=parent.pk)  # caller's copy, under r1
+        self.mp.move(parent, r2, "last-child")  # someone else re-parents it
+
+        self.mp.add_child(stale, name="c")
+
+        parent.refresh_from_db()
+        child = Category.objects.get(name="c")
+        self.assertEqual(child.parent_id, parent.pk)
+        self.assertTrue(child.path.startswith(parent.path))
+        self.assertEqual(child.depth, parent.depth + 1)
+
+    def test_move_plans_from_the_refreshed_target(self):
+        r1 = self.mp.add_root(name="r1")
+        r2 = self.mp.add_root(name="r2")
+        target = self.mp.add_child(r1, name="t")
+        node = self.mp.add_child(r1, name="n")
+        stale_target = Category.objects.get(pk=target.pk)
+        self.mp.move(target, r2, "last-child")
+
+        self.mp.move(node, stale_target, "last-child")
+
+        target.refresh_from_db()
+        node.refresh_from_db()
+        self.assertEqual(node.parent_id, target.pk)
+        self.assertTrue(node.path.startswith(target.path))
+        self.assertEqual(node.depth, target.depth + 1)
+
+    def test_move_decrements_the_parent_the_node_actually_left(self):
+        r1 = self.mp.add_root(name="r1")
+        r2 = self.mp.add_root(name="r2")
+        r3 = self.mp.add_root(name="r3")
+        node = self.mp.add_child(r1, name="n")
+        stale = Category.objects.get(pk=node.pk)  # remembers r1 as its parent
+        self.mp.move(node, r2, "last-child")
+
+        self.mp.move(stale, r3, "last-child")
+
+        for root, expected in ((r1, 0), (r2, 0), (r3, 1)):
+            root.refresh_from_db()
+            self.assertEqual(root.numchild, expected, root.name)
+
+    def test_add_sibling_plans_from_the_refreshed_node(self):
+        r1 = self.mp.add_root(name="r1")
+        r2 = self.mp.add_root(name="r2")
+        node = self.mp.add_child(r1, name="n")
+        stale = Category.objects.get(pk=node.pk)
+        self.mp.move(node, r2, "last-child")
+
+        self.mp.add_sibling(stale, name="s")
+
+        sibling = Category.objects.get(name="s")
+        self.assertEqual(sibling.parent_id, r2.pk)
+
+    def test_refresh_keeps_unsaved_edits_to_other_fields(self):
+        # Only the tree columns are re-read, so a caller that set a field and
+        # then built structure does not silently lose the edit.
+        root = self.mp.add_root(name="r")
+        root.name = "renamed-but-unsaved"
+        self.mp.add_child(root, name="c")
+        self.assertEqual(root.name, "renamed-but-unsaved")
+
+
+@mptree_only
+class MaterializedPathDatabaseAliasTests(TransactionTestCase):
+    """
+    One operation must not straddle two connections. ``other`` is a test mirror
+    of ``default`` -- the same rows -- so what these assert is which *connection*
+    the driver used, not which database ended up holding the data.
+    """
+
+    databases = {"default", "other"}
+
+    def test_driver_defaults_to_the_routed_write_alias(self):
+        self.assertEqual(MaterializedPath(Category).db_alias, "default")
+
+    def test_explicit_alias_keeps_every_statement_off_default(self):
+        mp = MaterializedPath(Category, using="other")
+        with self.assertNumQueries(0, using="default"):
+            root = mp.add_root(name="r")
+            child = mp.add_child(root, name="c")
+            mp.add_child(root, position="first-child", name="c2")
+            mp.move(child, root, "first-child")
+            mp.rebuild()
+        self.assertEqual(root._state.db, "other")
+
+    def test_instance_api_stays_on_the_alias_it_was_loaded_from(self):
+        Category.add_root(instance=Category(name="r"))
+        root = Category.objects.using("other").get(name="r")
+        with self.assertNumQueries(0, using="default"):
+            child = root.add_child(instance=Category(name="c"))
+            list(root.get_children())
+            list(child.get_ancestors())
+            list(child.get_siblings())
+            child.get_root()
+            child.delete()
+        self.assertEqual(child._state.db, "other")
+
+    def test_class_api_accepts_an_explicit_alias(self):
+        with self.assertNumQueries(0, using="default"):
+            list(Category.get_root_nodes(using="other"))
+            list(Category.get_tree(using="other"))
+            Category.fix_tree(using="other")
 
 
 @mptree_only
