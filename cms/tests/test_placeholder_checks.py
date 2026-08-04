@@ -71,6 +71,43 @@ class ChecksPlaceholderInterfaceTestCase(CMSTestCase):
         check.assert_not_called()
 
 
+class ClipboardPermissionTestCase(CMSTestCase):
+    """A clipboard is private: only its owner may work with it."""
+
+    def _get_clipboard(self, user):
+        user_settings = UserSettings.objects.create(
+            language='en',
+            user=user,
+            clipboard=Placeholder.objects.create(slot='clipboard'),
+        )
+        user_settings.clipboard.source = user_settings
+        user_settings.clipboard.save()
+        return user_settings.clipboard
+
+    def test_owner_has_permission(self):
+        user = self.get_staff_user_with_no_permissions()
+        clipboard = self._get_clipboard(user)
+
+        self.assertTrue(clipboard.has_change_permission(user))
+        self.assertTrue(clipboard.check_source(user))
+
+    def test_other_user_has_no_permission(self):
+        owner = self.get_staff_user_with_no_permissions()
+        other = self._create_user('other', is_staff=True, is_superuser=False)
+        clipboard = self._get_clipboard(owner)
+
+        self.assertFalse(clipboard.has_change_permission(other))
+        self.assertFalse(clipboard.check_source(other))
+
+    def test_superuser_has_permission(self):
+        owner = self.get_staff_user_with_no_permissions()
+        superuser = self.get_superuser()
+        clipboard = self._get_clipboard(owner)
+
+        self.assertTrue(clipboard.has_change_permission(superuser))
+        self.assertTrue(clipboard.check_source(superuser))
+
+
 class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
 
     def setUp(self):

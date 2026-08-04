@@ -338,6 +338,21 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
     def has_copy_from_clipboard_permission(self, request, placeholder, plugins):
         return placeholder.has_add_plugins_permission(request.user, plugins)
 
+    def has_paste_from_source_permission(self, request, source_placeholder, plugins):
+        # Pasting reads the plugins from the placeholder they are pasted from,
+        # so a user without access to that placeholder must not be able to
+        # exfiltrate its content into a placeholder they do control.
+        clipboard = request.toolbar.clipboard
+
+        if clipboard and source_placeholder.pk == clipboard.pk:
+            # Pasting from the user's own clipboard, which is what this
+            # operation is for. A user may always read their own clipboard.
+            return True
+
+        if not source_placeholder.has_add_plugins_permission(request.user, plugins):
+            return False
+        return source_placeholder.check_source(request.user)
+
     def has_copy_from_placeholder_permission(self, request, source_placeholder, target_placeholder, plugins):
         if not source_placeholder.has_add_plugins_permission(request.user, plugins):
             return False
@@ -872,6 +887,13 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                       target_placeholder, target_position, target_parent=None):
         plugins = [plugin] + list(plugin.get_descendants())
 
+        # Check the source side as well: the plugin is identified by a
+        # client-supplied id, so it is not necessarily one the user is allowed
+        # to read.
+        if not self.has_paste_from_source_permission(request, plugin.placeholder, plugins):
+            message = _("You have no permission to paste this plugin")
+            raise PermissionDenied(message)
+
         if not self.has_copy_from_clipboard_permission(request, target_placeholder, plugins):
             message = _("You have no permission to paste this plugin")
             raise PermissionDenied(message)
@@ -931,6 +953,15 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
     def _paste_placeholder(self, request, plugin, target_language,
                            target_placeholder, target_position):
         plugins = plugin.placeholder_ref.get_plugins_list()
+
+        # Check the source side as well: the plugin is identified by a
+        # client-supplied id, so it is not necessarily one the user is allowed
+        # to read. The plugins live in the reference placeholder, but that one
+        # is only reachable through the placeholder holding the reference
+        # plugin itself (normally the user's own clipboard).
+        if not self.has_paste_from_source_permission(request, plugin.placeholder, plugins):
+            message = _("You have no permission to paste this placeholder")
+            raise PermissionDenied(message)
 
         if not self.has_copy_from_clipboard_permission(request, target_placeholder, plugins):
             message = _("You have no permission to paste this placeholder")
