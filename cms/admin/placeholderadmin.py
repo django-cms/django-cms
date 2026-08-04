@@ -38,9 +38,9 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import (
     create_child_plugin_references,
-    get_clipboard_from_request,
     get_plugin_content,
     get_plugin_tree,
+    get_toolbar_from_request,
 )
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
@@ -337,7 +337,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
 
     def has_copy_plugins_permission(self, request, plugins):
         # Plugins can only be copied to the clipboard
-        placeholder = get_clipboard_from_request(request)
+        placeholder = get_toolbar_from_request(request).clipboard
         if placeholder is None:
             # No toolbar, no clipboard to copy into.
             return False
@@ -488,7 +488,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         if not target_language or target_language not in get_language_list(site_id=get_current_site(request).pk):
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
-        clipboard = get_clipboard_from_request(request)
+        clipboard = get_toolbar_from_request(request).clipboard
         copy_to_clipboard = clipboard is not None and target_placeholder.pk == clipboard.pk
         source_plugin_id = request.POST.get('source_plugin_id', None)
 
@@ -760,7 +760,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         move_a_copy = (
             move_a_copy and move_a_copy != "0" and move_a_copy.lower() != "false"
         )
-        clipboard = get_clipboard_from_request(request)
+        clipboard = get_toolbar_from_request(request).clipboard
         # Both may be None, which must not be read as "moving to the clipboard".
         move_to_clipboard = clipboard is not None and placeholder == clipboard
         source_placeholder = plugin.placeholder
@@ -1203,7 +1203,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
         language = request.GET.get('language')
 
-        clipboard = get_clipboard_from_request(request)
+        clipboard = get_toolbar_from_request(request).clipboard
 
         if clipboard is not None and placeholder.pk == clipboard.pk:
             # User is clearing the clipboard, no need for permission

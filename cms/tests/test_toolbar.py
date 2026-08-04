@@ -56,7 +56,7 @@ from cms.toolbar.items import (
 from cms.toolbar.toolbar import CMSToolbar, EmptyToolbar
 from cms.toolbar.utils import (
     add_live_url_querystring_param,
-    get_clipboard_from_request,
+    get_toolbar_from_request,
     get_object_edit_url,
     get_object_for_language,
     get_object_live_url,
@@ -252,7 +252,7 @@ class MissingToolbarTest(CMSTestCase):
         self.assertIsNone(toolbar.clipboard)
 
     def test_get_clipboard_from_request_without_toolbar(self):
-        self.assertIsNone(get_clipboard_from_request(self.get_request_without_toolbar()))
+        self.assertIsNone(get_toolbar_from_request(self.get_request_without_toolbar()).clipboard)
 
     def test_get_plugin_tree_without_toolbar(self):
         page = create_page("home", "nav_playground.html", "en")
