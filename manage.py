@@ -151,6 +151,14 @@ if __name__ == "__main__":
         },
     }
 
+    # A second alias for the tree backend's multi-database tests. Declared as a test
+    # mirror, so no extra test database is created and only tests that opt in via
+    # ``databases = {"default", "other"}`` ever touch the connection.
+    dynamic_configs["DATABASES"]["other"] = {
+        **dynamic_configs["DATABASES"]["default"],
+        "TEST": {"MIRROR": "default"},
+    }
+
     if "test" in sys.argv:
         SESSION_ENGINE = "django.contrib.sessions.backends.cache"
     else:

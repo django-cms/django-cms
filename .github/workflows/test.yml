@@ -170,6 +170,11 @@ jobs:
 
   django-main-sqlite:
     runs-on: ${{ matrix.os }}
+    # The django-main jobs run the suite on the materialized-path tree backend
+    # (all databases). cms.tests.test_mptree_backend only runs under it; every
+    # other job stays on treebeard.
+    env:
+      CMS_TREE_BACKEND: mptree
     strategy:
       fail-fast: false
       matrix:
@@ -202,6 +207,8 @@ jobs:
 
   django-main-postgres:
     runs-on: ${{ matrix.os }}
+    env:
+      CMS_TREE_BACKEND: mptree
     strategy:
       fail-fast: false
       matrix:
@@ -250,6 +257,8 @@ jobs:
 
   django-main-mysql:
     runs-on: ${{ matrix.os }}
+    env:
+      CMS_TREE_BACKEND: mptree
     strategy:
       fail-fast: false
       matrix:

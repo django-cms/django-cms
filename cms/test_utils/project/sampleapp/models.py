@@ -2,10 +2,12 @@ from functools import cached_property
 
 from django.db import models
 from django.urls import reverse
-from treebeard.mp_tree import MP_Node
 
 from cms.models.fields import PlaceholderRelationField
+from cms.utils.mptree import get_tree_base
 from cms.utils.placeholder import get_placeholder_from_slot
+
+MP_Node = get_tree_base()
 
 
 class Category(MP_Node):
