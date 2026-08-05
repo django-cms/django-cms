@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Language-Team: Belarusian (https://app.transifex.com/divio/teams/58664/be/)\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,13 @@ msgstr ""
 msgid "Page type"
 msgstr ""
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
+msgstr ""
+
+msgid "You do not have permission to copy this page."
 msgstr ""
 
 msgid "Overwrite URL"
@@ -42,6 +48,9 @@ msgid "Keep this field empty if standard path should be used."
 msgstr ""
 
 msgid "Start typing..."
+msgstr ""
+
+msgid "menu visibility"
 msgstr ""
 
 msgid "limit when this page is visible in the menu"
@@ -165,9 +174,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr ""
 
-msgid "Change Permissions"
-msgstr ""
-
 msgid "The page is not eligible to be home."
 msgstr ""
 
@@ -207,11 +213,6 @@ msgid "New sub page"
 msgstr ""
 
 msgid "New page"
-msgstr ""
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
 msgstr ""
 
 msgid "Database error"
@@ -325,9 +326,6 @@ msgstr ""
 msgid "Empty content"
 msgstr ""
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr ""
@@ -373,21 +371,6 @@ msgstr ""
 msgid "Placeholder"
 msgstr ""
 
-msgid "Getting started developer guide"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
-msgstr ""
-
-msgid "Discord community"
-msgstr ""
-
-msgid "What's new"
-msgstr ""
-
 msgid "Create"
 msgstr ""
 
@@ -398,9 +381,6 @@ msgid "Structure"
 msgstr ""
 
 msgid "Content"
-msgstr ""
-
-msgid "Help"
 msgstr ""
 
 msgid "Sites"
@@ -505,6 +485,9 @@ msgstr ""
 msgid "Select a valid page"
 msgstr ""
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -513,9 +496,6 @@ msgstr ""
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add another"
 msgstr ""
 
 msgid ""
@@ -613,9 +593,6 @@ msgid "template"
 msgstr ""
 
 msgid "login required"
-msgstr ""
-
-msgid "menu visibility"
 msgstr ""
 
 msgid "application"
@@ -824,6 +801,41 @@ msgid "user setting"
 msgstr ""
 
 msgid "user settings"
+msgstr ""
+
+msgid "by template"
+msgstr ""
+
+msgid "by code"
+msgstr ""
+
+msgid "static placeholder name"
+msgstr ""
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+msgid "placeholder code"
+msgstr ""
+
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+msgid "placeholder content"
+msgstr ""
+
+msgid "creation_method"
+msgstr ""
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
 msgid "Advanced options"
@@ -1109,9 +1121,6 @@ msgstr ""
 msgid "Apphook"
 msgstr ""
 
-msgid "Redirect"
-msgstr ""
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr ""
@@ -1260,7 +1269,7 @@ msgstr ""
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
-msgid "Open \\"
+msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
@@ -1377,6 +1386,12 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
 msgstr ""
 
 msgid "Give back"
@@ -1580,15 +1595,6 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
 msgid "Single placeholder"
-msgstr ""
-
-msgid "Community forum"
-msgstr ""
-
-msgid "Getting started"
-msgstr ""
-
-msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."
