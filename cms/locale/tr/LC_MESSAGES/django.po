@@ -4,17 +4,16 @@
 # 
 # Translators:
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2025
-# Şeref R. Ayar <serefayar@gmail.com>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Hamza SARI <hamza.sari@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Hamza SARI <hamza.sari@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Turkish (https://app.transifex.com/divio/teams/58664/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,8 +36,14 @@ msgstr "Başlığın URL'de kullanılan kısmı"
 msgid "Page type"
 msgstr "Sayfa tipi"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sayfa Tipleri"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "URL'nin üzerine yaz"
@@ -48,6 +53,9 @@ msgstr "Standart yolu kullanmak için bu alanı boş bırakın."
 
 msgid "Start typing..."
 msgstr "Yazmaya başla...."
+
+msgid "menu visibility"
+msgstr "menü görünürlüğü"
 
 msgid "limit when this page is visible in the menu"
 msgstr "Bu sayfanın menüde görünür olduğundaki sınırı"
@@ -185,9 +193,6 @@ msgstr "Çeviriler"
 msgid "Advanced Settings"
 msgstr "Gelişmiş Ayarlar"
 
-msgid "Change Permissions"
-msgstr "Yetkileri Değiştir"
-
 msgid "The page is not eligible to be home."
 msgstr "Bu sayfa ana sayfa olmak için uygun değil."
 
@@ -233,11 +238,6 @@ msgstr "Yeni alt sayfa"
 
 msgid "New page"
 msgstr "Yeni sayfa"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr "Bu siteye erişim izniniz yok. Lütfen yöneticinizle iletişime geçin."
 
 msgid "Database error"
 msgstr "Veritabanı hatası"
@@ -350,9 +350,6 @@ msgstr "Eylemler"
 msgid "Empty content"
 msgstr "Boş içerik"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)s Özellikleri"
@@ -401,21 +398,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "yer tutucu"
 
-msgid "Getting started developer guide"
-msgstr "Geliştiriciler için başlangıç kılavuzu"
-
-msgid "Documentation"
-msgstr "Dokümantasyon"
-
-msgid "User guide"
-msgstr "Kullanıcı kılavuzu"
-
-msgid "Discord community"
-msgstr "Discord topluluğu"
-
-msgid "What's new"
-msgstr "Yenilikler"
-
 msgid "Create"
 msgstr "Oluştur"
 
@@ -427,9 +409,6 @@ msgstr "Yapı"
 
 msgid "Content"
 msgstr "İçerik"
-
-msgid "Help"
-msgstr "Yardım"
 
 msgid "Sites"
 msgstr "Alanlar"
@@ -534,6 +513,9 @@ msgstr "Geçerli bir site seç"
 msgid "Select a valid page"
 msgstr "Geçerli bir sayfa seç"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -546,9 +528,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "%(conflict_page)s sayfası, geçerli sayfa ile aynı '%(url)s' adresine sahip."
-
-msgid "Add another"
-msgstr "Başka ekle"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -651,9 +630,6 @@ msgstr "şablon"
 
 msgid "login required"
 msgstr "giriş yapılmış olması gerekiyor"
-
-msgid "menu visibility"
-msgstr "menü görünürlüğü"
 
 msgid "application"
 msgstr "uygulama"
@@ -876,6 +852,43 @@ msgstr "kullanıcı ayarları"
 
 msgid "user settings"
 msgstr "kullanıcı ayarları"
+
+msgid "by template"
+msgstr "şablon ile"
+
+msgid "by code"
+msgstr "kod ile"
+
+msgid "static placeholder name"
+msgstr "statik yer tutucu adı"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Bu statik yer tutucuyu tanımlamak için açıklayıcı ad. Kullanıcılara "
+"gösterilmez."
+
+msgid "placeholder code"
+msgstr "yer tutucu kodu"
+
+msgid "To render the static placeholder in templates."
+msgstr "Şablonlar içindeki sabit yer tutucuyu resmetmek(render etmek) için."
+
+msgid "placeholder content"
+msgstr "yer tutucu içeriği"
+
+msgid "creation_method"
+msgstr "olusturma_metodu"
+
+msgid "static placeholder"
+msgstr "statik yer tutucu"
+
+msgid "static placeholders"
+msgstr "statik yer tutucular"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Aynı site ve koda sahip bir statik yer tutucu zaten mevcut"
 
 msgid "Advanced options"
 msgstr "Gelişmiş seçenekler"
@@ -1170,9 +1183,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Yönlendir"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Uygulama: %(apphook)s"
@@ -1326,8 +1336,8 @@ msgstr "Yapı modunu aç/kapat"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Yapı modunu aç/kapat ve üzerine gelinen eklentiyi vurgula"
 
-msgid "Open \\"
-msgstr "Aç \\"
+msgid "Open \"Create\" dialog"
+msgstr "\"Oluştur\" diyaloğunu aç"
 
 msgid "Focus on Toolbar"
 msgstr "Araç çubuğuna odaklan"
@@ -1480,6 +1490,12 @@ msgstr "Kurulum Notları"
 
 msgid "Support"
 msgstr "Destek"
+
+msgid "Documentation"
+msgstr "Dokümantasyon"
+
+msgid "User guide"
+msgstr "Kullanıcı kılavuzu"
 
 msgid "Give back"
 msgstr "Geri verin"
@@ -1701,15 +1717,6 @@ msgstr "%(plugin_name)s öğesine eklenti ekle"
 
 msgid "Single placeholder"
 msgstr "Tek yer tutucu"
-
-msgid "Community forum"
-msgstr "Topluluk forumu"
-
-msgid "Getting started"
-msgstr "Başlarken"
-
-msgid "Talk to us"
-msgstr "Bize ulaşın"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - kullanıcı hesabınız yaratıldı."

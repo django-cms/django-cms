@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 14:56+0000\n"
+"POT-Creation-Date: 2026-08-05 11:22+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -212,11 +212,6 @@ msgstr ""
 msgid "You do not have permission to edit this page"
 msgstr "You do not have permission to edit this page"
 
-msgid ""
-"(to change it, first unpublish the currently published version of this page)"
-msgstr ""
-"(to change it, first unpublish the currently published version of this page)"
-
 msgid "Add Translation"
 msgstr "Add Translation"
 
@@ -390,6 +385,9 @@ msgstr ""
 
 msgid "<unspecified>"
 msgstr "<unspecified>"
+
+msgid "The selected content does not match this object and grouping."
+msgstr ""
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
@@ -742,6 +740,14 @@ msgstr "redirect"
 msgid "Redirects to this URL."
 msgstr "Redirects to this URL."
 
+msgid "slug"
+msgstr "slug"
+
+#, fuzzy
+#| msgid "Overwrite URL"
+msgid "overwrite URL"
+msgstr "Overwrite URL"
+
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "All ancestors will not be displayed in the navigation"
 
@@ -772,9 +778,6 @@ msgstr "pages"
 
 msgid "No available title"
 msgstr "No available title"
-
-msgid "slug"
-msgstr "slug"
 
 msgid "Path"
 msgstr "Path"
@@ -1739,6 +1742,54 @@ msgstr "Change Category"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Thanks for spending some quality time with the Web site today."
 
+msgid "English"
+msgstr ""
+
+msgid "French"
+msgstr ""
+
+msgid "German"
+msgstr ""
+
+msgid "Brazilian Portuguese"
+msgstr ""
+
+msgid "Dutch"
+msgstr ""
+
+#, fuzzy
+#| msgid "Two columns"
+msgid "two columns"
+msgstr "Two columns"
+
+#, fuzzy
+#| msgid "Three columns"
+msgid "three columns"
+msgstr "Three columns"
+
+#, fuzzy
+#| msgid "in navigation"
+msgid "navigation examples"
+msgstr "in navigation"
+
+msgid "sidebar column"
+msgstr ""
+
+#, fuzzy
+#| msgid "Three columns"
+msgid "left column"
+msgstr "Three columns"
+
+#, fuzzy
+#| msgid "Add plugin"
+msgid "Add a link"
+msgstr "Add plugin"
+
+#, fuzzy
+#| msgid "Three columns"
+msgid "right column"
+msgstr "Three columns"
+
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Inherit the template of the nearest ancestor"
 
@@ -1802,6 +1853,13 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid ""
+#~ "(to change it, first unpublish the currently published version of this "
+#~ "page)"
+#~ msgstr ""
+#~ "(to change it, first unpublish the currently published version of this "
+#~ "page)"
 
 #~ msgid ""
 #~ "Users can't delete page permissions without permissions to change "
