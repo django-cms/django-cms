@@ -9,6 +9,8 @@ concurrency:
 jobs:
   postgres:
     runs-on: ${{ matrix.os }}
+    env:
+      CMS_TREE_BACKEND: mptree
     strategy:
       fail-fast: false
       matrix:
