@@ -337,7 +337,7 @@ class MaterializedPath:
             # sorted neighbours is enough to spot it.
             in_order = sorted(m[3] for m in movers)
             needs_park = any(
-                b.startswith(a) for a, b in zip(in_order, in_order[1:], strict=False)
+                b.startswith(a) for a, b in zip(in_order, in_order[1:])
             )
         if needs_park:
             # Deepest first: parking a nested subtree before its ancestor keeps
