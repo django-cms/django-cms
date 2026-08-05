@@ -1,18 +1,46 @@
 5.1.1 (2026-08-05)
 ==================
 
-Highlights:
------------
+Features:
+---------
+* Offer a dependency-free materialized-path page tree backend, selectable with the ``CMS_TREE_BACKEND``
+  setting (#8744) -- Fabian Braun
+* Store the page slug and overwrite URL on ``PageContent`` so they are versioned with the content
+  (#8729) -- Fabian Braun
+* Enforce per-site page URL uniqueness and reachability (#8730) -- Fabian Braun
+* Add a pytest configuration and move the test settings to ``cms/tests/settings.py`` (#8718) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Prevent superuser accounts from being managed by non-superuser page-user managers (be0baa565)
+  -- Fabian Braun
+* Fix a paste-a-copy IDOR that disclosed plugin content from unauthorized placeholders (#8746)
+  -- Fabian Braun
+* Fix ``EmptyToolbar`` missing the ``clipboard`` and ``toolbar_language`` properties (#8745) -- Fabian Braun
+* Fix plugins being rendered in the wrong language upon edit (#8739) -- Fabian Braun
+* Fix the squashed migration when using a custom user model (#8748) -- Benjamin PIERRE
+* Avoid N+1 queries when copying pages or plugins between languages (#8727) -- Vinit Kumar
+* Remove stray data from the wheel (#8734) -- Fabian Braun
+* Clarify the XSS security contract for custom plugins in the documentation (#8747) -- Fabian Braun
+* Fix the Bootstrap icon license notice (#8737) -- Fabian Braun
+* Pin the ``django-treebeard`` dependency to ``>=4.3,<6`` (72eff82b8) -- Fabian Braun
+
 
 Statistics:
 -----------
 
-This release includes 0 changelog entries, created with the help of the following contributors
+This release includes 14 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
+* Benjamin PIERRE (1 changelog entry)
+* Fabian Braun (12 changelog entries)
+* Vinit Kumar (1 changelog entry)
 
 With the review help of the following contributors:
 
+* Fabian Braun
+* Peter Wischer
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
