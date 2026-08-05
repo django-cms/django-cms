@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
-from treebeard.mp_tree import MP_NodeManager
 
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
@@ -14,7 +13,7 @@ from cms.models.query import PageQuerySet
 from cms.utils.i18n import get_fallback_languages
 
 
-class PageManager(MP_NodeManager):
+class PageManager(models.Manager):
 
     def get_queryset(self):
         """Change standard model queryset to our own.
