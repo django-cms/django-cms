@@ -847,30 +847,30 @@ msgid "by template"
 msgstr "بواسطة القالب"
 
 msgid "by code"
-msgstr ""
+msgstr "بواسطة الرمز"
 
 msgid "static placeholder name"
-msgstr ""
+msgstr "اسم الموضع الثابت"
 
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
-msgstr ""
+msgstr "اسم وصفي لتحديد هذا الموضع الثابت. لا يُعرض للمستخدمين."
 
 msgid "placeholder code"
-msgstr ""
+msgstr "رموز الموضع"
 
 msgid "To render the static placeholder in templates."
 msgstr "لتَصْيير الموضع الثابت في قوالب."
 
 msgid "placeholder content"
-msgstr ""
+msgstr "محتوى الموضع"
 
 msgid "creation_method"
-msgstr ""
+msgstr "طريقة الإنشاء"
 
 msgid "static placeholder"
-msgstr ""
+msgstr "موضع ثابت"
 
 msgid "static placeholders"
 msgstr "مواضع ثابتة"
