@@ -1,3 +1,25 @@
+Features:
+---------
+* Offer replacement for djangotree-beard dependency (#8744) (#8755) (e358d7eab) -- Fabian Braun
+
+Bug Fixes:
+----------
+* EmptyToolbar missed clipboard and toolbar_language properties (#8745) (#8756) (8594f7c84) -- Fabian Braun
+* Paste-a-copy IDOR discloses unauthorized plugin content (#8746) (#8757) (551302612) -- Fabian Braun
+* Upon edit localized text within plugins were rendered in the wrong language (#8740) (2eaa0e573) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 5.0.9 (2026-07-10)
 ==================
 

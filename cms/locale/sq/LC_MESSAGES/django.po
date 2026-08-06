@@ -36,13 +36,13 @@ msgid "Page type"
 msgstr "Lloj faqeje"
 
 msgid "You do not have permission to change this page."
-msgstr ""
+msgstr "S’keni leje për ndryshim të kësaj faqeje"
 
 msgid "Page Types"
 msgstr "Lloje Faqesh"
 
 msgid "You do not have permission to copy this page."
-msgstr ""
+msgstr "S’keni leje për të kopjuar këtë faqe"
 
 msgid "Overwrite URL"
 msgstr "Mbishkruaje URL-në"
@@ -515,7 +515,7 @@ msgid "Select a valid page"
 msgstr "Përzgjidhni faqe të vlefshme"
 
 msgid "Enter a valid relative or absolute URL."
-msgstr ""
+msgstr "Jepni një URL relative, ose absolute të vlefshme."
 
 #, python-format
 msgid ""
@@ -1550,7 +1550,7 @@ msgid "Next"
 msgstr "Pasuesi"
 
 msgid "Select what you would like to create"
-msgstr ""
+msgstr "Përzgjidhni ç’do të donit të krijoni"
 
 msgid "Unknown"
 msgstr "E panjohur"

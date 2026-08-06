@@ -858,30 +858,32 @@ msgid "by template"
 msgstr "по шаблон"
 
 msgid "by code"
-msgstr ""
+msgstr "по код"
 
 msgid "static placeholder name"
-msgstr ""
+msgstr "име на статичен плейсхолдър"
 
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr ""
+"Описателно име за идентифициране на този статичен плейсхолдър. Не се показва"
+" на потребителите."
 
 msgid "placeholder code"
-msgstr ""
+msgstr "код на плейсхолдъра"
 
 msgid "To render the static placeholder in templates."
 msgstr "За изобразяване на статичния плейсхолдър в шаблоните."
 
 msgid "placeholder content"
-msgstr ""
+msgstr "съдържание на плейсхолдъра"
 
 msgid "creation_method"
-msgstr ""
+msgstr "creation_method"
 
 msgid "static placeholder"
-msgstr ""
+msgstr "статичен плейсхолдър"
 
 msgid "static placeholders"
 msgstr "статични плейсхолдъри"

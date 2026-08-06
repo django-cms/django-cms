@@ -857,30 +857,32 @@ msgid "by template"
 msgstr "per plantilla"
 
 msgid "by code"
-msgstr ""
+msgstr "per codi"
 
 msgid "static placeholder name"
-msgstr ""
+msgstr "nom de marcador de posició estàtic"
 
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr ""
+"Nom descriptiu per identificar aquest marcador de posició estàtic. No es "
+"mostrarà als usuaris."
 
 msgid "placeholder code"
-msgstr ""
+msgstr "codi de marcador de posició"
 
 msgid "To render the static placeholder in templates."
 msgstr "Representar el marcador de posició estàtic a les plantilles"
 
 msgid "placeholder content"
-msgstr ""
+msgstr "contingut del marcador de posició"
 
 msgid "creation_method"
-msgstr ""
+msgstr "mètode de creació"
 
 msgid "static placeholder"
-msgstr ""
+msgstr "marcador de posició estàtic"
 
 msgid "static placeholders"
 msgstr "marcadors de posició estàtics"
