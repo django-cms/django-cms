@@ -173,6 +173,8 @@ CMS_MEDIA_URL = "/cms-media/"
 MEDIA_URL = "/media/"
 STATIC_URL = "/static/"
 ADMIN_MEDIA_PREFIX = "/static/admin/"
+# MAILERS exists only on Django 6.1+, so feature detection keeps these shared
+# settings importable on every supported version.
 if hasattr(django_mail, "mailers"):
     MAILERS = {
         "default": {

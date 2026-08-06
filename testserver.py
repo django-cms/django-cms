@@ -146,6 +146,8 @@ if __name__ == "__main__":
 
     SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
+    # MAILERS exists only on Django 6.1+, so feature detection keeps this
+    # standalone server importable on every supported version.
     if hasattr(django_mail, "mailers"):
         email_settings = {
             "MAILERS": {

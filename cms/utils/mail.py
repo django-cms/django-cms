@@ -25,6 +25,8 @@ def send_mail(subject, txt_template, to, context=None, html_template=None, fail_
     if html_template:
         body = render_to_string(html_template, context)
         message.attach_alternative(body, 'text/html')
+    # Preserve this helper's contract without forwarding Django 6.1's
+    # deprecated fail_silently argument.
     try:
         message.send()
     except Exception:

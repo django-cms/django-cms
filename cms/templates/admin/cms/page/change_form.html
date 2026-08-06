@@ -42,6 +42,7 @@
 {% endblock %}
 {% block content %}
 <div id="content-main">
+{# Django 6.1 renders object-tools outside content; older parents need it here because this template replaces content. #}
 {% django_version_gte 6 1 as object_tools_outside_content %}
 {% if not object_tools_outside_content %}
 {% block object-tools %}{% endblock %}

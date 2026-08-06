@@ -76,6 +76,7 @@ def pre_delete_group(instance, **kwargs):
 
 
 def user_m2m_changed(instance, action, reverse, pk_set, raw=False, **kwargs):
+    # Fixture loading can emit this signal before related rows are safe to query.
     if raw:
         return
     if action in (

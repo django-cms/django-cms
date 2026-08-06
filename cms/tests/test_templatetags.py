@@ -46,6 +46,7 @@ from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
 
+# Django 6.0 changed MANAGERS from name/address pairs to plain email addresses.
 TEST_MANAGERS = ["tests@django-cms.org"] if django.VERSION >= (6, 0) else [("Jenkins", "tests@django-cms.org")]
 
 

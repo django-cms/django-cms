@@ -615,6 +615,7 @@ class NoDBAdminTests(CMSTestCase):
 
 class EmailUserAdminCompatibilityTests(CMSTestCase):
     def test_add_fieldsets_do_not_use_removed_wide_class(self):
+        # Importing this admin under the default user model mutates the global app and admin registries.
         if settings.AUTH_USER_MODEL != "emailuserapp.EmailUser":
             self.skipTest("This test requires the email-based custom user model")
 
