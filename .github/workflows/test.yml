@@ -31,7 +31,7 @@ jobs:
           ubuntu-latest,
         ]
         exclude:
-          # Python 3.10 and 3.11 only supported until Django 5.2
+          # Django 6.0 and 6.1 support Python 3.12+ only.
           - python-version: '3.10'
             requirements-file: django-6.0.txt
           - python-version: '3.11'
@@ -100,7 +100,7 @@ jobs:
           ubuntu-latest,
         ]
         exclude:
-          # Python 3.10 and 3.11 only supported until Django 5.2
+          # Django 6.0 and 6.1 support Python 3.12+ only.
           - python-version: '3.10'
             requirements-file: django-6.0.txt
           - python-version: '3.11'
@@ -166,7 +166,7 @@ jobs:
           ubuntu-latest,
         ]
         exclude:
-          # Python 3.10 and 3.11 only supported until Django 5.2
+          # Django 6.0 and 6.1 support Python 3.12+ only.
           - python-version: '3.10'
             requirements-file: django-6.0.txt
           - python-version: '3.11'

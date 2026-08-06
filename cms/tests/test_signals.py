@@ -1,6 +1,9 @@
 import warnings
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.db.models.signals import m2m_changed
 from django.test.utils import override_settings
 
 from cms.api import create_page
@@ -19,6 +22,22 @@ overrides = {
 
 @override_settings(**overrides)
 class SignalTests(CMSTestCase):
+    def test_raw_user_group_fixture_event_does_not_access_database(self):
+        user = get_user_model().objects.create_user("fixture-user")
+        group = Group.objects.create(name="fixture-group")
+
+        with self.assertNumQueries(0):
+            m2m_changed.send(
+                sender=get_user_model().groups.through,
+                instance=group,
+                action="pre_add",
+                reverse=True,
+                model=get_user_model(),
+                pk_set={user.pk},
+                using="default",
+                raw=True,
+            )
+
     def test_move_page_signal_warns_on_connect(self):
         def receiver(**kwargs):
             return None

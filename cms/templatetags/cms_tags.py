@@ -93,7 +93,11 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
             raise Page.DoesNotExist(body)
         else:
             if "django.middleware.common.BrokenLinkEmailsMiddleware" in settings.MIDDLEWARE:
-                mail_managers(subject, body, fail_silently=True)
+                try:
+                    mail_managers(subject, body)
+                except Exception:
+                    # Reporting a missing page must not fail because its error email could not be sent.
+                    pass
             return None
 
 

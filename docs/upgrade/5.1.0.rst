@@ -22,7 +22,10 @@ django CMS 5.1 supports **Django 5.2, 6.0, and 6.1**. Django 4.2, 5.0, and
 maintenance. We highly recommend and only support the latest release of each
 supported series.
 
-It supports **Python 3.10, 3.11, 3.12, 3.13, and 3.14**.
+Supported Python versions depend on the selected Django series:
+
+* Django 5.2 supports Python 3.10 through 3.14.
+* Django 6.0 and 6.1 support Python 3.12 through 3.14.
 
 ******************
 Release highlights
@@ -55,7 +58,7 @@ more precise plugin configuration, and a modernized editing interface.
   previous theme remains available as a migration aid.
 
 * **Deploy on all maintained platform versions.** django CMS 5.1 supports Django
-  5.2, 6.0, and 6.1 and Python 3.10 through 3.14.
+  5.2, 6.0, and 6.1 across each series' supported Python versions.
 
 * **Benefit from security and reliability improvements.** The release
   strengthens authorization around editing and clipboard operations, improves

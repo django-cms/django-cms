@@ -25,7 +25,11 @@ def send_mail(subject, txt_template, to, context=None, html_template=None, fail_
     if html_template:
         body = render_to_string(html_template, context)
         message.attach_alternative(body, 'text/html')
-    message.send(fail_silently=fail_silently)
+    try:
+        message.send()
+    except Exception:
+        if not fail_silently:
+            raise
 
 
 def mail_page_user_change(user, created=False, password="", site=None):

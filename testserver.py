@@ -5,6 +5,7 @@ import tempfile
 import warnings
 
 import dj_database_url
+from django.core import mail as django_mail
 
 from cms.exceptions import DontUsePageAttributeWarning
 
@@ -145,6 +146,17 @@ if __name__ == "__main__":
 
     SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
+    if hasattr(django_mail, "mailers"):
+        email_settings = {
+            "MAILERS": {
+                "default": {
+                    "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
+                },
+            },
+        }
+    else:
+        email_settings = {"EMAIL_BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+
     MIDDLEWARES = [
         "django.middleware.cache.UpdateCacheMiddleware",
         "django.middleware.http.ConditionalGetMiddleware",
@@ -186,7 +198,6 @@ if __name__ == "__main__":
             MEDIA_URL="/media/",
             STATIC_URL="/static/",
             ADMIN_MEDIA_PREFIX="/static/admin/",
-            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
             PLUGIN_APPS=PLUGIN_APPS,
             DEBUG_TOOLBAR_PATCH_SETTINGS=False,
             INTERNAL_IPS=["127.0.0.1"],
@@ -311,4 +322,5 @@ if __name__ == "__main__":
             MIGRATION_MODULES=MIGRATION_MODULES,
             X_FRAME_OPTIONS="SAMEORIGIN",
             TEXT_INLINE_EDITING=False,
+            **email_settings,
         )

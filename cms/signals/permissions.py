@@ -75,7 +75,9 @@ def pre_delete_group(instance, **kwargs):
         clear_user_permission_cache(user)
 
 
-def user_m2m_changed(instance, action, reverse, pk_set, **kwargs):
+def user_m2m_changed(instance, action, reverse, pk_set, raw=False, **kwargs):
+    if raw:
+        return
     if action in (
         "pre_add",
         "pre_remove",

@@ -2,6 +2,7 @@ import os
 from copy import deepcopy
 from unittest.mock import patch
 
+import django
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -10,6 +11,7 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.template import Context, Template
+from django.template.loader import render_to_string
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch
@@ -43,6 +45,8 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
+
+TEST_MANAGERS = ["tests@django-cms.org"] if django.VERSION >= (6, 0) else [("Jenkins", "tests@django-cms.org")]
 
 
 class TemplatetagTests(CMSTestCase):
@@ -352,12 +356,25 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         with self.settings(
             MIDDLEWARE=settings.MIDDLEWARE + ["django.middleware.common.BrokenLinkEmailsMiddleware"],
             DEBUG=False,
-            MANAGERS=[("Jenkins", "tests@django-cms.org")],
+            MANAGERS=TEST_MANAGERS,
         ):
             request = self.get_request("/")
             page = _get_page_by_untyped_arg({"pk": 1003}, request, 1)
             self.assertEqual(page, None)
             self.assertEqual(len(mail.outbox), 1)
+
+    @patch("cms.templatetags.cms_tags.mail_managers", side_effect=OSError("mail unavailable"))
+    def test_get_page_by_untyped_arg_ignores_mail_backend_errors(self, mail_managers):
+        with self.settings(
+            MIDDLEWARE=settings.MIDDLEWARE + ["django.middleware.common.BrokenLinkEmailsMiddleware"],
+            DEBUG=False,
+            MANAGERS=TEST_MANAGERS,
+        ):
+            request = self.get_request("/")
+            page = _get_page_by_untyped_arg({"pk": 1003}, request, 1)
+
+        self.assertIsNone(page)
+        mail_managers.assert_called_once()
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_no_email(self):
         with self.settings(
@@ -365,7 +382,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
                 mw for mw in settings.MIDDLEWARE if mw != "django.middleware.common.BrokenLinkEmailsMiddleware"
             ],
             DEBUG=False,
-            MANAGERS=[("Jenkins", "tests@django-cms.org")],
+            MANAGERS=TEST_MANAGERS,
         ):
             request = self.get_request("/")
             page = _get_page_by_untyped_arg({"pk": 1003}, request, 1)
@@ -874,11 +891,14 @@ class AdminBreadcrumbMarkupTests(CMSTestCase):
             self.assertTrue(django_version_gte(6))
             self.assertFalse(django_version_gte(7))
 
-    def _get_admin_html(self, uri):
+    def _get_admin_response(self, uri):
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(uri)
         self.assertEqual(response.status_code, 200)
-        return response.content.decode("utf-8")
+        return response
+
+    def _get_admin_html(self, uri):
+        return self._get_admin_response(uri).content.decode("utf-8")
 
     # -- page tree changelist: admin/cms/page/tree/base.html --
 
@@ -911,3 +931,19 @@ class AdminBreadcrumbMarkupTests(CMSTestCase):
         self.assertIn('<ol class="breadcrumbs">', html)
         self.assertIn('aria-current="page"', html)
         self.assertNotIn('<div class="breadcrumbs">', html)
+
+    def test_page_change_form_object_tools_follow_django_layout(self):
+        page = create_page("Home", "nav_playground.html", "en")
+        response = self._get_admin_response(self.get_page_change_uri("en", page))
+        html = render_to_string(
+            "admin/cms/page/object_tools_test.html",
+            response.context_data,
+            request=response.wsgi_request,
+        )
+
+        marker = '<div id="object-tools-test-marker"></div>'
+        self.assertEqual(html.count(marker), 1)
+        if django.VERSION >= (6, 1):
+            self.assertLess(html.index(marker), html.index('<div id="content-main">'))
+        else:
+            self.assertGreater(html.index(marker), html.index('<div id="content-main">'))

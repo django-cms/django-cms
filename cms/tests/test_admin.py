@@ -613,6 +613,17 @@ class NoDBAdminTests(CMSTestCase):
         self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
 
 
+class EmailUserAdminCompatibilityTests(CMSTestCase):
+    def test_add_fieldsets_do_not_use_removed_wide_class(self):
+        if settings.AUTH_USER_MODEL != "emailuserapp.EmailUser":
+            self.skipTest("This test requires the email-based custom user model")
+
+        from cms.test_utils.project.emailuserapp.admin import UserAdmin
+
+        fieldset_options = UserAdmin.add_fieldsets[0][1]
+        self.assertNotIn("wide", fieldset_options.get("classes", ()))
+
+
 class PluginPermissionTests(AdminTestsBase):
     def setUp(self):
         self._page = create_page("test page", "nav_playground.html", "en")

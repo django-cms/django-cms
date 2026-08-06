@@ -20,11 +20,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        django-version: [
-          '4.2', '5.0', '5.1', '5.2',
-        ]
-        python-version: ['3.13']
-        requirements-file: ['requirements_base.txt']
         os: [
           ubuntu-latest,
         ]
@@ -34,23 +29,34 @@ jobs:
             flags: "--stories --versioning --moderation --alias"
           - name: all-off
             flags: "--no-stories --no-versioning --no-moderation --no-alias"
+        django:
+          - version: '5.2'
+            requirement: 'Django>=5.2,<6.0'
+            python: '3.13'
+          - version: '6.0'
+            requirement: 'Django>=6.0,<6.1'
+            python: '3.13'
+          - version: '6.1'
+            requirement: 'Django>=6.1,<6.2'
+            python: '3.13'
 
     steps:
     - uses: actions/checkout@v7
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.django.python }}
 
       uses: actions/setup-python@v7
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Create project from template (${{ matrix.mode }} / ${{ matrix.switches.name }})
+        python-version: ${{ matrix.django.python }}
+    - name: Create project with Django ${{ matrix.django.version }} (${{ matrix.mode }} / ${{ matrix.switches.name }})
       run: |
         sudo apt install gettext gcc -y
         python -m venv .venv
         source ./.venv/bin/activate
         python -m pip install --upgrade pip
-        pip install Django~=${{ matrix.django-version }}
-        pip install -e .
+        pip install -e . "${{ matrix.django.requirement }}"
+        python -c "import django; assert django.get_version().startswith('${{ matrix.django.version }}.')"
         djangocms mysite --noinput --mode ${{ matrix.mode }} ${{ matrix.switches.flags }}
+        python -c "import django; assert django.get_version().startswith('${{ matrix.django.version }}.')"
     - name: Verify requirements.in reflects the selected options
       env:
         MODE: ${{ matrix.mode }}

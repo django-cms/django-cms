@@ -42,7 +42,10 @@
 {% endblock %}
 {% block content %}
 <div id="content-main">
+{% django_version_gte 6 1 as object_tools_outside_content %}
+{% if not object_tools_outside_content %}
 {% block object-tools %}{% endblock %}
+{% endif %}
 
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{% if request.GET.site %}&amp;site={{ request.GET.site }}{% endif %}{% if request.GET.parent_page %}&amp;parent_page={{ request.GET.parent_page }}{% endif %}{%if request.GET.source %}&amp;source={{ request.GET.source }}{% endif %}" method="post" id="{{ opts.model_name }}_form">
 {% csrf_token %}
