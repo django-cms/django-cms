@@ -377,6 +377,19 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         self.assertIsNone(page)
         mail_managers.assert_called_once()
 
+    @patch("cms.templatetags.cms_tags.mail_managers", side_effect=ValueError("invalid message"))
+    def test_get_page_by_untyped_arg_does_not_ignore_unexpected_mail_errors(self, mail_managers):
+        with self.settings(
+            MIDDLEWARE=settings.MIDDLEWARE + ["django.middleware.common.BrokenLinkEmailsMiddleware"],
+            DEBUG=False,
+            MANAGERS=TEST_MANAGERS,
+        ):
+            request = self.get_request("/")
+            with self.assertRaisesRegex(ValueError, "invalid message"):
+                _get_page_by_untyped_arg({"pk": 1003}, request, 1)
+
+        mail_managers.assert_called_once()
+
     def test_get_page_by_untyped_arg_dict_fail_nodebug_no_email(self):
         with self.settings(
             MIDDLEWARE=[

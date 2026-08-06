@@ -5,9 +5,9 @@ import tempfile
 import warnings
 
 import dj_database_url
-from django.core import mail as django_mail
 
 from cms.exceptions import DontUsePageAttributeWarning
+from cms.test_utils.email import get_locmem_email_settings
 
 
 def gettext(s):
@@ -146,18 +146,7 @@ if __name__ == "__main__":
 
     SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
-    # MAILERS exists only on Django 6.1+, so feature detection keeps this
-    # standalone server importable on every supported version.
-    if hasattr(django_mail, "mailers"):
-        email_settings = {
-            "MAILERS": {
-                "default": {
-                    "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
-                },
-            },
-        }
-    else:
-        email_settings = {"EMAIL_BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    email_settings = get_locmem_email_settings()
 
     MIDDLEWARES = [
         "django.middleware.cache.UpdateCacheMiddleware",

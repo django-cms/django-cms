@@ -93,7 +93,7 @@ several error-handling arguments. The old APIs are deprecated in 6.1 and are
 scheduled for removal in 7.0. See the [mailers overview and migration guide](https://docs.djangoproject.com/en/6.1/howto/mailers-migration/).
 
 This is directly relevant and needs the changes described under
-[Required repository updates](#required-repository-updates).
+[Implemented repository updates](#implemented-repository-updates).
 
 ### Admin, forms, and CSP
 
@@ -199,14 +199,15 @@ No repository usage of these removed forms was found.
 The [official `fail_silently` guidance](https://docs.djangoproject.com/en/6.1/howto/mailers-migration/#replacing-fail-silently)
 recommends intent-specific exception handling rather than the boolean argument.
 
-- In the missing-page error path, `fail_silently` was omitted and `Exception`
-  is caught:
-  this is an error reporter where mail failure must not replace the original
-  response.
+- In the missing-page error path, `fail_silently` was omitted and transport
+  errors represented by `OSError` are caught. This is an error reporter where
+  mail failure must not replace the original response, while unexpected errors
+  still propagate.
 - `cms.utils.mail.send_mail()` preserves its public `fail_silently` argument
   for django CMS API compatibility but calls `message.send()` without the
-  deprecated Django argument. It catches broadly when suppression is requested
-  and re-raises otherwise; tests cover both branches.
+  deprecated Django argument. It suppresses `OSError` when requested and
+  re-raises it otherwise; other exceptions always propagate. Tests cover each
+  branch and successful multipart delivery.
 - On Django 6.1, the locmem backend is configured as:
 
   ```python
@@ -217,9 +218,10 @@ recommends intent-specific exception handling rather than the boolean argument.
   }
   ```
 
-  `EMAIL_BACKEND` is retained for Django <6.1 through feature detection. Django
-  explicitly recommends `hasattr(django.core.mail, "mailers")` or
-  `django.VERSION >= (6, 1)` for multi-version libraries.
+  `EMAIL_BACKEND` is retained for Django <6.1 through a shared feature-detection
+  helper used by the test settings and standalone test server. Django explicitly
+  recommends `hasattr(django.core.mail, "mailers")` or `django.VERSION >= (6, 1)`
+  for multi-version libraries.
 
 ### 2. Align the custom admin change form with the 6.1 block layout
 
@@ -257,7 +259,7 @@ work rather than fixing a signature crash.
 
 ## Validation evidence
 
-Clean Python 3.14 SQLite runs passed all 1,700 tests on Django 5.2.17, 6.0.8,
+Clean Python 3.14 SQLite runs passed all 1,704 tests on Django 5.2.17, 6.0.8,
 and 6.1, with 57 expected skips in each environment. The Django 6.0 and 6.1
 suites ran with Python warnings enabled; the 6.1 run emitted no deprecated
 `fail_silently` or legacy email-backend warnings. Focused custom-user runs

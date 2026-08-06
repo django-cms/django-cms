@@ -17,7 +17,8 @@ import os
 import tempfile
 
 import dj_database_url
-from django.core import mail as django_mail
+
+from cms.test_utils.email import get_locmem_email_settings
 
 
 def gettext(s):
@@ -173,16 +174,7 @@ CMS_MEDIA_URL = "/cms-media/"
 MEDIA_URL = "/media/"
 STATIC_URL = "/static/"
 ADMIN_MEDIA_PREFIX = "/static/admin/"
-# MAILERS exists only on Django 6.1+, so feature detection keeps these shared
-# settings importable on every supported version.
-if hasattr(django_mail, "mailers"):
-    MAILERS = {
-        "default": {
-            "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
-        },
-    }
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+globals().update(get_locmem_email_settings())
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ["127.0.0.1"]
 AUTHENTICATION_BACKENDS = (
