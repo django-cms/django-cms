@@ -1,3 +1,6 @@
+5.0.10 (2026-08-06)
+==================
+
 Features:
 ---------
 * Offer replacement for djangotree-beard dependency (#8744) (#8755) (e358d7eab) -- Fabian Braun
