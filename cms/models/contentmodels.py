@@ -10,6 +10,8 @@ from cms.utils.conf import get_cms_setting
 
 
 class PageContent(models.Model):
+    # Field changes need a custom migration operation as in 0044: versioning packages drop the
+    # unique_together below in the database only, and SQLite rebuilds the table from the state.
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (constants.VISIBILITY_ALL, _("no limit set")),
         (constants.VISIBILITY_USERS, _("for logged in users only")),
