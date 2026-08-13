@@ -132,10 +132,12 @@ class PageTree {
                     value: function(node) {
                         // it needs to have the "colde" format and not "col-de"
                         // as jstree will convert "col-de" to "colde"
-                        // also we strip dashes, in case language code contains it
-                        // e.g. zh-hans, zh-cn etc
+                        // all dashes are stripped and the key is lowercased to
+                        // match the "data-col..." attribute rendered by
+                        // admin/cms/page/tree/menu.html, in case the language
+                        // code contains them, e.g. zh-hans, de-x-l, zh-Hant
                         if (node.data) {
-                            return node.data['col' + obj.key.replace('-', '')];
+                            return node.data['col' + obj.key.replace(/-/g, '').toLowerCase()];
                         }
 
                         return '';
