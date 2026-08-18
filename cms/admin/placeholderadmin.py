@@ -563,10 +563,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             message = _('You do not have permission to copy these plugins.')
             raise PermissionDenied(message)
 
-        if not source_placeholder.check_source(request.user):
-            message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(message)
-
+        # Deliberately no ``source_placeholder.check_source()`` here: that is an
+        # editability gate (see ``placeholder_is_immutable``), and copying only
+        # reads the source. Editors must be able to copy out of content they may
+        # not edit, such as a published version or a draft another user has
+        # locked. Read access is covered by the permission check above.
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
             raise PermissionDenied(message)
@@ -599,10 +600,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             message = _('You do not have permission to copy this placeholder.')
             raise PermissionDenied(message)
 
-        if not source_placeholder.check_source(request.user):
-            message = _('You do not have permission to copy this placeholder.')
-            raise PermissionDenied(message)
-
+        # Deliberately no ``source_placeholder.check_source()`` here: that is an
+        # editability gate (see ``placeholder_is_immutable``), and copying only
+        # reads the source. Editors must be able to copy out of content they may
+        # not edit, such as a published version or a draft another user has
+        # locked. Read access is covered by the permission check above.
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy this placeholder.')
             raise PermissionDenied(message)
