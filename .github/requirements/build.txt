@@ -1,0 +1,44 @@
+# Hash-pinned build tooling for the PyPI/TestPyPI publish workflows.
+#
+# These packages execute code in the build job, before the distribution is
+# handed to the publish job, so they are pinned by hash rather than resolved
+# fresh on every release.
+#
+# Resolved for CPython 3.12 on linux-x86_64 (the runner used by
+# .github/workflows/publish-to-*-pypi.yml). To regenerate after a version bump:
+#
+#     python -m pip download --only-binary=:all: --python-version 3.12 \
+#         --dest /tmp/pins build check-wheel-contents
+#     for f in /tmp/pins/*.whl; do python -m pip hash "$f"; done
+#
+# Note: this does NOT cover the PEP 517 build backend. ``python -m build``
+# provisions setuptools and setuptools-scm (see [build-system] in
+# pyproject.toml) into an isolated environment at build time, unpinned.
+
+# Direct requirements
+build==1.5.0 \
+    --hash=sha256:13f3eecb844759ab66efec90ca17639bbf14dc06cb2fdf37a9010322d9c50a6f
+check-wheel-contents==0.6.3 \
+    --hash=sha256:5ae39c8c434b972f0740d04610759168590713175aab584b012b1b84f6771874
+
+# Transitive requirements
+annotated-types==0.8.0 \
+    --hash=sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0
+attrs==26.1.0 \
+    --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
+click==8.4.2 \
+    --hash=sha256:e6f9f66136c816745b9d65817da91d61d957fb16e02e4dcd0552553c5a197b76
+packaging==26.3 \
+    --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+pydantic==2.13.4 \
+    --hash=sha256:45a282cde31d808236fd7ea9d919b128653c8b38b393d1c4ab335c62924d9aba
+pydantic-core==2.46.4 \
+    --hash=sha256:926c9541b14b12b1681dca8a0b75feb510b06c6341b70a8e500c2fdcff837cce
+pyproject-hooks==1.2.0 \
+    --hash=sha256:9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913
+typing-extensions==4.16.0 \
+    --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
+typing-inspection==0.4.4 \
+    --hash=sha256:65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147
+wheel-filename==1.4.2 \
+    --hash=sha256:3fa599046443d4ca830d06e3d180cd0a675d5871af0a68daa5623318bb4d17e3
