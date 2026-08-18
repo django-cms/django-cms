@@ -1223,6 +1223,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             "protected": protected,
             "opts": opts,
             "app_label": opts.app_label,
+            "delete_confirmation_max_display": getattr(self, "delete_confirmation_max_display", None),
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(
@@ -1322,6 +1323,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             "protected": protected,
             "opts": opts,
             "app_label": opts.app_label,
+            "delete_confirmation_max_display": getattr(self, "delete_confirmation_max_display", None),
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
