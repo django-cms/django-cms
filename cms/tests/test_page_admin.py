@@ -584,6 +584,22 @@ class PageTest(PageTestBase):
 
         self.assertEqual(Page.objects.count() - count, 3)
 
+    def test_copy_page_preserves_login_required(self):
+        source = create_page("source", "nav_playground.html", "en", login_required=True)
+        source_child = create_page("source-child", "nav_playground.html", "en", parent=source, login_required=True)
+        target = create_page("target", "nav_playground.html", "en")
+
+        with self.login_user_context(self.get_superuser()):
+            copied_root = self.copy_page(source, target)
+
+        copied_root.refresh_from_db()
+        copied_child = copied_root.get_child_pages().get()
+        copied_child.refresh_from_db()
+
+        self.assertTrue(copied_root.login_required)
+        self.assertTrue(copied_child.login_required)
+        self.assertTrue(source_child.login_required)
+
     def test_copy_page_under_home(self):
         """
         Users should be able to copy a page and paste under the home page.
