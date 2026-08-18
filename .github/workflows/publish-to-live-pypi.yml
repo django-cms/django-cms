@@ -31,9 +31,12 @@ jobs:
         --user
         -r .github/requirements/build.txt
     - name: Build a binary wheel and a source tarball
+      # --no-isolation: use the hash-pinned setuptools/setuptools-scm installed
+      # above instead of letting build resolve the backend from PyPI at runtime.
       run: >-
         python -m
         build
+        --no-isolation
         --sdist
         --wheel
         --outdir dist/
