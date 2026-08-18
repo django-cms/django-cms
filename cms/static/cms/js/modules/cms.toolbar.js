@@ -668,8 +668,8 @@ class Toolbar {
 
     _sendPostRequest(el) {
         /* Allow post method to be used */
-        var formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
         var targetDocument = Helpers._getWindow().document;
+        var formToken = targetDocument.querySelector('form input[name="csrfmiddlewaretoken"]');
 
         // Build the form through DOM APIs rather than an HTML string: both the
         // href and the token end up as attribute *values*, never as markup, so
