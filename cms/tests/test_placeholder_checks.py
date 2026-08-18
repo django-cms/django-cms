@@ -265,6 +265,31 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(user_settings.clipboard.get_plugins('en').count(), 1)
 
+    def test_paste_plugin_from_immutable_source(self):
+        """Pasting only reads the source, so a non-editable source is allowed."""
+        superuser = self.get_superuser()
+        page = create_page('test', 'nav_playground.html', 'en')
+        source_placeholder = page.get_placeholders('en').get(slot='body')
+        source_plugin = self._add_plugin_to_placeholder(source_placeholder)
+        target_placeholder = Placeholder.objects.create(slot='target')
+        uri = self.get_move_plugin_uri(source_plugin)
+        self.check.return_value = False
+
+        with self.login_user_context(superuser):
+            data = {
+                'plugin_id': source_plugin.pk,
+                'placeholder_id': target_placeholder.pk,
+                'move_a_copy': 'true',
+                'target_language': 'en',
+                'target_position': 1,
+            }
+            response = self.client.post(uri, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(target_placeholder.get_plugins('en').count(), 1)
+        # The source is untouched: pasting copies, it does not move.
+        self.assertEqual(source_placeholder.get_plugins('en').count(), 1)
+
     def test_copy_plugins_to_placeholder_without_source(self):
         superuser = self.get_superuser()
         page = create_page('test', 'nav_playground.html', 'en')
