@@ -780,6 +780,41 @@ describe('CMS.Toolbar', function () {
             );
             expect(fakeWindow.location.href).toEqual('href');
         });
+
+        describe('POST requests', function () {
+            var hostileToken = '"><img class="injected-token">';
+            var hostileHref = '/publish/"><img class="injected-href">';
+
+            beforeEach(function () {
+                fakeWindow.document = document;
+                CMS.config.csrf = 'fallback-token';
+                // Has to be the first form in the document so that the token
+                // lookup picks it up.
+                $('<form class="cms-post-request-test"><input name="csrfmiddlewaretoken"></form>')
+                    .prependTo('body')
+                    .find('input')
+                    .val(hostileToken);
+                spyOn(window.HTMLFormElement.prototype, 'submit');
+            });
+
+            afterEach(function () {
+                $('form.cms-post-request-test').remove();
+            });
+
+            it('treats href and token as values, not as markup', function () {
+                toolbar._sendPostRequest($('<a class="cms-form-post-method"></a>').attr('href', hostileHref));
+
+                var form = $('body > form').last().addClass('cms-post-request-test');
+
+                expect(window.HTMLFormElement.prototype.submit).toHaveBeenCalled();
+                expect(form.attr('action')).toEqual(hostileHref);
+                expect(form.attr('method')).toEqual('POST');
+                expect(form.find('input[name="csrfmiddlewaretoken"]').val()).toEqual(hostileToken);
+                // Nothing was parsed as HTML, so no elements were injected.
+                expect(form.find('img').length).toEqual(0);
+                expect($('img.injected-href, img.injected-token').length).toEqual(0);
+            });
+        });
     });
 
     describe('._debug()', function () {
