@@ -1,9 +1,11 @@
 import re
 import typing
+import warnings
 from copy import copy
 from functools import partial
 from urllib.parse import parse_qsl
 
+from asgiref.local import Local
 from django import forms
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.checks import ModelAdminChecks
@@ -31,6 +33,7 @@ from django.views.decorators.http import require_GET
 from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, get_language_from_request
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
@@ -232,6 +235,109 @@ class GrouperModelAdminChecks(ModelAdminChecks):
         return super()._check_prepopulated_fields_key(obj, field_name, label)
 
 
+_UNSET = object()
+
+
+class Grouping:
+    """Request-scoped grouping state of a :class:`GrouperModelAdmin`.
+
+    :attr:`filters` maps each of the admin's
+    :attr:`~GrouperModelAdmin.extra_grouping_fields` (e.g. ``"language"``) to its
+    current value. :attr:`requested_content_obj` holds the content object explicitly
+    selected via the :attr:`~GrouperModelAdmin.content_pk_url_param` GET parameter,
+    or ``None``. Grouping values are also available as attributes, e.g.
+    ``grouping.language``.
+
+    Instances are created per request by
+    :meth:`GrouperModelAdmin.get_grouping_from_request` and retrieved with
+    :meth:`GrouperModelAdmin.get_grouping`. Do not store them beyond the request
+    they were created for.
+    """
+
+    def __init__(
+        self,
+        filters: dict[str, typing.Any] | None = None,
+        requested_content_obj: models.Model | None = None,
+    ):
+        self.filters: dict[str, typing.Any] = dict(filters or {})
+        self.requested_content_obj = requested_content_obj
+
+    def __getattr__(self, name: str) -> typing.Any:
+        try:
+            return self.__dict__["filters"][name]
+        except KeyError:
+            raise AttributeError(name) from None
+
+    def __repr__(self) -> str:
+        return f"Grouping({self.filters!r}, requested_content_obj={self.requested_content_obj!r})"
+
+
+class _GroupingFieldShim:
+    """Backward-compatibility data descriptor for grouping values that historically were
+    stored as attributes of the shared ``ModelAdmin`` instance (e.g. ``admin.language``) -
+    an unsafe pattern, since concurrent requests overwrote each other's values.
+
+    Reads, writes, and deletes are redirected to the :class:`Grouping` published for the
+    current thread/async task, keeping the historic attribute API intact for subclasses
+    and third-party packages while making it thread-safe. New code should use
+    :meth:`GrouperModelAdmin.get_grouping` instead.
+    """
+
+    def __init__(self, field: str, default: typing.Any = _UNSET):
+        self.field = field
+        self.default = default
+
+    def _deprecation_warning(self) -> None:
+        warnings.warn(
+            f"Accessing request-dependent grouping values as admin instance attributes "
+            f"(self.{self.field}) is deprecated. Use self.get_grouping(request).{self.field} instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=3,
+        )
+
+    def __get__(self, instance, owner=None) -> typing.Any:
+        if instance is None:
+            return self
+        self._deprecation_warning()
+        grouping = getattr(instance._local_grouping, "current", None)
+        if grouping is not None and self.field in grouping.filters:
+            return grouping.filters[self.field]
+        if self.default is _UNSET:
+            raise AttributeError(self.field)
+        return self.default
+
+    def __set__(self, instance, value) -> None:
+        self._deprecation_warning()
+        grouping = getattr(instance._local_grouping, "current", None)
+        if grouping is None:
+            grouping = instance._local_grouping.current = Grouping()
+        grouping.filters[self.field] = value
+
+    def __delete__(self, instance) -> None:
+        self._deprecation_warning()
+        grouping = getattr(instance._local_grouping, "current", None)
+        if grouping is None or self.field not in grouping.filters:
+            raise AttributeError(self.field)
+        del grouping.filters[self.field]
+
+
+class _RequestedContentObjShim:
+    """Thread-safe stand-in for the former ``_requested_content_obj`` instance attribute,
+    proxying to the :class:`Grouping` published for the current thread/async task."""
+
+    def __get__(self, instance, owner=None) -> models.Model | None:
+        if instance is None:
+            return self
+        grouping = getattr(instance._local_grouping, "current", None)
+        return grouping.requested_content_obj if grouping else None
+
+    def __set__(self, instance, value) -> None:
+        grouping = getattr(instance._local_grouping, "current", None)
+        if grouping is None:
+            grouping = instance._local_grouping.current = Grouping()
+        grouping.requested_content_obj = value
+
+
 class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     """Easy-to-use ModelAdmin for grouper models. Usage example::
 
@@ -304,10 +410,20 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     #: Name of the GET parameter that selects a specific content object (by primary key) to be shown
     #: in the change view instead of the latest content. See :meth:`get_urls`.
     content_pk_url_param = "cms_content"
-    #: Holds the specific content object requested via :attr:`content_pk_url_param` for the current request.
-    _requested_content_obj: models.Model | None = None
+    #: Holds the specific content object requested via :attr:`content_pk_url_param` for the current
+    #: request (thread-safe compatibility shim, see :meth:`get_grouping`).
+    _requested_content_obj = _RequestedContentObjShim()
 
     def __init__(self, model, admin_site):
+        # Request-derived grouping state (see Grouping) is stored per thread/async task:
+        # ModelAdmin instances are shared between concurrent requests and must not carry it.
+        self._local_grouping = Local()
+        # Route legacy attribute access (e.g. self.language) through thread-safe shims.
+        for field in self.extra_grouping_fields:
+            inherited = getattr(type(self), field, _UNSET)
+            if not isinstance(inherited, _GroupingFieldShim):
+                setattr(type(self), field, _GroupingFieldShim(field, default=inherited))
+
         self._content_subquery_fields = []
 
         super().__init__(model, admin_site)
@@ -459,26 +575,59 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         """Hook for get_language_from_request which by default uses the cms utility"""
         return get_language_from_request(request)
 
-    def get_grouping_from_request(self, request: HttpRequest) -> None:
-        """Retrieves the current grouping selectors from the request"""
+    def get_grouping_from_request(self, request: HttpRequest) -> Grouping:
+        """Computes the grouping state from the request, caches it on the request, and
+        publishes it for the current thread/async task.
+
+        Called at every admin entry point (change list, change form, delete, and history
+        views). Prefer :meth:`get_grouping` for read access - it reuses the cached state
+        instead of recomputing it."""
+        filters = {}
         for field in self.extra_grouping_fields:
             if hasattr(self, f"get_{field}_from_request"):
-                value = getattr(self, f"get_{field}_from_request")(request)
+                filters[field] = getattr(self, f"get_{field}_from_request")(request)
             else:
                 raise ImproperlyConfigured(
                     f"{self.__class__.__name__} lacks method 'get_{field}_from_request(request)' to work with "
                     f"extra_grouping_fields={self.extra_grouping_fields}"
                 )
-            if value != getattr(self, field, None):
-                setattr(self, field, value)
 
         # A specific content object may be requested by its primary key. If so, show exactly that
         # content object (which may not be the latest one) and align the grouping fields with it so
         # that the form, its hidden fields, and the edit URLs stay consistent.
-        self._requested_content_obj = self.get_requested_content_obj(request)
-        if self._requested_content_obj is not None:
+        requested_content_obj = self.get_requested_content_obj(request)
+        if requested_content_obj is not None:
             for field in self.extra_grouping_fields:
-                setattr(self, field, getattr(self._requested_content_obj, field))
+                filters[field] = getattr(requested_content_obj, field)
+
+        grouping = Grouping(filters, requested_content_obj)
+        if not hasattr(request, "_cms_grouping_cache"):
+            request._cms_grouping_cache = {}
+        request._cms_grouping_cache[self] = grouping
+        self._local_grouping.current = grouping
+        return grouping
+
+    def get_grouping(self, request: HttpRequest) -> Grouping:
+        """Returns the grouping state for ``request``, computing it on first access.
+
+        This is the request-scoped way to read grouping values - instead of the
+        deprecated admin instance attributes (e.g. ``self.language``)::
+
+            grouping = self.get_grouping(request)
+            grouping.language                # value of an extra grouping field
+            grouping.filters                 # e.g. {"language": "en"}
+            grouping.requested_content_obj   # content object selected via GET, or None
+        """
+        grouping = getattr(request, "_cms_grouping_cache", {}).get(self)
+        if grouping is None:
+            return self.get_grouping_from_request(request)
+        # (Re-)publish for legacy attribute access and request-less helpers.
+        self._local_grouping.current = grouping
+        return grouping
+
+    def _current_grouping(self) -> Grouping | None:
+        """The grouping most recently published for this thread/async task, if any."""
+        return getattr(self._local_grouping, "current", None)
 
     def get_requested_content_obj(self, request: HttpRequest) -> models.Model | None:
         """Returns the content object requested by primary key via :attr:`content_pk_url_param`, or
@@ -495,15 +644,23 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     @property
     def current_content_filters(self) -> dict[str, typing.Any]:
-        """Filters needed to get the correct content model instance"""
+        """Filters needed to get the correct content model instance based on the grouping
+        state published for the current thread/async task. Prefer
+        ``self.get_grouping(request).filters`` where the request is available."""
+        grouping = self._current_grouping()
+        filters = grouping.filters if grouping else {}
         return {
-            field: getattr(self, field, self.get_extra_grouping_field(field)) for field in self.extra_grouping_fields
+            field: filters[field] if field in filters else self.get_extra_grouping_field(field)
+            for field in self.extra_grouping_fields
         }
 
     def get_language(self) -> str:
-        """Hook on how to get the current language. By default, if it is set as a
-        property, use the property, otherwise let Django provide it."""
-        return getattr(self, "language", get_language())
+        """Hook on how to get the current language. By default, use the grouping state
+        published for the current thread/async task, otherwise let Django provide it."""
+        grouping = self._current_grouping()
+        if grouping is not None and "language" in grouping.filters:
+            return grouping.filters["language"]
+        return get_language()
 
     def get_language_tuple(self, site: Site | None = None) -> tuple[tuple[str, str], ...]:
         """Hook on how to get all available languages for the language selector."""
@@ -616,10 +773,11 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         * Save and returning to changelist will keep the grouping parameters
         """
         preserved_filters = dict(parse_qsl(super().get_preserved_filters(request)))
-        # Extra grouping fields from property
+        # Extra grouping fields from the published grouping state
+        grouping = self._current_grouping()
         grouping_filters = {}
         for field in self.extra_grouping_fields:
-            value = getattr(self, field, None)
+            value = grouping.filters.get(field) if grouping else None
             if "field" not in preserved_filters:
                 grouping_filters[field] = value
         preserved_filters.update(grouping_filters)
@@ -656,7 +814,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
         """Provide the grouping fields to edit"""
         if "language" in self.extra_grouping_fields:
-            language = self.language
+            language = self.get_grouping(request).language
             if obj:
                 filled_languages = self.get_content_objects(obj).values_list("language", flat=True).distinct()
             else:
@@ -676,7 +834,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             extra_context["can_change_content_obj"] = readonly_message is None
             if content_instance is None:
                 subtitle = _("Add %(language)s content") % dict(
-                    language=get_language_dict(site_id=site.pk).get(self.language)
+                    language=get_language_dict(site_id=site.pk).get(language)
                 )
                 extra_context["subtitle"] = subtitle
 
@@ -1084,7 +1242,7 @@ class _GrouperAdminFormMixin:
         if "language" in self._admin.extra_grouping_fields:
             site = get_current_site(self._request)
             language_dict = get_language_dict(site_id=site.pk if site else None)
-            language_postfix = f" ({language_dict[self._admin.language]})"
+            language_postfix = f" ({language_dict[self._admin.get_grouping(self._request).language]})"
             for field in fields:
                 if CONTENT_PREFIX + field in self.fields:
                     # Fields contained in field list?
