@@ -8,14 +8,14 @@ on:
       - 'fix/**'
 
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to TestPyPI
+  build:
+    name: Build Python 🐍 distributions 📦
     runs-on: ubuntu-latest
-    environment:
-      name: test
-      url: https://test.pypi.org/p/django-cms
+    # No id-token here: the build runs third-party code (pip, the build
+    # backend, check-wheel-contents) and must not be able to mint an OIDC
+    # token for trusted publishing. Publishing happens in a separate job.
     permissions:
-      id-token: write
+      contents: read
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python
@@ -23,16 +23,22 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install pypa/build
+    - name: Install build tooling
+      # Hash-pinned: all of this executes in the build job and shapes the
+      # distribution the publish job uploads. See the file for how to refresh.
       run: >-
         python -m
         pip install
-        build
+        --require-hashes
         --user
+        -r .github/requirements/build.txt
     - name: Build a binary wheel and a source tarball
+      # --no-isolation: use the hash-pinned setuptools/setuptools-scm installed
+      # above instead of letting build resolve the backend from PyPI at runtime.
       run: >-
         python -m
         build
+        --no-isolation
         --sdist
         --wheel
         --outdir dist/
@@ -40,7 +46,6 @@ jobs:
 
     - name: Check wheel contents
       run: |
-        python -m pip install check-wheel-contents
         python -m check_wheel_contents dist/*.whl
         python - <<'EOF'
         import glob, os, sys, zipfile
@@ -74,8 +79,33 @@ jobs:
             fh.write(summary)
         EOF
 
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v7
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  publish:
+    name: Publish Python 🐍 distributions 📦 to TestPyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: test
+      url: https://test.pypi.org/p/django-cms
+    permissions:
+      id-token: write
+    steps:
+    - name: Download the distribution packages
+      uses: actions/download-artifact@v8
+      with:
+        name: python-package-distributions
+        path: dist/
+
     - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      # pypa/gh-action-pypi-publish v1.14.2. Pinned to a commit rather than the
+      # mutable release/v1 branch: this action receives the OIDC publishing
+      # credential, so it is the one dependency that must not move on its own.
+      uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
       with:
         repository-url: https://test.pypi.org/legacy/
         skip-existing: true
