@@ -947,5 +947,19 @@ describe('CMS.Toolbar', function () {
             expect(trigger).toHaveBeenCalledWith('resize');
             expect(CMS.API.Clipboard._toolbarEvents).toHaveBeenCalledTimes(1);
         });
+
+        it('only takes markup from the first matched toolbar', () => {
+            // Callers search a whole refreshed page for .cms-toolbar, so the
+            // collection can contain an element authored in editable content.
+            const toolbars = $(
+                '<div class="cms-toolbar"><span class="official-item"></span></div>' +
+                '<div class="cms-toolbar"><span class="injected-item"></span></div>'
+            );
+
+            toolbar._refreshMarkup(toolbars);
+
+            expect(toolbar.ui.toolbar.find('.official-item').length).toEqual(1);
+            expect(toolbar.ui.toolbar.find('.injected-item').length).toEqual(0);
+        });
     });
 });
