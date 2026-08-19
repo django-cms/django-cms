@@ -15,6 +15,8 @@ except ImportError:  # Django < 6.1
     CSP_CONTEXT_KEY = "csp_nonce"
 
     def _nonce_attr(context, media=None):
+        # No nonce to render -- but media still has to be rendered, or the
+        # assets it carries would silently disappear from the page.
         return media.render() if media is not None else ""
 
 
@@ -53,8 +55,8 @@ def csp_nonce_attr(context, media=None):
 
     This is a cross-version stand-in for Django 6.1's built-in tag of the same
     name. Django 6.1 registers ``csp_nonce_attr`` as a built-in, so loading
-    ``cms_static`` shadows it with this identical implementation; on Django 5.2
-    and 6.0, where the built-in does not exist, the fallback renders nothing.
+    ``cms_static`` shadows it with this identical implementation. Django 5.2 and
+    6.0 have no CSP support at all, so there the tag renders no nonce.
 
     Usage::
 

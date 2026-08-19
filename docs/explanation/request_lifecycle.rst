@@ -85,7 +85,7 @@ Before the CMS view runs, Django's middleware stack fires in order.
     disables CMS-level caching for the request.
 
 
-1. URL resolution
+2. URL resolution
 -----------------
 
 The request arrives at :func:`cms.views.details` via the CMS URLconf.
@@ -322,9 +322,9 @@ serializes the result. The cache is invalidated by
 deleted — selectively by site and language or globally.
 
 Menu building and toolbar authorization also consult the permission
-cache (see `Step 7`_) to determine which pages are visible to the
-current user based on ``hide_untranslated``, login-required, and
-view-restriction settings.
+cache (see :ref:`Step 7 <placeholder_rendering_step>`) to determine
+which pages are visible to the current user based on
+``hide_untranslated``, login-required, and view-restriction settings.
 
 For the full menu system, see :doc:`menu_system`.
 
