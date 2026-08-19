@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="icon" type="image/png" href="{% static 'cms/img/favicon.png' %}">
     {% render_block "css" %}
-    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}">
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}" {% csp_nonce_attr %}>
 </head>
 <body class="cms-welcome-bg">
     {% cms_toolbar %}
