@@ -3917,6 +3917,46 @@ class PermissionsOnPageTest(PermissionsTestCase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 
+    def test_set_home_requires_permission_on_old_home(self):
+        """
+        Setting a new home page demotes the current one and rewrites its urls,
+        so change permission on the target page alone is not enough.
+        """
+        old_home = create_page("old-home", "nav_playground.html", "en")
+        old_home.set_as_homepage()
+        new_home = create_page("new-home", "nav_playground.html", "en")
+        endpoint = self.get_admin_url(Page, "set_home", new_home.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, "change_page")
+        self.add_page_permission(staff_user, new_home, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(old_home.reload().is_home)
+        self.assertFalse(new_home.reload().is_home)
+
+    def test_set_home_with_permission_on_both_pages(self):
+        """Change permission on both the old and the new home page is enough."""
+        old_home = create_page("old-home", "nav_playground.html", "en")
+        old_home.set_as_homepage()
+        new_home = create_page("new-home", "nav_playground.html", "en")
+        endpoint = self.get_admin_url(Page, "set_home", new_home.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, "change_page")
+        self.add_page_permission(staff_user, new_home, can_change=True)
+        self.add_page_permission(staff_user, old_home, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(old_home.reload().is_home)
+        self.assertTrue(new_home.reload().is_home)
+
     def test_get_permissions_page_permissions_can_change_without_global_permission(self):
         """Ensure PageAdmin.get_permissions computes can_change from allowed page paths.
 

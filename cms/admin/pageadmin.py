@@ -329,14 +329,21 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     def set_home(self, request, object_id):
         page = self.get_object(request, object_id=object_id)
 
-        if not self.has_change_permission(request, page):
-            raise PermissionDenied("You do not have permission to set 'home'.")
-
         if page is None:
             raise self._get_404_exception(object_id)
 
+        if not self.has_change_permission(request, page):
+            raise PermissionDenied("You do not have permission to set 'home'.")
+
         if not page.is_potential_home():
             return HttpResponseBadRequest(_("The page is not eligible to be home."))
+
+        # Setting a new home page demotes the current one and rewrites the url
+        # paths of both trees, so it takes change permission on both pages.
+        old_home = self.model.objects.filter(is_home=True, site=page.site_id).first()
+
+        if old_home and not self.has_change_permission(request, old_home):
+            raise PermissionDenied("You do not have permission to change the current home page.")
 
         new_home_tree, old_home_tree = page.set_as_homepage(request.user)
 
