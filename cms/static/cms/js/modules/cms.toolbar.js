@@ -794,7 +794,11 @@ class Toolbar {
     _refreshMarkup(newToolbar) {
         const switcher = this.ui.toolbarSwitcher.detach();
 
-        $(this.ui.toolbar).html(newToolbar.children());
+        // Only ever take the first match: callers build this collection with a
+        // page-wide .cms-toolbar search, and jQuery's children() would collect
+        // from every match. Editable content rendering a .cms-toolbar element
+        // must not get its markup copied into the live toolbar.
+        $(this.ui.toolbar).html(newToolbar.first().children());
 
         $('.cms-toolbar-item-cms-mode-switcher').replaceWith(switcher);
 
