@@ -75,18 +75,17 @@ Before the CMS view runs, Django's middleware stack fires in order.
     ``request._current_page_cache`` — an in-process attribute that
     prevents resolving the same page twice during a single request.
 
-``LanguageCookieMiddleware`` (optional — add it to
-:setting:`django:MIDDLEWARE` to enable)
+``LanguageCookieMiddleware`` (optional — add it to :setting:`django:MIDDLEWARE` to enable)
     Persists the user's language preference in a cookie so that
     subsequent visits default to the same language.
 
 ``ToolbarMiddleware``
     Attaches the toolbar if the user is staff and the request is in
-    edit mode (``?edit`` or ``?toolbar_on``). The toolbar's presence
+    edit mode (``?toolbar_on``). The toolbar's presence
     disables CMS-level caching for the request.
 
 
-2. URL resolution
+1. URL resolution
 -----------------
 
 The request arrives at :func:`cms.views.details` via the CMS URLconf.
@@ -181,7 +180,7 @@ plugin rendering, and menu building entirely.
 The check runs only when :setting:`CMS_PAGE_CACHE` is ``True``
 (default), the user is anonymous, the toolbar is not in edit mode, and
 no placeholder on the page uses the legacy ``cache = False`` flag (see
-`Step 7`_).
+:ref:`Step 7 <placeholder_rendering_step>`).
 
 If the conditions are met, ``get_page_cache(request)`` queries
 Django's cache backend for a key composed from the site ID, language,
@@ -229,6 +228,8 @@ The template defines which placeholders exist through ``{% placeholder
 "name" %}`` tags. These are the rendering anchor points for the next
 step.
 
+
+.. _placeholder_rendering_step:
 
 7. Placeholder rendering
 ------------------------
