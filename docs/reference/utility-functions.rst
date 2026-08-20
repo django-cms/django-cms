@@ -28,6 +28,15 @@ Grouper admin
     :show-inheritance:
 
 
+*****
+Pages
+*****
+
+.. module:: cms.utils.page
+
+.. autofunction:: get_page_from_request
+
+
 ************
 Placeholders
 ************

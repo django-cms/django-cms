@@ -1,7 +1,7 @@
 {% extends "admin/delete_confirmation.html" %}
-{% load i18n admin_urls static cms_admin %}
+{% load i18n admin_urls static cms_admin cms_static %}
 {% block extrahead %}{{ block.super }}
-    <style>
+    <style {% csp_nonce_attr %}>
         .flexbox {
             display: flex;
             justify-content: space-between;
