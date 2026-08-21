@@ -387,6 +387,13 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     return _handle_no_apphook(request)
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+            # Enforce the same object-level view check as the structure endpoint
+            # (and, for the page branch above, render_page()'s user_can_view_page).
+            # Without this, any staff user could read the rendered plugin content
+            # of any frontend-editable object. Mutations remain gated by change
+            # permission at the plugin endpoints.
+            if not user_can_view_placeholder_source(request.user, content_type_obj):
+                raise Http404
     except ObjectDoesNotExist as err:
         raise Http404 from err
 
