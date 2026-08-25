@@ -1,10 +1,21 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var PageTree = require('../../../static/cms/js/modules/cms.pagetree').default;
-var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown').default;
-var $ = require('jquery');
+import CMS from '../../../static/cms/js/modules/cms.base';
+import PageTree from '../../../static/cms/js/modules/cms.pagetree';
+import PageTreeDropdowns from '../../../static/cms/js/modules/cms.pagetree.dropdown';
+import $ from 'jquery';
 
-window.CMS = window.CMS || CMS;
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/cms.pagetree.dropdown', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    const actual = await vi.importActual('../../../static/cms/js/modules/cms.pagetree.dropdown');
+
+    registerActual('cms.pagetree.dropdown', actual);
+    return lazyMock('cms.pagetree.dropdown', { default: 'PageTreeDropdowns' });
+});
+
+window.CMS = CMS;
 CMS.PageTree = PageTree;
 CMS.PageTreeDropdowns = PageTreeDropdowns;
 
@@ -22,12 +33,12 @@ describe('CMS.PageTree', function () {
         fixture.load('pagetree.html');
         jasmine.Ajax.install();
         // Use rewiring to inject fake PageTreeDropdowns
-        PageTree.__Rewire__('PageTreeDropdowns', FakePageTreeDropdowns);
+        rewire('PageTreeDropdowns', FakePageTreeDropdowns);
     });
     afterEach(function () {
         fixture.cleanup();
         jasmine.Ajax.uninstall();
-        PageTree.__ResetDependency__('PageTreeDropdowns');
+        resetRewire('PageTreeDropdowns');
     });
 
     it('creates a PageTree class', function () {

@@ -1,12 +1,25 @@
 /* global document */
 import Clipboard from '../../../static/cms/js/modules/cms.clipboard';
 import $ from 'jquery';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
+import ls from 'local-storage';
+import CMS, { Helpers } from '../../../static/cms/js/modules/cms.base';
 
-window.CMS = window.CMS || CMS;
+import { rewire, resetRewire, registerActual } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/cms.plugins', async () => {
+    const { lazyMock } = await import('./helpers/rewire');
+
+    return lazyMock('cms.plugins', { default: 'Plugin' });
+});
+
+// cms.plugins is part of the plugins/structureboard/clipboard import cycle, so
+// the original cannot be loaded from inside the factory - it would deadlock
+registerActual('cms.plugins', await vi.importActual('../../../static/cms/js/modules/cms.plugins'));
+
+window.CMS = CMS;
 CMS.$ = $;
 CMS.API = CMS.API || {};
-CMS.API.Helpers = Clipboard.__GetDependency__('Helpers');
+CMS.API.Helpers = Helpers;
 CMS.Clipboard = Clipboard;
 CMS._instances = [];
 
@@ -190,27 +203,22 @@ describe('CMS.Clipboard', function() {
         });
 
         it('sets up event to handle external updates', () => {
-            Clipboard.__Rewire__('ls', {
-                on(name) {
-                    expect(name).toEqual('cms-clipboard');
-                }
+            spyOn(ls, 'on').and.callFake(function(name) {
+                expect(name).toEqual('cms-clipboard');
             });
             spyOn(CMS.Clipboard.prototype, '_handleExternalUpdate');
 
             clipboard = new CMS.Clipboard();
             expect(CMS.Clipboard.prototype._handleExternalUpdate).not.toHaveBeenCalled();
 
-            Clipboard.__Rewire__('ls', {
-                on(name, fn) {
-                    expect(name).toEqual('cms-clipboard');
-                    fn({ x: 1 });
-                }
+            ls.on.and.callFake(function(name, fn) {
+                expect(name).toEqual('cms-clipboard');
+                fn({ x: 1 });
             });
             clipboard = new CMS.Clipboard();
             expect(CMS.Clipboard.prototype._handleExternalUpdate).toHaveBeenCalledWith({
                 x: 1
             });
-            Clipboard.__ResetDependency__('ls');
         });
     });
 
@@ -242,7 +250,7 @@ describe('CMS.Clipboard', function() {
         it('makes a request to the API', function() {
             clipboard.clear();
             expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
-                url: 'clear-clipboard?cms_path=%2Fcontext.html',
+                url: `clear-clipboard?cms_path=${CMS_PATH}`,
                 post: '{ "csrfmiddlewaretoken": "test_csrf" }',
                 callback: jasmine.any(Function)
             });
@@ -250,7 +258,7 @@ describe('CMS.Clipboard', function() {
             spyOn($, 'noop');
             clipboard.clear($.noop);
             expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
-                url: 'clear-clipboard?cms_path=%2Fcontext.html',
+                url: `clear-clipboard?cms_path=${CMS_PATH}`,
                 post: '{ "csrfmiddlewaretoken": "test_csrf" }',
                 callback: jasmine.any(Function)
             });
@@ -365,7 +373,7 @@ describe('CMS.Clipboard', function() {
                 spyOn(clipboard, 'populate');
                 spyOn(clipboard, '_cleanupDOM');
                 spyOn(clipboard, '_enableTriggers');
-                Clipboard.__Rewire__('Plugin', FakePlugin);
+                rewire('Plugin', FakePlugin);
                 done();
             });
         });
@@ -373,7 +381,7 @@ describe('CMS.Clipboard', function() {
         afterEach(function() {
             pluginConstructor.calls.reset();
             FakePlugin._updateClipboard.calls.reset();
-            Clipboard.__ResetDependency__('Plugin');
+            resetRewire('Plugin');
             fixture.cleanup();
         });
 

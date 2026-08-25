@@ -7,8 +7,7 @@
 
 'use strict';
 
-const { DiffDOM, nodeToObj } = require('../../../static/cms/js/modules/dom-diff');
-
+import { DiffDOM, nodeToObj } from '../../../static/cms/js/modules/dom-diff';
 describe('DiffDOM', function() {
     let dd;
     let container;

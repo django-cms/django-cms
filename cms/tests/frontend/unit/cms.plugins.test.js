@@ -2,16 +2,39 @@
 'use strict';
 import Plugin from '../../../static/cms/js/modules/cms.plugins';
 
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Modal = require('../../../static/cms/js/modules/cms.modal').default;
-var Messages = require('../../../static/cms/js/modules/cms.messages').default;
-var Clipboard = require('../../../static/cms/js/modules/cms.clipboard').default;
-var $ = require('jquery');
+import CMS, { Helpers, KEYS } from '../../../static/cms/js/modules/cms.base';
+import Modal from '../../../static/cms/js/modules/cms.modal';
+import Messages from '../../../static/cms/js/modules/cms.messages';
+import Clipboard from '../../../static/cms/js/modules/cms.clipboard';
+import $ from 'jquery';
 
-window.CMS = window.CMS || CMS;
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.modal', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('cms.modal', await vi.importActual('../../../static/cms/js/modules/cms.modal'));
+    return lazyMock('cms.modal', { default: 'Modal' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.structureboard', async () => {
+    const { lazyMock } = await import('./helpers/rewire');
+
+    return lazyMock('cms.structureboard', { default: 'StructureBoard' });
+
+});
+
+window.CMS = CMS;
 CMS.API = CMS.API || {};
-CMS.API.Helpers = Plugin.__GetDependency__('Helpers');
-CMS.KEYS = Plugin.__GetDependency__('KEYS');
+CMS.API.Helpers = Helpers;
+CMS.KEYS = KEYS;
 CMS.$ = $;
 CMS.Plugin = Plugin;
 CMS.Modal = Modal;
@@ -44,16 +67,18 @@ describe('CMS.Plugin', function() {
     beforeEach(function(done) {
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        Plugin.__Rewire__('showLoader', showLoader);
-        Plugin.__Rewire__('hideLoader', hideLoader);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
         $(function() {
             CMS.settings = {
                 dragbars: [],
                 states: []
             };
 
-            Plugin.__Rewire__('isStructureReady', () => true);
-            Plugin.__Rewire__('isContentReady', () => true);
+            // isStructureReady()/isContentReady() are module private, and
+            // legacy_mode is what makes both of them true
+            CMS.config = $.extend(true, { settings: {} }, CMS.config);
+            CMS.config.settings.legacy_mode = true;
 
             spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function(value) {
                 CMS.settings = $.extend(true, {}, CMS.settings, value);
@@ -66,10 +91,8 @@ describe('CMS.Plugin', function() {
         Plugin.aliasPluginDuplicatesMap = {};
         Plugin.staticPlaceholderDuplicatesMap = {};
         $(document).off('dblclick.cms.plugin pointerover.cms.plugin pointerout.cms.plugin');
-        Plugin.__ResetDependency__('isStructureReady');
-        Plugin.__ResetDependency__('isContentReady');
-        Plugin.__ResetDependency__('showLoader');
-        Plugin.__ResetDependency__('hideLoader');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     describe('instance', function() {
@@ -80,6 +103,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -447,6 +471,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins_complex_markup.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -502,6 +527,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -530,7 +556,7 @@ describe('CMS.Plugin', function() {
                         copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
-                Plugin.__Rewire__('Modal', FakeModal);
+                rewire('Modal', FakeModal);
                 FakeModal.prototype.on = jasmine.createSpy();
                 FakeModal.prototype.open = jasmine.createSpy();
                 done();
@@ -538,7 +564,7 @@ describe('CMS.Plugin', function() {
         });
 
         afterEach(function() {
-            Plugin.__ResetDependency__('Modal');
+            resetRewire('Modal');
             jasmine.Ajax.uninstall();
             fixture.cleanup();
         });
@@ -592,7 +618,7 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open).toHaveBeenCalledWith({
                 url:
                     '/en/admin/cms/page/add-plugin/' +
-                        '?placeholder_id=1&plugin_type=TextPlugin&cms_path=%2Fcontext.html' +
+                        `?placeholder_id=1&plugin_type=TextPlugin&cms_path=${CMS_PATH}` +
                         '&plugin_language=en&plugin_position=42',
                 title: 'Text plugin'
             });
@@ -621,11 +647,12 @@ describe('CMS.Plugin', function() {
         }
 
         beforeEach(function(done) {
-            Plugin.__Rewire__('Modal', FakeModal);
+            rewire('Modal', FakeModal);
             spyOn(CMS.API.Helpers, 'addEventListener');
             FakeModal.prototype.open = jasmine.createSpy();
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -655,7 +682,7 @@ describe('CMS.Plugin', function() {
         });
 
         afterEach(function() {
-            Plugin.__ResetDependency__('Modal');
+            resetRewire('Modal');
             fixture.cleanup();
         });
 
@@ -697,6 +724,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -750,7 +778,7 @@ describe('CMS.Plugin', function() {
         it('makes a request to the API', function() {
             expect(plugin.copyPlugin(plugin.options)).toEqual(undefined);
             var request = jasmine.Ajax.requests.mostRecent();
-            expect(request.url).toEqual('/en/admin/cms/page/copy-plugins/?cms_path=%2Fcontext.html');
+            expect(request.url).toEqual(`/en/admin/cms/page/copy-plugins/?cms_path=${CMS_PATH}`);
             expect(request.method).toEqual('POST');
             expect(request.data()).toEqual({
                 source_placeholder_id: ['1'],
@@ -883,6 +911,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -947,7 +976,7 @@ describe('CMS.Plugin', function() {
             expect(plugin.cutPlugin()).toEqual(undefined);
 
             expect($.ajax).toHaveBeenCalledWith({
-                url: '/en/admin/cms/page/move-plugin/?cms_path=%2Fcontext.html',
+                url: `/en/admin/cms/page/move-plugin/?cms_path=${CMS_PATH}`,
                 type: 'POST',
                 data: {
                     placeholder_id: 'clipboardId',
@@ -1056,6 +1085,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html', 'clipboard.html', true);
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1082,7 +1112,7 @@ describe('CMS.Plugin', function() {
                         return [];
                     }
                 };
-                Plugin.__Rewire__('StructureBoard', {
+                rewire('StructureBoard', {
                     actualizePluginCollapseStatus: jasmine.createSpy()
                 });
                 spyOn(CMS.Plugin.prototype, 'movePlugin');
@@ -1197,6 +1227,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1266,7 +1297,7 @@ describe('CMS.Plugin', function() {
             CMS.API.locked = false;
             expect(plugin.movePlugin()).toEqual(undefined);
             var request = jasmine.Ajax.requests.mostRecent();
-            expect(request.url).toEqual('/en/admin/cms/page/move-plugin/?cms_path=%2Fcontext.html');
+            expect(request.url).toEqual(`/en/admin/cms/page/move-plugin/?cms_path=${CMS_PATH}`);
             expect(request.method).toEqual('POST');
             expect(request.data()).toEqual({
                 plugin_id: ['1'],
@@ -1412,10 +1443,11 @@ describe('CMS.Plugin', function() {
         FakeModal.prototype.open = jasmine.createSpy();
 
         beforeEach(function(done) {
-            Plugin.__Rewire__('Modal', FakeModal);
+            rewire('Modal', FakeModal);
             fixture.load('plugins.html');
             spyOn(CMS.API.Helpers, 'addEventListener').and.callThrough();
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1445,7 +1477,7 @@ describe('CMS.Plugin', function() {
         });
 
         afterEach(function() {
-            Plugin.__ResetDependency__('Modal');
+            resetRewire('Modal');
             fixture.cleanup();
         });
 
@@ -1477,6 +1509,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1527,6 +1560,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1568,6 +1602,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1605,7 +1640,7 @@ describe('CMS.Plugin', function() {
             spyOn(plugin, 'editPlugin');
             plugin.editPluginPostAjax({}, { url: 'test-url', breadcrumb: 'whatever' });
             expect(plugin.editPlugin).toHaveBeenCalledWith(
-                'test-url?cms_path=%2Fcontext.html',
+                `test-url?cms_path=${CMS_PATH}`,
                 'Test Text Plugin',
                 'whatever'
             );
@@ -1618,6 +1653,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1704,6 +1740,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -1826,7 +1863,7 @@ describe('CMS.Plugin', function() {
             link.trigger(Plugin.click);
             expect(plugin.editPlugin).toHaveBeenCalledTimes(1);
             expect(plugin.editPlugin).toHaveBeenCalledWith(
-                'edit_plugin_url?cms_path=%2Fcontext.html',
+                `edit_plugin_url?cms_path=${CMS_PATH}`,
                 'MockPlugin',
                 'MockBreadcrumb'
             );
@@ -1906,7 +1943,7 @@ describe('CMS.Plugin', function() {
 
             expect(plugin.deletePlugin).toHaveBeenCalledTimes(1);
             expect(plugin.deletePlugin).toHaveBeenCalledWith(
-                'DELETE_URL?cms_path=%2Fcontext.html',
+                `DELETE_URL?cms_path=${CMS_PATH}`,
                 'MockPlugin',
                 'Breadcrumb'
             );
@@ -1919,6 +1956,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -2013,6 +2051,7 @@ describe('CMS.Plugin', function() {
         beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.config = {
+                settings: { legacy_mode: true },
                 csrf: 'CSRF_TOKEN',
                 request: {
                     language: 'en'
@@ -2096,6 +2135,7 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             $(function() {
                 CMS.config = {
+                    settings: { legacy_mode: true },
                     csrf: 'CSRF_TOKEN',
                     request: {
                         language: 'en'
@@ -2269,6 +2309,7 @@ describe('CMS.Plugin', function() {
             fixture.load('plugin_child_classes.html');
             $(function() {
                 CMS.config = {
+                    settings: { legacy_mode: true },
                     csrf: 'CSRF_TOKEN',
                     request: {
                         language: 'en'
@@ -2361,6 +2402,7 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             $(function() {
                 CMS.config = {
+                    settings: { legacy_mode: true },
                     csrf: 'CSRF_TOKEN',
                     request: {
                         language: 'en'

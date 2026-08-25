@@ -3,7 +3,7 @@ import $ from 'jquery';
 
 import keyboard from '../keyboard';
 import tmpl from '../tmpl';
-var template = require('./help.html');
+import template from './help.html';
 
 /**
  * Binds [?] to open modal with shorcuts listing.

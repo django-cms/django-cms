@@ -13,7 +13,6 @@ const gulpSass = require('gulp-sass')(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 const eslint = require('gulp-eslint-new');
 const webpack = require('webpack');
-const { Server: KarmaServer, config: karmaConfig } = require('karma');
 
 // Logging utilities to replace gulp-util
 const log = {
@@ -45,7 +44,8 @@ const PROJECT_PATTERNS = {
         PROJECT_PATH.js + '/widgets/*.js',
         PROJECT_PATH.js + '/*.js',
         PROJECT_PATH.tests + '/**/*.js',
-        '!' + PROJECT_PATH.tests + '/unit/helpers/**/*.js',
+        '!' + PROJECT_PATH.tests + '/unit/helpers/jasmine-jquery.js',
+        '!' + PROJECT_PATH.tests + '/unit/helpers/mock-ajax.js',
         '!' + PROJECT_PATH.tests + '/coverage/**/*.js',
         '!' + PROJECT_PATH.js + '/modules/jquery.*.js',
         '!' + PROJECT_PATH.js + '/dist/*.js'
@@ -162,25 +162,19 @@ function lint() {
                 .pipe(eslint.failAfterError());
 }
 
-const unitTest = async (done) => {
-    try {
-        const parsedConfig = await karmaConfig.parseConfig(
-            PROJECT_PATH.tests + '/karma.conf.js',
-            { singleRun: true },
-            { promiseConfig: true, throwErrors: true }
-        );
-        const server = new KarmaServer(parsedConfig, (exitCode) => {
-            if (exitCode !== 0) {
-                done(new Error(`Karma tests failed with exit code ${exitCode}`));
-                process.exit(exitCode);
-            } else {
-                done();
-            }
-        });
-        server.start();
-    } catch (error) {
-        done(error);
-    }
+const unitTest = (done) => {
+    const { spawn } = require('child_process');
+    const args = process.argv.slice(3).filter((arg) => !arg.startsWith('--tests'));
+    const child = spawn('npx', ['vitest', 'run'].concat(args), { stdio: 'inherit', shell: true });
+
+    child.on('exit', (code) => {
+        if (code !== 0) {
+            done(new Error(`Unit tests failed with exit code ${code}`));
+            process.exit(code);
+        } else {
+            done();
+        }
+    });
 };
 
 const testsIntegration = (done) => {
@@ -190,6 +184,16 @@ const testsIntegration = (done) => {
     const baseUrl = process.env.BASE_URL || 'http://localhost:9009';
     const port = argv.port || 9009;
     const serverArgs = argv.serverArgs || '';
+
+    // testserver.py runs with migrations disabled and creates missing tables via
+    // `migrate --run-syncdb`, which never alters an existing schema. A database
+    // left over from an older checkout therefore fails every request with a
+    // column that does not exist, so start each run from a fresh one. Skipped
+    // when DATABASE_URL points somewhere else.
+    if (!process.env.DATABASE_URL) {
+        fs.rmSync('testdb.sqlite', { force: true });
+        log.info('Removed the previous test database');
+    }
 
     log.info('Starting Django test server...');
 
