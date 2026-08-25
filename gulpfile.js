@@ -185,6 +185,16 @@ const testsIntegration = (done) => {
     const port = argv.port || 9009;
     const serverArgs = argv.serverArgs || '';
 
+    // testserver.py runs with migrations disabled and creates missing tables via
+    // `migrate --run-syncdb`, which never alters an existing schema. A database
+    // left over from an older checkout therefore fails every request with a
+    // column that does not exist, so start each run from a fresh one. Skipped
+    // when DATABASE_URL points somewhere else.
+    if (!process.env.DATABASE_URL) {
+        fs.rmSync('testdb.sqlite', { force: true });
+        log.info('Removed the previous test database');
+    }
+
     log.info('Starting Django test server...');
 
     // Start the test server - use .venv/bin/python if exists, otherwise system python
