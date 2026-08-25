@@ -1,13 +1,23 @@
 /* global window, document */
 'use strict';
 
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Sideframe = require('../../../static/cms/js/modules/cms.sideframe').default;
-var $ = require('jquery');
+import CMS from '../../../static/cms/js/modules/cms.base';
+import Sideframe from '../../../static/cms/js/modules/cms.sideframe';
+import $ from 'jquery';
+
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
 var showLoader;
 var hideLoader;
 
-window.CMS = window.CMS || CMS;
+window.CMS = CMS;
 CMS.Sideframe = Sideframe;
 
 describe('CMS.Sideframe', function() {
@@ -15,13 +25,13 @@ describe('CMS.Sideframe', function() {
         CMS.API.Helpers._isStorageSupported = true;
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        Sideframe.__Rewire__('showLoader', showLoader);
-        Sideframe.__Rewire__('hideLoader', hideLoader);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
     });
 
     afterEach(() => {
-        Sideframe.__ResetDependency__('showLoader');
-        Sideframe.__ResetDependency__('hideLoader');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -112,7 +122,7 @@ describe('CMS.Sideframe', function() {
                 spyOn(CMS.API.Helpers, 'getSettings').and.callFake(function() {
                     return { sideframe: {}, edit_off: 1 };
                 });
-                url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
+                url = '/cms/tests/frontend/unit/html/sideframe_iframe.html';
                 done();
             });
         });
@@ -316,7 +326,7 @@ describe('CMS.Sideframe', function() {
                 spyOn(CMS.API.Helpers, 'getSettings').and.callFake(function() {
                     return { sideframe: {} };
                 });
-                url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
+                url = '/cms/tests/frontend/unit/html/sideframe_iframe.html';
                 done();
             });
         });
@@ -499,7 +509,7 @@ describe('CMS.Sideframe', function() {
                 open: jasmine.createSpy()
             };
             $(function() {
-                url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
+                url = '/cms/tests/frontend/unit/html/sideframe_iframe.html';
                 sideframe = new CMS.Sideframe();
                 sideframe.history = {
                     back: [],
@@ -579,8 +589,8 @@ describe('CMS.Sideframe', function() {
     describe('._goToHistory()', function() {
         var sideframe;
         var urls = [
-            '/base/cms/tests/frontend/unit/html/sideframe_iframe.html',
-            '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            '/cms/tests/frontend/unit/html/sideframe_iframe.html',
+            '/cms/tests/frontend/unit/html/modal_iframe.html'
         ];
         var iframe;
         beforeEach(function(done) {

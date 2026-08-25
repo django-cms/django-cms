@@ -1,14 +1,22 @@
 /* global document */
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Modal = require('../../../static/cms/js/modules/cms.modal').default;
-var $ = require('jquery');
-var Helpers = Modal.__GetDependency__('Helpers');
-var KEYS = Modal.__GetDependency__('KEYS');
+import CMS, { Helpers, KEYS } from '../../../static/cms/js/modules/cms.base';
+import Modal from '../../../static/cms/js/modules/cms.modal';
+import $ from 'jquery';
+
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
 var showLoader;
 var hideLoader;
 
-window.CMS = window.CMS || CMS;
+window.CMS = CMS;
 CMS.Modal = Modal;
 
 describe('CMS.Modal', function() {
@@ -17,8 +25,8 @@ describe('CMS.Modal', function() {
     beforeEach(() => {
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        Modal.__Rewire__('showLoader', showLoader);
-        Modal.__Rewire__('hideLoader', hideLoader);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
         CMS._eventRoot = $('#cms-top');
         CMS.ChangeTracker = function() {
             return {
@@ -30,8 +38,8 @@ describe('CMS.Modal', function() {
     });
 
     afterEach(() => {
-        Modal.__ResetDependency__('showLoader');
-        Modal.__ResetDependency__('hideLoader');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     it('creates a Modal class', function() {
@@ -142,7 +150,7 @@ describe('CMS.Modal', function() {
             expect(modal.open.bind(modal, { html: '<div></div>' })).not.toThrow();
             expect(
                 modal.open.bind(modal, {
-                    url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                    url: '/cms/tests/frontend/unit/html/modal_iframe.html'
                 })
             ).not.toThrow();
         });
@@ -1930,7 +1938,7 @@ describe('CMS.Modal', function() {
 
             modal.ui.modal.addClass('cms-modal-markup');
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html'
             });
 
             expect(modal.ui.modal).toHaveClass('cms-modal-iframe');
@@ -1946,14 +1954,14 @@ describe('CMS.Modal', function() {
             expect(modal.ui.titleSuffix.text()).toEqual('');
 
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html'
             });
 
             expect(modal.ui.titlePrefix.text()).toEqual('');
             expect(modal.ui.titleSuffix.text()).toEqual('');
 
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html',
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html',
                 title: 'Test title'
             });
 
@@ -1967,7 +1975,7 @@ describe('CMS.Modal', function() {
                 throw new Error('Cannot access contents');
             });
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).toHaveBeenCalled();
@@ -1982,7 +1990,7 @@ describe('CMS.Modal', function() {
 
         it('sets up ctrl + enter save', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(CMS.Modal._setupCtrlEnterSave).toHaveBeenCalledWith(
@@ -1994,7 +2002,7 @@ describe('CMS.Modal', function() {
 
         it('shows and hides the loader', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html'
             });
             expect(hideLoader).not.toHaveBeenCalled();
             expect(showLoader).toHaveBeenCalledTimes(1);
@@ -2007,7 +2015,7 @@ describe('CMS.Modal', function() {
 
         it('shows messages if iframe contains them', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(CMS.API.Messages.open).toHaveBeenCalledWith({
@@ -2019,7 +2027,7 @@ describe('CMS.Modal', function() {
 
         it('adds cms-admin cms-admin-modal classes to the iframe body', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect($(this).contents().find('body')).toHaveClass('cms-admin');
@@ -2031,7 +2039,7 @@ describe('CMS.Modal', function() {
         it('removes cms-loader class when iframe is loaded', function(done) {
             jasmine.clock().install();
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             jasmine.clock().tick(501);
             expect(modal.ui.modalBody).toHaveClass('cms-loader');
@@ -2045,7 +2053,7 @@ describe('CMS.Modal', function() {
         describe('reloading', function() {
             it('does not reload the page if not required', function(done) {
                 modal._loadIframe({
-                    url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                    url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
                     expect(Helpers.reloadBrowser).not.toHaveBeenCalled();
@@ -2055,7 +2063,7 @@ describe('CMS.Modal', function() {
             it('does not reload the page if not required', function(done) {
                 modal.enforceReload = true;
                 modal._loadIframe({
-                    url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                    url: '/cms/tests/frontend/unit/html/modal_iframe.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
                     expect(Helpers.reloadBrowser).not.toHaveBeenCalled();
@@ -2066,7 +2074,7 @@ describe('CMS.Modal', function() {
             xit('does reload the page if required', function(done) {
                 modal.enforceReload = true;
                 modal._loadIframe({
-                    url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                    url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
                     expect(Helpers.reloadBrowser).toHaveBeenCalledWith();
@@ -2078,7 +2086,7 @@ describe('CMS.Modal', function() {
                 modal.enforceReload = true;
                 expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
                 modal._loadIframe({
-                    url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                    url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
                     expect(showLoader).toHaveBeenCalledTimes(2);
@@ -2090,7 +2098,7 @@ describe('CMS.Modal', function() {
 
         it('does not close the modal if not required', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
@@ -2099,7 +2107,7 @@ describe('CMS.Modal', function() {
         });
         it('does not close the modal if not required', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
@@ -2110,7 +2118,7 @@ describe('CMS.Modal', function() {
         it('does not close the modal if not required', function(done) {
             modal.enforceClose = true;
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
@@ -2121,7 +2129,7 @@ describe('CMS.Modal', function() {
         it('closes the modal if required', function(done) {
             modal.enforceClose = true;
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).toHaveBeenCalledTimes(1);
@@ -2131,7 +2139,7 @@ describe('CMS.Modal', function() {
 
         it('resets django viewsitelink to open in the top level window', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
@@ -2142,7 +2150,7 @@ describe('CMS.Modal', function() {
 
         it('sets the buttons', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal._setButtons).toHaveBeenCalledWith($(this));
@@ -2153,7 +2161,7 @@ describe('CMS.Modal', function() {
         it('does not reset the saved state if there is no form errors', function(done) {
             modal.saved = 'custom';
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual('custom');
@@ -2164,7 +2172,7 @@ describe('CMS.Modal', function() {
         it('resets the saved state if there is a form error loaded in the iframe', function(done) {
             modal.saved = true;
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_errornote.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_errornote.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual(false);
@@ -2175,7 +2183,7 @@ describe('CMS.Modal', function() {
         it('resets the saved state if there was no success message in the frame', function(done) {
             modal.saved = true;
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_no_success.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_no_success.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual(false);
@@ -2186,7 +2194,7 @@ describe('CMS.Modal', function() {
         it('resets the saved state if there is a form error loaded in the iframe', function(done) {
             modal.saved = true;
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_errorlist.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_errorlist.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual(false);
@@ -2197,7 +2205,7 @@ describe('CMS.Modal', function() {
         xit('reloads browser if iframe was saved and there is no delete confirmation', function(done) {
             modal.saved = true;
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(Helpers.reloadBrowser).toHaveBeenCalledWith(jasmine.any(String));
@@ -2209,7 +2217,7 @@ describe('CMS.Modal', function() {
             modal.saved = true;
             modal.options.onClose = '/custom-on-close';
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(Helpers.reloadBrowser).toHaveBeenCalledWith('/custom-on-close');
@@ -2221,7 +2229,7 @@ describe('CMS.Modal', function() {
             modal.saved = true;
             expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(showLoader).toHaveBeenCalledTimes(1);
@@ -2232,7 +2240,7 @@ describe('CMS.Modal', function() {
 
         it('updates the title of the modal if required', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.ui.titlePrefix.text()).toEqual('I am a title');
@@ -2244,7 +2252,7 @@ describe('CMS.Modal', function() {
 
         it('updates the title of the modal if required', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html',
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html',
                 title: 'Test title'
             });
             modal.ui.modal.find('iframe').on('load', function() {
@@ -2257,7 +2265,7 @@ describe('CMS.Modal', function() {
 
         it('updates the title of the modal if required', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html',
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html',
                 title: '     '
             });
             modal.ui.modal.find('iframe').on('load', function() {
@@ -2270,7 +2278,7 @@ describe('CMS.Modal', function() {
 
         it('sets iframe data ready', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             expect(modal.ui.frame.find('iframe').data('ready')).toEqual(undefined);
             modal.ui.modal.find('iframe').on('load', function() {
@@ -2281,7 +2289,7 @@ describe('CMS.Modal', function() {
 
         it('adds keydown event to close the modal if ESC is pressed inside of the iframe', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 var body = $(this).contents().find('body');
@@ -2305,7 +2313,7 @@ describe('CMS.Modal', function() {
 
         it('adds keydown event that does not close if not confirmed', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             spyOn(modal, '_confirmDirtyEscCancel').and.returnValue(false);
             modal.ui.modal.find('iframe').on('load', function() {
@@ -2324,7 +2332,7 @@ describe('CMS.Modal', function() {
 
         it('does not adjust content if object-tools are not available', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             spyOn($.fn, 'css');
             modal.ui.modal.find('iframe').on('load', function() {
@@ -2335,7 +2343,7 @@ describe('CMS.Modal', function() {
 
         it('does not adjust content if object-tools are available', function(done) {
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             spyOn($.fn, 'css');
             modal.ui.modal.find('iframe').on('load', function() {
@@ -2348,7 +2356,7 @@ describe('CMS.Modal', function() {
             spyOn(modal, '_attachContentPreservingHandlers');
 
             modal._loadIframe({
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+                url: '/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal._attachContentPreservingHandlers).toHaveBeenCalledTimes(1);

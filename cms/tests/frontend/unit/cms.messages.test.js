@@ -1,9 +1,8 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Messages = require('../../../static/cms/js/modules/cms.messages').default;
-var $ = require('jquery');
-
-window.CMS = window.CMS || CMS;
+import CMS from '../../../static/cms/js/modules/cms.base';
+import Messages from '../../../static/cms/js/modules/cms.messages';
+import $ from 'jquery';
+window.CMS = CMS;
 CMS.Messages = Messages;
 
 describe('CMS.Messages', function() {

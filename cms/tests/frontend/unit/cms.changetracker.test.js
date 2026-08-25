@@ -1,11 +1,11 @@
 'use strict';
 
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var ChangeTracker = require('../../../static/cms/js/modules/cms.changetracker').default;
-var jQuery = require('jquery');
+import CMS from '../../../static/cms/js/modules/cms.base';
+import ChangeTracker from '../../../static/cms/js/modules/cms.changetracker';
+import jQuery from 'jquery';
 var $ = jQuery;
 
-window.CMS = window.CMS || CMS;
+window.CMS = CMS;
 CMS.ChangeTracker = ChangeTracker;
 
 describe('CMS.ChangeTracker', function () {
