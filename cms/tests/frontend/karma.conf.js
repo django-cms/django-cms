@@ -7,8 +7,17 @@
 'use strict';
 
 process.env.NODE_ENV = 'test';
-process.env.CHROME_BIN = process.env.CHROME_BIN || require('puppeteer').executablePath();
 
+/**
+ * puppeteer.executablePath() returns a string up to puppeteer 24 and a promise
+ * from puppeteer 25 on. Awaiting the result works for both.
+ */
+function resolveChromeBin() {
+    if (process.env.CHROME_BIN) {
+        return process.env.CHROME_BIN;
+    }
+    return Promise.resolve(require('puppeteer').executablePath());
+}
 
 var path = require('path');
 var fs = require('fs');
@@ -40,7 +49,9 @@ webpackConfig.plugins = [
     })
 ];
 
-module.exports = function (config) {
+module.exports = async function (config) {
+    process.env.CHROME_BIN = await resolveChromeBin();
+
     var browsers = {
         ChromeHeadlessCI: 'used for local testing'
     };
