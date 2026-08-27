@@ -1,3 +1,21 @@
+5.1.2 (2026-08-27)
+==================
+
+Highlights:
+-----------
+
+Statistics:
+-----------
+
+This release includes 0 changelog entries, created with the help of the following contributors
+(in alphabetical order):
+
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 5.1.1 (2026-08-05)
 ==================
 
