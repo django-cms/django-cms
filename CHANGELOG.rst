@@ -7,6 +7,14 @@ Features:
 
 Bug Fixes:
 ----------
+* Copy page missed login required property (#8785) (#8806) (54f505c3c) -- Fabian Braun
+* Grouper admin ignored read-only context for content objects without language field (#8799) (#8808) (c39fbe3e0) -- Fabian Braun
+* GrouperAdmin only showed current content versions (#8700) (#8802) (6747be6d1) -- Fabian Braun
+* Language column in page tree ignored multi-hyphen language codes like de-x-l (#8781) (#8805) (c104ee335) -- Fabian Braun
+* Manual page slug was overwritten when changing page title (#8796) (#8807) (95164e017) -- Fabian Braun
+* Page tree had a n+1 regression fetching urls (#8716) (#8804) (62be07364) -- Fabian Braun
+* check and delete-orphaned-plugins had an n+1 issue (#8701) (#8803) (691ca5496) -- Fabian Braun
+* edit and view endpoint did not check placholder perms (#8794) (#8809) (040a7b1ba) -- Fabian Braun
 * EmptyToolbar missed clipboard and toolbar_language properties (#8745) (#8756) (8594f7c84) -- Fabian Braun
 * Paste-a-copy IDOR discloses unauthorized plugin content (#8746) (#8757) (551302612) -- Fabian Braun
 * Upon edit localized text within plugins were rendered in the wrong language (#8740) (2eaa0e573) -- Fabian Braun
@@ -14,12 +22,15 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 20 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (6 pull requests)
+* Fabian Braun (17 pull requests)
 
 With the review help of the following contributors:
 
+* Github Release Action
+* Vinit Kumar
+* sourcery-ai[bot]
 
 Thanks to all contributors for their efforts!
 

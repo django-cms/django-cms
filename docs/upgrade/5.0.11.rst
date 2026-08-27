@@ -1,0 +1,124 @@
+.. _upgrade-to-5.0.11:
+
+####################
+5.0.11 release notes
+####################
+
+*August 5, 2026*
+
+Welcome to django CMS 5.0.10!
+
+This is a patch release of the 5.0 series. It contains **two security fixes**,
+which is why we recommend that all users of django CMS 5.0.x upgrade as soon as
+possible. There are no migrations and no backward incompatible changes, apart
+from the tightened clipboard permissions described under `Security fixes`_.
+
+If you are upgrading from django CMS 4.1 or earlier, read the release notes of
+all versions in between, in particular the :ref:`5.0.0 release notes
+<upgrade-to-5.0.0>`.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, 5.2, and 6.0**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+************************
+How to upgrade to 5.0.11
+************************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.10 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+********************
+What's new in 5.0.11
+********************
+
+Security fixes
+==============
+
+Both issues are also fixed in django CMS 5.1.1.
+
+Superusers could be managed by subordinate page-user managers
+-------------------------------------------------------------
+
+``get_subordinate_users()`` returned superuser accounts to any user holding
+``can_change_permissions``, in particular to any user granted that right through
+a ``GlobalPagePermission``. Such a manager could edit a superuser account,
+delete it, or change its password through the page-user admin, and thereby take
+it over.
+
+Superusers are now never subordinate to a non-superuser, however many
+permissions the latter holds. ``PageUserAdmin`` additionally rejects change,
+delete, and password-change requests for superuser objects, because Django's
+password view resolves its object directly and only checks
+``has_change_permission()``.
+
+If your project relies on delegated user administration, review who holds
+``GlobalPagePermission`` with ``can_change_permissions``: such a manager has
+every non-superuser account on the site as a subordinate, not only the accounts
+they created. This is now spelled out in :doc:`../explanation/permissions`.
+
+"Paste a copy" disclosed plugin content from unauthorized placeholders
+-----------------------------------------------------------------------
+
+The paste endpoints checked only that the user was allowed to add plugins to
+the *target* placeholder. The pasted plugin, however, is identified by a
+client-supplied id, so a user could paste a plugin (or a placeholder reference)
+from a placeholder they have no read access to into one they control, and read
+its content there.
+
+Both ``_paste_plugin()`` and ``_paste_placeholder()`` now also check the source
+side through the new
+``PlaceholderAdmin.has_paste_from_source_permission()`` hook. Pasting from the
+user's own clipboard is unaffected.
+
+Relatedly, a clipboard is now private to its owner:
+``UserSettings.has_placeholder_change_permission()`` and
+``PlaceholderForeignKey.run_checks()`` previously returned ``True``
+unconditionally — for *every* user, not just the clipboard's owner. They now
+return ``True`` only for the owner (or a superuser).
+
+``PlaceholderAdmin`` subclasses that override the paste endpoints should account
+for the new ``has_paste_from_source_permission(request, source_placeholder,
+plugins)`` hook, which is consulted before the existing
+``has_copy_from_clipboard_permission()`` check. Custom code that relied on the
+previous permissive behavior to access another user's clipboard will now be
+denied.
+
+Features
+========
+* Offer replacement for djangotree-beard dependency (#8744) (#8755) (e358d7eab) -- Fabian Braun
+
+  django CMS now ships ``cms.utils.mptree``, its own dependency-free
+  materialized-path tree implementation for the page tree. Its path encoding is
+  byte-for-byte compatible with treebeard's defaults, so **switching backends
+  requires no migration**. The backend is selected by the ``CMS_TREE_BACKEND``
+  setting (an environment variable of the same name is used as a fallback) and
+  defaults to ``"treebeard"``. To opt in::
+
+      CMS_TREE_BACKEND = "mptree"
+
+  ``django-treebeard`` remains a required dependency in 5.0.10.
+
+Bug Fixes
+=========
+* EmptyToolbar missed clipboard and toolbar_language properties (#8745) (#8756) (8594f7c84) -- Fabian Braun
+* Paste-a-copy IDOR discloses unauthorized plugin content (#8746) (#8757) (551302612) -- Fabian Braun
+* Superuser passwords could be changed if superusers were registered as subordinate users (#8758) (190b435c0) -- Fabian Braun
+* Upon edit localized text within plugins were rendered in the wrong language (#8740) (2eaa0e573) -- Fabian Braun
+
+Thanks to all contributors for their efforts!
