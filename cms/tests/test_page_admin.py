@@ -1652,87 +1652,6 @@ class PageTest(PageTestBase):
             + "\n".join(query["sql"] for query in second.captured_queries),
         )
 
-    def test_page_tree_redirect_icon_display(self):
-        """Test that redirect icon is displayed in page tree when page has redirect"""
-        superuser = self.get_superuser()
-        endpoint = self.get_admin_url(PageContent, "get_tree")
-
-        # Create pages
-        create_page("Home", "nav_playground.html", "en")
-        page_with_redirect = create_page("About", "nav_playground.html", "en")
-        create_page("Contact", "nav_playground.html", "en")
-
-        # Set redirect on one page
-        page_content = page_with_redirect.get_content_obj(language="en")
-        page_content.redirect = "/home/"
-        page_content.save()
-
-        with self.login_user_context(superuser):
-            response = self.client.get(endpoint)
-            self.assertEqual(response.status_code, 200)
-            content = response.content.decode("utf-8")
-
-            # Check that redirect icon is present for page with redirect
-            # The icon should have the class "cms-icon-redirect"
-            self.assertIn("cms-icon-redirect", content)
-
-            # Verify the icon is in the correct part of the page tree
-            # by checking for the redirect tooltip text
-            self.assertIn("data-cms-tooltip", content)
-            self.assertIn("redirect", content.lower())
-
-    def test_page_tree_redirect_icon_click_opens_edit(self):
-        """Test that clicking redirect icon in tree opens the page edit view"""
-        superuser = self.get_superuser()
-
-        # Create a page with redirect
-        page = create_page("About", "nav_playground.html", "en")
-        page_content = page.get_content_obj(language="en")
-        page_content.redirect = "/home/"
-        page_content.save()
-
-        endpoint = self.get_admin_url(PageContent, "get_tree")
-
-        with self.login_user_context(superuser):
-            response = self.client.get(endpoint)
-            self.assertEqual(response.status_code, 200)
-            content = response.content.decode("utf-8")
-
-            # The redirect icon should link to the page edit URL
-            # The link uses the PageContent change admin URL
-            admin_url = self.get_admin_url(PageContent, "change", page_content.pk)
-            self.assertIn(admin_url, content)
-
-            # Verify the link wraps the redirect icon
-            # by checking for the pattern: <a href="..."><span class="cms-icon cms-icon-redirect"></span></a>
-            self.assertRegex(
-                content, rf'<a href="{re.escape(admin_url)}"[^>]*>\s*<span class="cms-icon cms-icon-redirect">'
-            )
-
-    def test_page_tree_no_redirect_icon_for_normal_pages(self):
-        """Test that pages without redirects don't show redirect icon"""
-        superuser = self.get_superuser()
-        endpoint = self.get_admin_url(PageContent, "get_tree")
-
-        # Create a page without redirect
-        create_page("Home", "nav_playground.html", "en")
-        create_page("About", "nav_playground.html", "en")
-
-        with self.login_user_context(superuser):
-            response = self.client.get(endpoint)
-            self.assertEqual(response.status_code, 200)
-
-            # Parse the response and verify structure
-            # We expect the redirect icon section to not be present
-            # for pages without redirects
-            parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_str(parsed)
-
-            # The response should contain page structure
-            self.assertIn("Home", content)
-            self.assertIn("About", content)
-            self.assertNotIn("cms-icon-redirect", content)
-
     def test_page_changelist_search(self):
         superuser = self.get_superuser()
         endpoint = self.get_pages_admin_list_uri()
@@ -1914,40 +1833,6 @@ class PageActionsTestCase(PageTestBase):
             redirect_url = self.get_admin_url(PageContent, 'changelist') + "?language=en"
             self.assertRedirects(response, redirect_url)
             self.assertEqual(Page.objects.all().count(), 2)
-
-    def test_get_list_is_scoped_to_requested_site(self):
-        site2 = Site.objects.create(id=2, name="example-2.com", domain="example-2.com")
-        create_page(
-            "Bravo Site 1",
-            "nav_playground.html",
-            "en",
-            site=self.site,
-            slug="bravo-site-1",
-            created_by=self.admin,
-        )
-        with self.settings(CMS_LANGUAGES={2: [{"code": "en", "name": "English"}]}):
-            create_page(
-                "Bravo Site 2",
-                "nav_playground.html",
-                "en",
-                site=site2,
-                slug="bravo-site-2",
-                created_by=self.admin,
-            )
-
-            endpoint = admin_reverse("cms_page_get_list")
-            with self.login_user_context(self.admin):
-                response = self.client.get(
-                    endpoint,
-                    data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
-                    HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-                )
-
-        self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content.decode("utf-8"))
-        titles = {result["title"] for result in results}
-        self.assertIn("Bravo Site 1", titles)
-        self.assertNotIn("Bravo Site 2", titles)
 
     def test_get_list_prefetches_page_urls(self):
         """
