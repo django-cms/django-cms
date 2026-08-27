@@ -292,7 +292,13 @@ describe('CMS.PageTree', function () {
     describe('_setup() column values', function () {
         var pagetree;
 
-        // resolves a column by its header, as the value functions are anonymous
+        /**
+         * Resolves a column by its header, as the value functions are anonymous.
+         *
+         * @function columnFor
+         * @param {String} header column header
+         * @returns {Object}
+         */
         function columnFor(header) {
             return pagetree.ui.tree
                 .jstree(true)
