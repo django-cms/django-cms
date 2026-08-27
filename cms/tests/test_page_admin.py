@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 import sys
 from contextlib import contextmanager
 from unittest import skipUnless
