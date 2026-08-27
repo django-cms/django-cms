@@ -10,13 +10,17 @@ source "${SCRIPTS}/functions"
 
 # Scopes used in this script. Keep this compatible with the Bash 3 version
 # shipped by macOS, which does not support associative arrays.
-SCOPES=("feat" "security" "fix" "perf" "style" "refactor" "docs" "tools")
+# Not every type accepted by .github/workflows/lint-pr.yml belongs in the
+# changelog: build, chore, ci and test are deliberately left out as internal
+# noise. Reverts are user visible and share the "Bug Fixes:" heading.
+SCOPES=("feat" "security" "fix" "revert" "perf" "style" "refactor" "docs" "tools")
 
 scope_heading() {
     case "$1" in
         feat) echo "Features:" ;;
         security) echo "Security Updates:" ;;
         fix) echo "Bug Fixes:" ;;
+        revert) echo "Bug Fixes:" ;;
         perf) echo "Performance Improvements:" ;;
         style) echo "Styles:" ;;
         refactor) echo "Refactoring and Cleanups:" ;;
@@ -29,6 +33,28 @@ scope_heading() {
 # Conventional commit types included in the generated changelog. Backward
 # incompatible changes deliberately remain a manually maintained section.
 CHANGELOG_TYPES=$(IFS='|'; echo "${SCOPES[*]}")
+
+# awk helper shared by the entry, contributor and reviewer passes: bots and the
+# release automation must not be credited as contributors.
+read -r -d '' AWK_AUTOMATED <<'AWK'
+function automated(name, normalized) {
+    normalized=tolower(name)
+    return normalized ~ /\[bot\]/ || normalized ~ /(^|[^a-z])copilot([^a-z]|$)/ \
+        || normalized ~ /(^|[^a-z])claude([^a-z]|$)/ || normalized ~ /sourcery/ \
+        || normalized ~ /dependabot/ || normalized ~ /github release action/ \
+        || normalized ~ /django cms release/ || normalized == "unknown"
+}
+# Backports repeat the subject of the commit they port, with an extra pull
+# request reference. Strip every reference to recognise them as one entry.
+function entry_key(subject, normalized) {
+    normalized=tolower(subject)
+    gsub(/\(#[0-9]+\)/, "", normalized)
+    gsub(/[[:space:]]+/, " ", normalized)
+    sub(/^[[:space:]]+/, "", normalized)
+    sub(/[[:space:]]+$/, "", normalized)
+    return normalized
+}
+AWK
 VERSION_FIELD_RE='^[0-9]+\.[0-9]+\.[0-9]+'
 
 changelog_check_version() {
@@ -80,6 +106,24 @@ fi
 # Sanity checks
 if [ -z "$(git tag -l "${OLD_FULL_VERSION}")" ]; then
     error "Can not find tag for version ${OLD_FULL_VERSION} aborting ..."
+    exit 1
+fi
+
+# The changelog is built from the commits between the previous tag and HEAD. A
+# shallow clone (the GitHub Actions checkout default) has none of that history,
+# so the generated sections would silently come out empty.
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+    status "Repository is shallow, fetching the full history ..."
+    git fetch --unshallow --tags --quiet || true
+fi
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+    error "Repository history is shallow, the changelog would be incomplete."
+    error "Re-run with a full clone (actions/checkout with fetch-depth: 0)."
+    exit 1
+fi
+if ! git merge-base --is-ancestor "${OLD_FULL_VERSION}" HEAD; then
+    error "Tag ${OLD_FULL_VERSION} is not an ancestor of HEAD."
+    error "The changelog would miss the commits of that release line."
     exit 1
 fi
 
@@ -170,12 +214,11 @@ else
         /^unreleased$/ { getline; next }
         { print }
     ' "${current}" > "${previous}"
+    # No released version carries a "Highlights:" section in the changelog:
+    # highlights belong in docs/upgrade/<version>.rst instead.
     {
         echo "${title}"
         echo "${line}"
-        echo
-        echo "Highlights:"
-        echo "-----------"
         echo
         cat "${previous}"
     } > "${current}"
@@ -184,6 +227,7 @@ fi
 
 # computing / updating each section
 
+ENTRY_COUNT=0
 for scope in "${SCOPES[@]}"; do
     content=$(mktemp)
     heading=$(scope_heading "${scope}")
@@ -191,17 +235,23 @@ for scope in "${SCOPES[@]}"; do
     # only checking on the last version *in the changelog" (ex:rc1 to rc2, the changelog already includes old to rc1)
     # Accept conventional commit scopes and breaking-change markers, for
     # example feat(admin): and fix!:, not only the unscoped "feat:" form.
-    git log "${LAST_FULL_VERSION}..HEAD" --pretty="format:%s (%h) -- %aN" \
-        | awk -v scope="${scope}" '
+    git log "${LAST_FULL_VERSION}..HEAD" --pretty="format:%s%x09%h%x09%aN" \
+        | awk -F '\t' -v scope="${scope}" "${AWK_AUTOMATED}"'
             BEGIN { pattern="^" scope "(\\([^)]*\\))?!?:[[:space:]]*" }
-            tolower($0) ~ pattern {
-                sub(/^[^:]*:[[:space:]]*/, "", $0)
-                print "* " $0
+            tolower($1) ~ pattern && !automated($3) {
+                subject=$1
+                sub(/^[^:]*:[[:space:]]*/, "", subject)
+                key=entry_key(subject)
+                if (key in seen) next
+                seen[key]=1
+                print "* " subject " (" $2 ") -- " $3
             }
         ' > "${content}"
     if [ -z "$(cat "${content}")" ]; then
+        rm "${content}"
         continue
     fi
+    ENTRY_COUNT=$(( ENTRY_COUNT + $(wc -l < "${content}") ))
 
     # making sure the heading is there:
     if ! grep -q "^${heading}\$" "${current}"; then
@@ -228,21 +278,27 @@ for scope in "${SCOPES[@]}"; do
    rm "${content}"
 done
 
+if [ "${ENTRY_COUNT}" -eq 0 ]; then
+    error "No changelog entries found between ${LAST_FULL_VERSION} and HEAD."
+    error "Either no conventional commits (${CHANGELOG_TYPES}) were made since"
+    error "${LAST_FULL_VERSION}, or the history available to git is incomplete."
+    rm -f "${current}" "${legacy}"
+    exit 1
+fi
+
 # Generate statistics from the same conventional commits that produce the
 # changelog. Calling every commit a pull request caused incorrect totals when
 # release commits, merges, or uncategorized maintenance commits were present.
 statistics=$(mktemp)
 git log "${RELEASE_BASE_VERSION}..HEAD" --pretty="format:%s%x09%aN" \
-    | awk -F '\t' -v types="${CHANGELOG_TYPES}" '
+    | awk -F '\t' -v types="${CHANGELOG_TYPES}" "${AWK_AUTOMATED}"'
         BEGIN { pattern="^(" types ")(\\([^)]*\\))?!?:[[:space:]]*" }
-        function automated(name, normalized) {
-            normalized=tolower(name)
-            return normalized ~ /\[bot\]/ || normalized ~ /(^|[^a-z])copilot([^a-z]|$)/ \
-                || normalized ~ /(^|[^a-z])claude([^a-z]|$)/ || normalized ~ /sourcery/ \
-                || normalized ~ /dependabot/ || normalized ~ /github release action/ \
-                || normalized ~ /django cms release/ || normalized == "unknown"
+        tolower($1) ~ pattern && !automated($2) {
+            key=entry_key($1)
+            if (key in seen) next
+            seen[key]=1
+            print $2
         }
-        tolower($1) ~ pattern && !automated($2) { print $2 }
     ' > "${statistics}"
 CHANGE_NUMBER=$(wc -l < "${statistics}" | tr -d ' ')
 if [ "${CHANGE_NUMBER}" -eq 1 ]; then
@@ -263,11 +319,11 @@ EOF
 while read -r name; do
     count=$(grep -Fxc "${name}" "${statistics}")
     if [ "${count}" -gt 1 ]; then
-        pl="s"
+        label="entries"
     else
-        pl=""
+        label="entry"
     fi
-    echo "* ${name} (${count} changelog entr${pl:+ies}${pl:-y})" >> "${current}"
+    echo "* ${name} (${count} changelog ${label})" >> "${current}"
 done < <(sort -u "${statistics}")
 
 # shellcheck disable=SC2129
@@ -277,14 +333,7 @@ With the review help of the following contributors:
 
 EOF
 
-git log "${RELEASE_BASE_VERSION}..HEAD" | awk '
-    function automated(name, normalized) {
-        normalized=tolower(name)
-        return normalized ~ /\[bot\]/ || normalized ~ /(^|[^a-z])copilot([^a-z]|$)/ \
-            || normalized ~ /(^|[^a-z])claude([^a-z]|$)/ || normalized ~ /sourcery/ \
-            || normalized ~ /dependabot/ || normalized ~ /github release action/ \
-            || normalized ~ /django cms release/ || normalized == "unknown"
-    }
+git log "${RELEASE_BASE_VERSION}..HEAD" | awk "${AWK_AUTOMATED}"'
     tolower($0) ~ /^[[:space:]]*co-authored-by:/ {
         sub(/^[^:]*:[[:space:]]*/, "* ")
         sub(/ <.*$/, "")
