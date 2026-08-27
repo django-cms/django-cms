@@ -479,9 +479,9 @@ class Page(MP_Node):
             parent_page = parent_page or parent_node
 
         if parent_page:
-            new_page = parent_page.add_child(site=site)
+            new_page = parent_page.add_child(site=site, login_required=self.login_required)
         else:
-            new_page = Page.add_root(site=site)
+            new_page = Page.add_root(site=site, login_required=self.login_required)
 
         new_page._state = ModelState()
         new_page._clear_internal_cache()
