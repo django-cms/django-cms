@@ -115,6 +115,12 @@ fi
 
 OLDVER=$(python -c "import cms; print(cms.__version__)" )
 
+# A shallow checkout (the GitHub Actions default) has no history between the
+# tags, which makes changelog generation come up empty.
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+    status "- Repository is shallow, fetching the full history"
+    git fetch --unshallow --tags --quiet
+fi
 git fetch --all --tags --quiet
 if [ -z "$(git tag -l "${OLDVER}")" ]; then
     error "Can not find tag for version ${OLDVER} aborting ..."

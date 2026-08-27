@@ -4,15 +4,15 @@
 5.1.2 release notes
 ###################
 
-*August 5, 2026*
+*August 27, 2026*
 
-Welcome to django CMS 5.1.1!
+Welcome to django CMS 5.1.2!
 
-These release notes cover what has changed since django CMS 5.1.0. This is a
-patch release, but it contains two security fixes, two database migrations, and
-a change to how page URLs are stored and validated. Read the upgrade
-instructions and the backward-incompatible section before updating an existing
-project.
+These release notes cover what has changed since django CMS 5.1.1. This is a
+patch release. It contains no new migrations, but it fixes the 5.1.1 migrations
+so that they also apply on SQLite, and it tightens authorization on several
+endpoints. Projects that could not apply the 5.1.1 migrations should upgrade
+directly to 5.1.2.
 
 If you are upgrading from django CMS 5.0.x or earlier, read the
 :ref:`5.1.0 release notes <upgrade-to-5.1.0>` first — they cover the backward
@@ -33,64 +33,53 @@ It supports **Python 3.10, 3.11, 3.12, 3.13, and 3.14**.
 Release highlights
 ******************
 
-* **Two security fixes.** A non-superuser page-user manager could manage — and
-  therefore take over — superuser accounts. And the "paste a copy" endpoint
-  only checked the target placeholder, so a client-supplied plugin id could be
-  used to copy plugin content out of a placeholder the user is not allowed to
-  read. Both are fixed; see `Security fixes`_.
+* **Authorization fixes.** The edit and view endpoints did not check
+  placeholder permissions, so a user without change permission on a
+  placeholder could still reach its editing endpoints. Setting a new home page
+  no longer only requires permission on the new page, but also on the page that
+  is being demoted.
 
-* **Page URLs are versioned with the content.** The slug and overwrite URL now
-  live on ``PageContent``, so they are versioned together with the rest of the
-  content. Path uniqueness per site and language is now enforced by a database
-  constraint, and unpublished pages no longer resolve. Two migrations are
-  included.
+* **The 5.1.1 migrations now apply on SQLite.** ``cms.0044`` failed on SQLite
+  when djangocms-versioning was installed, which blocked the upgrade to 5.1.1
+  for those projects. The migration itself is unchanged in what it produces, so
+  no new migration is added and databases already migrated on 5.1.1 are
+  unaffected.
 
-* **An optional page tree backend without django-treebeard.** django CMS now
-  ships its own materialized-path implementation. It is byte-compatible with
-  treebeard's path encoding, so it can be switched on and off per deployment
-  without a migration. ``treebeard`` remains the default in 5.1.1.
+* **Manually entered page slugs are kept.** Changing a page title overwrote a
+  slug that had been entered by hand — a regression from moving the slug onto
+  ``PageContent`` in 5.1.1.
 
-* **Correct language when editing.** Plugins re-rendered after an edit were
-  rendered in the request language rather than the plugin's own language.
+* **Content Security Policy nonces on Django 6.1.** The admin, toolbar and
+  wizard templates emit the nonce Django 6.1 provides, so django CMS works
+  under a nonce-based CSP without ``unsafe-inline``.
 
 ***********************
 How to upgrade to 5.1.2
 ***********************
 
-Before upgrading, back up your database and review the
-:ref:`backward-incompatible changes <upgrade-5.1.1-backward-incompatible>`
-below. This release changes where page slugs and overwrite URLs are stored and
-adds a uniqueness constraint on page paths, so the migrations are not purely
-additive.
+This release adds no migrations and no backward incompatible changes. Upgrade
+django CMS::
 
-Upgrade django CMS::
+    python -m pip install --upgrade "django-cms==5.1.2"
 
-    python -m pip install --upgrade "django-cms==5.1.1"
+Then collect static files and run the django CMS checks::
 
-Then apply the migrations, collect static files, and run the django CMS checks::
-
-    python manage.py migrate
     python manage.py collectstatic --noinput
     python manage.py cms check
 
-Two migrations are applied:
+Collecting static files is required: this release changes the toolbar
+JavaScript and the path from which the welcome page loads ``welcome.js``.
 
-* ``cms.0044_pagecontent_slug_overwrite_url`` copies the currently effective
-  slug and overwrite URL from ``PageUrl`` onto every page content.
-* ``cms.0045_pageurl_site_unique_path`` adds a denormalized ``site`` foreign key
-  to ``PageUrl``, fills it, resolves any pre-existing duplicate paths, and adds
-  the uniqueness constraint.
+Projects upgrading from 5.1.0 also have to apply the migrations introduced in
+5.1.1::
 
-.. warning::
+    python manage.py migrate
 
-    If your database contains pages that share the same path on the same site
-    and language — which was possible before, although only one of them was
-    ever served — the migration keeps the path for one of them and leaves the
-    others without a path until they are published again. Run the migration
-    against a copy of your production database first and check the result.
-
-Test custom plugins, apphooks, permissions, frontend editing, and all templates
-in a staging environment before deploying.
+Those are the two migrations described in the
+:ref:`5.1.1 release notes <upgrade-to-5.1.1>`. 5.1.2 only repairs
+``cms.0044_pagecontent_slug_overwrite_url`` so that it also runs on SQLite when
+djangocms-versioning is installed; the resulting schema and data are unchanged,
+so databases that migrated successfully on 5.1.1 need no further action.
 
 *******************
 What's new in 5.1.2
@@ -99,208 +88,97 @@ What's new in 5.1.2
 Security fixes
 ==============
 
-Superusers could be managed by subordinate page-user managers
--------------------------------------------------------------
+Editing endpoints did not check placeholder permissions
+-------------------------------------------------------
 
-``get_subordinate_users()`` returned superuser accounts to any user holding
-``can_change_permissions``, in particular to any user granted that right through
-a ``GlobalPagePermission``. Such a manager could edit a superuser account,
-delete it, or change its password through the page-user admin, and thereby take
-it over.
+``render_object_endpoint()`` resolved the requested object and rendered it
+without an object-level view check, unlike the structure endpoint and, for
+pages, ``render_page()``. Any staff user could therefore read the rendered
+plugin content of any frontend-editable object, including placeholders they
+have no access to. The endpoint now calls
+``user_can_view_placeholder_source()`` and raises ``Http404`` when the check
+fails. Mutations were, and remain, gated by change permission at the plugin
+endpoints.
 
-Superusers are now never subordinate to a non-superuser, however many
-permissions the latter holds. ``PageUserAdmin`` additionally rejects change,
-delete, and password-change requests for superuser objects, because Django's
-password view resolves its object directly and only checks
-``has_change_permission()``.
+Setting a home page did not require permission on the previous one
+-------------------------------------------------------------------
 
-If your project relies on delegated user administration, review who holds
-``GlobalPagePermission`` with ``can_change_permissions``: such a manager has
-every non-superuser account on the site as a subordinate, not only the accounts
-they created. This is now spelled out in :doc:`../explanation/permissions`.
+``PageAdmin.set_home()`` only checked change permission on the page being
+promoted. Promoting a page demotes the current home page and rewrites the URL
+paths of both trees, so a user with change permission on a single page could
+change the URLs of a page tree they have no permission for. Change permission
+on the current home page is now required as well.
 
-"Paste a copy" disclosed plugin content from unauthorized placeholders
------------------------------------------------------------------------
+Editable content could inject markup into the toolbar
+------------------------------------------------------
 
-The paste endpoints checked only that the user was allowed to add plugins to
-the *target* placeholder. The pasted plugin, however, is identified by a
-client-supplied id, so a user could paste a plugin (or a placeholder reference)
-from a placeholder they have no read access to into one they control, and read
-its content there.
+When refreshing the toolbar, ``Toolbar._refreshMarkup()`` copied the children
+of *every* element matching ``.cms-toolbar`` on the page. Editable content that
+renders an element with that class — plugin content, for instance — had its
+markup copied into the live toolbar. Only the first match is used now.
 
-Both ``_paste_plugin()`` and ``_paste_placeholder()`` now also check the source
-side through the new
-``PlaceholderAdmin.has_paste_from_source_permission()`` hook. Pasting from the
-user's own clipboard is unaffected.
+CSRF form for POST toolbar items was assembled from a string
+--------------------------------------------------------------
 
-Relatedly, a clipboard is now private to its owner:
-``UserSettings.has_placeholder_change_permission()`` and
-``PlaceholderForeignKey.run_checks()`` previously returned ``True``
-unconditionally — for *every* user, not just the clipboard's owner. They now
-return ``True`` only for the owner (or a superuser).
+``Toolbar._sendPostRequest()`` built its hidden form by concatenating the item's
+``href`` and the CSRF token into an HTML string, so a quote or angle bracket in
+either could break out of the attribute it was placed in. The form and its token
+input are now created through DOM APIs, which puts both values in attribute
+positions that cannot be escaped.
 
-Page URLs
-=========
+Release pipeline
+----------------
 
-The slug and the overwrite URL of a page are now stored on the
-:class:`~cms.models.contentmodels.PageContent` model, so they are versioned
-together with the rest of the content when a versioning package such as
-djangocms-versioning is installed. The ``PageUrl`` model remains the routing
-table, but its entries are derived from the *published* content only. A data
-migration copies the currently effective slug and overwrite URL from the
-existing ``PageUrl`` objects onto every page content.
+The PyPI publishing workflows were split into a build job and a publish job, so
+that the job running third-party code — pip, the build backend,
+``check-wheel-contents`` — no longer holds the ``id-token: write`` permission
+needed to mint an OIDC token for trusted publishing. The build tooling is
+hash-pinned in ``.github/requirements/build.txt`` and installed with
+``--require-hashes``, the distribution is built with ``--no-isolation`` so the
+backend comes from those pins, and ``pypa/gh-action-pypi-publish`` is pinned to
+a commit instead of the mutable ``release/v1`` branch.
 
-This changes URL behavior in a few user-visible ways:
+Features
+========
 
-* Changing the slug or overwrite URL of a draft no longer affects the live URL;
-  the change takes effect when the draft is published. Consequently, these
-  fields are no longer locked in the page admin while a published version
-  exists. Without a versioning package every save remains public and updates
-  the URL immediately, as before.
-* Unpublishing a page content removes the URL's path, so the page — and its
-  descendant pages — stop resolving. The slug stays reserved for the page and
-  the path is restored on the next publish.
-* Publishing a version whose derived URL collides with the URL of another page
-  on the same site raises an ``IntegrityError`` and the publish is not applied.
-* Path uniqueness per site and language is now also enforced by a database
-  constraint. ``PageUrl`` carries a denormalized ``site`` foreign key for this
-  purpose; a data migration fills it and resolves any pre-existing duplicate
-  paths (of each set, only one page was actually served — it keeps the path,
-  the others become unreachable until their next publish).
-* Updating the URLs of a page's descendants (e.g. after a rename) now runs one
-  query per tree level instead of two queries per descendant page.
-
-``Page.get_absolute_url()`` now returns ``None`` for unreachable pages; see
-:ref:`upgrade-5.1.1-backward-incompatible` below.
-
-Optional page tree backend without django-treebeard
-===================================================
-
-django CMS now ships ``cms.utils.mptree``, its own dependency-free
-materialized-path tree implementation for the page tree. It treats
-``parent_id`` as the single source of truth and maintains ``path``, ``depth``,
-and ``numchild`` as a derived cache, operating set-based rather than pulling
-subtrees into Python, and locking at parent-row granularity.
-
-Its fields are declared identically to treebeard's ``MP_Node`` and its path
-encoding is byte-for-byte compatible with treebeard's defaults (base-36
-alphabet, ``steplen=4``, no separators), so **switching backends requires no
-migration** — the same database works with either.
-
-The backend is selected by the ``CMS_TREE_BACKEND`` setting and defaults to
-``"treebeard"``. To opt in::
-
-    CMS_TREE_BACKEND = "mptree"
-
-An environment variable of the same name is used as a fallback when the setting
-is not defined, which keeps the backends swappable in CI without touching the
-settings module. The value is resolved at import time, so changing it requires a
-process restart. In ``mptree`` mode, ``treebeard`` is never imported.
-
-This is a preparatory step towards dropping the ``django-treebeard`` dependency.
-It remains a required dependency in 5.1.1, now pinned to ``>=4.3,<6``.
-
-Minor features
-==============
-
-* ``pytest`` is now configured for the django CMS test suite. Test settings
-  moved from ``manage.py`` into ``cms/tests/settings.py``, so the suite can be
-  run with either ``pytest`` or ``manage.py test``.
-
-* Wheels are now built from an explicit package allow-list and checked with
-  ``check-wheel-contents`` in the publishing workflows.
-
-* The custom plugin how-to documents the XSS security contract for plugin
-  authors: what django CMS escapes, what it does not, and where a plugin is
-  responsible for escaping its own content. See
-  :doc:`../how_to/09-custom_plugins`.
+* Support Content Security Policy nonces introduced in Django 6.1 (#8792) -- Fabian Braun
 
 Bug Fixes
 =========
 
-* Fix superuser accounts being manageable by non-superuser page-user managers
-* Fix "paste a copy" disclosing plugin content from placeholders the user
-  cannot read
-* Fix plugins being re-rendered in the request language instead of the plugin's
-  own language after an edit
-* Fix the squashed initial migration failing with a custom user model
-* Fix ``EmptyToolbar`` missing the ``clipboard`` and ``toolbar_language``
-  properties, which made the placeholder admin fail when no toolbar was
-  attached to the request
-* Avoid N+1 queries when copying pages or plugins between languages
-* Remove the stray ``docs``, ``scripts``, and ``test_requirements``
-  directories from the wheel
-* Correct the Bootstrap icon license notice
+* Enforce placeholder permissions on the edit and view endpoints (#8794) -- Fabian Braun
+* Fix ``GrouperModelAdmin`` ignoring the read-only context for content objects without a language
+  field (#8799) -- Fabian Braun
+* Prevent a manually entered page slug from being overwritten when changing the page title (#8796)
+  -- Fabian Braun
+* Avoid needlessly clearing the permission caches on Django 6.1 signals (#8791) -- Fabian Braun
+* Allow copying plugins from write-protected (published) content (#8786) -- Fabian Braun
+* Harden the toolbar JavaScript (#8790) -- Fabian Braun
+* Require permission to change the previous home page before setting a new one (#8789) -- Fabian Braun
+* Explicitly escape the CSRF token used for POST requests (#8787) -- Fabian Braun
+* Harden the PyPI publish workflows (#8788) -- Fabian Braun
+* Fix copying a page dropping its login-required property (#8785) -- Fabian Braun
+* Limit the number of plugins displayed in the plugin deletion confirmation (#8784) -- Fabian Braun
+* Fix migration 0044 failing on SQLite when versioning was installed (#8777, #8779) -- Fabian Braun
+* Fix the language column in the page tree ignoring multi-hyphen language codes such as ``de-x-l``
+  (#8781) -- Fabian Braun
+* Fix the wrong ``welcome.js`` path (#8761) -- Fabian Braun
+* Add PostgreSQL 15 minimum version coverage for Django 6.1 to CI (#8774) -- Atiqur Rahman
 
-.. _upgrade-5.1.1-backward-incompatible:
 
-**************************************
-Backward incompatible changes in 5.1.1
-**************************************
+Statistics
+==========
 
-``get_absolute_url()`` of unreachable pages
-===========================================
+This release includes 16 changelog entries, created with the help of the following contributors
+(in alphabetical order):
 
-``Page.get_absolute_url()`` (and consequently
-``PageContent.get_absolute_url()``) now returns ``None`` for pages without a
-reachable path — for example, while the page or one of its ancestors is
-unpublished. Previously a URL was fabricated from the bare slug, which pointed
-to a location that never resolved (or resolved to a different page).
+* Atiqur Rahman (1 changelog entry)
+* Fabian Braun (15 changelog entries)
 
-Python code that consumes the result without checking it should be reviewed;
-django CMS's own toolbar helpers already handle the ``None`` case. In
-templates, rendering the value unchecked now produces ``href="None"`` —
-use Django's ``default`` filter to render a safe fallback instead:
+With the review help of the following contributors:
 
-.. code-block:: html+django
+* Fabian Braun
+* Mark Walker
+* Vinit Kumar
 
-    <a href="{{ page.get_absolute_url|default:'' }}">{{ page.get_title }}</a>
-
-Page slug and overwrite URL fields
-==================================
-
-The slug and overwrite URL are now fields of ``PageContent`` rather than of
-``PageUrl``. Code that wrote to ``PageUrl`` directly to rename a page should
-write to the page content instead and let django CMS derive the routing table
-from it. See `Page URLs`_ above for the behavioral consequences, including the
-new per-site, per-language uniqueness constraint on ``PageUrl.path``.
-
-Clipboard permissions
-=====================
-
-``UserSettings.has_placeholder_change_permission()`` and
-``PlaceholderForeignKey.run_checks()`` no longer return ``True``
-unconditionally; they now grant access only to the clipboard's owner and to
-superusers. Custom code that relied on the previous permissive behavior to
-access another user's clipboard will now be denied.
-
-``PlaceholderAdmin`` subclasses that override the paste endpoints should
-account for the new
-``has_paste_from_source_permission(request, source_placeholder, plugins)``
-hook, which is consulted before the existing
-``has_copy_from_clipboard_permission()`` check.
-
-Wheel contents
-==============
-
-The 5.1.0 wheel erroneously included the top-level directories ``docs``,
-``scripts``, and ``test_requirements``. They have been removed from the wheel
-without a deprecation period: they are not part of django CMS's Python API, and
-projects importing from them were relying on a packaging accident. Wheels are
-now built from an explicit package allow-list and verified with
-``check-wheel-contents`` in the publishing workflows.
-
-Features deprecated in 5.1.1
-============================
-
-Packaging
----------
-
-* Shipping the internal test suite (``cms.tests``) in binary distributions
-  (wheels) is deprecated; a future release will no longer include it
-  (#8733). The suite remains part of the source distribution and stays
-  available via ``pip install --no-binary django-cms django-cms`` or the
-  release tarballs. The public testing utilities in ``cms.test_utils``,
-  including ``cms.test_utils.testcases.CMSTestCase``, are not affected and
-  remain in the wheel. Projects importing from ``cms.tests`` should switch to
-  ``cms.test_utils``.
+Thanks to all contributors for their efforts!

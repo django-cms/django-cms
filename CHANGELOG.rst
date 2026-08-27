@@ -1,18 +1,43 @@
 5.1.2 (2026-08-27)
 ==================
 
-Highlights:
------------
+Features:
+---------
+* Support Content Security Policy nonces introduced in Django 6.1 (#8792) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Enforce placeholder permissions on the edit and view endpoints (#8794) -- Fabian Braun
+* Fix ``GrouperModelAdmin`` ignoring the read-only context for content objects without a language
+  field (#8799) -- Fabian Braun
+* Prevent a manually entered page slug from being overwritten when changing the page title (#8796)
+  -- Fabian Braun
+* Avoid needlessly clearing the permission caches on Django 6.1 signals (#8791) -- Fabian Braun
+* Allow copying plugins from write-protected (published) content (#8786) -- Fabian Braun
+* Harden the toolbar JavaScript (#8790) -- Fabian Braun
+* Require permission to change the previous home page before setting a new one (#8789) -- Fabian Braun
+* Fix copying a page dropping its login-required property (#8785) -- Fabian Braun
+* Limit the number of plugins displayed in the plugin deletion confirmation (#8784) -- Fabian Braun
+* Fix migration 0044 failing on SQLite when versioning was installed (#8777, #8779) -- Fabian Braun
+* Fix the language column in the page tree ignoring multi-hyphen language codes such as ``de-x-l``
+  (#8781) -- Fabian Braun
+* Fix the wrong ``welcome.js`` path (#8761) -- Fabian Braun
+
 
 Statistics:
 -----------
 
-This release includes 0 changelog entries, created with the help of the following contributors
+This release includes 16 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
+* Atiqur Rahman (1 changelog entry)
+* Fabian Braun (12 changelog entries)
 
 With the review help of the following contributors:
 
+* Fabian Braun
+* Mark Walker
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
