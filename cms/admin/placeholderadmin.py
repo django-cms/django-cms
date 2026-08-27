@@ -350,16 +350,19 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         # Pasting reads the plugins from the placeholder they are pasted from,
         # so a user without access to that placeholder must not be able to
         # exfiltrate its content into a placeholder they do control.
-        clipboard = request.toolbar.clipboard
+        clipboard = get_toolbar_from_request(request).clipboard
 
         if clipboard and source_placeholder.pk == clipboard.pk:
             # Pasting from the user's own clipboard, which is what this
             # operation is for. A user may always read their own clipboard.
             return True
 
-        if not source_placeholder.has_add_plugins_permission(request.user, plugins):
-            return False
-        return source_placeholder.check_source(request.user)
+        # Deliberately no ``source_placeholder.check_source()`` here: that is an
+        # editability gate (see ``placeholder_is_immutable``), and pasting only
+        # reads the source. Editors must be able to paste out of content they
+        # may not edit, such as a published version or a draft another user has
+        # locked. Read access is covered by the permission check below.
+        return source_placeholder.has_add_plugins_permission(request.user, plugins)
 
     def has_copy_from_placeholder_permission(self, request, source_placeholder, target_placeholder, plugins):
         if not source_placeholder.has_add_plugins_permission(request.user, plugins):
@@ -563,10 +566,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             message = _('You do not have permission to copy these plugins.')
             raise PermissionDenied(message)
 
-        if not source_placeholder.check_source(request.user):
-            message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(message)
-
+        # Deliberately no ``source_placeholder.check_source()`` here: that is an
+        # editability gate (see ``placeholder_is_immutable``), and copying only
+        # reads the source. Editors must be able to copy out of content they may
+        # not edit, such as a published version or a draft another user has
+        # locked. Read access is covered by the permission check above.
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
             raise PermissionDenied(message)
@@ -599,10 +603,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             message = _('You do not have permission to copy this placeholder.')
             raise PermissionDenied(message)
 
-        if not source_placeholder.check_source(request.user):
-            message = _('You do not have permission to copy this placeholder.')
-            raise PermissionDenied(message)
-
+        # Deliberately no ``source_placeholder.check_source()`` here: that is an
+        # editability gate (see ``placeholder_is_immutable``), and copying only
+        # reads the source. Editors must be able to copy out of content they may
+        # not edit, such as a published version or a draft another user has
+        # locked. Read access is covered by the permission check above.
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy this placeholder.')
             raise PermissionDenied(message)
@@ -1223,6 +1228,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             "protected": protected,
             "opts": opts,
             "app_label": opts.app_label,
+            "delete_confirmation_max_display": getattr(self, "delete_confirmation_max_display", None),
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(
@@ -1322,6 +1328,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             "protected": protected,
             "opts": opts,
             "app_label": opts.app_label,
+            "delete_confirmation_max_display": getattr(self, "delete_confirmation_max_display", None),
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)

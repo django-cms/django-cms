@@ -1,3 +1,5 @@
+import json
+import re
 import warnings
 from unittest.mock import patch
 
@@ -597,6 +599,36 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         response = self.client.post(endpoint, {})
         self.assertContains(response, '<script id="data-bridge" type="application/json">')
         self.assertContains(response, f'title=\\"EmptyPlugin ID: {test_plugin.pk}\\"')
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_change_message_escapes_plugin_representation(self):
+        """
+        The plugin change message ends up in the data bridge as raw JSON, where
+        no template autoescaping applies. A plugin's string representation is
+        editor-controlled, so it has to be escaped before it gets there.
+        """
+        payload = '<img src=x onerror="alert(1)">'
+        page = create_page("page", "col_two.html", "en")
+        ph1 = page.get_placeholders("en").get(slot="col_left")
+        test_plugin = add_plugin(
+            ph1, "LinkPlugin", "en", name="A Link", external_link="https://www.django-cms.org"
+        )
+
+        endpoint = self.get_change_plugin_uri(test_plugin)
+        response = self.client.post(
+            endpoint, {"name": payload, "external_link": "https://www.django-cms.org"}
+        )
+
+        bridge = json.loads(
+            re.search(
+                r'<script id="data-bridge" type="application/json">(.*?)</script>',
+                response.content.decode(),
+                re.S,
+            ).group(1)
+        )
+        message = bridge["messages"][0]["message"]
+        self.assertNotIn(payload, message)
+        self.assertIn("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;", message)
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, _get_placeholder_slots, "placeholder_tests/test_eleven.html")

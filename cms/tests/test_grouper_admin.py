@@ -1032,6 +1032,57 @@ class GrouperReadonlyMessageTestCase(SetupMixin, CMSTestCase):
         self.assertIsNone(self._message(request, content_obj))
 
 
+class GrouperReadonlyContextMixin:
+    """The change form has to be told whether the content object is read-only.
+
+    ``can_change_content_obj`` used to be added to the context only when ``language``
+    was among the extra grouping fields, so grouper admins without grouping fields
+    always rendered the read-only note -- even for perfectly editable content."""
+
+    readonly_note = "Some fields cannot be changed since they are read-only content."
+
+    def test_editable_content_sets_can_change_content_obj(self):
+        """Editable content: the flag is set and the read-only note is not rendered."""
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.change_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["can_change_content_obj"])
+        self.assertIsNone(response.context["content_readonly_message"])
+        self.assertNotContains(response, self.readonly_note)
+
+    @wo_content_permission
+    def test_readonly_content_clears_can_change_content_obj(self):
+        """Read-only content: the flag is cleared and the note is rendered."""
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.change_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["can_change_content_obj"])
+        self.assertContains(response, self.readonly_note)
+
+    def test_add_view_sets_can_change_content_obj(self):
+        """The add view has no content object yet, so content is never read-only there."""
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.add_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["can_change_content_obj"])
+        self.assertNotContains(response, self.readonly_note)
+
+
+class SimpleGrouperReadonlyContextTestCase(GrouperReadonlyContextMixin, SimpleSetupMixin, CMSTestCase):
+    """Grouper admin without extra grouping fields."""
+
+
+class GrouperReadonlyContextTestCase(GrouperReadonlyContextMixin, SetupMixin, CMSTestCase):
+    """Grouper admin with ``language`` as an extra grouping field."""
+
+
 class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
     def test_save_grouper_model(self) -> None:
         # Arrange

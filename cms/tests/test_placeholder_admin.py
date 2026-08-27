@@ -355,6 +355,23 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertContains(response, '<div class="success"></div>')
         self.assertFalse(CMSPlugin.objects.filter(pk=plugin.pk).exists())
 
+    def test_delete_plugin_confirmation_context(self):
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="source")
+        plugin = self._add_plugin_to_placeholder(placeholder)
+        endpoint = self.get_delete_plugin_uri(plugin)
+
+        with patch(
+            "cms.admin.placeholderadmin.PlaceholderAdmin.delete_confirmation_max_display",
+            1,
+            create=True,
+        ), self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("delete_confirmation_max_display", response.context)
+        self.assertEqual(response.context["delete_confirmation_max_display"], 1)
+
     def test_clear_placeholder_endpoint(self):
         """
         The Placeholder admin delete_plugin endpoint works
@@ -368,6 +385,19 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(placeholder.get_plugins("en").count(), 0)
+
+    def test_clear_placeholder_confirmation_context(self):
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="source")
+        self._add_plugin_to_placeholder(placeholder)
+        endpoint = self.get_clear_placeholder_url(placeholder)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("delete_confirmation_max_display", response.context)
+        self.assertIsNone(response.context["delete_confirmation_max_display"])
 
     def test_clear_clipboard_requires_post(self):
         """
