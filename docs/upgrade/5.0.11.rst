@@ -1,0 +1,91 @@
+.. _upgrade-to-5.0.11:
+
+####################
+5.0.11 release notes
+####################
+
+*August 27, 2026*
+
+Welcome to django CMS 5.0.11!
+
+This is a patch release of the 5.0 series. It contains **one security fix**,
+which is why we recommend that all users of django CMS 5.0.x upgrade as soon as
+possible. There are no migrations and no backward incompatible changes.
+
+The same fixes are contained in django CMS 5.1.2.
+
+If you are upgrading from django CMS 4.1 or earlier, read the release notes of
+all versions in between, in particular the :ref:`5.0.0 release notes
+<upgrade-to-5.0.0>`.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and
+only support the latest release of each series.
+
+It supports **Python 3.9, 3.10, 3.11, 3.12, and 3.13**. As for Django we highly
+recommend and only support the latest release of each series.
+
+************************
+How to upgrade to 5.0.11
+************************
+
+Update your project's ``requirements.txt`` file to require (at least) django CMS
+5.0.11 and run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+This release contains no migrations, but it does change static files, so
+collect them again::
+
+    python -m manage collectstatic --noinput
+    python -m manage cms check
+
+********************
+What's new in 5.0.11
+********************
+
+Security fixes
+==============
+
+This issue is also fixed in django CMS 5.1.2.
+
+Editing endpoints did not check placeholder permissions
+--------------------------------------------------------
+
+``render_object_endpoint()`` resolved the requested object and rendered it
+without an object-level view check, unlike the structure endpoint and, for
+pages, ``render_page()``. Any staff user could therefore read the rendered
+plugin content of any frontend-editable object, including placeholders they
+have no access to.
+
+The endpoint now calls ``user_can_view_placeholder_source()`` and raises
+``Http404`` when the check fails. Mutations were, and remain, gated by change
+permission at the plugin endpoints.
+
+Bug Fixes
+=========
+* Edit and view endpoints did not check placeholder permissions (#8794) (#8809) (040a7b1ba) -- Fabian Braun
+* Grouper admin ignored read-only context for content objects without language field (#8799) (#8808) (c39fbe3e0) -- Fabian Braun
+
+  ``GrouperModelAdmin`` only applied its read-only context to content models
+  that carry a language field, so grouper admins for language-less content
+  objects rendered editable fields where they should have been read-only.
+
+* Manual page slug was overwritten when changing page title (#8796) (#8807) (95164e017) -- Fabian Braun
+
+  The slug widget re-derived the slug from the title even after it had been
+  edited by hand.
+
+* Copy page missed login required property (#8785) (#8806) (54f505c3c) -- Fabian Braun
+* Language column in page tree ignored multi-hyphen language codes like ``de-x-l`` (#8781) (#8805) (c104ee335) -- Fabian Braun
+* Page tree had a n+1 regression fetching urls (#8716) (#8804) (62be07364) -- Fabian Braun
+* check and delete-orphaned-plugins had an n+1 issue (#8701) (#8803) (691ca5496) -- Fabian Braun
+* GrouperAdmin only showed current content versions (#8700) (#8802) (6747be6d1) -- Fabian Braun
+
+Thanks to all contributors for their efforts!
