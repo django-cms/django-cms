@@ -6,7 +6,7 @@
 # Grzegorz Biały <grzegorz@elcodo.pl>, 2023
 # Maciej Kostuch <kostuchmaciek@gmail.com>, 2023
 # ar4s <arkadiusz.adamski@gmail.com>, 2025
-# Maciej Olko <maciej.olko@gmail.com>, 2026
+# Maciej Olko, 2026
 # filip klosowski <filip@geoida.pl>, 2026
 # Piotr Wojcik <pwwpww@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
