@@ -19,7 +19,6 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.admin.forms import ChangePageForm
 from cms.admin.pageadmin import PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.appresolver import clear_app_resolvers

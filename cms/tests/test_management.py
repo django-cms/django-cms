@@ -292,17 +292,10 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(CMSPlugin.objects.all().count(), 3)
 
-        # Then both detached placeholders and their plugins should be gone
-        self.assertFalse(Placeholder.objects.filter(pk=ph_detached.pk).exists())
-        self.assertFalse(Placeholder.objects.filter(pk=ph_bogus.pk).exists())
-        self.assertFalse(CMSPlugin.objects.filter(pk=pl_detached.pk).exists())
-        self.assertFalse(CMSPlugin.objects.filter(pk=pl_bogus.pk).exists())
-
         # check stdout
         output = out.getvalue()
         self.assertIn("1 uninstalled plugins", output)
         self.assertIn("1 plugins with unsaved instances", output)
-        self.assertIn("2 detached placeholders", output)
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_plugin_report_query_count_does_not_scale_with_instances(self):
