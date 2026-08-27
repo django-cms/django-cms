@@ -596,6 +596,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         else:
             subtitle = _("Add content")
 
+        # Whether the content object may be changed is independent of the grouping fields:
+        # it has to be in the context for every grouper admin, or the change form cannot
+        # tell an editable content object from a read-only one. Gate on ``can_change_content``,
+        # the same predicate ``get_readonly_fields`` uses, so the note and the actually
+        # read-only fields cannot disagree.
+
         extra_context = {
             "changed_message": _(
                 'Content for the current language has been changed. Click "Cancel" to '
@@ -604,6 +610,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             "title": title,
             "content_instance": content_instance,
             "subtitle": subtitle,
+            "can_change_content_obj": self.can_change_content(request, content_instance),
         }
 
         """Provide the grouping fields to edit"""
@@ -622,7 +629,6 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 extra_context["language_tabs"] = self.get_language_tuple()
             extra_context["language"] = language
             extra_context["filled_languages"] = filled_languages
-            extra_context["can_change_content_obj"] = self.can_change_content(request, content_instance)
             if content_instance is None:
                 subtitle = _("Add %(language)s content") % dict(language=get_language_dict().get(self.language))
                 extra_context["subtitle"] = subtitle
