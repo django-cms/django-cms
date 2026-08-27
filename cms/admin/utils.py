@@ -614,13 +614,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             else:
                 filled_languages = []
 
-            site = get_current_site(request)
             if self.is_latest_content_obj(content_instance, obj):
                 # Only offer the language selector for the latest content. Switching the
                 # language always navigates to the latest content of the target language,
                 # so for an older content object switching languages back and forth would
                 # silently bring up a different (the latest) content object - confusing UX.
-                extra_context["language_tabs"] = self.get_language_tuple(site=site)
+                extra_context["language_tabs"] = self.get_language_tuple()
             extra_context["language"] = language
             extra_context["filled_languages"] = filled_languages
             extra_context["can_change_content_obj"] = self.can_change_content(request, content_instance)
