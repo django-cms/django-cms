@@ -4,6 +4,8 @@
 # 
 # Translators:
 # Translators:
+# Fabian Braun <fsbraun@gmx.de>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # kochin <kochinc@outlook.com>, 2013
 # kochin <kochinc@outlook.com>, 2013
 msgid ""

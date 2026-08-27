@@ -625,9 +625,24 @@ class EmptyToolbar(BaseToolbar):
 
     _cache_disabled = True
 
+    #: No toolbar means no user settings, hence no clipboard. Mirrors the initial
+    #: value on ``CMSToolbarBase`` so that callers can rely on the attribute
+    #: existing and only have to handle ``None``.
+    clipboard = None
+
     def __init__(self, request):
         self.request = request
         super().__init__()
+
+    @cached_property
+    def toolbar_language(self):
+        # There are no user settings to take a preferred language from, so the
+        # request language is the best available answer.
+        return self.request_language
+
+    @cached_property
+    def toolbar_language_bidi(self):
+        return self.toolbar_language in settings.LANGUAGES_BIDI
 
     def get_object(self):
         return None

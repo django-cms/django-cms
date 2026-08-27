@@ -22,8 +22,19 @@ def set_current_user(user):
     """
     Assigns current user from request to context variable, used by
     CurrentUserMiddleware.
+
+    Returns the ``contextvars.Token`` for the change, so callers can restore
+    the previous value with :func:`reset_current_user`.
     """
-    _current_user.set(user)
+    return _current_user.set(user)
+
+
+def reset_current_user(token):
+    """
+    Restores the current user context variable to the value it held before the
+    ``set_current_user`` call that produced ``token``.
+    """
+    _current_user.reset(token)
 
 
 def get_current_user():
@@ -55,6 +66,28 @@ def current_user(user):
 def get_model_permission_codename(model, action):
     opts = model._meta
     return opts.app_label + '.' + get_permission_codename(action, opts)
+
+
+def user_can_view_placeholder_source(user, source):
+    """Whether ``user`` may view the placeholders attached to ``source``.
+
+    Viewing the (read-only) structure board of a frontend-editable object
+    requires only *view* permission; mutating its plugins stays gated by
+    change permission at the plugin endpoints. This lets headless reviewers
+    inspect content structure without edit rights.
+
+    Honours a custom ``has_placeholder_view_permission`` hook on the object
+    and otherwise grants access to users holding the model/object ``view`` or
+    ``change`` permission (change implies the right to view).
+    """
+    if hasattr(source, "has_placeholder_view_permission"):
+        return source.has_placeholder_view_permission(user)
+    model = type(source)
+    perms = (
+        get_model_permission_codename(model, "view"),
+        get_model_permission_codename(model, "change"),
+    )
+    return any(user.has_perm(perm) or user.has_perm(perm, source) for perm in perms)
 
 
 def _has_global_permission(user, site, action):
@@ -226,6 +259,10 @@ def get_subordinate_users(user, site):
     If user haves global permissions or is a superuser, then he can see all the
     users.
 
+    Superusers are never subordinate to a non-superuser, no matter how many
+    permissions the latter holds. Otherwise a delegated administrator could
+    manage - and take over - a superuser account.
+
     This function is currently used in PagePermissionInlineAdminForm for limit
     users in permission combobox.
 
@@ -244,6 +281,13 @@ def get_subordinate_users(user, site):
     """
     from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
+    def without_superusers(qs):
+        # A non-superuser must never be handed a superuser as a subordinate:
+        # being able to manage the account means being able to take it over.
+        if user.is_superuser:
+            return qs
+        return qs.exclude(is_superuser=True)
+
     try:
         user_level = get_user_permission_level(user, site)
     except NoPermissionsException:
@@ -254,10 +298,10 @@ def get_subordinate_users(user, site):
             Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
-        return qs
+        return without_superusers(qs)
 
     if user_level == ROOT_USER_LEVEL:
-        return get_user_model().objects.all()
+        return without_superusers(get_user_model().objects.all())
 
     from cms.models import PermissionTuple
     allow_list = Q()
@@ -273,7 +317,7 @@ def get_subordinate_users(user, site):
         )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
-    return qs
+    return without_superusers(qs)
 
 
 def get_subordinate_groups(user, site):

@@ -36,7 +36,10 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
-from cms.models.permissionmodels import User
+from cms.models.permissionmodels import (
+    EDIT_PERMISSION_REQUIRED_MESSAGES,
+    User,
+)
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
 from cms.operations.helpers import (
     send_post_page_operation,
@@ -49,8 +52,10 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
+from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 from cms.utils.permissions import (
     get_current_user,
+    get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
     get_user_permission_level,
@@ -108,13 +113,22 @@ def get_main_language_page_content_template(new_page):
     return None
 
 
+# Permission actions managed by the CMS permission forms (Django's defaults).
+CMS_PERMISSION_ACTIONS = ("add", "change", "delete")
+
+# Maps each ``can_<action>_<name>`` permission group to the model whose
+# permission governs it. Used to render, read and authorize the checkboxes.
+CMS_PERMISSION_MODELS = (
+    (Page, "page"),
+    (PageUser, "pageuser"),
+    (PagePermission, "pagepermission"),
+)
+
+
 def save_permissions(data, obj):
-    models = (
-        (Page, "page"),
-        (PageUser, "pageuser"),
-        (PageUserGroup, "pageuser"),
-        (PagePermission, "pagepermission"),
-    )
+    # ``PageUserGroup`` shares the ``pageuser`` field with ``PageUser`` but has
+    # its own content type, so the permission must be (un)assigned on both.
+    models = (*CMS_PERMISSION_MODELS, (PageUserGroup, "pageuser"))
 
     if not obj.pk:
         # save obj, otherwise we can't assign permissions to him
@@ -124,7 +138,7 @@ def save_permissions(data, obj):
 
     for model, name in models:
         content_type = ContentType.objects.get_for_model(model)
-        for key in ("add", "change", "delete"):
+        for key in CMS_PERMISSION_ACTIONS:
             # add permission `key` for model `model`
             codename = get_permission_codename(key, model._meta)
             permission = Permission.objects.get(content_type=content_type, codename=codename)
@@ -274,15 +288,14 @@ class AddPageForm(BasePageContentForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        page_field = self.fields.get("cms_page")
+        if page_field:
+            page_field.queryset = page_field.queryset.filter(site=self._site)
+
         source_field = self.fields.get("source")
 
         if not source_field or source_field.widget.is_hidden:
             return
-
-        page_field = self.fields.get("cms_page")
-
-        if page_field:
-            page_field.queryset = page_field.queryset.filter(site=self._site)
 
         root_page = PageType.get_root_page(site=self._site)
 
@@ -334,6 +347,12 @@ class AddPageForm(BasePageContentForm):
         if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
         return parent_page
+
+    def clean_cms_page(self):
+        page = self.cleaned_data.get("cms_page")
+        if page and not user_can_change_page(self._user, page, site=page.site):
+            raise ValidationError(_("You do not have permission to change this page."))
+        return page
 
     def create_translation(self, page, main_language_page_content_template=None):
         data = self.cleaned_data
@@ -516,25 +535,15 @@ class DuplicatePageForm(AddPageForm):
         widget=forms.HiddenInput(),
     )
 
-
-def url_is_locked(page_content: PageContent) -> bool:
-    """Return whether ``page_content``'s URL is shared with a published
-    (publicly visible) version of the same page and language.
-
-    With a versioning package installed the slug and path live on the
-    (unversioned) :class:`~cms.models.pagemodel.PageUrl` and are therefore
-    shared across all versions of a page. Editing the slug of a draft would
-    silently change the URL of the already published version. Without versioning
-    the content being edited *is* the public version, so the URL is never
-    locked.
-    """
-    if page_content is None or page_content.pk is None:
-        return False
-    return (
-        PageContent.objects.filter(page=page_content.page_id, language=page_content.language)
-        .values_list("pk", flat=True)
-        .exclude(pk=page_content.pk).exists()
-    )
+    def clean_source(self):
+        source = self.cleaned_data.get("source")
+        # ``source`` is a hidden field whose value is fully controlled by the
+        # client on POST and whose queryset spans every page on every site.
+        # ``has_add_permission`` only checks that the user may create *a* page,
+        # not that they may read ``source``.
+        if source and not user_can_view_page(self._user, source):
+            raise ValidationError(_("You do not have permission to copy this page."))
+        return source
 
 
 class ChangePageForm(BasePageContentForm):
@@ -611,26 +620,12 @@ class ChangePageForm(BasePageContentForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.url_obj = self.instance.page.get_url(self._language)
-        self.fields["slug"].initial = self.url_obj.slug
+        self.fields["slug"].initial = self.instance.slug
         self.fields["redirect"].widget.language = self._language
         self.fields["redirect"].initial = self.instance.redirect
 
-        if not self.url_obj.managed:
-            self.fields["overwrite_url"].initial = self.url_obj.path
-
-        if self._url_is_locked:
-            # The URL is shared with a published version of this page (only
-            # possible with a versioning package installed). Changing the slug
-            # or overwrite URL would silently change the live URL, so drop those
-            # fields from the editable form. PageContentAdmin renders them as
-            # read-only instead (see PageContentAdmin.get_readonly_fields()).
-            self.fields.pop("slug", None)
-            self.fields.pop("overwrite_url", None)
-
-    @cached_property
-    def _url_is_locked(self):
-        return url_is_locked(self.instance)
+        if self.instance.overwrite_url:
+            self.fields["overwrite_url"].initial = self.instance.overwrite_url
 
     @cached_property
     def _language(self):
@@ -646,30 +641,19 @@ class ChangePageForm(BasePageContentForm):
 
         page = self.instance.page
 
-        if self._url_is_locked:
-            # The slug and overwrite URL are read-only; the URL must not change.
-            return data
-
         if page.is_home:
-            data["path"] = ""
+            # the home page always lives at the root path
             return data
 
         slug = data["slug"]
         path_override = self.cleaned_data.get("overwrite_url")
 
-        if path_override:
-            path = path_override.strip("/")
-        elif page.parent:
-            if page.parent.is_home:
-                path = slug
-            else:
-                base_path = page.parent.get_path(self._language)
-                path = f"{base_path}/{slug}" if base_path else None
-        else:
-            path = slug
+        # the same derivation Page.update_urls_from_content applies on save
+        path = page.get_url_data(slug, path_override, self._language)["path"]
 
         if path is None:
-            data["path"] = None
+            # the page has no reachable path (e.g. unpublished parent),
+            # so there is no URL to validate
             return data
 
         user_language = get_site_language_from_request(self._request, site_id=self._site.pk)
@@ -686,8 +670,6 @@ class ChangePageForm(BasePageContentForm):
         except ValidationError as error:
             field = "overwrite_url" if path_override else "slug"
             self.add_error(field, error)
-        else:
-            data["path"] = path
         return data
 
     def clean_xframe_options(self):
@@ -709,30 +691,23 @@ class ChangePageForm(BasePageContentForm):
 
         data = self.cleaned_data.copy()
         page = self.instance.page
-        page_slug = data.pop("slug", None)
-        page_path = data.pop("path", None)
-        page_overwrite_url = data.pop("overwrite_url", None)
+        data["overwrite_url"] = (data.get("overwrite_url") or "").strip("/") or None
         page_content = super().save(commit=False)
         page_content.update(
             changed_by=get_clean_username(self._request.user),
             changed_date=timezone.now(),
             **data,
         )
-        if not self._url_is_locked:
-            # When the URL is shared with a published version the slug/path must
-            # not change, so the (read-only) URL fields are ignored on save.
-            page.update_urls(
-                self._language,
-                path=page_path,
-                slug=page_slug,
-                managed=not bool(page_overwrite_url),
-            )
-            page._update_url_path_recursive(self._language)
-        page.clear_cache(menu=True)
+        if page_content.is_public():
+            # This content is what visitors see (nothing like a versioning
+            # package hides it), so the page URL follows the change right away.
+            # Otherwise the URL is only updated once this content is published.
+            page.update_urls_from_content(self._language)
 
-        if not self._url_is_locked and page.application_urls and "slug" in self.changed_data:
-            # Connects the apphook restart handler to the request finished signal
-            set_restart_trigger()
+            if page.application_urls and "slug" in self.changed_data:
+                # Connects the apphook restart handler to the request finished signal
+                set_restart_trigger()
+        page.clear_cache(menu=True)
         send_post_page_operation(
             request=self._request,
             operation=CHANGE_PAGE_TRANSLATION,
@@ -1289,6 +1264,10 @@ class GenericCmsPermissionForm(forms.ModelForm):
     can_change_pagepermission = forms.BooleanField(label=_("Change"), required=False)
     can_delete_pagepermission = forms.BooleanField(label=_("Delete"), required=False)
 
+    # Maps the ``can_<action>_<name>`` permission fields to the model whose
+    # permission they grant. Mirrors ``save_permissions`` and the fieldsets
+    # rendered by ``PageUserGroupAdmin``/``PageUserAdmin``.
+
     def __init__(self, *args, **kwargs):
         instance = kwargs.get("instance")
         initial = kwargs.get("initial") or {}
@@ -1305,28 +1284,22 @@ class GenericCmsPermissionForm(forms.ModelForm):
         # Validate Page options
         if not data.get("can_change_page"):
             if data.get("can_add_page"):
-                message = _(
-                    "Users can't create a page without permissions "
-                    "to change the created page. Edit permissions required."
-                )
-                raise ValidationError(message)
+                raise ValidationError(EDIT_PERMISSION_REQUIRED_MESSAGES["can_add"])
 
             if data.get("can_delete_page"):
-                message = _(
-                    "Users can't delete a page without permissions to change the page. Edit permissions required."
-                )
-                raise ValidationError(message)
+                raise ValidationError(EDIT_PERMISSION_REQUIRED_MESSAGES["can_delete"])
 
             if data.get("can_add_pagepermission"):
                 message = _(
-                    "Users can't set page permissions without permissions to change a page. Edit permissions required."
+                    "Users can't set page permissions without also being able to "
+                    "change the page. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
 
             if data.get("can_delete_pagepermission"):
                 message = _(
-                    "Users can't delete page permissions without permissions "
-                    "to change a page. Edit permissions required."
+                    "Users can't delete page permissions without also being able "
+                    "to change the page. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
 
@@ -1334,28 +1307,54 @@ class GenericCmsPermissionForm(forms.ModelForm):
         if not data.get("can_change_pagepermission"):
             if data.get("can_add_pagepermission"):
                 message = _(
-                    "Users can't create page permissions without permissions "
-                    "to change the created permission. Edit permissions required."
+                    "Users can't create page permissions without also being able "
+                    "to change them. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
 
             if data.get("can_delete_pagepermission"):
                 message = _(
-                    "Users can't delete page permissions without permissions "
-                    "to change permissions. Edit permissions required."
+                    "Users can't delete page permissions without also being able "
+                    "to change them. Please also enable 'Can edit'."
                 )
                 raise ValidationError(message)
+
+        # Enforce "nobody can grant more than they have" at the data layer.
+        self._drop_unauthorized_permissions(data)
+        return data
+
+    def _drop_unauthorized_permissions(self, data):
+        """Remove ``can_*`` entries the current manager is not allowed to manage.
+
+        ``PageUserGroupAdmin.get_fieldsets`` only *renders* the permission
+        checkboxes the manager actually holds, but the ``can_*`` fields are
+        declared on this form and therefore stay in ``base_fields`` regardless
+        of the admin's ``fields=`` restriction. A crafted POST can set the
+        hidden ones, and ``save_permissions`` would then grant them -- letting a
+        delegated manager escalate a group beyond their own rights (CWE-269).
+        Dropping the unauthorized entries here means they are neither granted
+        nor revoked, so any existing value the manager may not touch is left
+        untouched as well.
+        """
+        user = self._current_user
+        for model, name in CMS_PERMISSION_MODELS:
+            for action in CMS_PERMISSION_ACTIONS:
+                field = f"can_{action}_{name}"
+                if field not in self.fields:
+                    continue
+                if user is None or not user.has_perm(get_model_permission_codename(model, action)):
+                    data.pop(field, None)
+        return data
 
     def populate_initials(self, obj):
         """Read out permissions from permission system."""
         initials = {}
         permission_accessor = get_permission_accessor(obj)
 
-        for model in (Page, PageUser, PagePermission):
-            name = model.__name__.lower()
+        for model, name in CMS_PERMISSION_MODELS:
             content_type = ContentType.objects.get_for_model(model)
             permissions = permission_accessor.filter(content_type=content_type).values_list("codename", flat=True)
-            for key in ("add", "change", "delete"):
+            for key in CMS_PERMISSION_ACTIONS:
                 codename = get_permission_codename(key, model._meta)
                 initials[f"can_{key}_{name}"] = codename in permissions
         return initials
@@ -1499,6 +1498,12 @@ class PluginAddValidationForm(forms.Form):
 
         page = placeholder.page
         template = page.get_template() if page else None
+
+        plugin_class = plugin_pool.get_plugin(data["plugin_type"])
+        if not plugin_class.is_allowed_in_slot(placeholder.slot):
+            message = gettext("Plugin %(plugin)s is not allowed in placeholder '%(slot)s'.")
+            self.add_error(None, message % {"plugin": plugin_class.__name__, "slot": placeholder.slot})
+            return self.cleaned_data
 
         try:
             has_reached_plugin_limit(placeholder, data["plugin_type"], language, template=template)

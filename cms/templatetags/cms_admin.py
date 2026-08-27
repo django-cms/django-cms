@@ -1,3 +1,4 @@
+import django
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import AsTag, InclusionTag
@@ -22,6 +23,18 @@ from cms.utils.urlutils import admin_reverse
 register = template.Library()
 
 CMS_ADMIN_ICON_BASE = f"{settings.STATIC_URL}admin/img/"
+
+
+@register.simple_tag
+def django_version_gte(major, minor=0):
+    """Return ``True`` if the running Django version is at least ``(major, minor)``.
+
+    Used in admin templates to switch between the legacy
+    ``<div class="breadcrumbs">`` markup (Django < 6.1) and the
+    ``<ol class="breadcrumbs">`` markup introduced in Django 6.1, whose CSS
+    is element-qualified (``ol.breadcrumbs``) and no longer styles a ``<div>``.
+    """
+    return django.VERSION[:2] >= (major, minor)
 
 
 @register.simple_tag
@@ -101,7 +114,7 @@ class GetPreviewUrl(AsTag):
             )
         if not page_content:
             return ""
-        return self.get_url(page_content, language=page_content.language)
+        return self.get_url(page_content, language=getattr(page_content, "language", None))
 
     def get_url(self, object, language):
         return get_object_preview_url(object, language=language)
@@ -330,5 +343,8 @@ def submit_row_plugin(context):
 @register.filter
 def placeholder_is_immutable(placeholder, user):
     if isinstance(placeholder, Placeholder):
-        return not placeholder.check_source(user)
+        # A placeholder is editable only if the source permits editing *and*
+        # the user may change it. View-only users (e.g. headless reviewers) can
+        # open the structure board but must see it read-only.
+        return not (placeholder.check_source(user) and placeholder.has_change_permission(user))
     return True

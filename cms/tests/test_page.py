@@ -878,6 +878,47 @@ class PagesTestCase(TransactionCMSTestCase):
             resp = self.client.get(page.get_absolute_url("en"))
             self.assertEqual(resp.get("X-Frame-Options"), None)
 
+    def test_xframe_options_inherit_with_cms_page_cache_and_clickjacking_middleware(self):
+        # A cached "Inherit" page must still receive the clickjacking
+        # middleware's X-Frame-Options header. Regression: the cached copy used
+        # to be served with xframe_options_exempt=True, which suppressed the
+        # middleware and dropped the header, leaving cached inherit pages
+        # framable while the uncached copy was protected.
+        if getattr(settings, "MIDDLEWARE", None):
+            override = {
+                "MIDDLEWARE": settings.MIDDLEWARE
+                + [
+                    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+                ]
+            }
+        else:
+            override = {
+                "MIDDLEWARE_CLASSES": settings.MIDDLEWARE_CLASSES
+                + [
+                    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+                ]
+            }
+
+        override["CMS_PAGE_CACHE"] = True
+        override["X_FRAME_OPTIONS"] = "SAMEORIGIN"
+
+        with self.settings(**override):
+            page = create_page(
+                "inherit page",
+                "nav_playground.html",
+                "en",
+                xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
+            )
+
+            # Fresh response from render_page: the middleware adds the site
+            # default because the page defers to it (inherit).
+            resp = self.client.get(page.get_absolute_url("en"))
+            self.assertEqual(resp.get("X-Frame-Options"), "SAMEORIGIN")
+
+            # Response from page cache must carry the same protection.
+            resp = self.client.get(page.get_absolute_url("en"))
+            self.assertEqual(resp.get("X-Frame-Options"), "SAMEORIGIN")
+
     def test_page_cache_basic(self):
         """
         Test that the page cache works in its basic form
@@ -893,7 +934,7 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(cached_data)
 
         # Verify cache contents
-        cached_content, cached_headers, expires = cached_data
+        cached_content, cached_headers, expires, xframe_options_exempt = cached_data
         self.assertEqual(cached_content, response.content)
 
     def test_page_cache_language_handling(self):

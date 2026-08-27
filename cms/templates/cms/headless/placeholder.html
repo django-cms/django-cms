@@ -5,7 +5,7 @@
             <meta charset="utf-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
             <title>{% block title %}{{ request.current_page.get_page_title|striptags }}{% endblock %}</title>
-            <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.headless.css' %}"/>
+            <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.headless.css' %}" {% csp_nonce_attr %}/>
 {% endspaceless %}{% render_block 'css' %}{% spaceless %}
     {% block page_head %}{% endblock %}
         </head>

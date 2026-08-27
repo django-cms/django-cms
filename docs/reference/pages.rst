@@ -16,4 +16,8 @@ Pages
     :show-inheritance:
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
-.
+
+Views
+-----
+
+.. autofunction:: cms.views.details

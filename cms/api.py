@@ -38,11 +38,12 @@ Also, the functions defined in this module do sanity checks on arguments.
 """
 
 import warnings
+from collections import defaultdict
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError, ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, models, transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 
@@ -66,7 +67,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
 from cms.utils.permissions import _current_user
-from cms.utils.plugins import copy_plugins_to_placeholder
+from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 from menus.menu_pool import menu_pool
 
 # ===============================================================================
@@ -98,6 +99,24 @@ def _verify_apphook(apphook, namespace):
     if apphook_pool.apps[apphook_name].app_name and not namespace:
         raise ValidationError("apphook with app_name must define a namespace")
     return apphook_name
+
+
+def _get_default_slug(page, title, language):
+    candidate = slugify(title)
+    base = page.get_path_for_slug(candidate, language)
+    # without a reachable path (e.g. unpublished parent) check the bare slug
+    # for availability instead
+    return get_available_slug(page.site, base if base is not None else candidate, language)
+
+
+def _validate_path_uniqueness(page, path, language):
+    if path is None:
+        # pages without a reachable path (e.g. unpublished parent) cannot
+        # conflict with any URL
+        return
+    from cms.forms.validators import validate_url_uniqueness
+
+    validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
 
 
 def _verify_plugin_type(plugin_type):
@@ -238,50 +257,57 @@ def create_page(
     else:
         application_urls = None
 
-    # ugly permissions hack
+    # ugly permissions hack: expose the creator through the _current_user
+    # context variable for the duration of the creation, then restore the
+    # previous value. Capturing the token and resetting (instead of blindly
+    # setting None at the end) avoids clobbering a user set by
+    # CurrentUserMiddleware and prevents leaking the creator into the next
+    # operation on the same thread. See cms.utils.permissions.reset_current_user.
     if created_by and isinstance(created_by, get_user_model()):
-        _current_user.set(created_by)
+        user_token = _current_user.set(created_by)
         created_by = get_clean_username(created_by)
     else:
-        _current_user.set(None)
+        user_token = _current_user.set(None)
 
-    if reverse_id:
-        if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
-            raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
+    try:
+        if reverse_id:
+            if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
+                raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
-    page = Page(
-        parent=parent,
-        created_by=created_by,
-        changed_by=created_by,
-        reverse_id=reverse_id,
-        navigation_extenders=navigation_extenders,
-        application_urls=application_urls,
-        application_namespace=apphook_namespace,
-        login_required=login_required,
-        site=site,
-    )
-    page.add_to_tree(position=position)
-    page.save()
+        page = Page(
+            parent=parent,
+            created_by=created_by,
+            changed_by=created_by,
+            reverse_id=reverse_id,
+            navigation_extenders=navigation_extenders,
+            application_urls=application_urls,
+            application_namespace=apphook_namespace,
+            login_required=login_required,
+            site=site,
+        )
+        page.add_to_tree(position=position)
+        page.save()
 
-    create_page_content(
-        language=language,
-        title=title,
-        menu_title=menu_title,
-        page_title=page_title,
-        slug=slug,
-        created_by=created_by,
-        redirect=redirect,
-        meta_description=meta_description,
-        page=page,
-        overwrite_url=overwrite_url,
-        soft_root=soft_root,
-        in_navigation=in_navigation,
-        template=template,
-        limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,
-    )
-    _current_user.set(None)
-    return page
+        create_page_content(
+            language=language,
+            title=title,
+            menu_title=menu_title,
+            page_title=page_title,
+            slug=slug,
+            created_by=created_by,
+            redirect=redirect,
+            meta_description=meta_description,
+            page=page,
+            overwrite_url=overwrite_url,
+            soft_root=soft_root,
+            in_navigation=in_navigation,
+            template=template,
+            limit_visibility_in_menu=limit_visibility_in_menu,
+            xframe_options=xframe_options,
+        )
+        return page
+    finally:
+        _current_user.reset(user_token)
 
 
 @transaction.atomic
@@ -340,57 +366,71 @@ def create_page_content(
 
     # set default slug:
     if not slug:
-        base = page.get_path_for_slug(slugify(title), language)
-        slug = get_available_slug(page.site, base, language)
+        slug = _get_default_slug(page, title, language)
 
-    if overwrite_url:
-        path = overwrite_url.strip("/")
-    elif path is None:
-        path = page.get_path_for_slug(slug, language)
+    if overwrite_url or path is None:
+        path = page.get_url_data(slug, overwrite_url, language)["path"]
 
+    # When called directly (not via create_page) with a user instance, expose
+    # it through the _current_user context variable so signal handlers and
+    # PageContent.objects.with_user() attribute the creation correctly. Capture
+    # the token so we can restore the previous value at the end -- otherwise the
+    # user leaks into the next operation on the same thread when
+    # CurrentUserMiddleware is not installed (it only resets at the request
+    # boundary). See cms.utils.permissions.reset_current_user.
+    user_token = None
     if created_by and isinstance(created_by, get_user_model()):
-        _current_user.set(created_by)
+        user_token = _current_user.set(created_by)
         created_by = get_clean_username(created_by)
 
     try:
-        from cms.forms.validators import validate_url_uniqueness
+        try:
+            _validate_path_uniqueness(page, path, language)
+        except ValidationError as e:
+            raise IntegrityError(e)
 
-        validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
-    except ValidationError as e:
-        raise IntegrityError(e)
-
-    page.urls.update_or_create(
-        page=page,
-        language=language,
-        defaults=dict(
+        # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
+        user = _current_user.get(None)
+        page_content = PageContent.objects.with_user(user).create(
+            language=language,
+            title=title,
+            menu_title=menu_title,
+            page_title=page_title,
+            redirect=redirect,
+            meta_description=meta_description,
+            page=page,
+            created_by=created_by,
+            changed_by=created_by,
+            soft_root=soft_root,
+            in_navigation=in_navigation,
+            template=template,
+            limit_visibility_in_menu=limit_visibility_in_menu,
+            xframe_options=xframe_options,
             slug=slug,
-            path=path,
-            managed=not bool(overwrite_url),
-        ),
-    )
+            overwrite_url=overwrite_url.strip("/") if overwrite_url else None,
+        )
+        page_content.rescan_placeholders()
 
-    # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
-    user = _current_user.get(None)
-    page_content = PageContent.objects.with_user(user).create(
-        language=language,
-        title=title,
-        menu_title=menu_title,
-        page_title=page_title,
-        redirect=redirect,
-        meta_description=meta_description,
-        page=page,
-        created_by=created_by,
-        changed_by=created_by,
-        soft_root=soft_root,
-        in_navigation=in_navigation,
-        template=template,
-        limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,
-    )
-    page_content.rescan_placeholders()
-    page._clear_internal_cache()
+        if page_content.is_public():
+            # The page URL is derived from public content only. With a versioning
+            # package installed the new content is created as a draft and gets
+            # its URL on first publish.
+            page.urls.update_or_create(
+                page=page,
+                language=language,
+                defaults=dict(
+                    slug=slug,
+                    path=path,
+                    managed=not bool(overwrite_url),
+                    site_id=page.site_id,
+                ),
+            )
+        page._clear_internal_cache()
 
-    return page_content
+        return page_content
+    finally:
+        if user_token is not None:
+            _current_user.reset(user_token)
 
 
 @transaction.atomic
@@ -631,14 +671,36 @@ def copy_plugins_to_language(page, source_language, target_language, only_empty=
      plugins exists in the target language (on a placeholder basis).
     :return int: number of copied plugins
     """
+    source_placeholders = list(page.get_placeholders(source_language))
+    placeholder_ids = [placeholder.pk for placeholder in source_placeholders]
+    source_plugins = downcast_plugins(
+        CMSPlugin.objects.filter(
+            placeholder_id__in=placeholder_ids,
+            language=source_language,
+        ).order_by("position")
+    )
+    target_plugin_counts = dict(
+        CMSPlugin.objects.filter(
+            placeholder_id__in=placeholder_ids,
+            language=target_language,
+        )
+        .values("placeholder_id")
+        .annotate(count=models.Count("pk"))
+        .values_list("placeholder_id", "count")
+    )
+    plugins_by_placeholder = defaultdict(list)
+    for plugin in source_plugins:
+        plugins_by_placeholder[plugin.placeholder_id].append(plugin)
+
     copied = 0
-    placeholders = page.get_placeholders(source_language)
-    for placeholder in placeholders:
-        # only_empty is True we check if the placeholder already has plugins and
-        # we skip it if has some
-        if not only_empty or not placeholder.get_plugins(language=target_language).exists():
-            plugins = list(placeholder.get_plugins(language=source_language))
-            copied_plugins = copy_plugins_to_placeholder(plugins, placeholder, language=target_language)
+    for placeholder in source_placeholders:
+        if not only_empty or not target_plugin_counts.get(placeholder.pk):
+            copied_plugins = copy_plugins_to_placeholder(
+                plugins_by_placeholder[placeholder.pk],
+                placeholder,
+                language=target_language,
+                plugins_are_downcast=True,
+            )
             copied += len(copied_plugins)
     return copied
 

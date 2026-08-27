@@ -40,8 +40,8 @@ There's more than one way to do this, but here's one to help you get started:
     git clone https://github.com/django-cms/django-cms.git
 
     # install the dependencies for testing
-    # note that requirements files for other Django versions are also provided
-    pip install -r django-cms/test_requirements/django-X.Y.txt
+    # choose one of the supported Django versions in test_requirements/
+    pip install -r django-cms/test_requirements/django-5.2.txt
 
     # run the test suite
     # note that you must be in the django-cms directory when you do this,
@@ -120,22 +120,23 @@ command.
 To use a different database, set the ``DATABASE_URL`` environment variable to a
 dj-database-url compatible value.
 
-Running Frontend Tests
+Running frontend tests
 ----------------------
 
-We have two types of frontend tests: unit tests and integration tests. For unit tests we
-are using `Karma <http://karma-runner.github.io/>`_ as a test runner and `Jasmine
-<http://jasmine.github.io/>`_ as a test framework.
+We have two types of frontend tests: unit tests and integration tests. Unit tests use
+`Karma <https://karma-runner.github.io/>`_ as the test runner and `Jasmine
+<https://jasmine.github.io/>`_ as the test framework. Integration tests use
+`Playwright <https://playwright.dev/>`_.
 
 In order to be able to run them you need to install necessary dependencies as outlined
 in :ref:`frontend tooling installation instructions <contributing_frontend>`.
 
-Linting runs against the test files as well with ``gulp lint``. In order to run
+Linting runs against the test files as well with ``npx gulp lint``. To run
 linting continuously, do:
 
 .. code-block::
 
-    gulp watch
+    npx gulp watch
 
 Unit tests
 ~~~~~~~~~~
@@ -144,33 +145,44 @@ Unit tests can be run like this:
 
 .. code-block::
 
-    gulp unitTest
+    npx gulp unitTest
 
 If your code is failing and you want to run only specific files, you can provide the
 ``--tests`` parameter with comma separated file names, like this:
 
 .. code-block::
 
-    gulp unitTest --tests=cms.base,cms.modal
+    npx gulp unitTest --tests=cms.base,cms.modal
 
-If you want to run tests continuously you can use the watch command:
+The tests run in headless Chrome. The test configuration uses the Chrome installation
+provided by Puppeteer unless the ``CHROME_BIN`` environment variable points to a
+different Chrome or Chromium executable.
 
-.. code-block::
+Integration tests
+~~~~~~~~~~~~~~~~~
 
-    gulp unitTest --watch
+Install Playwright's Chromium browser once after installing the Node dependencies:
 
-This will rerun the suite whenever source or test file is changed. By default the tests
-are running on `PhantomJS <http://phantomjs.org/>`_, but when running Karma in watch
-mode you can also visit the server it spawns with an actual browser.
+.. code-block:: sh
 
-    INFO [karma]: Karma v0.13.15 server started at http://localhost:9876/
+    npx playwright install chromium
 
-On Travis CI we are using SauceLabs integration to run tests in a set of different real
-browsers, but you can opt out of running them on saucelabs using ``[skip saucelabs]``
-marker in the commit message, similar to how you would skip the build entirely using
-``[skip ci]``.
+Run the integration suite with:
 
-We're using Jasmine as a test framework and Istanbul as a code coverage tool.
+.. code-block:: sh
+
+    npx gulp testsIntegration
+
+This task starts the Django test server on port 9009, runs the Playwright tests, and
+stops the server afterwards. It uses ``.venv/bin/python`` when that file exists and
+otherwise uses ``python`` from ``PATH``. To run selected test files, provide a
+comma-separated list:
+
+.. code-block:: sh
+
+    npx gulp testsIntegration --testFiles=loginAdmin.spec.js,touch-action.spec.js
+
+Use ``npx gulp tests`` to run the unit and integration suites in sequence.
 
 Writing tests
 -------------

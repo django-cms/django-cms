@@ -6,6 +6,17 @@ from sekizai.context import SekizaiContext
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cache import invalidate_cms_page_cache
+from cms.cache.page import (
+    _page_cache_key,
+    _page_url_key,
+    _page_vary_headers_cache_key,
+    _vary_on_hash,
+    get_page_cache,
+    get_page_url_cache,
+    get_xframe_cache,
+    set_page_url_cache,
+    set_xframe_cache,
+)
 from cms.cache.placeholder import (
     _get_placeholder_cache_key,
     _get_placeholder_cache_version,
@@ -32,8 +43,10 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
+from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
+from cms.utils.i18n import get_default_language_for_site
 
 
 class CacheTestCase(CMSTestCase):
@@ -870,3 +883,232 @@ class PlaceholderCacheTestCase(CMSTestCase):
                 self.placeholder_en, "en", 1, en_crazy_request
             )
             self.assertEqual(en_crazy_content, cached_en_crazy_content)
+
+
+class PageCacheKeyTestCase(CMSTestCase):
+    """Direct unit tests for the page-cache key helpers."""
+
+    def test_page_cache_key_includes_prefix_site_language(self):
+        request = self.get_request("/en/", language="en")
+        key = _page_cache_key(request)
+
+        prefix = get_cms_setting("CACHE_PREFIX")
+        site = get_current_site(request)
+        self.assertTrue(key.startswith(f"{prefix}:{site.pk}:en:"))
+
+    def test_page_cache_key_varies_on_language(self):
+        en_request = self.get_request("/en/", language="en")
+        de_request = self.get_request("/en/", language="de")
+        self.assertNotEqual(
+            _page_cache_key(en_request), _page_cache_key(de_request)
+        )
+
+    def test_page_cache_key_varies_on_path(self):
+        request_a = self.get_request("/en/page-a/", language="en")
+        request_b = self.get_request("/en/page-b/", language="en")
+        self.assertNotEqual(
+            _page_cache_key(request_a), _page_cache_key(request_b)
+        )
+
+    def test_page_cache_key_includes_timezone_when_use_tz(self):
+        request = self.get_request("/en/", language="en")
+        with self.settings(USE_TZ=True):
+            key = _page_cache_key(request)
+        self.assertIn(".%s" % get_timezone_name(), key)
+
+    def test_page_cache_key_falls_back_to_default_language(self):
+        """Without ``request.LANGUAGE_CODE`` the site default language is used."""
+        request = self.get_request("/en/", language="en")
+        del request.LANGUAGE_CODE
+        site = get_current_site(request)
+        default_language = get_default_language_for_site(site.pk)
+        key = _page_cache_key(request)
+        self.assertIn(f":{default_language}:", key)
+
+    def test_page_cache_key_varies_on_declared_headers(self):
+        """The same request yields different keys per declared header value."""
+        request_us = self.get_request("/en/", language="en")
+        request_us.META["HTTP_COUNTRY_CODE"] = "US"
+        request_fr = self.get_request("/en/", language="en")
+        request_fr.META["HTTP_COUNTRY_CODE"] = "FR"
+
+        self.assertNotEqual(
+            _page_cache_key(request_us, ["Country-Code"]),
+            _page_cache_key(request_fr, ["Country-Code"]),
+        )
+
+    def test_page_cache_key_ignores_undeclared_headers(self):
+        """Header values only matter when the header is in ``vary_on``."""
+        request_us = self.get_request("/en/", language="en")
+        request_us.META["HTTP_COUNTRY_CODE"] = "US"
+        request_fr = self.get_request("/en/", language="en")
+        request_fr.META["HTTP_COUNTRY_CODE"] = "FR"
+
+        self.assertEqual(
+            _page_cache_key(request_us), _page_cache_key(request_fr)
+        )
+
+    def test_vary_on_hash_is_constant_for_empty(self):
+        request = self.get_request("/en/", language="en")
+        self.assertEqual(_vary_on_hash(request, []), _vary_on_hash(request, []))
+
+    def test_vary_on_hash_is_order_and_case_insensitive(self):
+        request = self.get_request("/en/", language="en")
+        request.META["HTTP_COUNTRY_CODE"] = "US"
+        request.META["HTTP_X_REGION"] = "EU"
+
+        self.assertEqual(
+            _vary_on_hash(request, ["Country-Code", "X-Region"]),
+            _vary_on_hash(request, ["x-region", "country-code"]),
+        )
+
+    def test_vary_on_hash_varies_on_value(self):
+        request_us = self.get_request("/en/", language="en")
+        request_us.META["HTTP_COUNTRY_CODE"] = "US"
+        request_fr = self.get_request("/en/", language="en")
+        request_fr.META["HTTP_COUNTRY_CODE"] = "FR"
+
+        self.assertNotEqual(
+            _vary_on_hash(request_us, ["Country-Code"]),
+            _vary_on_hash(request_fr, ["Country-Code"]),
+        )
+
+    def test_page_vary_headers_cache_key_suffix(self):
+        request = self.get_request("/en/", language="en")
+        self.assertEqual(
+            _page_vary_headers_cache_key(request),
+            _page_cache_key(request) + ".vary-on",
+        )
+
+
+class PageCacheRoundTripTestCase(CMSTestCase):
+    def setUp(self):
+        from django.core.cache import cache
+
+        super().setUp()
+        cache.clear()
+
+    def tearDown(self):
+        from django.core.cache import cache
+
+        super().tearDown()
+        cache.clear()
+
+    def test_get_page_cache_miss_returns_none(self):
+        request = self.get_request("/en/never-cached/", language="en")
+        self.assertIsNone(get_page_cache(request))
+
+    def test_set_and_get_page_cache_round_trip(self):
+        """A primed page response can be read back via ``get_page_cache``."""
+        exclude = [
+            "django.middleware.cache.UpdateCacheMiddleware",
+            "django.middleware.cache.FetchFromCacheMiddleware",
+        ]
+        overrides = {
+            "MIDDLEWARE": [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        }
+        with self.settings(**overrides):
+            page = create_page("cached page", "nav_playground.html", "en")
+            placeholder = page.get_placeholders("en").get(slot="body")
+            add_plugin(placeholder, "TextPlugin", "en", body="Cached body")
+            page_url = page.get_absolute_url()
+
+            # Prime the cache (set_page_cache runs as a post-render callback).
+            response = self.client.get(page_url)
+            self.assertEqual(response.status_code, 200)
+
+            request = self.get_request(page_url, language="en")
+            cached = get_page_cache(request)
+            self.assertIsNotNone(cached)
+            content, headers, expires_datetime, xframe_options_exempt = cached
+            self.assertIn(b"Cached body", content)
+            self.assertIsNotNone(expires_datetime)
+
+
+class XFrameCacheTestCase(CMSTestCase):
+    def setUp(self):
+        from django.core.cache import cache
+
+        super().setUp()
+        cache.clear()
+
+    def tearDown(self):
+        from django.core.cache import cache
+
+        super().tearDown()
+        cache.clear()
+
+    def test_get_xframe_cache_miss_returns_none(self):
+        page = create_page("xframe page", "nav_playground.html", "en")
+        self.assertIsNone(get_xframe_cache(page))
+
+    def test_set_and_get_xframe_cache(self):
+        page = create_page("xframe page", "nav_playground.html", "en")
+        set_xframe_cache(page, 1)
+        self.assertEqual(get_xframe_cache(page), 1)
+
+    def test_xframe_cache_is_per_page(self):
+        page1 = create_page("xframe page 1", "nav_playground.html", "en")
+        page2 = create_page("xframe page 2", "nav_playground.html", "en")
+        set_xframe_cache(page1, 1)
+        self.assertEqual(get_xframe_cache(page1), 1)
+        self.assertIsNone(get_xframe_cache(page2))
+
+
+class PageURLCacheTestCase(CMSTestCase):
+    def setUp(self):
+        from django.core.cache import cache
+
+        super().setUp()
+        cache.clear()
+
+    def tearDown(self):
+        from django.core.cache import cache
+
+        super().tearDown()
+        cache.clear()
+
+    def test_page_url_key_is_absolute_url_type(self):
+        key = _page_url_key("my-page", "en", 1, None)
+        self.assertTrue(key.endswith("_type:absolute_url"))
+
+    def test_page_url_key_omits_extra_key_when_none(self):
+        key = _page_url_key("my-page", "en", 1, None)
+        self.assertNotIn("_key:", key)
+
+    def test_page_url_key_includes_extra_key(self):
+        key = _page_url_key("my-page", "en", 1, "preview")
+        self.assertIn("_key:preview", key)
+
+    def test_page_url_key_varies_on_extra_key(self):
+        self.assertNotEqual(
+            _page_url_key("my-page", "en", 1, "a"),
+            _page_url_key("my-page", "en", 1, "b"),
+        )
+
+    def test_page_url_key_varies_on_language_and_site(self):
+        base = _page_url_key("my-page", "en", 1, None)
+        self.assertNotEqual(base, _page_url_key("my-page", "de", 1, None))
+        self.assertNotEqual(base, _page_url_key("my-page", "en", 2, None))
+
+    def test_get_page_url_cache_miss_returns_none(self):
+        self.assertIsNone(get_page_url_cache("missing-page", "en", 1))
+
+    def test_set_and_get_page_url_cache(self):
+        set_page_url_cache("my-page", "en", 1, "/en/my-page/")
+        self.assertEqual(get_page_url_cache("my-page", "en", 1), "/en/my-page/")
+
+    def test_set_and_get_page_url_cache_with_extra_key(self):
+        set_page_url_cache("my-page", "en", 1, "/en/my-page/", extra_key="preview")
+        # The extra-key variant is isolated from the default variant.
+        self.assertEqual(
+            get_page_url_cache("my-page", "en", 1, extra_key="preview"),
+            "/en/my-page/",
+        )
+        self.assertIsNone(get_page_url_cache("my-page", "en", 1))
+
+    def test_page_url_cache_is_invalidated_by_version_bump(self):
+        set_page_url_cache("my-page", "en", 1, "/en/my-page/")
+        self.assertEqual(get_page_url_cache("my-page", "en", 1), "/en/my-page/")
+        invalidate_cms_page_cache()
+        self.assertIsNone(get_page_url_cache("my-page", "en", 1))

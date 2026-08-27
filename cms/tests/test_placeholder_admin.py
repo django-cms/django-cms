@@ -7,6 +7,7 @@ from django.test.utils import CaptureQueriesContext, override_settings
 
 from cms.api import add_plugin, create_page
 from cms.models import CMSPlugin, Placeholder, UserSettings
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
 
@@ -27,6 +28,48 @@ class PlaceholderAdminTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             data = {"name": "A Link", "external_link": "https://www.django-cms.org"}
             response = self.client.post(uri, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(plugins.count(), 1)
+
+    def test_add_plugin_rejected_in_disallowed_slot(self):
+        """A plugin with allowed_slots cannot be added to a slot it does not allow."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="sidebar")
+        plugins = placeholder.get_plugins("en").filter(plugin_type="LinkPlugin")
+        uri = self.get_add_plugin_uri(
+            placeholder=placeholder,
+            plugin_type="LinkPlugin",
+            language="en",
+        )
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {"name": "A Link", "external_link": "https://www.django-cms.org"}
+                response = self.client.post(uri, data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(plugins.count(), 0)
+
+    def test_add_plugin_allowed_in_listed_slot(self):
+        """A plugin with allowed_slots can be added to a slot it allows."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="content")
+        plugins = placeholder.get_plugins("en").filter(plugin_type="LinkPlugin")
+        uri = self.get_add_plugin_uri(
+            placeholder=placeholder,
+            plugin_type="LinkPlugin",
+            language="en",
+        )
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {"name": "A Link", "external_link": "https://www.django-cms.org"}
+                response = self.client.post(uri, data)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugins.count(), 1)
@@ -70,6 +113,57 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(source_placeholder.get_plugins("en").filter(pk=source_plugin.pk).exists())
         self.assertTrue(target_placeholder.get_plugins("en").filter(plugin_type=source_plugin.plugin_type).exists())
+
+    def test_copy_plugins_rejected_into_disallowed_slot(self):
+        """A plugin with allowed_slots cannot be copied into a slot it does not allow."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source_placeholder = Placeholder.objects.create(slot="content")
+        target_placeholder = Placeholder.objects.create(slot="sidebar")
+        source_plugin = self._add_plugin_to_placeholder(source_placeholder)
+        endpoint = self.get_copy_plugin_uri(source_plugin)
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "source_language": "en",
+                    "source_placeholder_id": source_placeholder.pk,
+                    "target_language": "en",
+                    "target_placeholder_id": target_placeholder.pk,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 400)
+        # Nothing was copied into the disallowed target slot.
+        self.assertFalse(target_placeholder.get_plugins("en").exists())
+
+    def test_copy_plugins_allowed_into_listed_slot(self):
+        """A plugin with allowed_slots can be copied into a slot it allows."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source_placeholder = Placeholder.objects.create(slot="content")
+        target_placeholder = Placeholder.objects.create(slot="sidebar")
+        source_plugin = self._add_plugin_to_placeholder(source_placeholder)
+        endpoint = self.get_copy_plugin_uri(source_plugin)
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        with patch.object(LinkPlugin, "allowed_slots", ["content", "sidebar"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "source_language": "en",
+                    "source_placeholder_id": source_placeholder.pk,
+                    "target_language": "en",
+                    "target_placeholder_id": target_placeholder.pk,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            target_placeholder.get_plugins("en").filter(plugin_type="LinkPlugin").exists()
+        )
 
     def test_copy_plugins_to_clipboard(self):
         """
@@ -261,6 +355,23 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertContains(response, '<div class="success"></div>')
         self.assertFalse(CMSPlugin.objects.filter(pk=plugin.pk).exists())
 
+    def test_delete_plugin_confirmation_context(self):
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="source")
+        plugin = self._add_plugin_to_placeholder(placeholder)
+        endpoint = self.get_delete_plugin_uri(plugin)
+
+        with patch(
+            "cms.admin.placeholderadmin.PlaceholderAdmin.delete_confirmation_max_display",
+            1,
+            create=True,
+        ), self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("delete_confirmation_max_display", response.context)
+        self.assertEqual(response.context["delete_confirmation_max_display"], 1)
+
     def test_clear_placeholder_endpoint(self):
         """
         The Placeholder admin delete_plugin endpoint works
@@ -274,6 +385,44 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(placeholder.get_plugins("en").count(), 0)
+
+    def test_clear_placeholder_confirmation_context(self):
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="source")
+        self._add_plugin_to_placeholder(placeholder)
+        endpoint = self.get_clear_placeholder_url(placeholder)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("delete_confirmation_max_display", response.context)
+        self.assertIsNone(response.context["delete_confirmation_max_display"])
+
+    def test_clear_clipboard_requires_post(self):
+        """
+        Clearing the clipboard mutates state immediately (no confirmation
+        page), so it must reject CSRF-exempt GET requests. A GET leaves the
+        clipboard untouched; a POST clears it.
+        """
+        superuser = self.get_superuser()
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=superuser,
+            clipboard=Placeholder.objects.create(slot="clipboard"),
+        )
+        self._add_plugin_to_placeholder(user_settings.clipboard)
+        endpoint = self.get_clear_placeholder_url(user_settings.clipboard)
+
+        with self.login_user_context(superuser):
+            get_response = self.client.get(endpoint)
+            self.assertEqual(get_response.status_code, 405)
+            # The clipboard was not cleared by the GET request.
+            self.assertEqual(user_settings.clipboard.get_plugins("en").count(), 1)
+
+            post_response = self.client.post(endpoint)
+            self.assertEqual(post_response.status_code, 200)
+            self.assertEqual(user_settings.clipboard.get_plugins("en").count(), 0)
 
     def _fill_page_body(self, page, lang):
         ph_en = page.get_placeholders(lang).get(slot="placeholder")
@@ -439,6 +588,86 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
         self.assertIsNone(parent.parent_id)
         self.assertEqual(child.parent_id, parent.pk)
 
+    def test_move_plugin_rejected_into_disallowed_slot(self):
+        """A plugin with allowed_slots cannot be moved into a slot it does not allow."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source = Placeholder.objects.create(slot="content")
+        target = Placeholder.objects.create(slot="sidebar")
+        plugin = add_plugin(source, "LinkPlugin", "en", name="link", external_link="https://example.com")
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        endpoint = self.get_move_plugin_uri(plugin)
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "plugin_id": plugin.pk,
+                    "placeholder_id": target.pk,
+                    "target_language": "en",
+                    "target_position": 1,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 400)
+        plugin.refresh_from_db()
+        # The plugin stays in its original placeholder.
+        self.assertEqual(plugin.placeholder_id, source.pk)
+
+    def test_move_plugin_rejected_when_descendant_disallowed_in_slot(self):
+        """Moving a subtree is rejected if any descendant is disallowed in the target slot."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source = Placeholder.objects.create(slot="content")
+        target = Placeholder.objects.create(slot="sidebar")
+        # The moved (root) plugin is allowed in every slot, but its child is restricted.
+        parent = add_plugin(source, "StylePlugin", "en", label="wrap")
+        add_plugin(source, "LinkPlugin", "en", name="link", external_link="https://example.com", target=parent)
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        endpoint = self.get_move_plugin_uri(parent)
+        with patch.object(LinkPlugin, "allowed_slots", ["content"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "plugin_id": parent.pk,
+                    "placeholder_id": target.pk,
+                    "target_language": "en",
+                    "target_position": 1,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 400)
+        parent.refresh_from_db()
+        # The subtree stays in its original placeholder.
+        self.assertEqual(parent.placeholder_id, source.pk)
+
+    def test_move_plugin_allowed_into_listed_slot(self):
+        """A plugin with allowed_slots can be moved into a slot it allows."""
+        from cms.plugin_pool import plugin_pool
+
+        superuser = self.get_superuser()
+        source = Placeholder.objects.create(slot="content")
+        target = Placeholder.objects.create(slot="sidebar")
+        plugin = add_plugin(source, "LinkPlugin", "en", name="link", external_link="https://example.com")
+
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        endpoint = self.get_move_plugin_uri(plugin)
+        with patch.object(LinkPlugin, "allowed_slots", ["content", "sidebar"]):
+            with self.login_user_context(superuser):
+                data = {
+                    "plugin_id": plugin.pk,
+                    "placeholder_id": target.pk,
+                    "target_language": "en",
+                    "target_position": 1,
+                }
+                response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        plugin.refresh_from_db()
+        # The plugin moved into the allowed target placeholder.
+        self.assertEqual(plugin.placeholder_id, target.pk)
+
     def test_copy_plugin_to_clipboard_requires_source_permission(self):
         """Copying a plugin to the clipboard must check source-side permission.
 
@@ -587,3 +816,130 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertFalse(user_settings.clipboard.get_plugins("en").exists())
+
+    def _get_clipboard(self, user, with_source=True):
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=user,
+            clipboard=Placeholder.objects.create(slot="clipboard"),
+        )
+        if with_source:
+            user_settings.clipboard.source = user_settings
+            user_settings.clipboard.save()
+        return user_settings.clipboard
+
+    def test_paste_plugin_requires_source_permission(self):
+        """Pasting a plugin must check permission on the placeholder it is
+        pasted *from*.
+
+        The plugin to paste is identified by a client-supplied id, so a staff
+        user could otherwise name any plugin in the installation and have its
+        content copied into a placeholder they do control -- their own
+        clipboard, for instance.
+        """
+        attacker = self._create_user(
+            "attacker", is_staff=True, is_superuser=False, permissions=["add_link"]
+        )
+        clipboard = self._get_clipboard(attacker)
+
+        # A placeholder the attacker has no permission on.
+        victim_placeholder = Placeholder.objects.create(slot="secret")
+        victim_plugin = add_plugin(
+            victim_placeholder,
+            "LinkPlugin",
+            "en",
+            name="VictimSecretLink",
+            external_link="https://secret.example.com",
+        )
+        endpoint = self.get_move_plugin_uri(victim_plugin)
+        with self.login_user_context(attacker):
+            data = {
+                "plugin_id": victim_plugin.pk,
+                "placeholder_id": clipboard.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(clipboard.get_plugins("en").exists())
+
+    def test_paste_placeholder_requires_source_permission(self):
+        """Pasting a placeholder reference must check permission on the
+        placeholder holding it.
+
+        A clipboard belongs to a single user, so its contents must not be
+        pasteable by anybody else.
+        """
+        attacker = self._create_user(
+            "attacker", is_staff=True, is_superuser=False, permissions=["add_link"]
+        )
+        victim = self._create_user(
+            "victim", is_staff=True, is_superuser=False, permissions=["add_link"]
+        )
+        attacker_clipboard = self._get_clipboard(attacker)
+        victim_clipboard = self._get_clipboard(victim)
+
+        # The victim copied a whole placeholder into their clipboard.
+        reference = add_plugin(
+            victim_clipboard, "PlaceholderPlugin", "en", name="Victim clipboard"
+        )
+        add_plugin(
+            reference.placeholder_ref,
+            "LinkPlugin",
+            "en",
+            name="VictimSecretLink",
+            external_link="https://secret.example.com",
+        )
+
+        endpoint = self.get_move_plugin_uri(reference)
+        with self.login_user_context(attacker):
+            data = {
+                "plugin_id": reference.pk,
+                "placeholder_id": attacker_clipboard.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(attacker_clipboard.get_plugins("en").exists())
+
+    def test_paste_plugin_from_own_clipboard_without_source(self):
+        """A user may always paste from their own clipboard.
+
+        Clipboards created before they got a source object still have none by
+        the time the plugin to paste is fetched, so the source-side check must
+        not rely on the clipboard's source alone.
+        """
+        user = self.get_staff_user_with_no_permissions()
+        self.add_permission(user, "change_example1")
+        self.add_permission(user, "add_link")
+        clipboard = self._get_clipboard(user, with_source=False)
+
+        target = Example1.objects.create(
+            char_1="one", char_2="two", char_3="tree", char_4="four"
+        ).placeholder
+        plugin = add_plugin(
+            clipboard,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+
+        endpoint = self.get_move_plugin_uri(plugin)
+        with self.login_user_context(user):
+            data = {
+                "plugin_id": plugin.pk,
+                "placeholder_id": target.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(target.get_plugins("en").count(), 1)

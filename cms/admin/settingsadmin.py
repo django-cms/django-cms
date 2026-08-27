@@ -21,6 +21,8 @@ from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
 from cms.models.contentmodels import PageContent
 from cms.utils.page import get_page_from_request
+from cms.utils.page_permissions import user_can_view_page
+from cms.utils.permissions import user_can_view_placeholder_source
 from cms.utils.urlutils import admin_reverse
 
 
@@ -85,6 +87,21 @@ class SettingsAdmin(admin.ModelAdmin):
             current_page = attached_obj.page
         else:
             current_page = get_page_from_request(request, use_path=origin_url.path, clean_path=True)
+
+        # The object id/type come straight from the client, so enforce an
+        # object-level view check before rendering a toolbar for it. Without
+        # this, any staff user could read the title/breadcrumb/edit URLs of
+        # pages on other sites or of view-restricted pages they cannot access.
+        # Deny with the same generic response as an unknown object so this does
+        # not become an existence oracle.
+        if isinstance(attached_obj, PageContent):
+            if not user_can_view_page(request.user, current_page):
+                return HttpResponseBadRequest('Invalid parameters')
+        elif attached_obj is not None:
+            if not user_can_view_placeholder_source(request.user, attached_obj):
+                return HttpResponseBadRequest('Invalid parameters')
+        elif current_page is not None and not user_can_view_page(request.user, current_page):
+            return HttpResponseBadRequest('Invalid parameters')
 
         data = QueryDict(query_string=origin_url.query, mutable=True)
         placeholders = request.GET.getlist("placeholders[]")

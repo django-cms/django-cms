@@ -22,6 +22,7 @@ if (files[0] === '*') {
     require('./shortcuts.test');
     require('./keyboard.test');
     require('./preload-images.test');
+    require('./slug.test');
     require('./dom-diff.test');
     // FIXME this has to be last because it messes with the url
     require('./cms.structureboard.test'); // missing some tests

@@ -1,12 +1,14 @@
 {% load i18n l10n sekizai_tags static cms_tags cms_js_tags cms_static %}
 
-{% addtoblock "css" %}<link rel="stylesheet" href="{% static_with_version "cms/css/cms.base.css" %}" />{% endaddtoblock %}
-{% for css in cms_toolbar.media.render_css %}
+{% addtoblock "css" %}<link rel="stylesheet" href="{% static_with_version "cms/css/cms.base.css" %}" {% csp_nonce_attr %}/>{% endaddtoblock %}
+{% render_media_assets cms_toolbar.media "css" as cms_toolbar_css %}
+{% for css in cms_toolbar_css %}
     {% addtoblock "css" %}{{ css }}{% endaddtoblock %}
 {% endfor %}
 
 {% addtoblock "js" %}
-<script data-cms src="{% static_with_version "cms/js/dist/bundle.toolbar.min.js" %}" type="text/javascript"></script>
+<script data-cms src="{% static_with_version "cms/js/dist/bundle.toolbar.min.js" %}" type="text/javascript" {% csp_nonce_attr %}></script>
+{# INFO: a non-executable JSON data block; browsers never run it, so CSP does not check it and it must stay nonce-free #}
 <script data-cms-config id="cms-config-json" type="application/json">
 {
     "mode": {% if cms_toolbar.edit_mode_active or cms_toolbar.structure_mode_active %}"draft"{% else %}"live"{% endif %},
@@ -128,6 +130,7 @@
 </script>
 {% endaddtoblock %}
 {% if cms_toolbar.clipboard_plugin %}{% render_plugin_init_js cms_toolbar.clipboard_plugin %}{% endif %}
-{% for js in cms_toolbar.media.render_js %}
+{% render_media_assets cms_toolbar.media "js" as cms_toolbar_js %}
+{% for js in cms_toolbar_js %}
     {% addtoblock "js" %}{{ js }}{% endaddtoblock %}
 {% endfor %}

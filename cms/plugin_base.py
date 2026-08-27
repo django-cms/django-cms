@@ -1,3 +1,4 @@
+import fnmatch
 import json
 import re
 from collections.abc import Callable
@@ -11,7 +12,8 @@ from django.template import Context
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_str, smart_str
 from django.utils.functional import lazy
-from django.utils.html import escapejs
+from django.utils.html import conditional_escape, escapejs
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
@@ -207,6 +209,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     See also: Model's ``allowed_plugins`` attribute for model-level restrictions.
     """
 
+    allowed_slots = None
+    """Plugin-level restriction: A list of placeholder slot names where this plugin can be added.
+
+    Each entry may be an exact slot name or a glob pattern (e.g. ``"content"`` or ``"footer_*"``),
+    matched against the placeholder's ``slot``.
+
+    - If ``None`` (default): The plugin can be added to any slot.
+    - If a list/tuple is provided: The plugin can only be added to slots matching one of the entries.
+    - If an empty list ``[]``: The plugin cannot be added to any slot.
+
+    This is the plugin-side counterpart to the ``plugins``/``excluded_plugins`` keys of
+    ``CMS_PLACEHOLDER_CONF``. Both filters must pass for the plugin to be available in a slot.
+
+    See also: :attr:`allowed_models`, ``CMS_PLACEHOLDER_CONF``.
+    """
+
     allow_children = False
     """Allows this plugin to have child plugins - other plugins placed inside it?
 
@@ -331,15 +349,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             raise ValidationError("plugin has no render_template: %s" % self.__class__)
         return template
 
-    if DJANGO_5_1:
-        # Avoid a bug in Django's template engine that is incompatible with Python 3.9+
-        # type hinting. By default, the parent class has no __class_getitem__ method.
-        # There exist third-party packages, however, that inject type hinting into Django.
-        # This ensures, that any type hinting is ignored for CMSPlugin (below Django 5.2)
-        # See https://github.com/django-cms/django-cms/issues/7948
-        def __class_getitem__(cls, item):
-            raise TypeError
-
     @classmethod
     def get_render_queryset(cls):
         return cls.model._default_manager.all()
@@ -374,6 +383,20 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         context["instance"] = instance
         context["placeholder"] = placeholder
         return context
+
+    @classmethod
+    def is_allowed_in_slot(cls, slot: str | None) -> bool:
+        """Return whether this plugin may be added to a placeholder with the given ``slot``.
+
+        Honours the :attr:`allowed_slots` plugin-level restriction. A ``slot`` of ``None``
+        (an unbound query, e.g. the global plugin listing) is always allowed.
+        """
+        if cls.allowed_slots is None or slot is None:
+            return True
+        # Tolerate a bare string (e.g. ``allowed_slots = "content"``) instead of
+        # iterating over its characters, which would silently misbehave.
+        patterns = [cls.allowed_slots] if isinstance(cls.allowed_slots, str) else cls.allowed_slots
+        return any(fnmatch.fnmatchcase(slot, pattern) for pattern in patterns)
 
     @classmethod
     def requires_parent_plugin(cls, slot, page):
@@ -620,7 +643,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             operation_kwargs["operation"] = operations.CHANGE_PLUGIN
         else:
             parent_id = obj.parent.pk if obj.parent else None
-            tree_order = obj.placeholder.get_plugin_tree_order(parent_id)
+            tree_order = obj.placeholder.get_plugin_tree_order(obj.language, parent_id)
             operation_kwargs["plugin"] = obj
             operation_kwargs["operation"] = operations.ADD_PLUGIN
             operation_kwargs["tree_order"] = tree_order
@@ -650,8 +673,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {"name": force_str(opts.verbose_name), "obj": force_str(obj)}
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
+        msg_dict = {
+            "name": conditional_escape(force_str(opts.verbose_name)),
+            "obj": conditional_escape(force_str(obj)),
+        }
+        msg = mark_safe(_('The %(name)s "%(obj)s" was changed successfully.') % msg_dict)
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj, action="change")
 

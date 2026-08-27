@@ -617,6 +617,43 @@ class TestPageWizardSubmission(CMSTestCase):
         edit_endpoint = get_object_edit_url(Page.objects.exclude(pk=page.pk).last().get_content_obj("en"), "en")
         self.assertContains(response, MODAL_HTML_REDIRECT.format(url=edit_endpoint))
 
+    def test_subpage_wizard_submission(self):
+        """Regression test for #8697: the subpage wizard must run through both
+        steps and create the new page as a child of the origin page.
+
+        The subpage entry is only offered while the wizard knows the origin
+        page, so a regression that drops the page between steps both hides the
+        entry (step 0 fails to validate) and detaches the created page.
+        """
+        parent = create_page("home", "nav_playground.html", "en")
+        entry_id = cms_subpage_wizard.id
+        endpoint = admin_reverse("cms_wizard_create")
+        data_step1 = {
+            "wizard_create_view-current_step": "0",
+            "0-entry": entry_id,
+            "0-language": "en",
+            "0-page": parent.pk,
+        }
+        data_step2 = {
+            "wizard_create_view-current_step": "1",
+            "1-title": "my child page",
+            "1-slug": "my-child-page",
+            "1-content": "",
+        }
+
+        with self.login_user_context(self.get_superuser()):
+            # Step 0 must advance to step 1 -- i.e. the subpage entry stays a
+            # valid choice because the origin page survives the transition.
+            response = self.client.post(endpoint, data_step1, follow=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, "Please choose an option")
+            response = self.client.post(endpoint, data_step2)
+
+        new_page = Page.objects.exclude(pk=parent.pk).get()
+        self.assertEqual(new_page.parent_id, parent.pk)
+        edit_endpoint = get_object_edit_url(new_page.get_content_obj("en"), "en")
+        self.assertContains(response, MODAL_HTML_REDIRECT.format(url=edit_endpoint))
+
 
 class TestWizardHelpers(CMSTestCase):
     def setUp(self):

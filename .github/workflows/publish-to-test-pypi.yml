@@ -5,10 +5,89 @@ on:
     branches:
       - 'develop'
       - 'release/**'
+      - 'fix/**'
 
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to TestPyPI
+  build:
+    name: Build Python 🐍 distributions 📦
+    runs-on: ubuntu-latest
+    # No id-token here: the build runs third-party code (pip, the build
+    # backend, check-wheel-contents) and must not be able to mint an OIDC
+    # token for trusted publishing. Publishing happens in a separate job.
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+    - name: Set up Python
+      uses: actions/setup-python@v7
+      with:
+        python-version: '3.12'
+
+    - name: Install build tooling
+      # Hash-pinned: all of this executes in the build job and shapes the
+      # distribution the publish job uploads. See the file for how to refresh.
+      run: >-
+        python -m
+        pip install
+        --require-hashes
+        --user
+        -r .github/requirements/build.txt
+    - name: Build a binary wheel and a source tarball
+      # --no-isolation: use the hash-pinned setuptools/setuptools-scm installed
+      # above instead of letting build resolve the backend from PyPI at runtime.
+      run: >-
+        python -m
+        build
+        --no-isolation
+        --sdist
+        --wheel
+        --outdir dist/
+        .
+
+    - name: Check wheel contents
+      run: |
+        python -m check_wheel_contents dist/*.whl
+        python - <<'EOF'
+        import glob, os, sys, zipfile
+        wheels = glob.glob("dist/*.whl")
+        if len(wheels) != 1:
+            sys.exit(f"Expected exactly one wheel in dist/, found: {wheels or 'none'}")
+        wheel = wheels[0]
+        z = zipfile.ZipFile(wheel)
+        names = z.namelist()
+        allowed = ("cms/", "menus/")
+        stray = sorted({n.split("/")[0] for n in names
+                        if not n.startswith(allowed) and ".dist-info/" not in n})
+        # Step 2 (#8733): uncomment to fail on cms.tests in the wheel, and drop the shim line:
+        # tests = [n for n in names if n.startswith("cms/tests/")]
+        tests = []
+        if not any(n.startswith("cms/test_utils/") for n in names):
+            sys.exit("cms.test_utils missing from wheel - it is public API for third-party test suites")
+        if stray or tests:
+            sys.exit(f"Unexpected wheel contents - stray top-level: {stray}, cms/tests files: {len(tests)}")
+        compressed = os.path.getsize(wheel) / 1024 / 1024
+        installed = sum(i.file_size for i in z.infolist()) / 1024 / 1024
+        summary = (
+            f"### Wheel check: `{os.path.basename(wheel)}`\n\n"
+            f"| Wheel      |       Size |\n"
+            f"|------------|------------|\n"
+            f"| Compressed | {compressed:7.1f} MB |\n"
+            f"| Installed  | {installed:7.1f} MB |\n"
+        )
+        print(summary)
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+            fh.write(summary)
+        EOF
+
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v7
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  publish:
+    name: Publish Python 🐍 distributions 📦 to TestPyPI
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: test
@@ -16,29 +95,17 @@ jobs:
     permissions:
       id-token: write
     steps:
-    - uses: actions/checkout@v7
-    - name: Set up Python
-      uses: actions/setup-python@v6
+    - name: Download the distribution packages
+      uses: actions/download-artifact@v8
       with:
-        python-version: '3.12'
-
-    - name: Install pypa/build
-      run: >-
-        python -m
-        pip install
-        build
-        --user
-    - name: Build a binary wheel and a source tarball
-      run: >-
-        python -m
-        build
-        --sdist
-        --wheel
-        --outdir dist/
-        .
+        name: python-package-distributions
+        path: dist/
 
     - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      # pypa/gh-action-pypi-publish v1.14.2. Pinned to a commit rather than the
+      # mutable release/v1 branch: this action receives the OIDC publishing
+      # credential, so it is the one dependency that must not move on its own.
+      uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
       with:
         repository-url: https://test.pypi.org/legacy/
         skip-existing: true

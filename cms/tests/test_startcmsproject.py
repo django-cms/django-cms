@@ -1,5 +1,8 @@
+import io
 import json
 import os
+import sys
+import tarfile
 import tempfile
 import urllib.error
 from io import StringIO
@@ -128,6 +131,7 @@ DEFAULT_OPTIONS = {
     "moderation": False,
     "alias": True,
     "stories": False,
+    "history": False,
 }
 
 
@@ -146,6 +150,37 @@ def make_command():
 
 
 class LoadInstallRulesTests(SimpleTestCase):
+    def test_loads_rules_from_custom_template_directory(self):
+        rules = bundled_rules()
+        rules["installed_apps"] = [{"items": ["agency_app"]}]
+        with tempfile.TemporaryDirectory() as template:
+            with open(os.path.join(template, Command.INSTALL_RULES_FILENAME), "w", encoding="utf-8") as rules_file:
+                json.dump(rules, rules_file)
+            command = make_command()
+            command._requested_template = template
+            with mock.patch("urllib.request.urlopen") as urlopen:
+                loaded = command.load_install_rules()
+        self.assertEqual(loaded["installed_apps"], [{"items": ["agency_app"]}])
+        urlopen.assert_not_called()
+
+    def test_loads_rules_from_custom_remote_template_archive(self):
+        rules = bundled_rules()
+        rules["installed_apps"] = [{"items": ["remote_agency_app"]}]
+        archive = io.BytesIO()
+        payload = json.dumps(rules).encode()
+        with tarfile.open(fileobj=archive, mode="w:gz") as template_tar:
+            member = tarfile.TarInfo(f"agency-template/{Command.INSTALL_RULES_FILENAME}")
+            member.size = len(payload)
+            template_tar.addfile(member, io.BytesIO(payload))
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = archive.getvalue()
+        command = make_command()
+        command._requested_template = "https://example.com/agency-template.tar.gz"
+        with mock.patch("urllib.request.urlopen", return_value=response) as urlopen:
+            loaded = command.load_install_rules()
+        self.assertEqual(loaded["installed_apps"], [{"items": ["remote_agency_app"]}])
+        urlopen.assert_called_once_with("https://example.com/agency-template.tar.gz", timeout=15)
+
     def test_metadata_keys_are_ignored(self):
         """A ``$schema`` entry (and any other ``$``-prefixed key) is dropped."""
         payload = json.dumps(bundled_rules(**{"$schema": "https://example.com/schema.json"})).encode()
@@ -164,6 +199,26 @@ class LoadInstallRulesTests(SimpleTestCase):
         self.assertIn("installed_apps", rules)
         self.assertIn("using bundled defaults", command.stderr.getvalue())
 
+    def test_can_force_bundled_rules(self):
+        command = make_command()
+        command._use_bundled_install_rules = True
+        with mock.patch("urllib.request.urlopen") as urlopen:
+            rules = command.load_install_rules()
+        self.assertIn("installed_apps", rules)
+        urlopen.assert_not_called()
+
+    def test_fetched_rules_without_options_use_bundled_options(self):
+        rules = bundled_rules()
+        rules.pop("options")
+        rules["installed_apps"] = [{"items": ["remote_app"]}]
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = json.dumps(rules).encode()
+        command = make_command()
+        with mock.patch("urllib.request.urlopen", return_value=response):
+            loaded = command.load_install_rules()
+        self.assertIn("options", loaded)
+        self.assertEqual(loaded["installed_apps"], [{"items": ["remote_app"]}])
+
     def test_non_object_rules_raise(self):
         response = mock.MagicMock()
         response.__enter__.return_value.read.return_value = b'["not", "a", "dict"]'
@@ -171,6 +226,55 @@ class LoadInstallRulesTests(SimpleTestCase):
         with mock.patch("urllib.request.urlopen", return_value=response):
             with self.assertRaises(CommandError):
                 command.load_install_rules()
+
+    def test_unknown_option_flag_raises(self):
+        rules = bundled_rules(installed_apps=[{"items": ["cms"], "when": {"flag": "unknown"}}])
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = json.dumps(rules).encode()
+        command = make_command()
+        with mock.patch("urllib.request.urlopen", return_value=response):
+            with self.assertRaises(CommandError) as raised:
+                command.load_install_rules()
+        self.assertIn("unknown option flag", str(raised.exception))
+
+
+class ParserOptionTests(SimpleTestCase):
+    def test_custom_template_defines_command_options(self):
+        rules = bundled_rules()
+        rules["options"]["agency_feature"] = {
+            "type": "boolean",
+            "default": False,
+            "label": "Agency feature",
+            "help": "Install the agency feature.",
+        }
+        with tempfile.TemporaryDirectory() as template:
+            with open(os.path.join(template, Command.INSTALL_RULES_FILENAME), "w", encoding="utf-8") as rules_file:
+                json.dump(rules, rules_file)
+            command = make_command()
+            with mock.patch.object(sys, "argv", ["djangocms", "mysite", "--template", template]):
+                parser = command.create_parser("djangocms", "")
+            parsed = parser.parse_args(["mysite", "--template", template, "--agency-feature"])
+        self.assertTrue(parsed.agency_feature)
+
+    def test_template_options_are_added_from_rules(self):
+        command = make_command()
+        command.load_install_rules = mock.Mock(return_value=bundled_rules())
+        parser = command.create_parser("djangocms", "")
+        parsed = parser.parse_args(["mysite", "--mode", "headless", "--no-versioning", "--stories", "--history"])
+        self.assertEqual(parsed.mode, "headless")
+        self.assertFalse(parsed.versioning)
+        self.assertTrue(parsed.stories)
+        self.assertTrue(parsed.history)
+
+    def test_use_bundled_rules_option_skips_fetch_while_building_parser(self):
+        command = make_command()
+        with mock.patch.object(sys, "argv", ["djangocms", "--use-bundled-install-rules"]), mock.patch(
+            "urllib.request.urlopen"
+        ) as urlopen:
+            parser = command.create_parser("djangocms", "")
+        parsed = parser.parse_args(["mysite", "--use-bundled-install-rules"])
+        self.assertTrue(parsed.use_bundled_install_rules)
+        urlopen.assert_not_called()
 
 
 class EditingHelperTests(SimpleTestCase):
@@ -285,13 +389,25 @@ class PackageDerivationTests(SimpleTestCase):
             "djangocms_frontend.contrib.image",
             "rest_framework",
             "djangocms_rest",
+            "djangocms_history",
         ]
-        packages_map = {"filer": "django-filer", "rest_framework": "djangorestframework"}
+        packages_map = {
+            "filer": "django-filer",
+            "djangocms_history": "djangocms-history>=3",
+            "rest_framework": "djangorestframework",
+        }
         command._finish_existing_project(apps, packages_map, {"interactive": False})
         packages = command.install_packages.call_args.args[0]
         self.assertEqual(
             packages,
-            ["django-cms", "django-filer", "djangocms-frontend", "djangorestframework", "djangocms-rest"],
+            [
+                "django-cms",
+                "django-filer",
+                "djangocms-frontend",
+                "djangorestframework",
+                "djangocms-rest",
+                "djangocms-history>=3",
+            ],
         )
 
     def test_install_packages_rejects_unexpected_characters(self):
@@ -299,6 +415,13 @@ class PackageDerivationTests(SimpleTestCase):
         for bad in ["django-cms; rm -rf /", "pkg==1.0", "foo bar", "evil$(whoami)", "a/b"]:
             with self.assertRaises(CommandError):
                 command.install_packages([bad])
+
+    def test_install_packages_accepts_lower_bound_specs(self):
+        command = make_command()
+        with mock.patch.object(command, "running_in_venv", return_value=True), mock.patch("subprocess.run") as run:
+            run.return_value.returncode = 0
+            command.install_packages(["djangocms-history>=3"])
+        run.assert_called_once()
 
     def test_install_packages_refuses_outside_venv(self):
         # Outside a virtual environment (and without the opt-out env var) the
@@ -384,6 +507,7 @@ class AddToExistingProjectTests(SimpleTestCase):
             self.assertIn(app, settings_text)
         self.assertNotIn("djangocms_moderation", settings_text)
         self.assertNotIn("djangocms_stories", settings_text)
+        self.assertNotIn("djangocms_history", settings_text)
         self.assertNotIn("djangocms_rest", settings_text)
 
         # Positional inserts
@@ -410,6 +534,17 @@ class AddToExistingProjectTests(SimpleTestCase):
         # The dotted frontend apps must reach the package resolution step.
         apps = command._finish_existing_project.call_args.args[0]
         self.assertIn("djangocms_frontend.contrib.grid", apps)
+
+    def test_history_option(self):
+        command = self.run_command(history=True)
+
+        settings_text = self._read("mysite/settings.py")
+        self.assertIn('"djangocms_history",', settings_text)
+
+        apps = command._finish_existing_project.call_args.args[0]
+        packages_map = command._finish_existing_project.call_args.args[1]
+        self.assertIn("djangocms_history", apps)
+        self.assertEqual(packages_map["djangocms_history"], "djangocms-history>=3")
 
     def test_headless_mode(self):
         self.run_command(mode="headless")
@@ -591,6 +726,7 @@ class AddToExistingProjectTests(SimpleTestCase):
 class HandleValidationTests(SimpleTestCase):
     def test_moderation_requires_versioning(self):
         command = make_command()
+        command.load_install_rules = mock.Mock(return_value=bundled_rules())
         options = {
             "name": "mysite",
             "directory": None,
@@ -609,6 +745,7 @@ class HandleValidationTests(SimpleTestCase):
 
     def test_dry_run_rejected_for_new_project(self):
         command = make_command()
+        command.load_install_rules = mock.Mock(return_value=bundled_rules())
         options = {
             "name": "mysite",
             "directory": None,
@@ -628,6 +765,7 @@ class HandleValidationTests(SimpleTestCase):
 
     def test_missing_name_with_noinput(self):
         command = make_command()
+        command.load_install_rules = mock.Mock(return_value=bundled_rules())
         options = {
             "name": None,
             "directory": None,
@@ -643,3 +781,23 @@ class HandleValidationTests(SimpleTestCase):
         with self.assertRaises(CommandError) as raised:
             command.handle(**options)
         self.assertEqual(str(raised.exception), Command.missing_args_message)
+
+    def test_missing_name_without_input_fails_cleanly(self):
+        command = make_command()
+        command.load_install_rules = mock.Mock(return_value=bundled_rules())
+        options = {
+            "name": None,
+            "directory": None,
+            "interactive": True,
+            "prompt": False,
+            "template": None,
+            "mode": None,
+            "versioning": None,
+            "moderation": None,
+            "alias": None,
+            "stories": None,
+            "history": None,
+        }
+        with mock.patch("builtins.input", side_effect=EOFError), self.assertRaises(CommandError) as raised:
+            command.handle(**options)
+        self.assertIn("Input is not available", str(raised.exception))
