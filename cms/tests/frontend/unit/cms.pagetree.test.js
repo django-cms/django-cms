@@ -289,6 +289,54 @@ describe('CMS.PageTree', function () {
         });
     });
 
+    describe('_setup() column values', function () {
+        var pagetree;
+
+        /**
+         * Resolves a column by its header, as the value functions are anonymous.
+         *
+         * @function columnFor
+         * @param {String} header column header
+         * @returns {Object}
+         */
+        function columnFor(header) {
+            return pagetree.ui.tree
+                .jstree(true)
+                .settings.grid.columns.filter(function (column) {
+                    return column.header === header;
+                })[0];
+        }
+
+        beforeEach(function (done) {
+            $(function () {
+                // the template renders "data-col<language>" with every dash
+                // stripped, so the lookup key has to be stripped the same way
+                var opts = $('.js-cms-pagetree').data('json');
+
+                opts.columns.push({ title: 'DE-X-L', key: 'de-x-l' });
+                opts.columns.push({ title: 'ZH-Hant', key: 'zh-Hant' });
+                $('.js-cms-pagetree').data('json', opts);
+
+                pagetree = new CMS.PageTree();
+                done();
+            });
+        });
+
+        it('reads the cell from the matching data attribute', function () {
+            expect(columnFor('EN').value({ data: { colen: 'en cell' } })).toEqual('en cell');
+            expect(columnFor('Menu').value({ data: { colmenu: 'menu cell' } })).toEqual('menu cell');
+        });
+
+        it('strips every dash of the language code, not only the first one', function () {
+            expect(columnFor('ZH-CN').value({ data: { colzhcn: 'zh-cn cell' } })).toEqual('zh-cn cell');
+            expect(columnFor('DE-X-L').value({ data: { coldexl: 'de-x-l cell' } })).toEqual('de-x-l cell');
+        });
+
+        it('lowercases the language code', function () {
+            expect(columnFor('ZH-Hant').value({ data: { colzhhant: 'zh-Hant cell' } })).toEqual('zh-Hant cell');
+        });
+    });
+
     describe('_getNodeId()', function () {
         var pagetree;
         var node;
