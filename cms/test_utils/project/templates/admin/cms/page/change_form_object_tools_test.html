@@ -1,0 +1,9 @@
+{# Used by cms.tests.test_templatetags.AdminObjectToolsPlacementTests: a real downstream child #}
+{# template overriding {% block object-tools %}, the way a project or third-party app would. #}
+{% extends "admin/cms/page/change_form.html" %}
+
+{% block object-tools %}
+<ul class="object-tools downstream-object-tools">
+    <li><a href="/downstream/" class="downstream-tool-link">Downstream tool</a></li>
+</ul>
+{% endblock %}
