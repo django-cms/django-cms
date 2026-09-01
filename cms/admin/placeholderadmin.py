@@ -5,6 +5,7 @@ from urllib.parse import parse_qsl, urlparse
 
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import models, transaction
@@ -1229,6 +1230,10 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             "opts": opts,
             "app_label": opts.app_label,
             "delete_confirmation_max_display": getattr(self, "delete_confirmation_max_display", None),
+            # This view is only ever shown inside the CMS modal: render it without the
+            # admin chrome, like the other frontend editing views do.
+            "is_popup": True,
+            "is_popup_var": IS_POPUP_VAR,
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(
@@ -1329,6 +1334,10 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             "opts": opts,
             "app_label": opts.app_label,
             "delete_confirmation_max_display": getattr(self, "delete_confirmation_max_display", None),
+            # This view is only ever shown inside the CMS modal: render it without the
+            # admin chrome, like the other frontend editing views do.
+            "is_popup": True,
+            "is_popup_var": IS_POPUP_VAR,
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
