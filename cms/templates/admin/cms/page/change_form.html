@@ -30,19 +30,25 @@
 {% endblock %}
 
 {% block content_title %}
+    {% django_version_gte 6 1 as object_tools_in_title_bar %}
     {% if title %}<h1>{{ title }}</h1>{% endif %}
-    {% get_edit_url original as admin_url %}
-    {% if not popup and not add %}
-        <ul class="object-tools hide-in-modal">
-            <li>
-                <a href="{{ admin_url }}" target="_parent">{% trans "View on site" %}</a>
-            </li>
-        </ul>
-    {% endif %}
+    {# Django 6.1 has a dedicated tools slot next to the title: see the object-tools block below. #}
+    {% if not object_tools_in_title_bar %}{% include "admin/cms/page/includes/object_tools.html" %}{% endif %}
 {% endblock %}
 {% block content %}
+{% django_version_gte 6 1 as object_tools_in_title_bar %}
 <div id="content-main">
-{% block object-tools %}{% endblock %}
+{# Django 6.1 moved the object-tools block out of the content block, into the ".titles-and-tools" #}
+{# bar of admin/base.html. Keep defining the block here, so that it still replaces the admin's #}
+{# default History / View on site tools, but only render it in the legacy nested position on #}
+{# Django < 6.1: on 6.1 the parent template already renders it above, and rendering it here as #}
+{# well would emit any downstream override twice. #}
+{% if not object_tools_in_title_bar %}
+{% block object-tools %}
+    {% django_version_gte 6 1 as object_tools_in_title_bar %}
+    {% if object_tools_in_title_bar %}{% include "admin/cms/page/includes/object_tools.html" %}{% endif %}
+{% endblock %}
+{% endif %}
 
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{% if request.GET.site %}&amp;site={{ request.GET.site }}{% endif %}{% if request.GET.parent_page %}&amp;parent_page={{ request.GET.parent_page }}{% endif %}{%if request.GET.source %}&amp;source={{ request.GET.source }}{% endif %}" method="post" id="{{ opts.model_name }}_form">
 {% csrf_token %}
