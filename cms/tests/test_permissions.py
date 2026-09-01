@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.models import Site
 from django.db import OperationalError, ProgrammingError
 from django.test.utils import override_settings
@@ -27,7 +27,9 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
+    user_can_change_page_advanced_settings,
     user_can_delete_page,
+    user_can_move_page,
     user_can_publish_page,
 )
 
@@ -308,3 +310,155 @@ class PermissionCacheInvalidationTests(CMSTestCase):
         self._fill_permission_cache()
         group.delete()
         self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+
+
+@override_settings(CMS_PERMISSION=True)
+class GlobalPagePermissionEscalationTests(CMSTestCase):
+    """A permission manager must not grant rights they do not hold themselves.
+
+    ``GlobalPagePermissionAdmin`` used to expose every ``can_*`` flag
+    unconditionally, so a delegate holding only ``can_change_permissions`` could
+    POST themselves ``can_publish``/``can_delete``/``can_change_advanced_settings``/
+    ``can_move_page`` site-wide (CWE-269).
+    """
+
+    add_url = '/en/admin/cms/globalpagepermission/add/'
+
+    def _create_delegate(self, username='delegate', sites=None, **flags):
+        user = self._create_user(username, is_staff=True, is_superuser=False)
+        for codename in ('add_globalpagepermission', 'change_globalpagepermission'):
+            user.user_permissions.add(Permission.objects.get(codename=codename))
+        # The page model permissions a delegated manager normally carries; the
+        # CMS grant below is what actually limits them.
+        user.user_permissions.add(
+            *Permission.objects.filter(codename__in=[
+                'change_page', 'publish_page', 'change_page_advanced_settings',
+                'move_page', 'delete_page',
+            ])
+        )
+        defaults = dict.fromkeys(GlobalPagePermission.get_all_permissions(), False)
+        defaults.update(can_change=True, can_change_permissions=True, **flags)
+        grant = GlobalPagePermission.objects.create(user=user, **defaults)
+        grant.sites.set(sites if sites is not None else [Site.objects.get_current()])
+        return self.reload(user), grant
+
+    def _post(self, actor, **extra):
+        data = {
+            'user': actor.pk,
+            'group': '',
+            'sites': [Site.objects.get_current().pk],
+            '_save': 'Save',
+        }
+        data.update(extra)
+        with self.login_user_context(actor):
+            return self.client.post(self.add_url, data)
+
+    def test_delegate_cannot_grant_flags_it_does_not_hold(self):
+        page = create_page('secret', 'nav_playground.html', 'en')
+        delegate, _grant = self._create_delegate()
+
+        self.assertFalse(user_can_publish_page.without_cache(delegate, page))
+
+        response = self._post(
+            delegate,
+            can_add='on', can_change='on', can_delete='on', can_publish='on',
+            can_change_advanced_settings='on', can_change_permissions='on',
+            can_move_page='on', can_view='on',
+        )
+        self.assertEqual(response.status_code, 302)
+
+        # A row is still created -- the manager may delegate what they hold --
+        # but only with the flags they actually have.
+        escalated = GlobalPagePermission.objects.filter(user=delegate).exclude(pk=_grant.pk)
+        self.assertEqual(escalated.count(), 1)
+        new_grant = escalated.get()
+        for flag in ('can_add', 'can_delete', 'can_publish',
+                     'can_change_advanced_settings', 'can_move_page', 'can_view'):
+            self.assertFalse(getattr(new_grant, flag), f'{flag} was granted')
+        # The two rights the delegate does hold are theirs to delegate.
+        self.assertTrue(new_grant.can_change)
+        self.assertTrue(new_grant.can_change_permissions)
+
+        clear_user_permission_cache(delegate)
+        delegate = self.reload(delegate)
+        self.assertFalse(user_can_publish_page.without_cache(delegate, page))
+        self.assertFalse(user_can_change_page_advanced_settings.without_cache(delegate, page))
+        self.assertFalse(user_can_move_page.without_cache(delegate, page))
+
+    def test_delegate_can_grant_flags_it_holds(self):
+        delegate, _grant = self._create_delegate(can_publish=True)
+        target = self._create_user('target', is_staff=True)
+
+        response = self._post(delegate, user=target.pk, can_change='on', can_publish='on')
+        self.assertEqual(response.status_code, 302)
+
+        new_grant = GlobalPagePermission.objects.get(user=target)
+        self.assertTrue(new_grant.can_change)
+        self.assertTrue(new_grant.can_publish)
+
+    def test_flag_held_on_one_site_cannot_be_granted_on_another(self):
+        other_site = Site.objects.create(domain='other.example.com', name='other')
+        delegate, _grant = self._create_delegate(can_publish=True)
+
+        response = self._post(
+            delegate,
+            sites=[Site.objects.get_current().pk, other_site.pk],
+            can_change='on', can_publish='on',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('can_publish', response.context_data['adminform'].form.errors)
+        self.assertFalse(
+            GlobalPagePermission.objects.filter(user=delegate).exclude(pk=_grant.pk).exists()
+        )
+
+    def test_all_sites_grant_requires_unrestricted_rights(self):
+        """An empty ``sites`` means every site, so a site-scoped manager cannot use it."""
+        delegate, _grant = self._create_delegate(can_publish=True)
+
+        response = self._post(delegate, sites=[], can_change='on', can_publish='on')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('can_publish', response.context_data['adminform'].form.errors)
+
+    def test_editing_a_row_does_not_revoke_untouchable_flags(self):
+        """Flags the manager may not grant are also flags they may not strip."""
+        delegate, _grant = self._create_delegate()
+        target = self._create_user('target', is_staff=True)
+        existing = GlobalPagePermission.objects.create(
+            user=target, can_change=True, can_publish=True, can_delete=True,
+            can_change_advanced_settings=True,
+        )
+        existing.sites.set([Site.objects.get_current()])
+
+        with self.login_user_context(delegate):
+            response = self.client.post(
+                f'/en/admin/cms/globalpagepermission/{existing.pk}/change/',
+                {
+                    'user': target.pk,
+                    'group': '',
+                    'sites': [Site.objects.get_current().pk],
+                    'can_change': 'on',
+                    '_save': 'Save',
+                },
+            )
+        self.assertEqual(response.status_code, 302)
+
+        existing.refresh_from_db()
+        self.assertTrue(existing.can_publish)
+        self.assertTrue(existing.can_delete)
+        self.assertTrue(existing.can_change_advanced_settings)
+
+    def test_superuser_is_unrestricted(self):
+        superuser = self.get_superuser()
+        target = self._create_user('target', is_staff=True)
+
+        response = self._post(
+            superuser, user=target.pk,
+            can_change='on', can_publish='on', can_delete='on',
+            can_change_advanced_settings='on', can_move_page='on',
+        )
+        self.assertEqual(response.status_code, 302)
+
+        new_grant = GlobalPagePermission.objects.get(user=target)
+        self.assertTrue(new_grant.can_publish)
+        self.assertTrue(new_grant.can_change_advanced_settings)
+        self.assertTrue(new_grant.can_move_page)

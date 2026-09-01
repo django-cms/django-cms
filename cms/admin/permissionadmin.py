@@ -146,6 +146,33 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
             filter_copy.remove('user')
         return filter_copy
 
+    def get_exclude(self, request, obj=None):
+        """Offer only the ``can_*`` flags the acting user may hand out.
+
+        Mirrors ``PagePermissionInlineAdmin.get_formset``: a manager must not be
+        able to grant -- to themselves or anyone else -- a right they do not hold
+        (CWE-269). Excluding the field keeps it out of the rendered form *and*
+        out of a crafted POST. Whether a flag the manager holds on some site may
+        be granted for the sites actually picked is settled in the form's
+        ``clean()``, once ``sites`` is known.
+        """
+        exclude = list(super().get_exclude(request, obj) or [])
+        grantable = permissions.get_grantable_global_permissions(request.user)
+        exclude.extend(
+            field for field in GlobalPagePermission.get_all_permissions()
+            if field not in grantable and field not in exclude
+        )
+        return exclude
+
+    def get_form(self, request, obj=None, **kwargs):
+        form_class = super().get_form(request, obj, **kwargs)
+        # The form caps each granted flag to the sites the manager holds it on,
+        # so it needs to know who is acting. ``modelform_factory`` returns a
+        # fresh subclass per call, so this is per-request state rather than
+        # shared mutation of the declared form class.
+        form_class._current_user = request.user
+        return form_class
+
     def has_add_permission(self, request):
         site = Site.objects.get_current(request)
         return permissions.user_can_add_global_permissions(request.user, site)

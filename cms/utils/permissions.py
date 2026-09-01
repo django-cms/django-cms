@@ -114,6 +114,57 @@ def _has_global_permission(user, site, action):
     return has_perm
 
 
+def _global_permission_flags(queryset):
+    """OR together the ``can_*`` flags of every row in ``queryset``."""
+    flags = GlobalPagePermission.get_all_permissions()
+    granted = set()
+
+    for row in queryset.values(*flags):
+        granted.update(flag for flag in flags if row[flag])
+    return granted
+
+
+def get_grantable_global_permissions(user, site_ids=None):
+    """Return the ``can_*`` flags ``user`` may hand out through a global permission.
+
+    A delegated permission manager must never grant a right they do not hold
+    themselves (see ``docs/explanation/permissions.rst``), so what is grantable
+    depends on the sites the grant would cover:
+
+    * ``site_ids=None`` -- the union of the flags the user holds on any site.
+      The widest set they could ever grant, used to decide which fields to
+      offer at all.
+    * ``site_ids=[]`` -- an empty ``GlobalPagePermission.sites`` means "every
+      site", so granting requires an equally unrestricted grant of the flag.
+    * a non-empty list -- the flags held on *every* one of those sites. A flag
+      held on one site alone cannot be used to grant it on another.
+    """
+    all_flags = set(GlobalPagePermission.get_all_permissions())
+
+    if not user or not user.is_authenticated:
+        return set()
+
+    if user.is_superuser or not get_cms_setting('PERMISSION'):
+        return all_flags
+
+    if site_ids is None:
+        return _global_permission_flags(GlobalPagePermission.objects.with_user(user))
+
+    if not site_ids:
+        return _global_permission_flags(
+            GlobalPagePermission.objects.with_user(user).filter(sites__isnull=True)
+        )
+
+    granted = all_flags
+    for site_id in site_ids:
+        granted &= _global_permission_flags(
+            GlobalPagePermission.objects.get_with_site(user, site_id)
+        )
+        if not granted:
+            break
+    return granted
+
+
 def user_can_add_global_permissions(user, site):
     return _has_global_permission(user, site, action='add')
 
