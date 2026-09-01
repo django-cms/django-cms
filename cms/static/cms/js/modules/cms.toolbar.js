@@ -617,7 +617,7 @@ class Toolbar {
                 });
 
                 modal.open({
-                    url: Helpers.updateUrlWithPath(el.attr('href')) + '&_popup=1',
+                    url: Helpers.updateUrlWithPath(el.attr('href'), [['_popup', 1]]),
                     title: el.data('name')
                 });
                 break;
