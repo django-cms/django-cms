@@ -16,6 +16,7 @@ from classytags.utils import flatten_context
 from classytags.values import ListValue, StringValue
 from django import template
 from django.conf import settings
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.db.models import Model
@@ -547,6 +548,12 @@ class CMSEditableObject(InclusionTag):
                 extra_context["attribute_name"] = "add"
             extra_context["instance"] = instance
             extra_context["generic"] = opts
+            # Django only renders an admin add/change form without the admin chrome
+            # (branding, nav sidebar, breadcrumbs) - and only answers a successful save
+            # with ``admin/popup_response.html``, which the CMS modal uses to close
+            # itself - if the ``_popup`` flag is present. The CMS' own frontend editing
+            # views (``edit_field``, the changelist) do not take the flag.
+            is_admin_changeform = False
             # view_method has the precedence and we retrieve the corresponding
             # attribute in the instance class.
             # If view_method refers to a method it will be called passing the
@@ -563,6 +570,7 @@ class CMSEditableObject(InclusionTag):
                 if not editmode:
                     view_url = f"admin:{opts.app_label}_{opts.model_name}_add"
                     url_base = reverse(view_url)
+                    is_admin_changeform = True
                 elif not edit_fields:
                     if not view_url:
                         view_url = f"admin:{opts.app_label}_{opts.model_name}_change"
@@ -570,6 +578,7 @@ class CMSEditableObject(InclusionTag):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
                         url_base = reverse(view_url, args=(instance.pk,))
+                    is_admin_changeform = True
                 else:
                     if not view_url:
                         if isinstance(instance, CMSPlugin):
@@ -583,7 +592,11 @@ class CMSEditableObject(InclusionTag):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     querystring["edit_fields"] = ",".join(context["edit_fields"])
             if editmode:
+                if is_admin_changeform:
+                    querystring[IS_POPUP_VAR] = 1
                 extra_context["edit_url"] = f"{url_base}?{urlencode(querystring)}"
+            elif is_admin_changeform:
+                extra_context["edit_url"] = f"{url_base}?{urlencode({IS_POPUP_VAR: 1})}"
             else:
                 extra_context["edit_url"] = "%s" % url_base
             extra_context["refresh_page"] = True

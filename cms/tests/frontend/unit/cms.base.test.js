@@ -831,6 +831,32 @@ describe('cms.base.js', function() {
 
                 expect(CMS.API.Helpers.updateUrlWithPath('/')).toEqual('/?cms_path=%2Fde%2F%3Flanguage%3Den');
             });
+
+            it('sets additional params on urls that have no query string yet', function() {
+                spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+                    location: {
+                        pathname: '/de/',
+                        search: ''
+                    }
+                });
+
+                expect(CMS.API.Helpers.updateUrlWithPath('/admin/app/model/1/change/', [['_popup', 1]])).toEqual(
+                    '/admin/app/model/1/change/?cms_path=%2Fde%2F&_popup=1'
+                );
+            });
+
+            it('sets additional params on urls that already have a query string', function() {
+                spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+                    location: {
+                        pathname: '/de/',
+                        search: ''
+                    }
+                });
+
+                expect(
+                    CMS.API.Helpers.updateUrlWithPath('/admin/app/model/1/change/?language=en', [['_popup', 1]])
+                ).toEqual('/admin/app/model/1/change/?language=en&cms_path=%2Fde%2F&_popup=1');
+            });
         });
 
         describe('.setColorScheme() and .getColorScheme()', function() {
