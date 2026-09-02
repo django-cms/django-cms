@@ -1,3 +1,61 @@
+5.2.0dev1 (2026-09-02)
+======================
+
+Features:
+---------
+* Support Django 6.1 CSP nonces (#8792) (2d392d932) -- Fabian Braun
+* Offer replacement for djangotree-beard dependency (#8744) (1ea064a5b) -- Fabian Braun
+* Enforce per-site page URL uniqueness and reachability (#8730) (6fc90113d) -- Fabian Braun
+* Persistent url fields for page contents (#8729) (2ae5bd555) -- Fabian Braun
+* Added config for pytest (#8718) (4ad0d687d) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Some inline editing modals did not contain _popup=1 query param for Django (#8816) (8d2f94b02) -- Fabian Braun
+* Object tools moved with Django 6.1 (#8819) (8df73e592) -- Fabian Braun
+* Release scripts silently produced an empty changelog (#8813) (a3e2b34cf) -- Fabian Braun
+* edit and view endpoint did not check placholder perms (#8794) (542c331ed) -- Fabian Braun
+* Grouper admin ignored read-only context for content objects without language field (#8799) (ae5f0c856) -- Fabian Braun
+* Manual page slug was overwritten when changing page title (#8796) (7f44f2e68) -- Fabian Braun
+* Django 6.1 signals unnecessarily cleared permission caches (#8791) (22f01b69b) -- Fabian Braun
+* Copying from write-protected (published) content was prohibited (#8786) (d7cebdfa8) -- Fabian Braun
+* Toolbar JS hardened (#8790) (3feb9e46b) -- Fabian Braun
+* Require permission to change previous home page to set new one (#8789) (f5691ca2c) -- Fabian Braun
+* Copy page missed login required property (#8785) (15c6b556b) -- Fabian Braun
+* Add display limit to plugin deletion context (#8784) (5193124c2) -- Fabian Braun
+* Language column in page tree ignored multi-hyphen language codes like de-x-l (#8781) (5db670c01) -- Fabian Braun
+* Migration 0044 failed on sqlite when versioning was installed (#8777) (67bfe9290) -- Fabian Braun
+* welcome.js path was wrong (#8761) (4462a50b2) -- Fabian Braun
+* EmptyToolbar missed clipboard and toolbar_language properties (#8745) (80be80789) -- Fabian Braun
+* Paste-a-copy IDOR discloses unauthorized plugin content (#8746) (373607d2e) -- Fabian Braun
+* Squashed migration with custom user model (#8748) (02c3dc405) -- Benjamin PIERRE
+* Upon edit plugins were rendered in the wrong language (#8739) (5d8b9cbd9) -- Fabian Braun
+* Remove stray data from wheel (#8734) (23b1a5cc9) -- Fabian Braun
+* Avoid N+1 queries when copying pages or plugins between languages (#8727) (45f3afa96) -- Vinit Kumar
+
+Documentation:
+--------------
+* Update tutorial to conver potential failures (#8817) (4d704848a) -- Fabian Braun
+* Clarified mental model for subordinate user management (#8811) (d4cfb831e) -- Fabian Braun
+* Clarify XSS security contract for custom plugins (#8747) (866b07b42) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 29 changelog entries, created with the help of the following contributors
+(in alphabetical order):
+
+* Benjamin PIERRE (1 changelog entry)
+* Fabian Braun (27 changelog entries)
+* Vinit Kumar (1 changelog entry)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 5.1.0 (2026-07-10)
 ==================
 
