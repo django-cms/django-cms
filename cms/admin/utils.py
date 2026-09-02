@@ -171,10 +171,15 @@ class GrouperChangeListBase(ChangeList):
     current_language: str | None = None
     available_languages: tuple[tuple[str, str], ...] = ()
     _extra_grouping_fields: list[str] = []
+    _content_pk_url_param: str | None = None
 
     def get_filters_params(self, params: dict | None = None):
         lookup_params = super().get_filters_params(params)
-        for field in self._extra_grouping_fields:
+        # The content pk parameter selects a content object in the change view. It is preserved
+        # across the change form's submission and can therefore reach the changelist, where it is
+        # meaningless (the changelist always lists the latest content) - and would be rejected as
+        # an unknown filter.
+        for field in (*self._extra_grouping_fields, self._content_pk_url_param):
             if field in lookup_params:
                 del lookup_params[field]
         return lookup_params
@@ -521,7 +526,10 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return type(
             GrouperChangeListBase.__name__,
             (GrouperChangeListBase,),
-            dict(_extra_grouping_fields=self.extra_grouping_fields),
+            dict(
+                _extra_grouping_fields=self.extra_grouping_fields,
+                _content_pk_url_param=self.content_pk_url_param,
+            ),
         )
 
     def get_urls(self) -> list:
@@ -610,6 +618,15 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         self.get_grouping_from_request(request)
         return super().history_view(request, object_id, extra_context)
 
+    def response_change(self, request: HttpRequest, obj: models.Model) -> HttpResponse:
+        """Drop the content selection unless the user stays in the change form: only "save and
+        continue editing" returns to the very content object that was just edited. Every other
+        target (the changelist, the add view) shows or creates the latest content, so the
+        parameter would only stick to their urls."""
+        if "_continue" not in request.POST:
+            self._requested_content_obj = None
+        return super().response_change(request, obj)
+
     def get_preserved_filters(self, request: HttpRequest) -> str:
         """Always preserve grouping get parameters! Also, add them to changelist filters:
         * Save and continue will keep the grouping parameters
@@ -625,6 +642,14 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         preserved_filters.update(grouping_filters)
         if "_changelist_filters" not in preserved_filters:
             preserved_filters["_changelist_filters"] = urlencode(grouping_filters)
+        # Keep a specifically requested content object selected: the change form is submitted to the
+        # url built from the preserved filters, and "save and continue editing" returns to it. Without
+        # the parameter both would silently fall back to the latest content object - and saving would
+        # write the form's data to a different content object than the one being edited.
+        # It is deliberately not part of "_changelist_filters": the changelist always lists the
+        # latest content.
+        if self._requested_content_obj is not None:
+            preserved_filters[self.content_pk_url_param] = self._requested_content_obj.pk
         return urlencode(preserved_filters)
 
     def get_extra_context(self, request: HttpRequest, object_id: str | None = None) -> dict[str, typing.Any]:
