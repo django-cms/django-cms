@@ -259,6 +259,10 @@ def get_subordinate_users(user, site):
     If user haves global permissions or is a superuser, then he can see all the
     users.
 
+    Superusers are never subordinate to a non-superuser, no matter how many
+    permissions the latter holds. Otherwise a delegated administrator could
+    manage - and take over - a superuser account.
+
     This function is currently used in PagePermissionInlineAdminForm for limit
     users in permission combobox.
 
@@ -277,6 +281,13 @@ def get_subordinate_users(user, site):
     """
     from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
+    def without_superusers(qs):
+        # A non-superuser must never be handed a superuser as a subordinate:
+        # being able to manage the account means being able to take it over.
+        if user.is_superuser:
+            return qs
+        return qs.exclude(is_superuser=True)
+
     try:
         user_level = get_user_permission_level(user, site)
     except NoPermissionsException:
@@ -287,10 +298,10 @@ def get_subordinate_users(user, site):
             Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
-        return qs
+        return without_superusers(qs)
 
     if user_level == ROOT_USER_LEVEL:
-        return get_user_model().objects.all()
+        return without_superusers(get_user_model().objects.all())
 
     from cms.models import PermissionTuple
     allow_list = Q()
@@ -306,7 +317,7 @@ def get_subordinate_users(user, site):
         )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
-    return qs
+    return without_superusers(qs)
 
 
 def get_subordinate_groups(user, site):

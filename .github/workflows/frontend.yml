@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Use Node.js ${{ env.NODE_VERSION }}
-      uses: actions/setup-node@v6
+      uses: actions/setup-node@v7
       with:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm install
@@ -27,7 +27,8 @@ jobs:
         if [ -z "$CHROME_BIN" ]; then
           rm -rf ~/.cache/puppeteer/chrome
           npx puppeteer browsers install chrome
-          CHROME_BIN="$(node -e "console.log(require('puppeteer').executablePath())")"
+          # executablePath() returns a string up to puppeteer 24 and a promise from 25 on.
+          CHROME_BIN="$(node -e "Promise.resolve(require('puppeteer').executablePath()).then(p => console.log(p))")"
         fi
         echo "Using Chrome at: $CHROME_BIN"
         test -x "$CHROME_BIN"

@@ -284,6 +284,80 @@ authority.
 The mental model is deliberate: **a page-user manager is a superuser
 for their subordinate users only.** A user is "subordinate" when the
 manager created them, or when they sit at the same or a lower level in
+the page tree the manager controls.
+
+The size of that set depends on where the manager's own authority comes
+from. A manager whose ``can_change_permissions`` right is granted by a
+:class:`~cms.models.permissionmodels.PagePermission` on part of the tree
+has only the users at or below that point. A manager granted the right
+by a :class:`~cms.models.permissionmodels.GlobalPagePermission` sits at
+the top of the hierarchy, and every non-superuser account on the site is
+subordinate to them — not merely the ones they created. Grant global
+permissions with that in mind.
+
+Within the subordinate set, the manager can do almost everything a
+superuser could do to those accounts:
+
+* create new staff users (new page-users are made staff automatically);
+* grant and revoke any permission or group the manager *themselves*
+  holds — they cannot hand out rights they do not have;
+* edit account status fields, including ``is_staff`` (admin-login
+  capability) and ``is_active`` (whether the account may log in at
+  all).
+
+The single boundary a manager cannot cross is **superuser status**,
+and it holds in both directions:
+
+* A manager can never *grant* superuser status. ``is_superuser`` is
+  read-only for non-superusers, so neither a subordinate nor the
+  manager themselves can be promoted.
+* A manager can never *manage an account that already has it*.
+  Superusers are never subordinate to a non-superuser, however many
+  permissions the manager holds. A superuser account is therefore
+  absent from the manager's user list entirely — they cannot edit it,
+  delete it, or change its password.
+
+The second half matters as much as the first. Being able to set an
+account's password is equivalent to being that account, so a manager
+who could reach a superuser's password would hold superuser rights in
+all but name. Both halves are enforced by the same rule — the
+subordinate set excludes superusers — rather than by the read-only
+field alone.
+
+**A manager can reverse a setting a superuser made.** This follows
+directly from the model and is worth stating plainly. If a superuser
+disables a subordinate account (``is_active = False``) or removes its
+staff flag (``is_staff = False``), a page-user manager with that user
+in their subordinate set can switch it back on. The manager's authority
+over a subordinate is not subordinate to the superuser's earlier edit;
+it is the *same* authority over that account, minus the ability to
+grant superuser. If you need a deactivation or a demotion to be
+permanent against a manager, the user must be moved out of that
+manager's subordinate set — for example by deleting the account, or by
+re-parenting it above the manager's page-tree level — rather than
+relying on the status flag alone.
+
+This is intentional delegation, not a gap: the whole point of a
+page-user manager is to off-load routine account administration from
+the superuser. Hand the role only to people you would trust with the
+accounts it covers.
+
+
+*******************************
+Delegated user management
+*******************************
+
+With ``CMS_PERMISSION = True`` a non-superuser can be given the right
+to manage *other* users — the "Users" and "User groups" entries in the
+admin become available to anyone who has the ``change`` permission on
+the CMS user/group models and a page-permission level of their own.
+These users are **page-user managers**. They are not superusers, yet
+inside their own corner of the system they act with superuser-like
+authority.
+
+The mental model is deliberate: **a page-user manager is a superuser
+for their subordinate users only.** A user is "subordinate" when the
+manager created them, or when they sit at the same or a lower level in
 the page tree the manager controls. Within that subordinate set, the
 manager can do almost everything a superuser could do to those
 accounts:

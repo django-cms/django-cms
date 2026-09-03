@@ -101,6 +101,24 @@ def _verify_apphook(apphook, namespace):
     return apphook_name
 
 
+def _get_default_slug(page, title, language):
+    candidate = slugify(title)
+    base = page.get_path_for_slug(candidate, language)
+    # without a reachable path (e.g. unpublished parent) check the bare slug
+    # for availability instead
+    return get_available_slug(page.site, base if base is not None else candidate, language)
+
+
+def _validate_path_uniqueness(page, path, language):
+    if path is None:
+        # pages without a reachable path (e.g. unpublished parent) cannot
+        # conflict with any URL
+        return
+    from cms.forms.validators import validate_url_uniqueness
+
+    validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+
+
 def _verify_plugin_type(plugin_type):
     """
     Verifies the given plugin_type is valid and returns a tuple of
@@ -348,13 +366,10 @@ def create_page_content(
 
     # set default slug:
     if not slug:
-        base = page.get_path_for_slug(slugify(title), language)
-        slug = get_available_slug(page.site, base, language)
+        slug = _get_default_slug(page, title, language)
 
-    if overwrite_url:
-        path = overwrite_url.strip("/")
-    elif path is None:
-        path = page.get_path_for_slug(slug, language)
+    if overwrite_url or path is None:
+        path = page.get_url_data(slug, overwrite_url, language)["path"]
 
     # When called directly (not via create_page) with a user instance, expose
     # it through the _current_user context variable so signal handlers and
@@ -370,9 +385,7 @@ def create_page_content(
 
     try:
         try:
-            from cms.forms.validators import validate_url_uniqueness
-
-            validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+            _validate_path_uniqueness(page, path, language)
         except ValidationError as e:
             raise IntegrityError(e)
 
@@ -409,6 +422,7 @@ def create_page_content(
                     slug=slug,
                     path=path,
                     managed=not bool(overwrite_url),
+                    site_id=page.site_id,
                 ),
             )
         page._clear_internal_cache()

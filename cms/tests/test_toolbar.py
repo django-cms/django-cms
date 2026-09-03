@@ -6,6 +6,7 @@ from unittest.mock import patch
 import iptools
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin import site
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -18,6 +19,7 @@ from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
+from django.utils.http import urlencode
 from django.utils.translation import get_language, gettext_lazy as _, override
 
 from cms.admin.forms import RequestToolbarForm
@@ -37,7 +39,7 @@ from cms.cms_toolbars import (
     PageToolbar,
     get_user_model,
 )
-from cms.models import PagePermission, UserSettings
+from cms.models import PagePermission, Placeholder, UserSettings
 from cms.test_utils.project.placeholderapp.models import CharPksExample, Example1
 from cms.test_utils.project.placeholderapp.views import ClassDetail, detail_view
 from cms.test_utils.testcases import URL_CMS_USERSETTINGS, CMSTestCase
@@ -51,7 +53,7 @@ from cms.toolbar.items import (
     SubMenu,
     ToolbarAPIMixin,
 )
-from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.toolbar import CMSToolbar, EmptyToolbar
 from cms.toolbar.utils import (
     add_live_url_querystring_param,
     get_object_edit_url,
@@ -59,6 +61,8 @@ from cms.toolbar.utils import (
     get_object_live_url,
     get_object_preview_url,
     get_object_structure_url,
+    get_plugin_tree,
+    get_toolbar_from_request,
 )
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
@@ -227,6 +231,70 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
         with self.settings(CMS_INTERNAL_IPS=iptools.IpRangeList(("128.0.0.0", "128.0.0.255"))):
             request = self.get_page_request(None, self.get_staff(), "/en/example/")
             self.assertFalse(hasattr(request, "toolbar"))
+
+
+class MissingToolbarTest(CMSTestCase):
+    """
+    The plugin endpoints must degrade instead of crashing when the toolbar is
+    absent, e.g. because CMS_INTERNAL_IPS excludes the client or because
+    ToolbarMiddleware is not installed. They enforce their own permissions and
+    must not depend on the middleware having run.
+    """
+
+    def get_request_without_toolbar(self):
+        request = RequestFactory().post("/")
+        request.user = self.get_superuser()
+        self.assertFalse(hasattr(request, "toolbar"))
+        return request
+
+    def test_empty_toolbar_has_a_clipboard_attribute(self):
+        toolbar = EmptyToolbar(RequestFactory().get("/"))
+        self.assertIsNone(toolbar.clipboard)
+
+    def test_get_clipboard_from_request_without_toolbar(self):
+        self.assertIsNone(get_toolbar_from_request(self.get_request_without_toolbar()).clipboard)
+
+    def test_get_plugin_tree_without_toolbar(self):
+        page = create_page("home", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en")[0]
+        plugin = add_plugin(placeholder, "LinkPlugin", "en", name="link", external_link="http://example.com")
+
+        tree = get_plugin_tree(self.get_request_without_toolbar(), [plugin])
+
+        self.assertIn("html", tree)
+        self.assertEqual(len(tree["plugins"]), 1)
+
+    def test_copy_plugins_permission_denied_without_clipboard(self):
+        """Without a clipboard there is nothing to copy into, so deny rather than crash."""
+        page = create_page("home", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en")[0]
+        plugin = add_plugin(placeholder, "LinkPlugin", "en", name="link", external_link="http://example.com")
+        admin_instance = site._registry[Placeholder]
+
+        self.assertFalse(admin_instance.has_copy_plugins_permission(self.get_request_without_toolbar(), [plugin]))
+
+    def test_add_plugin_endpoint_does_not_crash_without_toolbar(self):
+        """Regression: rendering the close frame used to raise AttributeError."""
+        page = create_page("home", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en")[0]
+        data = {
+            "plugin_type": "LinkPlugin",
+            "placeholder_id": placeholder.pk,
+            "plugin_language": "en",
+            "plugin_position": 1,
+            "cms_path": "/en/",
+        }
+        url = admin_reverse("cms_placeholder_add_plugin") + "?" + urlencode(data)
+
+        # CMS_INTERNAL_IPS excludes the test client, so no toolbar is attached.
+        with self.settings(CMS_INTERNAL_IPS=["203.0.113.10"]):
+            with self.login_user_context(self.get_superuser()):
+                response = self.client.post(
+                    url, {"name": "link", "external_link": "http://example.com"}
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(placeholder.get_plugins("en").count(), 1)
 
 
 @override_settings(CMS_PERMISSION=False)
@@ -1949,6 +2017,77 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             ),
         )
 
+    def test_changeform_url_is_marked_as_popup(self):
+        """The frontend editing modal opens the plain admin changeform, which only
+        renders without the admin chrome - and only closes the modal upon saving -
+        when the ``_popup`` flag is set."""
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_block instance %}
+    {{ instance }}
+{% endrender_model_block %}
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?language=en&amp;_popup=1"'.format(
+                admin_reverse("placeholderapp_example1_change", args=(ex1.pk,))
+            ),
+        )
+
+    def test_add_form_url_is_marked_as_popup(self):
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_add instance %}
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?_popup=1"'.format(admin_reverse("placeholderapp_example1_add")),
+        )
+
+    def test_edit_field_url_is_not_marked_as_popup(self):
+        """``edit_field`` is a cms view rendering its own chrome-less template: it
+        neither needs nor understands the ``_popup`` flag."""
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "char_1" "char_1" %}</h1>
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?language=en&amp;edit_fields=char_1"'.format(
+                admin_reverse("placeholderapp_example1_edit_field", args=(ex1.pk, "en"))
+            ),
+        )
+
     def test_invalid_attribute(self):
         user = self.get_staff()
         page = create_page("Test", "col_two.html", "en")
@@ -2291,6 +2430,22 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
 
 class ToolbarUtilsTestCase(ToolbarTestBase):
+    def test_get_plugin_content_uses_plugin_language(self):
+        page = create_page("test page", "col_two.html", "de")
+        placeholder = page.get_placeholders("de").get(slot="col_left")
+        plugin = add_plugin(placeholder, "TextPlugin", "de", body="test")
+        request = self.get_page_request(page, self.get_superuser(), "/de/")
+
+        with patch.object(
+            request.toolbar.content_renderer,
+            "render_plugin",
+            side_effect=lambda *args, **kwargs: get_language(),
+        ), override("en"):
+            content = utils.get_plugin_content(request, plugin)
+
+            self.assertEqual(content[0]["html"], "de")
+            self.assertEqual(get_language(), "en")
+
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
     def test_add_live_url_querystring_param_no_querystring(self):

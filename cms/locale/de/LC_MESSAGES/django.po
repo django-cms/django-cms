@@ -4,11 +4,10 @@
 # 
 # Translators:
 # djangoger <thomas.meitz@retailify.de>, 2023
-# Alexander Elvers <transifex@alex.kandru.de>, 2023
 # Angelo Dini <angelo.dini@divio.ch>, 2023
-# Jannik Vieten <me@exploide.net>, 2023
 # Hendrik Richter <hendrikr@gnome.org>, 2025
-# Patrick Lauber <patrick.lauber@divio.ch>, 2026
+# Jannik Vieten <me@exploide.net>, 2026
+# Alexander Elvers <transifex@alex.kandru.de>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Peter Wischer <peter.wischer@lwl.org>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
@@ -16,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Peter Wischer <peter.wischer@lwl.org>, 2026\n"
 "Language-Team: German (https://app.transifex.com/divio/teams/58664/de/)\n"
@@ -41,8 +40,14 @@ msgstr "Die Kurzform des Titels, die in URLs verwendet wird"
 msgid "Page type"
 msgstr "Seitentyp"
 
+msgid "You do not have permission to change this page."
+msgstr "Sie haben nicht die Berechtigung, diese Seite zu ändern."
+
 msgid "Page Types"
 msgstr "Seitentypen"
+
+msgid "You do not have permission to copy this page."
+msgstr "Sie haben nicht die Berechtigung, diese Seite zu kopieren."
 
 msgid "Overwrite URL"
 msgstr "Manuelle URL"
@@ -54,6 +59,9 @@ msgstr ""
 
 msgid "Start typing..."
 msgstr "Geben Sie etwas ein …"
+
+msgid "menu visibility"
+msgstr "Menü-Sichtbarkeit"
 
 msgid "limit when this page is visible in the menu"
 msgstr "Limitiert, wer diese Seite im Menu sehen kann."
@@ -191,9 +199,6 @@ msgstr "Übersetzungen"
 msgid "Advanced Settings"
 msgstr "Erweiterte Einstellungen"
 
-msgid "Change Permissions"
-msgstr "Berechtigungen bearbeiten"
-
 msgid "The page is not eligible to be home."
 msgstr "Die Seite ist nicht berechtigt die Startseite zu sein."
 
@@ -241,13 +246,6 @@ msgstr "Neue Unterseite"
 
 msgid "New page"
 msgstr "Neue Seite"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Ihnen fehlt die Berechtigung, auf dieses Site zuzugreifen. Bitte "
-"kontaktieren Sie Ihren Administrator."
 
 msgid "Database error"
 msgstr "Datenbankfehler"
@@ -361,9 +359,6 @@ msgstr "Aktionen"
 msgid "Empty content"
 msgstr "Leerer Inhalt"
 
-msgid "You do not have permission to change this content."
-msgstr "Sie haben nicht die Berechtigung, diesen Inhalt zu ändern."
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Eigenschaften (%(object_name)s)"
@@ -413,21 +408,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Platzhalter"
 
-msgid "Getting started developer guide"
-msgstr "Erste Schritte für Entwickler"
-
-msgid "Documentation"
-msgstr "Dokumentation"
-
-msgid "User guide"
-msgstr "Benutzeranleitung"
-
-msgid "Discord community"
-msgstr "Discord-Community"
-
-msgid "What's new"
-msgstr "Was ist neu"
-
 msgid "Create"
 msgstr "Erstellen"
 
@@ -439,9 +419,6 @@ msgstr "Struktur"
 
 msgid "Content"
 msgstr "Inhalt"
-
-msgid "Help"
-msgstr "Hilfe"
 
 msgid "Sites"
 msgstr "Website"
@@ -545,6 +522,9 @@ msgstr "Wählen Sie eine gültige Webseite"
 msgid "Select a valid page"
 msgstr "Wählen Sie eine gültige Seite"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr "Geben Sie eine gültige relative oder absolute URL ein."
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -558,9 +538,6 @@ msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Die Seite %(conflict_page)s hat die selbe URL '%(url)s' wie die aktuelle "
 "Seite."
-
-msgid "Add another"
-msgstr "Weiteren hinzufügen"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -659,9 +636,6 @@ msgstr "Vorlage"
 
 msgid "login required"
 msgstr "Login erforderlich"
-
-msgid "menu visibility"
-msgstr "Menü-Sichtbarkeit"
 
 msgid "application"
 msgstr "Applikation"
@@ -887,6 +861,45 @@ msgstr "Benutzer-Einstellung"
 
 msgid "user settings"
 msgstr "Benutzer-Einstellungen"
+
+msgid "by template"
+msgstr "Bei Vorlage"
+
+msgid "by code"
+msgstr "Bei Code"
+
+msgid "static placeholder name"
+msgstr "Name des statischen Platzhalters"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Beschreibender Name, um den statischen Platzhalter zu identifizieren. Wird "
+"nicht dem Benutzer gezeigt."
+
+msgid "placeholder code"
+msgstr "Platzhalter-Kennung"
+
+msgid "To render the static placeholder in templates."
+msgstr "Um den statischen Platzhalter im Template zu rendern."
+
+msgid "placeholder content"
+msgstr "Platzhalter-Inhalt"
+
+msgid "creation_method"
+msgstr "erstellungs_methode"
+
+msgid "static placeholder"
+msgstr "Statischer Platzhalter"
+
+msgid "static placeholders"
+msgstr "Statische Platzhalter"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
+"Ein statischer Platzhalter mit der gleichen Website und Kennung existiert "
+"bereits."
 
 msgid "Advanced options"
 msgstr "Erweiterte Einstellungen"
@@ -1185,9 +1198,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Umleiten"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Applikation: %(apphook)s"
@@ -1347,8 +1357,8 @@ msgstr "Strukturmodus umschalten"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Strukturmodus umschalten und angewählten Baustein hervorheben."
 
-msgid "Open \\"
-msgstr "Öffnen"
+msgid "Open \"Create\" dialog"
+msgstr "Öffne \"Erstellen\" Dialog"
 
 msgid "Focus on Toolbar"
 msgstr "Toolbar fokussieren"
@@ -1503,6 +1513,12 @@ msgstr "Hinweise zur Installation"
 
 msgid "Support"
 msgstr "Support"
+
+msgid "Documentation"
+msgstr "Dokumentation"
+
+msgid "User guide"
+msgstr "Benutzeranleitung"
 
 msgid "Give back"
 msgstr "Etwas zurückgeben"
@@ -1718,15 +1734,6 @@ msgstr "Baustein zu %(plugin_name)s hinzufügen"
 
 msgid "Single placeholder"
 msgstr "Einzelner Platzhalter"
-
-msgid "Community forum"
-msgstr "Community-Forum"
-
-msgid "Getting started"
-msgstr "Erste Schritte"
-
-msgid "Talk to us"
-msgstr "Sprich mit uns"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - Ihr Benutzerkonto wurde erstellt."

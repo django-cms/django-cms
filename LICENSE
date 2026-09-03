@@ -91,6 +91,14 @@ Note: Used for accessibility - traps focus within modals
 
 ================================================================================
 
+Package: Bootstrap Icons
+License: MIT License
+License URL: https://github.com/twbs/icons/blob/main/LICENSE
+Copyright (c) 2019-2024 The Bootstrap Authors
+Website: https://icons.getbootstrap.com
+
+================================================================================
+
 Package: local-storage
 Version: 2.0.0
 License: MIT

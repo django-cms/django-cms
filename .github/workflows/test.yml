@@ -25,8 +25,8 @@ jobs:
           django-6.0.txt,
           django-6.1.txt
         ]
-        # On nightly runs, test all postgres versions. On push/PR, only test latest.
-        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["16", "17", "18"]') || fromJSON('["16"]') }}
+        # On nightly runs, test all postgres versions (15, 16, 17, 18). On push/PR, test minimum supported (15) and latest.
+        postgres-version: ${{ github.event_name == 'schedule' && fromJSON('["15", "16", "17", "18"]') || fromJSON('["15"]') }}
         os: [
           ubuntu-latest,
         ]
@@ -57,7 +57,7 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -125,7 +125,7 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -180,7 +180,7 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -207,6 +207,11 @@ jobs:
 
   django-main-sqlite:
     runs-on: ${{ matrix.os }}
+    # The django-main jobs run the suite on the materialized-path tree backend
+    # (all databases). cms.tests.test_mptree_backend only runs under it; every
+    # other job stays on treebeard.
+    env:
+      CMS_TREE_BACKEND: mptree
     strategy:
       fail-fast: false
       matrix:
@@ -220,7 +225,7 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -246,6 +251,8 @@ jobs:
 
   django-main-postgres:
     runs-on: ${{ matrix.os }}
+    env:
+      CMS_TREE_BACKEND: mptree
     strategy:
       fail-fast: false
       matrix:
@@ -273,7 +280,7 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -303,6 +310,8 @@ jobs:
 
   django-main-mysql:
     runs-on: ${{ matrix.os }}
+    env:
+      CMS_TREE_BACKEND: mptree
     strategy:
       fail-fast: false
       matrix:
@@ -329,7 +338,7 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -373,7 +382,7 @@ jobs:
       - uses: actions/checkout@v7
         name: Set up Python ${{ matrix.python-version }}
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 

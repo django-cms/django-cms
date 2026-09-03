@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Roger Pons <rogerpons@gmail.com>, 2026
+# Roger Pons <rogerpons@gmail.com>, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Catalan (https://app.transifex.com/divio/teams/58664/ca/)\n"
@@ -35,8 +35,14 @@ msgstr "La part del títol que s'utilitza en la direcció URL"
 msgid "Page type"
 msgstr "Tipus de Pàgina"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipus de Pàgina"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sobreescriu URL"
@@ -46,6 +52,9 @@ msgstr "Manté aquest camp buit si s'ha d'usar la ruta per defecte"
 
 msgid "Start typing..."
 msgstr "Comenceu a escriure..."
+
+msgid "menu visibility"
+msgstr "visibilitat del menú"
 
 msgid "limit when this page is visible in the menu"
 msgstr "limitar quan aquesta pàgina és visible al menú"
@@ -182,9 +191,6 @@ msgstr "Traduccions"
 msgid "Advanced Settings"
 msgstr "Configuració avançada"
 
-msgid "Change Permissions"
-msgstr "Modificar permisos"
-
 msgid "The page is not eligible to be home."
 msgstr "La pàgina no es pot establir com a inici."
 
@@ -230,13 +236,6 @@ msgstr "Nova subpàgina"
 
 msgid "New page"
 msgstr "Nova pàgina"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"No teniu permís per accedir a aquest lloc. Contacteu amb el vostre "
-"administrador."
 
 msgid "Database error"
 msgstr "Error de la base de dades"
@@ -349,9 +348,6 @@ msgstr "Accions"
 msgid "Empty content"
 msgstr "Contingut buit"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Propietats de %(object_name)s"
@@ -402,21 +398,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Marcador de posició"
 
-msgid "Getting started developer guide"
-msgstr "Guia de primers passos per a desenvolupadors"
-
-msgid "Documentation"
-msgstr "Documentació"
-
-msgid "User guide"
-msgstr "Guia d'usuari"
-
-msgid "Discord community"
-msgstr "Comunitat de Discord"
-
-msgid "What's new"
-msgstr "Novetats"
-
 msgid "Create"
 msgstr "Crear"
 
@@ -428,9 +409,6 @@ msgstr "Estructura"
 
 msgid "Content"
 msgstr "Contingut"
-
-msgid "Help"
-msgstr "Ajuda"
 
 msgid "Sites"
 msgstr "Llocs"
@@ -534,6 +512,9 @@ msgstr "Seleccionar un lloc vàlid"
 msgid "Select a valid page"
 msgstr "Seleccionar una pàgina vàlida"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -547,9 +528,6 @@ msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "La pàgina %(conflict_page)s té la mateixa url '%(url)s' que la pàgina "
 "actual."
-
-msgid "Add another"
-msgstr "Afegir un altre"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -649,9 +627,6 @@ msgstr "plantilla"
 
 msgid "login required"
 msgstr "necessita identificació"
-
-msgid "menu visibility"
-msgstr "visibilitat del menú"
 
 msgid "application"
 msgstr "aplicació"
@@ -877,6 +852,44 @@ msgstr "paràmetre d'usuari"
 
 msgid "user settings"
 msgstr "configuració de l'usuari"
+
+msgid "by template"
+msgstr "per plantilla"
+
+msgid "by code"
+msgstr "per codi"
+
+msgid "static placeholder name"
+msgstr "nom de marcador de posició estàtic"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Nom descriptiu per identificar aquest marcador de posició estàtic. No es "
+"mostrarà als usuaris."
+
+msgid "placeholder code"
+msgstr "codi de marcador de posició"
+
+msgid "To render the static placeholder in templates."
+msgstr "Representar el marcador de posició estàtic a les plantilles"
+
+msgid "placeholder content"
+msgstr "contingut del marcador de posició"
+
+msgid "creation_method"
+msgstr "mètode de creació"
+
+msgid "static placeholder"
+msgstr "marcador de posició estàtic"
+
+msgid "static placeholders"
+msgstr "marcadors de posició estàtics"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
+"Ja existeix un marcador de posició estàtic amb el mateix lloc web i codi"
 
 msgid "Advanced options"
 msgstr "Opcions avançades"
@@ -1172,9 +1185,6 @@ msgstr "Arrel tova"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Redirigir"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplicació: %(apphook)s"
@@ -1330,8 +1340,8 @@ msgstr ""
 "Commutar el mode d'estructura i ressaltar el plugin sobre el qual es passa "
 "el cursor"
 
-msgid "Open \\"
-msgstr "Obrir \\"
+msgid "Open \"Create\" dialog"
+msgstr "Obrir el diàleg \"Crear\""
 
 msgid "Focus on Toolbar"
 msgstr "Enfocar la barra d'eines"
@@ -1486,6 +1496,12 @@ msgstr "Notes de la instal·lació"
 
 msgid "Support"
 msgstr "Suport"
+
+msgid "Documentation"
+msgstr "Documentació"
+
+msgid "User guide"
+msgstr "Guia d'usuari"
 
 msgid "Give back"
 msgstr "Tornar quelcom a la comunitat"
@@ -1708,15 +1724,6 @@ msgstr "Afegir plugin a %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Marcador de posició únic"
-
-msgid "Community forum"
-msgstr "Fòrum de la comunitat"
-
-msgid "Getting started"
-msgstr "Primers passos"
-
-msgid "Talk to us"
-msgstr "Parleu amb nosaltres"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - s'ha creat el vostre compte d'usuari."

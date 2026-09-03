@@ -18,8 +18,14 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v7
+        with:
+          # The changelog is generated from the commits between the previous
+          # tag and HEAD. The default shallow checkout has no such history and
+          # silently produces an empty changelog.
+          fetch-depth: 0
+          fetch-tags: true
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
       - name: Start building version ${{ inputs.version }}
         env:
           BUILD_BRANCH: release/build

@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.db import connection
+from django.db import IntegrityError, connection, transaction
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
@@ -579,6 +579,22 @@ class PageTest(PageTestBase):
             self.copy_page(page_a, page_b_a)
 
         self.assertEqual(Page.objects.count() - count, 3)
+
+    def test_copy_page_preserves_login_required(self):
+        source = create_page("source", "nav_playground.html", "en", login_required=True)
+        source_child = create_page("source-child", "nav_playground.html", "en", parent=source, login_required=True)
+        target = create_page("target", "nav_playground.html", "en")
+
+        with self.login_user_context(self.get_superuser()):
+            copied_root = self.copy_page(source, target)
+
+        copied_root.refresh_from_db()
+        copied_child = copied_root.get_child_pages().get()
+        copied_child.refresh_from_db()
+
+        self.assertTrue(copied_root.login_required)
+        self.assertTrue(copied_child.login_required)
+        self.assertTrue(source_child.login_required)
 
     def test_copy_page_under_home(self):
         """
@@ -1310,6 +1326,67 @@ class PageTest(PageTestBase):
         url = cms_page.urls.get(language="en")
         self.assertIsNone(url.path)
         self.assertEqual(url.slug, "page")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_update_urls_from_content_updates_deep_descendants(self):
+        # The level-based descendant update covers the whole subtree; pages
+        # below an overwritten URL derive from its fixed path.
+        cms_page = create_page("page", "nav_playground.html", "en", slug="page")
+        child = create_page("child", "nav_playground.html", "en", parent=cms_page, slug="child")
+        grandchild = create_page("grandchild", "nav_playground.html", "en", parent=child, slug="grandchild")
+        overwritten = create_page(
+            "fixed", "nav_playground.html", "en", parent=child, slug="fixed", overwrite_url="fixed/url"
+        )
+        under_overwritten = create_page("leaf", "nav_playground.html", "en", parent=overwritten, slug="leaf")
+
+        cms_page.get_content_obj("en", fallback=False).update(slug="renamed")
+        cms_page.update_urls_from_content("en")
+
+        self.assertEqual(child.reload().get_path("en"), "renamed/child")
+        self.assertEqual(grandchild.reload().get_path("en"), "renamed/child/grandchild")
+        self.assertEqual(overwritten.reload().get_path("en"), "fixed/url")
+        self.assertEqual(under_overwritten.reload().get_path("en"), "fixed/url/leaf")
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_page_url_path_unique_per_site_in_database(self):
+        # The database enforces path uniqueness per site and language ...
+        create_page("page", "nav_playground.html", "en", slug="page")
+        other = create_page("other", "nav_playground.html", "en", slug="other")
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            # a queryset update bypasses the application-level checks
+            other.urls.filter(language="en").update(path="page")
+
+        # ... while any number of unreachable pages (path=None) may coexist
+        third = create_page("third", "nav_playground.html", "en", slug="third")
+        other.urls.filter(language="en").update(path=None)
+        third.urls.filter(language="en").update(path=None)
+        self.assertEqual(PageUrl.objects.filter(path__isnull=True, language="en").count(), 2)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_unpublished_parent_invalidates_child_urls(self):
+        # When a parent loses its path (e.g. it is unpublished), its children
+        # become unreachable too: their paths are invalidated and
+        # get_absolute_url returns None instead of a fabricated slug-only url.
+        parent = create_page("parent", "nav_playground.html", "en", slug="parent")
+        child = create_page("child", "nav_playground.html", "en", parent=parent, slug="child")
+
+        with patch.object(PageContent.objects, "filter", return_value=PageContent.objects.none()):
+            parent.update_urls_from_content("en")
+
+        child = child.reload()
+        url = child.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertEqual(url.slug, "child")
+        self.assertIsNone(child.get_absolute_url("en"))
+
+        # Saving or publishing the child while the parent has no path keeps
+        # the child unreachable instead of exposing it at a slug-only path.
+        child.update_urls_from_content("en")
+
+        url = child.urls.get(language="en")
+        self.assertIsNone(url.path)
+        self.assertIsNone(child.get_absolute_url("en"))
 
     @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):
@@ -3839,6 +3916,46 @@ class PermissionsOnPageTest(PermissionsTestCase):
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
+
+    def test_set_home_requires_permission_on_old_home(self):
+        """
+        Setting a new home page demotes the current one and rewrites its urls,
+        so change permission on the target page alone is not enough.
+        """
+        old_home = create_page("old-home", "nav_playground.html", "en")
+        old_home.set_as_homepage()
+        new_home = create_page("new-home", "nav_playground.html", "en")
+        endpoint = self.get_admin_url(Page, "set_home", new_home.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, "change_page")
+        self.add_page_permission(staff_user, new_home, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(old_home.reload().is_home)
+        self.assertFalse(new_home.reload().is_home)
+
+    def test_set_home_with_permission_on_both_pages(self):
+        """Change permission on both the old and the new home page is enough."""
+        old_home = create_page("old-home", "nav_playground.html", "en")
+        old_home.set_as_homepage()
+        new_home = create_page("new-home", "nav_playground.html", "en")
+        endpoint = self.get_admin_url(Page, "set_home", new_home.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, "change_page")
+        self.add_page_permission(staff_user, new_home, can_change=True)
+        self.add_page_permission(staff_user, old_home, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(old_home.reload().is_home)
+        self.assertTrue(new_home.reload().is_home)
 
     def test_get_permissions_page_permissions_can_change_without_global_permission(self):
         """Ensure PageAdmin.get_permissions computes can_change from allowed page paths.

@@ -1,15 +1,55 @@
 import warnings
+from collections import Counter
 
-from treebeard.mp_tree import MP_NodeQuerySet
+from django.db import models
+from django.db.models import Case, F, When
 
 from cms.exceptions import NoHomeFound
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+from cms.utils.mptree import get_queryset_base, get_tree_backend
+
+# Resolved once at import time (same as the model base in pagemodel.py). In
+# mptree mode the base is a plain QuerySet and treebeard is never imported.
+_USING_TREEBEARD = get_tree_backend() == "treebeard"
 
 
-class PageQuerySet(MP_NodeQuerySet):
+class PageQuerySet(get_queryset_base()):
 
     node_warning = ("As of django CMS 5.0 the Page model does not have a node property anymore. "
                     "Use the related fields directly.")
+
+    def delete(self, *args, **kwargs):
+        if _USING_TREEBEARD:
+            # treebeard's MP_NodeQuerySet.delete removes whole subtrees by path
+            # and fixes parent numchild.
+            return super().delete(*args, **kwargs)
+        # mptree backend: the parent FK's on_delete=CASCADE removes descendants
+        # (no orphans), but the surviving parents' numchild cache still needs
+        # decrementing -- mirror treebeard's behaviour using parent_id instead
+        # of path. (Instance .delete() is handled on the model mixin; this path
+        # covers bulk ``Page.objects.filter(...).delete()``.)
+        rows = list(self.values_list("pk", "parent_id"))
+        deleted = {pk for pk, _ in rows}
+        lost = Counter(
+            parent_id for _, parent_id in rows
+            if parent_id is not None and parent_id not in deleted
+        )
+        using = self.db
+        result = models.QuerySet.delete(self, *args, **kwargs)
+        for parent_id, num_lost in lost.items():
+            self.model._base_manager.using(using).filter(pk=parent_id).update(
+                # Floored at zero in case the cache was already stale. Not with
+                # Greatest(F("numchild") - n, 0): ``numchild`` is unsigned, so
+                # MySQL raises "value is out of range" on the subtraction before
+                # GREATEST ever sees it. CASE evaluates its branch lazily and so
+                # only subtracts where the result cannot underflow.
+                numchild=Case(
+                    When(numchild__gte=num_lost, then=F("numchild") - num_lost),
+                    default=0,
+                    output_field=models.PositiveIntegerField(),
+                )
+            )
+        return result
 
     def get_descendants(self, parent=None):
         if parent is None:
@@ -41,8 +81,8 @@ class PageQuerySet(MP_NodeQuerySet):
         return self.exclude(application_urls=None).exclude(application_urls='').exists()
 
     def delete_fast(self):
-        # calls django's delete instead of the one from treebeard
-        super(MP_NodeQuerySet, self).delete()
+        # plain Django delete, skipping any tree-fixup delete (both backends)
+        models.QuerySet.delete(self)
 
     def root_only(self):
         return self.filter(depth=1)

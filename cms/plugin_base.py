@@ -12,7 +12,8 @@ from django.template import Context
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_str, smart_str
 from django.utils.functional import lazy
-from django.utils.html import escapejs
+from django.utils.html import conditional_escape, escapejs
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
@@ -672,8 +673,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {"name": force_str(opts.verbose_name), "obj": force_str(obj)}
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
+        msg_dict = {
+            "name": conditional_escape(force_str(opts.verbose_name)),
+            "obj": conditional_escape(force_str(obj)),
+        }
+        msg = mark_safe(_('The %(name)s "%(obj)s" was changed successfully.') % msg_dict)
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj, action="change")
 

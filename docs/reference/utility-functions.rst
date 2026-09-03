@@ -39,6 +39,15 @@ Grouper admin
     removed in django CMS 6.0.
 
 
+*****
+Pages
+*****
+
+.. module:: cms.utils.page
+
+.. autofunction:: get_page_from_request
+
+
 ************
 Placeholders
 ************

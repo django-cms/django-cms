@@ -122,7 +122,7 @@ def get_plugin_tree(
     template = toolbar.templates.drag_item_template
     get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
-    copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
+    copy_to_clipboard = toolbar.clipboard and placeholder.pk == toolbar.clipboard.pk
     plugins = list(downcast_plugins(plugins, select_placeholder=True))
     root_plugins = create_child_plugin_references(plugins)
 
@@ -183,14 +183,15 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin]
     renderer._placeholders_are_editable = True
     sekizai_context = SekizaiContext({'request': request, **context})
     try:
-        return [{
-            "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
-            "js": "".join(sekizai_context[get_varname()].get("js", [])),
-            "css": "".join(sekizai_context[get_varname()].get("css", [])),
-            "position": plugin.position,
-            "placeholder_id": plugin.placeholder_id,
-            "pluginIds": get_plugin_tree_ids(plugin),
-        } for plugin in plugin_list]
+        with force_language(plugin_list[0].language):
+            return [{
+                "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
+                "js": "".join(sekizai_context[get_varname()].get("js", [])),
+                "css": "".join(sekizai_context[get_varname()].get("css", [])),
+                "position": plugin.position,
+                "placeholder_id": plugin.placeholder_id,
+                "pluginIds": get_plugin_tree_ids(plugin),
+            } for plugin in plugin_list]
     except Exception:
         return []  # do not deliver content if rendering fails
 
@@ -306,6 +307,8 @@ def get_object_live_url(obj: models.Model, language: str | None = None, site: Si
 
     with force_language(language):
         absolute_url = obj.get_absolute_url()
+        if not absolute_url:
+            return None
         url_param = get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM")
         if params and url_param in params:
             params = params.copy()

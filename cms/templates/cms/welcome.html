@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="icon" type="image/png" href="{% static 'cms/img/favicon.png' %}">
     {% render_block "css" %}
-    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}">
-    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.welcome.css' %}">
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}" {% csp_nonce_attr %}>
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.welcome.css' %}" {% csp_nonce_attr %}>
 </head>
 <body class="cms-welcome-bg">
     {% cms_toolbar %}
@@ -117,6 +117,6 @@
              data-login-url="{% url "admin:login" %}?next={{ next_url }}"></div>
     {% endif %}
     {% endlanguage %}
-    <script src="{% static_with_version "cms/js/welcome.js" %}"></script>
+    <script src="{% static "cms/js/welcome.js" %}" {% csp_nonce_attr %}></script>
 </body>
 </html>

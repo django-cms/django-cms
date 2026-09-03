@@ -453,8 +453,8 @@ django-sekizai, please refer to the `django-sekizai documentation`_.
 Note that sekizai **can't** help you with the **admin-side** plugin templates - what
 follows is for your plugins' **output templates**.
 
-Inline JavaScrip code
-+++++++++++++++++++++
+Inline JavaScript code
+++++++++++++++++++++++
 
 django CMS does not enforce a specific way to include JavaScript code in your plugins.
 Inline JavaScript code is a potential security risk, so it is recommended to avoid it
@@ -540,6 +540,124 @@ A **bad** example:
             // needs to be run after a content refresh
         });
 
+
+.. _plugin-security:
+
+Security considerations
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Plugin output is trusted HTML
++++++++++++++++++++++++++++++
+
+Whatever your plugin renders is inserted into the page as **markup**. django CMS
+renders each plugin's template, joins the resulting strings, and marks the result
+as safe before handing it to the surrounding template.
+
+This is not a missing check -- it is what makes placeholders work. The output of a
+template *is* HTML, and escaping it a second time would turn every plugin's
+``<div>`` into a visible ``&lt;div&gt;``. Django's own ``render_to_string()``,
+``Template.render()`` and ``{% include %}`` return safe strings for exactly the
+same reason.
+
+The consequence is worth stating plainly: **the placeholder pipeline cannot
+protect you from what your plugin renders.** Escaping is your plugin's
+responsibility, and it happens inside your plugin's template.
+
+Do not defeat auto-escaping
++++++++++++++++++++++++++++
+
+Django templates escape variables by default, so the normal case is already safe
+and needs nothing from you:
+
+.. code-block:: html+django
+
+    {# Safe: auto-escaping applies. #}
+    <div class="teaser">{{ instance.headline }}</div>
+
+The default is only lost if you switch it off. ``|safe``, ``mark_safe()``,
+``format_html()`` with unescaped arguments, and ``{% autoescape off %}`` all tell
+Django that a value is already trustworthy markup:
+
+.. code-block:: html+django
+
+    {# Unsafe if `body` can be edited by someone you do not fully trust. #}
+    <div class="teaser">{{ instance.body|safe }}</div>
+
+Use those constructs only for markup your own code produced. Never apply them to
+a value that arrived from a form, a request, an import, or an external API.
+
+Sanitize on save, not on render
++++++++++++++++++++++++++++++++
+
+Some plugins legitimately need to store HTML -- a rich text body, an embed
+snippet. Clean that value **when it is stored**, so that what sits in the database
+is already safe and every consumer of the field (templates, feeds, an API, a
+search index) benefits:
+
+.. code-block:: python
+
+    import nh3
+    from django import forms
+
+    from cms.plugin_base import CMSPluginBase
+    from cms.plugin_pool import plugin_pool
+
+    from .models import Teaser
+
+
+    class TeaserForm(forms.ModelForm):
+        class Meta:
+            model = Teaser
+            fields = "__all__"
+
+        def clean_body(self):
+            return nh3.clean(
+                self.cleaned_data["body"],
+                tags={"p", "br", "strong", "em", "ul", "ol", "li", "a"},
+                attributes={"a": {"href", "title"}},
+            )
+
+
+    @plugin_pool.register_plugin
+    class TeaserPlugin(CMSPluginBase):
+        model = Teaser
+        form = TeaserForm
+        render_template = "teaser/teaser.html"
+
+Sanitizing at render time instead is a weaker choice: it runs on every request,
+and at that point the value is indistinguishable from the surrounding template
+markup, so an allowlist broad enough to keep your layout intact is usually too
+broad to be useful.
+
+If the field is not meant to contain markup at all, do not sanitize it -- simply
+leave auto-escaping on and render it with ``{{ instance.body }}``.
+
+.. note::
+
+    django CMS core ships no plugin that renders user-supplied HTML. Packages that
+    do -- rich text editors in particular -- handle sanitization themselves; check
+    the relevant settings of any such package you install, and keep them enabled.
+
+Who counts as an attacker
++++++++++++++++++++++++++
+
+Content editors are inside your trust boundary. A staff user who may add plugins
+to a page can, by design, change what visitors of that page see, and per-page
+permissions gate *which* pages they may touch rather than *what* they may put on
+them. See :doc:`/explanation/permissions` -- permissions are not a substitute for
+trust.
+
+That does not make the guidance above optional. Editor accounts get compromised or
+shared, content is imported from other systems, and plugin fields are sometimes
+filled programmatically from sources nobody vetted. Treat anything you did not
+render yourself as untrusted.
+
+A Content Security Policy adds a second line of defense and limits the damage an
+injected script can do; see `Inline JavaScript code`_ above for what django CMS
+does to keep strict policies workable.
+
+If you believe you have found a security issue in django CMS itself, please
+follow :ref:`reporting_security_issues` rather than opening a public ticket.
 
 .. _plugin-context-processors:
 
