@@ -14,7 +14,7 @@ Bug Fixes:
 * Some inline editing modals did not contain _popup=1 query param for Django (#8816) (8d2f94b02) -- Fabian Braun
 * Object tools moved with Django 6.1 (#8819) (8df73e592) -- Fabian Braun
 * Release scripts silently produced an empty changelog (#8813) (a3e2b34cf) -- Fabian Braun
-* edit and view endpoint did not check placholder perms (#8794) (542c331ed) -- Fabian Braun
+* edit and view endpoint did not check placeholder perms (#8794) (542c331ed) -- Fabian Braun
 * Grouper admin ignored read-only context for content objects without language field (#8799) (ae5f0c856) -- Fabian Braun
 * Manual page slug was overwritten when changing page title (#8796) (7f44f2e68) -- Fabian Braun
 * Django 6.1 signals unnecessarily cleared permission caches (#8791) (22f01b69b) -- Fabian Braun
@@ -35,7 +35,7 @@ Bug Fixes:
 
 Documentation:
 --------------
-* Update tutorial to conver potential failures (#8817) (4d704848a) -- Fabian Braun
+* Update tutorial to cover potential failures (#8817) (4d704848a) -- Fabian Braun
 * Clarified mental model for subordinate user management (#8811) (d4cfb831e) -- Fabian Braun
 * Clarify XSS security contract for custom plugins (#8747) (866b07b42) -- Fabian Braun
 
