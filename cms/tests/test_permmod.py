@@ -21,6 +21,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.page_permissions import user_can_view_page
+from cms.utils.urlutils import admin_reverse
 
 
 @override_settings(CMS_PERMISSION=True)
@@ -673,3 +674,91 @@ class GlobalPermissionTests(CMSTestCase):
         request.user = user
         has_perm = site._registry[Page].has_add_permission(request)
         self.assertFalse(has_perm)
+
+
+@override_settings(CMS_PERMISSION=True)
+class AddPageParentPermissionTests(CMSTestCase):
+    """The parent a page is created under is submitted in the POST body, while
+    ``PageAdmin.has_add_permission`` only sees the one in the query string. Both
+    have to be checked, otherwise an editor confined to one subtree can point the
+    permission check at a page they may edit and create the page elsewhere."""
+
+    def setUp(self):
+        self.home = create_page('home', 'nav_playground.html', 'en')
+        self.allowed = create_page('allowed', 'nav_playground.html', 'en', parent=self.home)
+        self.forbidden = create_page('forbidden', 'nav_playground.html', 'en', parent=self.home)
+
+        self.editor = self._create_user('editor', is_staff=True)
+        self.editor.user_permissions.add(*Permission.objects.filter(
+            codename__in=[
+                'add_page', 'change_page', 'view_page',
+                'add_pagecontent', 'change_pagecontent', 'view_pagecontent',
+            ]
+        ))
+        PagePermission.objects.create(
+            page=self.allowed,
+            user=self.editor,
+            can_add=True,
+            can_change=True,
+            grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+        )
+
+    def _add_page(self, slug, query_parent=None, body_parent=None):
+        url = admin_reverse('cms_pagecontent_add') + '?language=en'
+        if query_parent:
+            url += f'&parent_page={query_parent.pk}'
+        return self.client.post(url, {
+            'title': slug,
+            'slug': slug,
+            'parent_page': str(body_parent.pk) if body_parent else '',
+        })
+
+    def test_add_below_allowed_parent(self):
+        with self.login_user_context(self.editor):
+            response = self._add_page('ok', query_parent=self.allowed, body_parent=self.allowed)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Page.objects.filter(parent=self.allowed).count(), 1)
+
+    def test_add_below_forbidden_parent_is_denied(self):
+        with self.login_user_context(self.editor):
+            response = self._add_page('nope', query_parent=self.forbidden, body_parent=self.forbidden)
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Page.objects.filter(parent=self.forbidden).exists())
+
+    def test_forbidden_parent_in_body_is_denied(self):
+        """The query string points at a page the editor may add to, the body at one they may not."""
+        with self.login_user_context(self.editor):
+            response = self._add_page('nope', query_parent=self.allowed, body_parent=self.forbidden)
+        self.assertContains(response, 'You do not have permission to add a page here.')
+        self.assertFalse(Page.objects.filter(parent=self.forbidden).exists())
+
+    def test_empty_parent_in_body_is_denied(self):
+        """An empty parent in the body would create a root page."""
+        root_pages = Page.objects.filter(parent=None).count()
+        with self.login_user_context(self.editor):
+            response = self._add_page('nope', query_parent=self.allowed, body_parent=None)
+        self.assertContains(response, 'You do not have permission to add a page here.')
+        self.assertEqual(Page.objects.filter(parent=None).count(), root_pages)
+
+    def test_add_translation_ignores_the_parent(self):
+        """Adding a translation submits no parent, the permission is checked
+        against ``cms_page`` instead. The empty parent must not deny it."""
+        editor = self._create_user('global_editor', is_staff=True)
+        editor.user_permissions.add(*Permission.objects.filter(
+            codename__in=[
+                'add_page', 'change_page', 'view_page',
+                'add_pagecontent', 'change_pagecontent', 'view_pagecontent',
+            ]
+        ))
+        GlobalPagePermission.objects.create(user=editor, can_add=True, can_change=True)
+
+        url = admin_reverse('cms_pagecontent_add') + f'?language=de&cms_page={self.allowed.pk}'
+        with self.login_user_context(editor):
+            response = self.client.post(url, {
+                'title': 'erlaubt',
+                'slug': 'erlaubt',
+                'cms_page': str(self.allowed.pk),
+                'parent_page': '',
+            })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(self.allowed.has_translation('de'))
