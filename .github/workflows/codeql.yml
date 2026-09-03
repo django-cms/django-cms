@@ -2,9 +2,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main", "develop-4", "release/0.10.x", "release/2.1.x", "release/2.2.x", "release/2.3.x", "release/2.4.x", "release/3.0.x", "release/3.1.x", "release/3.2.x", "release/3.3.x", "release/3.4.x", "release/3.5.x", "release/3.6.x", "release/3.7.x", "release/3.8.x", "release/3.9.x", "release/3.10.x", "release/3.11.x", "release/4.0.x", "release/4.0.0.x", "release/4.0.1.x", "release/4.1.x" , "release/5.0.x"]
+    branches: [ "main", "release/5.0.x", "release/5.1.x"]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main" ]
   schedule:
     - cron: "40 4 * * 6"
 
@@ -30,7 +30,7 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          queries: +security-and-quality
+          queries: +security-extended
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v4

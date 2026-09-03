@@ -24,23 +24,34 @@
                     }
                 } else {
                     e.preventDefault();
-                    /* Get csrftoken either from form (admin) or from the toolbar */
-                    let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
-                    let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                        ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
-                    let fakeForm = $(
-                        '<form style="display: none" action="' + action.attr('href') + '" method="' +
-                               formMethod + '">' + csrfToken +
-                        '</form>'
-                    );
                     let body = window.top.document.body;
 
                     if (keepSideFrame) {
                         body = window.document.body;
-                    } else {
+                    }
+
+                    /* Get csrftoken either from form (admin) or from the toolbar */
+                    let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
+                    /* Build the form through the DOM API: the href and the token must never be
+                       interpolated into an HTML string, since jQuery hands back the *decoded*
+                       attribute value and a quote in it would break out of the attribute. */
+                    let doc = body.ownerDocument;
+                    let fakeForm = doc.createElement('form');
+                    let tokenInput = doc.createElement('input');
+
+                    fakeForm.style.display = 'none';
+                    fakeForm.setAttribute('method', formMethod);
+                    fakeForm.setAttribute('action', action.attr('href'));
+
+                    tokenInput.setAttribute('type', 'hidden');
+                    tokenInput.setAttribute('name', 'csrfmiddlewaretoken');
+                    tokenInput.value = (formToken ? formToken.value : formToken) || window.CMS.config.csrf;
+                    fakeForm.appendChild(tokenInput);
+
+                    if (!keepSideFrame) {
                         closeSideFrame();
                     }
-                    fakeForm.appendTo(body).submit();
+                    $(fakeForm).appendTo(body).submit();
                 }
             });
 
