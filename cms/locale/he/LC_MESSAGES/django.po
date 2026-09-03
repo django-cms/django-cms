@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fishfur A Banter <fishfurbanter@gmail.com>, 2026\n"
 "Language-Team: Hebrew (https://app.transifex.com/divio/teams/58664/he/)\n"
@@ -35,8 +35,14 @@ msgstr "החלק מהכותרת בשימוש ב-URL"
 msgid "Page type"
 msgstr "סוג דף"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "סוגי דף"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "שכתב URL"
@@ -46,6 +52,9 @@ msgstr "השאר תיבה זו ריקה אם נדרש שימוש ב-path סטנ�
 
 msgid "Start typing..."
 msgstr "התחל לכתוב..."
+
+msgid "menu visibility"
+msgstr "נראות תפריט"
 
 msgid "limit when this page is visible in the menu"
 msgstr "הגבל מתי דף זה מוצג בתפריט"
@@ -182,9 +191,6 @@ msgstr "תרגומים"
 msgid "Advanced Settings"
 msgstr "אפשרויות מתקדמות"
 
-msgid "Change Permissions"
-msgstr "שנה הרשאות"
-
 msgid "The page is not eligible to be home."
 msgstr "הדף אינו כשיר להיות דף הבית."
 
@@ -225,11 +231,6 @@ msgstr "תת-דף חדש"
 
 msgid "New page"
 msgstr "דף חדש"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr "אין לך הרשאה לגשת לאתר זה. אנא פנה למנהל המערכת שלך."
 
 msgid "Database error"
 msgstr "שגיאת מסד נתונים"
@@ -342,9 +343,6 @@ msgstr "פעולות"
 msgid "Empty content"
 msgstr "תוכן ריק"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "מאפייני %(object_name)s"
@@ -392,21 +390,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "מציין מיקום"
 
-msgid "Getting started developer guide"
-msgstr "מדריך למפתחים לתחילת העבודה"
-
-msgid "Documentation"
-msgstr "תיעוד"
-
-msgid "User guide"
-msgstr "מדריך למשתמש"
-
-msgid "Discord community"
-msgstr "קהילת Discord"
-
-msgid "What's new"
-msgstr "מה חדש"
-
 msgid "Create"
 msgstr "צור"
 
@@ -418,9 +401,6 @@ msgstr "מבנה"
 
 msgid "Content"
 msgstr "תוכן"
-
-msgid "Help"
-msgstr "עזרה"
 
 msgid "Sites"
 msgstr "אתרים"
@@ -524,6 +504,9 @@ msgstr "בחר אתר חוקי"
 msgid "Select a valid page"
 msgstr "בחר דף חוקי"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -535,9 +518,6 @@ msgstr ""
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "לדף %(conflict_page)s יש אותה כתובת '%(url)s' כמו לדף הנוכחי."
-
-msgid "Add another"
-msgstr "הוסף עוד"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -635,9 +615,6 @@ msgstr "תבנית"
 
 msgid "login required"
 msgstr "נדרשת התחברות"
-
-msgid "menu visibility"
-msgstr "נראות תפריט"
 
 msgid "application"
 msgstr "יישום"
@@ -855,6 +832,41 @@ msgstr "הגדרת משתמש"
 
 msgid "user settings"
 msgstr "הגדרות משתמש"
+
+msgid "by template"
+msgstr ""
+
+msgid "by code"
+msgstr ""
+
+msgid "static placeholder name"
+msgstr ""
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+msgid "placeholder code"
+msgstr ""
+
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+msgid "placeholder content"
+msgstr ""
+
+msgid "creation_method"
+msgstr ""
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
 
 msgid "Advanced options"
 msgstr "אפשרויות מתקדמות"
@@ -1150,9 +1162,6 @@ msgstr "שורש רך"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "נתב מחדש"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "יישום: %(apphook)s"
@@ -1303,8 +1312,8 @@ msgstr "החלף מצב מבנה"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "החלף מצב מבנה והדגש את הפלאגין שמעליו מרחפים"
 
-msgid "Open \\"
-msgstr "פתח \\"
+msgid "Open \"Create\" dialog"
+msgstr ""
 
 msgid "Focus on Toolbar"
 msgstr "התמקד בסרגל הכלים"
@@ -1457,6 +1466,12 @@ msgstr "הערות התקנה"
 
 msgid "Support"
 msgstr "תמיכה"
+
+msgid "Documentation"
+msgstr "תיעוד"
+
+msgid "User guide"
+msgstr "מדריך למשתמש"
 
 msgid "Give back"
 msgstr "תרום בחזרה"
@@ -1673,15 +1688,6 @@ msgstr "הוסף פלאגין אל %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "מציין מיקום יחיד"
-
-msgid "Community forum"
-msgstr "פורום הקהילה"
-
-msgid "Getting started"
-msgstr "תחילת העבודה"
-
-msgid "Talk to us"
-msgstr "דברו איתנו"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - חשבון המשתמש שלך נוצר."
