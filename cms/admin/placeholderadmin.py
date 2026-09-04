@@ -803,23 +803,26 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
 
-        # True if the plugin is not being moved from the clipboard
-        # to a placeholder or from a placeholder to the clipboard.
-        move_a_plugin = not move_a_copy and not move_to_clipboard
-
         if parent_id and plugin.parent_id != parent_id:
             target_pl = placeholder or plugin.placeholder
 
-            if move_a_plugin:
-                target_parent = get_object_or_404(
-                    CMSPlugin,
-                    pk=parent_id,
-                    language=target_language,
-                    placeholder=target_pl,
-                )
-            else:
-                target_parent = get_object_or_404(CMSPlugin, pk=parent_id)
-        elif parent_id:
+            # The new parent must live in the placeholder (and language) the
+            # plugin ends up in. This holds for pastes and cuts just as much as
+            # for moves: ``plugin_parent`` is client supplied, so an unscoped
+            # lookup would let a user name a plugin in a placeholder they have
+            # no permission for. That both parents the new plugin outside its
+            # own placeholder and returns the foreign parent's rendered subtree
+            # in the response.
+            target_parent = get_object_or_404(
+                CMSPlugin,
+                pk=parent_id,
+                language=target_language,
+                placeholder=target_pl,
+            )
+        elif parent_id and placeholder is None:
+            # ``plugin_parent`` names the plugin's current parent. Keeping it
+            # only makes sense while the plugin stays in its placeholder; the
+            # parent does not travel to another one.
             target_parent = plugin.parent
         else:
             target_parent = None

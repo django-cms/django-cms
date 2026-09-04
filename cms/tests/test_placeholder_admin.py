@@ -943,3 +943,99 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(target.get_plugins("en").count(), 1)
+
+    def test_paste_plugin_rejects_parent_in_other_placeholder(self):
+        """``plugin_parent`` must live in the placeholder the copy lands in.
+
+        The id is client-supplied, so an unscoped lookup would let a staff user
+        name a plugin in a placeholder they have no permission on. The copy
+        would then be parented outside its own placeholder, and the response
+        renders the foreign parent's whole subtree back to the caller.
+        """
+        user = self._create_user(
+            "attacker",
+            is_staff=True,
+            is_superuser=False,
+            permissions=["add_link", "change_link", "change_example1"],
+        )
+        clipboard = self._get_clipboard(user)
+
+        # A page placeholder the user has no permission on.
+        page = create_page("restricted", "nav_playground.html", "en")
+        restricted = page.get_placeholders("en")[0]
+        foreign_parent = add_plugin(
+            restricted,
+            "LinkPlugin",
+            "en",
+            name="VictimSecretLink",
+            external_link="https://secret.example.com",
+        )
+        self.assertFalse(restricted.has_change_permission(user))
+
+        # A placeholder the user does control.
+        target = Example1.objects.create(
+            char_1="one", char_2="two", char_3="tree", char_4="four"
+        ).placeholder
+        plugin = add_plugin(
+            clipboard,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+
+        endpoint = self.get_move_plugin_uri(plugin)
+        with self.login_user_context(user):
+            data = {
+                "plugin_id": plugin.pk,
+                "placeholder_id": target.pk,
+                "plugin_parent": foreign_parent.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertNotContains(response, "VictimSecretLink", status_code=404)
+        self.assertFalse(target.get_plugins("en").exists())
+        self.assertEqual(foreign_parent.cmsplugin_set.count(), 0)
+
+    def test_paste_plugin_accepts_parent_in_target_placeholder(self):
+        """The regular case still works: a parent inside the target placeholder."""
+        user = self._create_user(
+            "editor",
+            is_staff=True,
+            is_superuser=False,
+            permissions=["add_link", "change_link", "change_example1"],
+        )
+        clipboard = self._get_clipboard(user)
+        target = Example1.objects.create(
+            char_1="one", char_2="two", char_3="tree", char_4="four"
+        ).placeholder
+        parent = add_plugin(
+            target, "LinkPlugin", "en", name="Parent", external_link="https://example.com"
+        )
+        plugin = add_plugin(
+            clipboard,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+
+        endpoint = self.get_move_plugin_uri(plugin)
+        with self.login_user_context(user):
+            data = {
+                "plugin_id": plugin.pk,
+                "placeholder_id": target.pk,
+                "plugin_parent": parent.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 2,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(target.get_plugins("en").count(), 2)
+        self.assertEqual(parent.cmsplugin_set.get().placeholder_id, target.pk)
