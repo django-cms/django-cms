@@ -889,6 +889,81 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         self.assertEqual(content_instance_de.secret_greeting, data["content__secret_greeting"])  # Has new content
 
 
+class SimpleGrouperContentSelectionTestCase(SimpleSetupMixin, CMSTestCase):
+    """The content object selected by :attr:`GrouperModelAdmin.content_pk_url_param` has to survive
+    the change form's submission: the form is posted to the url built from the preserved filters,
+    and "save and continue editing" returns to it."""
+
+    def get_change_form(self, content_obj, **values) -> tuple[str, dict]:
+        """Open the change form for a specific content object and return the url it is submitted
+        to together with the data of a full submission (mimicking the rendered form)."""
+        param = self.admin.content_pk_url_param
+        response = self.client.get(f"{self.change_url}?{param}={content_obj.pk}")
+        self.assertEqual(response.status_code, 200)
+        form = response.context["adminform"].form
+        data = {}
+        for name, field in form.fields.items():
+            value = form.initial.get(name, field.initial)
+            value = getattr(value, "pk", value)
+            if field.required and value in (None, ""):
+                value = "some content"
+            data[name] = "" if value is None else value
+        data[f"{CONTENT_PREFIX}secret_greeting"] = "Changed content"
+        data.update(values)
+        return self.change_url + response.context["form_url"], data
+
+    def test_change_form_saves_requested_content_obj(self) -> None:
+        """Saving writes to the content object shown, not to the latest one."""
+        param = self.admin.content_pk_url_param
+        latest = self.createContentInstance("en")  # lower pk: picked as latest by .first()
+        other = self.createContentInstance("en")  # higher pk: a different content object
+        with self.login_user_context(self.admin_user):
+            post_url, data = self.get_change_form(other)
+            self.assertIn(f"{param}={other.pk}", post_url)
+            response = self.client.post(post_url, data=data)
+        self.assertEqual(response.status_code, 302)
+        other.refresh_from_db()
+        latest.refresh_from_db()
+        self.assertEqual(other.secret_greeting, "Changed content")
+        self.assertNotEqual(latest.secret_greeting, "Changed content")
+
+    def test_save_and_continue_keeps_requested_content_obj(self) -> None:
+        """Saving and continuing to edit returns to the very content object that was edited."""
+        param = self.admin.content_pk_url_param
+        self.createContentInstance("en")
+        other = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            post_url, data = self.get_change_form(other)
+            response = self.client.post(post_url, data={**data, "_continue": "1"})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(f"{param}={other.pk}", response.url)
+
+    def test_save_returns_to_changelist_without_content_selection(self) -> None:
+        """Plain saving returns to the changelist, which always lists the latest content."""
+        param = self.admin.content_pk_url_param
+        self.createContentInstance("en")
+        other = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            post_url, data = self.get_change_form(other)
+            response = self.client.post(post_url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn(param, response.url)
+
+    def test_changelist_ignores_content_selection(self) -> None:
+        """The content selection is no filter: the changelist ignores it instead of rejecting it
+        as an unknown lookup."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.changelist_url}?{param}={content.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, content.secret_greeting)
+
+
+class GrouperContentSelectionTestCase(SetupMixin, SimpleGrouperContentSelectionTestCase):
+    """Same, for a grouper admin that groups by language."""
+
+
 class GrouperCanChangeContentTestCase(SetupMixin, CMSTestCase):
     """Tests for ``GrouperModelAdmin.can_change_content`` in both the add and change case.
 
