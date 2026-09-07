@@ -14,6 +14,21 @@ import Fixture from './helpers/fixture';
 import { resetRewireRegistry } from './helpers/rewire';
 import { installJasmineGlobals, jasmine } from './helpers/jasmine-compat';
 
+// Vitest 5 exposes Vite define expressions as raw strings in browser mode.
+// Evaluate JSON values so the tests see the same booleans and strings as the
+// application build. Leave identifiers and already-normalized values alone.
+['__DEV__', '__TEST__', '__CMS_VERSION__'].forEach(name => {
+    const value = globalThis[name];
+
+    if (typeof value === 'string') {
+        try {
+            globalThis[name] = JSON.parse(value);
+        } catch {
+            // Vite define values may also be JavaScript identifiers.
+        }
+    }
+});
+
 // the specs and both vendored helpers expect these on window
 // the local-storage package (and webpack's shim) expect a node-style `global`
 window.global = window.global || window;
