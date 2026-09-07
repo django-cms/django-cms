@@ -52,7 +52,12 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
-from cms.utils.page_permissions import user_can_change_page, user_can_view_page
+from cms.utils.page_permissions import (
+    user_can_add_page,
+    user_can_add_subpage,
+    user_can_change_page,
+    user_can_view_page,
+)
 from cms.utils.permissions import (
     get_current_user,
     get_model_permission_codename,
@@ -346,6 +351,24 @@ class AddPageForm(BasePageContentForm):
         parent_page = self.cleaned_data.get("parent_page")
         if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
+
+        if self.cleaned_data.get("cms_page"):
+            # A translation is added to an existing page, the parent is not used.
+            # ``clean_cms_page`` checks the permission on that page instead.
+            return parent_page
+
+        # ``parent_page`` is a hidden field whose value is fully controlled by the
+        # client on POST, while ``has_add_permission`` only validated the parent
+        # taken from the query string. Re-check the permission against the parent
+        # the page is actually created under -- this is to prevent people from
+        # possible form-hacking.
+        if parent_page:
+            has_perm = user_can_add_subpage(self._user, target=parent_page, site=self._site)
+        else:
+            has_perm = user_can_add_page(self._user, site=self._site)
+
+        if not has_perm:
+            raise ValidationError(_("You do not have permission to add a page here."))
         return parent_page
 
     def clean_cms_page(self):
