@@ -30,7 +30,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     env:
-      NODE_VERSION: '24'
+      NODE_VERSION: '26'
       PYTHON_VERSION: '3.13'
 
     steps:
