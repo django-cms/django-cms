@@ -2,6 +2,7 @@ import os
 from copy import deepcopy
 from unittest.mock import patch
 
+import django
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -21,6 +22,7 @@ from djangocms_text.cms_plugins import TextPlugin
 from sekizai.context import SekizaiContext
 
 import cms
+from cms.admin.pageadmin import PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import (
@@ -911,3 +913,88 @@ class AdminBreadcrumbMarkupTests(CMSTestCase):
         self.assertIn('<ol class="breadcrumbs">', html)
         self.assertIn('aria-current="page"', html)
         self.assertNotIn('<div class="breadcrumbs">', html)
+
+
+class AdminObjectToolsPlacementTests(CMSTestCase):
+    """Django 6.1 moved ``{% block object-tools %}`` out of ``{% block content %}``: it is now a
+    top-level block that ``admin/base.html`` renders in the ``.titles-and-tools`` bar next to the
+    page title. ``admin/cms/page/change_form.html`` still has to *define* the block nested inside
+    its own ``content`` override (that is what suppresses the admin's default History tool), so the
+    block node has to be rendered conditionally -- otherwise Django renders it both from the 6.1
+    top-level position and again from the nested one, and every downstream override shows up twice.
+    """
+
+    #: ``True`` when the running Django renders ``object-tools`` outside ``content``.
+    OBJECT_TOOLS_OUTSIDE_CONTENT = django.VERSION[:2] >= (6, 1)
+
+    #: A real child template overriding ``{% block object-tools %}``, the way a project or a
+    #: third-party app (djangocms-versioning, djangocms-alias, ...) would.
+    DOWNSTREAM_TEMPLATE = "admin/cms/page/change_form_object_tools_test.html"
+    DOWNSTREAM_MARKER = "downstream-tool-link"
+
+    def _get_page_change_html(self, page, change_form_template=None):
+        with self.login_user_context(self.get_superuser()):
+            if change_form_template is None:
+                response = self.client.get(self.get_page_change_uri("en", page))
+            else:
+                with patch.object(PageContentAdmin, "change_form_template", change_form_template):
+                    response = self.client.get(self.get_page_change_uri("en", page))
+        self.assertEqual(response.status_code, 200)
+        return response.content.decode("utf-8")
+
+    # -- downstream overrides of {% block object-tools %} --
+
+    def test_downstream_object_tools_rendered_once(self):
+        """A child template's object-tools must not be emitted twice on Django 6.1."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page, self.DOWNSTREAM_TEMPLATE)
+        self.assertEqual(
+            html.count(self.DOWNSTREAM_MARKER),
+            1,
+            "Downstream object-tools override must render exactly once.",
+        )
+
+    def test_downstream_object_tools_placement_relative_to_content_main(self):
+        """The single render must sit in the position the running Django expects."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page, self.DOWNSTREAM_TEMPLATE)
+
+        content_main_index = html.index('id="content-main"')
+
+        if self.OBJECT_TOOLS_OUTSIDE_CONTENT:
+            # ``rindex``: the *last* occurrence must already be before #content-main, so a stray
+            # second render in the legacy nested position fails here too.
+            self.assertLess(
+                html.rindex(self.DOWNSTREAM_MARKER),
+                content_main_index,
+                "On Django >= 6.1 object-tools belong outside (before) #content-main.",
+            )
+        else:
+            self.assertGreater(
+                html.index(self.DOWNSTREAM_MARKER),
+                content_main_index,
+                "On Django < 6.1 object-tools belong in the legacy position inside #content-main.",
+            )
+
+    # -- the default page actions shipped by django CMS --
+
+    def test_default_page_object_tools_rendered_once(self):
+        """django CMS' own "View on site" tool renders once, and replaces the admin default."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page)
+
+        self.assertEqual(html.count('class="object-tools hide-in-modal"'), 1)
+        self.assertEqual(html.count("View on site"), 1)
+        # The admin's default object tools are replaced, not added to.
+        self.assertNotIn("historylink", html)
+
+    def test_default_page_object_tools_outside_content_main(self):
+        """The page actions render in the title/tools area, never inside the form column."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page)
+
+        self.assertLess(
+            html.index('class="object-tools hide-in-modal"'),
+            html.index('id="content-main"'),
+        )
+

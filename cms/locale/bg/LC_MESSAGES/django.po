@@ -3,17 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Venelin Stoykov <vkstoykov@gmail.com>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Ivaylo Nakov, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Ivaylo Nakov, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Bulgarian (https://app.transifex.com/divio/teams/58664/bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,8 +35,14 @@ msgstr "Частта от заглавието, която се използва
 msgid "Page type"
 msgstr "Тип страница"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Типове страници"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Напиши URL адрес"
@@ -48,6 +53,9 @@ msgstr ""
 
 msgid "Start typing..."
 msgstr "Започни да пишеш..."
+
+msgid "menu visibility"
+msgstr "видимост на менюто"
 
 msgid "limit when this page is visible in the menu"
 msgstr "ограничи, когато тази страница е видима в менюто"
@@ -188,9 +196,6 @@ msgstr "Преводи"
 msgid "Advanced Settings"
 msgstr "Разширени настройки"
 
-msgid "Change Permissions"
-msgstr "Промени правата"
-
 msgid "The page is not eligible to be home."
 msgstr "Тази страница не може да бъде начална."
 
@@ -237,12 +242,6 @@ msgstr "Нова подстраница"
 
 msgid "New page"
 msgstr "Нова страница"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Нямате права за достъп до този сайт. Свържете се с вашия администратор."
 
 msgid "Database error"
 msgstr "Грешка в базата данни"
@@ -355,9 +354,6 @@ msgstr "Действия"
 msgid "Empty content"
 msgstr "Празно съдържание"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)sСвойства"
@@ -408,21 +404,6 @@ msgstr "Django CMS"
 msgid "Placeholder"
 msgstr "Плейсхолдър"
 
-msgid "Getting started developer guide"
-msgstr "Ръководство за начало за разработчици"
-
-msgid "Documentation"
-msgstr "Документация"
-
-msgid "User guide"
-msgstr "Ръководство за потребителя"
-
-msgid "Discord community"
-msgstr "Общност в Discord"
-
-msgid "What's new"
-msgstr "Какво ново"
-
 msgid "Create"
 msgstr "Създай"
 
@@ -434,9 +415,6 @@ msgstr "Структура"
 
 msgid "Content"
 msgstr "Съдържание"
-
-msgid "Help"
-msgstr "Помощ"
 
 msgid "Sites"
 msgstr "сайтове"
@@ -540,6 +518,9 @@ msgstr "Изберете валиден сайт"
 msgid "Select a valid page"
 msgstr "Изберете валидна страница"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -552,9 +533,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Страница %(conflict_page)sима същия url '%(url)s' като текущата страница."
-
-msgid "Add another"
-msgstr "Добавяне на още"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -654,9 +632,6 @@ msgstr "шаблон"
 
 msgid "login required"
 msgstr "необходимо е вписване"
-
-msgid "menu visibility"
-msgstr "видимост на менюто"
 
 msgid "application"
 msgstr "приложение"
@@ -878,6 +853,43 @@ msgstr "настройка на потребителя"
 
 msgid "user settings"
 msgstr "настройки на потребителя"
+
+msgid "by template"
+msgstr "по шаблон"
+
+msgid "by code"
+msgstr "по код"
+
+msgid "static placeholder name"
+msgstr "име на статичен плейсхолдър"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Описателно име за идентифициране на този статичен плейсхолдър. Не се показва"
+" на потребителите."
+
+msgid "placeholder code"
+msgstr "код на плейсхолдъра"
+
+msgid "To render the static placeholder in templates."
+msgstr "За изобразяване на статичния плейсхолдър в шаблоните."
+
+msgid "placeholder content"
+msgstr "съдържание на плейсхолдъра"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "статичен плейсхолдър"
+
+msgid "static placeholders"
+msgstr "статични плейсхолдъри"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Вече съществува статичен плейсхолдър със същия сайт и код"
 
 msgid "Advanced options"
 msgstr "Разширени опции"
@@ -1174,9 +1186,6 @@ msgstr "Софт корен"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Пренасочване"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Приложение: %(apphook)s"
@@ -1331,8 +1340,8 @@ msgstr "Превключи режим на структура"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Превключи режим на структура и открои плъгина под курсора"
 
-msgid "Open \\"
-msgstr "Отваряне \\"
+msgid "Open \"Create\" dialog"
+msgstr "Отвори диалоговия прозорец \"Създай\""
 
 msgid "Focus on Toolbar"
 msgstr "Фокусирай лентата с инструменти"
@@ -1487,6 +1496,12 @@ msgstr "Инсталационни бележки"
 
 msgid "Support"
 msgstr "Помощ"
+
+msgid "Documentation"
+msgstr "Документация"
+
+msgid "User guide"
+msgstr "Ръководство за потребителя"
 
 msgid "Give back"
 msgstr "Дайте нещо в замяна"
@@ -1708,15 +1723,6 @@ msgstr "Добави плъгин към %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Единичен плейсхолдър"
-
-msgid "Community forum"
-msgstr "Форум на общността"
-
-msgid "Getting started"
-msgstr "Да започнем"
-
-msgid "Talk to us"
-msgstr "Говорете с нас"
 
 msgid "CMS - your user account was created."
 msgstr "CMS — Вашият потребителски профил беше създаден."

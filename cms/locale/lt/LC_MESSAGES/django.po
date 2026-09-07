@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Matas Dailyda <matas@dailyda.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Matas Dailyda <matas@dailyda.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Lithuanian (https://app.transifex.com/divio/teams/58664/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,8 +35,14 @@ msgstr "Pavadinimo dalis, kuri yra naudojama URL"
 msgid "Page type"
 msgstr "Puslapio tipas"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Puslapio tipai"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Perrašyti URL"
@@ -46,6 +52,9 @@ msgstr "Palikite šį lauką tuščią jeigu bus naudojamas standartinis kelias.
 
 msgid "Start typing..."
 msgstr "Pradėkite rašyti..."
+
+msgid "menu visibility"
+msgstr "meniu matomumas"
 
 msgid "limit when this page is visible in the menu"
 msgstr "apriboti, kada šis puslapis yra matomas meniu"
@@ -185,9 +194,6 @@ msgstr "Vertimai"
 msgid "Advanced Settings"
 msgstr "Papildomi nustatymai"
 
-msgid "Change Permissions"
-msgstr "Pakeisti teises"
-
 msgid "The page is not eligible to be home."
 msgstr "Šis puslapis negali būti pradiniu puslapiu."
 
@@ -232,12 +238,6 @@ msgstr "Naujas vidinis puslapis"
 
 msgid "New page"
 msgstr "Naujas puslapis"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Neturite teisės pasiekti šios svetainės. Kreipkitės į administratorių."
 
 msgid "Database error"
 msgstr "Duomenų bazės klaida"
@@ -350,9 +350,6 @@ msgstr "Veiksmai"
 msgid "Empty content"
 msgstr "Tuščias turinys"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)s savybės"
@@ -403,21 +400,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Rezervuota vieta"
 
-msgid "Getting started developer guide"
-msgstr "Pradžios vadovas kūrėjams"
-
-msgid "Documentation"
-msgstr "Dokumentacija"
-
-msgid "User guide"
-msgstr "Vartotojo vadovas"
-
-msgid "Discord community"
-msgstr "Discord bendruomenė"
-
-msgid "What's new"
-msgstr "Kas naujo"
-
 msgid "Create"
 msgstr "Kurti"
 
@@ -429,9 +411,6 @@ msgstr "Struktūra"
 
 msgid "Content"
 msgstr "Turinys"
-
-msgid "Help"
-msgstr "Pagalba"
 
 msgid "Sites"
 msgstr "Tinklalapiai"
@@ -535,6 +514,9 @@ msgstr "Pasirinkite tinkamą svetainę"
 msgid "Select a valid page"
 msgstr "Pasirinkite tinkamą puslapį"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -548,9 +530,6 @@ msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Puslapis %(conflict_page)s turi tą patį url '%(url)s' kaip dabartinis "
 "puslapis."
-
-msgid "Add another"
-msgstr "Pridėti dar"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -652,9 +631,6 @@ msgstr "šablonas"
 
 msgid "login required"
 msgstr "būtinas prisijungimas"
-
-msgid "menu visibility"
-msgstr "meniu matomumas"
 
 msgid "application"
 msgstr "aplikacija"
@@ -879,6 +855,44 @@ msgstr "vartotojo nustatymas"
 
 msgid "user settings"
 msgstr "vartotojo nustatymai"
+
+msgid "by template"
+msgstr "pagal šabloną"
+
+msgid "by code"
+msgstr "pagal kodą"
+
+msgid "static placeholder name"
+msgstr "statinės rezervuotos vietos pavadinimas"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Apibudinantis pavadinimas atpažinti šią statinę rezervuotą vietą. Nerodoma "
+"vartotojams."
+
+msgid "placeholder code"
+msgstr "rezervuotos vietos kodas"
+
+msgid "To render the static placeholder in templates."
+msgstr "Atvaizduoti statinę rezervuotą vietą šablonuose."
+
+msgid "placeholder content"
+msgstr "rezervuotos vietos turinys"
+
+msgid "creation_method"
+msgstr "sukūrimo metodas"
+
+msgid "static placeholder"
+msgstr "statinė rezervuota vieta"
+
+msgid "static placeholders"
+msgstr "statinės rezervuotos vietos"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
+"Statinė rezervuota vieta su tuo pačiu tinklalapiu ir kodu jau egzistuoja"
 
 msgid "Advanced options"
 msgstr "Papildomi nustatymai"
@@ -1176,9 +1190,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Aplikacija"
 
-msgid "Redirect"
-msgstr "Nukreipti"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikacija: %(apphook)s"
@@ -1333,8 +1344,8 @@ msgstr "Perjungti į struktūros vaizdą"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Perjungti į struktūros vaizdą ir paryškinti pasirinktą įskiepį"
 
-msgid "Open \\"
-msgstr "Atidaryti \\"
+msgid "Open \"Create\" dialog"
+msgstr "Atidaryti \"Kūrimo\" dialogą"
 
 msgid "Focus on Toolbar"
 msgstr "Koncentruotis į įrankių juostą"
@@ -1489,6 +1500,12 @@ msgstr "Diegimo užrašai"
 
 msgid "Support"
 msgstr "Palaikymas"
+
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+msgid "User guide"
+msgstr "Vartotojo vadovas"
 
 msgid "Give back"
 msgstr "Atsidėkokite"
@@ -1710,15 +1727,6 @@ msgstr "Pridėti įskiepį %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Viena rezervuota vieta"
-
-msgid "Community forum"
-msgstr "Bendruomenės forumas"
-
-msgid "Getting started"
-msgstr "Pradžia"
-
-msgid "Talk to us"
-msgstr "Susisiekite su mumis"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - jūsų vartojo paskyra sukurta."

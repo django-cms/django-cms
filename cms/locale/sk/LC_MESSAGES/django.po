@@ -3,17 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fabian Braun <fsbraun@gmx.de>, 2026
-# Thomas Thomas <tparobok@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # Martin Kilian <xmartink01@gmail.com>, 2026
+# Thomas Thomas <tparobok@gmail.com>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Martin Kilian <xmartink01@gmail.com>, 2026\n"
+"Last-Translator: Thomas Thomas <tparobok@gmail.com>, 2026\n"
 "Language-Team: Slovak (https://app.transifex.com/divio/teams/58664/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,8 +36,14 @@ msgstr "Časť názvu, ktorá je použitá v URL"
 msgid "Page type"
 msgstr "Typ stránky"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Typy stránok"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Prepísať URL"
@@ -48,6 +54,9 @@ msgstr ""
 
 msgid "Start typing..."
 msgstr "Začnite písať..."
+
+msgid "menu visibility"
+msgstr "viditeľnosť menu"
 
 msgid "limit when this page is visible in the menu"
 msgstr "obmedzuje zobrazenie tejto stránky v menu"
@@ -178,9 +187,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "Pokročilé nastavenia"
 
-msgid "Change Permissions"
-msgstr "Upraviť práva"
-
 msgid "The page is not eligible to be home."
 msgstr ""
 
@@ -222,11 +228,6 @@ msgstr "Nová podstránka"
 
 msgid "New page"
 msgstr "Nová stránka"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
 
 msgid "Database error"
 msgstr "Databázová chyba"
@@ -339,9 +340,6 @@ msgstr ""
 msgid "Empty content"
 msgstr ""
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr ""
@@ -387,21 +385,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Umiestňovač"
 
-msgid "Getting started developer guide"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
-msgstr ""
-
-msgid "Discord community"
-msgstr ""
-
-msgid "What's new"
-msgstr ""
-
 msgid "Create"
 msgstr "Vytvoriť"
 
@@ -413,9 +396,6 @@ msgstr "Štruktúra"
 
 msgid "Content"
 msgstr "Obsah"
-
-msgid "Help"
-msgstr ""
 
 msgid "Sites"
 msgstr "Weby"
@@ -519,6 +499,9 @@ msgstr "Vyberte platné miesto"
 msgid "Select a valid page"
 msgstr "Vyberte platnú stránku"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -527,9 +510,6 @@ msgstr ""
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add another"
 msgstr ""
 
 msgid ""
@@ -630,9 +610,6 @@ msgstr "šablóna"
 
 msgid "login required"
 msgstr "vyžadovať prihlásenie"
-
-msgid "menu visibility"
-msgstr "viditeľnosť menu"
 
 msgid "application"
 msgstr "aplikácia"
@@ -848,6 +825,42 @@ msgstr "užívateľské nastavenie"
 
 msgid "user settings"
 msgstr "užívateľské nastavenia"
+
+msgid "by template"
+msgstr "podľa šablóny"
+
+msgid "by code"
+msgstr "podľa kódu"
+
+msgid "static placeholder name"
+msgstr "názov statického umiestňovača"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Popisný názov identifikujúci tento umiestňovač. Nie je zobrazený užívateľom."
+
+msgid "placeholder code"
+msgstr "kód umiestňovača"
+
+msgid "To render the static placeholder in templates."
+msgstr "Generuj statické umiestňovače v šablónach."
+
+msgid "placeholder content"
+msgstr "obsah umiestňovača"
+
+msgid "creation_method"
+msgstr "creation_method"
+
+msgid "static placeholder"
+msgstr "statický umiestňovač"
+
+msgid "static placeholders"
+msgstr "statické umiestňovače"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Statický umiestňovač s rovnakým kódom pre tento web už existuje"
 
 msgid "Advanced options"
 msgstr "Pokročilé nastavenia"
@@ -1134,9 +1147,6 @@ msgstr ""
 msgid "Apphook"
 msgstr ""
 
-msgid "Redirect"
-msgstr "Presmerovanie"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikácia: %(apphook)s"
@@ -1285,7 +1295,7 @@ msgstr ""
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
-msgid "Open \\"
+msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
@@ -1404,6 +1414,12 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
 msgstr ""
 
 msgid "Give back"
@@ -1607,15 +1623,6 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr "Pridať plugin do %(plugin_name)s"
 
 msgid "Single placeholder"
-msgstr ""
-
-msgid "Community forum"
-msgstr ""
-
-msgid "Getting started"
-msgstr ""
-
-msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

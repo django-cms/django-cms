@@ -6,18 +6,18 @@
 # Andrii Vozniuk, 2023
 # tarasyyyk <taras.korzhak96@gmail.com>, 2023
 # Петро Романчук <ixer@ixer.org.ua>, 2025
-# Panasoft, 2026
+# Panasoft, 2025
 # Anton Linevich <linevich@swebion.com>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Volodymyr Bergman <wowkalucky@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Volodymyr Bergman <wowkalucky@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Ukrainian (https://app.transifex.com/divio/teams/58664/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,8 +40,14 @@ msgstr "Частина назви, що використовується у ад
 msgid "Page type"
 msgstr "Тип сторінки"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Типи Сторінок"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Перезаписати URL"
@@ -51,6 +57,9 @@ msgstr "Залиште це поле пустим, якщо використов
 
 msgid "Start typing..."
 msgstr "Розпочати друкування..."
+
+msgid "menu visibility"
+msgstr "видимість меню"
 
 msgid "limit when this page is visible in the menu"
 msgstr "обмеження, коли ця сторінка є видимою у меню"
@@ -188,9 +197,6 @@ msgstr "Переклади"
 msgid "Advanced Settings"
 msgstr "Розширені Налаштування"
 
-msgid "Change Permissions"
-msgstr "Змінити Дозволи"
-
 msgid "The page is not eligible to be home."
 msgstr "Сторінка не може бути домашньою."
 
@@ -237,12 +243,6 @@ msgstr "Нова вкладена сторінка"
 
 msgid "New page"
 msgstr "Нова сторінка"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"У вас немає дозволу на доступ до цього сайту. Зверніться до адміністратора."
 
 msgid "Database error"
 msgstr "Помилка бази даних"
@@ -355,9 +355,6 @@ msgstr "Дії"
 msgid "Empty content"
 msgstr "Порожній зміст"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Властивості %(object_name)s"
@@ -408,21 +405,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Заповнювач"
 
-msgid "Getting started developer guide"
-msgstr "Посібник для розробників-початківців"
-
-msgid "Documentation"
-msgstr "Документація"
-
-msgid "User guide"
-msgstr "Посібник користувача"
-
-msgid "Discord community"
-msgstr "Спільнота в Discord"
-
-msgid "What's new"
-msgstr "Що нового"
-
 msgid "Create"
 msgstr "Створити"
 
@@ -434,9 +416,6 @@ msgstr "Структура"
 
 msgid "Content"
 msgstr "Зміст"
-
-msgid "Help"
-msgstr "Довідка"
 
 msgid "Sites"
 msgstr "Сайти"
@@ -540,6 +519,9 @@ msgstr "Виберіть чинний сайт"
 msgid "Select a valid page"
 msgstr "Виберіть чинну сторінку"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -553,9 +535,6 @@ msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Сторінка %(conflict_page)sмає таке ж посилання '%(url)s' як і поточна "
 "сторінка."
-
-msgid "Add another"
-msgstr "Додати ще"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -656,9 +635,6 @@ msgstr "шаблон"
 
 msgid "login required"
 msgstr "потрібен login"
-
-msgid "menu visibility"
-msgstr "видимість меню"
 
 msgid "application"
 msgstr "Пристосунок"
@@ -880,6 +856,43 @@ msgstr "налаштування користувача"
 
 msgid "user settings"
 msgstr "налаштування користувача"
+
+msgid "by template"
+msgstr "за шаблоном"
+
+msgid "by code"
+msgstr "за кодом"
+
+msgid "static placeholder name"
+msgstr "назва статичного заповнювача"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Образна назва для ідентифікації даного заповнювача. Не показується "
+"користувачам."
+
+msgid "placeholder code"
+msgstr "код заповнювача"
+
+msgid "To render the static placeholder in templates."
+msgstr "Для візуалізації статичного заповнювача у шаблонах."
+
+msgid "placeholder content"
+msgstr "зміст заповнювача"
+
+msgid "creation_method"
+msgstr "метод_створення"
+
+msgid "static placeholder"
+msgstr "статичний заповнювач"
+
+msgid "static placeholders"
+msgstr "статичні заповнювачі"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Статичний заповнювач з тим самим сайтом та кодом вже існує"
 
 msgid "Advanced options"
 msgstr "Розширені опції"
@@ -1181,9 +1194,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Перенаправлення"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Програма: %(apphook)s"
@@ -1338,8 +1348,8 @@ msgstr "Переключити в режим структури"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Переключити в режим структури і підсвічувати плагіни"
 
-msgid "Open \\"
-msgstr "Відкрити \\"
+msgid "Open \"Create\" dialog"
+msgstr "Відкрити діалог \"Створити\""
 
 msgid "Focus on Toolbar"
 msgstr "Зфокусувати на Панелі"
@@ -1494,6 +1504,12 @@ msgstr "Нотатки з інсталяції"
 
 msgid "Support"
 msgstr "Підтримка"
+
+msgid "Documentation"
+msgstr "Документація"
+
+msgid "User guide"
+msgstr "Посібник користувача"
 
 msgid "Give back"
 msgstr "Віддячити"
@@ -1708,15 +1724,6 @@ msgstr "Додати плагін до %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Один заповнювач"
-
-msgid "Community forum"
-msgstr "Форум спільноти"
-
-msgid "Getting started"
-msgstr "Початок роботи"
-
-msgid "Talk to us"
-msgstr "Зв'язатися з нами"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - створено обліковий запис користувача."

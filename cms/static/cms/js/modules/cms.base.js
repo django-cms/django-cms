@@ -468,13 +468,14 @@ export const Helpers = {
      * @function updateUrlWithPath
      * @private
      * @param {String} url url
+     * @param {Array[]} [params] additional array of [`param`, `value`] arrays to set on the url
      * @returns {String} modified url
      */
-    updateUrlWithPath: function(url) {
+    updateUrlWithPath: function(url, params) {
         var win = this._getWindow();
         var path = win.location.pathname + win.location.search;
 
-        return this.makeURL(url, [['cms_path', path]]);
+        return this.makeURL(url, [['cms_path', path]].concat(params || []));
     },
 
     /**

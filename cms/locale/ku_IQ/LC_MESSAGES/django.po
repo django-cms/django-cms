@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fabian Braun <fsbraun@gmx.de>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Kurdish (Iraq) (https://app.transifex.com/divio/teams/58664/ku_IQ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +34,13 @@ msgstr "ئەو بەشەی ناونیشان کە لە بەستەردا بەکار
 msgid "Page type"
 msgstr ""
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
+msgstr ""
+
+msgid "You do not have permission to copy this page."
 msgstr ""
 
 msgid "Overwrite URL"
@@ -45,6 +51,9 @@ msgstr "ئەم خانەیە بە بەتاڵی جێبهێڵە گەر پێویست
 
 msgid "Start typing..."
 msgstr ""
+
+msgid "menu visibility"
+msgstr "دەرکەوتنی پێڕست"
 
 msgid "limit when this page is visible in the menu"
 msgstr "سنووردارکردن لە کاتێکا ئەم پەرەیە دەرکەوتبێت لە پێڕستدا"
@@ -167,9 +176,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "ڕێکخستنە پێشکەوتووەکان"
 
-msgid "Change Permissions"
-msgstr ""
-
 msgid "The page is not eligible to be home."
 msgstr ""
 
@@ -209,11 +215,6 @@ msgid "New sub page"
 msgstr ""
 
 msgid "New page"
-msgstr ""
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
 msgstr ""
 
 msgid "Database error"
@@ -327,9 +328,6 @@ msgstr ""
 msgid "Empty content"
 msgstr ""
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr ""
@@ -375,21 +373,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr ""
 
-msgid "Getting started developer guide"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
-msgstr ""
-
-msgid "Discord community"
-msgstr ""
-
-msgid "What's new"
-msgstr ""
-
 msgid "Create"
 msgstr ""
 
@@ -400,9 +383,6 @@ msgid "Structure"
 msgstr ""
 
 msgid "Content"
-msgstr ""
-
-msgid "Help"
 msgstr ""
 
 msgid "Sites"
@@ -507,6 +487,9 @@ msgstr "مالپەرێکی شیاو دەستنیشان بکە"
 msgid "Select a valid page"
 msgstr "پەرەیەکی شیاو دەسنیشان بکە"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -515,9 +498,6 @@ msgstr ""
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add another"
 msgstr ""
 
 msgid ""
@@ -616,9 +596,6 @@ msgstr "قاڵب"
 
 msgid "login required"
 msgstr "چوونە ژوورەوەی پێویستە"
-
-msgid "menu visibility"
-msgstr "دەرکەوتنی پێڕست"
 
 msgid "application"
 msgstr "بەرنامە"
@@ -832,6 +809,41 @@ msgid "user setting"
 msgstr ""
 
 msgid "user settings"
+msgstr ""
+
+msgid "by template"
+msgstr ""
+
+msgid "by code"
+msgstr ""
+
+msgid "static placeholder name"
+msgstr ""
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+msgid "placeholder code"
+msgstr ""
+
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+msgid "placeholder content"
+msgstr ""
+
+msgid "creation_method"
+msgstr ""
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
 msgid "Advanced options"
@@ -1115,9 +1127,6 @@ msgstr ""
 msgid "Apphook"
 msgstr ""
 
-msgid "Redirect"
-msgstr " ئارەستەکردن"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr ""
@@ -1266,7 +1275,7 @@ msgstr ""
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
-msgid "Open \\"
+msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
@@ -1383,6 +1392,12 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
 msgstr ""
 
 msgid "Give back"
@@ -1588,15 +1603,6 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
 msgid "Single placeholder"
-msgstr ""
-
-msgid "Community forum"
-msgstr ""
-
-msgid "Getting started"
-msgstr ""
-
-msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

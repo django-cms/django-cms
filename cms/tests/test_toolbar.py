@@ -2017,6 +2017,77 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             ),
         )
 
+    def test_changeform_url_is_marked_as_popup(self):
+        """The frontend editing modal opens the plain admin changeform, which only
+        renders without the admin chrome - and only closes the modal upon saving -
+        when the ``_popup`` flag is set."""
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_block instance %}
+    {{ instance }}
+{% endrender_model_block %}
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?language=en&amp;_popup=1"'.format(
+                admin_reverse("placeholderapp_example1_change", args=(ex1.pk,))
+            ),
+        )
+
+    def test_add_form_url_is_marked_as_popup(self):
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_add instance %}
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?_popup=1"'.format(admin_reverse("placeholderapp_example1_add")),
+        )
+
+    def test_edit_field_url_is_not_marked_as_popup(self):
+        """``edit_field`` is a cms view rendering its own chrome-less template: it
+        neither needs nor understands the ``_popup`` flag."""
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "char_1" "char_1" %}</h1>
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?language=en&amp;edit_fields=char_1"'.format(
+                admin_reverse("placeholderapp_example1_edit_field", args=(ex1.pk, "en"))
+            ),
+        )
+
     def test_invalid_attribute(self):
         user = self.get_staff()
         page = create_page("Test", "col_two.html", "en")

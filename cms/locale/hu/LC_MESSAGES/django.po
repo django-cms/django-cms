@@ -5,14 +5,13 @@
 # Translators:
 # Tibor Balogh, 2025
 # Alexander Blomberg, 2026
-# fazekasda <fazekasda@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Hungarian (https://app.transifex.com/divio/teams/58664/hu/)\n"
@@ -37,8 +36,14 @@ msgstr "A cím része, ami az URL-ben használandó"
 msgid "Page type"
 msgstr "Oldal típus"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Oldal típusok"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "URL felülírása"
@@ -50,6 +55,9 @@ msgstr ""
 
 msgid "Start typing..."
 msgstr "Kezdj el gépelni..."
+
+msgid "menu visibility"
+msgstr "menü láthatósága"
 
 msgid "limit when this page is visible in the menu"
 msgstr "korlátozza, hogy mikor jelenjen meg ez az oldal a menüben"
@@ -188,9 +196,6 @@ msgstr "Fordítások"
 msgid "Advanced Settings"
 msgstr "További beállítások"
 
-msgid "Change Permissions"
-msgstr "Jogosultságok megváltoztatása"
-
 msgid "The page is not eligible to be home."
 msgstr "Az oldal nem használható kezőlapként."
 
@@ -234,13 +239,6 @@ msgstr "Új aloldal"
 
 msgid "New page"
 msgstr "Új oldal"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Nincs jogosultsága a webhely eléréséhez. Vegye fel a kapcsolatot a "
-"rendszergazdával."
 
 msgid "Database error"
 msgstr "Adatbázis hiba"
@@ -353,9 +351,6 @@ msgstr "Műveletek"
 msgid "Empty content"
 msgstr "Üres tartalom"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)s tulajdonságai"
@@ -406,21 +401,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Hely"
 
-msgid "Getting started developer guide"
-msgstr "Fejlesztői útmutató a kezdéshez"
-
-msgid "Documentation"
-msgstr "Dokumentáció"
-
-msgid "User guide"
-msgstr "Felhasználói kézikönyv"
-
-msgid "Discord community"
-msgstr "Discord-közösség"
-
-msgid "What's new"
-msgstr "Újdonságok"
-
 msgid "Create"
 msgstr "Létrehoz"
 
@@ -432,9 +412,6 @@ msgstr "Struktúra"
 
 msgid "Content"
 msgstr "Tartalom"
-
-msgid "Help"
-msgstr "Segítség"
 
 msgid "Sites"
 msgstr "Webhely"
@@ -538,6 +515,9 @@ msgstr "Válasszon egy érvényes webhelyet"
 msgid "Select a valid page"
 msgstr "Válasszon egy érvényes oldalt"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -551,9 +531,6 @@ msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "A(z) %(conflict_page)s oldalnak ugyanaz az URL-je ('%(url)s'), mint az "
 "aktuális oldalnak."
-
-msgid "Add another"
-msgstr "Új hozzáadása"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -655,9 +632,6 @@ msgstr "sablon"
 
 msgid "login required"
 msgstr "bejelentkezés szükséges"
-
-msgid "menu visibility"
-msgstr "menü láthatósága"
 
 msgid "application"
 msgstr "alkalmazás"
@@ -883,6 +857,43 @@ msgstr "felhasználó beállítás"
 
 msgid "user settings"
 msgstr "felhasználó beállítások"
+
+msgid "by template"
+msgstr "sablon szerint"
+
+msgid "by code"
+msgstr "kód szerint"
+
+msgid "static placeholder name"
+msgstr "statikus helyőrző neve"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Leíró név, amely segítségével azonosítja a helyőrzőt. A látogatók számára "
+"nem jelenik meg."
+
+msgid "placeholder code"
+msgstr "helyőrző kódja"
+
+msgid "To render the static placeholder in templates."
+msgstr "Sablonokban használt statikus helyőrzők megjelenítéséhez."
+
+msgid "placeholder content"
+msgstr "helyőrző tartalma"
+
+msgid "creation_method"
+msgstr "létrehozás módja"
+
+msgid "static placeholder"
+msgstr "statikus helyőrző"
+
+msgid "static placeholders"
+msgstr "statikus helyőrzők"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Már létezik statikus helyőrző ugyanazzal a webhellyel és kóddal"
 
 msgid "Advanced options"
 msgstr "További beállítások"
@@ -1182,9 +1193,6 @@ msgstr "Lágy gyökér"
 msgid "Apphook"
 msgstr "Alkalmazás (apphook)"
 
-msgid "Redirect"
-msgstr "Átirányítás"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Alkalmazás: %(apphook)s"
@@ -1341,8 +1349,8 @@ msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 "Váltsd át a szerkezeti módot, és jelöld ki a fölé mutató beépülő modult"
 
-msgid "Open \\"
-msgstr "Megnyitás \\"
+msgid "Open \"Create\" dialog"
+msgstr "Nyissa meg a \"Létrehozás\" párbeszédpanelt"
 
 msgid "Focus on Toolbar"
 msgstr "Fókusz az Eszköztárra"
@@ -1496,6 +1504,12 @@ msgstr "Telepítési Megjegyzések"
 
 msgid "Support"
 msgstr "Támogatás"
+
+msgid "Documentation"
+msgstr "Dokumentáció"
+
+msgid "User guide"
+msgstr "Felhasználói kézikönyv"
 
 msgid "Give back"
 msgstr "Adjon vissza"
@@ -1718,15 +1732,6 @@ msgstr "Bővítmény hozzáadása ehhez %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Egyetlen hely"
-
-msgid "Community forum"
-msgstr "Közösségi fórum"
-
-msgid "Getting started"
-msgstr "Kezdő lépések"
-
-msgid "Talk to us"
-msgstr "Beszélj velünk"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - a felhasználói fiókod létrejött."

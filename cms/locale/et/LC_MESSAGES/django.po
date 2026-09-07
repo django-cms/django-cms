@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # Martin <martinpajuste@gmail.com>, 2023
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Rivo Zängov <eraser@eraser.ee>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Rivo Zängov <eraser@eraser.ee>, 2026\n"
 "Language-Team: Estonian (https://app.transifex.com/divio/teams/58664/et/)\n"
@@ -36,8 +36,14 @@ msgstr "Osa pealkirjast, mida kasutatakse internetiaadressi koostamiseks"
 msgid "Page type"
 msgstr "Lehekülje tüüp"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Lehekülje tüübid"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Kirjuta üle internetiaadress"
@@ -47,6 +53,9 @@ msgstr "Hoia see väli tühjana, et kasutada standardset rada."
 
 msgid "Start typing..."
 msgstr "Alusta kirjutamist..."
+
+msgid "menu visibility"
+msgstr "menüü nähtavus"
 
 msgid "limit when this page is visible in the menu"
 msgstr ""
@@ -169,9 +178,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "Muud seadistused"
 
-msgid "Change Permissions"
-msgstr "Muuda õiguseid"
-
 msgid "The page is not eligible to be home."
 msgstr ""
 
@@ -212,11 +218,6 @@ msgstr "Uus alamlehekülg"
 
 msgid "New page"
 msgstr "Uus lehekülg"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
 
 msgid "Database error"
 msgstr "Andmebaasi viga"
@@ -329,9 +330,6 @@ msgstr ""
 msgid "Empty content"
 msgstr ""
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr ""
@@ -377,21 +375,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Kohahoidja"
 
-msgid "Getting started developer guide"
-msgstr ""
-
-msgid "Documentation"
-msgstr "Dokumentatsioon"
-
-msgid "User guide"
-msgstr ""
-
-msgid "Discord community"
-msgstr ""
-
-msgid "What's new"
-msgstr ""
-
 msgid "Create"
 msgstr "Loo"
 
@@ -403,9 +386,6 @@ msgstr "Struktuur"
 
 msgid "Content"
 msgstr "Sisu"
-
-msgid "Help"
-msgstr ""
 
 msgid "Sites"
 msgstr "Saidid"
@@ -509,6 +489,9 @@ msgstr "Vali korrektne sait"
 msgid "Select a valid page"
 msgstr "Vali korrektne lehekülg"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -517,9 +500,6 @@ msgstr ""
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add another"
 msgstr ""
 
 msgid ""
@@ -618,9 +598,6 @@ msgstr "mall"
 
 msgid "login required"
 msgstr "sisselogimine on nõutud"
-
-msgid "menu visibility"
-msgstr "menüü nähtavus"
 
 msgid "application"
 msgstr "rakendus"
@@ -833,6 +810,41 @@ msgstr "kasutaja seaded"
 
 msgid "user settings"
 msgstr "kasutaja seaded"
+
+msgid "by template"
+msgstr "malli järgi"
+
+msgid "by code"
+msgstr "koodi järgi"
+
+msgid "static placeholder name"
+msgstr ""
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+msgid "placeholder code"
+msgstr ""
+
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+msgid "placeholder content"
+msgstr ""
+
+msgid "creation_method"
+msgstr ""
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
 
 msgid "Advanced options"
 msgstr "Täpsemad valikud"
@@ -1115,9 +1127,6 @@ msgstr ""
 msgid "Apphook"
 msgstr ""
 
-msgid "Redirect"
-msgstr "Ümbersuunamine"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr ""
@@ -1266,7 +1275,7 @@ msgstr ""
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
-msgid "Open \\"
+msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
@@ -1384,6 +1393,12 @@ msgstr "Paigaldamise märkmed"
 
 msgid "Support"
 msgstr "Kasutajatugi"
+
+msgid "Documentation"
+msgstr "Dokumentatsioon"
+
+msgid "User guide"
+msgstr ""
 
 msgid "Give back"
 msgstr ""
@@ -1586,15 +1601,6 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
 msgid "Single placeholder"
-msgstr ""
-
-msgid "Community forum"
-msgstr ""
-
-msgid "Getting started"
-msgstr ""
-
-msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

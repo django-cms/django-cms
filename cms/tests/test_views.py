@@ -697,3 +697,78 @@ class NonPageContentStructureEndpointTests(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(self._url())
         self.assertContains(response, self._marker())
+
+
+class NonPageContentObjectEndpointTests(CMSTestCase):
+    """The preview and edit endpoints must also authorize non-PageContent objects.
+
+    Companion to :class:`NonPageContentStructureEndpointTests`. Registered
+    through ``admin_site.admin_view`` these endpoints only require an active
+    staff user, and unlike the structure board they render the object's full
+    plugin output. Without an object-level check, any staff user could read the
+    rendered content of any frontend-editable object (e.g. a model registered
+    via ``cms_toolbar_enabled_models``) without permission to view it.
+    """
+
+    def setUp(self) -> None:
+        from cms.api import add_plugin
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        self.target = Example1.objects.create(
+            char_1="private-object", char_2="b", char_3="c", char_4="d",
+        )
+        self.placeholder = self.target.placeholder
+        add_plugin(
+            self.placeholder, "LinkPlugin", "en",
+            name="SuperSecretLinkName", external_link="https://secret.example.com",
+        )
+
+    def _staff_with_perm(self, codename):
+        staff = self._create_user(f"staff_{codename}", is_staff=True, is_superuser=False)
+        staff.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="placeholderapp", codename=codename
+            )
+        )
+        return staff
+
+    def _urls(self):
+        return {
+            "preview": get_object_preview_url(self.target, language="en"),
+            "edit": get_object_edit_url(self.target, language="en"),
+        }
+
+    def test_denies_staff_without_view_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    response = self.client.get(url)
+                    self.assertEqual(
+                        response.status_code,
+                        404,
+                        msg=f"{name} endpoint leaked a non-PageContent object's content",
+                    )
+                    self.assertNotContains(
+                        response, "SuperSecretLinkName", status_code=404
+                    )
+
+    def test_allows_staff_with_view_permission(self):
+        staff = self._staff_with_perm("view_example1")
+        with self.login_user_context(staff):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    self.assertContains(self.client.get(url), "SuperSecretLinkName")
+
+    def test_allows_staff_with_change_permission(self):
+        staff = self._staff_with_perm("change_example1")
+        with self.login_user_context(staff):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    self.assertContains(self.client.get(url), "SuperSecretLinkName")
+
+    def test_allows_superuser(self):
+        with self.login_user_context(self.get_superuser()):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    self.assertContains(self.client.get(url), "SuperSecretLinkName")
