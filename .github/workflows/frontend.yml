@@ -10,7 +10,7 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     env:
-      NODE_VERSION: '24'
+      NODE_VERSION: '26'
 
     steps:
     - uses: actions/checkout@v7
