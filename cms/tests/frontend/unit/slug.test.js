@@ -1,5 +1,6 @@
 'use strict';
-const addSlugHandlers = require('../../../static/cms/js/modules/slug').default;
+
+import addSlugHandlers from '../../../static/cms/js/modules/slug';
 
 describe('addSlugHandlers', () => {
     let container;

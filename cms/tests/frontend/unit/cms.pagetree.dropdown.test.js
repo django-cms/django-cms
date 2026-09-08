@@ -1,10 +1,9 @@
 /* global document */
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown').default;
-var $ = require('jquery');
-
-window.CMS = window.CMS || CMS;
+import CMS from '../../../static/cms/js/modules/cms.base';
+import PageTreeDropdowns from '../../../static/cms/js/modules/cms.pagetree.dropdown';
+import $ from 'jquery';
+window.CMS = CMS;
 CMS.PageTreeDropdowns = PageTreeDropdowns;
 
 
