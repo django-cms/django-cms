@@ -364,13 +364,13 @@ def user_can_view_all_pages(user, site):
     return has_global_permission(user, site, action='view_page')
 
 
-def user_can_copy_descendants(user, page, site, parent_page, copy_permissions):
-    """Allow unreadable descendants only when the copy keeps them unreadable.
+def user_can_relocate_descendants(user, page, site, parent_page, keep_restrictions=True):
+    """Allow unreadable descendants only when they stay unreadable at ``parent_page``.
 
     The caller checks root view access and destination add access separately.
-    ``copy_with_descendants`` preserves inherited source view restrictions when
-    copying permissions. Destination grants can nevertheless widen access:
-    change permission also confers view access, even on a restricted page.
+    ``copy_with_descendants`` and ``Page.move_page`` preserve inherited source
+    view restrictions. Destination grants can nevertheless widen access: change
+    permission also confers view access, even on a restricted page.
     """
     unreadable = [
         descendant for descendant in page.get_descendant_pages()
@@ -378,7 +378,7 @@ def user_can_copy_descendants(user, page, site, parent_page, copy_permissions):
     ]
     if not unreadable:
         return True
-    if not copy_permissions:
+    if not keep_restrictions:
         return False
 
     # Fetch destination permissions without reusing source-site permission caches.
@@ -399,6 +399,22 @@ def user_can_copy_descendants(user, page, site, parent_page, copy_permissions):
         for descendant in unreadable
         for permission in destination_permissions
     )
+
+
+def user_can_copy_descendants(user, page, site, parent_page, copy_permissions):
+    """Whether ``page`` may be copied below ``parent_page`` with its descendants."""
+    return user_can_relocate_descendants(
+        user, page, site, parent_page, keep_restrictions=copy_permissions
+    )
+
+
+def user_can_move_descendants(user, page, site, parent_page):
+    """Whether ``page`` may be moved below ``parent_page`` with its descendants.
+
+    A move always preserves the subtree's view restrictions, so only the
+    destination's own grants can widen access.
+    """
+    return user_can_relocate_descendants(user, page, site, parent_page)
 
 
 def get_add_perm_tuples(user, site, check_global=True, use_cache=True):

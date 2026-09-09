@@ -562,6 +562,18 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             message = _("Error! You don't have permissions to move this page. Please reload the page")
             return jsonify_request(HttpResponseForbidden(message))
 
+        # The whole subtree moves along, so authorize the whole subtree: the
+        # destination may grant access that the source did not.
+        target_page, position = form.get_tree_options()
+        if position in ("first-child", "last-child"):
+            parent_page = target_page
+        else:
+            parent_page = target_page.parent if target_page else None
+
+        if not page_permissions.user_can_move_descendants(user, page, page.site, parent_page):
+            message = _("Error! You don't have permissions to move this page. Please reload the page")
+            return jsonify_request(HttpResponseForbidden(message))
+
         operation_token = send_pre_page_operation(
             request=request,
             operation=operations.MOVE_PAGE,
@@ -569,7 +581,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             sender=self.model,
         )
 
-        form.move_page()
+        form.move_page(user=user)
 
         send_post_page_operation(
             request=request,
