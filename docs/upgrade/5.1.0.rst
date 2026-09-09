@@ -22,7 +22,21 @@ django CMS 5.1 supports **Django 5.2, 6.0, and 6.1**. Django 4.2, 5.0, and
 maintenance. We highly recommend and only support the latest release of each
 supported series.
 
-It supports **Python 3.10, 3.11, 3.12, 3.13, and 3.14**.
+Use the latest patch release of a supported combination:
+
+.. list-table:: Django and Python versions
+   :header-rows: 1
+
+   * - Django
+     - Python
+   * - `5.2 <https://docs.djangoproject.com/en/5.2/releases/5.2/#python-compatibility>`_
+     - 3.10, 3.11, 3.12, 3.13, 3.14
+   * - `6.0 <https://docs.djangoproject.com/en/6.0/releases/6.0/#python-compatibility>`_
+     - 3.12, 3.13, 3.14
+   * - `6.1 <https://docs.djangoproject.com/en/6.1/releases/6.1/#python-compatibility>`_
+     - 3.12, 3.13, 3.14
+
+Python 3.10 and 3.11 require Django 5.2.
 
 ******************
 Release highlights
@@ -54,8 +68,8 @@ more precise plugin configuration, and a modernized editing interface.
   spacing, visual consistency, and light/dark color-scheme support. The
   previous theme remains available as a migration aid.
 
-* **Deploy on all maintained platform versions.** django CMS 5.1 supports Django
-  5.2, 6.0, and 6.1 and Python 3.10 through 3.14.
+* **Deploy on maintained platform versions.** django CMS 5.1 supports the
+  Django/Python combinations listed above.
 
 * **Benefit from security and reliability improvements.** The release
   strengthens authorization around editing and clipboard operations, improves
@@ -85,6 +99,41 @@ Then apply migrations, collect static files, and run the django CMS checks::
 Test custom plugins, apphooks, permissions, frontend editing, and all templates
 in a staging environment before deploying. Projects that customize or replace
 django CMS migrations should also review the new squashed initial migration.
+
+Upgrading to Django 6.1
+======================
+
+Django 6.1 requires `PostgreSQL 15+
+<https://docs.djangoproject.com/en/6.1/releases/6.1/#dropped-support-for-postgresql-14>`_,
+`MySQL 8.4+
+<https://docs.djangoproject.com/en/6.1/releases/6.1/#dropped-support-for-mysql-8-4>`_,
+`MariaDB 10.11+
+<https://docs.djangoproject.com/en/6.1/releases/6.1/#dropped-support-for-mariadb-10-11>`_,
+or `SQLite 3.37+
+<https://docs.djangoproject.com/en/6.1/releases/6.1/#miscellaneous>`_.
+
+Page and template-fragment caches that vary on headers or arguments use new
+keys. Existing entries become cold misses and are repopulated on demand; no
+cache data migration is required. See `Django's cache-key changes
+<https://docs.djangoproject.com/en/6.1/releases/6.1/#miscellaneous>`_.
+
+Legacy signed cookies may be rejected after upgrading. Django's
+``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` setting can temporarily accept them
+during a transition; it is deprecated and should not remain enabled
+permanently. Review the `signed-cookie fallback guidance
+<https://docs.djangoproject.com/en/6.1/ref/settings/#signed-cookie-legacy-salt-fallback>`_.
+
+Projects using CMS email features can configure the default backend through
+``MAILERS["default"]``. Migrate the deprecated ``EMAIL_*`` settings together:
+they are unavailable once ``MAILERS`` is defined. Check other email-sending
+dependencies for compatibility and migrate ``ADMINS``/``MANAGERS`` address
+pairs to strings. See `Django's mailers migration guide
+<https://docs.djangoproject.com/en/6.1/howto/mailers-migration/>`_.
+
+No django CMS model migration is required solely by Django 6.1. Still run
+the normal migrations for django CMS, Django, and installed applications as
+described above, and review `Django's version-upgrade guide
+<https://docs.djangoproject.com/en/6.1/howto/upgrade-version/>`_.
 
 *******************
 What's new in 5.1.0

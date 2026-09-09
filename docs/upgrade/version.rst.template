@@ -20,11 +20,23 @@ updating an existing project.
 Django and Python compatibility
 *******************************
 
-django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
-support the latest release of each series.
+django CMS supports **Django 5.2, 6.0, and 6.1**. Use the latest patch release
+of a supported combination:
 
-It supports **Python 3.11, 3.12, 3.13, and 3.14**. As for Django we highly recommend and only
-support the latest release of each series.
+.. list-table:: Django and Python versions
+   :header-rows: 1
+
+   * - Django
+     - Python
+   * - `5.2 <https://docs.djangoproject.com/en/5.2/releases/5.2/#python-compatibility>`_
+     - 3.10, 3.11, 3.12, 3.13, 3.14
+   * - `6.0 <https://docs.djangoproject.com/en/6.0/releases/6.0/#python-compatibility>`_
+     - 3.12, 3.13, 3.14
+   * - `6.1 <https://docs.djangoproject.com/en/6.1/releases/6.1/#python-compatibility>`_
+     - 3.12, 3.13, 3.14
+
+Python 3.10 and 3.11 require Django 5.2. Review this table when changing
+the supported Django or Python series.
 
 ***********************
 How to upgrade to 5.X.X
@@ -69,4 +81,3 @@ Removal of deprecated functionality
 ===================================
 
 Empty sections are to be removed before release.
-
