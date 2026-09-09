@@ -193,7 +193,31 @@ jobs:
         uv pip install --system -r test_requirements/databases.txt
         uv pip install --system -e .
 
+    - name: Test final Django 6.1 without deprecations
+      if: matrix.requirements-file == 'django-6.1.txt'
+      env:
+        DATABASE_URL: sqlite://localhost/testdb.sqlite
+      run: |
+        python - <<'PY'
+        import sys
+        import warnings
+
+        import django
+        from coverage.cmdline import main
+        from django.utils import deprecation
+
+        print(f"Testing Django {django.get_version()}", flush=True)
+        assert django.VERSION[:2] == (6, 1) and django.VERSION[3] == "final", "Expected final Django 6.1"
+        # Django renamed this warning when adopting calendar versioning.
+        removed_warning = getattr(deprecation, "RemovedInDjango2028Warning", None)
+        if removed_warning is None:
+            removed_warning = deprecation.RemovedInDjango70Warning
+        warnings.simplefilter("error", removed_warning)
+        sys.exit(main(["run", "manage.py", "test"]))
+        PY
+
     - name: Test with django test runner (coverage enabled)
+      if: matrix.requirements-file != 'django-6.1.txt'
       run: coverage run manage.py test
       env:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
