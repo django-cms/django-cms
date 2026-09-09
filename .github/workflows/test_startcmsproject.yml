@@ -43,14 +43,33 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Create project from template (${{ matrix.mode }} / ${{ matrix.switches.name }})
+      env:
+        DJANGO_SERIES: ${{ matrix.django-version }}
       run: |
+        set -euo pipefail
         sudo apt install gettext gcc -y
         python -m venv .venv
         source ./.venv/bin/activate
         python -m pip install --upgrade pip
-        pip install Django~=${{ matrix.django-version }}
-        pip install -e .
+        # Keep nested pip installs during project generation on the same series.
+        export PIP_CONSTRAINT="$PWD/.venv/django-constraints.txt"
+        printf 'Django~=%s.0\n' "$DJANGO_SERIES" > "$PIP_CONSTRAINT"
+        pip install -e . "Django~=${DJANGO_SERIES}.0"
+
+        check_django() {
+          python - <<'PY'
+        import os
+        import django
+
+        expected = tuple(map(int, os.environ["DJANGO_SERIES"].split(".")))
+        print(f"Django {django.get_version()} (expected {os.environ['DJANGO_SERIES']})", flush=True)
+        assert django.VERSION[:2] == expected, "Project generation changed the selected Django series"
+        PY
+        }
+
+        check_django
         djangocms mysite --noinput --mode ${{ matrix.mode }} ${{ matrix.switches.flags }}
+        check_django
     - name: Verify requirements.in reflects the selected options
       env:
         MODE: ${{ matrix.mode }}
