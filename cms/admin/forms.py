@@ -545,6 +545,14 @@ class DuplicatePageForm(AddPageForm):
             raise ValidationError(_("You do not have permission to copy this page."))
         return source
 
+    def from_source(self, source, parent=None):
+        new_page = super().from_source(source, parent=parent)
+        # ``Page.copy()`` is called with ``permissions=False``, so a duplicate of
+        # a view-restricted page would be world-readable. Carry the source's view
+        # restrictions -- its own and the ones it inherits -- over to the copy.
+        new_page.apply_view_restrictions(source.get_view_restrictions(), user=self._user)
+        return new_page
+
 
 class ChangePageForm(BasePageContentForm):
     overwrite_url = forms.CharField(
@@ -1008,8 +1016,8 @@ class MovePageForm(PageTreeForm):
         # The user is moving from right to left.
         return target_page, "left"
 
-    def move_page(self):
-        self.page.move_page(*self.get_tree_options())
+    def move_page(self, user=None):
+        self.page.move_page(*self.get_tree_options(), user=user)
 
     def _determine_new_parent(self, target_page, position):
         if position in ("first-child", "last-child"):
