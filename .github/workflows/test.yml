@@ -151,6 +151,51 @@ jobs:
         include-hidden-files: true
         path: '.coverage*'
 
+  mariadb-minimum:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'yes'
+          MARIADB_DATABASE: djangocms_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=3
+    env:
+      DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
+      DJANGO_SETTINGS_MODULE: cms.tests.settings
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.14'
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip uv
+        uv pip install --system pytest -r test_requirements/django-6.1.txt -r test_requirements/databases.txt
+    - name: Verify MariaDB minimum and run tests
+      run: |
+        python - <<'PY'
+        import django
+        django.setup()
+        from django.db import connection
+
+        print(f"Django {django.get_version()}, MariaDB {connection.mysql_server_info}", flush=True)
+        assert connection.mysql_is_mariadb and connection.mysql_version[:2] == (10, 11), "Expected MariaDB 10.11"
+        PY
+        coverage run manage.py test
+    - name: Upload coverage data
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage-data-mariadb-10.11-django-6.1
+        include-hidden-files: true
+        path: '.coverage*'
+
   sqlite:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -192,6 +237,16 @@ jobs:
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
         uv pip install --system -e .
+
+    - name: Verify Django 6.1 SQLite minimum
+      if: matrix.requirements-file == 'django-6.1.txt'
+      run: |
+        python - <<'PY'
+        import sqlite3
+
+        print(f"SQLite {sqlite3.sqlite_version}")
+        assert sqlite3.sqlite_version_info >= (3, 37), "Django 6.1 requires SQLite 3.37 or newer"
+        PY
 
     - name: Test with django test runner (coverage enabled)
       run: coverage run manage.py test
@@ -369,7 +424,7 @@ jobs:
     name: Coverage
     runs-on: ${{ matrix.os }}
     needs: [
-      postgres, mysql, sqlite,
+      postgres, mysql, mariadb-minimum, sqlite,
       django-main-sqlite,
       django-main-postgres,
       django-main-mysql,
