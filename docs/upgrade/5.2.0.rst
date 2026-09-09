@@ -108,25 +108,26 @@ always ``False`` there. Each of them needs a staff session that may add pages;
 none is exploitable anonymously, but the content they expose is readable
 anonymously afterwards. We recommend that all users upgrade as soon as possible.
 
-TODO: replace the ``GHSA-xxxx-xxxx-xxxx`` placeholders with the advisory
-identifiers once the advisories are published.
+`GHSA-976q-w6ch-6w82 <https://github.com/django-cms/django-cms/security/advisories/GHSA-976q-w6ch-6w82>`_
+covers all three, which share a root cause, their prerequisites and their fix:
 
-* ``GHSA-xxxx-xxxx-xxxx``: *Copy* in the page tree authorized only the root of
-  the subtree it was asked to copy, while every descendant below it was copied
-  and recreated without its view restrictions. A delegated editor who could view
-  one public page therefore obtained a publicly readable copy of every
-  view-restricted page below it. Copying now authorizes the whole subtree and
-  preserves the view restrictions the source inherited from ancestors outside
-  it.
-* ``GHSA-xxxx-xxxx-xxxx``: *Duplicate* created the new page with no permissions
-  at all, so duplicating a view-restricted page republished its content to
-  anonymous visitors. The duplicate now carries the source's view restrictions,
-  both its own and the ones it inherited.
-* ``GHSA-xxxx-xxxx-xxxx``: Moving a page out of a restricted branch dropped the
-  view restrictions that it and its descendants inherited from their ancestors,
-  exposing the pages themselves -- including descendants the moving user was not
-  allowed to view -- to anonymous visitors. Moving now authorizes the whole
-  subtree and materializes the inherited view restrictions on the moved page.
+* *Copy* authorized only the root of the subtree it was asked to copy, while
+  every descendant below it was copied and recreated without its view
+  restrictions. A delegated editor who could view one public page therefore
+  obtained a publicly readable copy of every view-restricted page below it.
+  Selecting *Copy permissions* did not help: the flag was passed to the
+  descendants but not to the copied root, so the root lost its own permission
+  records as well. Copying now authorizes the whole subtree and preserves the
+  view restrictions the source inherited from ancestors outside it.
+* *Duplicate* created the new page with no permissions at all, so duplicating a
+  view-restricted page republished its content to anonymous visitors. The
+  duplicate now carries the source's view restrictions, both its own and the
+  ones it inherited.
+* *Move* dropped the view restrictions that a page and its descendants
+  inherited from the ancestors they left behind, exposing the pages themselves
+  -- including descendants the moving user was not allowed to view -- to
+  anonymous visitors. Moving now authorizes the whole subtree and materializes
+  the inherited view restrictions on the moved page.
 
 No action beyond upgrading is required. Pages that were copied, duplicated or
 moved *before* the upgrade keep the permissions they were created with, so
