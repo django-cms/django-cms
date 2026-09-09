@@ -7,6 +7,7 @@ import warnings
 import dj_database_url
 
 from cms.exceptions import DontUsePageAttributeWarning
+from cms.test_utils.mail import get_email_settings
 
 
 def gettext(s):
@@ -186,7 +187,7 @@ if __name__ == "__main__":
             MEDIA_URL="/media/",
             STATIC_URL="/static/",
             ADMIN_MEDIA_PREFIX="/static/admin/",
-            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            **get_email_settings(),
             PLUGIN_APPS=PLUGIN_APPS,
             DEBUG_TOOLBAR_PATCH_SETTINGS=False,
             INTERNAL_IPS=["127.0.0.1"],

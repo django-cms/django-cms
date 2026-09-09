@@ -39,12 +39,15 @@ from cms.templatetags.cms_tags import (
     render_plugin,
 )
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
+from cms.test_utils.mail import MAILERS_SUPPORTED
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
+
+TEST_MANAGERS = ["Jenkins <tests@django-cms.org>"] if MAILERS_SUPPORTED else [("Jenkins", "tests@django-cms.org")]
 
 
 class TemplatetagTests(CMSTestCase):
@@ -354,7 +357,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         with self.settings(
             MIDDLEWARE=settings.MIDDLEWARE + ["django.middleware.common.BrokenLinkEmailsMiddleware"],
             DEBUG=False,
-            MANAGERS=[("Jenkins", "tests@django-cms.org")],
+            MANAGERS=TEST_MANAGERS,
         ):
             request = self.get_request("/")
             page = _get_page_by_untyped_arg({"pk": 1003}, request, 1)
@@ -367,7 +370,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
                 mw for mw in settings.MIDDLEWARE if mw != "django.middleware.common.BrokenLinkEmailsMiddleware"
             ],
             DEBUG=False,
-            MANAGERS=[("Jenkins", "tests@django-cms.org")],
+            MANAGERS=TEST_MANAGERS,
         ):
             request = self.get_request("/")
             page = _get_page_by_untyped_arg({"pk": 1003}, request, 1)
