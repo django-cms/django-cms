@@ -100,11 +100,37 @@ Minor features
 Security fixes
 ==============
 
-TODO: describe each security-relevant fix, who is affected, and any action
-required beyond upgrading. Reference the advisory where one was published.
+This release fixes broken access control in the page tree's *Copy*, *Duplicate*
+and *Move* operations. All three require ``CMS_PERMISSION = True`` and at least
+one per-page view restriction: an installation that does not use the permission
+system has nothing to disclose, because ``Page.has_view_restrictions()`` is
+always ``False`` there. Each of them needs a staff session that may add pages;
+none is exploitable anonymously, but the content they expose is readable
+anonymously afterwards. We recommend that all users upgrade as soon as possible.
 
-* TODO: security fix 1
-* TODO: security fix 2
+TODO: replace the ``GHSA-xxxx-xxxx-xxxx`` placeholders with the advisory
+identifiers once the advisories are published.
+
+* ``GHSA-xxxx-xxxx-xxxx``: *Copy* in the page tree authorized only the root of
+  the subtree it was asked to copy, while every descendant below it was copied
+  and recreated without its view restrictions. A delegated editor who could view
+  one public page therefore obtained a publicly readable copy of every
+  view-restricted page below it. Copying now authorizes the whole subtree and
+  preserves the view restrictions the source inherited from ancestors outside
+  it.
+* ``GHSA-xxxx-xxxx-xxxx``: *Duplicate* created the new page with no permissions
+  at all, so duplicating a view-restricted page republished its content to
+  anonymous visitors. The duplicate now carries the source's view restrictions,
+  both its own and the ones it inherited.
+* ``GHSA-xxxx-xxxx-xxxx``: Moving a page out of a restricted branch dropped the
+  view restrictions that it and its descendants inherited from their ancestors,
+  exposing the pages themselves -- including descendants the moving user was not
+  allowed to view -- to anonymous visitors. Moving now authorizes the whole
+  subtree and materializes the inherited view restrictions on the moved page.
+
+No action beyond upgrading is required. Pages that were copied, duplicated or
+moved *before* the upgrade keep the permissions they were created with, so
+review restricted branches for unrestricted copies made earlier.
 
 Bug Fixes
 =========
@@ -121,10 +147,37 @@ TODO: point at the full list of fixes in ``CHANGELOG.rst``.
 Backward incompatible changes in 5.2.0
 **************************************
 
-Backward incompatible change 1
-==============================
+View restrictions follow pages that are copied, duplicated or moved
+===================================================================
 
-TODO: what changed, who is affected, and what to do instead.
+The security fixes above change how permissions behave around page copies and
+moves:
+
+* A page moved out of a restricted branch stays restricted at its new location.
+  The view grants it inherited are written to the moved page as ``can_view``
+  ``PagePermission`` rows (no other flag is carried over). To publish such a
+  page, remove the restriction explicitly -- which requires the *can change
+  permissions* right on it.
+* ``Page.move_page()`` accepts a new optional ``user`` argument and now writes
+  ``PagePermission`` rows. Pass the acting user so that the permission caches
+  are invalidated for them::
+
+      page.move_page(target, position, user=request.user)
+* The move endpoint answers ``403`` when the moved subtree contains pages the
+  user may not view and the destination would grant them access, mirroring the
+  behaviour of copy.
+* Two new methods support this: ``Page.get_view_restrictions()`` snapshots the
+  ``can_view`` grants that protect a page, and ``Page.apply_view_restrictions()``
+  recreates such a snapshot on a page at its new location. Code that relocates
+  pages outside of ``Page.move_page()`` or ``Page.copy_with_descendants()``
+  should use them.
+* ``cms.utils.page_permissions`` gained ``user_can_relocate_descendants()`` with
+  the thin wrappers ``user_can_copy_descendants()`` and
+  ``user_can_move_descendants()`` for authorizing an operation against a whole
+  subtree rather than its root.
+
+See :doc:`/explanation/permissions` for the full picture of how permissions
+behave when pages are moved, copied or deleted.
 
 Backward incompatible change 2
 ==============================
