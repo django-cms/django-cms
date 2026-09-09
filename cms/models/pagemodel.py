@@ -602,7 +602,19 @@ class Page(MP_Node):
                 Prefetch("pagecontent_set", queryset=PageContent.admin_manager.all()),
             )
         )
-        new_root_page = self.copy(target_site, parent_page=parent_page, user=user)
+        if copy_permissions and get_cms_setting("PERMISSION"):
+            from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_DESCENDANTS, PagePermission, PermissionTuple
+            from cms.models.permissionmodels import MASK_DESCENDANTS
+
+            # Snapshot paths before inserting the copy can move source nodes.
+            inherited_restrictions = list(
+                PagePermission.objects.filter(
+                    page__in=self.get_ancestor_pages(), can_view=True
+                ).select_related("page")
+            )
+        new_root_page = self.copy(
+            target_site, parent_page=parent_page, permissions=copy_permissions, user=user
+        )
 
         if target_page and position in ("first-child"):
             # target page is a parent and user has requested to
@@ -621,6 +633,31 @@ class Page(MP_Node):
             pages_by_id[page.id] = page.copy(
                 target_site, parent_page=parent, translations=True, permissions=copy_permissions, user=user
             )
+
+        if copy_permissions and get_cms_setting("PERMISSION"):
+            from cms.cache.permissions import clear_permission_cache
+            from cms.utils.permissions import clear_permission_lru_caches
+
+            # Ancestors outside the copied subtree will no longer protect it.
+            # Materialize their view grants on the new root, retaining descendant
+            # scope but not importing unrelated ancestor editing privileges.
+            restrictions = []
+            for permission in inherited_restrictions:
+                if PermissionTuple((permission.grant_on, permission.page.path)).contains(self.path):
+                    restrictions.append(PagePermission(
+                        page=new_root_page,
+                        user_id=permission.user_id,
+                        group_id=permission.group_id,
+                        grant_on=(
+                            ACCESS_PAGE_AND_DESCENDANTS
+                            if permission.grant_on & MASK_DESCENDANTS else ACCESS_PAGE
+                        ),
+                        **{flag: flag == "can_view" for flag in PagePermission.get_all_permissions()},
+                    ))
+            PagePermission.objects.bulk_create(restrictions)
+            # bulk_create does not emit the permission signals.
+            clear_permission_cache()
+            clear_permission_lru_caches(user)
         return new_root_page
 
     def delete(self, *args, **kwargs):

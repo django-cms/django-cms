@@ -364,6 +364,43 @@ def user_can_view_all_pages(user, site):
     return has_global_permission(user, site, action='view_page')
 
 
+def user_can_copy_descendants(user, page, site, parent_page, copy_permissions):
+    """Allow unreadable descendants only when the copy keeps them unreadable.
+
+    The caller checks root view access and destination add access separately.
+    ``copy_with_descendants`` preserves inherited source view restrictions when
+    copying permissions. Destination grants can nevertheless widen access:
+    change permission also confers view access, even on a restricted page.
+    """
+    unreadable = [
+        descendant for descendant in page.get_descendant_pages()
+        if not user_can_view_page(user, descendant, page.site)
+    ]
+    if not unreadable:
+        return True
+    if not copy_permissions:
+        return False
+
+    # Fetch destination permissions without reusing source-site permission caches.
+    view_permissions = get_view_perm_tuples(user, site, use_cache=False)
+    change_permissions = (
+        get_change_perm_tuples(user, site, use_cache=False)
+        if user.has_perm(PAGE_CHANGE_CODENAME) else []
+    )
+    if GRANT_ALL_PERMISSIONS in (view_permissions, change_permissions):
+        return False
+
+    # An all-zero segment cannot identify an existing page. Only permissions
+    # inherited from the destination ancestors can match these prospective paths.
+    root_path = (parent_page.path if parent_page else '') + '0' * Page.steplen
+    destination_permissions = [PermissionTuple(perm) for perm in (*view_permissions, *change_permissions)]
+    return not any(
+        permission.contains(root_path + descendant.path[len(page.path):])
+        for descendant in unreadable
+        for permission in destination_permissions
+    )
+
+
 def get_add_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has add page rights or the string

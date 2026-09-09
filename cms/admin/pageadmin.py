@@ -663,6 +663,16 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             # User can only copy / paste a page if he has permission to add a page
             can_copy_page = page_permissions.user_can_add_page(user, site)
 
+        if can_copy_page:
+            target_page, position = form.get_tree_options()
+            if position in ("first-child", "last-child"):
+                parent_page = target_page
+            else:
+                parent_page = target_page.parent if target_page else None
+            can_copy_page = page_permissions.user_can_copy_descendants(
+                user, page, site, parent_page, form.cleaned_data["copy_permissions"]
+            )
+
         if not can_copy_page:
             message = _("Error! You don't have permissions to copy this page.")
             return jsonify_request(HttpResponseForbidden(message))
