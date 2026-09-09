@@ -238,6 +238,21 @@ jobs:
         uv pip install --system -r test_requirements/databases.txt
         uv pip install --system -e .
 
+    - name: Build SQLite 3.37.2
+      if: matrix.requirements-file == 'django-6.1.txt' && matrix.python-version == '3.12'
+      working-directory: ${{ runner.temp }}
+      run: |
+        curl --fail --silent --show-error --location --retry 3 \
+          https://www.sqlite.org/2022/sqlite-autoconf-3370200.tar.gz -o sqlite.tar.gz
+        echo "4089a8d9b467537b3f246f217b84cd76e00b1d1a971fe5aca1e30e230e46b2d8  sqlite.tar.gz" | sha256sum --check
+        tar -xzf sqlite.tar.gz
+        cd sqlite-autoconf-3370200
+        ./configure --prefix="$RUNNER_TEMP/sqlite-minimum" --disable-static --enable-shared
+        make -j2
+        make install
+        # Make Python load the minimum library for the subsequent checks and suite.
+        echo "LD_LIBRARY_PATH=$RUNNER_TEMP/sqlite-minimum/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
     - name: Verify Django 6.1 SQLite minimum
       if: matrix.requirements-file == 'django-6.1.txt'
       run: |
@@ -246,6 +261,8 @@ jobs:
 
         print(f"SQLite {sqlite3.sqlite_version}")
         assert sqlite3.sqlite_version_info >= (3, 37), "Django 6.1 requires SQLite 3.37 or newer"
+        if "${{ matrix.python-version }}" == "3.12":
+            assert sqlite3.sqlite_version_info == (3, 37, 2), "Expected the minimum SQLite library"
         PY
 
     - name: Test final Django 6.1 without deprecations
