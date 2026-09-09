@@ -198,6 +198,10 @@ jobs:
       env:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
 
+    - name: Test custom email-user layout
+      if: matrix.python-version == '3.14'
+      run: python manage.py test cms.tests.test_admin_layout --auth-user-model emailuserapp.EmailUser
+
     - name: Upload coverage data
       uses: actions/upload-artifact@v7
       with:
