@@ -350,7 +350,7 @@ class FormsTestCase(CMSTestCase):
         site2 = Site.objects.create(pk=2, domain="site2.com", name="site2")
 
         # Identical root level trees on both sites, as produced by ``manage.py cms copy-site``
-        for site in (self.site, site2):
+        for site in (get_current_site(), site2):
             create_page("A", "nav_playground.html", "de", slug="a", site=site)
             create_page("B", "nav_playground.html", "de", slug="b", site=site)
 
