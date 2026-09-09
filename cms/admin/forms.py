@@ -1017,7 +1017,11 @@ class MovePageForm(PageTreeForm):
         return target_page.parent
 
     def _validate_slug_uniqueness(self, parent, language, slug):
-        target_siblings = Page.objects.filter(parent=parent).exclude(pk=self.page.pk)
+        target_siblings = Page.objects.filter(
+            parent=parent,
+            site=self._site,
+            is_page_type=self.page.is_page_type,
+        ).exclude(pk=self.page.pk)
         if target_siblings.filter(urls__slug=slug, urls__language=language).exists():
             raise ValidationError(
                 _(
