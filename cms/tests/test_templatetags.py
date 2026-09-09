@@ -381,6 +381,18 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         request = self.get_request("/")
         self.assertRaises(TypeError, _get_page_by_untyped_arg, [], request, 1)
 
+    @override_settings(DEBUG=False, MIDDLEWARE=["django.middleware.common.BrokenLinkEmailsMiddleware"])
+    def test_missing_page_mail_error(self):
+        with patch("cms.templatetags.cms_tags.mail_managers", side_effect=ConnectionError):
+            page = _get_page_by_untyped_arg({"pk": 1003}, self.get_request("/"), 1)
+        self.assertIsNone(page)
+
+    @override_settings(DEBUG=False, MIDDLEWARE=["django.middleware.common.BrokenLinkEmailsMiddleware"])
+    def test_missing_page_code_error(self):
+        with patch("cms.templatetags.cms_tags.mail_managers", side_effect=ValueError):
+            with self.assertRaises(ValueError):
+                _get_page_by_untyped_arg({"pk": 1003}, self.get_request("/"), 1)
+
     def test_show_placeholder_for_page_content_does_not_exist(self):
         """
         Verify ``show_placeholder`` correctly handles being given an
