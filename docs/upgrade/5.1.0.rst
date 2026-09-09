@@ -101,7 +101,7 @@ in a staging environment before deploying. Projects that customize or replace
 django CMS migrations should also review the new squashed initial migration.
 
 Upgrading to Django 6.1
-======================
+=======================
 
 Django 6.1 requires `PostgreSQL 15+
 <https://docs.djangoproject.com/en/6.1/releases/6.1/#dropped-support-for-postgresql-14>`_,
