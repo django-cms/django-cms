@@ -46,6 +46,7 @@ from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_site_id
+from cms.utils.mail import MAIL_DELIVERY_ERRORS
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
 
@@ -94,7 +95,11 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
             raise Page.DoesNotExist(body)
         else:
             if "django.middleware.common.BrokenLinkEmailsMiddleware" in settings.MIDDLEWARE:
-                mail_managers(subject, body, fail_silently=True)
+                try:
+                    mail_managers(subject, body)
+                except MAIL_DELIVERY_ERRORS:
+                    # A delivery failure must not replace the missing-page response.
+                    pass
             return None
 
 
