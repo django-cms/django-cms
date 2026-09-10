@@ -284,7 +284,7 @@ def user_can_view_page(user, page, site=None):
         # Page has no restrictions but user can't see unrestricted pages
         return False
 
-    if user_can_change_page(user, page):
+    if user_can_change_page(user, page, site=site):
         # If user has change permissions on a page
         # then he can automatically view it.
         return True
@@ -293,6 +293,7 @@ def user_can_view_page(user, page, site=None):
         page=page,
         user=user,
         action='view_page',
+        site=site,
         check_global=False,
     )
     return has_perm
@@ -367,6 +368,59 @@ def _perm_tuples_to_ids(perm_tuples):
         allowed_pages |= PermissionTuple(perm).allow_list("node")
 
     return list(Page.objects.filter(allowed_pages).values_list('pk', flat=True))
+
+
+def user_can_relocate_descendants(user, page, site, parent_page, keep_restrictions=True):
+    """Allow unreadable descendants only when they stay unreadable at ``parent_page``.
+
+    The caller checks root view access and destination add access separately.
+    ``copy_with_descendants`` and ``Page.move_page`` preserve inherited source
+    view restrictions. Destination grants can nevertheless widen access: change
+    permission also confers view access, even on a restricted page.
+    """
+    unreadable = [
+        descendant for descendant in page.get_descendant_pages()
+        if not user_can_view_page(user, descendant, page.site)
+    ]
+    if not unreadable:
+        return True
+    if not keep_restrictions:
+        return False
+
+    # Fetch destination permissions without reusing source-site permission caches.
+    view_permissions = get_view_perm_tuples(user, site, use_cache=False)
+    change_permissions = (
+        get_change_perm_tuples(user, site, use_cache=False)
+        if user.has_perm(PAGE_CHANGE_CODENAME) else []
+    )
+    if GRANT_ALL_PERMISSIONS in (view_permissions, change_permissions):
+        return False
+
+    # An all-zero segment cannot identify an existing page. Only permissions
+    # inherited from the destination ancestors can match these prospective paths.
+    root_path = (parent_page.path if parent_page else '') + '0' * Page.steplen
+    destination_permissions = [PermissionTuple(perm) for perm in (*view_permissions, *change_permissions)]
+    return not any(
+        permission.contains(root_path + descendant.path[len(page.path):])
+        for descendant in unreadable
+        for permission in destination_permissions
+    )
+
+
+def user_can_copy_descendants(user, page, site, parent_page, copy_permissions):
+    """Whether ``page`` may be copied below ``parent_page`` with its descendants."""
+    return user_can_relocate_descendants(
+        user, page, site, parent_page, keep_restrictions=copy_permissions
+    )
+
+
+def user_can_move_descendants(user, page, site, parent_page):
+    """Whether ``page`` may be moved below ``parent_page`` with its descendants.
+
+    A move always preserves the subtree's view restrictions, so only the
+    destination's own grants can widen access.
+    """
+    return user_can_relocate_descendants(user, page, site, parent_page)
 
 
 def get_add_perm_tuples(user, site, check_global=True, use_cache=True):
