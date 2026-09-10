@@ -423,7 +423,7 @@ class Page(MP_Node):
         else:
             self.parent.add_sibling(pos=position, instance=self)
 
-    def move_page(self, target_page, position="first-child"):
+    def move_page(self, target_page, position="first-child", user=None):
         """
         Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
@@ -431,6 +431,10 @@ class Page(MP_Node):
         """
         assert isinstance(target_page, Page), f"{target_page} is not an instance of Page."
         inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
+
+        # Snapshot before the move: the ancestors protecting this subtree stop
+        # doing so as soon as its path changes.
+        inherited_restrictions = self.get_view_restrictions(inherited_only=True)
 
         if inherited_template and target_page.is_root() and position in ("left", "right"):
             # The page is being moved to a root position.
@@ -455,6 +459,10 @@ class Page(MP_Node):
         self.update(parent=self.parent)
         self.refresh_from_db(fields=("path", "depth"))
 
+        # The subtree left the ancestors it inherited its view restrictions
+        # from, so they have to be materialized on its new root.
+        self.apply_view_restrictions(inherited_restrictions, user=user)
+
         # Update the urls for the page being moved and its descendants.
         _lock_tree_roots(self)
 
@@ -475,6 +483,85 @@ class Page(MP_Node):
         plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids, language=language)
         models.query.QuerySet.delete(plugins)
         return placeholders
+
+    def get_view_restrictions(self, inherited_only=False):
+        """Snapshot the ``can_view`` grants that currently protect this page.
+
+        Each entry is a ``(user_id, group_id, grant_on)`` tuple whose scope is
+        expressed relative to *this* page: a grant inherited from an ancestor
+        becomes ``ACCESS_PAGE_AND_DESCENDANTS`` when it also covers what is
+        below this page, and ``ACCESS_PAGE`` when it stops here. The page's own
+        rows keep their own scope.
+        """
+        from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_DESCENDANTS, PagePermission
+        from cms.models.permissionmodels import MASK_DESCENDANTS
+
+        if not get_cms_setting("PERMISSION"):
+            return []
+
+        restrictions = [
+            (
+                permission.user_id,
+                permission.group_id,
+                ACCESS_PAGE_AND_DESCENDANTS if permission.grant_on & MASK_DESCENDANTS else ACCESS_PAGE,
+            )
+            for permission in PagePermission.objects.for_page(self).filter(can_view=True)
+            if permission.page_id != self.pk
+        ]
+
+        if not inherited_only:
+            restrictions += [
+                (permission.user_id, permission.group_id, permission.grant_on)
+                for permission in self.pagepermission_set.filter(can_view=True)
+            ]
+        return restrictions
+
+    def apply_view_restrictions(self, restrictions, user=None):
+        """Recreate ``restrictions`` (from ``get_view_restrictions``) on this page.
+
+        Used when a page leaves the subtree its view restrictions came from: the
+        ancestors that protected it no longer do, so their grants have to be
+        materialized here. Only ``can_view`` is carried over -- the editing
+        privileges attached to the original rows are not privileges of the new
+        location. Grants the page already inherits at its new position with at
+        least the same scope are skipped, so repeated moves do not pile up
+        redundant rows.
+        """
+        from cms.cache.permissions import clear_permission_cache
+        from cms.models import PagePermission
+        from cms.models.permissionmodels import MASK_DESCENDANTS
+        from cms.utils.permissions import clear_permission_lru_caches
+
+        if not restrictions or not get_cms_setting("PERMISSION"):
+            return []
+
+        def scope(grant_on):
+            return 2 if grant_on & MASK_DESCENDANTS else 1
+
+        covered = {}
+        for permission in PagePermission.objects.for_page(self).filter(can_view=True):
+            audience = (permission.user_id, permission.group_id)
+            covered[audience] = max(covered.get(audience, 0), scope(permission.grant_on))
+
+        new_permissions = [
+            PagePermission(
+                page=self,
+                user_id=user_id,
+                group_id=group_id,
+                grant_on=grant_on,
+                **{flag: flag == "can_view" for flag in PagePermission.get_all_permissions()},
+            )
+            for user_id, group_id, grant_on in restrictions
+            if scope(grant_on) > covered.get((user_id, group_id), 0)
+        ]
+
+        if new_permissions:
+            PagePermission.objects.bulk_create(new_permissions)
+            # bulk_create does not emit the permission signals.
+            clear_permission_cache()
+            if user is not None:
+                clear_permission_lru_caches(user)
+        return new_permissions
 
     def copy(
         self,
@@ -565,7 +652,13 @@ class Page(MP_Node):
                 permissions_new.append(permission)
 
             if permissions_new:
+                from cms.cache.permissions import clear_permission_cache
+                from cms.utils.permissions import clear_permission_lru_caches
+
                 new_page.pagepermission_set.bulk_create(permissions_new)
+                # bulk_create does not emit the permission signals.
+                clear_permission_cache()
+                clear_permission_lru_caches(user)
         return new_page
 
     def copy_with_descendants(
@@ -602,7 +695,10 @@ class Page(MP_Node):
                 Prefetch("pagecontent_set", queryset=PageContent.admin_manager.all()),
             )
         )
-        new_root_page = self.copy(target_site, parent_page=parent_page, user=user)
+        if copy_permissions:
+            # Snapshot paths before inserting the copy can move source nodes.
+            inherited_restrictions = self.get_view_restrictions(inherited_only=True)
+        new_root_page = self.copy(target_site, parent_page=parent_page, permissions=copy_permissions, user=user)
 
         if target_page and position in ("first-child"):
             # target page is a parent and user has requested to
@@ -621,6 +717,10 @@ class Page(MP_Node):
             pages_by_id[page.id] = page.copy(
                 target_site, parent_page=parent, translations=True, permissions=copy_permissions, user=user
             )
+
+        if copy_permissions:
+            # Ancestors outside the copied subtree will no longer protect it.
+            new_root_page.apply_view_restrictions(inherited_restrictions, user=user)
         return new_root_page
 
     def delete(self, *args, **kwargs):

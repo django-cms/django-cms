@@ -1,0 +1,126 @@
+.. _upgrade-to-5.1.3:
+
+###################
+5.1.3 release notes
+###################
+
+*Month DD, YYYY*
+
+Welcome to django CMS 5.1.3!
+
+These release notes cover what has changed since django CMS 5.1.2. This patch
+release fixes broken access control in page-tree operations. Read the security
+fixes and their backward-incompatible effects before updating an existing
+project.
+
+If you are upgrading from django CMS 5.0.x or earlier, read the
+:ref:`5.1.0 release notes <upgrade-to-5.1.0>` first — they cover the backward
+incompatible changes, deprecations, and removals of the 5.1 series.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS 5.1 supports **Django 5.2, 6.0, and 6.1**. Django 4.2, 5.0, and
+5.1 are no longer supported because those series no longer receive upstream
+maintenance. We highly recommend and only support the latest release of each
+supported series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13, and 3.14**.
+
+***********************
+How to upgrade to 5.1.3
+***********************
+
+Before upgrading, back up your database and review the
+:ref:`backward-incompatible changes <upgrade-5.1.3-backward-incompatible>`
+below.
+
+Upgrade django CMS::
+
+    python -m pip install --upgrade "django-cms==5.1.3"
+
+Then collect static files and run the django CMS checks::
+
+    python manage.py collectstatic --noinput
+    python manage.py cms check
+
+This release adds no migrations.
+
+*******************
+What's new in 5.1.3
+*******************
+
+Security fixes
+==============
+
+This release fixes broken access control in the page tree's *Copy*, *Duplicate*
+and *Move* operations. All three require ``CMS_PERMISSION = True`` and at least
+one per-page view restriction: an installation that does not use the permission
+system has nothing to disclose, because ``Page.has_view_restrictions()`` is
+always ``False`` there. Each of them needs a staff session that may add pages;
+none is exploitable anonymously, but the content they expose is readable
+anonymously afterwards. We recommend that all users upgrade as soon as possible.
+
+`GHSA-976q-w6ch-6w82 <https://github.com/django-cms/django-cms/security/advisories/GHSA-976q-w6ch-6w82>`_
+covers all three, which share a root cause, their prerequisites and their fix:
+
+* *Copy* authorized only the root of the subtree it was asked to copy, while
+  every descendant below it was copied and recreated without its view
+  restrictions. A delegated editor who could view one public page therefore
+  obtained a publicly readable copy of every view-restricted page below it.
+  Selecting *Copy permissions* did not help: the flag was passed to the
+  descendants but not to the copied root, so the root lost its own permission
+  records as well. Copying now authorizes the whole subtree and preserves the
+  view restrictions the source inherited from ancestors outside it.
+* *Duplicate* created the new page with no permissions at all, so duplicating a
+  view-restricted page republished its content to anonymous visitors. The
+  duplicate now carries the source's view restrictions, both its own and the
+  ones it inherited.
+* *Move* dropped the view restrictions that a page and its descendants
+  inherited from the ancestors they left behind, exposing the pages themselves
+  -- including descendants the moving user was not allowed to view -- to
+  anonymous visitors. Moving now authorizes the whole subtree and materializes
+  the inherited view restrictions on the moved page.
+
+No action beyond upgrading is required. Pages that were copied, duplicated or
+moved *before* the upgrade keep the permissions they were created with, so
+review restricted branches for unrestricted copies made earlier.
+
+.. _upgrade-5.1.3-backward-incompatible:
+
+**************************************
+Backward incompatible changes in 5.1.3
+**************************************
+
+View restrictions follow pages that are copied, duplicated or moved
+===================================================================
+
+The security fixes above change how permissions behave around page copies and
+moves:
+
+* A page moved out of a restricted branch stays restricted at its new location.
+  The view grants it inherited are written to the moved page as ``can_view``
+  ``PagePermission`` rows (no other flag is carried over). To publish such a
+  page, remove the restriction explicitly -- which requires the *can change
+  permissions* right on it.
+* ``Page.move_page()`` accepts a new optional ``user`` argument and now writes
+  ``PagePermission`` rows. Pass the acting user so that the permission caches
+  are invalidated for them::
+
+      page.move_page(target, position, user=request.user)
+* The move endpoint answers ``403`` when the moved subtree contains pages the
+  user may not view and the destination would grant them access, mirroring the
+  behaviour of copy.
+* Two new methods support this: ``Page.get_view_restrictions()`` snapshots the
+  ``can_view`` grants that protect a page, and ``Page.apply_view_restrictions()``
+  recreates such a snapshot on a page at its new location. Code that relocates
+  pages outside of ``Page.move_page()`` or ``Page.copy_with_descendants()``
+  should use them.
+* ``cms.utils.page_permissions`` gained ``user_can_relocate_descendants()`` with
+  the thin wrappers ``user_can_copy_descendants()`` and
+  ``user_can_move_descendants()`` for authorizing an operation against a whole
+  subtree rather than its root.
+
+See :doc:`/explanation/permissions` for the full picture of how permissions
+behave when pages are moved, copied or deleted.
