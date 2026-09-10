@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 from django import forms
 from django.apps import apps
 from django.apps.registry import Apps
+from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.template import TemplateSyntaxError
@@ -17,6 +18,7 @@ from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.constants import MODAL_HTML_REDIRECT, TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 from cms.models import Page, UserSettings
+from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
@@ -26,6 +28,7 @@ from cms.toolbar.utils import (
 )
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from cms.utils.page_permissions import user_can_add_subpage
 from cms.utils.setup import setup_cms_apps
 from cms.utils.urlutils import admin_reverse
 from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
@@ -663,6 +666,99 @@ class TestPageWizardSubmission(CMSTestCase):
         self.assertEqual(new_page.parent_id, parent.pk)
         edit_endpoint = get_object_edit_url(new_page.get_content_obj("en"), "en")
         self.assertContains(response, MODAL_HTML_REDIRECT.format(url=edit_endpoint))
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_LANGUAGES={
+        1: [{"code": "en", "name": "English"}],
+        2: [{"code": "en", "name": "English"}],
+    },
+)
+class TestWizardSiteIsolation(CMSTestCase):
+    def setUp(self):
+        self.site = Site.objects.get_current()
+        self.other_site, _ = Site.objects.get_or_create(
+            pk=2, defaults={"domain": "other.example", "name": "Other site"},
+        )
+        self.local_parent = create_page("Local parent", "nav_playground.html", "en", site=self.site)
+        self.other_parent = create_page("Other parent", "nav_playground.html", "en", site=self.other_site)
+        self.other_child = create_page(
+            "Other child", "nav_playground.html", "en", site=self.other_site, parent=self.other_parent,
+        )
+        self.writer = self._create_user(
+            "site_writer", is_staff=True, permissions=["add_page", "change_page"],
+        )
+        permission = GlobalPagePermission.objects.create(user=self.writer, can_add=True, can_change=True)
+        permission.sites.add(self.site)
+
+    def test_cross_site_origin_is_rejected(self):
+        self.assertFalse(user_can_add_subpage(self.writer, self.other_parent, site=self.other_site))
+        endpoint = admin_reverse("cms_wizard_create")
+        page_count = Page.objects.count()
+
+        with self.login_user_context(self.writer):
+            response = self.client.post(endpoint, {
+                "wizard_create_view-current_step": "0",
+                "0-entry": cms_page_wizard.id,
+                "0-language": "en",
+                "0-page": self.other_child.pk,
+            })
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("page", response.context["wizard"]["form"].errors)
+            # Posting step 1 directly must not bypass the rejected origin.
+            response = self.client.post(endpoint, {
+                "wizard_create_view-current_step": "1",
+                "1-title": "Cross-site sibling",
+                "1-slug": "cross-site-sibling",
+            })
+            self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Page.objects.count(), page_count)
+
+    def test_same_site_subpage_submission(self):
+        endpoint = admin_reverse("cms_wizard_create")
+        with self.login_user_context(self.writer):
+            response = self.client.post(endpoint, {
+                "wizard_create_view-current_step": "0",
+                "0-entry": cms_subpage_wizard.id,
+                "0-language": "en",
+                "0-page": self.local_parent.pk,
+            })
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.context["wizard"]["steps"].current, "1")
+            response = self.client.post(endpoint, {
+                "wizard_create_view-current_step": "1",
+                "1-title": "Local child",
+                "1-slug": "local-child",
+            })
+            self.assertEqual(response.status_code, 200)
+
+        child = Page.objects.get(pagecontent_set__title="Local child")
+        self.assertEqual(child.site_id, self.site.pk)
+        self.assertEqual(child.parent_id, self.local_parent.pk)
+
+    def test_cross_site_parent_is_rejected_by_creation_forms(self):
+        # Tree integrity must also hold for direct form use, including
+        # superusers and projects without CMS per-page permissions.
+        with self.login_user_context(self.get_superuser()):
+            request = self.get_request()
+        for permissions_enabled in (True, False):
+            for form_class, origin in (
+                (CreateCMSPageForm, self.other_child),
+                (CreateCMSSubPageForm, self.other_parent),
+            ):
+                with self.subTest(permissions=permissions_enabled, form=form_class):
+                    with override_settings(CMS_PERMISSION=permissions_enabled):
+                        form = form_class(
+                            data={"title": "Cross-site page", "slug": "cross-site-page"},
+                            wizard_page=origin,
+                            wizard_site=self.site,
+                            wizard_language="en",
+                            wizard_request=request,
+                        )
+                        self.assertFalse(form.is_valid())
+                        self.assertIn("parent_page", form.errors)
 
 
 class TestWizardHelpers(CMSTestCase):
