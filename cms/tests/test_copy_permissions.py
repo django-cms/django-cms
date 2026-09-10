@@ -327,6 +327,7 @@ class DuplicatePermissionsTests(CMSTestCase):
                 },
             )
         self.actor = type(self.actor).objects.get(pk=self.actor.pk)
+        self.target.refresh_from_db()
         return response, self.target.get_child_pages().first()
 
     def test_duplicate_preserves_own_restriction(self):
