@@ -122,7 +122,7 @@ class WizardCreateView(SessionWizardView):
         else:
             page_pk = self.page_pk or self.request.GET.get('page', None)
             if page_pk and page_pk != 'None':
-                kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
+                kwargs['wizard_page'] = Page.objects.filter(pk=page_pk, site=self.site).first()
             else:
                 kwargs['wizard_page'] = None
             kwargs['wizard_language'] = get_site_language_from_request(
