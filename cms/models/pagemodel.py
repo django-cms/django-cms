@@ -652,7 +652,13 @@ class Page(MP_Node):
                 permissions_new.append(permission)
 
             if permissions_new:
+                from cms.cache.permissions import clear_permission_cache
+                from cms.utils.permissions import clear_permission_lru_caches
+
                 new_page.pagepermission_set.bulk_create(permissions_new)
+                # bulk_create does not emit the permission signals.
+                clear_permission_cache()
+                clear_permission_lru_caches(user)
         return new_page
 
     def copy_with_descendants(
