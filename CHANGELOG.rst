@@ -1,3 +1,29 @@
+5.1.3 (2026-09-10)
+==================
+
+Bug Fixes:
+----------
+* Wizard now rejects pages for other sites (#8848) (#8853) (10234a8d4) -- Fabian Braun
+* Preserve best-effort CMS mail delivery (#8842) (#8850) (#8851) (dde1fdf53) -- Fabian Braun
+* GrouperAdmin wrote to the wrong content object when one was selected by pk (#8826) (#8837) (b2126db1a) -- Fabian Braun
+* Slug uniqueness ignored site (#8831) (#8839) (721d7e5d5) -- Fabian Braun
+* Migration 0045 failed on PostgreSQL for databases with duplicate page paths (#8823) (#8835) (16cea2b03) -- Fabian Braun
+* Some inline editing modals did not contain _popup=1 query param for Django (#8816) (#8821) (592d11aa0) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 6 changelog entries, created with the help of the following contributors
+(in alphabetical order):
+
+* Fabian Braun (6 changelog entries)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 5.1.2 (2026-08-27)
 ==================
 
