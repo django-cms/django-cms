@@ -22,6 +22,7 @@ class MailTestCase(CMSTestCase):
         mail_page_user_change(user)
         self.assertEqual(len(mail.outbox), 1)
 
+
 @override_settings(
     TEMPLATES=[
         {
