@@ -190,6 +190,59 @@ CMS, rather than relying on a view restriction to conceal it in the
 admin.
 
 
+**********************************
+Moving, copying and deleting pages
+**********************************
+
+Because a view restriction can cascade to a page's descendants, who is
+allowed to see a page depends on *where that page sits* in the tree.
+Moving or copying a page therefore raises a question no permission form
+can answer on its own: should the page keep the audience it had, or
+adopt the one implied by its new position?
+
+django CMS answers it conservatively. No relocation may hand you — or
+the public — content you were not allowed to read in the first place,
+and a restriction is never dropped by accident:
+
+* **Move.** When a page leaves the branch whose ancestors restricted
+  it, those view grants are written onto the moved page itself. The
+  page, and everything below it, stays as restricted at its new
+  position as it was at the old one. Publishing it is a separate,
+  deliberate act: remove the restriction, which requires the *can
+  change permissions* right on the page.
+* **Copy and paste.** Here you choose. The *Copy permissions* checkbox
+  in the paste dialog — shown only with ``CMS_PERMISSION = True`` —
+  decides whether the pasted pages keep the permission rows of the
+  originals, edit rights included. Ticked, the copy is as restricted as
+  the source, inherited restrictions included. Cleared, the copy has no
+  permissions at all, and the paste is refused if the subtree contains
+  a page you are not allowed to view.
+* **Duplicate.** Duplicating a single page always carries its view
+  restrictions across, its own and the ones it inherited. It never
+  copies edit rights.
+
+Both move and paste are refused outright when the subtree contains
+pages you may not view *and* the destination would grant you access to
+them — for instance when you hold "can change" on the target page and
+its descendants. Change permission implies view permission, so such a
+relocation would hand you content you could not read before.
+
+Deleting needs no rule of its own: deleting a page deletes its
+descendants, and the confirmation step checks your delete permission on
+every one of them. A branch that contains a page you may not delete
+cannot be deleted at its root either.
+
+So an editor who owns a restricted branch cannot publish it by dragging
+it out of the branch, nor by duplicating it. Copying it with *Copy
+permissions* cleared does produce an unrestricted copy — but only of
+pages that editor was already allowed to read.
+
+..  versionchanged:: 5.2
+    Earlier versions dropped the inherited view restrictions when a page
+    was moved, copied with descendants, or duplicated, and authorized
+    only the root of a copied or moved subtree.
+
+
 *************************
 Delegated user management
 *************************
