@@ -119,6 +119,19 @@ class CopyPermissionsTests(CMSTestCase):
         self.assertTrue(copied.pagepermission_set.filter(user=self.actor, can_view=True).exists())
         self.assertEqual(self.client.get(copied.get_absolute_url()).status_code, 404)
 
+    def test_copy_permissions_invalidates_permission_caches(self):
+        self.add_page_permission(self.actor, self.source, can_change=True, grant_on=ACCESS_PAGE)
+        self.assertTrue(page_permissions.user_can_change_page(self.actor, self.source))
+
+        copied = self.source.copy(
+            self.source.site,
+            parent_page=self.target,
+            permissions=True,
+            user=self.actor,
+        )
+
+        self.assertTrue(page_permissions.user_can_change_page(self.actor, copied))
+
     def test_readable_descendants_can_be_copied_without_permissions(self):
         self.add_page_permission(self.actor, self.secret, can_view=True, grant_on=ACCESS_PAGE)
         response = self.copy("")
