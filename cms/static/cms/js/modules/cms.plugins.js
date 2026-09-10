@@ -1087,7 +1087,7 @@ class Plugin {
         var isTouching;
         var plugins;
 
-        var initModal = once(function initModal() {
+        var initModal = once(function initializeModal() {
             var placeholder = $(
                 '<div class="cms-add-plugin-placeholder">' + CMS.config.lang.addPluginPlaceholder + '</div>'
             );

@@ -2,18 +2,19 @@
 // #IMPORTS#
 const gulp = require('gulp');
 const fs = require('fs');
+const path = require('path');
+const { Writable } = require('stream');
+const { finished } = require('stream/promises');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cleanCSS = require('gulp-clean-css');
 const browserSync = require('browser-sync').create();
 const gulpif = require('gulp-if');
-const iconfont = require('gulp-iconfont');
 const iconfontCss = require('gulp-iconfont-css');
 const gulpSass = require('gulp-sass')(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 const eslint = require('gulp-eslint-new');
 const webpack = require('webpack');
-const { Server: KarmaServer, config: karmaConfig } = require('karma');
 
 // Logging utilities to replace gulp-util
 const log = {
@@ -45,7 +46,8 @@ const PROJECT_PATTERNS = {
         PROJECT_PATH.js + '/widgets/*.js',
         PROJECT_PATH.js + '/*.js',
         PROJECT_PATH.tests + '/**/*.js',
-        '!' + PROJECT_PATH.tests + '/unit/helpers/**/*.js',
+        '!' + PROJECT_PATH.tests + '/unit/helpers/jasmine-jquery.js',
+        '!' + PROJECT_PATH.tests + '/unit/helpers/mock-ajax.js',
         '!' + PROJECT_PATH.tests + '/coverage/**/*.js',
         '!' + PROJECT_PATH.js + '/modules/jquery.*.js',
         '!' + PROJECT_PATH.js + '/dist/*.js'
@@ -111,6 +113,7 @@ const INTEGRATION_TESTS = [
 ];
 
 const CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' }).match(/__version__ = '(.*?)'/)[1];
+const FIRST_ICON_CODEPOINT = Number('0xE001');
 
 function sass() {
     return gulp
@@ -132,24 +135,56 @@ function sass() {
         .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
 }
 
-function icons() {
-    return gulp
-        .src(PROJECT_PATTERNS.icons)
+async function icons() {
+    const { default: iconfont } = await import('gulp-iconfont');
+    const iconFiles = fs.readdirSync(PROJECT_PATH.icons + '/src')
+        .filter(file => file.endsWith('.svg'))
+        .sort()
+        .map(file => path.join(PROJECT_PATH.icons, 'src', file));
+    const codepoints = new Map(iconFiles.map((file, index) => [
+        path.basename(file, '.svg'),
+        FIRST_ICON_CODEPOINT + index
+    ]));
+    const stylesheetSink = new Writable({
+        objectMode: true,
+        write(file, encoding, callback) {
+            if (file.extname === '.scss') {
+                fs.writeFile(file.path, file.contents, callback);
+            } else {
+                callback();
+            }
+        }
+    });
+    const stylesheetStream = gulp
+        .src(iconFiles)
         .pipe(iconfontCss({
             fontName: 'django-cms-iconfont',
             path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
             targetPath: '../../sass/components/_iconography.scss',
-            fontPath: '../../fonts/' + CMS_VERSION + '/'
+            fontPath: '../../fonts/' + CMS_VERSION + '/',
+            fixedCodepoints: Object.fromEntries(codepoints)
         }))
-        .pipe(iconfont({
-            fontName: 'django-cms-iconfont',
-            normalize: true,
-            formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
-        }))
-        .on('glyphs', function(glyphs, opts) {
-            // Icon font glyphs generated
-        })
-        .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
+        .pipe(stylesheetSink);
+    const fontStream = iconfont(iconFiles, {
+        fontName: 'django-cms-iconfont',
+        metadataProvider(file, callback) {
+            const name = path.basename(file, '.svg');
+            const codepoint = codepoints.get(name);
+
+            Promise.resolve().then(() => callback(null, {
+                path: file,
+                name,
+                unicode: [String.fromCodePoint(codepoint)],
+                renamed: false
+            }));
+        },
+        normalize: true,
+        formats: ['svg', 'ttf', 'eot', 'woff', 'woff2'],
+        // Font timestamps do not affect rendering; keep checked-in assets reproducible.
+        timestamp: 1
+    }).pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
+
+    return Promise.all([finished(stylesheetStream), finished(fontStream)]);
 }
 
 function lint() {
@@ -162,25 +197,19 @@ function lint() {
                 .pipe(eslint.failAfterError());
 }
 
-const unitTest = async (done) => {
-    try {
-        const parsedConfig = await karmaConfig.parseConfig(
-            PROJECT_PATH.tests + '/karma.conf.js',
-            { singleRun: true },
-            { promiseConfig: true, throwErrors: true }
-        );
-        const server = new KarmaServer(parsedConfig, (exitCode) => {
-            if (exitCode !== 0) {
-                done(new Error(`Karma tests failed with exit code ${exitCode}`));
-                process.exit(exitCode);
-            } else {
-                done();
-            }
-        });
-        server.start();
-    } catch (error) {
-        done(error);
-    }
+const unitTest = (done) => {
+    const { spawn } = require('child_process');
+    const args = process.argv.slice(3).filter((arg) => !arg.startsWith('--tests'));
+    const child = spawn('npx', ['vitest', 'run'].concat(args), { stdio: 'inherit', shell: true });
+
+    child.on('exit', (code) => {
+        if (code !== 0) {
+            done(new Error(`Unit tests failed with exit code ${code}`));
+            process.exit(code);
+        } else {
+            done();
+        }
+    });
 };
 
 const testsIntegration = (done) => {
@@ -190,6 +219,16 @@ const testsIntegration = (done) => {
     const baseUrl = process.env.BASE_URL || 'http://localhost:9009';
     const port = argv.port || 9009;
     const serverArgs = argv.serverArgs || '';
+
+    // testserver.py runs with migrations disabled and creates missing tables via
+    // `migrate --run-syncdb`, which never alters an existing schema. A database
+    // left over from an older checkout therefore fails every request with a
+    // column that does not exist, so start each run from a fresh one. Skipped
+    // when DATABASE_URL points somewhere else.
+    if (!process.env.DATABASE_URL) {
+        fs.rmSync('testdb.sqlite', { force: true });
+        log.info('Removed the previous test database');
+    }
 
     log.info('Starting Django test server...');
 

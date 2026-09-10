@@ -47,7 +47,6 @@
                 "django.contrib.sites",
                 "cms",
                 "menus",
-                "treebeard",
                 "sekizai",
                 "filer",
                 "easy_thumbnails",
