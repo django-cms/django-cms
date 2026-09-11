@@ -74,9 +74,16 @@ def _get_page_permission_tuples_for_action(user, site, action, check_global=True
         return cached
 
     page_actions = get_page_actions(user, site)
-    # Set cache for all actions calculated
-    for act, page_paths in page_actions.items():
-        set_permission_cache(user, act, list(page_paths))
+
+    if use_cache:
+        # Set cache for all actions calculated. Only ever write when the cache
+        # was consulted as well: the cache key has no site component, while
+        # ``page_actions`` is filtered by ``site``. Callers that pass
+        # ``use_cache=False`` do so to evaluate a *different* site (a copy or
+        # move target), and writing those tuples back would leave the user's
+        # permission cache describing the wrong site until it expires.
+        for act, page_paths in page_actions.items():
+            set_permission_cache(user, act, list(page_paths))
     return page_actions[action]
 
 
@@ -370,6 +377,68 @@ def _perm_tuples_to_ids(perm_tuples):
     return list(Page.objects.filter(allowed_pages).values_list('pk', flat=True))
 
 
+def _view_restricted_paths(pages, site):
+    """Paths of ``pages`` that carry a view restriction, resolved in one query.
+
+    Equivalent to ``page.has_view_restrictions(site)`` per page -- the grants of
+    an ancestor are matched by path, exactly like
+    :meth:`~cms.models.managers.PagePermissionManager.for_page` matches them by
+    ancestor path -- but without a query per page. Grants of other sites cannot
+    match because tree roots, and therefore path prefixes, are unique per root.
+    """
+    from cms.models import PagePermission
+
+    if not get_cms_setting('PERMISSION'):
+        return set()
+
+    grants = [
+        PermissionTuple(grant)
+        for grant in (
+            PagePermission
+            .objects
+            .filter(can_view=True, page__site=site)
+            .values_list('grant_on', 'page__path')
+        )
+    ]
+    if not grants:
+        return set()
+    return {
+        page.path for page in pages
+        if any(grant.contains(page.path) for grant in grants)
+    }
+
+
+def _unreadable_descendants(user, page):
+    """The descendants of ``page`` that ``user`` may not view.
+
+    Runs on every page-tree move, so it avoids the per-descendant permission
+    query a naive loop would issue on large subtrees.
+    """
+    site = page.site
+
+    if user_can_view_all_pages(user, site):
+        # Every descendant is viewable, whatever its restrictions.
+        return []
+
+    descendants = list(page.get_descendant_pages())
+    public_for = get_cms_setting('PUBLIC_FOR')
+    can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
+
+    if can_see_unrestricted:
+        # Unrestricted pages are viewable by definition, so only the restricted
+        # ones have to be checked one by one.
+        restricted_paths = _view_restricted_paths(descendants, site)
+        descendants = [
+            descendant for descendant in descendants
+            if descendant.path in restricted_paths
+        ]
+
+    return [
+        descendant for descendant in descendants
+        if not user_can_view_page(user, descendant, site)
+    ]
+
+
 def user_can_relocate_descendants(user, page, site, parent_page, keep_restrictions=True):
     """Allow unreadable descendants only when they stay unreadable at ``parent_page``.
 
@@ -378,10 +447,7 @@ def user_can_relocate_descendants(user, page, site, parent_page, keep_restrictio
     view restrictions. Destination grants can nevertheless widen access: change
     permission also confers view access, even on a restricted page.
     """
-    unreadable = [
-        descendant for descendant in page.get_descendant_pages()
-        if not user_can_view_page(user, descendant, page.site)
-    ]
+    unreadable = _unreadable_descendants(user, page)
     if not unreadable:
         return True
     if not keep_restrictions:

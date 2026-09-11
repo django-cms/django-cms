@@ -520,6 +520,16 @@ class Page(MP_Node):
             audience = (permission.user_id, permission.group_id)
             covered[audience] = max(covered.get(audience, 0), scope(permission.grant_on))
 
+        # ``restrictions`` may name the same audience more than once -- a
+        # grandparent granting ACCESS_DESCENDANTS and the direct parent
+        # ACCESS_PAGE_AND_CHILDREN both protect this page. Keep only the widest
+        # grant per audience so a relocation writes at most one row for each.
+        widest = {}
+        for user_id, group_id, grant_on in restrictions:
+            audience = (user_id, group_id)
+            if audience not in widest or scope(grant_on) > scope(widest[audience]):
+                widest[audience] = grant_on
+
         new_permissions = [
             PagePermission(
                 page=self,
@@ -528,7 +538,7 @@ class Page(MP_Node):
                 grant_on=grant_on,
                 **{flag: flag == "can_view" for flag in PagePermission.get_all_permissions()},
             )
-            for user_id, group_id, grant_on in restrictions
+            for (user_id, group_id), grant_on in widest.items()
             if scope(grant_on) > covered.get((user_id, group_id), 0)
         ]
 

@@ -560,8 +560,19 @@ class DuplicatePageForm(AddPageForm):
         # ``copy(..., permissions=False)`` even strips the source's view
         # restrictions, leaving the copy fully readable. Require that the user
         # is actually allowed to view the page they are copying.
-        if source and not user_can_view_page(self._user, source):
-            raise ValidationError(_("You do not have permission to copy this page."))
+        #
+        # The check has to run against ``source``'s own site: page and global
+        # permissions are both site-scoped, so falling back to the *current*
+        # site would let grants on the site being edited satisfy the check for
+        # a restricted page on an unrelated site. Only same-site sources are
+        # reachable through the admin (the duplicate view resolves the page
+        # through the site-filtered admin queryset), so a source from another
+        # site is a forged POST and is rejected outright.
+        if source:
+            if source.site_id != self._site.pk:
+                raise ValidationError(_("You do not have permission to copy this page."))
+            if not user_can_view_page(self._user, source, site=source.site):
+                raise ValidationError(_("You do not have permission to copy this page."))
         return source
 
     def from_source(self, source, parent=None):

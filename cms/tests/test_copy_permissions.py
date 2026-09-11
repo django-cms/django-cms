@@ -3,9 +3,11 @@ from django.contrib.sites.models import Site
 from django.test import override_settings
 
 from cms.api import add_plugin, create_page
+from cms.cache.permissions import get_permission_cache
 from cms.models import (
     ACCESS_CHILDREN,
     ACCESS_PAGE,
+    ACCESS_PAGE_AND_CHILDREN,
     ACCESS_PAGE_AND_DESCENDANTS,
     CMSPlugin,
     Page,
@@ -105,6 +107,52 @@ class CopyPermissionsTests(CMSTestCase):
         self.assertFalse(page_permissions.user_can_view_page(self.actor, self.secret))
         with self.settings(SITE_ID=site.pk):
             self.assertCopyDenied("on")
+
+    @override_settings(
+        CMS_LANGUAGES={
+            1: [{"code": "en", "name": "English"}],
+            2: [{"code": "en", "name": "English"}],
+        }
+    )
+    def test_destination_site_probe_does_not_poison_permission_cache(self):
+        """Probing the destination site must not overwrite the source site's cache.
+
+        The permission cache key has no site component, while the tuples it
+        holds are filtered by site. A copy or move to another site evaluates
+        that site's permissions with ``use_cache=False``; writing the result
+        back would leave every later check on the current site reading the
+        wrong site's paths until the entry expires.
+        """
+        other_site = Site.objects.create(domain="destination.example", name="Destination")
+        other_target = create_page("other-site", "nav_playground.html", "en", site=other_site)
+        self.add_page_permission(self.actor, other_target, can_change=True, grant_on=ACCESS_PAGE)
+
+        expected = page_permissions.get_change_perm_tuples(self.actor, self.target.site)
+        self.assertEqual(get_permission_cache(self.actor, "change_page"), list(expected))
+
+        page_permissions.get_change_perm_tuples(self.actor, other_site, use_cache=False)
+
+        self.assertEqual(get_permission_cache(self.actor, "change_page"), list(expected))
+
+    def test_inherited_restrictions_are_not_duplicated_per_audience(self):
+        """Two inherited grants for the same audience must yield a single row."""
+        group = Group.objects.create(name="Inherited viewers")
+        ancestor = create_page("dedup-ancestor", "nav_playground.html", "en")
+        parent = create_page("dedup-parent", "nav_playground.html", "en", parent=ancestor)
+        page = create_page("dedup-page", "nav_playground.html", "en", parent=parent)
+        self.add_page_permission(
+            None, ancestor, group=group, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS
+        )
+        self.add_page_permission(
+            None, parent, group=group, can_view=True, grant_on=ACCESS_PAGE_AND_CHILDREN
+        )
+        self.assertEqual(len(page.get_view_restrictions(inherited_only=True)), 2)
+
+        page.move_page(self.target, position="last-child", user=self.admin)
+
+        rows = page.pagepermission_set.filter(group=group, can_view=True)
+        self.assertEqual(rows.count(), 1)
+        self.assertEqual(rows.get().grant_on, ACCESS_PAGE_AND_DESCENDANTS)
 
     def test_unreadable_grandchild_requires_copy_permissions(self):
         self.secret.pagepermission_set.all().delete()

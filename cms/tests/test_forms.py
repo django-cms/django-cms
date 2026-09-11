@@ -25,7 +25,7 @@ from cms.forms.utils import (
     update_site_and_page_choices,
 )
 from cms.forms.widgets import ApplicationConfigSelect
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, Page
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, GlobalPagePermission, Page
 from cms.test_utils.testcases import (
     URL_CMS_PAGE_ADVANCED_CHANGE,
     URL_CMS_PAGE_PERMISSIONS,
@@ -565,6 +565,32 @@ class DuplicatePageFormSecurityTestCase(CMSTestCase):
         self.add_page_permission(superuser, secret, can_view=True)
 
         attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, secret)
+            self.assertFalse(form.is_valid())
+            self.assertIn("source", form.errors)
+
+    def test_duplicate_rejects_source_from_another_site(self):
+        """A source on another site must not be validated against the *current*
+        site's permissions.
+
+        Page and global permissions are site-scoped, so a staff user holding
+        global view/change rights on the site being edited would otherwise pass
+        the check for a restricted page on an unrelated site, duplicate it into
+        a site they control, and read its content there.
+        """
+        superuser = self.get_superuser()
+        other_site = Site.objects.create(domain="other.example.com", name="other.example.com")
+        secret = create_page(
+            "secret", "nav_playground.html", "de", site=other_site, created_by=superuser
+        )
+        self.add_page_permission(superuser, secret, can_view=True)
+
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+        GlobalPagePermission.objects.create(
+            user=attacker, can_view=True, can_change=True, can_add=True
+        ).sites.add(Site.objects.get_current())
 
         with self.settings(CMS_PERMISSION=True):
             form = self._build_form(attacker, secret)

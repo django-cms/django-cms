@@ -237,10 +237,11 @@ it out of the branch, nor by duplicating it. Copying it with *Copy
 permissions* cleared does produce an unrestricted copy — but only of
 pages that editor was already allowed to read.
 
-..  versionchanged:: 5.2
+..  versionchanged:: 5.0.12
     Earlier versions dropped the inherited view restrictions when a page
     was moved, copied with descendants, or duplicated, and authorized
-    only the root of a copied or moved subtree.
+    only the root of a copied or moved subtree. The same fix ships in
+    5.1.3 and 5.2.
 
 
 *************************
