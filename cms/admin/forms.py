@@ -285,6 +285,7 @@ class AddPageForm(BasePageContentForm):
     content_defaults = {
         "in_navigation": get_cms_setting("DEFAULT_IN_NAVIGATION"),
     }
+    source_permission_denied = _("You do not have permission to use this page type.")
 
     class Meta:
         model = PageContent
@@ -310,8 +311,13 @@ class AddPageForm(BasePageContentForm):
             titles = PageContent.objects.filter(page__in=descendants, language=self._language)
             choices = [("", "---------")]
             choices.extend((title.page_id, title.title) for title in titles)
+            # Narrow the queryset and not just the choices: ``source`` is validated
+            # against the queryset, which otherwise spans the page types of every
+            # site, while the choices are merely what the widget renders.
+            source_field.queryset = descendants
             source_field.choices = choices
         else:
+            source_field.queryset = source_field.queryset.none()
             choices = []
 
         if len(choices) < 2:
@@ -346,6 +352,16 @@ class AddPageForm(BasePageContentForm):
         else:
             data["path"] = path
         return data
+
+    def clean_source(self):
+        source = self.cleaned_data.get("source")
+        # ``source`` is a hidden field whose value is fully controlled by the
+        # client on POST and ``has_add_permission`` only checks that the user may
+        # create *a* page, not that they may read ``source`` -- whose placeholders,
+        # plugins and extensions ``save()`` copies into the new page.
+        if source and not user_can_view_page(self._user, source):
+            raise ValidationError(self.source_permission_denied)
+        return source
 
     def clean_parent_page(self):
         parent_page = self.cleaned_data.get("parent_page")
@@ -415,6 +431,10 @@ class AddPageForm(BasePageContentForm):
             user=self._user,
         )
         new_page.update(is_page_type=False)
+        # ``Page.copy()`` is called with ``permissions=False``, so a copy of a
+        # view-restricted source would be world-readable. Carry the source's view
+        # restrictions -- its own and the ones it inherits -- over to the copy.
+        new_page.apply_view_restrictions(source.get_view_restrictions(), user=self._user)
         return new_page
 
     def get_template(self):
@@ -557,24 +577,7 @@ class DuplicatePageForm(AddPageForm):
         required=True,
         widget=forms.HiddenInput(),
     )
-
-    def clean_source(self):
-        source = self.cleaned_data.get("source")
-        # ``source`` is a hidden field whose value is fully controlled by the
-        # client on POST and whose queryset spans every page on every site.
-        # ``has_add_permission`` only checks that the user may create *a* page,
-        # not that they may read ``source``.
-        if source and not user_can_view_page(self._user, source):
-            raise ValidationError(_("You do not have permission to copy this page."))
-        return source
-
-    def from_source(self, source, parent=None):
-        new_page = super().from_source(source, parent=parent)
-        # ``Page.copy()`` is called with ``permissions=False``, so a duplicate of
-        # a view-restricted page would be world-readable. Carry the source's view
-        # restrictions -- its own and the ones it inherits -- over to the copy.
-        new_page.apply_view_restrictions(source.get_view_restrictions(), user=self._user)
-        return new_page
+    source_permission_denied = _("You do not have permission to copy this page.")
 
 
 class ChangePageForm(BasePageContentForm):
