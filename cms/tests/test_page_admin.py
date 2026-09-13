@@ -2745,16 +2745,15 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_user_can_change_template(self):
         """
-        User can change a page's template if he
-        has change permissions on the Page model and both
-        global change and change advanced settings permissions.
+        The template lives on the page content, so changing it needs the change
+        permission on the page -- not the *change advanced settings* one.
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = self.get_page_change_template_uri("en", page)
 
         self.add_permission(staff_user, "change_page")
-        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=True)
+        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=False)
 
         with self.login_user_context(staff_user):
             page._clear_internal_cache()
@@ -2765,16 +2764,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_user_cant_change_template(self):
         """
-        User can't change a page's template if he
-        does not have change permissions on the Page model,
-        global change permissions and/or global change advanced settings
-        permissions.
+        User can't change a page's template without the change permission on
+        the Page model or without global change permissions.
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = self.get_page_change_template_uri("en", page)
 
-        self.add_permission(staff_user, "change_page")
         self.add_global_permission(staff_user, can_change=True)
 
         with self.login_user_context(staff_user):
@@ -2782,6 +2778,27 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(page.get_template(), "nav_playground.html")
+
+    def test_user_can_change_template_on_change_form(self):
+        """
+        The template field of the page content change form is governed by the
+        change permission, like every other field of that form.
+        """
+        page = self.get_permissions_test_page()
+        translation = page.get_admin_content("en")
+        staff_user = self.get_staff_user_with_no_permissions()
+        endpoint = self.get_admin_url(PageContent, "change", translation.pk) + "?language=en"
+
+        self.add_permission(staff_user, "change_page")
+        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=False)
+
+        with self.login_user_context(staff_user):
+            self.assertContains(self.client.get(endpoint), 'name="template"')
+            response = self.client.post(endpoint, self._get_page_data(template="simple.html"))
+
+        self.assertEqual(response.status_code, 302)
+        translation.refresh_from_db()
+        self.assertEqual(translation.template, "simple.html")
 
     def test_user_can_view_page_permissions_summary(self):
         """

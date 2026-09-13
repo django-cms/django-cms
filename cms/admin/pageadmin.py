@@ -1183,9 +1183,6 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page_content is None:
             raise self._get_404_exception(object_id)
 
-        if not self.has_change_advanced_settings_permission(request, obj=page_content):
-            raise PermissionDenied("No permissions to change the template")
-
         to_template = request.POST.get("template", None)
 
         if get_cms_setting("TEMPLATES"):
