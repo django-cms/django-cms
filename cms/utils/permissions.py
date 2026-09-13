@@ -14,6 +14,28 @@ from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
+
+class _CurrentUserRef:
+    """Identity-comparable holder for the value of :data:`_current_user`.
+
+    ``request.user`` is a ``SimpleLazyObject``, and asgiref compares context
+    variables when it restores a context after handing control back to the
+    event loop (``asgiref.sync._restore_context``). Comparing a lazy user
+    evaluates it, which runs the auth backend's database query on the event
+    loop thread and raises ``SynchronousOnlyOperation`` -- in some asgiref
+    versions before the result future is completed, hanging the request.
+
+    Storing the user behind this wrapper keeps the context variable cheap to
+    compare (default identity equality) so the user is only evaluated where
+    django CMS actually reads it, in synchronous code.
+    """
+
+    __slots__ = ('user',)
+
+    def __init__(self, user):
+        self.user = user
+
+
 # context variable support for async-safe user tracking
 _current_user: ContextVar = ContextVar('current_user', default=None)
 
@@ -26,7 +48,7 @@ def set_current_user(user):
     Returns the ``contextvars.Token`` for the change, so callers can restore
     the previous value with :func:`reset_current_user`.
     """
-    return _current_user.set(user)
+    return _current_user.set(_CurrentUserRef(user) if user is not None else None)
 
 
 def reset_current_user(token):
@@ -41,7 +63,8 @@ def get_current_user():
     """
     Returns current user, or None
     """
-    return _current_user.get()
+    ref = _current_user.get()
+    return ref.user if ref is not None else None
 
 
 def get_current_user_name():
