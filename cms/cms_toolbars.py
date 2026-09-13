@@ -75,7 +75,6 @@ TOOLBAR_DISABLE_BREAK = "Toolbar disable Break"
 SHORTCUTS_BREAK = "Shortcuts Break"
 
 DEFAULT_HELP_MENU_ITEMS = (
-    (_("Getting started developer guide"), "https://docs.django-cms.org/en/stable/introduction/index.html"),
     (_("Documentation"), "https://docs.django-cms.org/en/stable/"),
     (_("User guide"), "https://user-guide.django-cms.org"),
     (_("Discord community"), "https://www.django-cms.org/discord"),
