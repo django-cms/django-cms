@@ -64,8 +64,16 @@ extensions = [
     'sphinx.ext.todo',
     "sphinx_copybutton",
     "sphinx_design",
+    "sphinx_reredirects",
     "sphinxext.opengraph",
     ]
+
+# Redirects for documents that have been moved or removed.
+# Targets starting with "/" are relative to the documentation root.
+redirects = {
+    "introduction/index": "/index.html",
+}
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'django': ('https://docs.djangoproject.com/en/4.2/', 'https://docs.djangoproject.com/en/4.2/_objects/'),
