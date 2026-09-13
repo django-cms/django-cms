@@ -9,7 +9,7 @@ from django.urls import path
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import SimpleLazyObject
 
-from cms.signals.apphook import DISPATCH_UID, trigger_restart
+from cms.signals.apphook import DISPATCH_UID, set_restart_trigger, trigger_restart
 from cms.utils.permissions import (
     _current_user,
     current_user,
@@ -98,7 +98,11 @@ class CurrentUserMiddlewareAsyncTests(SimpleTestCase):
     def setUp(self):
         # Another test may have armed the apphook restart trigger, which hits
         # the database from request_finished and is unrelated to this test.
-        request_finished.disconnect(trigger_restart, dispatch_uid=DISPATCH_UID)
+        # Disarm it for the duration of the test and re-arm it afterwards so
+        # the signal is left exactly as it was found.
+        was_armed = request_finished.disconnect(trigger_restart, dispatch_uid=DISPATCH_UID)
+        if was_armed:
+            self.addCleanup(set_restart_trigger)
 
     async def test_asgi_request_with_unevaluated_lazy_user(self):
         with patch("django.contrib.auth.middleware.get_user", sync_only_user):
