@@ -6,6 +6,7 @@ sphinx-copybutton
 sphinxext-opengraph
 sphinxcontrib-spelling
 sphinx-design
+sphinx-reredirects
 pyenchant>3
 sphinx-autobuild
 datetime
