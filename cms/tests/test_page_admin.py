@@ -3310,13 +3310,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
         endpoint = self.get_admin_url(Page, "advanced", page.pk) + "?language=en"
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         with self.login_user_context(self.get_superuser()):
             data = self._get_page_permissions_data(page=page.pk, user=staff_user.pk)
             data["_continue"] = "1"
             self.client.post(endpoint, data)
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_permission_cache_invalidation_on_group_add(self):
         """
@@ -3326,13 +3326,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         group = Group(name="test_group")
         group.save()
         staff_user.groups.add(group)
 
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_permission_cache_invalidation_on_group_remove(self):
         """
@@ -3346,11 +3346,11 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         group.save()
         staff_user.groups.add(group)
 
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         group.user_set.remove(staff_user)
 
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_user_can_copy_page(self):
         """

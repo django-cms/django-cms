@@ -73,6 +73,7 @@ from cms.signals.apphook import set_restart_trigger
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import get_site_from_request, jsonify_request
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_language_list,
@@ -969,7 +970,10 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
             from cms.cache.permissions import get_cache_key, get_cache_permission_version
 
-            cache.delete(get_cache_key(request.user, "change_page"), version=get_cache_permission_version())
+            cache.delete(
+                get_cache_key(request.user, obj.page.site, "change_page"),
+                version=get_cache_permission_version(),
+            )
 
             # redirect to the edit view if added from the toolbar
             url = get_object_edit_url(obj)  # Redirects to preview if necessary
@@ -1090,11 +1094,38 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return user_sites
 
     def user_can_access_site(self, request):
+        """
+        .. deprecated:: 5.2
+            Unused. Site isolation is enforced by ``has_change_permission``,
+            which checks ``user_can_change_at_least_one_page`` against the site
+            of the request.
+        """
+        import warnings
+
+        warnings.warn(
+            "PageContentAdmin.user_can_access_site() is deprecated and unused. "
+            "Use has_change_permission(request) instead, which already scopes the check to the "
+            "site of the request.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         site = get_site_from_request(request)
         user_sites = self.get_sites_for_user(request.user)
         return site in user_sites
 
     def raise_site_permission_denied(self):
+        """
+        .. deprecated:: 5.2
+            Unused. Raise ``django.core.exceptions.PermissionDenied`` directly.
+        """
+        import warnings
+
+        warnings.warn(
+            "PageContentAdmin.raise_site_permission_denied() is deprecated and unused. "
+            "Raise django.core.exceptions.PermissionDenied directly instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         raise PermissionDenied(_("You do not have permission to access this site. Please contact your administrator."))
 
     def changelist_view(self, request, extra_context=None):
