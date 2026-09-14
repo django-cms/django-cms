@@ -329,6 +329,25 @@ class ApphooksTestCase(BaseApphooksTestCase):
         self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_on_page_type_is_not_routed(self):
+        """Page types are not served on the public site. An apphook attached to
+        one must not be dispatched either -- its patterns are matched before the
+        catch-all ``cms.views.details`` route, which would bypass the check
+        there."""
+        en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
+
+        with force_language("en"):
+            path = reverse('sample-settings')
+
+        self.assertEqual(self.client.get(path).status_code, 200)
+
+        en_title.page.update(is_page_type=True)
+        self.reload_urls()
+
+        self.assertEqual(self.client.get(path).status_code, 404)
+        self.apphook_clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphook_permissions(self):
         en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
 

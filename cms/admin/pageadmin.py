@@ -87,6 +87,10 @@ from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
 
+#: Upper bound for the number of pages :meth:`PageAdmin.get_list` returns. The
+#: view feeds an autocomplete, so a full inventory of the site is never useful.
+PAGE_SMART_LINK_MAX_RESULTS = 50
+
 
 class PageDeleteMessageMixin:
     """Expressive and simplified delete confirmation message for pages and translations."""
@@ -376,8 +380,13 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             site = get_site_from_request(request)
             query_term = request.GET.get("q", "").strip("/")
 
+            if not query_term:
+                # ``icontains`` matches every page for an empty term, which would
+                # turn this autocomplete into a full listing of the site.
+                return HttpResponse(json.dumps([]), content_type="application/json")
+
             language_code = request.GET.get("language_code", settings.LANGUAGE_CODE)
-            matching_published_pages = (
+            matching_pages = (
                 self.model.objects.on_site(site)
                 .filter(
                     Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
@@ -385,12 +394,14 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                     | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
                     | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
                 )
+                # Page types are blueprints for new pages, not link targets.
+                .filter(is_page_type=False)
                 .prefetch_related("urls", "pagecontent_set")
-                .distinct()
+                .distinct()[:PAGE_SMART_LINK_MAX_RESULTS]
             )
 
             results = []
-            for page in matching_published_pages:
+            for page in matching_pages:
                 results.append(
                     {
                         "path": page.get_path(language=language_code),
@@ -1213,9 +1224,6 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         if page_content is None:
             raise self._get_404_exception(object_id)
-
-        if not self.has_change_advanced_settings_permission(request, obj=page_content):
-            raise PermissionDenied("No permissions to change the template")
 
         to_template = request.POST.get("template", None)
 

@@ -15,7 +15,7 @@
         $('#' + options.id).select2({
             placeholder: options.text,
             allowClear: true,
-            minimumInputLength: 0,
+            minimumInputLength: 1,
             tags: true,
             createTag: function (params) {
                 var term = $.trim(params.term);

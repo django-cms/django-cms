@@ -75,7 +75,6 @@ TOOLBAR_DISABLE_BREAK = "Toolbar disable Break"
 SHORTCUTS_BREAK = "Shortcuts Break"
 
 DEFAULT_HELP_MENU_ITEMS = (
-    (_("Getting started developer guide"), "https://docs.django-cms.org/en/stable/introduction/index.html"),
     (_("Documentation"), "https://docs.django-cms.org/en/stable/"),
     (_("User guide"), "https://user-guide.django-cms.org"),
     (_("Discord community"), "https://www.django-cms.org/discord"),
@@ -690,29 +689,26 @@ class PageToolbar(CMSToolbar):
             if edit_mode:
                 action = admin_reverse("cms_pagecontent_change_template", args=(self.page_content.pk,))
 
-                if can_change_advanced:
-                    if get_cms_setting("TEMPLATES"):
-                        options = self.page_content.template_choices
-                        template_menu = _("Templates")
-                    else:
-                        options = [
-                            (placeholders[0], placeholders[2]) for placeholders in get_cms_setting("PLACEHOLDERS")
-                        ]
-                        template_menu = _("Placeholders")
-                    if options:
-                        templates_menu = current_page_menu.get_or_create_menu(
-                            "templates",
-                            template_menu,
-                            disabled=not can_change,
-                        )
+                if get_cms_setting("TEMPLATES"):
+                    options = self.page_content.template_choices
+                    template_menu = _("Templates")
+                else:
+                    options = [(placeholders[0], placeholders[2]) for placeholders in get_cms_setting("PLACEHOLDERS")]
+                    template_menu = _("Placeholders")
+                if options:
+                    templates_menu = current_page_menu.get_or_create_menu(
+                        "templates",
+                        template_menu,
+                        disabled=not can_change,
+                    )
 
-                        for path, name in options:
-                            active = self.page_content.template == path
-                            if path == TEMPLATE_INHERITANCE_MAGIC:
-                                templates_menu.add_break(TEMPLATE_MENU_BREAK)
-                            templates_menu.add_ajax_item(
-                                name, action=action, data={"template": path}, active=active, on_success=refresh
-                            )
+                    for path, name in options:
+                        active = self.page_content.template == path
+                        if path == TEMPLATE_INHERITANCE_MAGIC:
+                            templates_menu.add_break(TEMPLATE_MENU_BREAK)
+                        templates_menu.add_ajax_item(
+                            name, action=action, data={"template": path}, active=active, on_success=refresh
+                        )
 
             # navigation toggle
             in_navigation = self.page_content.in_navigation
