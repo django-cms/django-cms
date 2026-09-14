@@ -21,7 +21,7 @@ from django.utils.translation import override as force_language
 from djangocms_text.models import Text
 
 from cms import constants
-from cms.admin.pageadmin import PageContentAdmin
+from cms.admin.pageadmin import PAGE_SMART_LINK_MAX_RESULTS, PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
@@ -2094,6 +2094,67 @@ class PageActionsTestCase(PageTestBase):
         titles = {result["title"] for result in results}
         self.assertIn("Bravo Site 1", titles)
         self.assertNotIn("Bravo Site 2", titles)
+
+    def test_get_list_ignores_an_empty_query(self):
+        """``icontains`` matches everything for an empty term, so an empty query
+        would turn the autocomplete into a listing of every page on the site."""
+        create_page("Bravo", "nav_playground.html", "en", site=self.site, created_by=self.admin)
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            response = self.client.get(
+                endpoint,
+                data={"site": self.site.pk, "q": "", "language_code": "en"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content.decode("utf-8")), [])
+
+    def test_get_list_excludes_page_types(self):
+        """Page types are blueprints for new pages, not link targets."""
+        create_page("Bravo page", "nav_playground.html", "en", site=self.site, created_by=self.admin)
+        root = create_page(
+            "Page Types", "nav_playground.html", "en", site=self.site, reverse_id=constants.PAGE_TYPES_ID
+        )
+        page_type = create_page("Bravo type", "nav_playground.html", "en", site=self.site, parent=root)
+        Page.objects.filter(pk__in=(root.pk, page_type.pk)).update(is_page_type=True)
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            response = self.client.get(
+                endpoint,
+                data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content.decode("utf-8"))
+        self.assertEqual({result["title"] for result in results}, {"Bravo page"})
+
+    def test_get_list_caps_the_number_of_results(self):
+        for index in range(PAGE_SMART_LINK_MAX_RESULTS + 5):
+            create_page(
+                f"Bravo {index}",
+                "nav_playground.html",
+                "en",
+                site=self.site,
+                slug=f"bravo-{index}",
+                created_by=self.admin,
+            )
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            response = self.client.get(
+                endpoint,
+                data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            len(json.loads(response.content.decode("utf-8"))), PAGE_SMART_LINK_MAX_RESULTS
+        )
 
     def test_get_list_prefetches_page_urls(self):
         """

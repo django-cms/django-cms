@@ -246,6 +246,10 @@ def _get_app_patterns(site: Site | None) -> list[URLPattern]:
         page_urls
         .exclude(page__application_urls=None)
         .exclude(page__application_urls='')
+        # Page types are blueprints for new pages, not content. Their apphook
+        # would otherwise be dispatched before the catch-all ``cms.views.details``
+        # route, serving the page type on the public site.
+        .exclude(page__is_page_type=True)
         .order_by('-page__path')
         .select_related('page')
     )
