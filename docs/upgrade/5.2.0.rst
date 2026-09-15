@@ -209,6 +209,17 @@ second argument::
     get_permission_cache(user, site, "change_page")
     set_permission_cache(user, site, "change_page", value)
 
+``site`` is a ``django.contrib.sites.models.Site`` instance. Pass the site the
+permissions were computed for, which may differ from
+``Site.objects.get_current()`` in a multi-site installation.
+
+``clear_user_permission_cache(user)`` keeps its existing signature and now
+clears the user's entries for every site.
+
+This is an internal API, but projects or packages that warm or inspect the
+permission cache directly must update their calls to include the site. Calls
+using the old signatures raise ``TypeError``.
+
 
 Changing a page template needs only the change permission
 =========================================================
@@ -233,20 +244,6 @@ withhold the *change page* permission on those pages instead.
     django CMS 3.4.6 made template changes require the *change advanced
     settings* permission, back when the template was a field of ``Page``. The
     two remaining checks from that change are removed.
-
-``cms.cache.permissions`` helpers take the site
-
-``site`` is a ``django.contrib.sites.models.Site`` instance -- the one the
-permissions were computed for. Passing the wrong site is what the fix prevents,
-so pass the site the request is being served for, not
-``Site.objects.get_current()`` by reflex.
-
-``clear_user_permission_cache(user)`` is unchanged, and now clears the user's
-entries for every site.
-
-This is an internal API, but a project or package that warms or inspects the
-permission cache itself has to be updated: the old two-argument calls raise
-``TypeError``.
 
 Dependencies, settings, and migrations
 ======================================
