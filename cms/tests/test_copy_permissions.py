@@ -466,3 +466,47 @@ class PageTypeSourcePermissionsTests(CMSTestCase):
         self.assertTrue(copy.has_view_restrictions(copy.site))
         self.assertFalse(page_permissions.user_can_view_page(AnonymousUser(), copy))
         self.assertEqual(self.client.get(copy.get_absolute_url()).status_code, 404)
+
+    def test_rejects_source_when_adding_translation(self):
+        source = self.create_page_type("restricted-type")
+        self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        destination = create_page("destination", "nav_playground.html", "de")
+        self.add_page_permission(self.actor, destination, can_change=True, grant_on=ACCESS_PAGE)
+        self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
+        self.assertTrue(page_permissions.user_can_view_page(AnonymousUser(), destination))
+
+        endpoints = (
+            self.get_admin_url(PageContent, "add"),
+            self.get_admin_url(PageContent, "duplicate", source.get_content_obj("en").pk),
+        )
+        data = {
+            "cms_page": destination.pk,
+            "source": source.pk,
+            "language": "en",
+            "title": "translation",
+            "slug": "translation",
+            "_save": 1,
+        }
+        models = (Page, PageContent, CMSPlugin, PagePermission)
+        counts = tuple(model.objects.count() for model in models)
+        with self.login_user_context(self.actor):
+            for endpoint in endpoints:
+                with self.subTest(endpoint=endpoint):
+                    response = self.client.post(
+                        f"{endpoint}?cms_page={destination.pk}&language=en&parent_page={self.target.pk}",
+                        data,
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    self.assertIn("source", response.context["adminform"].form.errors)
+                    self.assertFalse(destination.pagecontent_set.filter(language="en").exists())
+                    self.assertEqual(counts, tuple(model.objects.count() for model in models))
+
+            # Adding a translation without a source remains supported.
+            data.pop("source")
+            response = self.client.post(
+                f"{endpoints[0]}?cms_page={destination.pk}&language=en&parent_page={self.target.pk}",
+                data,
+            )
+        self.assertEqual(response.status_code, 302)
+        self.assertNotContains(self.client.get(destination.get_absolute_url("en")), self.marker)

@@ -331,6 +331,12 @@ class AddPageForm(BasePageContentForm):
             # addressed first.
             return data
 
+        if data.get("cms_page") and data.get("source"):
+            # Translations reuse an existing page and skip from_source(), where
+            # the source's view restrictions are preserved before copying content.
+            self.add_error("source", _("A source page cannot be used when adding a translation."))
+            return data
+
         parent_page = data.get("parent_page")
         if parent_page:
             slug = data["slug"]
