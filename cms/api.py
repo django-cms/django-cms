@@ -66,7 +66,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
-from cms.utils.permissions import _current_user
+from cms.utils.permissions import get_current_user, reset_current_user, set_current_user
 from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 from menus.menu_pool import menu_pool
 
@@ -257,17 +257,17 @@ def create_page(
     else:
         application_urls = None
 
-    # ugly permissions hack: expose the creator through the _current_user
+    # ugly permissions hack: expose the creator through the current-user
     # context variable for the duration of the creation, then restore the
     # previous value. Capturing the token and resetting (instead of blindly
     # setting None at the end) avoids clobbering a user set by
     # CurrentUserMiddleware and prevents leaking the creator into the next
     # operation on the same thread. See cms.utils.permissions.reset_current_user.
     if created_by and isinstance(created_by, get_user_model()):
-        user_token = _current_user.set(created_by)
+        user_token = set_current_user(created_by)
         created_by = get_clean_username(created_by)
     else:
-        user_token = _current_user.set(None)
+        user_token = set_current_user(None)
 
     try:
         if reverse_id:
@@ -307,7 +307,7 @@ def create_page(
         )
         return page
     finally:
-        _current_user.reset(user_token)
+        reset_current_user(user_token)
 
 
 @transaction.atomic
@@ -372,7 +372,7 @@ def create_page_content(
         path = page.get_url_data(slug, overwrite_url, language)["path"]
 
     # When called directly (not via create_page) with a user instance, expose
-    # it through the _current_user context variable so signal handlers and
+    # it through the current-user context variable so signal handlers and
     # PageContent.objects.with_user() attribute the creation correctly. Capture
     # the token so we can restore the previous value at the end -- otherwise the
     # user leaks into the next operation on the same thread when
@@ -380,7 +380,7 @@ def create_page_content(
     # boundary). See cms.utils.permissions.reset_current_user.
     user_token = None
     if created_by and isinstance(created_by, get_user_model()):
-        user_token = _current_user.set(created_by)
+        user_token = set_current_user(created_by)
         created_by = get_clean_username(created_by)
 
     try:
@@ -390,7 +390,7 @@ def create_page_content(
             raise IntegrityError(e)
 
         # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
-        user = _current_user.get(None)
+        user = get_current_user()
         page_content = PageContent.objects.with_user(user).create(
             language=language,
             title=title,
@@ -430,7 +430,7 @@ def create_page_content(
         return page_content
     finally:
         if user_token is not None:
-            _current_user.reset(user_token)
+            reset_current_user(user_token)
 
 
 @transaction.atomic
