@@ -113,7 +113,8 @@ standard ``{% extends %}`` and ``{% block %}`` mechanics:
    ``{% block %}`` slots that per-page content will fill.
 2. **CMS page template** — extends ``base.html`` and fills those blocks with
    :ttag:`placeholder` tags for page-specific content. These are the templates you list in
-   :setting:`CMS_TEMPLATES` and select in the page's *Advanced settings*.
+   :setting:`CMS_TEMPLATES` and select in the page's settings, or from the toolbar's
+   *Page > Templates* menu.
 3. **Apphook or model template** — extends ``CMS_TEMPLATE`` (see :ref:`page_template`
    below) and overrides blocks with application output. This way an app view inherits
    whichever page template the current CMS page is using — including the toolbar, sekizai
