@@ -21,7 +21,7 @@ from django.utils.translation import override as force_language
 from djangocms_text.models import Text
 
 from cms import constants
-from cms.admin.pageadmin import PageContentAdmin
+from cms.admin.pageadmin import PAGE_SMART_LINK_MAX_RESULTS, PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
@@ -2095,6 +2095,67 @@ class PageActionsTestCase(PageTestBase):
         self.assertIn("Bravo Site 1", titles)
         self.assertNotIn("Bravo Site 2", titles)
 
+    def test_get_list_ignores_an_empty_query(self):
+        """``icontains`` matches everything for an empty term, so an empty query
+        would turn the autocomplete into a listing of every page on the site."""
+        create_page("Bravo", "nav_playground.html", "en", site=self.site, created_by=self.admin)
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            response = self.client.get(
+                endpoint,
+                data={"site": self.site.pk, "q": "", "language_code": "en"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content.decode("utf-8")), [])
+
+    def test_get_list_excludes_page_types(self):
+        """Page types are blueprints for new pages, not link targets."""
+        create_page("Bravo page", "nav_playground.html", "en", site=self.site, created_by=self.admin)
+        root = create_page(
+            "Page Types", "nav_playground.html", "en", site=self.site, reverse_id=constants.PAGE_TYPES_ID
+        )
+        page_type = create_page("Bravo type", "nav_playground.html", "en", site=self.site, parent=root)
+        Page.objects.filter(pk__in=(root.pk, page_type.pk)).update(is_page_type=True)
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            response = self.client.get(
+                endpoint,
+                data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content.decode("utf-8"))
+        self.assertEqual({result["title"] for result in results}, {"Bravo page"})
+
+    def test_get_list_caps_the_number_of_results(self):
+        for index in range(PAGE_SMART_LINK_MAX_RESULTS + 5):
+            create_page(
+                f"Bravo {index}",
+                "nav_playground.html",
+                "en",
+                site=self.site,
+                slug=f"bravo-{index}",
+                created_by=self.admin,
+            )
+
+        endpoint = admin_reverse("cms_page_get_list")
+        with self.login_user_context(self.admin):
+            response = self.client.get(
+                endpoint,
+                data={"site": self.site.pk, "q": "Bravo", "language_code": "en"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            len(json.loads(response.content.decode("utf-8"))), PAGE_SMART_LINK_MAX_RESULTS
+        )
+
     def test_get_list_prefetches_page_urls(self):
         """
         Regression test: the smart-link autocomplete endpoint resolves the
@@ -2745,16 +2806,15 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_user_can_change_template(self):
         """
-        User can change a page's template if he
-        has change permissions on the Page model and both
-        global change and change advanced settings permissions.
+        The template lives on the page content, so changing it needs the change
+        permission on the page -- not the *change advanced settings* one.
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = self.get_page_change_template_uri("en", page)
 
         self.add_permission(staff_user, "change_page")
-        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=True)
+        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=False)
 
         with self.login_user_context(staff_user):
             page._clear_internal_cache()
@@ -2765,16 +2825,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_user_cant_change_template(self):
         """
-        User can't change a page's template if he
-        does not have change permissions on the Page model,
-        global change permissions and/or global change advanced settings
-        permissions.
+        User can't change a page's template without the change permission on
+        the Page model or without global change permissions.
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = self.get_page_change_template_uri("en", page)
 
-        self.add_permission(staff_user, "change_page")
         self.add_global_permission(staff_user, can_change=True)
 
         with self.login_user_context(staff_user):
@@ -2782,6 +2839,27 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(page.get_template(), "nav_playground.html")
+
+    def test_user_can_change_template_on_change_form(self):
+        """
+        The template field of the page content change form is governed by the
+        change permission, like every other field of that form.
+        """
+        page = self.get_permissions_test_page()
+        translation = page.get_admin_content("en")
+        staff_user = self.get_staff_user_with_no_permissions()
+        endpoint = self.get_admin_url(PageContent, "change", translation.pk) + "?language=en"
+
+        self.add_permission(staff_user, "change_page")
+        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=False)
+
+        with self.login_user_context(staff_user):
+            self.assertContains(self.client.get(endpoint), 'name="template"')
+            response = self.client.post(endpoint, self._get_page_data(template="simple.html"))
+
+        self.assertEqual(response.status_code, 302)
+        translation.refresh_from_db()
+        self.assertEqual(translation.template, "simple.html")
 
     def test_user_can_view_page_permissions_summary(self):
         """
@@ -3310,13 +3388,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
         endpoint = self.get_admin_url(Page, "advanced", page.pk) + "?language=en"
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         with self.login_user_context(self.get_superuser()):
             data = self._get_page_permissions_data(page=page.pk, user=staff_user.pk)
             data["_continue"] = "1"
             self.client.post(endpoint, data)
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_permission_cache_invalidation_on_group_add(self):
         """
@@ -3326,13 +3404,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         group = Group(name="test_group")
         group.save()
         staff_user.groups.add(group)
 
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_permission_cache_invalidation_on_group_remove(self):
         """
@@ -3346,11 +3424,11 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         group.save()
         staff_user.groups.add(group)
 
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         group.user_set.remove(staff_user)
 
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_user_can_copy_page(self):
         """

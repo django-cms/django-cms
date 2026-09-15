@@ -552,37 +552,35 @@ class ToolbarTests(ToolbarTestBase):
 
     @override_settings(CMS_PERMISSION=True)
     def test_template_change_permission(self):
+        """The template lives on the page content, so the *change* permission
+        governs it -- not *change advanced settings*.
+        """
         page = create_page("test", "nav_playground.html", "en")
         page_content = self.get_pagecontent_obj(page)
         edit_url = get_object_edit_url(page_content)
 
-        # Staff user with change page permissions only
+        def get_template_items(user):
+            request = self.get_page_request(page, user, edit_url)
+            page_item = self.get_page_item(CMSToolbar(request))
+            return [item for item in page_item.items if force_str(getattr(item, "name", "")) == "Templates"]
+
+        # Staff user with change page permissions only -- no advanced settings.
         staff_user = self.get_staff_user_with_no_permissions()
         self.add_permission(staff_user, "change_page")
         global_permission = self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
-        # User should not see "Templates" option because he only has
-        # "change" permission.
-        request = self.get_page_request(page, staff_user, edit_url)
-        toolbar = CMSToolbar(request)
-        page_item = self.get_page_item(toolbar)
-        template_item = [item for item in page_item.items if force_str(getattr(item, "name", "")) == "Templates"]
-        self.assertEqual(len(template_item), 0)
+        template_item = get_template_items(staff_user)
+        self.assertEqual(len(template_item), 1)
+        self.assertFalse(template_item[0].disabled)
 
-        # Give the user change advanced settings permission
+        # Granting advanced settings on top changes nothing.
         global_permission.can_change_advanced_settings = True
         global_permission.save()
-
-        # Reload user to avoid stale caches
         staff_user = self.reload(staff_user)
 
-        # User should see "Templates" option because
-        # he has "change advanced settings" permission
-        request = self.get_page_request(page, staff_user, edit_url)
-        toolbar = CMSToolbar(request)
-        page_item = self.get_page_item(toolbar)
-        template_item = [item for item in page_item.items if force_str(getattr(item, "name", "")) == "Templates"]
+        template_item = get_template_items(staff_user)
         self.assertEqual(len(template_item), 1)
+        self.assertFalse(template_item[0].disabled)
 
     def test_markup(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
