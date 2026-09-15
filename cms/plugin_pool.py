@@ -234,10 +234,17 @@ class PluginPool:
         placeholder: str | None = None,
         obj: models.Model | None = None,
         setting_key: str = "plugins",
+        include_page_only: bool = True,
         root_plugin: bool = False,
         *,
         page: models.Model | None = None,
     ):
+        """``include_page_only`` is accepted and ignored.
+
+        It paired with the removed ``CMSPluginBase.page_only`` attribute and had
+        already stopped being read; keeping the parameter means a positional or
+        keyword call from older third-party code still works.
+        """
         from cms.utils.placeholder import get_placeholder_conf
 
         obj = _obj_from_deprecated_page(obj, page, "get_all_plugins")

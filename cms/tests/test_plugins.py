@@ -25,6 +25,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.plugin_rendering import ContentRenderer
 from cms.shared.editing_urls import get_object_edit_url
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, ArticlePluginModel, Section
@@ -2273,6 +2274,62 @@ class RemovedPageOnlyTests(CMSTestCase):
     def test_base_no_longer_defines_page_only(self):
         self.assertFalse(hasattr(CMSPluginBase, "page_only"))
 
-    def test_get_all_plugins_no_longer_takes_include_page_only(self):
-        with self.assertRaises(TypeError):
-            plugin_pool.get_all_plugins("body", include_page_only=True)
+
+class LegacyPageKeywordCompatTests(CMSTestCase):
+    """Every renamed argument still accepts ``page=``; nothing raises TypeError.
+
+    Third-party plugins call these with the old keyword, so the rename must be
+    additive: ``obj`` takes precedence, ``page`` still resolves, and arguments
+    that were dropped because nothing read them are accepted and ignored rather
+    than rejected.
+    """
+
+    def _content_obj(self):
+        return create_page("home", "nav_playground.html", "en").get_content_obj("en")
+
+    def test_plugin_conf_api_accepts_page_keyword(self):
+        obj = self._content_obj()
+        plugin_class = type("CompatPlugin", (CMSPluginBase,), {"render_template": "allow_children_plugin.html"})
+
+        for call in (
+            lambda: plugin_class.get_require_parent("body", page=obj),
+            lambda: plugin_class.get_parent_classes("body", page=obj),
+            lambda: plugin_class.get_child_classes("body", page=obj),
+            lambda: plugin_class.get_child_class_overrides("body", page=obj),
+            lambda: plugin_class.get_child_plugin_candidates("body", page=obj),
+            lambda: plugin_class.requires_parent_plugin("body", page=obj),
+            lambda: plugin_pool.get_all_plugins("body", page=obj),
+            lambda: plugin_pool.get_text_enabled_plugins("body", page=obj),
+        ):
+            with self.subTest(call=call):
+                with self.assertWarns(RemovedInDjangoCMS70Warning):
+                    call()
+
+    def test_get_toolbar_plugin_struct_accepts_page_keyword(self):
+        from cms.utils.placeholder import get_toolbar_plugin_struct
+
+        obj = self._content_obj()
+        with self.assertWarns(RemovedInDjangoCMS70Warning):
+            with_page = get_toolbar_plugin_struct(plugin_pool.registered_plugins, "body", page=obj)
+        with_obj = get_toolbar_plugin_struct(plugin_pool.registered_plugins, "body", obj)
+
+        self.assertEqual(with_page, with_obj)
+
+    def test_obj_wins_over_page_when_both_given(self):
+        from cms.utils.placeholder import get_toolbar_plugin_struct
+
+        obj = self._content_obj()
+        with self.assertWarns(RemovedInDjangoCMS70Warning):
+            get_toolbar_plugin_struct(plugin_pool.registered_plugins, "body", obj=obj, page=None or obj)
+
+    def test_dropped_arguments_are_accepted_not_rejected(self):
+        """``include_page_only`` and the renderer's ``page`` were never read."""
+        plugin_pool.get_all_plugins("body", include_page_only=True)
+
+        page = create_page("home2", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").first()
+        request = self.get_request("/")
+        request.user = self.get_superuser()
+        renderer = ContentRenderer(request)
+        with self.assertWarns(RemovedInDjangoCMS70Warning):
+            renderer.get_placeholder_toolbar_js(placeholder, page=page)

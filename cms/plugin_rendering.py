@@ -149,7 +149,10 @@ class BaseRenderer:
         plugin_menu_template = self.templates.placeholder_plugin_menu_template
         return plugin_menu_template.render({"plugin_menu": plugin_menu})
 
-    def get_placeholder_toolbar_js(self, placeholder):
+    def get_placeholder_toolbar_js(self, placeholder, page: models.Model | None = None):
+        # ``page`` has never been read here; it is accepted only so that older
+        # third-party calls keep working.
+        _obj_from_deprecated_page(None, page, "get_placeholder_toolbar_js")
         plugins = self.plugin_pool.get_root_plugins(placeholder)  # original
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
