@@ -59,10 +59,12 @@ forbidden_modules =
 # Container: core -> pages  (RFC 6.1)
 # The placeholder/plugin core must not know that pages exist.
 #
-# Retired by: step 3 (page-free Placeholder/CMSPlugin) and step 8 (the
-# render_object_* endpoints move from cms.views into core.editing, RFC 7.2).
-# cms.cache.placeholder is core's own cache and only sits under cms.cache
-# until step 7 re-homes it.
+# Retired by: step 8 (the render_object_* endpoints move from cms.views into
+# core.editing, RFC 7.2). cms.cache.placeholder is core's own cache and only
+# sits under cms.cache until step 7 re-homes it.
+#
+# Step 3 retired the Placeholder -> PageContent import: `Placeholder.page` now
+# asks cms.shared.resolvers, and pages provides the lookup.
 # ---------------------------------------------------------------------------
 [importlinter:contract:core-not-pages]
 name = core does not depend on pages
@@ -93,7 +95,6 @@ forbidden_modules =
     cms.views
     menus
 ignore_imports =
-    cms.models.placeholdermodel -> cms.models.contentmodels
     cms.models.placeholdermodel -> cms.cache.placeholder
     cms.plugin_rendering -> cms.cache.placeholder
     cms.admin.placeholderadmin -> cms.views

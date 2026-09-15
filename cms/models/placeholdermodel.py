@@ -15,6 +15,7 @@ from cms.cache.placeholder import clear_placeholder_cache
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
+from cms.shared.resolvers import resolve
 from cms.shared.signals import placeholder_cache_cleared
 from cms.utils import get_language_from_request, permissions
 from cms.utils.conf import get_cms_setting, get_site_id
@@ -216,16 +217,12 @@ class Placeholder(models.Model):
 
     def page_getter(self):
         if not hasattr(self, "_page"):
-            from cms.models.contentmodels import PageContent
-            # Check if the GenericForeignKey is cached by looking for the _source_cache attribute
-            if "source" in self._state.fields_cache and isinstance(self.source, PageContent):
-                self._page = self.source.page
-            else:
-                try:
-                    # Directly go through PageContent to avoid having to get the source and the page in separate queries
-                    self._page = PageContent.admin_manager.filter(placeholders=self).select_related("page").first().page
-                except AttributeError:
-                    self._page = None
+            # Which page -- if any -- a placeholder belongs to is a question
+            # only the pages container can answer, and core must not import it.
+            # cms.models.contentmodels registers the lookup; without pages
+            # installed this resolves to None, as it does for a placeholder
+            # attached to anything else.
+            self._page = resolve("placeholder_page", self)
         return self._page
 
     def page_setter(self, value):

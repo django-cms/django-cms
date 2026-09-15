@@ -171,9 +171,6 @@ extend-ignore = [
 "menus/menu_pool.py" = [
   "PLW2901",  # `for` loop variable `menu_cls` overwritten by assignment target
 ]
-"cms/toolbar/utils.py" = [
-  "B020"  # Loop control variable `plugin` overrides iterable it iterates
-]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true

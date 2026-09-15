@@ -6,6 +6,7 @@ from cms import constants
 from cms.models.fields import PlaceholderRelationField
 from cms.models.managers import ContentAdminManager, PageContentManager
 from cms.models.pagemodel import Page
+from cms.shared.resolvers import provide
 from cms.utils.conf import get_cms_setting
 
 
@@ -416,3 +417,23 @@ class EmptyPageContent:
         :rtype: ``bool``
         """
         return True
+
+
+def _resolve_placeholder_page(placeholder):
+    """Answer ``Placeholder.page`` for placeholders that belong to a page.
+
+    Registered with :mod:`cms.shared.resolvers` so that the core container can
+    ask without importing pages. Returns ``None`` for a placeholder attached to
+    anything else.
+    """
+    # Check if the GenericForeignKey is cached by looking for the _source_cache attribute
+    if "source" in placeholder._state.fields_cache and isinstance(placeholder.source, PageContent):
+        return placeholder.source.page
+    try:
+        # Directly go through PageContent to avoid having to get the source and the page in separate queries
+        return PageContent.admin_manager.filter(placeholders=placeholder).select_related("page").first().page
+    except AttributeError:
+        return None
+
+
+provide("placeholder_page", _resolve_placeholder_page)

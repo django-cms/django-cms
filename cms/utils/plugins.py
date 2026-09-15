@@ -13,7 +13,7 @@ from django.utils.translation import gettext as _
 from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_base import CMSPluginBase
+from cms.plugin_base import CMSPluginBase, _obj_from_deprecated_page
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.permissions import has_plugin_permission
@@ -171,22 +171,23 @@ def get_plugins_as_layered_tree(plugins):
     return root_plugins
 
 
-def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
+def get_plugin_restrictions(plugin, obj=None, restrictions_cache=None, *, page=None):
     if restrictions_cache is None:
         restrictions_cache = {}
 
+    obj = _obj_from_deprecated_page(obj, page, "get_plugin_restrictions")
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
-    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page or plugin.placeholder.source)
+    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, obj or plugin.placeholder.source)
     parents_cache = cache.setdefault("plugin_parents", {})
     children_cache = cache.setdefault("plugin_children", {})
     try:
         parent_classes = parents_cache[plugin_type]
     except KeyError:
         parent_classes = plugin_class.get_parent_classes(
-            slot=plugin.placeholder.slot,
-            page=page,
-            instance=plugin,
+            plugin.placeholder.slot,
+            obj,
+            plugin,
         )
 
     if plugin_class.cache_parent_classes:
@@ -203,18 +204,18 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
             child_classes = children_cache[plugin_type]
             # Still check child classes that did not cache their parent classes
             uncached_child_classes = plugin_class.get_child_classes(
-                slot=plugin.placeholder.slot,
-                page=page,
-                instance=plugin,
+                plugin.placeholder.slot,
+                obj,
+                plugin,
                 only_uncached=True,
             )
             child_classes = child_classes + uncached_child_classes  # Creates a new list to not change the cache
             child_classes = child_classes or [""]
         except KeyError:
             child_classes = plugin_class.get_child_classes(
-                slot=plugin.placeholder.slot,
-                page=page,
-                instance=plugin,
+                plugin.placeholder.slot,
+                obj,
+                plugin,
                 only_uncached=False,
             )
             if plugin_class.cache_child_classes:  # Check if child classes should be cached

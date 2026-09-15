@@ -137,8 +137,8 @@ def get_plugin_tree(
     def collect_plugin_data(plugin):
         child_classes, _ = get_plugin_restrictions(
             plugin=plugin,
+            obj=placeholder.source,
             restrictions_cache=restrictions,
-            page=placeholder.source,
         )
         # Make the resolved restrictions available to the drag-item template so it can decide
         # whether children may be added without recomputing them per access.

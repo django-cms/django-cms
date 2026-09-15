@@ -44,6 +44,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.compat.warnings import RemovedInDjangoCMS70Warning
 from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
 from cms.utils.urlutils import admin_reverse
 
@@ -827,7 +828,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         toolbar_struct = get_toolbar_plugin_struct(
             plugins=plugin_pool.registered_plugins,
             slot=placeholder.slot,
-            page=page,
+            obj=page,
         )
 
         style_config = [config for config in toolbar_struct if config["value"] == "StylePlugin"]
@@ -1011,7 +1012,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         )
 
         def allows_add_children(plugin):
-            child_classes, _ = get_plugin_restrictions(plugin, page=placeholder.source)
+            child_classes, _ = get_plugin_restrictions(plugin, obj=placeholder.source)
             return any(child_classes)
 
         with register_plugins(NoChildrenPlugin, EmptyChildPlugin, OpenChildPlugin, RestrictedChildPlugin, RestrictedNoChildPlugin):
@@ -2195,3 +2196,83 @@ class IsSlotPluginTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ThirdPartyPlugin, "en")
             info = plugin.get_plugin_info()
             self.assertTrue(info["is_slot"])
+
+
+class DeprecatedPageArgumentTests(CMSTestCase):
+    """The plugin-configuration API takes ``obj``, not ``page``.
+
+    These arguments were always duck-typed on ``get_template()`` and never had
+    to be a ``Page`` -- core must not depend on the pages container at all. The
+    old keyword keeps working for one more major release, and django CMS itself
+    passes the object positionally so that a third-party plugin overriding one
+    of these methods with the old parameter name still receives it.
+    """
+
+    def _plugin_class(self):
+        return type("ObjArgPlugin", (CMSPluginBase,), {"render_template": "allow_children_plugin.html"})
+
+    def _content_obj(self):
+        # The argument is the object a placeholder belongs to -- a PageContent,
+        # never a Page. PluginPool.get_all_plugins_for_model asserts as much.
+        return create_page("home", "nav_playground.html", "en").get_content_obj("en")
+
+    def test_page_keyword_still_works_but_warns(self):
+        obj = self._content_obj()
+        plugin_class = self._plugin_class()
+
+        with self.assertWarns(RemovedInDjangoCMS70Warning):
+            with_page = plugin_class.get_parent_classes("body", page=obj)
+        with_obj = plugin_class.get_parent_classes("body", obj)
+
+        self.assertEqual(with_page, with_obj)
+
+    def test_obj_keyword_is_silent(self):
+        obj = self._content_obj()
+        plugin_class = self._plugin_class()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RemovedInDjangoCMS70Warning)
+            plugin_class.get_parent_classes("body", obj=obj)
+            plugin_class.get_require_parent("body", obj=obj)
+            plugin_class.get_child_classes("body", obj=obj)
+            plugin_pool.get_all_plugins("body", obj=obj)
+
+    def test_overrides_using_the_old_parameter_name_still_receive_the_object(self):
+        """django CMS passes the object positionally, so old overrides keep working."""
+        seen = []
+
+        class LegacyOverridePlugin(CMSPluginBase):
+            render_template = "allow_children_plugin.html"
+
+            @classmethod
+            def get_parent_classes(cls, slot, page=None, instance=None):
+                seen.append(page)
+                return []
+
+        obj = self._content_obj()
+        LegacyOverridePlugin.requires_parent_plugin("body", obj)
+
+        self.assertEqual(seen, [obj])
+
+
+class RemovedPageOnlyTests(CMSTestCase):
+    """``page_only`` is gone in 6.0; ``allowed_models`` replaced it.
+
+    It had already stopped doing anything -- nothing read the attribute -- so a
+    plugin setting it was unrestricted either way. Removing it therefore changes
+    no behaviour, but a plugin that still declares it deserves to be told where
+    the replacement is rather than to fail silently.
+    """
+
+    def test_declaring_page_only_warns(self):
+        with self.assertWarns(UserWarning) as caught:
+            type("LegacyPageOnlyPlugin", (CMSPluginBase,), {"page_only": True})
+
+        self.assertIn("allowed_models", str(caught.warning))
+
+    def test_base_no_longer_defines_page_only(self):
+        self.assertFalse(hasattr(CMSPluginBase, "page_only"))
+
+    def test_get_all_plugins_no_longer_takes_include_page_only(self):
+        with self.assertRaises(TypeError):
+            plugin_pool.get_all_plugins("body", include_page_only=True)

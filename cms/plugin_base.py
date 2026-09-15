@@ -1,12 +1,14 @@
 import fnmatch
 import json
 import re
+import warnings
 from collections.abc import Callable
 from functools import lru_cache
 
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
+from django.db import models
 from django.http import HttpRequest, HttpResponse
 from django.template import Context
 from django.template.response import TemplateResponse
@@ -19,9 +21,9 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.core.editing.structure import get_plugin_tree
 from cms.exceptions import SubClassNeededError
-from cms.models import CMSPlugin, Page
+from cms.models import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
-from cms.utils.compat import DJANGO_5_1
+from cms.utils.compat.warnings import RemovedInDjangoCMS70Warning
 from cms.utils.conf import get_cms_setting
 
 
@@ -85,6 +87,16 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         if "get_extra_plugin_menu_items" in attrs:
             new_plugin._has_extra_plugin_menu_items = True
 
+        if "page_only" in attrs:
+            # Removed in django CMS 6.0, and inert for some time before that:
+            # nothing read it, so a plugin setting it was already unrestricted.
+            warnings.warn(
+                f"{name}.page_only is no longer supported and is ignored. "
+                'Use allowed_models = ["cms.pagecontent"] instead.',
+                UserWarning,
+                stacklevel=2,
+            )
+
         # Normalize allowed_models entries to lowercase (app_label.model)
         # to allow case-insensitive configuration such as "cms.PageContent".
         # ContentType.app_label and .model are lowercase, so we match that.
@@ -97,6 +109,29 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 # Coerce single value into list
                 new_plugin.allowed_models = [str(allowed_models).lower()]
         return new_plugin
+
+
+def _obj_from_deprecated_page(obj, page, method_name: str):
+    """Accept the old ``page=`` keyword for what is really the source object.
+
+    These arguments were always duck-typed on ``get_template()``, never required
+    to be a :class:`~cms.models.pagemodel.Page`, and the core container must not
+    depend on pages at all. The parameter is therefore ``obj``; ``page=`` keeps
+    working for one more major release.
+
+    Callers inside django CMS pass the object positionally, so a third-party
+    plugin that overrides one of these methods with the old ``page`` parameter
+    name keeps receiving it.
+    """
+    if page is None:
+        return obj
+    warnings.warn(
+        f"The 'page' argument of '{method_name}' is deprecated; use 'obj' instead. "
+        "It never had to be a Page -- any model a placeholder belongs to works.",
+        RemovedInDjangoCMS70Warning,
+        stacklevel=3,
+    )
+    return obj if obj is not None else page
 
 
 def template_slot_caching(method: Callable) -> Callable:
@@ -115,7 +150,7 @@ def template_slot_caching(method: Callable) -> Callable:
 
     Example:
         @template_slot_caching
-        def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+        def get_child_class_overrides(cls, slot: str, obj: Optional[models.Model] = None, instance: Optional[CMSPlugin] = None):
             # Method implementation...
             pass
     """
@@ -185,13 +220,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
       the text-editor and comes in handy when you use multiple plugins in your text.
 
     See also: :meth:`icon_alt`, :meth:`icon_src`."""
-
-    #: Set to ``True`` if this plugin should only be used in a placeholder that is attached to a django CMS page,
-    #: and not other models with ``PlaceholderRelationFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
-    #: :attr:`require_parent`.
-    #:
-    #: Deprecated: Use allowed_models attribute instead (e.g., `allowed_models = ["cms.pagecontent"]`)
-    page_only = False
 
     allowed_models = None
     """Plugin-level restriction: A list of valid models where this plugin can be added.
@@ -399,21 +427,27 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return any(fnmatch.fnmatchcase(slot, pattern) for pattern in patterns)
 
     @classmethod
-    def requires_parent_plugin(cls, slot, page):
-        if cls.get_require_parent(slot, page):
+    def requires_parent_plugin(cls, slot, obj=None, *, page=None):
+        obj = _obj_from_deprecated_page(obj, page, "requires_parent_plugin")
+        if cls.get_require_parent(slot, obj):
             return True
 
-        allowed_parents = cls.get_parent_classes(slot, page)
+        allowed_parents = cls.get_parent_classes(slot, obj)
         return bool(allowed_parents)
 
     @classmethod
     @lru_cache
-    def _get_template_for_conf(cls, page: Page | None, instance: CMSPlugin | None = None):
-        """Cache page template because page.get_template() might have to fetch the page content object from the db
-        since django CMS 4"""
-        if page and hasattr(page, "get_template"):
+    def _get_template_for_conf(cls, obj: models.Model | None, instance: CMSPlugin | None = None):
+        """Cache the template of the object the placeholder belongs to.
+
+        ``obj`` is any model with a ``get_template()`` method, not only a
+        :class:`~cms.models.pagemodel.Page` -- it is duck-typed below, and the
+        argument is being renamed to ``obj``. Caching matters because
+        ``get_template()`` may have to fetch the page content object from the
+        database since django CMS 4."""
+        if obj and hasattr(obj, "get_template"):
             # Make the database access lazy, so that it only happens if needed.
-            return lazy(page.get_template, str)()
+            return lazy(obj.get_template, str)()
         if (
             instance is not None
             and instance.placeholder.source
@@ -425,10 +459,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_require_parent(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None) -> bool:
+    def get_require_parent(
+        cls,
+        slot: str,
+        obj: models.Model | None = None,
+        instance: CMSPlugin | None = None,
+        *,
+        page: models.Model | None = None,
+    ) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_conf(page, instance)
+        obj = _obj_from_deprecated_page(obj, page, "get_require_parent")
+        template = cls._get_template_for_conf(obj, instance)
 
         # config overrides..
         require_parent = get_placeholder_conf("require_parent", slot, template, default=cls.require_parent)
@@ -769,7 +811,14 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_child_class_overrides(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None):
+    def get_child_class_overrides(
+        cls,
+        slot: str,
+        obj: models.Model | None = None,
+        instance: CMSPlugin | None = None,
+        *,
+        page: models.Model | None = None,
+    ):
         """
         Returns a list of plugin types that are allowed
         as children of this plugin.
@@ -777,7 +826,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         from cms.plugin_pool import plugin_pool
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_conf(page, instance)
+        obj = _obj_from_deprecated_page(obj, page, "get_child_class_overrides")
+        template = cls._get_template_for_conf(obj, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf("child_classes", slot, template, default={})
@@ -786,7 +836,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return plugin_pool.resolve_plugin_patterns(child_classes)
 
     @classmethod
-    def get_child_plugin_candidates(cls, slot: str, page: Page | None = None) -> list:
+    def get_child_plugin_candidates(
+        cls, slot: str, obj: models.Model | None = None, *, page: models.Model | None = None
+    ) -> list:
         """
         Returns a list of all plugin classes
         that will be considered when fetching
@@ -799,21 +851,29 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
 
-        return plugin_pool.get_all_plugins(slot, page, root_plugin=False)
+        obj = _obj_from_deprecated_page(obj, page, "get_child_plugin_candidates")
+        return plugin_pool.get_all_plugins(slot, obj, root_plugin=False)
 
     @classmethod
     @template_slot_caching
     def get_child_classes(
-        cls, slot, page: Page | None = None, instance: CMSPlugin | None = None, only_uncached: bool = False
+        cls,
+        slot,
+        obj: models.Model | None = None,
+        instance: CMSPlugin | None = None,
+        only_uncached: bool = False,
+        *,
+        page: models.Model | None = None,
     ) -> list[str]:
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
         """
         # Placeholder overrides are highest in priority
-        child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
+        obj = _obj_from_deprecated_page(obj, page, "get_child_classes")
+        child_classes = cls.get_child_class_overrides(slot, obj, instance)
         # Get all child plugin candidates
-        installed_plugins = cls.get_child_plugin_candidates(slot, page)
+        installed_plugins = cls.get_child_plugin_candidates(slot, obj)
 
         if child_classes == "auto":
             # Allow all plugins as children that explicitly declare this plugin as parent
@@ -840,7 +900,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # If there are no restrictions then the plugin
         # is a valid child class.
         for plugin_class in installed_plugins:
-            allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
+            allowed_parents = plugin_class.get_parent_classes(slot, obj, instance)
             if allowed_parents is None or plugin_type in allowed_parents:
                 # Plugin has no parent restrictions (``None``) or
                 # current plugin (self) is a configured parent.
@@ -852,11 +912,19 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_parent_classes(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None) -> list[str]:
+    def get_parent_classes(
+        cls,
+        slot: str,
+        obj: models.Model | None = None,
+        instance: CMSPlugin | None = None,
+        *,
+        page: models.Model | None = None,
+    ) -> list[str]:
         from cms.plugin_pool import plugin_pool
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_conf(page, instance)
+        obj = _obj_from_deprecated_page(obj, page, "get_parent_classes")
+        template = cls._get_template_for_conf(obj, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf("parent_classes", slot, template, default={})

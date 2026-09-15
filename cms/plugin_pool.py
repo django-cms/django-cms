@@ -14,9 +14,8 @@ from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
-from cms.plugin_base import CMSPluginBase
+from cms.plugin_base import CMSPluginBase, _obj_from_deprecated_page
 from cms.utils.helpers import normalize_name
 
 _GLOB_CHARS = ("*", "?", "[")
@@ -233,16 +232,18 @@ class PluginPool:
     def get_all_plugins(
         self,
         placeholder: str | None = None,
-        page: Page | None = None,
+        obj: models.Model | None = None,
         setting_key: str = "plugins",
-        include_page_only: bool = True,
         root_plugin: bool = False,
+        *,
+        page: models.Model | None = None,
     ):
         from cms.utils.placeholder import get_placeholder_conf
 
-        plugins = self.get_all_plugins_for_model(page.__class__) if page else self.plugins.values()
+        obj = _obj_from_deprecated_page(obj, page, "get_all_plugins")
+        plugins = self.get_all_plugins_for_model(obj.__class__) if obj else self.plugins.values()
         template = (
-            lazy(page.get_template, str)() if page and hasattr(page, "get_template") else None
+            lazy(obj.get_template, str)() if obj and hasattr(obj, "get_template") else None
         )  # Make template lazy to avoid unnecessary db access
 
         allowed_plugins = (
@@ -277,7 +278,7 @@ class PluginPool:
 
         if root_plugin:
             # Filters out any plugin that requires a parent or has set parent classes
-            plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
+            plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, obj))
         return plugins
 
     def get_root_plugins(self, placeholder: Placeholder) -> list[type[CMSPluginBase]]:
@@ -287,9 +288,12 @@ class PluginPool:
             self.root_plugin_cache[key] =list(self.get_all_plugins(placeholder.slot, placeholder.source, root_plugin=True))
         return self.root_plugin_cache[key]
 
-    def get_text_enabled_plugins(self, placeholder, page) -> list[type[CMSPluginBase]]:
-        plugins = set(self.get_all_plugins(placeholder, page, root_plugin=False))
-        plugins.update(self.get_all_plugins(placeholder, page, setting_key="text_only_plugins", root_plugin=False))
+    def get_text_enabled_plugins(
+        self, placeholder, obj: models.Model | None = None, *, page: models.Model | None = None
+    ) -> list[type[CMSPluginBase]]:
+        obj = _obj_from_deprecated_page(obj, page, "get_text_enabled_plugins")
+        plugins = set(self.get_all_plugins(placeholder, obj, root_plugin=False))
+        plugins.update(self.get_all_plugins(placeholder, obj, setting_key="text_only_plugins", root_plugin=False))
         return sorted((p for p in plugins if p.text_enabled), key=attrgetter("module", "name"))
 
     def get_plugin(self, name) -> type[CMSPluginBase]:

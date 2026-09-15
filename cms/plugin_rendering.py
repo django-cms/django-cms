@@ -23,10 +23,10 @@ from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.core.editing.structure import get_placeholder_toolbar_js, get_plugin_toolbar_js
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
+from cms.plugin_base import _obj_from_deprecated_page
 from cms.plugin_pool import PluginPool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_language_from_request
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
@@ -133,25 +133,23 @@ class BaseRenderer:
 
         return self._plugins_with_perms
 
-    def get_placeholder_plugin_menu(self, placeholder: Placeholder, page: Page | None = None):
+    def get_placeholder_plugin_menu(
+        self,
+        placeholder: Placeholder,
+        obj: models.Model | None = None,
+        *,
+        page: models.Model | None = None,
+    ):
+        obj = _obj_from_deprecated_page(obj, page, "get_placeholder_plugin_menu")
         plugin_menu = get_toolbar_plugin_struct(
             plugins=self.get_plugins_with_perms(),
             slot=placeholder.slot,
-            obj=page,
+            obj=obj,
         )
         plugin_menu_template = self.templates.placeholder_plugin_menu_template
         return plugin_menu_template.render({"plugin_menu": plugin_menu})
 
-    def get_placeholder_toolbar_js(self, placeholder, page: models.Model | None = None):
-        if page:
-            import warnings
-
-            warnings.warn(
-                "The 'page' argument of 'get_placeholder_toolbar_js' is deprecated and will be removed in a future "
-                "release. It can be safely removed from the call.",
-                RemovedInDjangoCMS60Warning,
-                stacklevel=2,
-            )
+    def get_placeholder_toolbar_js(self, placeholder):
         plugins = self.plugin_pool.get_root_plugins(placeholder)  # original
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
@@ -165,7 +163,7 @@ class BaseRenderer:
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
         child_classes, _ = get_plugin_restrictions(
             plugin=plugin,
-            page=obj,
+            obj=obj,
             restrictions_cache=placeholder_cache,  # Store non-global plugin-restriction in placeholder_cache
         )
         # Make the resolved restrictions available to the drag-item template (which renders the
@@ -734,7 +732,7 @@ class StructureRenderer(BaseRenderer):
         placeholder_structure_js = self.placeholder_edit_template.format(
             placeholder_id=placeholder.pk,
             plugin_js=plugin_js_output,
-            plugin_menu_js=self.get_placeholder_plugin_menu(placeholder, page=obj),
+            plugin_menu_js=self.get_placeholder_plugin_menu(placeholder, obj),
             placeholder_js=placeholder_toolbar_js,
         )
         return mark_safe(placeholder_structure_js)
@@ -769,7 +767,7 @@ class LegacyRenderer(ContentRenderer):
 
     def get_editable_placeholder_context(self, placeholder, page=None):
         context = super().get_editable_placeholder_context(placeholder, page)
-        context["plugin_menu_js"] = self.get_placeholder_plugin_menu(placeholder, page=page)
+        context["plugin_menu_js"] = self.get_placeholder_plugin_menu(placeholder, page)
         return context
 
 

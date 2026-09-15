@@ -190,13 +190,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         response = self.client.get(admin_reverse("placeholderapp_twoplaceholderexample_add"))
         self.assertEqual(response.status_code, 200)
 
-    def test_page_only_plugins(self):
-        ex = Example1(char_1="one", char_2="two", char_3="tree", char_4="four")
-        ex.save()
-        response = self.client.get(admin_reverse("placeholderapp_example1_change", args=(ex.pk,)))
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "InheritPagePlaceholderPlugin")
-
     def test_inter_placeholder_plugin_move(self):
         ex = TwoPlaceholderExample(char_1="one", char_2="two", char_3="tree", char_4="four")
         ex.save()
