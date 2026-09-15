@@ -3,6 +3,7 @@ from django.contrib.sites.models import Site
 from django.test import override_settings
 
 from cms.api import add_plugin, create_page
+from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.models import (
     ACCESS_CHILDREN,
     ACCESS_PAGE,
@@ -131,6 +132,38 @@ class CopyPermissionsTests(CMSTestCase):
         )
 
         self.assertTrue(page_permissions.user_can_change_page(self.actor, copied))
+
+    def test_copy_permissions_invalidates_another_users_cached_actions(self):
+        recipient = self._create_user("recipient", is_staff=True, is_superuser=False)
+        self.add_permission(recipient, "change_page")
+        self.add_page_permission(recipient, self.source, can_change=True, grant_on=ACCESS_PAGE)
+        self.assertTrue(page_permissions.user_can_change_page(recipient, self.source))
+
+        copied = self.source.copy(
+            self.source.site,
+            parent_page=self.target,
+            permissions=True,
+            user=self.actor,
+        )
+
+        self.assertTrue(page_permissions.user_can_change_page(recipient, copied))
+
+    def test_copy_permissions_invalidates_cache_again_on_commit(self):
+        self.add_page_permission(self.actor, self.source, can_change=True, grant_on=ACCESS_PAGE)
+
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            self.source.copy(
+                self.source.site,
+                parent_page=self.target,
+                permissions=True,
+                user=self.actor,
+            )
+            # Simulate a concurrent request caching pre-commit permission rows.
+            set_permission_cache(self.actor, "change_page", [])
+            self.assertEqual(get_permission_cache(self.actor, "change_page"), [])
+
+        self.assertEqual(len(callbacks), 1)
+        self.assertIsNone(get_permission_cache(self.actor, "change_page"))
 
     def test_readable_descendants_can_be_copied_without_permissions(self):
         self.add_page_permission(self.actor, self.secret, can_view=True, grant_on=ACCESS_PAGE)

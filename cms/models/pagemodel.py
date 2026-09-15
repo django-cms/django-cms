@@ -4,7 +4,7 @@ from os.path import join
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.db import IntegrityError, connection, models, router
+from django.db import IntegrityError, connection, models, router, transaction
 from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.constraints import UniqueConstraint
@@ -561,6 +561,7 @@ class Page(MP_Node):
             clear_permission_cache()
             if user is not None:
                 clear_permission_lru_caches(user)
+            transaction.on_commit(clear_permission_cache)
         return new_permissions
 
     def copy(
@@ -659,6 +660,8 @@ class Page(MP_Node):
                 # bulk_create does not emit the permission signals.
                 clear_permission_cache()
                 clear_permission_lru_caches(user)
+                # A concurrent request can rebuild the cache before these rows commit.
+                transaction.on_commit(clear_permission_cache)
         return new_page
 
     def copy_with_descendants(
