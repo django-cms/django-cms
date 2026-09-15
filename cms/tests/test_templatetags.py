@@ -31,6 +31,7 @@ from cms.models import (
     PageContent,
     Placeholder,
 )
+from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
 from cms.templatetags.cms_admin import django_version_gte, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
@@ -43,7 +44,6 @@ from cms.test_utils.mail import MAILERS_SUPPORTED
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
 

@@ -15,9 +15,9 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches
 
 from cms.api import add_plugin, create_page
+from cms.shared.editing_urls import get_object_edit_url
 from cms.templatetags.cms_static import CSP_NONCE_SUPPORTED
 from cms.test_utils.testcases import CMSTestCase
-from cms.toolbar.utils import get_object_edit_url
 from cms.utils.urlutils import admin_reverse
 
 NONCE = "cms-test-nonce"

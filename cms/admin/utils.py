@@ -29,7 +29,7 @@ from django.utils.translation import get_language, gettext_lazy as _
 from django.views.decorators.http import require_GET
 
 from cms.models.managers import ContentAdminManager
-from cms.toolbar.utils import get_object_edit_url
+from cms.shared.editing_urls import get_object_edit_url
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple

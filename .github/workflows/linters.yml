@@ -20,3 +20,21 @@ jobs:
 
     - name: Run ruff on menus
       run: ruff check --output-format=github menus
+
+  import-linter:
+    name: import contracts
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - run: python -Im pip install --user import-linter
+
+    # Contracts and their grandfathered exceptions live in .importlinter.
+    # A new boundary violation fails here; so does an exception that no
+    # longer matches anything, which is the signal to delete that line.
+    - name: Check architecture import contracts
+      run: lint-imports

@@ -7,10 +7,7 @@ from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _, override as force_language
 
-from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_preview_url,
-)
+from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
 
 
 def get_entries():

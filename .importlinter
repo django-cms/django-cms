@@ -1,0 +1,335 @@
+# ---------------------------------------------------------------------------
+# django CMS import contracts  (RFC _CMS6_RFC.md, step 0)
+#
+# These contracts encode the *target* container/layer architecture against the
+# *current* tree. They are a scoreboard, not a description of today's code.
+#
+#   Run:      lint-imports
+#   Verbose:  lint-imports --verbose
+#
+# Every entry under `ignore_imports` is a known violation that the RFC retires
+# at a named step. The comment block above each contract says which. Removing
+# an `ignore_imports` line is how a step proves it is done -- never add a new
+# one without a corresponding note.
+#
+# import-linter fails on an `ignore_imports` entry that matches nothing, so the
+# grandfathered list cannot rot: fix the import and the run tells you to delete
+# the line. Treat that failure as the success signal it is.
+#
+# Known blind spot: `from cms.models import Page` imports the `cms.models`
+# package facade, not `cms.models.pagemodel`, so container boundaries inside
+# that facade are invisible to these contracts until step 7 splits the models
+# into per-container modules and turns `cms.models` into a shim. Contracts
+# therefore name concrete submodules wherever possible.
+#
+# `allow_indirect_imports = True` on every forbidden contract keeps the report
+# at "which file directly imports what it should not". Without it every module
+# reaches every other through the `cms.models` / `cms.api` facades and the
+# output is unreadable.
+# ---------------------------------------------------------------------------
+
+[importlinter]
+root_packages =
+    cms
+    menus
+
+# ---------------------------------------------------------------------------
+# Container: menus  (RFC 6.3)
+# The menu framework must stand alone on top of `shared` (cms.utils.conf/i18n).
+#
+# Retired by: step 1 -- splitting cms/toolbar/utils.py moves the editing-URL
+# helpers to `shared`, so menus.utils no longer reaches into the toolbar.
+# ---------------------------------------------------------------------------
+[importlinter:contract:menus-standalone]
+name = menus does not reach into cms internals
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    menus
+forbidden_modules =
+    cms.admin
+    cms.api
+    cms.models
+    cms.plugin_rendering
+    cms.templatetags
+    cms.toolbar
+    cms.toolbar_pool
+
+# ---------------------------------------------------------------------------
+# Container: core -> pages  (RFC 6.1)
+# The placeholder/plugin core must not know that pages exist.
+#
+# Retired by: step 3 (page-free Placeholder/CMSPlugin) and step 8 (the
+# render_object_* endpoints move from cms.views into core.editing, RFC 7.2).
+# cms.cache.placeholder is core's own cache and only sits under cms.cache
+# until step 7 re-homes it.
+# ---------------------------------------------------------------------------
+[importlinter:contract:core-not-pages]
+name = core does not depend on pages
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.admin.placeholderadmin
+    cms.cache.placeholder
+    cms.models.aliaspluginmodel
+    cms.models.placeholdermodel
+    cms.models.placeholderpluginmodel
+    cms.models.pluginmodel
+    cms.operations
+    cms.plugin_base
+    cms.plugin_pool
+    cms.plugin_rendering
+    cms.utils.placeholder
+    cms.utils.plugins
+forbidden_modules =
+    cms.admin.pageadmin
+    cms.appresolver
+    cms.cache
+    cms.cms_menus
+    cms.models.contentmodels
+    cms.models.pagemodel
+    cms.page_rendering
+    cms.utils.page
+    cms.views
+    menus
+ignore_imports =
+    cms.models.placeholdermodel -> cms.models.contentmodels
+    cms.models.placeholdermodel -> cms.cache
+    cms.models.placeholdermodel -> cms.cache.placeholder
+    cms.plugin_rendering -> cms.cache.placeholder
+    cms.admin.placeholderadmin -> cms.views
+
+# ---------------------------------------------------------------------------
+# Container: core -> permissions  (RFC 7.1.1)
+# Permission policy belongs in services, resolved through a contract, not in
+# the core model and renderer.
+#
+# Retired by: step 5 (services enforce) and step 6 (permission backend).
+# ---------------------------------------------------------------------------
+[importlinter:contract:core-not-permissions]
+name = core does not depend on permissions
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.admin.placeholderadmin
+    cms.models.placeholdermodel
+    cms.models.pluginmodel
+    cms.plugin_base
+    cms.plugin_pool
+    cms.plugin_rendering
+    cms.utils.placeholder
+    cms.utils.plugins
+forbidden_modules =
+    cms.cache.permissions
+    cms.models.permissionmodels
+    cms.utils.page_permissions
+    cms.utils.permissions
+ignore_imports =
+    cms.models.placeholdermodel -> cms.utils.permissions
+    cms.plugin_rendering -> cms.utils.permissions
+    cms.utils.plugins -> cms.utils.permissions
+
+# ---------------------------------------------------------------------------
+# Container: core -> toolbar  (RFC 6.5.1)
+# The toolbar sits above core. Core reaches it today only for the structure-
+# mode JSON helpers, which are core's own code living in the wrong file.
+#
+# Retired by: step 1 -- get_plugin_tree & co. move to core.editing.
+# ---------------------------------------------------------------------------
+[importlinter:contract:core-not-toolbar]
+name = core does not depend on the toolbar container
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.admin.placeholderadmin
+    cms.models.placeholdermodel
+    cms.models.pluginmodel
+    cms.plugin_base
+    cms.plugin_pool
+    cms.plugin_rendering
+    cms.utils.placeholder
+    cms.utils.plugins
+forbidden_modules =
+    cms.cms_toolbars
+    cms.toolbar
+    cms.toolbar_base
+    cms.toolbar_pool
+# Both remaining entries are `get_toolbar_from_request` only -- toolbar *state*,
+# which the plugin endpoints and the renderer genuinely need. Retired by step 8,
+# when those endpoints move into cms.core.editing (a presentation layer, which
+# may use the toolbar framework).
+ignore_imports =
+    cms.admin.placeholderadmin -> cms.toolbar.utils
+    cms.plugin_rendering -> cms.toolbar.utils
+
+# ---------------------------------------------------------------------------
+# Container: toolbar  (RFC 6.5.3)
+# The toolbar framework and chrome must not import pages or permissions; they
+# reach both through contracts.
+#
+# Currently KEPT only because `from cms.models import PageContent` hides behind
+# the facade (see blind spot above). Re-check after step 7.
+# ---------------------------------------------------------------------------
+[importlinter:contract:toolbar-not-pages]
+name = toolbar does not depend on pages or permissions
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.toolbar
+    cms.toolbar_base
+    cms.toolbar_pool
+forbidden_modules =
+    cms.admin
+    cms.api
+    cms.appresolver
+    cms.cache.page
+    cms.models.contentmodels
+    cms.models.pagemodel
+    cms.models.permissionmodels
+    cms.utils.page_permissions
+    cms.utils.permissions
+
+# ---------------------------------------------------------------------------
+# Container: pages -> menus  (RFC 6.3)
+# The pages model layer must not call into the menu framework; cache
+# invalidation becomes a signal / the menu_invalidation contract.
+#
+# Retired by: step 2.
+# ---------------------------------------------------------------------------
+[importlinter:contract:pages-model-not-menus]
+name = the pages model does not call the menu framework
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.models.contentmodels
+    cms.models.pagemodel
+forbidden_modules =
+    menus
+ignore_imports =
+    cms.models.pagemodel -> menus.menu_pool
+
+# ---------------------------------------------------------------------------
+# Container: permissions  (RFC 6.2)
+# Permissions is the most nearly isolated container and must stay that way.
+#
+# Retired by: step 6 -- has_plugin_permission moves behind the contract
+# instead of reaching into the plugin pool.
+# ---------------------------------------------------------------------------
+[importlinter:contract:permissions-isolated]
+name = permissions does not reach into core, pages or the toolbar
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.cache.permissions
+    cms.models.permissionmodels
+    cms.utils.page_permissions
+    cms.utils.permissions
+forbidden_modules =
+    cms.admin
+    cms.cache.page
+    cms.models.contentmodels
+    cms.models.pagemodel
+    cms.plugin_base
+    cms.plugin_pool
+    cms.plugin_rendering
+    cms.templatetags
+    cms.toolbar
+ignore_imports =
+    cms.utils.permissions -> cms.plugin_pool
+
+# ---------------------------------------------------------------------------
+# Layer: model  (RFC 5.1)
+# Models must not import upwards. This contract is already KEPT -- it exists
+# to stop it regressing.
+# ---------------------------------------------------------------------------
+[importlinter:contract:model-layer]
+name = the model layer does not import admin, toolbar or templatetags
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.models
+forbidden_modules =
+    cms.admin
+    cms.api
+    cms.templatetags
+    cms.toolbar
+    cms.toolbar_pool
+
+# ---------------------------------------------------------------------------
+# Layer: shared  (RFC 5, `contrib` / `shared`)
+# cms.utils is the de-facto shared package. Nothing in it may import a layer
+# above it.
+#
+# Retired by: step 5 (cms.utils.plugins -> cms.api becomes a service call),
+# step 7 (helpers/placeholder re-homed into core; is_editable_model and the
+# declared-placeholder scan are core, not shared).
+# ---------------------------------------------------------------------------
+[importlinter:contract:shared-layer]
+name = shared utilities do not import admin, api, toolbar or templatetags
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.utils
+forbidden_modules =
+    cms.admin
+    cms.api
+    cms.templatetags
+    cms.toolbar
+ignore_imports =
+    cms.utils.helpers -> cms.admin.placeholderadmin
+    cms.utils.placeholder -> cms.templatetags.cms_tags
+    cms.utils.plugins -> cms.api
+
+# ---------------------------------------------------------------------------
+# Layer: core.editing  (RFC 7.2)
+# The frontend editor is generic over the edited model: a model becomes
+# editable by registering in its cms_config.py, never by the editor importing
+# it. As a presentation layer this package may use the toolbar framework --
+# that is why it is not a source of the `core-not-toolbar` contract.
+# ---------------------------------------------------------------------------
+[importlinter:contract:core-editing-generic]
+name = the frontend editor does not know about any particular container
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.core.editing
+forbidden_modules =
+    cms.admin.pageadmin
+    cms.appresolver
+    cms.cache.page
+    cms.cms_menus
+    cms.models.contentmodels
+    cms.models.pagemodel
+    cms.models.permissionmodels
+    cms.page_rendering
+    cms.utils.page
+    cms.utils.page_permissions
+    menus
+
+# ---------------------------------------------------------------------------
+# Package: cms.shared  (RFC 5)
+# Helpers every container may use, that depend on no container.
+#
+# Retired by: a later step -- get_object_for_language keeps a PageContent fast
+# path, which becomes a registered hook.
+# ---------------------------------------------------------------------------
+[importlinter:contract:shared-depends-on-nothing]
+name = shared depends on no container
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.shared
+forbidden_modules =
+    cms.admin
+    cms.api
+    cms.cms_menus
+    cms.core
+    cms.models
+    cms.plugin_base
+    cms.plugin_pool
+    cms.plugin_rendering
+    cms.templatetags
+    cms.toolbar
+    menus
+ignore_imports =
+    cms.shared.editing_urls -> cms.models

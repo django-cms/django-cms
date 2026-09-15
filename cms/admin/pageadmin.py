@@ -69,8 +69,8 @@ from cms.operations.helpers import (
     send_pre_page_operation,
 )
 from cms.plugin_pool import plugin_pool
+from cms.shared.editing_urls import get_object_edit_url
 from cms.signals.apphook import set_restart_trigger
-from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import get_site_from_request, jsonify_request
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning

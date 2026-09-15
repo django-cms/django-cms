@@ -17,10 +17,10 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
+from cms.core.editing.structure import get_plugin_tree
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin, Page
 from cms.models.placeholdermodel import Placeholder
-from cms.toolbar.utils import get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 

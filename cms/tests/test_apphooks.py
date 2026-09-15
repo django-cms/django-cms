@@ -1080,7 +1080,7 @@ class ApphooksTestCase(BaseApphooksTestCase):
         """
         from django.contrib.contenttypes.models import ContentType
 
-        from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
+        from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url, get_object_structure_url
 
         # Create a page with an apphook attached
         self.apphook_clear()

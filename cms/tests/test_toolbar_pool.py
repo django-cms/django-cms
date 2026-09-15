@@ -4,8 +4,8 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms import api
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
+from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.testcases import CMSTestCase
-from cms.toolbar.utils import get_object_edit_url
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import ToolbarPool, toolbar_pool
 

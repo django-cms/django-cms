@@ -41,7 +41,8 @@ from cms.page_rendering import (
     _render_welcome_page,
     render_pagecontent,
 )
-from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
+from cms.shared.editing_urls import get_object_preview_url
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import is_editable_model

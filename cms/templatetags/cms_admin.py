@@ -16,7 +16,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models import Page, PageContent, Placeholder
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
+from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
 

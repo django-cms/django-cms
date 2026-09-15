@@ -9,12 +9,12 @@ from cms.api import add_plugin, create_page
 from cms.cache.placeholder import get_placeholder_cache
 from cms.models import EmptyPageContent, Page, Placeholder
 from cms.plugin_rendering import PluginContext
+from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url
 from cms.views import details
 
 TEMPLATE_NAME = 'tests/rendering/base.html'

@@ -30,6 +30,7 @@ from cms.models import PageContent
 from cms.models.pagemodel import Page, PageUrl
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
+from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
 from cms.test_utils.util.context_managers import (
@@ -37,7 +38,6 @@ from cms.test_utils.util.context_managers import (
     UserLoginContext,
     override_placeholder_conf,
 )
-from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request

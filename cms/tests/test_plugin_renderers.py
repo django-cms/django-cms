@@ -10,10 +10,10 @@ from cms.plugin_rendering import (
     LegacyRenderer,
     StructureRenderer,
 )
+from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url
 
 
 class TestStructureRenderer(CMSTestCase):

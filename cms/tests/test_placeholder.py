@@ -22,6 +22,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.settingmodels import UserSettings
 from cms.plugin_pool import plugin_pool
+from cms.shared.editing_urls import get_object_edit_url, get_object_structure_url
 from cms.test_utils.project.placeholder_relation_field_app.models import (
     FancyPoll,
 )
@@ -35,11 +36,7 @@ from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.test_toolbar import ToolbarTestBase
-from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_structure_url,
-    get_toolbar_from_request,
-)
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.placeholder import (
     _get_nodelist,
     _scan_placeholders,

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 
-from cms.toolbar.utils import get_object_edit_url, get_object_for_language, get_object_preview_url
+from cms.shared.editing_urls import get_object_edit_url, get_object_for_language, get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.i18n import (
     force_language,

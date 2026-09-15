@@ -20,14 +20,11 @@ from django.utils.translation import get_language, override
 from django.views.debug import ExceptionReporter
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
+from cms.core.editing.structure import get_placeholder_toolbar_js, get_plugin_toolbar_js
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from cms.plugin_pool import PluginPool
-from cms.toolbar.utils import (
-    get_placeholder_toolbar_js,
-    get_plugin_toolbar_js,
-    get_toolbar_from_request,
-)
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_language_from_request
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting

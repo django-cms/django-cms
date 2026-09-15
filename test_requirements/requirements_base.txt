@@ -9,6 +9,7 @@ django-sekizai>=0.7
 django-treebeard>=4.3,<6
 djangocms-admin-style>=1.5
 djangocms-text
+import-linter  # architecture contracts, see .importlinter
 iptools
 mock>=2.0.0
 Pillow

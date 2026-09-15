@@ -21,13 +21,13 @@ from cms.models import PageContent, PageUrl, UserSettings
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
+from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
     URL_CMS_PAGE_DELETE,
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
-from cms.toolbar.utils import get_object_edit_url
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse

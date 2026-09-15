@@ -25,6 +25,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.shared.editing_urls import get_object_edit_url
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, ArticlePluginModel, Section
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
@@ -43,7 +44,6 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url
 from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
 from cms.utils.urlutils import admin_reverse
 

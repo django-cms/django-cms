@@ -12,12 +12,8 @@ from django.utils.translation import (
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Page, PageContent, PageType, Placeholder
+from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url, get_object_structure_url
 from cms.toolbar.items import REFRESH_PAGE, ButtonList, SubMenu, TemplateItem
-from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_preview_url,
-    get_object_structure_url,
-)
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions

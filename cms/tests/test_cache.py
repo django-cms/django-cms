@@ -29,6 +29,7 @@ from cms.cache.placeholder import (
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
+from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
     DateTimeCacheExpirationPlugin,
@@ -42,7 +43,6 @@ from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name

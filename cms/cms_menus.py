@@ -7,7 +7,8 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, PagePermission, PageUrl
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_toolbar_from_request
+from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,

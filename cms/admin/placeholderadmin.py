@@ -30,6 +30,7 @@ from django.views.decorators.http import require_POST
 from cms import operations
 from cms.admin.forms import PluginAddValidationForm
 from cms.constants import SLUG_REGEXP
+from cms.core.editing.structure import create_child_plugin_references, get_plugin_content, get_plugin_tree
 from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
@@ -37,12 +38,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
-from cms.toolbar.utils import (
-    create_child_plugin_references,
-    get_plugin_content,
-    get_plugin_tree,
-    get_toolbar_from_request,
-)
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list

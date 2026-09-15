@@ -39,12 +39,22 @@ from cms.cms_toolbars import (
     PageToolbar,
     get_user_model,
 )
+from cms.core.editing import structure
+from cms.core.editing.structure import get_plugin_tree
 from cms.models import PagePermission, Placeholder, UserSettings
+from cms.shared import editing_urls
+from cms.shared.editing_urls import (
+    add_live_url_querystring_param,
+    get_object_edit_url,
+    get_object_for_language,
+    get_object_live_url,
+    get_object_preview_url,
+    get_object_structure_url,
+)
 from cms.test_utils.project.placeholderapp.models import CharPksExample, Example1
 from cms.test_utils.project.placeholderapp.views import ClassDetail, detail_view
 from cms.test_utils.testcases import URL_CMS_USERSETTINGS, CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext, override_placeholder_conf
-from cms.toolbar import utils
 from cms.toolbar.items import (
     AjaxItem,
     Break,
@@ -54,16 +64,7 @@ from cms.toolbar.items import (
     ToolbarAPIMixin,
 )
 from cms.toolbar.toolbar import CMSToolbar, EmptyToolbar
-from cms.toolbar.utils import (
-    add_live_url_querystring_param,
-    get_object_edit_url,
-    get_object_for_language,
-    get_object_live_url,
-    get_object_preview_url,
-    get_object_structure_url,
-    get_plugin_tree,
-    get_toolbar_from_request,
-)
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
@@ -2439,7 +2440,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
             "render_plugin",
             side_effect=lambda *args, **kwargs: get_language(),
         ), override("en"):
-            content = utils.get_plugin_content(request, plugin)
+            content = structure.get_plugin_content(request, plugin)
 
             self.assertEqual(content[0]["html"], "de")
             self.assertEqual(get_language(), "en")
@@ -2482,7 +2483,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         # Get the original edit endpoint url, and patch it with additional querystring parameter
         base_edit_url = admin_reverse("cms_placeholder_render_object_edit", args=[content_type.pk, page_content.pk])
 
-        with patch.object(utils, "admin_reverse", return_value=f"{base_edit_url}?base_qsp=base_value"):
+        with patch.object(editing_urls, "admin_reverse", return_value=f"{base_edit_url}?base_qsp=base_value"):
             edit_url = get_object_edit_url(page_content)
 
         # Get the original edit endpoint url, and patch it with additional querystring parameter
@@ -2490,7 +2491,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
             "cms_placeholder_render_object_preview", args=[content_type.pk, page_content.pk]
         )
 
-        with patch.object(utils, "admin_reverse", return_value=f"{base_preview_url}?base_qsp=base_value"):
+        with patch.object(editing_urls, "admin_reverse", return_value=f"{base_preview_url}?base_qsp=base_value"):
             preview_url = get_object_edit_url(page_content)
 
         self.assertIn(f"?base_qsp=base_value&test-live-link={live_url}", edit_url)
@@ -2574,10 +2575,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
         self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
 
-    @patch("cms.toolbar.utils.get_cms_setting")
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_cms_setting")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_edit_url_appends_language_if_no_i18n_prefix(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
     ):
@@ -2591,10 +2592,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         url = get_object_edit_url(obj, language="de")
         self.assertIn("?language=de", url)
 
-    @patch("cms.toolbar.utils.get_cms_setting")
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_cms_setting")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_preview_url_appends_language_if_no_i18n_prefix(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
     ):
@@ -2608,9 +2609,9 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         url = get_object_preview_url(obj, language="fr")
         self.assertIn("?language=fr", url)
 
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_structure_url_appends_language_if_no_i18n_prefix(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path
     ):
@@ -2626,10 +2627,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
 
     # --- Tests for GET parameter forwarding (params argument) ---
 
-    @patch("cms.toolbar.utils.get_cms_setting")
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_cms_setting")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_edit_url_appends_extra_params(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
     ):
@@ -2646,10 +2647,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertIn("baz=qux", url)
         self.assertIn("language=de", url)
 
-    @patch("cms.toolbar.utils.get_cms_setting")
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_cms_setting")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_preview_url_appends_extra_params(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
     ):
@@ -2666,9 +2667,9 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertIn("beta=2", url)
         self.assertIn("language=fr", url)
 
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_structure_url_appends_extra_params(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path
     ):
@@ -2684,10 +2685,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertIn("y=20", url)
         self.assertIn("language=es", url)
 
-    @patch("cms.toolbar.utils.get_cms_setting")
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_cms_setting")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_url_without_params_has_no_extra_querystring(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
     ):
@@ -2701,10 +2702,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         url = get_object_edit_url(obj, language="de", params=None)
         self.assertEqual(url, "/admin/cms/placeholder/render/object/edit/1/?language=de")
 
-    @patch("cms.toolbar.utils.get_cms_setting")
-    @patch("cms.toolbar.utils.get_language_from_path")
-    @patch("cms.toolbar.utils.admin_reverse")
-    @patch("cms.toolbar.utils.ContentType")
+    @patch("cms.shared.editing_urls.get_cms_setting")
+    @patch("cms.shared.editing_urls.get_language_from_path")
+    @patch("cms.shared.editing_urls.admin_reverse")
+    @patch("cms.shared.editing_urls.ContentType")
     def test_get_object_url_does_not_mutate_original_params(
         self, mock_contenttype, mock_admin_reverse, mock_get_lang_from_path, mock_get_cms_setting
     ):
