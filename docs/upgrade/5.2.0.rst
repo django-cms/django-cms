@@ -133,6 +133,18 @@ No action beyond upgrading is required. Pages that were copied, duplicated or
 moved *before* the upgrade keep the permissions they were created with, so
 review restricted branches for unrestricted copies made earlier.
 
+One further access-control fixes round out the same area:
+
+* **The per-user permission cache was not scoped to a site.** Page permissions
+  are computed per site, but they were cached under a key that did not name
+  one, so the value warmed while a user browsed a site they work on satisfied
+  the "may change at least one page" gate of every *other* site. The page tree,
+  changelist and page-link autocomplete of those sites then listed their pages
+  -- titles, slugs and URLs -- to a user with no rights on them. Per-page checks
+  were unaffected, so this disclosed page trees but granted no write access.
+  Both require ``CMS_PERMISSION = True``; the cache issue additionally requires
+  a multi-site installation.
+
 Bug Fixes
 =========
 
@@ -180,6 +192,35 @@ moves:
 See :doc:`/explanation/permissions` for the full picture of how permissions
 behave when pages are moved, copied or deleted.
 
+``cms.cache.permissions`` helpers take the site
+===============================================
+
+Fixing the permission cache described above required the site to become part of
+the cache key, so the helpers in ``cms.cache.permissions`` take it as their
+second argument::
+
+    # before
+    get_cache_key(user, "change_page")
+    get_permission_cache(user, "change_page")
+    set_permission_cache(user, "change_page", value)
+
+    # after
+    get_cache_key(user, site, "change_page")
+    get_permission_cache(user, site, "change_page")
+    set_permission_cache(user, site, "change_page", value)
+
+``site`` is a ``django.contrib.sites.models.Site`` instance. Pass the site the
+permissions were computed for, which may differ from
+``Site.objects.get_current()`` in a multi-site installation.
+
+``clear_user_permission_cache(user)`` keeps its existing signature and now
+clears the user's entries for every site.
+
+This is an internal API, but projects or packages that warm or inspect the
+permission cache directly must update their calls to include the site. Calls
+using the old signatures raise ``TypeError``.
+
+
 Changing a page template needs only the change permission
 =========================================================
 
@@ -204,11 +245,6 @@ withhold the *change page* permission on those pages instead.
     settings* permission, back when the template was a field of ``Page``. The
     two remaining checks from that change are removed.
 
-``cms.cache.permissions`` helpers take the site
-===============================================
-
-TODO: what changed, who is affected, and what to do instead.
-
 Dependencies, settings, and migrations
 ======================================
 
@@ -217,10 +253,15 @@ TODO: new or raised dependencies, changed defaults, and new migrations.
 Features deprecated in 5.2.0
 ============================
 
-Deprecation area 1
-------------------
+Page admin site helpers
+-----------------------
 
-* TODO: what is deprecated, when it will be removed, and the replacement.
+* ``PageContentAdmin.user_can_access_site()`` and
+  ``PageContentAdmin.raise_site_permission_denied()`` are deprecated and will be
+  removed in django CMS 6.0. Neither has ever been called: site isolation is
+  enforced by ``PageContentAdmin.has_change_permission()``, which checks
+  ``user_can_change_at_least_one_page()`` against the site of the request. Use
+  that instead, and raise ``django.core.exceptions.PermissionDenied`` directly.
 
 Deprecation area 2
 ------------------
