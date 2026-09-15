@@ -103,6 +103,12 @@ def details(request, slug):
     site = get_current_site(request)
     page = get_page_from_request(request, use_path=slug)
 
+    if page and page.is_page_type:
+        # Page types are blueprints used to create new pages, not content: they
+        # must not be served on the public site. The admin renders them through
+        # the object preview/edit endpoints instead.
+        return _handle_no_page(request)
+
     if not page and not slug and not Page.objects.on_site(site).exists():
         # render the welcome page if the requested path is root "/"
         # and there's no pages

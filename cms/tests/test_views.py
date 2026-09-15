@@ -14,7 +14,7 @@ from django.utils import translation
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import override as force_language
 
-from cms.api import create_page, create_page_content
+from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings
 from cms.page_rendering import _handle_no_page
@@ -88,6 +88,33 @@ class ViewTests(CMSTestCase):
             response = self.client.get("/en/")
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.template_name, "cms/welcome.html")
+
+    def _create_page_type(self, title="my type"):
+        from cms import constants
+        from cms.models import Page
+
+        root = create_page("Page Types", "nav_playground.html", "en", reverse_id=constants.PAGE_TYPES_ID)
+        page_type = create_page(title, "nav_playground.html", "en", parent=root)
+        Page.objects.filter(pk__in=(root.pk, page_type.pk)).update(is_page_type=True)
+        return Page.objects.get(pk=page_type.pk)
+
+    def test_page_types_are_not_served(self):
+        """
+        Page types are blueprints used to create new pages, not content, so they
+        must not be rendered on the public site -- not even for a superuser.
+        """
+        page_type = self._create_page_type()
+        add_plugin(page_type.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body="blueprint")
+        url = page_type.get_absolute_url("en")
+
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+        with self.login_user_context(self.get_superuser()):
+            self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_page_types_root_is_not_served(self):
+        page_type = self._create_page_type()
+        self.assertEqual(self.client.get(page_type.parent.get_absolute_url("en")).status_code, 404)
 
     def test_handle_no_page(self):
         """

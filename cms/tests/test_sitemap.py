@@ -2,8 +2,9 @@ import copy
 
 from django.db.models import QuerySet
 
+from cms import constants
 from cms.api import create_page, create_page_content
-from cms.models import PageUrl
+from cms.models import Page, PageUrl
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.conf import get_cms_setting
@@ -120,6 +121,23 @@ class SitemapTestCase(CMSTestCase):
                 if item["item"].path:
                     url += item["item"].path + "/"
                 self.assertEqual(item["location"], url)
+
+    def test_sitemap_excludes_page_types(self):
+        """
+        Page types are blueprints for new pages, not content, and are not served
+        on the public site -- so they must not be advertised to crawlers either.
+        """
+        count = len(CMSSitemap().items())
+
+        root = create_page(
+            "Page Types", "nav_playground.html", "en", reverse_id=constants.PAGE_TYPES_ID
+        )
+        page_type = create_page("a type", "nav_playground.html", "en", parent=root)
+        Page.objects.filter(pk__in=(root.pk, page_type.pk)).update(is_page_type=True)
+
+        items = CMSSitemap().items()
+        self.assertEqual(len(items), count)
+        self.assertFalse(items.filter(page__is_page_type=True).exists())
 
     def test_sitemap_items_type(self):
         """

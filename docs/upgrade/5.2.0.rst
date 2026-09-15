@@ -180,8 +180,32 @@ moves:
 See :doc:`/explanation/permissions` for the full picture of how permissions
 behave when pages are moved, copied or deleted.
 
-Backward incompatible change 2
-==============================
+Changing a page template needs only the change permission
+=========================================================
+
+The template moved from ``Page`` to ``PageContent`` in django CMS 4: it is
+per-language content, not page configuration, and it is not part of the
+*Advanced settings* form. The permission it requires now says so consistently --
+*change page* is enough everywhere:
+
+* The toolbar's *Page > Templates* menu is shown to anyone who may change the
+  page, and disabled for anyone who may not. It used to be hidden outright
+  without the *change advanced settings* permission.
+* The ``change-template/`` endpoint no longer requires that permission either.
+  It used to answer ``403`` without it.
+
+The page content change form, which has always offered the *Template* field on
+the change permission alone, is unchanged. Projects that relied on *change
+advanced settings* to keep delegated editors away from templates no longer can:
+withhold the *change page* permission on those pages instead.
+
+..  versionchanged:: 5.2
+    django CMS 3.4.6 made template changes require the *change advanced
+    settings* permission, back when the template was a field of ``Page``. The
+    two remaining checks from that change are removed.
+
+``cms.cache.permissions`` helpers take the site
+===============================================
 
 TODO: what changed, who is affected, and what to do instead.
 
