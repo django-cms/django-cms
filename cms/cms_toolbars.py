@@ -66,8 +66,15 @@ USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
-TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
-SHORTCUTS_BREAK = 'Shortcuts Break'
+TOOLBAR_DISABLE_BREAK = "Toolbar disable Break"
+SHORTCUTS_BREAK = "Shortcuts Break"
+
+DEFAULT_HELP_MENU_ITEMS = (
+    (_("Documentation"), "https://docs.django-cms.org/en/stable/"),
+    (_("User guide"), "https://user-guide.django-cms.org"),
+    (_("Discord community"), "https://www.django-cms.org/discord"),
+    (_("What's new"), "https://www.django-cms.org/en/blog/"),
+)
 
 
 @toolbar_pool.register
