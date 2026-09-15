@@ -11,11 +11,11 @@ from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
+from cms.shared.signals import placeholder_cache_cleared
 from cms.utils import get_language_from_request, permissions
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
@@ -369,13 +369,18 @@ class Placeholder(models.Model):
         return min_ttl
 
     def clear_cache(self, language, site_id=None):
-        if get_cms_setting("PAGE_CACHE"):
-            # Clears all the page caches
-            invalidate_cms_page_cache()
-
         if not site_id and self.page:
             site_id = self.page.site_id
         clear_placeholder_cache(self, language, get_site_id(site_id))
+        # Caches that embed rendered placeholder content -- the page cache, for
+        # one -- are now stale. Their owners listen for this; core does not
+        # invalidate them itself.
+        placeholder_cache_cleared.send(
+            sender=Placeholder,
+            placeholder=self,
+            language=language,
+            site_id=site_id,
+        )
 
     def get_plugin_tree_order(self, language, parent_id=None):
         """

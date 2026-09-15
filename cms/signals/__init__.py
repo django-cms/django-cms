@@ -12,10 +12,15 @@ from cms.models import (
     PageUser,
     PageUserGroup,
 )
+from cms.shared.signals import page_caches_invalidated, placeholder_cache_cleared
 
 # Import pagecontent signal handlers to ensure they are connected
 from cms.signals import pagecontent  # noqa: F401
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
+from cms.signals.cache import (
+    clear_menu_cache_for_page,
+    invalidate_page_cache_for_placeholder,
+)
 from cms.signals.log_entries import (
     log_page_operations,
     log_placeholder_operations,
@@ -85,6 +90,19 @@ if settings.DEBUG:
 
 urls_need_reloading.connect(trigger_server_restart, dispatch_uid="aldryn-apphook-reload-handle-urls-need-reloading")
 
+
+# ##################### cross-container caches #######################
+
+# The model layer announces what it invalidated; reaching into another
+# container to act on it happens here. See cms.shared.signals.
+placeholder_cache_cleared.connect(
+    invalidate_page_cache_for_placeholder,
+    dispatch_uid="cms_invalidate_page_cache_for_placeholder",
+)
+page_caches_invalidated.connect(
+    clear_menu_cache_for_page,
+    dispatch_uid="cms_clear_menu_cache_for_page",
+)
 
 # ##################### log entries #######################
 

@@ -94,7 +94,6 @@ forbidden_modules =
     menus
 ignore_imports =
     cms.models.placeholdermodel -> cms.models.contentmodels
-    cms.models.placeholdermodel -> cms.cache
     cms.models.placeholdermodel -> cms.cache.placeholder
     cms.plugin_rendering -> cms.cache.placeholder
     cms.admin.placeholderadmin -> cms.views
@@ -205,8 +204,6 @@ source_modules =
     cms.models.pagemodel
 forbidden_modules =
     menus
-ignore_imports =
-    cms.models.pagemodel -> menus.menu_pool
 
 # ---------------------------------------------------------------------------
 # Container: permissions  (RFC 6.2)
@@ -243,7 +240,7 @@ ignore_imports =
 # to stop it regressing.
 # ---------------------------------------------------------------------------
 [importlinter:contract:model-layer]
-name = the model layer does not import admin, toolbar or templatetags
+name = the model layer does not import admin, toolbar, templatetags or menus
 type = forbidden
 allow_indirect_imports = True
 source_modules =
@@ -254,6 +251,7 @@ forbidden_modules =
     cms.templatetags
     cms.toolbar
     cms.toolbar_pool
+    menus
 
 # ---------------------------------------------------------------------------
 # Layer: shared  (RFC 5, `contrib` / `shared`)

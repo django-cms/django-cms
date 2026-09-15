@@ -17,13 +17,13 @@ from django.utils.translation import get_language, gettext_lazy as _, override a
 
 from cms import constants
 from cms.models.managers import PageManager, PageUrlManager
+from cms.shared.signals import page_caches_invalidated
 from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
 from cms.utils.mptree import get_tree_base
 from cms.utils.page import get_clean_username
-from menus.menu_pool import menu_pool
 
 logger = getLogger(__name__)
 
@@ -786,9 +786,16 @@ class Page(MP_Node):
             for placeholder_instance in placeholders:
                 placeholder_instance.clear_cache(language, site_id=self.site_id)
 
-        if menu:
-            # Clears all menu caches for this page's site
-            menu_pool.clear(site_id=self.site_id)
+        # Navigation caches belong to the menus container. A receiver in
+        # cms.signals.cache clears them, so the model layer no longer has to
+        # import menus.menu_pool.
+        page_caches_invalidated.send(
+            sender=Page,
+            page=self,
+            language=language,
+            menu=menu,
+            placeholder=placeholder,
+        )
 
     def get_child_pages(self):
         return self.get_children().order_by("path")
