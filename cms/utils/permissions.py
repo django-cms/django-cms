@@ -178,11 +178,16 @@ def get_user_permission_level(user, site):
 def cached_func(func):
     @wraps(func, assigned=available_attrs(func))
     def cached_func(user, *args, **kwargs):
-        func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+        from cms.cache.permissions import get_cache_permission_version
 
-        if not hasattr(user, func_cache_name):
+        func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+        func_version_name = '%s_version' % func_cache_name
+        version = get_cache_permission_version()
+
+        if not hasattr(user, func_cache_name) or getattr(user, func_version_name, None) != version:
             cached_func = lru_cache(maxsize=None)(func)
             setattr(user, func_cache_name, cached_func)
+            setattr(user, func_version_name, version)
         return getattr(user, func_cache_name)(user, *args, **kwargs)
 
     # Allows us to access the un-cached function
@@ -194,6 +199,9 @@ def clear_func_cache(user, func):
     func_cache_name = '_djangocms_cached_func_%s' % func.__name__
     if hasattr(user, func_cache_name):
         delattr(user, func_cache_name)
+    func_version_name = '%s_version' % func_cache_name
+    if hasattr(user, func_version_name):
+        delattr(user, func_version_name)
 
 
 def clear_permission_lru_caches(user):
