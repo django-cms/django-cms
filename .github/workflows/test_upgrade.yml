@@ -1,9 +1,10 @@
 name: django CMS upgrade test
 
 # Release PRs into a release branch bump cms/__init__.py. For those, install the
-# previous version into a fresh project, create content, upgrade to the PR's
-# version and check that migrations run through and the site still works on
-# all supported databases.
+# latest release before the PR's version (which may be a major version jump)
+# into a fresh project, create content, upgrade to the PR's version and check
+# that migrations run through and the site still works on all supported
+# databases.
 
 on:
   pull_request:
@@ -25,7 +26,6 @@ jobs:
       changed: ${{ steps.versions.outputs.changed }}
       old-version: ${{ steps.versions.outputs.old-version }}
       new-version: ${{ steps.versions.outputs.new-version }}
-      old-source: ${{ steps.versions.outputs.old-source }}
     steps:
     - uses: actions/checkout@v7
       with:
@@ -38,6 +38,9 @@ jobs:
         path: base
         sparse-checkout: cms/__init__.py
         sparse-checkout-cone-mode: false
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.13'
     - name: Compare versions
       id: versions
       run: |
@@ -45,27 +48,22 @@ jobs:
         get_version() {
           sed -n "s/^__version__ = [\"']\(.*\)[\"']/\1/p" "$1/cms/__init__.py"
         }
-        old=$(get_version base)
+        base=$(get_version base)
         new=$(get_version head)
-        echo "Base version: $old"
+        echo "Base version: $base"
         echo "PR version:   $new"
-        echo "old-version=$old" >> "$GITHUB_OUTPUT"
         echo "new-version=$new" >> "$GITHUB_OUTPUT"
-        if [ "$old" = "$new" ]; then
+        if [ "$base" = "$new" ]; then
           echo "changed=false" >> "$GITHUB_OUTPUT"
           echo "Version unchanged, skipping upgrade test."
           exit 0
         fi
         echo "changed=true" >> "$GITHUB_OUTPUT"
-        # Test the upgrade from the release users actually have installed. Fall
-        # back to the base branch's source if that version was never published.
-        if python3 -m pip download --no-deps --quiet --dest "$RUNNER_TEMP/dl" "django-cms==$old"; then
-          echo "old-source=pypi" >> "$GITHUB_OUTPUT"
-          echo "Previous version $old will be installed from PyPI."
-        else
-          echo "old-source=git" >> "$GITHUB_OUTPUT"
-          echo "Previous version $old is not on PyPI, installing from base commit."
-        fi
+        # Upgrade from the latest release on PyPI before the new version
+        old=$(python -m pip install --dry-run --no-deps --ignore-installed --quiet --report - "django-cms<$new" \
+          | python -c 'import json, sys; print(json.load(sys.stdin)["install"][0]["metadata"]["version"])')
+        echo "Previous release: $old"
+        echo "old-version=$old" >> "$GITHUB_OUTPUT"
 
   upgrade:
     needs: detect-version-change
@@ -76,7 +74,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.13']
-        # Latest LTS and latest release supported by both versions
+        # Latest LTS and latest release; both must be supported by the previous
+        # release too, so adjust when testing an upgrade across major versions
         django:
           - version: '5.2'
             requirement: 'Django>=5.2,<6.0'
@@ -115,30 +114,18 @@ jobs:
     - uses: actions/checkout@v7
       with:
         path: head
-    - uses: actions/checkout@v7
-      if: needs.detect-version-change.outputs.old-source == 'git'
-      with:
-        ref: ${{ github.event.pull_request.base.sha }}
-        path: base
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install django CMS ${{ env.OLD_VERSION }}
-      env:
-        OLD_SOURCE: ${{ needs.detect-version-change.outputs.old-source }}
       run: |
         set -euo pipefail
         python -m pip install --upgrade pip uv
-        if [ "$OLD_SOURCE" = pypi ]; then
-          old_package="django-cms==$OLD_VERSION"
-        else
-          old_package="./base"
-        fi
         uv pip install --system \
           "${{ matrix.django.requirement }}" \
-          "$old_package" \
+          "django-cms==$OLD_VERSION" \
           djangocms-text \
           dj-database-url \
           -r head/test_requirements/databases.txt
