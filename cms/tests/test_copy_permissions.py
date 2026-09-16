@@ -1,7 +1,9 @@
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.sites.models import Site
-from django.test import override_settings
+from django.core.exceptions import ValidationError
+from django.test import RequestFactory, override_settings
 
+from cms.admin.forms import AddPageForm, DuplicatePageForm
 from cms.api import add_plugin, create_page
 from cms.constants import PAGE_TYPES_ID
 from cms.models import (
@@ -430,6 +432,7 @@ class PageTypeSourcePermissionsTests(CMSTestCase):
                 },
             )
         self.actor = type(self.actor).objects.get(pk=self.actor.pk)
+        self.target.refresh_from_db()
         return response, self.target.get_child_pages().first()
 
     def assertAddDenied(self, source):
@@ -524,3 +527,29 @@ class PageTypeSourcePermissionsTests(CMSTestCase):
             )
         self.assertEqual(response.status_code, 302)
         self.assertNotContains(self.client.get(destination.get_absolute_url("en")), self.marker)
+
+    @override_settings(
+        CMS_LANGUAGES={
+            1: [{"code": "en", "name": "English"}],
+            2: [{"code": "en", "name": "English"}],
+        }
+    )
+    def test_source_view_permission_is_checked_on_the_source_site(self):
+        # The admin may work on a site other than ``SITE_ID``. A global view grant
+        # limited to ``SITE_ID`` must not unlock a restricted page on that site.
+        site = Site.objects.create(domain="other.example", name="Other")
+        source = self.create_page_type("restricted-type", site=site)
+        self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
+        permission = self.add_global_permission(self.actor, can_view=True)
+        permission.sites.set([Site.objects.get(pk=1)])
+        request = RequestFactory().get("/")
+        request.user = self.actor
+        self.assertTrue(page_permissions.user_can_view_all_pages(self.actor, Site.objects.get(pk=1)))
+        self.assertFalse(page_permissions.user_can_view_page(self.actor, source, site=site))
+
+        for form_class in (AddPageForm, DuplicatePageForm):
+            with self.subTest(form=form_class.__name__):
+                form = type(form_class.__name__, (form_class,), {"_site": site, "_request": request})()
+                form.cleaned_data = {"source": source}
+                with self.assertRaises(ValidationError):
+                    form.clean_source()
