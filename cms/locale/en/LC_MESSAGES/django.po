@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-05 11:22+0000\n"
+"POT-Creation-Date: 2026-09-16 15:10+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -33,6 +33,14 @@ msgstr "The part of the title that is used in the URL"
 
 msgid "Page type"
 msgstr "Page type"
+
+#, fuzzy
+#| msgid "You do not have permission to edit this page"
+msgid "You do not have permission to use this page type."
+msgstr "You do not have permission to edit this page"
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
 
 #, fuzzy
 #| msgid "You do not have permission to edit this page"
@@ -398,9 +406,6 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Placeholder"
-
-msgid "Getting started developer guide"
-msgstr "Getting started developer guide"
 
 msgid "Documentation"
 msgstr "Documentation"
@@ -1853,6 +1858,9 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid "Getting started developer guide"
+#~ msgstr "Getting started developer guide"
 
 #~ msgid ""
 #~ "(to change it, first unpublish the currently published version of this "
