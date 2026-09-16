@@ -355,7 +355,7 @@ class AddPageForm(BasePageContentForm):
         # client on POST and ``has_add_permission`` only checks that the user may
         # create *a* page, not that they may read ``source`` -- whose placeholders,
         # plugins and extensions ``save()`` copies into the new page.
-        if source and not user_can_view_page(self._user, source):
+        if source and not user_can_view_page(self._user, source, site=source.site):
             raise ValidationError(self.source_permission_denied)
         return source
 
@@ -588,7 +588,7 @@ class DuplicatePageForm(AddPageForm):
         # ``copy(..., permissions=False)`` even strips the source's view
         # restrictions, leaving the copy fully readable. Require that the user
         # is actually allowed to view the page they are copying.
-        if source and not user_can_view_page(self._user, source):
+        if source and not user_can_view_page(self._user, source, site=source.site):
             raise ValidationError(self.source_permission_denied)
         return source
 
