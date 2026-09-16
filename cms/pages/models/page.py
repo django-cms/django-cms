@@ -16,7 +16,7 @@ from django.utils.timezone import now
 from django.utils.translation import get_language, gettext_lazy as _, override as force_language
 
 from cms import constants
-from cms.models.managers import PageManager, PageUrlManager
+from cms.pages.models.managers import PageManager, PageUrlManager
 from cms.pages.mptree import get_tree_base
 from cms.pages.utils import get_clean_username
 from cms.shared.resolvers import provide

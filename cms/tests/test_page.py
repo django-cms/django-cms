@@ -1091,7 +1091,7 @@ class PageContentTests(CMSTestCase):
         self.assertEqual(german_content.pk, self.german_content.pk)
 
     def test_page_content_manager(self):
-        from cms.models.managers import ContentAdminQuerySet
+        from cms.pages.models.managers import ContentAdminQuerySet
 
         # check if admin_manager exists
         self.assertTrue(isinstance(PageContent.admin_manager, models.Manager))

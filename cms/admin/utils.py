@@ -28,7 +28,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 from django.views.decorators.http import require_GET
 
-from cms.models.managers import ContentAdminManager
+from cms.pages.models.managers import ContentAdminManager
 from cms.shared.editing_urls import get_object_edit_url
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.helpers import is_editable_model

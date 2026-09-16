@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms.models.fields import PlaceholderRelationField
-from cms.models.managers import ContentAdminManager, PageContentManager
+from cms.pages.models.managers import ContentAdminManager, PageContentManager
 from cms.pages.models.page import Page
 from cms.shared.resolvers import provide
 from cms.utils.conf import get_cms_setting
