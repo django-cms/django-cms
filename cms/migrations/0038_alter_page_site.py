@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="usersettings",
             name="clipboard",
-            field=cms.models.settingmodels.PlaceholderForeignKey(
+            field=cms.core.models.settings.PlaceholderForeignKey(
                 blank=True,
                 editable=False,
                 null=True,

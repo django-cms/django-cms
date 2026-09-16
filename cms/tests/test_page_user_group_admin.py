@@ -2,7 +2,7 @@ from django.contrib.messages.storage.cookie import CookieStorage
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
-from cms.models.permissionmodels import PageUserGroup
+from cms.permissions.models import PageUserGroup
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
 

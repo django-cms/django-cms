@@ -19,7 +19,7 @@ from cms.models import Placeholder, UserSettings
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url, get_object_structure_url
 from cms.templates import TemplatesCache
 from cms.toolbar.items import ButtonList, Menu, ToolbarAPIMixin
-from cms.toolbar_pool import toolbar_pool
+from cms.toolbar.pool import toolbar_pool
 from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
@@ -397,7 +397,7 @@ class CMSToolbarBase(BaseToolbar):
         Associates an object with the toolbar.
 
         Sets the toolbar's object if one has not already been set. This object is typically
-        a Django model instance that the toolbar should operate on, such as a :class:`~cms.models.contentmodels.PageContent` object or any
+        a Django model instance that the toolbar should operate on, such as a :class:`~cms.pages.models.content.PageContent` object or any
         other model that supports editable placeholders through a :class:`~cms.models.fields.PlaceholderRelationField`.
 
         The object is used by other toolbar methods like

@@ -1,7 +1,7 @@
 from django.urls import NoReverseMatch
 
 from cms.models import PageContent
-from cms.toolbar_base import CMSToolbar
+from cms.toolbar.base import CMSToolbar
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
 
@@ -70,7 +70,7 @@ class ExtensionToolbar(CMSToolbar):
         """
         Get the admin url for the page content extensions menu item, depending on whether a
         :class:`~cms.extensions.models.PageContentExtension` instance exists for the
-        :class:`~cms.models.contentmodels.PageContent` displayed.
+        :class:`~cms.pages.models.content.PageContent` displayed.
 
         Return a tuple of the page content extension and the url; the extension is None
         if no instance exists, the url is None is no admin is registered for the extension.

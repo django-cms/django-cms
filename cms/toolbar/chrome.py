@@ -17,9 +17,9 @@ from django.urls import NoReverseMatch
 from django.utils.translation import gettext_lazy as _
 
 from cms.shared import resolvers
+from cms.toolbar.base import CMSToolbar
 from cms.toolbar.items import SubMenu, TemplateItem
-from cms.toolbar_base import CMSToolbar
-from cms.toolbar_pool import toolbar_pool
+from cms.toolbar.pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse

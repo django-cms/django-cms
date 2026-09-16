@@ -18,7 +18,7 @@ from cms.cache.permissions import (
     set_permission_cache,
 )
 from cms.models import Page, PageContent
-from cms.models.permissionmodels import (
+from cms.permissions.models import (
     ACCESS_CHILDREN,
     ACCESS_DESCENDANTS,
     ACCESS_PAGE,

@@ -25,11 +25,11 @@ from cms.admin.pageadmin import PAGE_SMART_LINK_MAX_RESULTS, PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
+from cms.core.models.plugin import CMSPlugin
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models import PageContent
-from cms.models.pagemodel import Page, PageUrl
-from cms.models.permissionmodels import PagePermission
-from cms.models.pluginmodel import CMSPlugin
+from cms.pages.models.page import Page, PageUrl
+from cms.permissions.models import PagePermission
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
@@ -1599,7 +1599,7 @@ class PageTest(PageTestBase):
         # Simulate a versioning package: the latest content for this language differs from the
         # content object being shown.
         fake_latest = type("FakeContent", (), {"pk": content.pk + 1000})()
-        with patch("cms.models.pagemodel.Page.get_admin_content", return_value=fake_latest):
+        with patch("cms.pages.models.page.Page.get_admin_content", return_value=fake_latest):
             with self.login_user_context(superuser):
                 response = self.client.get(change_url)
         self.assertNotContains(response, 'id="page_form_lang_tabs"')

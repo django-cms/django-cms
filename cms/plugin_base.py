@@ -20,9 +20,9 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.core.editing.structure import get_plugin_tree
+from cms.core.models.placeholder import Placeholder
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
-from cms.models.placeholdermodel import Placeholder
 from cms.utils.compat.warnings import RemovedInDjangoCMS70Warning
 from cms.utils.conf import get_cms_setting
 
@@ -115,7 +115,7 @@ def _obj_from_deprecated_page(obj, page, method_name: str):
     """Accept the old ``page=`` keyword for what is really the source object.
 
     These arguments were always duck-typed on ``get_template()``, never required
-    to be a :class:`~cms.models.pagemodel.Page`, and the core container must not
+    to be a :class:`~cms.pages.models.page.Page`, and the core container must not
     depend on pages at all. The parameter is therefore ``obj``; ``page=`` keeps
     working for one more major release.
 
@@ -203,7 +203,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     render_plugin = True
 
     #: If the plugin requires per-instance settings, then this setting must be set to a model that inherits from
-    #: :class:`~cms.models.pluginmodel.CMSPlugin`. See also: :ref:`storing configuration`.
+    #: :class:`~cms.core.models.plugin.CMSPlugin`. See also: :ref:`storing configuration`.
     model = CMSPlugin
 
     text_enabled = False
@@ -387,7 +387,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         :param dict context: The context with which the page is rendered.
         :param instance: The instance of your plugin that is rendered.
-        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+        :type instance: :class:`cms.core.models.plugin.CMSPlugin` instance
         :param str placeholder: The name of the placeholder that is rendered.
         :rtype: `dict` or :class:`django.template.Context`
 
@@ -441,7 +441,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """Cache the template of the object the placeholder belongs to.
 
         ``obj`` is any model with a ``get_template()`` method, not only a
-        :class:`~cms.models.pagemodel.Page` -- it is duck-typed below, and the
+        :class:`~cms.pages.models.page.Page` -- it is duck-typed below, and the
         argument is being renamed to ``obj``. Caching matters because
         ``get_template()`` may have to fetch the page content object from the
         database since django CMS 4."""
@@ -744,7 +744,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         to an icon to display in the text of the text plugin.
 
         :param instance: The instance of the plugin model.
-        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+        :type instance: :class:`cms.core.models.plugin.CMSPlugin` instance
 
         Example::
 
@@ -763,7 +763,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         :param instance: The instance of the plugin model to provide specific information
             for the 'alt' text.
-        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+        :type instance: :class:`cms.core.models.plugin.CMSPlugin` instance
 
         By default, :meth:`icon_alt` will return a string of the form: "[plugin type] -
         [instance]", but can be modified to return anything you like.

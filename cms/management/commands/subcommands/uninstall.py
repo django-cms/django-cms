@@ -1,7 +1,7 @@
 from django.core.management.base import LabelCommand
 
+from cms.core.models.plugin import CMSPlugin
 from cms.models import Page
-from cms.models.pluginmodel import CMSPlugin
 
 from .base import SubcommandsCommand
 

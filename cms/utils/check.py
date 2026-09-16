@@ -307,9 +307,9 @@ def check_plugin_instances(output):
 
 @define_check
 def check_copy_relations(output):
+    from cms.core.models.plugin import CMSPlugin
     from cms.extensions import extension_pool
     from cms.extensions.models import BaseExtension
-    from cms.models.pluginmodel import CMSPlugin
     from cms.plugin_pool import plugin_pool
 
     def c_to_s(klass):

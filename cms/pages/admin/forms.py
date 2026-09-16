@@ -36,14 +36,14 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
-from cms.models.permissionmodels import (
-    EDIT_PERMISSION_REQUIRED_MESSAGES,
-    User,
-)
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
 from cms.operations.helpers import (
     send_post_page_operation,
     send_pre_page_operation,
+)
+from cms.permissions.models import (
+    EDIT_PERMISSION_REQUIRED_MESSAGES,
+    User,
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger

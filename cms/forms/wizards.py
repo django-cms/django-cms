@@ -5,7 +5,7 @@ from django.utils.html import strip_tags
 from django.utils.text import slugify
 from django.utils.translation import gettext, gettext_lazy as _
 
-from cms.admin.forms import AddPageForm
+from cms.pages.admin.forms import AddPageForm
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting

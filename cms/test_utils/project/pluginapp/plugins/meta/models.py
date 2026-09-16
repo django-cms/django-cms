@@ -1,4 +1,4 @@
-from cms.models.pluginmodel import CMSPlugin
+from cms.core.models.plugin import CMSPlugin
 
 
 class TestPluginModel(CMSPlugin):

@@ -7,13 +7,13 @@ from django.utils.translation import gettext_lazy as _
 from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
-from cms.models.pagemodel import Page
+from cms.pages.models.page import Page
 
 
 class PageSelectFormField(forms.MultiValueField):
     """
     Behaves like a :class:`django.forms.ModelChoiceField` field for the
-    :class:`cms.models.pagemodel.Page` model, but displays itself as a split
+    :class:`cms.pages.models.page.Page` model, but displays itself as a split
     field with a select drop-down for the site and one for the page. It also
     indents the page names based on what level they're on, so that the page
     select drop-down is easier to use. This takes the same arguments as

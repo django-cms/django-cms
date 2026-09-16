@@ -27,11 +27,11 @@ from django.views.decorators.http import require_POST
 from cms import operations
 from cms.constants import SLUG_REGEXP
 from cms.core.editing.structure import create_child_plugin_references, get_plugin_content, get_plugin_tree
+from cms.core.models.placeholder import Placeholder
+from cms.core.models.plugin import CMSPlugin
 from cms.core.services import plugins as plugin_services
 from cms.core.services.permissions import AdminPluginPermissions
 from cms.exceptions import PluginLimitReached
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
 from cms.pages.admin.forms import PluginAddValidationForm
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool

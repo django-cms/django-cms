@@ -18,10 +18,10 @@ from django.utils.translation import override as force_language
 from cms import constants
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cache.page import get_page_cache
+from cms.core.models.placeholder import Placeholder
+from cms.core.models.plugin import CMSPlugin
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, PageContent
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting

@@ -1,5 +1,5 @@
 from cms.api import create_page
-from cms.models.pagemodel import Page
+from cms.pages.models.page import Page
 
 
 class NavextendersFixture:

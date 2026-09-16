@@ -78,7 +78,7 @@ class TreeFieldParityTests(SimpleTestCase):
     def test_queryset_is_treebeard_free_in_mptree_mode(self):
         # The page queryset must not inherit from treebeard when the mptree
         # backend is active -- otherwise treebeard would be imported.
-        from cms.models.query import PageQuerySet
+        from cms.pages.models.query import PageQuerySet
 
         mro_modules = {base.__module__ for base in PageQuerySet.__mro__}
         self.assertNotIn("treebeard.mp_tree", mro_modules)

@@ -46,8 +46,6 @@ from cms.models import (
     PagePermission,
     PageUrl,
 )
-from cms.models.pagemodel import AdminCacheDict
-from cms.models.permissionmodels import PermissionTuple
 from cms.pages import services as page_services
 from cms.pages.admin.forms import (
     AddPageForm,
@@ -59,8 +57,10 @@ from cms.pages.admin.forms import (
     DuplicatePageForm,
     MovePageForm,
 )
+from cms.pages.models.page import AdminCacheDict
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
 from cms.permissions.admin import PERMISSION_ADMIN_INLINES
+from cms.permissions.models import PermissionTuple
 from cms.plugin_pool import plugin_pool
 from cms.shared.editing_urls import get_object_edit_url
 from cms.shared.operations import OperationContext

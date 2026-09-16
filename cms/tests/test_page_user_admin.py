@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
-from cms.models.permissionmodels import PageUser
+from cms.permissions.models import PageUser
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.permissions import get_subordinate_users
 from cms.utils.urlutils import admin_reverse

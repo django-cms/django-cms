@@ -40,7 +40,7 @@ __all__ = ["MovedName", "moved", "registry", "resolve"]
 class MovedName(NamedTuple):
     """One relocated name, as recorded by :func:`moved`."""
 
-    #: Dotted path the name used to live at, e.g. ``cms.models.pagemodel.Page``.
+    #: Dotted path the name used to live at, e.g. ``cms.pages.models.page.Page``.
     old_path: str
     #: Dotted path it lives at now.
     new_path: str

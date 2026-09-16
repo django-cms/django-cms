@@ -6,7 +6,7 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from cms.models.contentmodels import PageContent
+from cms.pages.models.content import PageContent
 from cms.signals.apphook import set_restart_trigger
 
 logger = logging.getLogger(__name__)

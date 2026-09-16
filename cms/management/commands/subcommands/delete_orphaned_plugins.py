@@ -2,9 +2,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 
+from cms.core.models.placeholder import Placeholder
+from cms.core.models.plugin import CMSPlugin
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
 
 from .base import SubcommandsCommand
 

@@ -12,10 +12,10 @@ from django.test.utils import CaptureQueriesContext, override_settings
 from djangocms_text.cms_plugins import TextPlugin
 
 from cms.api import add_plugin, create_page, create_page_content
+from cms.core.models.placeholder import Placeholder
+from cms.core.models.plugin import CMSPlugin
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models import Page, PageUrl
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase

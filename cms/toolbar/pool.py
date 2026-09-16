@@ -35,12 +35,12 @@ class ToolbarPool:
     def register(self, toolbar):
         if not self.force_register and get_cms_setting('TOOLBARS'):
             return toolbar
-        from cms.toolbar_base import CMSToolbar
+        from cms.toolbar.base import CMSToolbar
 
         # validate the app
         if not issubclass(toolbar, CMSToolbar):
             raise ImproperlyConfigured('CMS Toolbar must inherit '
-                                       'cms.toolbar_base.CMSToolbar, %r does not' % toolbar)
+                                       'cms.toolbar.base.CMSToolbar, %r does not' % toolbar)
         name = f"{toolbar.__module__}.{toolbar.__name__}"
         if name in self.toolbars.keys():
             raise ToolbarAlreadyRegistered("[%s] a toolbar with this name is already registered" % name)

@@ -11,7 +11,7 @@ from cms.utils.urlutils import admin_reverse, relative_url_regex
 
 if TYPE_CHECKING:
     # Only needed for type hinting - avoid circular import
-    from cms.models.pagemodel import Page
+    from cms.pages.models.page import Page
 
 
 def validate_relative_url(value):
@@ -46,7 +46,7 @@ def validate_url_uniqueness(
     site, path: str, language: str, user_language: str | None = None, exclude_page: Optional["Page"] = None
 ):
     """Checks for conflicting urls"""
-    from cms.models.pagemodel import PageUrl
+    from cms.pages.models.page import PageUrl
 
     if "/" in path:
         validate_url(path)

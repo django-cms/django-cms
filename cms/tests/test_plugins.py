@@ -20,9 +20,9 @@ from djangocms_text.models import Text
 
 from cms import api
 from cms.api import create_page
+from cms.core.models.plugin import CMSPlugin
 from cms.exceptions import DontUsePageAttributeWarning, PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
-from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import ContentRenderer

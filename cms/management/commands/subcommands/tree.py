@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.db import IntegrityError
 
-from cms.models.pagemodel import Page, PageUrl
+from cms.pages.models.page import Page, PageUrl
 
 from .base import SubcommandsCommand
 

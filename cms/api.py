@@ -51,16 +51,16 @@ from cms import constants
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.core.models.placeholder import Placeholder
+from cms.core.models.plugin import CMSPlugin
 from cms.models import PageContent
-from cms.models.pagemodel import Page
-from cms.models.permissionmodels import (
+from cms.pages.models.page import Page
+from cms.permissions.models import (
     ACCESS_PAGE_AND_DESCENDANTS,
     GlobalPagePermission,
     PagePermission,
     PageUser,
 )
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils.conf import get_cms_setting
@@ -439,7 +439,7 @@ def add_plugin(placeholder, plugin_type, language, position="last-child", target
     Adds a plugin to a placeholder and returns it.
 
     :param placeholder: Placeholder to add the plugin to
-    :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
+    :type placeholder: :class:`cms.core.models.placeholder.Placeholder` instance
     :param plugin_type: What type of plugin to add
     :type plugin_type: str or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
     :param str language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
@@ -517,7 +517,7 @@ def create_page_user(
     :param bool can_*: Permissions to give the user
     :param bool grant_all: Grant all permissions to the user
     """
-    from cms.admin.forms import save_permissions
+    from cms.pages.admin.forms import save_permissions
 
     if grant_all:
         # just be lazy
@@ -662,7 +662,7 @@ def copy_plugins_to_language(page, source_language, target_language, only_empty=
     .. warning: This function skips permissions checks
 
     :param page: the page to copy
-    :type page: :class:`cms.models.pagemodel.Page` instance
+    :type page: :class:`cms.pages.models.page.Page` instance
     :param string source_language: The source language code,
      must be in :setting:`django:LANGUAGES`
     :param string target_language: The source language code,

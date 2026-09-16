@@ -11,8 +11,8 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
 from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
+from cms.core.models.plugin import CMSPlugin
 from cms.exceptions import PluginLimitReached
-from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase, _obj_from_deprecated_page
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
@@ -260,10 +260,10 @@ def copy_plugins_to_placeholder(
 
     :param iterable plugins: Plugins to be copied
     :param placeholder: Target placeholder
-    :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
+    :type placeholder: :class:`cms.core.models.placeholder.Placeholder` instance
     :param str language: target language (if no root plugin is given)
     :param root_plugin:
-    :type placeholder: :class:`cms.models.pluginmodel.CMSPlugin` instance
+    :type placeholder: :class:`cms.core.models.plugin.CMSPlugin` instance
     :param int start_positions: Cache for start positions by language
     :param bool plugins_are_downcast: Whether the plugins are already concrete plugin instances
 

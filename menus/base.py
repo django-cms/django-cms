@@ -125,7 +125,7 @@ class NavigationNode:
 
     def get_menu_title(self) -> str:
         """
-        Returns the associated title using the naming convention of 'cms.models.pagemodel.Page'.
+        Returns the associated title using the naming convention of 'cms.pages.models.page.Page'.
         """
         return self.title
 

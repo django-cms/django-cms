@@ -9,7 +9,7 @@ from django.urls.resolvers import RegexPattern, URLPattern
 from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
-from cms.models.pagemodel import Page
+from cms.pages.models.page import Page
 from cms.utils import get_current_site
 from cms.utils.i18n import get_language_list
 
@@ -231,7 +231,7 @@ def _get_app_patterns(site: Site | None) -> list[URLPattern]:
     If the app is still configured, but is no longer installed/available, then
     this method returns a degenerate patterns object: patterns('')
     """
-    from cms.models.pagemodel import PageUrl
+    from cms.pages.models.page import PageUrl
 
     included = []
     hooked_applications = OrderedDict()

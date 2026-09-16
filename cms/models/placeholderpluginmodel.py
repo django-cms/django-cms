@@ -1,42 +1,21 @@
-from functools import cached_property
+"""Moved to :mod:`cms.core.models.placeholderplugin`.
 
-from django.db import models
+Kept importable because the ecosystem imports from this path, and because
+``cms.models`` star-imports it (see :mod:`cms.compat`).
+"""
 
-from cms.models import CMSPlugin
-from cms.models.fields import PlaceholderRelationField
-from cms.utils.placeholder import get_placeholder_from_slot
+from cms.compat import moved
 
-
-class PlaceholderReference(CMSPlugin):
-    cmsplugin_ptr = models.OneToOneField(
-        CMSPlugin,
-        on_delete=models.CASCADE,
-        related_name='cms_placeholderreference',
-        parent_link=True,
-    )
-    name = models.CharField(max_length=255)
-    placeholders = PlaceholderRelationField()
-
-    @cached_property
-    def placeholder_ref(self):
-        placeholder = get_placeholder_from_slot(self.placeholders, "clipboard")
-        placeholder.source = self
-        return placeholder
-
-    class Meta:
-        app_label = 'cms'
-
-    def __str__(self):
-        return self.name
-
-    def move_to(self, placeholder, language):
-        for plugin in self.placeholder_ref.get_plugins():
-            plugin.placeholder = placeholder
-            plugin.language = language
-            plugin.save()
-
-    def move_from(self, placeholder, language):
-        for plugin in placeholder.get_plugins():
-            plugin.placeholder = self.placeholder_ref
-            plugin.language = language
-            plugin.save()
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {
+        "CMSPlugin": "cms.core.models.placeholderplugin.CMSPlugin",
+        "PlaceholderReference": "cms.core.models.placeholderplugin.PlaceholderReference",
+        "PlaceholderRelationField": "cms.core.models.placeholderplugin.PlaceholderRelationField",
+        "cached_property": "cms.core.models.placeholderplugin.cached_property",
+        "get_placeholder_from_slot": "cms.core.models.placeholderplugin.get_placeholder_from_slot",
+        "models": "cms.core.models.placeholderplugin.models",
+    },
+    since="6.0",
+    fallback="cms.core.models.placeholderplugin",
+)

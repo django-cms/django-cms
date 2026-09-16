@@ -13,8 +13,8 @@ from django.utils.functional import cached_property, lazy
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
+from cms.core.models.placeholder import Placeholder
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from cms.models.placeholdermodel import Placeholder
 from cms.plugin_base import CMSPluginBase, _obj_from_deprecated_page
 from cms.utils.helpers import normalize_name
 

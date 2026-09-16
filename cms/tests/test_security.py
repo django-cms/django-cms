@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.http import QueryDict
 
 from cms.api import add_plugin, create_page
-from cms.models.pluginmodel import CMSPlugin
+from cms.core.models.plugin import CMSPlugin
 from cms.test_utils.testcases import CMSTestCase
 
 

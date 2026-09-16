@@ -17,10 +17,10 @@ from sekizai.context import SekizaiContext
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_page_content
+from cms.core.models.placeholder import Placeholder
+from cms.core.models.plugin import CMSPlugin
+from cms.core.models.settings import UserSettings
 from cms.exceptions import DuplicatePlaceholderWarning, PlaceholderNotFound
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
-from cms.models.settingmodels import UserSettings
 from cms.plugin_pool import plugin_pool
 from cms.shared.editing_urls import get_object_edit_url, get_object_structure_url
 from cms.test_utils.project.placeholder_relation_field_app.models import (

@@ -3,13 +3,13 @@ from itertools import chain
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 
+from cms.core.models.placeholder import Placeholder
 from cms.forms.fields import PageSelectFormField
-from cms.models.placeholdermodel import Placeholder
 
 
 class PageField(models.ForeignKey):
     """
-    This is a foreign key field to the :class:`cms.models.pagemodel.Page` model
+    This is a foreign key field to the :class:`cms.pages.models.page.Page` model
     that defaults to the :class:`~cms.forms.fields.PageSelectFormField` form
     field when rendered in forms. It has the same API as the
     :class:`django:django.db.models.ForeignKey` but does not require

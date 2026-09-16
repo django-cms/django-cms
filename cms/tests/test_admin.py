@@ -17,10 +17,10 @@ from cms import api
 from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.core.models.placeholder import Placeholder
 from cms.models import PageContent, PageUrl, UserSettings
-from cms.models.pagemodel import Page
-from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.models.placeholdermodel import Placeholder
+from cms.pages.models.page import Page
+from cms.permissions.models import GlobalPagePermission, PagePermission
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (

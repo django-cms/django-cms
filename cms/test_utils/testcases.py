@@ -25,7 +25,7 @@ from django.utils.translation import activate, get_language
 from cms.api import add_plugin, create_page
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, PageContent
-from cms.models.permissionmodels import (
+from cms.permissions.models import (
     GlobalPagePermission,
     PagePermission,
     PageUser,

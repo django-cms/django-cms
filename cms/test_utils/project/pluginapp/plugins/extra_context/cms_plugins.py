@@ -1,6 +1,6 @@
 from django.utils.translation import gettext as _
 
-from cms.models.pluginmodel import CMSPlugin
+from cms.core.models.plugin import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 

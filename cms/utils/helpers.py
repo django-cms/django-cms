@@ -94,8 +94,8 @@ def is_editable_model(model_class):
     """
     from django.contrib import admin
 
-    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
-    from cms.models.placeholdermodel import Placeholder
+    from cms.core.admin.placeholder import FrontendEditableAdminMixin
+    from cms.core.models.placeholder import Placeholder
 
     # First check whether model_class has
     # any fields which has a relation to Placeholder

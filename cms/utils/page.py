@@ -126,7 +126,7 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
     Generates slug for path.
     If path is used, appends the value of suffix to the end.
     """
-    from cms.models.pagemodel import PageUrl
+    from cms.pages.models.page import PageUrl
 
     base, _, slug = path.rpartition('/')
     page_urls = PageUrl.objects.get_for_site(site, path=path, language=language)

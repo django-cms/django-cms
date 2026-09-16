@@ -108,7 +108,7 @@ class CMSNavigationNode(NavigationNode):
 
 class CMSMenu(Menu):
     """Subclass of :class:`menus.base.Menu`. Its :meth:`~menus.base.Menu.get_nodes()` creates a list of NavigationNodes
-    based on a site's :class:`cms.models.pagemodel.Page` objects.
+    based on a site's :class:`cms.pages.models.page.Page` objects.
     """
 
     def __init__(self, renderer):

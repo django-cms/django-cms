@@ -17,7 +17,7 @@
 # the line. Treat that failure as the success signal it is.
 #
 # Known blind spot: `from cms.models import Page` imports the `cms.models`
-# package facade, not `cms.models.pagemodel`, so container boundaries inside
+# package facade, not `cms.pages.models.page`, so container boundaries inside
 # that facade are invisible to these contracts until step 7 splits the models
 # into per-container modules and turns `cms.models` into a shim. Contracts
 # therefore name concrete submodules wherever possible.
@@ -71,12 +71,12 @@ name = core does not depend on pages
 type = forbidden
 allow_indirect_imports = True
 source_modules =
-    cms.admin.placeholderadmin
+    cms.core.admin.placeholder
     cms.cache.placeholder
-    cms.models.aliaspluginmodel
-    cms.models.placeholdermodel
-    cms.models.placeholderpluginmodel
-    cms.models.pluginmodel
+    cms.core.models.aliasplugin
+    cms.core.models.placeholder
+    cms.core.models.placeholderplugin
+    cms.core.models.plugin
     cms.operations
     cms.plugin_base
     cms.plugin_pool
@@ -84,20 +84,20 @@ source_modules =
     cms.utils.placeholder
     cms.utils.plugins
 forbidden_modules =
-    cms.admin.pageadmin
+    cms.pages.admin.page
     cms.appresolver
     cms.cache
     cms.cms_menus
-    cms.models.contentmodels
-    cms.models.pagemodel
+    cms.pages.models.content
+    cms.pages.models.page
     cms.page_rendering
     cms.utils.page
     cms.views
     menus
 ignore_imports =
-    cms.models.placeholdermodel -> cms.cache.placeholder
+    cms.core.models.placeholder -> cms.cache.placeholder
     cms.plugin_rendering -> cms.cache.placeholder
-    cms.admin.placeholderadmin -> cms.views
+    cms.core.admin.placeholder -> cms.views
 
 # ---------------------------------------------------------------------------
 # Container: core -> permissions  (RFC 7.1.1)
@@ -111,9 +111,9 @@ name = core does not depend on permissions
 type = forbidden
 allow_indirect_imports = True
 source_modules =
-    cms.admin.placeholderadmin
-    cms.models.placeholdermodel
-    cms.models.pluginmodel
+    cms.core.admin.placeholder
+    cms.core.models.placeholder
+    cms.core.models.plugin
     cms.plugin_base
     cms.plugin_pool
     cms.plugin_rendering
@@ -121,11 +121,11 @@ source_modules =
     cms.utils.plugins
 forbidden_modules =
     cms.cache.permissions
-    cms.models.permissionmodels
+    cms.permissions.models
     cms.utils.page_permissions
     cms.utils.permissions
 ignore_imports =
-    cms.models.placeholdermodel -> cms.utils.permissions
+    cms.core.models.placeholder -> cms.utils.permissions
     cms.plugin_rendering -> cms.utils.permissions
     cms.utils.plugins -> cms.utils.permissions
 
@@ -141,9 +141,9 @@ name = core does not depend on the toolbar container
 type = forbidden
 allow_indirect_imports = True
 source_modules =
-    cms.admin.placeholderadmin
-    cms.models.placeholdermodel
-    cms.models.pluginmodel
+    cms.core.admin.placeholder
+    cms.core.models.placeholder
+    cms.core.models.plugin
     cms.plugin_base
     cms.plugin_pool
     cms.plugin_rendering
@@ -159,7 +159,7 @@ forbidden_modules =
 # when those endpoints move into cms.core.editing (a presentation layer, which
 # may use the toolbar framework).
 ignore_imports =
-    cms.admin.placeholderadmin -> cms.toolbar.utils
+    cms.core.admin.placeholder -> cms.toolbar.utils
     cms.plugin_rendering -> cms.toolbar.utils
 
 # ---------------------------------------------------------------------------
@@ -182,12 +182,15 @@ forbidden_modules =
     cms.admin
     cms.api
     cms.appresolver
+    cms.core.admin
+    cms.pages.admin
+    cms.permissions.admin
     cms.cache.page
     cms.cms_toolbars
     cms.core
-    cms.models.contentmodels
-    cms.models.pagemodel
-    cms.models.permissionmodels
+    cms.pages.models.content
+    cms.pages.models.page
+    cms.permissions.models
     cms.pages
     cms.utils.page_permissions
     cms.utils.permissions
@@ -204,8 +207,8 @@ name = the pages model does not call the menu framework
 type = forbidden
 allow_indirect_imports = True
 source_modules =
-    cms.models.contentmodels
-    cms.models.pagemodel
+    cms.pages.models.content
+    cms.pages.models.page
 forbidden_modules =
     menus
 
@@ -222,14 +225,14 @@ type = forbidden
 allow_indirect_imports = True
 source_modules =
     cms.cache.permissions
-    cms.models.permissionmodels
+    cms.permissions.models
     cms.utils.page_permissions
     cms.utils.permissions
 forbidden_modules =
     cms.admin
     cms.cache.page
-    cms.models.contentmodels
-    cms.models.pagemodel
+    cms.pages.models.content
+    cms.pages.models.page
     cms.plugin_base
     cms.plugin_pool
     cms.plugin_rendering
@@ -248,9 +251,15 @@ name = the model layer does not import admin, toolbar, templatetags or menus
 type = forbidden
 allow_indirect_imports = True
 source_modules =
+    cms.core.models
     cms.models
+    cms.pages.models
+    cms.permissions.models
 forbidden_modules =
     cms.admin
+    cms.core.admin
+    cms.pages.admin
+    cms.permissions.admin
     cms.api
     cms.templatetags
     cms.toolbar
@@ -278,7 +287,7 @@ forbidden_modules =
     cms.templatetags
     cms.toolbar
 ignore_imports =
-    cms.utils.helpers -> cms.admin.placeholderadmin
+    cms.utils.helpers -> cms.core.admin.placeholder
     cms.utils.placeholder -> cms.templatetags.cms_tags
     cms.utils.plugins -> cms.api
 
@@ -296,13 +305,13 @@ allow_indirect_imports = True
 source_modules =
     cms.core.editing
 forbidden_modules =
-    cms.admin.pageadmin
+    cms.pages.admin.page
     cms.appresolver
     cms.cache.page
     cms.cms_menus
-    cms.models.contentmodels
-    cms.models.pagemodel
-    cms.models.permissionmodels
+    cms.pages.models.content
+    cms.pages.models.page
+    cms.permissions.models
     cms.page_rendering
     cms.utils.page
     cms.utils.page_permissions

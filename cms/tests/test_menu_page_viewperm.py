@@ -13,7 +13,7 @@ from cms.models import (
     ACCESS_PAGE_AND_DESCENDANTS,
     Page,
 )
-from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.permissions.models import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import user_can_view_page
 from menus.menu_pool import menu_pool

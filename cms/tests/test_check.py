@@ -7,8 +7,8 @@ from django.test import TestCase
 from djangocms_text.cms_plugins import TextPlugin
 
 from cms.api import add_plugin
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
+from cms.core.models.placeholder import Placeholder
+from cms.core.models.plugin import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.extensionapp.models import MyPageExtension

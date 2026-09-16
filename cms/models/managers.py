@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
-from cms.models.query import PageQuerySet
+from cms.pages.models.query import PageQuerySet
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.i18n import get_fallback_languages
 

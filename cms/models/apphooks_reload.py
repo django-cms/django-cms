@@ -1,39 +1,18 @@
-import uuid
+"""Moved to :mod:`cms.pages.models.apphooks_reload`.
 
-from django.db import models
+Kept importable because the ecosystem imports from this path, and because
+``cms.models`` star-imports it (see :mod:`cms.compat`).
+"""
 
+from cms.compat import moved
 
-class UrlconfRevision(models.Model):
-    revision = models.CharField(max_length=255)
-
-    class Meta:
-        app_label = 'cms'
-
-    def save(self, *args, **kwargs):
-        """
-        Simply forces this model to be a singleton.
-        """
-        self.pk = 1
-        super().save(*args, **kwargs)
-
-    @classmethod
-    def get_or_create_revision(cls, revision=None):
-        """
-        Convenience method for getting or creating revision.
-        """
-        if revision is None:
-            revision = str(uuid.uuid4())
-        obj, created = cls.objects.get_or_create(
-            pk=1, defaults=dict(revision=revision))
-        return obj.revision, created
-
-    @classmethod
-    def update_revision(cls, revision):
-        """
-        Convenience method for updating the revision.
-        """
-        obj, created = cls.objects.get_or_create(
-            pk=1, defaults=dict(revision=revision))
-        if not created:
-            obj.revision = revision
-            obj.save()
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {
+        "UrlconfRevision": "cms.pages.models.apphooks_reload.UrlconfRevision",
+        "models": "cms.pages.models.apphooks_reload.models",
+        "uuid": "cms.pages.models.apphooks_reload.uuid",
+    },
+    since="6.0",
+    fallback="cms.pages.models.apphooks_reload",
+)
