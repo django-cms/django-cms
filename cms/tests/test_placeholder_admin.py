@@ -735,3 +735,54 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(target.get_plugins("en").count(), 2)
         self.assertEqual(parent.cmsplugin_set.get().placeholder_id, target.pk)
+
+    def test_move_plugin_rejects_existing_parent_in_other_placeholder(self):
+        """An unchanged ``plugin_parent`` is not trusted blindly either.
+
+        A child whose stored parent lives in another placeholder (e.g., left
+        behind by the unscoped paste lookup) must not let the caller render
+        that foreign parent's subtree by resubmitting the parent's id.
+        """
+        user = self._create_user(
+            "attacker",
+            is_staff=True,
+            is_superuser=False,
+            permissions=["add_link", "change_link", "change_example1"],
+        )
+
+        page = create_page("restricted", "nav_playground.html", "en")
+        restricted = page.get_placeholders("en")[0]
+        foreign_parent = add_plugin(
+            restricted,
+            "LinkPlugin",
+            "en",
+            name="VictimSecretLink",
+            external_link="https://secret.example.com",
+        )
+        self.assertFalse(restricted.has_change_permission(user))
+
+        target = Example1.objects.create(
+            char_1="one", char_2="two", char_3="tree", char_4="four"
+        ).placeholder
+        plugin = add_plugin(
+            target,
+            "LinkPlugin",
+            "en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+        # Simulate a malformed cross-placeholder relation already in the database.
+        CMSPlugin.objects.filter(pk=plugin.pk).update(parent=foreign_parent)
+
+        endpoint = self.get_move_plugin_uri(plugin)
+        with self.login_user_context(user):
+            data = {
+                "plugin_id": plugin.pk,
+                "plugin_parent": foreign_parent.pk,
+                "target_language": "en",
+                "target_position": 1,
+            }
+            response = self.client.post(endpoint, data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertNotContains(response, "VictimSecretLink", status_code=404)
