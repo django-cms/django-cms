@@ -4,14 +4,15 @@
 5.1.3 release notes
 ###################
 
-*Month DD, YYYY*
+*September 16, 2026*
 
 Welcome to django CMS 5.1.3!
 
 These release notes cover what has changed since django CMS 5.1.2. This patch
-release fixes broken access control in page-tree operations. Read the security
-fixes and their backward-incompatible effects before updating an existing
-project.
+release fixes broken access control in the page tree, the add-page form and the
+page wizard, and it repairs migration ``cms.0045`` on PostgreSQL. Read the
+security fixes and their backward-incompatible effects before updating an
+existing project.
 
 If you are upgrading from django CMS 5.0.x or earlier, read the
 :ref:`5.1.0 release notes <upgrade-to-5.1.0>` first — they cover the backward
@@ -45,7 +46,15 @@ Then collect static files and run the django CMS checks::
     python manage.py collectstatic --noinput
     python manage.py cms check
 
-This release adds no migrations.
+This release adds no new migrations. It repairs
+``cms.0045_pageurl_site_unique_path``, which failed on PostgreSQL for databases
+containing duplicate page paths with *cannot ALTER TABLE "cms_pageurl" because
+it has pending trigger events*. If that migration failed for you, run it again
+after upgrading::
+
+    python manage.py migrate
+
+Databases that already applied the migration successfully are unaffected.
 
 *******************
 What's new in 5.1.3
@@ -54,13 +63,20 @@ What's new in 5.1.3
 Security fixes
 ==============
 
+This release fixes three advisories. All of them require an authenticated
+staff account; none is exploitable anonymously. We recommend that all users
+upgrade as soon as possible.
+
+Page-tree copy, duplicate and move disclosed view-restricted pages
+------------------------------------------------------------------
+
 This release fixes broken access control in the page tree's *Copy*, *Duplicate*
 and *Move* operations. All three require ``CMS_PERMISSION = True`` and at least
 one per-page view restriction: an installation that does not use the permission
 system has nothing to disclose, because ``Page.has_view_restrictions()`` is
 always ``False`` there. Each of them needs a staff session that may add pages;
 none is exploitable anonymously, but the content they expose is readable
-anonymously afterwards. We recommend that all users upgrade as soon as possible.
+anonymously afterwards.
 
 `GHSA-976q-w6ch-6w82 <https://github.com/django-cms/django-cms/security/advisories/GHSA-976q-w6ch-6w82>`_
 covers all three, which share a root cause, their prerequisites and their fix:
@@ -86,6 +102,38 @@ covers all three, which share a root cause, their prerequisites and their fix:
 No action beyond upgrading is required. Pages that were copied, duplicated or
 moved *before* the upgrade keep the permissions they were created with, so
 review restricted branches for unrestricted copies made earlier.
+
+The page wizard allowed creating pages below a parent on another site
+---------------------------------------------------------------------
+
+`GHSA-ppqv-h89f-6q9p <https://github.com/django-cms/django-cms/security/advisories/GHSA-ppqv-h89f-6q9p>`_:
+in a multi-site installation, the *New page* and *New sub page* wizards accepted
+an origin page from any site. The add permission was then checked against the
+current site while the new page was attached to the foreign parent, so a staff
+user with add rights on one site could insert pages into the page tree of a
+site they have no rights on, leaving the new page with a parent on a different
+site. The wizard now only resolves origin pages on the current site, and the
+page creation form rejects a parent that belongs to another site -- for
+superusers and with ``CMS_PERMISSION = False`` as well.
+
+Adding a page from a page type disclosed restricted page types
+--------------------------------------------------------------
+
+`GHSA-7fqg-chmv-c89g <https://github.com/django-cms/django-cms/security/advisories/GHSA-7fqg-chmv-c89g>`_
+(low severity): with ``CMS_PERMISSION = True``, the *Page type* field of the
+add-page form narrowed the choices it rendered to the current site's page
+types, but validated a submitted value against *every* page type in the
+database. A staff user who may add a page could therefore submit the id of a
+page type on another site, or one protected by a view restriction, and have its
+placeholders, plugins and extensions copied into a page they own -- without the
+view restrictions of the source.
+
+Page types cannot be created through the interface in django CMS 4 and 5, so
+only databases that still carry page types migrated from django CMS 3, or
+created programmatically, are affected. The add-page form, the page wizard and
+*Duplicate* now accept only page types of the current site, require view
+permission on the source, and carry the source's view restrictions over to the
+new page.
 
 .. _upgrade-5.1.3-backward-incompatible:
 
@@ -124,3 +172,72 @@ moves:
 
 See :doc:`/explanation/permissions` for the full picture of how permissions
 behave when pages are moved, copied or deleted.
+
+Page creation validates the page type and parent more strictly
+================================================================
+
+* ``AddPageForm.source`` only accepts page types below the current site's
+  page-type root. Previously only the rendered choices were narrowed; the field
+  now also narrows its queryset. Code that passes a page type from another site
+  to the form, or to ``CreateCMSPageForm``, gets a validation error.
+* ``AddPageForm`` gained ``clean_source()``, which requires view permission on
+  the source, and its ``from_source()`` now applies the source's view
+  restrictions to the new page. ``DuplicatePageForm`` inherits both instead of
+  defining its own. The denial message is set per form through the new
+  ``source_permission_denied`` class attribute.
+* Submitting both ``cms_page`` (adding a translation) and ``source`` to
+  ``AddPageForm`` is rejected: a translation reuses the existing page and would
+  bypass the view restrictions applied in ``from_source()``.
+* ``CreateCMSPageForm.clean_parent_page()`` rejects a parent on another site,
+  and ``WizardStep1Form`` only accepts pages of the current site. Custom wizards
+  that deliberately created pages across sites no longer work.
+
+The current user is stored behind a wrapper
+===========================================
+
+To fix ``CurrentUserMiddleware`` hanging requests under ASGI, the
+``cms.utils.permissions._current_user`` context variable no longer holds the
+user itself but a private wrapper. Use the public helpers
+``get_current_user()``, ``set_current_user()`` and ``reset_current_user()``
+instead of accessing the context variable directly.
+
+**********
+Bug Fixes
+**********
+
+* Fix a hang of ``CurrentUserMiddleware`` in async (ASGI) mode (#8863) -- Fabian Braun
+* Check permissions on the page type used as source when adding a page (#8858) -- Fabian Braun
+* Preserve view restrictions when copying, duplicating or moving pages in the page tree (#8840)
+  -- Fabian Braun
+* Reject origin pages and parents from other sites in the page wizard (#8848) -- Fabian Braun
+* Keep CMS mail delivery best-effort: stop forwarding the deprecated ``fail_silently``
+  argument to Django and suppress only transport errors and missing mailers (#8842) -- Fabian Braun
+* Fix ``GrouperModelAdmin`` saving to the latest content object instead of the one selected by pk
+  (#8826) -- Fabian Braun
+* Fix the slug uniqueness check when moving pages ignoring the site and page types (#8831)
+  -- Fabian Braun
+* Fix migration ``cms.0045`` failing on PostgreSQL for databases with duplicate page paths (#8823)
+  -- Fabian Braun
+* Open inline editing and plugin/placeholder deletion modals as Django admin popups (#8816)
+  -- Fabian Braun
+
+*************
+Documentation
+*************
+
+* Provide a redirect for the documentation link in the help menu (#8862) -- Fabian Braun
+
+**********
+Statistics
+**********
+
+This release includes 10 changelog entries, created with the help of the following contributors
+(in alphabetical order):
+
+* Fabian Braun (10 changelog entries)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
