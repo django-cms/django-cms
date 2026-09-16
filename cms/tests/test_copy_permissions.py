@@ -1,8 +1,11 @@
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.sites.models import Site
-from django.test import override_settings
+from django.core.exceptions import ValidationError
+from django.test import RequestFactory, override_settings
 
+from cms.admin.forms import AddPageForm, DuplicatePageForm
 from cms.api import add_plugin, create_page
+from cms.constants import PAGE_TYPES_ID
 from cms.models import (
     ACCESS_CHILDREN,
     ACCESS_PAGE,
@@ -386,3 +389,167 @@ class DuplicatePermissionsTests(CMSTestCase):
         self.assertEqual(PagePermission.objects.count(), count)
         self.assertFalse(copy.has_view_restrictions(copy.site))
         self.assertContains(self.client.get(copy.get_absolute_url()), self.marker)
+
+
+@override_settings(CMS_PERMISSION=True, CMS_PUBLIC_FOR="all")
+class PageTypeSourcePermissionsTests(CMSTestCase):
+    """``Add page`` can copy a page type; its restrictions come along.
+
+    Page types can no longer be created through the UI, but rows migrated from
+    django CMS 3.x are still offered as ``source`` on the add form.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.admin = self.get_superuser()
+        self.actor = self.get_staff_user_with_no_permissions()
+        for codename in ("add_page", "change_page", "add_text", "change_text"):
+            self.add_permission(self.actor, codename)
+        self.target = create_page("target", "nav_playground.html", "en")
+        self.add_page_permission(self.actor, self.target, can_add=True, can_change=True, grant_on=ACCESS_PAGE)
+        self.marker = "CONFIDENTIAL-PAGE-TYPE-REGRESSION"
+
+    def create_page_type(self, title, site=None):
+        root = create_page("Page Types", "nav_playground.html", "en", site=site, reverse_id=PAGE_TYPES_ID)
+        page_type = create_page(title, "nav_playground.html", "en", site=site, parent=root)
+        Page.objects.filter(pk__in=(root.pk, page_type.pk)).update(is_page_type=True)
+        add_plugin(page_type.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
+        return Page.objects.get(pk=page_type.pk)
+
+    def add_from_source(self, source):
+        endpoint = self.get_admin_url(PageContent, "add")
+        with self.login_user_context(self.actor):
+            response = self.client.post(
+                f"{endpoint}?parent_page={self.target.pk}",
+                {
+                    "title": "from-page-type",
+                    "slug": "from-page-type",
+                    "template": "nav_playground.html",
+                    "language": "en",
+                    "source": source.pk,
+                    "parent_page": self.target.pk,
+                    "_save": 1,
+                },
+            )
+        self.actor = type(self.actor).objects.get(pk=self.actor.pk)
+        self.target.refresh_from_db()
+        return response, self.target.get_child_pages().first()
+
+    def assertAddDenied(self, source):
+        counts = (Page.objects.count(), CMSPlugin.objects.count())
+        response, copy = self.add_from_source(source)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(copy)
+        self.assertEqual(counts, (Page.objects.count(), CMSPlugin.objects.count()))
+
+    def test_rejects_page_type_user_cannot_view(self):
+        source = self.create_page_type("secret-type")
+        self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.assertFalse(page_permissions.user_can_view_page(self.actor, source))
+        self.assertAddDenied(source)
+
+    @override_settings(
+        CMS_LANGUAGES={
+            1: [{"code": "en", "name": "English"}],
+            2: [{"code": "en", "name": "English"}],
+        }
+    )
+    def test_rejects_page_type_from_another_site(self):
+        site = Site.objects.create(domain="other.example", name="Other")
+        self.assertAddDenied(self.create_page_type("other-site-type", site=site))
+
+    def test_rejects_page_type_root(self):
+        source = self.create_page_type("visible-type")
+        self.assertAddDenied(source.parent)
+
+    def test_readable_page_type_can_be_used(self):
+        source = self.create_page_type("visible-type")
+        self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
+
+        response, copy = self.add_from_source(source)
+        self.assertEqual(response.status_code, 302)
+        self.assertIsNotNone(copy)
+        self.assertFalse(copy.is_page_type)
+        self.assertContains(self.client.get(copy.get_absolute_url()), self.marker)
+
+    def test_restricted_page_type_keeps_its_restriction(self):
+        source = self.create_page_type("restricted-type")
+        self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
+
+        response, copy = self.add_from_source(source)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(copy.has_view_restrictions(copy.site))
+        self.assertFalse(page_permissions.user_can_view_page(AnonymousUser(), copy))
+        self.assertEqual(self.client.get(copy.get_absolute_url()).status_code, 404)
+
+    def test_rejects_source_when_adding_translation(self):
+        source = self.create_page_type("restricted-type")
+        self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        destination = create_page("destination", "nav_playground.html", "de")
+        self.add_page_permission(self.actor, destination, can_change=True, grant_on=ACCESS_PAGE)
+        self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
+        self.assertTrue(page_permissions.user_can_view_page(AnonymousUser(), destination))
+
+        endpoints = (
+            self.get_admin_url(PageContent, "add"),
+            self.get_admin_url(PageContent, "duplicate", source.get_content_obj("en").pk),
+        )
+        data = {
+            "cms_page": destination.pk,
+            "source": source.pk,
+            "language": "en",
+            "title": "translation",
+            "slug": "translation",
+            "_save": 1,
+        }
+        models = (Page, PageContent, CMSPlugin, PagePermission)
+        counts = tuple(model.objects.count() for model in models)
+        with self.login_user_context(self.actor):
+            for endpoint in endpoints:
+                with self.subTest(endpoint=endpoint):
+                    response = self.client.post(
+                        f"{endpoint}?cms_page={destination.pk}&language=en&parent_page={self.target.pk}",
+                        data,
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    self.assertIn("source", response.context["adminform"].form.errors)
+                    self.assertFalse(destination.pagecontent_set.filter(language="en").exists())
+                    self.assertEqual(counts, tuple(model.objects.count() for model in models))
+
+            # Adding a translation without a source remains supported.
+            data.pop("source")
+            response = self.client.post(
+                f"{endpoints[0]}?cms_page={destination.pk}&language=en&parent_page={self.target.pk}",
+                data,
+            )
+        self.assertEqual(response.status_code, 302)
+        self.assertNotContains(self.client.get(destination.get_absolute_url("en")), self.marker)
+
+    @override_settings(
+        CMS_LANGUAGES={
+            1: [{"code": "en", "name": "English"}],
+            2: [{"code": "en", "name": "English"}],
+        }
+    )
+    def test_source_view_permission_is_checked_on_the_source_site(self):
+        # The admin may work on a site other than ``SITE_ID``. A global view grant
+        # limited to ``SITE_ID`` must not unlock a restricted page on that site.
+        site = Site.objects.create(domain="other.example", name="Other")
+        source = self.create_page_type("restricted-type", site=site)
+        self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
+        permission = self.add_global_permission(self.actor, can_view=True)
+        permission.sites.set([Site.objects.get(pk=1)])
+        request = RequestFactory().get("/")
+        request.user = self.actor
+        self.assertTrue(page_permissions.user_can_view_all_pages(self.actor, Site.objects.get(pk=1)))
+        self.assertFalse(page_permissions.user_can_view_page(self.actor, source, site=site))
+
+        for form_class in (AddPageForm, DuplicatePageForm):
+            with self.subTest(form=form_class.__name__):
+                form = type(form_class.__name__, (form_class,), {"_site": site, "_request": request})()
+                form.cleaned_data = {"source": source}
+                with self.assertRaises(ValidationError):
+                    form.clean_source()
