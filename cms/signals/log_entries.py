@@ -97,6 +97,20 @@ def create_log_entry(user_id, content_type_id, object_id, object_repr, action_fl
         )
 
 
+def _acting_user(kwargs):
+    """The user behind an operation.
+
+    Operations reach here from the admin, where there is a request, and from the
+    service layer, where there may not be -- so the explicit ``user`` kwarg wins
+    and the request is only a fallback for receivers of older signals.
+    """
+    user = kwargs.get("user")
+    if user is not None:
+        return user
+    request = kwargs.get("request")
+    return getattr(request, "user", None)
+
+
 def _is_valid_page_instance(page):
     """
     Check if the supplied object is a valid Page / PageType object
@@ -108,17 +122,17 @@ def log_page_operations(sender, **kwargs):
     """
     Create a log for the correct page operation type
     """
-    request = kwargs.get('request')
+    user = _acting_user(kwargs)
     operation_type = kwargs.get('operation')
     obj = kwargs.get('obj')
 
     # Check that we have instructions for the operation
     # and an instance of Page to link to in the log
-    if operation_type in _page_operations_map and _is_valid_page_instance(obj):
+    if user is not None and operation_type in _page_operations_map and _is_valid_page_instance(obj):
         operation_handler = _page_operations_map[operation_type]
         content_type_id = ContentType.objects.get_for_model(obj).pk
         create_log_entry(
-            user_id=request.user.pk,
+            user_id=user.pk,
             content_type_id=content_type_id,
             object_id=obj.pk,
             object_repr=str(obj),
@@ -131,11 +145,11 @@ def log_placeholder_operations(sender, **kwargs):
     """
     Create a log for the correct placeholder operation type
     """
-    request = kwargs.get('request')
+    user = _acting_user(kwargs)
     operation_type = kwargs.get('operation')
 
     # Check that we have instructions for the operation
-    if operation_type in _placeholder_operations_map:
+    if user is not None and operation_type in _placeholder_operations_map:
         operation_handler = _placeholder_operations_map[operation_type]
         placeholder = kwargs.get(operation_handler['placeholder_kwarg'])
         page = placeholder.page
@@ -144,7 +158,7 @@ def log_placeholder_operations(sender, **kwargs):
         if _is_valid_page_instance(page):
             content_type_id = ContentType.objects.get_for_model(page).pk
             create_log_entry(
-                user_id=request.user.pk,
+                user_id=user.pk,
                 content_type_id=content_type_id,
                 object_id=page.pk,
                 object_repr=str(page),

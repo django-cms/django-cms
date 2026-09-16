@@ -68,8 +68,10 @@ from cms.operations.helpers import (
     send_post_page_operation,
     send_pre_page_operation,
 )
+from cms.pages import services as page_services
 from cms.plugin_pool import plugin_pool
 from cms.shared.editing_urls import get_object_edit_url
+from cms.shared.operations import OperationContext
 from cms.signals.apphook import set_restart_trigger
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import get_site_from_request, jsonify_request
@@ -350,22 +352,10 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if old_home and not self.has_change_permission(request, old_home):
             raise PermissionDenied("You do not have permission to change the current home page.")
 
-        new_home_tree, old_home_tree = page.set_as_homepage(request.user)
-
-        # Check if one of the affected pages either from the old homepage
-        # or the homepage had an apphook attached
-        if old_home_tree:
-            apphooks_affected = old_home_tree.has_apphooks()
-        else:
-            apphooks_affected = False
-
-        if not apphooks_affected:
-            apphooks_affected = new_home_tree.has_apphooks()
-
-        if apphooks_affected:
-            # One or more pages affected by this operation was attached to an apphook.
-            # As a result, fire the apphook reload signal to reload the url patterns.
-            set_restart_trigger()
+        page_services.set_home(
+            page,
+            context=OperationContext.from_request(request, language=request.GET.get("language")),
+        )
         return HttpResponse("ok")
 
     def get_list(self, request):
@@ -586,21 +576,10 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             message = _("Error! You don't have permissions to move this page. Please reload the page")
             return jsonify_request(HttpResponseForbidden(message))
 
-        operation_token = send_pre_page_operation(
-            request=request,
-            operation=operations.MOVE_PAGE,
-            obj=page,
-            sender=self.model,
-        )
-
-        form.move_page(user=user)
-
-        send_post_page_operation(
-            request=request,
-            operation=operations.MOVE_PAGE,
-            token=operation_token,
-            obj=page,
-            sender=self.model,
+        page_services.move_page(
+            page,
+            *form.get_tree_options(),
+            context=OperationContext.from_request(request, language=request.GET.get("language")),
         )
         return jsonify_request(HttpResponse(status=200))
 
