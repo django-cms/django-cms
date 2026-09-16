@@ -144,7 +144,7 @@ class PermissionAdminMigrationSafetyTests(CMSTestCase):
             objects = _BrokenManager()
 
         return patch(
-            'cms.admin.permissionadmin.get_user_model',
+            'cms.permissions.admin.get_user_model',
             return_value=_BrokenUserModel,
         )
 

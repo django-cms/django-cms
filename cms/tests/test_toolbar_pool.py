@@ -16,11 +16,14 @@ class TestToolbar(CMSToolbar):
 
 class ToolbarPoolTests(CMSTestCase):
     def test_register(self):
+        # The pool keys on ``__module__.__name__``, so a toolbar's key follows
+        # the class if it is ever moved. Import paths in ``CMS_TOOLBARS`` are
+        # unaffected -- those are resolved before registration.
         pool = ToolbarPool()
         pool.register(TestToolbar)
         pool.register(CMSToolbar)
         self.assertEqual(pool.toolbars, {
-            'cms.toolbar_base.CMSToolbar': CMSToolbar,
+            'cms.toolbar.base.CMSToolbar': CMSToolbar,
             'cms.tests.test_toolbar_pool.TestToolbar': TestToolbar})
 
         self.assertRaises(ToolbarAlreadyRegistered,
@@ -38,7 +41,7 @@ class ToolbarPoolTests(CMSTestCase):
 
         test_toolbar = OrderedDict()
         test_toolbar['cms.tests.test_toolbar_pool.TestToolbar'] = TestToolbar
-        test_toolbar['cms.toolbar_base.CMSToolbar'] = CMSToolbar
+        test_toolbar['cms.toolbar.base.CMSToolbar'] = CMSToolbar
         self.assertEqual(list(test_toolbar.keys()), list(pool.toolbars.keys()))
 
     def test_unregister(self):

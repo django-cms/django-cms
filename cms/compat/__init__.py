@@ -61,13 +61,29 @@ def resolve(path: str):
     return getattr(importlib.import_module(module_path), attribute)
 
 
-def moved(module: str, names: dict[str, str], *, since: str, warn: type[Warning] | None = None):
+def moved(
+    module: str,
+    names: dict[str, str],
+    *,
+    since: str,
+    warn: type[Warning] | None = None,
+    fallback: str | None = None,
+):
     """Declare that ``names`` used to live in ``module`` and record the move.
 
     :param module: the shim module's own ``__name__``.
     :param names: maps each old attribute name to its new dotted path.
     :param since: django CMS version that performed the move.
     :param warn: warning category to raise on access, or ``None`` to stay silent.
+    :param fallback: for a module moved wholesale, the module it moved to. Any
+        name not in ``names`` is then looked up there.
+
+        This matters more than it looks. A module's namespace holds everything it
+        imported, not only what it defined, and callers do reach for those --
+        ``cms.admin.forms.ValidationError`` was a real example found by the test
+        suite. A shim built only from declared names silently narrows the
+        namespace and breaks them. Pointing at the new module preserves the old
+        behaviour exactly, accidental leakage included.
     :returns: ``(__getattr__, __dir__, __all__)`` for the shim module to bind.
     """
     for old_name, new_path in names.items():
@@ -83,6 +99,11 @@ def moved(module: str, names: dict[str, str], *, since: str, warn: type[Warning]
     def __getattr__(name: str):
         entry = _registry.get(f"{module}.{name}")
         if entry is None:
+            if fallback and not name.startswith("__"):
+                try:
+                    return resolve(f"{fallback}.{name}")
+                except AttributeError:
+                    pass
             raise AttributeError(f"module {module!r} has no attribute {name!r}")
         if entry.warn is not None:
             # Raised lazily, so a module that is merely imported stays quiet and
