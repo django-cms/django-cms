@@ -8,7 +8,7 @@ name: django CMS upgrade test
 on:
   pull_request:
     branches:
-      - 'release/*.x'
+      - 'release/*.*.x'
     paths:
       - 'cms/__init__.py'
       - '.github/upgrade-test/**'
