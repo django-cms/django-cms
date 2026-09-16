@@ -1,7 +1,11 @@
+import warnings
 from unittest.mock import patch
 
+from django.contrib import admin
 from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
 from django.db import OperationalError, ProgrammingError
 from django.test.utils import override_settings
 
@@ -9,10 +13,11 @@ from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionI
 from cms.api import add_plugin, assign_user_to_page, create_page
 from cms.cache.permissions import (
     clear_user_permission_cache,
+    get_cache_key,
     get_permission_cache,
     set_permission_cache,
 )
-from cms.models import Page
+from cms.models import Page, PageContent
 from cms.models.permissionmodels import (
     ACCESS_CHILDREN,
     ACCESS_DESCENDANTS,
@@ -24,9 +29,11 @@ from cms.models.permissionmodels import (
     PermissionTuple,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
+    user_can_change_at_least_one_page,
     user_can_change_page_advanced_settings,
     user_can_delete_page,
     user_can_move_page,
@@ -56,15 +63,15 @@ class PermissionCacheTests(CMSTestCase):
         """
         Test basic permissions cache get / set / clear low-level api
         """
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertIsNone(cached_permissions)
 
-        set_permission_cache(self.user_normal, "change_page", [self.home_page.id])
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        set_permission_cache(self.user_normal, Site.objects.get_current(), "change_page", [self.home_page.id])
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertEqual(cached_permissions, [self.home_page.id])
 
         clear_user_permission_cache(self.user_normal)
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertIsNone(cached_permissions)
 
     def test_permission_manager(self):
@@ -75,12 +82,13 @@ class PermissionCacheTests(CMSTestCase):
                              created_by=self.user_super)
         assign_user_to_page(page_b, self.user_normal, can_view=True,
                             can_change=True)
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertIsNone(cached_permissions)
 
         live_permissions = get_change_perm_tuples(self.user_normal, Site.objects.get_current())
-        cached_permissions_permissions = get_permission_cache(self.user_normal,
-                                                              "change_page")
+        cached_permissions_permissions = get_permission_cache(
+            self.user_normal, Site.objects.get_current(), "change_page"
+        )
         self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
@@ -99,7 +107,7 @@ class PermissionCacheTests(CMSTestCase):
             user=self.user_normal,
         )
         page_permission.sites.add(Site.objects.get_current())
-        set_permission_cache(self.user_normal, "publish_page", [])
+        set_permission_cache(self.user_normal, Site.objects.get_current(), "publish_page", [])
 
         can_publish = user_can_publish_page(
             self.user_normal,
@@ -285,31 +293,135 @@ class PermissionCacheInvalidationTests(CMSTestCase):
         self.home_page = create_page("home", "nav_playground.html", "en", created_by=self.user_super)
 
     def _fill_permission_cache(self):
-        set_permission_cache(self.user_normal, "change_page", [self.home_page.id])
-        self.assertIsNotNone(get_permission_cache(self.user_normal, "change_page"))
+        set_permission_cache(self.user_normal, Site.objects.get_current(), "change_page", [self.home_page.id])
+        self.assertIsNotNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
 
     def test_user_save_clears_permission_cache(self):
         self._fill_permission_cache()
         self.user_normal.save()
-        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
 
     def test_user_delete_clears_permission_cache(self):
         self._fill_permission_cache()
         self.user_normal.delete()
-        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
 
     def test_group_membership_change_clears_permission_cache(self):
         group = Group.objects.create(name="permission-cache-group")
         self._fill_permission_cache()
         self.user_normal.groups.add(group)
-        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
 
     def test_group_delete_clears_permission_cache_of_members(self):
         group = Group.objects.create(name="permission-cache-group")
         self.user_normal.groups.add(group)
         self._fill_permission_cache()
         group.delete()
-        self.assertIsNone(get_permission_cache(self.user_normal, "change_page"))
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_CACHE_DURATIONS={
+        'menus': 60,
+        'content': 60,
+        'permissions': 60,
+    },
+    CMS_LANGUAGES={
+        1: [{'code': 'en', 'name': 'English'}],
+        2: [{'code': 'en', 'name': 'English'}],
+    },
+)
+class PermissionCacheSiteIsolationTests(CMSTestCase):
+    """The cached page permissions of one site must not be served for another.
+
+    ``get_page_actions_for_user`` filters by site, so a value warmed while
+    browsing a site the user works on used to satisfy the "can change at least
+    one page" gate of every other site, disclosing their page trees.
+    """
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+        self.site_a = Site.objects.get_current()
+        self.site_b = Site.objects.create(domain='b.example', name='B')
+        self.user = self._create_user('editor', is_staff=True, add_default_permissions=True)
+        self.page_a = create_page('site-a', 'nav_playground.html', 'en', site=self.site_a)
+        assign_user_to_page(self.page_a, self.user, can_view=True, can_change=True)
+        self.secret_b = create_page('SECRET-SITE-B', 'nav_playground.html', 'en', site=self.site_b)
+
+    def get_tree(self, site):
+        return self.client.get(self.get_admin_url(PageContent, 'get_tree') + f'?site={site.pk}')
+
+    def test_cache_key_includes_the_site(self):
+        self.assertNotEqual(
+            get_cache_key(self.user, self.site_a, 'change_page'),
+            get_cache_key(self.user, self.site_b, 'change_page'),
+        )
+
+    def test_cached_permissions_are_not_reused_across_sites(self):
+        self.assertTrue(user_can_change_at_least_one_page(self.user, self.site_a))
+        self.assertIsNotNone(get_permission_cache(self.user, self.site_a, 'change_page'))
+        self.assertIsNone(get_permission_cache(self.user, self.site_b, 'change_page'))
+        self.assertFalse(user_can_change_at_least_one_page(self.user, self.site_b))
+
+    def test_warming_one_site_does_not_disclose_another(self):
+        with self.login_user_context(self.user):
+            self.assertEqual(self.get_tree(self.site_a).status_code, 200)
+            # The gate of site B must not be satisfied by the value just warmed.
+            response = self.get_tree(self.site_b)
+        self.assertEqual(response.status_code, 403)
+
+    def test_own_site_stays_reachable_when_cache_is_warm(self):
+        with self.login_user_context(self.user):
+            self.get_tree(self.site_b)
+            response = self.get_tree(self.site_a)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'site-a')
+
+    def test_clear_user_permission_cache_clears_every_site(self):
+        set_permission_cache(self.user, self.site_a, 'change_page', [self.page_a.path])
+        set_permission_cache(self.user, self.site_b, 'change_page', [self.secret_b.path])
+
+        clear_user_permission_cache(self.user)
+
+        self.assertIsNone(get_permission_cache(self.user, self.site_a, 'change_page'))
+        self.assertIsNone(get_permission_cache(self.user, self.site_b, 'change_page'))
+
+
+@override_settings(CMS_PERMISSION=True)
+class DeprecatedSiteAccessHelperTests(CMSTestCase):
+    """``user_can_access_site``/``raise_site_permission_denied`` are unused.
+
+    Site isolation is enforced by ``PageContentAdmin.has_change_permission()``.
+    """
+
+    def get_admin(self):
+        return admin.site._registry[PageContent]
+
+    def test_user_can_access_site_warns(self):
+        request = self.get_request("/en/")
+        request.user = self.get_superuser()
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
+            self.assertTrue(self.get_admin().user_can_access_site(request))
+
+        self.assertTrue(
+            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
+            "Expected a deprecation warning from user_can_access_site().",
+        )
+
+    def test_raise_site_permission_denied_warns(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
+            with self.assertRaises(PermissionDenied):
+                self.get_admin().raise_site_permission_denied()
+
+        self.assertTrue(
+            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
+            "Expected a deprecation warning from raise_site_permission_denied().",
+        )
 
 
 @override_settings(CMS_PERMISSION=True)

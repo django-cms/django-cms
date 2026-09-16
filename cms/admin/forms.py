@@ -52,7 +52,12 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
-from cms.utils.page_permissions import user_can_change_page, user_can_view_page
+from cms.utils.page_permissions import (
+    user_can_add_page,
+    user_can_add_subpage,
+    user_can_change_page,
+    user_can_view_page,
+)
 from cms.utils.permissions import (
     get_current_user,
     get_grantable_global_permissions,
@@ -281,6 +286,7 @@ class AddPageForm(BasePageContentForm):
     content_defaults = {
         "in_navigation": get_cms_setting("DEFAULT_IN_NAVIGATION"),
     }
+    source_permission_denied = _("You do not have permission to use this page type.")
 
     class Meta:
         model = PageContent
@@ -306,8 +312,13 @@ class AddPageForm(BasePageContentForm):
             titles = PageContent.objects.filter(page__in=descendants, language=self._language)
             choices = [("", "---------")]
             choices.extend((title.page_id, title.title) for title in titles)
+            # Narrow the queryset and not just the choices: ``source`` is validated
+            # against the queryset, which otherwise spans the page types of every
+            # site, while the choices are merely what the widget renders.
+            source_field.queryset = descendants
             source_field.choices = choices
         else:
+            source_field.queryset = source_field.queryset.none()
             choices = []
 
         if len(choices) < 2:
@@ -319,6 +330,12 @@ class AddPageForm(BasePageContentForm):
         if self._errors:
             # Form already has errors, best to let those be
             # addressed first.
+            return data
+
+        if data.get("cms_page") and data.get("source"):
+            # Translations reuse an existing page and skip from_source(), where
+            # the source's view restrictions are preserved before copying content.
+            self.add_error("source", _("A source page cannot be used when adding a translation."))
             return data
 
         parent_page = data.get("parent_page")
@@ -343,10 +360,38 @@ class AddPageForm(BasePageContentForm):
             data["path"] = path
         return data
 
+    def clean_source(self):
+        source = self.cleaned_data.get("source")
+        # ``source`` is a hidden field whose value is fully controlled by the
+        # client on POST and ``has_add_permission`` only checks that the user may
+        # create *a* page, not that they may read ``source`` -- whose placeholders,
+        # plugins and extensions ``save()`` copies into the new page.
+        if source and not user_can_view_page(self._user, source):
+            raise ValidationError(self.source_permission_denied)
+        return source
+
     def clean_parent_page(self):
         parent_page = self.cleaned_data.get("parent_page")
         if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
+
+        if self.cleaned_data.get("cms_page"):
+            # A translation is added to an existing page, the parent is not used.
+            # ``clean_cms_page`` checks the permission on that page instead.
+            return parent_page
+
+        # ``parent_page`` is a hidden field whose value is fully controlled by the
+        # client on POST, while ``has_add_permission`` only validated the parent
+        # taken from the query string. Re-check the permission against the parent
+        # the page is actually created under -- this is to prevent people from
+        # possible form-hacking.
+        if parent_page:
+            has_perm = user_can_add_subpage(self._user, target=parent_page, site=self._site)
+        else:
+            has_perm = user_can_add_page(self._user, site=self._site)
+
+        if not has_perm:
+            raise ValidationError(_("You do not have permission to add a page here."))
         return parent_page
 
     def clean_cms_page(self):
@@ -393,6 +438,10 @@ class AddPageForm(BasePageContentForm):
             user=self._user,
         )
         new_page.update(is_page_type=False)
+        # ``Page.copy()`` is called with ``permissions=False``, so a copy of a
+        # view-restricted source would be world-readable. Carry the source's view
+        # restrictions -- its own and the ones it inherits -- over to the copy.
+        new_page.apply_view_restrictions(source.get_view_restrictions(), user=self._user)
         return new_page
 
     def get_template(self):
@@ -535,16 +584,7 @@ class DuplicatePageForm(AddPageForm):
         required=True,
         widget=forms.HiddenInput(),
     )
-
-    def clean_source(self):
-        source = self.cleaned_data.get("source")
-        # ``source`` is a hidden field whose value is fully controlled by the
-        # client on POST and whose queryset spans every page on every site.
-        # ``has_add_permission`` only checks that the user may create *a* page,
-        # not that they may read ``source``.
-        if source and not user_can_view_page(self._user, source):
-            raise ValidationError(_("You do not have permission to copy this page."))
-        return source
+    source_permission_denied = _("You do not have permission to copy this page.")
 
 
 class ChangePageForm(BasePageContentForm):
@@ -1009,8 +1049,8 @@ class MovePageForm(PageTreeForm):
         # The user is moving from right to left.
         return target_page, "left"
 
-    def move_page(self):
-        self.page.move_page(*self.get_tree_options())
+    def move_page(self, user=None):
+        self.page.move_page(*self.get_tree_options(), user=user)
 
     def _determine_new_parent(self, target_page, position):
         if position in ("first-child", "last-child"):
@@ -1018,7 +1058,11 @@ class MovePageForm(PageTreeForm):
         return target_page.parent
 
     def _validate_slug_uniqueness(self, parent, language, slug):
-        target_siblings = Page.objects.filter(parent=parent).exclude(pk=self.page.pk)
+        target_siblings = Page.objects.filter(
+            parent=parent,
+            site=self._site,
+            is_page_type=self.page.is_page_type,
+        ).exclude(pk=self.page.pk)
         if target_siblings.filter(urls__slug=slug, urls__language=language).exists():
             raise ValidationError(
                 _(

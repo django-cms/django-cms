@@ -38,6 +38,24 @@ def _resolve_duplicate_paths(apps, schema_editor):
         ).exclude(pk=duplicate["first_pk"]).update(path=None)
 
 
+def _flush_deferred_constraints(apps, schema_editor):
+    """Run the deferred constraint checks the updates above have queued.
+
+    ``_fill_site`` writes a new version of every ``PageUrl`` row and
+    ``_resolve_duplicate_paths`` writes some of them a second time. PostgreSQL
+    queues a deferred foreign key check for every row whose previous version
+    was written by the current transaction -- even when no key column changed
+    -- so the twice-written rows leave pending trigger events behind. The
+    ``ALTER TABLE`` of the unique constraint below then fails with "cannot
+    ALTER TABLE cms_pageurl because it has pending trigger events" (#8818).
+
+    ``SET CONSTRAINTS ALL IMMEDIATE`` runs those checks now and keeps
+    deferrable constraints immediate for the rest of this transaction.
+    """
+    if schema_editor is not None and schema_editor.connection.vendor == "postgresql":
+        schema_editor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("cms", "0044_pagecontent_slug_overwrite_url"),
@@ -70,6 +88,9 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(_resolve_duplicate_paths, migrations.RunPython.noop, elidable=False),
+        migrations.RunPython(
+            _flush_deferred_constraints, migrations.RunPython.noop, elidable=False
+        ),
         migrations.AddConstraint(
             model_name="pageurl",
             constraint=models.UniqueConstraint(

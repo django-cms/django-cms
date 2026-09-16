@@ -124,9 +124,12 @@ Running frontend tests
 ----------------------
 
 We have two types of frontend tests: unit tests and integration tests. Unit tests use
-`Karma <https://karma-runner.github.io/>`_ as the test runner and `Jasmine
-<https://jasmine.github.io/>`_ as the test framework. Integration tests use
-`Playwright <https://playwright.dev/>`_.
+`Vitest <https://vitest.dev/>`_ as the test runner, in browser mode, so they execute in
+a real Chromium instance driven by `Playwright <https://playwright.dev/>`_ - a lot of
+the assertions depend on real layout and CSS. The specs themselves are still written in
+the Jasmine style: a compatibility layer in ``cms/tests/frontend/unit/helpers`` maps
+``jasmine.createSpy``, ``spyOn``, ``jasmine.clock``, the ``done`` callbacks and the
+vendored jasmine-jquery matchers onto vitest. Integration tests use Playwright too.
 
 In order to be able to run them you need to install necessary dependencies as outlined
 in :ref:`frontend tooling installation instructions <contributing_frontend>`.
@@ -141,22 +144,28 @@ linting continuously, do:
 Unit tests
 ~~~~~~~~~~
 
-Unit tests can be run like this:
+Install the browser they run in once, after installing the Node dependencies:
 
 .. code-block::
 
-    npx gulp unitTest
+    npx playwright install chromium
 
-If your code is failing and you want to run only specific files, you can provide the
-``--tests`` parameter with comma separated file names, like this:
+Unit tests can then be run like this:
 
 .. code-block::
 
-    npx gulp unitTest --tests=cms.base,cms.modal
+    npm run test:unit
 
-The tests run in headless Chrome. The test configuration uses the Chrome installation
-provided by Puppeteer unless the ``CHROME_BIN`` environment variable points to a
-different Chrome or Chromium executable.
+If your code is failing and you want to run only specific files, pass them to vitest:
+
+.. code-block::
+
+    npx vitest run cms/tests/frontend/unit/cms.base.test.js
+
+``npm run test:unit:watch`` re-runs the affected specs as you edit, and
+``npm run test:unit:coverage`` writes a coverage report to
+``cms/tests/frontend/coverage``. ``npx gulp unitTest`` still works and simply
+delegates to vitest.
 
 Integration tests
 ~~~~~~~~~~~~~~~~~

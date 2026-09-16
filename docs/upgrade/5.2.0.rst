@@ -1,0 +1,282 @@
+.. _upgrade-to-5.2.0:
+
+###################
+5.2.0 release notes
+###################
+
+*Month DD, YYYY*
+
+Welcome to django CMS 5.2.0!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you need to consider when upgrading from django CMS
+5.1.x or earlier. Read the upgrade instructions and removed-functionality
+section before updating an existing project.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS 5.2 supports **Django X.Y and Z.0**. TODO: state which series are no
+longer supported and why. We highly recommend and only support the latest
+release of each supported series.
+
+It supports **Python 3.x, 3.y, and 3.z**.
+
+******************
+Release highlights
+******************
+
+TODO: one or two sentences on the theme of this release.
+
+* **Highlight 1.** TODO: what the user can now do, and why it matters.
+
+* **Highlight 2.** TODO.
+
+* **Highlight 3.** TODO.
+
+***********************
+How to upgrade to 5.2.0
+***********************
+
+Before upgrading, back up your database and uploaded media and review the
+:ref:`backward-incompatible changes <upgrade-5.2-backward-incompatible>` below.
+TODO: note any minimum Django version or removed APIs.
+
+Upgrade django CMS and ensure that your environment contains a compatible
+Django version::
+
+    python -m pip install --upgrade "django-cms==5.2.0" "Django>=X.Y"
+
+Then apply migrations, collect static files, and run the django CMS checks::
+
+    python manage.py migrate
+    python manage.py collectstatic --noinput
+    python manage.py cms check
+
+Test custom plugins, apphooks, permissions, frontend editing, and all templates
+in a staging environment before deploying. TODO: add any release-specific
+upgrade caveats.
+
+*******************
+What's new in 5.2.0
+*******************
+
+Feature 1
+=========
+
+TODO: describe the feature — what changed, what users see, and how to use it.
+
+Feature 2
+=========
+
+TODO: describe the feature.
+
+Sub-topic of feature 2
+----------------------
+
+TODO: details, examples, or configuration for the feature above.
+
+Example::
+
+    # TODO: replacement code sample
+
+TODO: link to the relevant how-to or reference page.
+
+Feature 3
+=========
+
+TODO: describe the feature.
+
+Minor features
+==============
+
+* TODO: minor feature 1.
+
+* TODO: minor feature 2.
+
+* TODO: minor feature 3.
+
+Security fixes
+==============
+
+This release fixes broken access control in the page tree's *Copy*, *Duplicate*
+and *Move* operations. All three require ``CMS_PERMISSION = True`` and at least
+one per-page view restriction: an installation that does not use the permission
+system has nothing to disclose, because ``Page.has_view_restrictions()`` is
+always ``False`` there. Each of them needs a staff session that may add pages;
+none is exploitable anonymously, but the content they expose is readable
+anonymously afterwards. We recommend that all users upgrade as soon as possible.
+
+`GHSA-976q-w6ch-6w82 <https://github.com/django-cms/django-cms/security/advisories/GHSA-976q-w6ch-6w82>`_
+covers all three, which share a root cause, their prerequisites and their fix:
+
+* *Copy* authorized only the root of the subtree it was asked to copy, while
+  every descendant below it was copied and recreated without its view
+  restrictions. A delegated editor who could view one public page therefore
+  obtained a publicly readable copy of every view-restricted page below it.
+  Selecting *Copy permissions* did not help: the flag was passed to the
+  descendants but not to the copied root, so the root lost its own permission
+  records as well. Copying now authorizes the whole subtree and preserves the
+  view restrictions the source inherited from ancestors outside it.
+* *Duplicate* created the new page with no permissions at all, so duplicating a
+  view-restricted page republished its content to anonymous visitors. The
+  duplicate now carries the source's view restrictions, both its own and the
+  ones it inherited.
+* *Move* dropped the view restrictions that a page and its descendants
+  inherited from the ancestors they left behind, exposing the pages themselves
+  -- including descendants the moving user was not allowed to view -- to
+  anonymous visitors. Moving now authorizes the whole subtree and materializes
+  the inherited view restrictions on the moved page.
+
+No action beyond upgrading is required. Pages that were copied, duplicated or
+moved *before* the upgrade keep the permissions they were created with, so
+review restricted branches for unrestricted copies made earlier.
+
+One further access-control fixes round out the same area:
+
+* **The per-user permission cache was not scoped to a site.** Page permissions
+  are computed per site, but they were cached under a key that did not name
+  one, so the value warmed while a user browsed a site they work on satisfied
+  the "may change at least one page" gate of every *other* site. The page tree,
+  changelist and page-link autocomplete of those sites then listed their pages
+  -- titles, slugs and URLs -- to a user with no rights on them. Per-page checks
+  were unaffected, so this disclosed page trees but granted no write access.
+  Both require ``CMS_PERMISSION = True``; the cache issue additionally requires
+  a multi-site installation.
+
+Bug Fixes
+=========
+
+* TODO: notable bug fix 1
+* TODO: notable bug fix 2
+* TODO: notable bug fix 3
+
+TODO: point at the full list of fixes in ``CHANGELOG.rst``.
+
+.. _upgrade-5.2-backward-incompatible:
+
+**************************************
+Backward incompatible changes in 5.2.0
+**************************************
+
+View restrictions follow pages that are copied, duplicated or moved
+===================================================================
+
+The security fixes above change how permissions behave around page copies and
+moves:
+
+* A page moved out of a restricted branch stays restricted at its new location.
+  The view grants it inherited are written to the moved page as ``can_view``
+  ``PagePermission`` rows (no other flag is carried over). To publish such a
+  page, remove the restriction explicitly -- which requires the *can change
+  permissions* right on it.
+* ``Page.move_page()`` accepts a new optional ``user`` argument and now writes
+  ``PagePermission`` rows. Pass the acting user so that the permission caches
+  are invalidated for them::
+
+      page.move_page(target, position, user=request.user)
+* The move endpoint answers ``403`` when the moved subtree contains pages the
+  user may not view and the destination would grant them access, mirroring the
+  behaviour of copy.
+* Two new methods support this: ``Page.get_view_restrictions()`` snapshots the
+  ``can_view`` grants that protect a page, and ``Page.apply_view_restrictions()``
+  recreates such a snapshot on a page at its new location. Code that relocates
+  pages outside of ``Page.move_page()`` or ``Page.copy_with_descendants()``
+  should use them.
+* ``cms.utils.page_permissions`` gained ``user_can_relocate_descendants()`` with
+  the thin wrappers ``user_can_copy_descendants()`` and
+  ``user_can_move_descendants()`` for authorizing an operation against a whole
+  subtree rather than its root.
+
+See :doc:`/explanation/permissions` for the full picture of how permissions
+behave when pages are moved, copied or deleted.
+
+``cms.cache.permissions`` helpers take the site
+===============================================
+
+Fixing the permission cache described above required the site to become part of
+the cache key, so the helpers in ``cms.cache.permissions`` take it as their
+second argument::
+
+    # before
+    get_cache_key(user, "change_page")
+    get_permission_cache(user, "change_page")
+    set_permission_cache(user, "change_page", value)
+
+    # after
+    get_cache_key(user, site, "change_page")
+    get_permission_cache(user, site, "change_page")
+    set_permission_cache(user, site, "change_page", value)
+
+``site`` is a ``django.contrib.sites.models.Site`` instance. Pass the site the
+permissions were computed for, which may differ from
+``Site.objects.get_current()`` in a multi-site installation.
+
+``clear_user_permission_cache(user)`` keeps its existing signature and now
+clears the user's entries for every site.
+
+This is an internal API, but projects or packages that warm or inspect the
+permission cache directly must update their calls to include the site. Calls
+using the old signatures raise ``TypeError``.
+
+
+Changing a page template needs only the change permission
+=========================================================
+
+The template moved from ``Page`` to ``PageContent`` in django CMS 4: it is
+per-language content, not page configuration, and it is not part of the
+*Advanced settings* form. The permission it requires now says so consistently --
+*change page* is enough everywhere:
+
+* The toolbar's *Page > Templates* menu is shown to anyone who may change the
+  page, and disabled for anyone who may not. It used to be hidden outright
+  without the *change advanced settings* permission.
+* The ``change-template/`` endpoint no longer requires that permission either.
+  It used to answer ``403`` without it.
+
+The page content change form, which has always offered the *Template* field on
+the change permission alone, is unchanged. Projects that relied on *change
+advanced settings* to keep delegated editors away from templates no longer can:
+withhold the *change page* permission on those pages instead.
+
+..  versionchanged:: 5.2
+    django CMS 3.4.6 made template changes require the *change advanced
+    settings* permission, back when the template was a field of ``Page``. The
+    two remaining checks from that change are removed.
+
+Dependencies, settings, and migrations
+======================================
+
+TODO: new or raised dependencies, changed defaults, and new migrations.
+
+Features deprecated in 5.2.0
+============================
+
+Page admin site helpers
+-----------------------
+
+* ``PageContentAdmin.user_can_access_site()`` and
+  ``PageContentAdmin.raise_site_permission_denied()`` are deprecated and will be
+  removed in django CMS 6.0. Neither has ever been called: site isolation is
+  enforced by ``PageContentAdmin.has_change_permission()``, which checks
+  ``user_can_change_at_least_one_page()`` against the site of the request. Use
+  that instead, and raise ``django.core.exceptions.PermissionDenied`` directly.
+
+Deprecation area 2
+------------------
+
+* TODO: what is deprecated, when it will be removed, and the replacement.
+
+Removal of deprecated functionality
+===================================
+
+Removal area 1
+--------------
+
+* TODO: what was removed and what to use instead.
+
+Removal area 2
+--------------
+
+* TODO: what was removed and what to use instead.

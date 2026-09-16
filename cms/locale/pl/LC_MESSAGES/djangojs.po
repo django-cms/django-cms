@@ -6,15 +6,15 @@
 # Translators:
 # angularcircle, 2012
 # angularcircle, 2012
-# Maciej Olko <maciej.olko@gmail.com>, 2016
-# Maciej Olko <maciej.olko@gmail.com>, 2016
+# Maciej Olko, 2016
+# Maciej Olko, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
-"Last-Translator: Maciej Olko <maciej.olko@gmail.com>, 2016\n"
+"Last-Translator: Maciej Olko, 2016\n"
 "Language-Team: Polish (http://app.transifex.com/divio/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

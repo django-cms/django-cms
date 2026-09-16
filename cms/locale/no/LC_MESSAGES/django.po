@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Eirik Krogstad <eirikkr@gmail.com>, 2026
+# Eirik Krogstad <eirikkr@gmail.com>, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Norwegian (https://app.transifex.com/divio/teams/58664/no/)\n"
@@ -35,7 +35,13 @@ msgstr "Delen av tittelen som brukes i adressen"
 msgid "Page type"
 msgstr "Sidetype"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
+msgstr ""
+
+msgid "You do not have permission to copy this page."
 msgstr ""
 
 msgid "Overwrite URL"
@@ -46,6 +52,9 @@ msgstr "La dette feltet være tomt hvis standardsti skal brukes"
 
 msgid "Start typing..."
 msgstr ""
+
+msgid "menu visibility"
+msgstr "synlighet i meny"
 
 msgid "limit when this page is visible in the menu"
 msgstr "begrens når denne siden er synlig i menyen"
@@ -168,9 +177,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "Avanserte instillinger"
 
-msgid "Change Permissions"
-msgstr "Endre tillatelser"
-
 msgid "The page is not eligible to be home."
 msgstr ""
 
@@ -212,11 +218,6 @@ msgid "New sub page"
 msgstr ""
 
 msgid "New page"
-msgstr ""
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
 msgstr ""
 
 msgid "Database error"
@@ -330,9 +331,6 @@ msgstr ""
 msgid "Empty content"
 msgstr ""
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr ""
@@ -378,21 +376,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Plassholder"
 
-msgid "Getting started developer guide"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
-msgstr ""
-
-msgid "Discord community"
-msgstr ""
-
-msgid "What's new"
-msgstr ""
-
 msgid "Create"
 msgstr ""
 
@@ -404,9 +387,6 @@ msgstr "Struktur"
 
 msgid "Content"
 msgstr "Innhold"
-
-msgid "Help"
-msgstr ""
 
 msgid "Sites"
 msgstr "Nettsider"
@@ -510,6 +490,9 @@ msgstr "Velg et gyldig nettsted"
 msgid "Select a valid page"
 msgstr "Velg en gyldig side"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -518,9 +501,6 @@ msgstr ""
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add another"
 msgstr ""
 
 msgid ""
@@ -619,9 +599,6 @@ msgstr "mal"
 
 msgid "login required"
 msgstr "krever innlogging"
-
-msgid "menu visibility"
-msgstr "synlighet i meny"
 
 msgid "application"
 msgstr "applikasjon"
@@ -833,6 +810,43 @@ msgstr "brukerinnstilling"
 
 msgid "user settings"
 msgstr "brukerinnstillinger"
+
+msgid "by template"
+msgstr "etter mal"
+
+msgid "by code"
+msgstr "etter kode"
+
+msgid "static placeholder name"
+msgstr "statisk plassholder navn"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Beskrivende navn for å identifisere denne statiske plassholderen. Vises ikke"
+" for brukere."
+
+msgid "placeholder code"
+msgstr "plassholder kode"
+
+msgid "To render the static placeholder in templates."
+msgstr "For å rendre den statiske plassholderen i maler."
+
+msgid "placeholder content"
+msgstr "plassholder innhold"
+
+msgid "creation_method"
+msgstr "skapelse_metode"
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
 
 msgid "Advanced options"
 msgstr "Avanserte valg"
@@ -1115,9 +1129,6 @@ msgstr ""
 msgid "Apphook"
 msgstr ""
 
-msgid "Redirect"
-msgstr "Videresend"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Applikasjon: %(apphook)s"
@@ -1266,7 +1277,7 @@ msgstr ""
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
-msgid "Open \\"
+msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
@@ -1385,6 +1396,12 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
 msgstr ""
 
 msgid "Give back"
@@ -1590,15 +1607,6 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
 msgid "Single placeholder"
-msgstr ""
-
-msgid "Community forum"
-msgstr ""
-
-msgid "Getting started"
-msgstr ""
-
-msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

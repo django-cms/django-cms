@@ -754,7 +754,11 @@ class Modal {
                 cls = 'cms-btn cms-btn-caution';
             }
 
-            var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
+            // the title comes from the admin page inside the iframe, so it is set as text
+            // rather than interpolated into an HTML string
+            var el = $('<a href="#"></a>')
+                .attr('class', cls + ' ' + item.attr('class'))
+                .text(title);
 
 
             el.on(that.click + ' ' + that.touchEnd, function(e) {

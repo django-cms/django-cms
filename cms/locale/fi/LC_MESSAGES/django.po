@@ -7,17 +7,16 @@
 # Ville-Eemeli Käkelä <ville-eemeli.kakela@bitfactor.fi>, 2025
 # Niklas Jerva <niklas.jerva@gmail.com>, 2025
 # Teemu Gratschev <teemu.gratschev@gmail.com>, 2026
-# Klaus Dahlén, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Kusti Hämäläinen <kusti.hamalainen@aalto.fi>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 19:53+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Kusti Hämäläinen <kusti.hamalainen@aalto.fi>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Finnish (https://app.transifex.com/divio/teams/58664/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,8 +39,14 @@ msgstr "Osa otsikosta jota käytetään URL:ssa"
 msgid "Page type"
 msgstr "Sivutyyppi"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sivutyypit"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Yliaja URL"
@@ -51,6 +56,9 @@ msgstr "Jätä tämä kenttä tyhjäksi jos halutaan käyttää oletuspolkua."
 
 msgid "Start typing..."
 msgstr "Aloita kirjoittaminen..."
+
+msgid "menu visibility"
+msgstr "näytä valikossa"
 
 msgid "limit when this page is visible in the menu"
 msgstr "rajoita tämän sivun näkyvyyttä valikossa"
@@ -187,9 +195,6 @@ msgstr "Käännökset"
 msgid "Advanced Settings"
 msgstr "Edistyneet asetukset"
 
-msgid "Change Permissions"
-msgstr "Muuta oikeuksia"
-
 msgid "The page is not eligible to be home."
 msgstr "Tätä sivua ei voi valita etusivuksi."
 
@@ -236,13 +241,6 @@ msgstr "Uusi alasivu"
 
 msgid "New page"
 msgstr "Uusi sivu"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Sinulla ei ole oikeutta käyttää tätä sivustoa. Ota yhteyttä "
-"järjestelmänvalvojaan."
 
 msgid "Database error"
 msgstr "Tietokantavirhe"
@@ -355,9 +353,6 @@ msgstr "Toiminnot"
 msgid "Empty content"
 msgstr "Tyhjä sisältö"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "%(object_name)s-ominaisuudet"
@@ -408,21 +403,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Sisältöpaikka"
 
-msgid "Getting started developer guide"
-msgstr "Kehittäjän aloitusopas"
-
-msgid "Documentation"
-msgstr "Dokumentaatio"
-
-msgid "User guide"
-msgstr "Käyttöopas"
-
-msgid "Discord community"
-msgstr "Discord-yhteisö"
-
-msgid "What's new"
-msgstr "Uutta"
-
 msgid "Create"
 msgstr "Luo"
 
@@ -434,9 +414,6 @@ msgstr "Rakenne"
 
 msgid "Content"
 msgstr "Sisältö"
-
-msgid "Help"
-msgstr "Ohje"
 
 msgid "Sites"
 msgstr "Sivustot"
@@ -540,6 +517,9 @@ msgstr "Valitse kelvollinen sivusto"
 msgid "Select a valid page"
 msgstr "Valitse kelvollinen sivu"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -552,9 +532,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Sivulla %(conflict_page)s on sama url '%(url)s' kuin nykyisellä sivulla."
-
-msgid "Add another"
-msgstr "Lisää uusi"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -655,9 +632,6 @@ msgstr "asettelu"
 
 msgid "login required"
 msgstr "Sisäänkirjautuminen vaadittu"
-
-msgid "menu visibility"
-msgstr "näytä valikossa"
 
 msgid "application"
 msgstr "sovellus"
@@ -880,6 +854,42 @@ msgstr "käyttäjäasetukset"
 
 msgid "user settings"
 msgstr "käyttäjäasetukset"
+
+msgid "by template"
+msgstr "asettelupohjan mukaan"
+
+msgid "by code"
+msgstr "koodin mukaan"
+
+msgid "static placeholder name"
+msgstr "staattisen sisältöpaikan nimi"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr "Kuvaava nimi tälle staattiselle sisältöpaikalle. Ei näy käyttäjille."
+
+msgid "placeholder code"
+msgstr "sisältöpaikan tunniste"
+
+msgid "To render the static placeholder in templates."
+msgstr "Staattisen sisältöpaikan esittämiseksi asettelupohjissa."
+
+msgid "placeholder content"
+msgstr "sisältöpaikan sisältö"
+
+msgid "creation_method"
+msgstr "luontitapa"
+
+msgid "static placeholder"
+msgstr "staattinen sisältöpaikka"
+
+msgid "static placeholders"
+msgstr "staattiset sisältöpaikat"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
+"Staattinen sisältöalue samalla sivustolla ja tunnisteella on jo olemassa"
 
 msgid "Advanced options"
 msgstr "Edistyneet asetukset"
@@ -1177,9 +1187,6 @@ msgstr "Pehmeä juuri"
 msgid "Apphook"
 msgstr "Ohjelmaliitos"
 
-msgid "Redirect"
-msgstr "Edelleenohjaus"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Ohjelma: %(apphook)s"
@@ -1334,8 +1341,8 @@ msgstr "Vaihda rakennetila"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Vaihda rakennetila ja korosta osoitettu liitännäinen"
 
-msgid "Open \\"
-msgstr "Avaa \\"
+msgid "Open \"Create\" dialog"
+msgstr "Avaa \"Luo\"-ikkuna"
 
 msgid "Focus on Toolbar"
 msgstr "Keskitä työkalupalkkiin"
@@ -1490,6 +1497,12 @@ msgstr "Asennushuomautukset"
 
 msgid "Support"
 msgstr "Tuki"
+
+msgid "Documentation"
+msgstr "Dokumentaatio"
+
+msgid "User guide"
+msgstr "Käyttöopas"
 
 msgid "Give back"
 msgstr "Anna takaisin"
@@ -1709,15 +1722,6 @@ msgstr "Lisää liitännäinen kohteeseen %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Yksittäinen sisältöpaikka"
-
-msgid "Community forum"
-msgstr "Yhteisöfoorumi"
-
-msgid "Getting started"
-msgstr "Aloittaminen"
-
-msgid "Talk to us"
-msgstr "Ota yhteyttä"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - käyttäjätilisi on luotu."

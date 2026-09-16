@@ -74,6 +74,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['page'].queryset = Page.objects.on_site(self._site)
         # set the entries here to get an up to date list of entries.
         choices = list(entry_choices(
             user=self._request.user,

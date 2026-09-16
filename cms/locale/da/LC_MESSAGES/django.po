@@ -3,17 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# valberg <valberg@orn.li>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
+# valberg <valberg@orn.li>, 2025
 # Jonas Hyatt <jonas@hyatt.space>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Jonas Hyatt <jonas@hyatt.space>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Danish (https://app.transifex.com/divio/teams/58664/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,8 +36,14 @@ msgstr "Del af titlen der bliver brugt i adressen"
 msgid "Page type"
 msgstr "Sidetype"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sidetyper"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Overskriv adresse"
@@ -47,6 +53,9 @@ msgstr "Lad feltet stå tomt, hvis standardstien skal bruges"
 
 msgid "Start typing..."
 msgstr "Begynd at taste"
+
+msgid "menu visibility"
+msgstr "menu synlighed"
 
 msgid "limit when this page is visible in the menu"
 msgstr "begræns hvornår denne side er synlig i menuen"
@@ -177,9 +186,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "Avancerede indstillinger"
 
-msgid "Change Permissions"
-msgstr "Ret rettigheder"
-
 msgid "The page is not eligible to be home."
 msgstr ""
 
@@ -224,11 +230,6 @@ msgstr "Ny underside"
 
 msgid "New page"
 msgstr "Ny side"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
 
 msgid "Database error"
 msgstr "Database fejl"
@@ -341,9 +342,6 @@ msgstr ""
 msgid "Empty content"
 msgstr ""
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr ""
@@ -389,21 +387,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Pladsholder"
 
-msgid "Getting started developer guide"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
-msgstr ""
-
-msgid "Discord community"
-msgstr ""
-
-msgid "What's new"
-msgstr ""
-
 msgid "Create"
 msgstr "Opret"
 
@@ -415,9 +398,6 @@ msgstr "Struktur"
 
 msgid "Content"
 msgstr "Indhold"
-
-msgid "Help"
-msgstr ""
 
 msgid "Sites"
 msgstr "Sider"
@@ -521,6 +501,9 @@ msgstr "Vælg et gyldigt website"
 msgid "Select a valid page"
 msgstr "Vælg en gyldig side"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -529,9 +512,6 @@ msgstr ""
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add another"
 msgstr ""
 
 msgid ""
@@ -630,9 +610,6 @@ msgstr "skabelon"
 
 msgid "login required"
 msgstr "login krævet"
-
-msgid "menu visibility"
-msgstr "menu synlighed"
 
 msgid "application"
 msgstr "applikation"
@@ -847,6 +824,43 @@ msgstr "brugerindstilling"
 
 msgid "user settings"
 msgstr "brugerindstillinger"
+
+msgid "by template"
+msgstr "efter skabelon"
+
+msgid "by code"
+msgstr "efter kode"
+
+msgid "static placeholder name"
+msgstr "statisk pladsholder navn"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Beskrivende navn til at identificere denne statiske pladsholder. Bliver ikke"
+" vist til brugere."
+
+msgid "placeholder code"
+msgstr "pladsholder kode"
+
+msgid "To render the static placeholder in templates."
+msgstr "For at rendere den statiske pladsholder i skabeloner."
+
+msgid "placeholder content"
+msgstr "pladsholder indhold"
+
+msgid "creation_method"
+msgstr "oprettelse_metode"
+
+msgid "static placeholder"
+msgstr "statisk pladsholder"
+
+msgid "static placeholders"
+msgstr "statiske pladsholdere"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "En statisk pladsholder med samme side og kode findes i forvejen."
 
 msgid "Advanced options"
 msgstr "Avancerede indstillinger"
@@ -1129,9 +1143,6 @@ msgstr ""
 msgid "Apphook"
 msgstr ""
 
-msgid "Redirect"
-msgstr "Videresend"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Applikation: %(apphook)s"
@@ -1280,7 +1291,7 @@ msgstr ""
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
-msgid "Open \\"
+msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
@@ -1399,6 +1410,12 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
 msgstr ""
 
 msgid "Give back"
@@ -1604,15 +1621,6 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
 msgid "Single placeholder"
-msgstr ""
-
-msgid "Community forum"
-msgstr ""
-
-msgid "Getting started"
-msgstr ""
-
-msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

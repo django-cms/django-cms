@@ -18,6 +18,8 @@ import tempfile
 
 import dj_database_url
 
+from cms.test_utils.mail import get_email_settings
+
 
 def gettext(s):
     return s
@@ -172,7 +174,7 @@ CMS_MEDIA_URL = "/cms-media/"
 MEDIA_URL = "/media/"
 STATIC_URL = "/static/"
 ADMIN_MEDIA_PREFIX = "/static/admin/"
-EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+globals().update(get_email_settings())
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ["127.0.0.1"]
 AUTHENTICATION_BACKENDS = (

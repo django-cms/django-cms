@@ -7,6 +7,7 @@ from unittest import mock, skipIf
 from django import http
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
@@ -44,6 +45,7 @@ from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
+from cms.utils.urlutils import admin_reverse
 
 
 @contextmanager
@@ -549,6 +551,29 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertContains(response, '<div class="success"></div>')
         # there should be no plugins
         self.assertEqual(0, CMSPlugin.objects.all().count())
+
+    def test_delete_confirmation_views_render_as_popup(self):
+        """Both confirmation pages are only ever shown inside the CMS modal, so they
+        have to render without the admin chrome - like the other frontend editing
+        views do."""
+        page = api.create_page(title="test page", language="en", template="nav_playground.html")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        plugin = api.add_plugin(placeholder=placeholder, language="en", plugin_type="TextPlugin", body="")
+
+        endpoints = (
+            self.get_delete_plugin_uri(plugin),
+            admin_reverse("cms_placeholder_clear_placeholder", args=(placeholder.pk,)) + "?language=en",
+        )
+        for endpoint in endpoints:
+            with self.subTest(endpoint=endpoint):
+                response = self.client.get(endpoint)
+                self.assertTrue(response.context["is_popup"])
+                # The admin chrome django renders for a non-popup page
+                self.assertNotContains(response, 'id="site-name"')
+                self.assertNotContains(response, 'id="nav-sidebar"')
+                # ... and the flag has to be available to the confirmation form, so that
+                # django's stock template can carry it through the POST
+                self.assertEqual(response.context["is_popup_var"], IS_POPUP_VAR)
 
     def test_remove_plugin_not_associated_to_page(self):
         """

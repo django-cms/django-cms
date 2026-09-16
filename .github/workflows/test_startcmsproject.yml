@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         django-version: [
-          '4.2', '5.0', '5.1', '5.2',
+          '5.2', '6.0', '6.1'
         ]
         python-version: ['3.13']
         requirements-file: ['requirements_base.txt']

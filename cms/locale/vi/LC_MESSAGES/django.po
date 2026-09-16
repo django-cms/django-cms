@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Vietnamese (https://app.transifex.com/divio/teams/58664/vi/)\n"
@@ -34,8 +34,14 @@ msgstr "Phần của tiêu đề được sử dụng trong URL"
 msgid "Page type"
 msgstr "Loại trang"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Các loại trang"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Ghi đè URL"
@@ -45,6 +51,9 @@ msgstr "Để trống trường này nếu muốn sử dụng đường dẫn ti
 
 msgid "Start typing..."
 msgstr "Bắt đầu gõ..."
+
+msgid "menu visibility"
+msgstr "hiển thị trong menu"
 
 msgid "limit when this page is visible in the menu"
 msgstr "giới hạn khi trang này được hiển thị trong menu"
@@ -182,9 +191,6 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr "Cài đặt nâng cao"
 
-msgid "Change Permissions"
-msgstr "Thay đổi quyền"
-
 msgid "The page is not eligible to be home."
 msgstr "Trang này không đủ điều kiện để làm trang chủ."
 
@@ -229,11 +235,6 @@ msgstr "Trang con mới"
 
 msgid "New page"
 msgstr "Trang mới"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
 
 msgid "Database error"
 msgstr "Lỗi cơ sở dữ liệu"
@@ -346,9 +347,6 @@ msgstr "Hành động"
 msgid "Empty content"
 msgstr "Nội dung trống"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Thuộc tính %(object_name)s"
@@ -398,21 +396,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Placeholder"
 
-msgid "Getting started developer guide"
-msgstr "Hướng dẫn bắt đầu dành cho nhà phát triển"
-
-msgid "Documentation"
-msgstr "Tài liệu"
-
-msgid "User guide"
-msgstr "Hướng dẫn người dùng"
-
-msgid "Discord community"
-msgstr "Cộng đồng Discord"
-
-msgid "What's new"
-msgstr "Có gì mới"
-
 msgid "Create"
 msgstr "Tạo"
 
@@ -424,9 +407,6 @@ msgstr "Cấu trúc"
 
 msgid "Content"
 msgstr "Nội dung"
-
-msgid "Help"
-msgstr "Trợ giúp"
 
 msgid "Sites"
 msgstr "Các trang web"
@@ -530,6 +510,9 @@ msgstr "Chọn một trang web hợp lệ"
 msgid "Select a valid page"
 msgstr "Chọn một trang hợp lệ"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -541,9 +524,6 @@ msgstr ""
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Trang %(conflict_page)s có cùng url '%(url)s' với trang hiện tại."
-
-msgid "Add another"
-msgstr ""
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -643,9 +623,6 @@ msgstr "template"
 
 msgid "login required"
 msgstr "yêu cầu đăng nhập"
-
-msgid "menu visibility"
-msgstr "hiển thị trong menu"
 
 msgid "application"
 msgstr "ứng dụng"
@@ -868,6 +845,41 @@ msgstr "cài đặt người dùng"
 
 msgid "user settings"
 msgstr "các cài đặt người dùng"
+
+msgid "by template"
+msgstr ""
+
+msgid "by code"
+msgstr ""
+
+msgid "static placeholder name"
+msgstr ""
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+msgid "placeholder code"
+msgstr ""
+
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+msgid "placeholder content"
+msgstr ""
+
+msgid "creation_method"
+msgstr ""
+
+msgid "static placeholder"
+msgstr ""
+
+msgid "static placeholders"
+msgstr ""
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr ""
 
 msgid "Advanced options"
 msgstr "Tùy chọn nâng cao"
@@ -1161,9 +1173,6 @@ msgstr "Gốc mềm"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr ""
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Ứng dụng: %(apphook)s"
@@ -1317,8 +1326,8 @@ msgstr "Bật/tắt chế độ cấu trúc"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Bật/tắt chế độ cấu trúc và làm nổi bật plugin đang di chuột qua"
 
-msgid "Open \\"
-msgstr "Mở \\"
+msgid "Open \"Create\" dialog"
+msgstr ""
 
 msgid "Focus on Toolbar"
 msgstr "Tập trung vào thanh công cụ"
@@ -1473,6 +1482,12 @@ msgstr "Ghi chú cài đặt"
 
 msgid "Support"
 msgstr "Hỗ trợ"
+
+msgid "Documentation"
+msgstr "Tài liệu"
+
+msgid "User guide"
+msgstr "Hướng dẫn người dùng"
 
 msgid "Give back"
 msgstr "Đóng góp lại"
@@ -1693,15 +1708,6 @@ msgstr "Thêm plugin vào %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr ""
-
-msgid "Community forum"
-msgstr "Diễn đàn cộng đồng"
-
-msgid "Getting started"
-msgstr "Bắt đầu"
-
-msgid "Talk to us"
-msgstr "Trò chuyện với chúng tôi"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - tài khoản người dùng của bạn đã được tạo."

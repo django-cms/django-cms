@@ -9,18 +9,17 @@
 # Alexandre Filgueira <faidoc@gmail.com>, 2023
 # Luis Zárate <luisza@visualcon.net>, 2025
 # Adolfo Gómez <dkmaster@dkmon.com>, 2025
-# Diego Alejandro Romero Mercado, 2026
-# Eduardo Ludi <eduludi@gmail.com>, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
+# Diego Alejandro Romero Mercado, 2025
 # jorlugaqui <jorlugaqui@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: jorlugaqui <jorlugaqui@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/divio/teams/58664/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,8 +42,14 @@ msgstr "La parte del título que se usa en la URL"
 msgid "Page type"
 msgstr "Tipo de página"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Tipos de Página"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Sobreescribir la URL"
@@ -54,6 +59,9 @@ msgstr "Mantenga este campo vacío si se va a utilizar la ruta estándar."
 
 msgid "Start typing..."
 msgstr "Empiece a teclear..."
+
+msgid "menu visibility"
+msgstr "visibilidad del menú"
 
 msgid "limit when this page is visible in the menu"
 msgstr "límite cuando la página es visible en el menú"
@@ -192,9 +200,6 @@ msgstr "Traducciones"
 msgid "Advanced Settings"
 msgstr "Configuración avanzada"
 
-msgid "Change Permissions"
-msgstr "Cambiar permisos"
-
 msgid "The page is not eligible to be home."
 msgstr "Ésta página no es elegible para ser Inicio"
 
@@ -241,13 +246,6 @@ msgstr "Nueva sub página"
 
 msgid "New page"
 msgstr "Nueva página"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"No tiene permiso para acceder a este sitio. Póngase en contacto con su "
-"administrador."
 
 msgid "Database error"
 msgstr "Error de Base de Datos"
@@ -361,9 +359,6 @@ msgstr "Acciones"
 msgid "Empty content"
 msgstr "Contenido vacío"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Propiedades de %(object_name)s"
@@ -414,21 +409,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Placeholder"
 
-msgid "Getting started developer guide"
-msgstr "Guía para desarrolladores que empiezan"
-
-msgid "Documentation"
-msgstr "Documentación"
-
-msgid "User guide"
-msgstr "Guía de usuario"
-
-msgid "Discord community"
-msgstr "Comunidad de Discord"
-
-msgid "What's new"
-msgstr "¿Que hay de nuevo?"
-
 msgid "Create"
 msgstr "Crear"
 
@@ -440,9 +420,6 @@ msgstr "Estructura"
 
 msgid "Content"
 msgstr "Contenido"
-
-msgid "Help"
-msgstr "Ayuda"
 
 msgid "Sites"
 msgstr "Sitios"
@@ -546,6 +523,9 @@ msgstr "Elija un sitio válido"
 msgid "Select a valid page"
 msgstr "Elija una página válida"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -559,9 +539,6 @@ msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "La página %(conflict_page)s tiene la misma url '%(url)s' que la página "
 "actual."
-
-msgid "Add another"
-msgstr "Añadir otro"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -662,9 +639,6 @@ msgstr "plantilla"
 
 msgid "login required"
 msgstr "se necesita autentificar"
-
-msgid "menu visibility"
-msgstr "visibilidad del menú"
 
 msgid "application"
 msgstr "aplicación"
@@ -891,6 +865,43 @@ msgstr "configuración de usuario"
 
 msgid "user settings"
 msgstr "Configuraciones de usuario"
+
+msgid "by template"
+msgstr "por plantilla"
+
+msgid "by code"
+msgstr "por código"
+
+msgid "static placeholder name"
+msgstr "nombre del placeholder estático"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Nombre descriptivo para identificar este placeholder estático. No se "
+"mostrará a los usuarios."
+
+msgid "placeholder code"
+msgstr "código de placeholder"
+
+msgid "To render the static placeholder in templates."
+msgstr "Para renderizar los placeholder estáticos en plantillas."
+
+msgid "placeholder content"
+msgstr "contenido de placeholder"
+
+msgid "creation_method"
+msgstr "metodo_de_creacion"
+
+msgid "static placeholder"
+msgstr "placeholder estático"
+
+msgid "static placeholders"
+msgstr "placeholder estáticos"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "Un placeholder estático ya existe con el mismo codigo y site"
 
 msgid "Advanced options"
 msgstr "Opciones avanzadas"
@@ -1188,9 +1199,6 @@ msgstr "Softroot"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Redirigir"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplicación: %(apphook)s"
@@ -1345,8 +1353,8 @@ msgstr "Cambiar modo de estructura"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Alternar el modo de estructura y resaltar el complemento suspendido"
 
-msgid "Open \\"
-msgstr "Abrir \\"
+msgid "Open \"Create\" dialog"
+msgstr "Abrir \"Crear\" diálogo."
 
 msgid "Focus on Toolbar"
 msgstr "Foco en la barra de herramientas"
@@ -1501,6 +1509,12 @@ msgstr "Notas de instalación"
 
 msgid "Support"
 msgstr "Soporte"
+
+msgid "Documentation"
+msgstr "Documentación"
+
+msgid "User guide"
+msgstr "Guía de usuario"
 
 msgid "Give back"
 msgstr "Devolver"
@@ -1724,15 +1738,6 @@ msgstr "Agregar extensión a %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Placeholder único"
-
-msgid "Community forum"
-msgstr "Foro comunitario"
-
-msgid "Getting started"
-msgstr "Empezando"
-
-msgid "Talk to us"
-msgstr "Hablenos"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - su cuenta de usuario ha sido creada."

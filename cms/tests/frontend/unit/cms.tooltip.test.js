@@ -1,10 +1,9 @@
 'use strict';
 
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Tooltip = require('../../../static/cms/js/modules/cms.tooltip').default;
-var $ = require('jquery');
-
-window.CMS = window.CMS || CMS;
+import CMS from '../../../static/cms/js/modules/cms.base';
+import Tooltip from '../../../static/cms/js/modules/cms.tooltip';
+import $ from 'jquery';
+window.CMS = CMS;
 CMS.Tooltip = Tooltip;
 
 

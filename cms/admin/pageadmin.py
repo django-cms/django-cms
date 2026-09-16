@@ -73,6 +73,7 @@ from cms.signals.apphook import set_restart_trigger
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import get_site_from_request, jsonify_request
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_language_list,
@@ -85,6 +86,10 @@ from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
+
+#: Upper bound for the number of pages :meth:`PageAdmin.get_list` returns. The
+#: view feeds an autocomplete, so a full inventory of the site is never useful.
+PAGE_SMART_LINK_MAX_RESULTS = 50
 
 
 class PageDeleteMessageMixin:
@@ -375,8 +380,13 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             site = get_site_from_request(request)
             query_term = request.GET.get("q", "").strip("/")
 
+            if not query_term:
+                # ``icontains`` matches every page for an empty term, which would
+                # turn this autocomplete into a full listing of the site.
+                return HttpResponse(json.dumps([]), content_type="application/json")
+
             language_code = request.GET.get("language_code", settings.LANGUAGE_CODE)
-            matching_published_pages = (
+            matching_pages = (
                 self.model.objects.on_site(site)
                 .filter(
                     Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
@@ -384,12 +394,14 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                     | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
                     | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
                 )
+                # Page types are blueprints for new pages, not link targets.
+                .filter(is_page_type=False)
                 .prefetch_related("urls", "pagecontent_set")
-                .distinct()
+                .distinct()[:PAGE_SMART_LINK_MAX_RESULTS]
             )
 
             results = []
-            for page in matching_published_pages:
+            for page in matching_pages:
                 results.append(
                     {
                         "path": page.get_path(language=language_code),
@@ -562,6 +574,18 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             message = _("Error! You don't have permissions to move this page. Please reload the page")
             return jsonify_request(HttpResponseForbidden(message))
 
+        # The whole subtree moves along, so authorize the whole subtree: the
+        # destination may grant access that the source did not.
+        target_page, position = form.get_tree_options()
+        if position in ("first-child", "last-child"):
+            parent_page = target_page
+        else:
+            parent_page = target_page.parent if target_page else None
+
+        if not page_permissions.user_can_move_descendants(user, page, page.site, parent_page):
+            message = _("Error! You don't have permissions to move this page. Please reload the page")
+            return jsonify_request(HttpResponseForbidden(message))
+
         operation_token = send_pre_page_operation(
             request=request,
             operation=operations.MOVE_PAGE,
@@ -569,7 +593,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             sender=self.model,
         )
 
-        form.move_page()
+        form.move_page(user=user)
 
         send_post_page_operation(
             request=request,
@@ -662,6 +686,16 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         elif can_copy_page:
             # User can only copy / paste a page if he has permission to add a page
             can_copy_page = page_permissions.user_can_add_page(user, site)
+
+        if can_copy_page:
+            target_page, position = form.get_tree_options()
+            if position in ("first-child", "last-child"):
+                parent_page = target_page
+            else:
+                parent_page = target_page.parent if target_page else None
+            can_copy_page = page_permissions.user_can_copy_descendants(
+                user, page, site, parent_page, form.cleaned_data["copy_permissions"]
+            )
 
         if not can_copy_page:
             message = _("Error! You don't have permissions to copy this page.")
@@ -947,7 +981,10 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
             from cms.cache.permissions import get_cache_key, get_cache_permission_version
 
-            cache.delete(get_cache_key(request.user, "change_page"), version=get_cache_permission_version())
+            cache.delete(
+                get_cache_key(request.user, obj.page.site, "change_page"),
+                version=get_cache_permission_version(),
+            )
 
             # redirect to the edit view if added from the toolbar
             url = get_object_edit_url(obj)  # Redirects to preview if necessary
@@ -1068,11 +1105,38 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return user_sites
 
     def user_can_access_site(self, request):
+        """
+        .. deprecated:: 5.2
+            Unused. Site isolation is enforced by ``has_change_permission``,
+            which checks ``user_can_change_at_least_one_page`` against the site
+            of the request.
+        """
+        import warnings
+
+        warnings.warn(
+            "PageContentAdmin.user_can_access_site() is deprecated and unused. "
+            "Use has_change_permission(request) instead, which already scopes the check to the "
+            "site of the request.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         site = get_site_from_request(request)
         user_sites = self.get_sites_for_user(request.user)
         return site in user_sites
 
     def raise_site_permission_denied(self):
+        """
+        .. deprecated:: 5.2
+            Unused. Raise ``django.core.exceptions.PermissionDenied`` directly.
+        """
+        import warnings
+
+        warnings.warn(
+            "PageContentAdmin.raise_site_permission_denied() is deprecated and unused. "
+            "Raise django.core.exceptions.PermissionDenied directly instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         raise PermissionDenied(_("You do not have permission to access this site. Please contact your administrator."))
 
     def changelist_view(self, request, extra_context=None):
@@ -1160,9 +1224,6 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         if page_content is None:
             raise self._get_404_exception(object_id)
-
-        if not self.has_change_advanced_settings_permission(request, obj=page_content):
-            raise PermissionDenied("No permissions to change the template")
 
         to_template = request.POST.get("template", None)
 

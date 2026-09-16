@@ -1,16 +1,53 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Sideframe = require('../../../static/cms/js/modules/cms.sideframe').default;
-var Messages = require('../../../static/cms/js/modules/cms.messages').default;
-var $ = require('jquery');
+import CMS, { Helpers, KEYS } from '../../../static/cms/js/modules/cms.base';
+import Sideframe from '../../../static/cms/js/modules/cms.sideframe';
+import Messages from '../../../static/cms/js/modules/cms.messages';
+import $ from 'jquery';
 import Toolbar from '../../../static/cms/js/modules/cms.toolbar';
 import Modal from '../../../static/cms/js/modules/cms.modal';
 
-CMS.API = CMS.API || {};
-CMS.API.Helpers = Toolbar.__GetDependency__('Helpers');
-CMS.KEYS = Toolbar.__GetDependency__('KEYS');
+import { rewire, resetRewire } from './helpers/rewire';
 
-window.CMS = window.CMS || CMS;
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.modal', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('cms.modal', await vi.importActual('../../../static/cms/js/modules/cms.modal'));
+    return lazyMock('cms.modal', { default: 'Modal' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.sideframe', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('cms.sideframe', await vi.importActual('../../../static/cms/js/modules/cms.sideframe'));
+    return lazyMock('cms.sideframe', { default: 'Sideframe' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.navigation', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('cms.navigation', await vi.importActual('../../../static/cms/js/modules/cms.navigation'));
+    return lazyMock('cms.navigation', { default: 'Navigation' });
+});
+
+vi.mock('../../../static/cms/js/modules/dom-diff', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('dom-diff', await vi.importActual('../../../static/cms/js/modules/dom-diff'));
+    return lazyMock('dom-diff', { DiffDOM: 'DiffDOM', nodeToObj: 'nodeToObj' });
+});
+
+CMS.API = CMS.API || {};
+CMS.API.Helpers = Helpers;
+CMS.KEYS = KEYS;
+
+window.CMS = CMS;
 CMS.Toolbar = Toolbar;
 CMS.Modal = Modal;
 CMS.Sideframe = Sideframe;
@@ -26,15 +63,15 @@ describe('CMS.Toolbar', function () {
     beforeEach(() => {
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        Toolbar.__Rewire__('showLoader', showLoader);
-        Toolbar.__Rewire__('hideLoader', hideLoader);
-        Toolbar.__Rewire__('Navigation', Navigation);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
+        rewire('Navigation', Navigation);
     });
 
     afterEach(() => {
-        Toolbar.__ResetDependency__('Navigation');
-        Toolbar.__ResetDependency__('showLoader');
-        Toolbar.__ResetDependency__('hideLoader');
+        resetRewire('Navigation');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     it('creates a Toolbar class', function () {
@@ -121,6 +158,9 @@ describe('CMS.Toolbar', function () {
     describe('.openAjax()', function () {
         var toolbar;
         beforeEach(function (done) {
+            // the module reaches for CMS.API.StructureBoard; karma had it left over
+            // from another spec file
+            CMS.API.StructureBoard = { invalidateState: jasmine.createSpy() };
             fixture.load('toolbar.html');
             CMS.config = {};
             CMS.settings = $.extend(CMS.settings, {
@@ -542,7 +582,6 @@ describe('CMS.Toolbar', function () {
             expect(toolbar.ui.window).toHandle(toolbar.resize + '.menu.reset');
         });
 
-
         it('handles mousemove over top level toolbar items', function () {
             var firstMenuItem = $(toolbar.ui.navigations.find('> li')[0]);
             var secondMenuItem = $(toolbar.ui.navigations.find('> li')[1]);
@@ -619,37 +658,6 @@ describe('CMS.Toolbar', function () {
 
     });
 
-    describe('._screenBlock()', function () {
-        var toolbar;
-        beforeEach(function (done) {
-            fixture.load('toolbar.html');
-            CMS.config = {};
-            CMS.settings = $.extend(CMS.settings, {
-                toolbar: 'expanded'
-            });
-            $(function () {
-                spyOn(CMS.Toolbar.prototype, '_initialStates');
-                toolbar = new CMS.Toolbar();
-                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
-                    return $.extend(true, CMS.settings, input);
-                });
-                toolbar.ui.window = $('<div></div>');
-                toolbar.ui.screenBlock = $('<div></div>');
-                spyOn($.fn, 'css').and.callThrough();
-                done();
-            });
-        });
-
-        afterEach(function () {
-            var timeoutId = setInterval(function () {
-            }, 10);
-
-            for (var i; i <= timeoutId; i++) {
-                clearInterval(i);
-            }
-            fixture.cleanup();
-        });
-    });
 
     describe('._delegate()', function () {
         var toolbar;
@@ -679,8 +687,8 @@ describe('CMS.Toolbar', function () {
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
-                Toolbar.__Rewire__('Modal', FakeModal);
-                Toolbar.__Rewire__('Sideframe', FakeSideframe);
+                rewire('Modal', FakeModal);
+                rewire('Sideframe', FakeSideframe);
                 spyOn(toolbar, 'openAjax');
                 spyOn(CMS.API.Helpers, '_getWindow').and.returnValue(fakeWindow);
                 spyOn(CMS.API.Messages, 'open');
@@ -692,8 +700,8 @@ describe('CMS.Toolbar', function () {
         });
 
         afterEach(function (done) {
-            Toolbar.__ResetDependency__('Modal');
-            Toolbar.__ResetDependency__('Sideframe');
+            resetRewire('Modal');
+            resetRewire('Sideframe');
             fixture.cleanup();
             setTimeout(function () {
                 done();
@@ -909,8 +917,8 @@ describe('CMS.Toolbar', function () {
                 toolbar: 'expanded'
             });
             $(function () {
-                Toolbar.__Rewire__('Navigation', FakeNavigation);
-                Toolbar.__Rewire__('DiffDOM', DiffDOM);
+                rewire('Navigation', FakeNavigation);
+                rewire('DiffDOM', DiffDOM);
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
                 spyOn(toolbar, 'setSettings').and.callFake(function (input) {
@@ -930,8 +938,8 @@ describe('CMS.Toolbar', function () {
 
         afterEach(function (done) {
             jasmine.clock().uninstall();
-            Toolbar.__ResetDependency__('Navigation');
-            Toolbar.__ResetDependency__('DiffDOM');
+            resetRewire('Navigation');
+            resetRewire('DiffDOM');
             fixture.cleanup();
             setTimeout(function () {
                 done();

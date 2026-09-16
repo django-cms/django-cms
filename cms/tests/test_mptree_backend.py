@@ -41,7 +41,7 @@ TEMPLATE = "nav_playground.html"
 
 mptree_only = skipIf(
     get_tree_backend() == "treebeard",
-    "mptree backend only -- run with CMS_TREE_BACKEND=mptree",
+    "mptree backend only -- run with CMS_TREE_BACKEND=\"mptree\"",
 )
 
 

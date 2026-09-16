@@ -899,11 +899,22 @@ class PageTree {
                     parent = window.parent;
                 }
                 let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
-                let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                    ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
+                /* Build the form through the DOM API: the href and the token must never be
+                   interpolated into an HTML string, since jQuery hands back the *decoded*
+                   attribute value and a quote in it would break out of the attribute. */
+                let doc = parent.document;
+                let fakeForm = doc.createElement('form');
+                let tokenInput = doc.createElement('input');
 
-                $('<form method="post" action="' + element.attr('href') + '">' +
-                    csrfToken + '</form>')
+                fakeForm.setAttribute('method', 'post');
+                fakeForm.setAttribute('action', element.attr('href'));
+
+                tokenInput.setAttribute('type', 'hidden');
+                tokenInput.setAttribute('name', 'csrfmiddlewaretoken');
+                tokenInput.value = (formToken ? formToken.value : formToken) || window.CMS.config.csrf;
+                fakeForm.appendChild(tokenInput);
+
+                $(fakeForm)
                     .appendTo($(parent.document.body))
                     .submit();
                 return;

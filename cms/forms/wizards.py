@@ -126,6 +126,8 @@ class CreateCMSPageForm(AddPageForm):
             parent_page = None
 
         if parent_page:
+            if parent_page.site_id != self._site.pk:
+                raise ValidationError("Site doesn't match the parent's page site")
             has_perm = user_can_add_subpage(self._user, target=parent_page, site=self._site)
         else:
             has_perm = user_can_add_page(self._user, site=self._site)

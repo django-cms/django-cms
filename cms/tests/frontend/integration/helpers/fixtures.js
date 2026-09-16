@@ -125,7 +125,47 @@ const test = baseTest.extend({
           await page.click('.cms-modal-foot a.cms-btn.cms-btn-action.default');
 
           await page.waitForSelector('.cms-ready');
+          // the wizard navigates to the page it just created; let that finish
+          // before the spec drives the page itself
+          await page.waitForLoadState('networkidle');
         }
+      },
+
+      /**
+       * Enter edit mode from a preview page. The "Edit" button is a link, so
+       * this is a navigation and has to be awaited as one.
+       */
+      enterEditMode: async () => {
+        await page.waitForSelector('.cms-toolbar');
+        const editButton = page.locator('.cms-btn-switch-edit');
+
+        if (await editButton.count()) {
+          await editButton.first().click();
+          await page.waitForLoadState('networkidle');
+          await page.waitForSelector('.cms-toolbar');
+        }
+      },
+
+      /**
+       * Open the structure board. Edit mode alone only renders it - it stays
+       * hidden until the toolbar's mode switcher is used.
+       */
+      openStructureBoard: async () => {
+        await page.click('.cms-toolbar-item-cms-mode-switcher a');
+        await page.waitForSelector('.cms-structure', { state: 'visible' });
+      },
+
+      /**
+       * Open a top level toolbar menu ("Page", "Language", ...) so that its
+       * items become clickable.
+       * @param {string} label - the menu's label
+       */
+      openMenu: async (label) => {
+        await page
+          .locator('.cms-toolbar-item-navigation > li > a')
+          .filter({ hasText: label })
+          .first()
+          .click();
       },
 
       /**

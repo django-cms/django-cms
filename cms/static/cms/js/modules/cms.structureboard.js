@@ -2,7 +2,6 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-/* eslint-env es6 */
 /* jshint esversion: 6 */
 
 import $ from 'jquery';

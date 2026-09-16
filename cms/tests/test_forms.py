@@ -24,7 +24,7 @@ from cms.forms.utils import (
     update_site_and_page_choices,
 )
 from cms.forms.widgets import ApplicationConfigSelect
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, Page
 from cms.test_utils.testcases import (
     URL_CMS_PAGE_ADVANCED_CHANGE,
     URL_CMS_PAGE_PERMISSIONS,
@@ -337,6 +337,26 @@ class FormsTestCase(CMSTestCase):
             str(form.errors["__all__"]),
             "Form should report slug collision error",
         )
+
+    def test_move_root_page_form_ignores_other_sites(self):
+        """Moving a root page must only check its siblings on the page's own site (#8830)"""
+        site2 = Site.objects.create(pk=2, domain="site2.com", name="site2")
+
+        # Identical root level trees on both sites, as produced by ``manage.py cms copy-site``
+        for site in (self.site, site2):
+            create_page("A", "nav_playground.html", "de", slug="a", site=site)
+            create_page("B", "nav_playground.html", "de", slug="b", site=site)
+
+        page_b = Page.objects.filter(site=site2, urls__slug="b", urls__language="de").distinct().get()
+
+        data = {
+            "target": "",  # root level
+            "position": 0,
+            "site": site2.pk,
+        }
+        with force_language("de"):
+            form = forms.MovePageForm(data=data, page=page_b, site=site2)
+            self.assertTrue(form.is_valid(), form.errors)
 
     def test_move_page_form_child_parent_slug_collision(self):
         """Test that pages cannot be moved to create duplicate slugs at the same level"""

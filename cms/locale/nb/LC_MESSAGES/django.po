@@ -4,7 +4,6 @@
 # 
 # Translators:
 # Bjorn Pettersen <bjorn@tkbe.org>, 2025
-# Kim Silkebækken <kim@silkebaekken.net>, 2026
 # Erlend Dalen <erlend.dalen@gmail.com>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
@@ -12,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 20:08+0000\n"
+"POT-Creation-Date: 2026-07-10 11:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Norwegian Bokmål (https://app.transifex.com/divio/teams/58664/nb/)\n"
@@ -37,8 +36,14 @@ msgstr "Delen av tittelen som brukes i adressen"
 msgid "Page type"
 msgstr "Sidetype"
 
+msgid "You do not have permission to change this page."
+msgstr ""
+
 msgid "Page Types"
 msgstr "Sidetyper"
+
+msgid "You do not have permission to copy this page."
+msgstr ""
 
 msgid "Overwrite URL"
 msgstr "Overstyr adresse"
@@ -48,6 +53,9 @@ msgstr "La dette feltet være tomt hvis standardadresse skal brukes"
 
 msgid "Start typing..."
 msgstr "Begynn å skrive..."
+
+msgid "menu visibility"
+msgstr "menyvisbarhet"
 
 msgid "limit when this page is visible in the menu"
 msgstr "begrens når denne siden er synlig i menyen"
@@ -184,9 +192,6 @@ msgstr "Oversettelser"
 msgid "Advanced Settings"
 msgstr "Avanserte instillinger"
 
-msgid "Change Permissions"
-msgstr "Endre rettigheter"
-
 msgid "The page is not eligible to be home."
 msgstr "Denne siden kvalifiserer ikke til å være hjem."
 
@@ -232,13 +237,6 @@ msgstr "Ny underside"
 
 msgid "New page"
 msgstr "Ny side"
-
-msgid ""
-"You do not have permission to access this site. Please contact your "
-"administrator."
-msgstr ""
-"Du har ikke rettigheter til å få tilgang til dette nettstedet. Vennligst "
-"kontakt administratoren din."
 
 msgid "Database error"
 msgstr "Databasefeil"
@@ -351,9 +349,6 @@ msgstr "Handlinger"
 msgid "Empty content"
 msgstr "Tomt innhold"
 
-msgid "You do not have permission to change this content."
-msgstr ""
-
 #, python-format
 msgid "%(object_name)s Properties"
 msgstr "Egenskaper for %(object_name)s"
@@ -404,21 +399,6 @@ msgstr "django CMS"
 msgid "Placeholder"
 msgstr "Plassholder"
 
-msgid "Getting started developer guide"
-msgstr "Utviklerveiledning for å komme i gang"
-
-msgid "Documentation"
-msgstr "Dokumentasjon"
-
-msgid "User guide"
-msgstr "Brukerveiledning"
-
-msgid "Discord community"
-msgstr "Discord-fellesskap"
-
-msgid "What's new"
-msgstr "Hva er nytt"
-
 msgid "Create"
 msgstr "Opprett"
 
@@ -430,9 +410,6 @@ msgstr "Struktur"
 
 msgid "Content"
 msgstr "Innhold"
-
-msgid "Help"
-msgstr "Hjelp"
 
 msgid "Sites"
 msgstr "Nettsteder"
@@ -536,6 +513,9 @@ msgstr "Velg et gyldig nettsted"
 msgid "Select a valid page"
 msgstr "Velg en gyldig side"
 
+msgid "Enter a valid relative or absolute URL."
+msgstr ""
+
 #, python-format
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
@@ -547,9 +527,6 @@ msgstr ""
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Siden %(conflict_page)s har samme url '%(url)s' som gjeldende side."
-
-msgid "Add another"
-msgstr "Legg til en til"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -648,9 +625,6 @@ msgstr "template"
 
 msgid "login required"
 msgstr "krever innlogging"
-
-msgid "menu visibility"
-msgstr "menyvisbarhet"
 
 msgid "application"
 msgstr "applikasjon"
@@ -872,6 +846,43 @@ msgstr "brukerinnstilling"
 
 msgid "user settings"
 msgstr "brukerinnstillinger"
+
+msgid "by template"
+msgstr "etter mal"
+
+msgid "by code"
+msgstr "etter kode"
+
+msgid "static placeholder name"
+msgstr "statisk plassholdernavn"
+
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+"Beskrivende navn for å identifisere denne statiske plassholderen. Ikke vist "
+"til brukere."
+
+msgid "placeholder code"
+msgstr "plassholderkode"
+
+msgid "To render the static placeholder in templates."
+msgstr "For å gjengi den statiske plassholderen i maler."
+
+msgid "placeholder content"
+msgstr "plassholderinnhold"
+
+msgid "creation_method"
+msgstr "opprettingsmetode"
+
+msgid "static placeholder"
+msgstr "statisk plassholder"
+
+msgid "static placeholders"
+msgstr "statiske plassholdere"
+
+msgid "A static placeholder with the same site and code already exists"
+msgstr "En statisk plassholder med samme nettsted og kode finnes allerede"
 
 msgid "Advanced options"
 msgstr "Avanserte valg"
@@ -1163,9 +1174,6 @@ msgstr "Myk topp"
 msgid "Apphook"
 msgstr "Apphook"
 
-msgid "Redirect"
-msgstr "Videresend"
-
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Applikasjon: %(apphook)s"
@@ -1318,8 +1326,8 @@ msgstr "Veksle strukturmodus"
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr "Veksle strukturmodus og fremhev pluginet under markøren"
 
-msgid "Open \\"
-msgstr "Åpne \\"
+msgid "Open \"Create\" dialog"
+msgstr "Åpne \"Opprett\"-dialogen"
 
 msgid "Focus on Toolbar"
 msgstr "Fokus på verktøylinja"
@@ -1474,6 +1482,12 @@ msgstr "Installasjonsnotis"
 
 msgid "Support"
 msgstr "Støtte"
+
+msgid "Documentation"
+msgstr "Dokumentasjon"
+
+msgid "User guide"
+msgstr "Brukerveiledning"
 
 msgid "Give back"
 msgstr "Gi tilbake"
@@ -1693,15 +1707,6 @@ msgstr "Legg til plugin i %(plugin_name)s"
 
 msgid "Single placeholder"
 msgstr "Enkelt plassholder"
-
-msgid "Community forum"
-msgstr "Diskusjonsforum"
-
-msgid "Getting started"
-msgstr "Kom i gang"
-
-msgid "Talk to us"
-msgstr "Snakk med oss"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - din brukerkonto ble opprettet."

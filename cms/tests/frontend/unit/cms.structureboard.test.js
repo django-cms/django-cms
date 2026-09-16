@@ -1,22 +1,70 @@
 'use strict';
 import StructureBoard from '../../../static/cms/js/modules/cms.structureboard';
 import Plugin from '../../../static/cms/js/modules/cms.plugins';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var $ = require('jquery');
-var keyboard = require('../../../static/cms/js/modules/keyboard').default;
+import CMS, { Helpers, KEYS } from '../../../static/cms/js/modules/cms.base';
+import $ from 'jquery';
+import keyboard from '../../../static/cms/js/modules/keyboard';
+
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.plugins', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+    const namespace = lazyMock('cms.plugins', { default: 'Plugin' });
+
+    // not awaited on purpose: cms.plugins is part of the plugins/structureboard/
+    // clipboard import cycle, and awaiting it here deadlocks the mock
+    vi.importActual('../../../static/cms/js/modules/cms.plugins')
+        .then(actual => registerActual('cms.plugins', actual));
+    return namespace;
+});
+
+vi.mock('../../../static/cms/js/modules/cms.clipboard', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+    const namespace = lazyMock('cms.clipboard', { default: 'Clipboard' });
+
+    // not awaited on purpose: cms.clipboard is part of the plugins/structureboard/
+    // clipboard import cycle, and awaiting it here deadlocks the mock
+    vi.importActual('../../../static/cms/js/modules/cms.clipboard')
+        .then(actual => registerActual('cms.clipboard', actual));
+    return namespace;
+});
+
+vi.mock('../../../static/cms/js/modules/dom-diff', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('dom-diff', await vi.importActual('../../../static/cms/js/modules/dom-diff'));
+    return lazyMock('dom-diff', { DiffDOM: 'DiffDOM', nodeToObj: 'nodeToObj' });
+});
+
+vi.mock('../../../static/cms/js/modules/preload-images', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('preload-images', await vi.importActual('../../../static/cms/js/modules/preload-images'));
+    return lazyMock('preload-images', { default: 'preloadImagesFromMarkup' });
+});
+
 var showLoader;
 var hideLoader;
 
-window.CMS = window.CMS || CMS;
+window.CMS = CMS;
 CMS.StructureBoard = StructureBoard;
 CMS.Plugin = Plugin;
 CMS.API = CMS.API || {};
-CMS.API.Helpers = StructureBoard.__GetDependency__('Helpers');
-CMS.KEYS = StructureBoard.__GetDependency__('KEYS');
+CMS.API.Helpers = Helpers;
+CMS.KEYS = KEYS;
 CMS.$ = $;
 
 const pluginConstructor = jasmine.createSpy();
-const originalPlugin = StructureBoard.__GetDependency__('Plugin');
+// the real class, not the rewirable stand-in: FakePlugin._updateClipboard()
+// delegates to it, which would otherwise recurse into itself
+const originalPlugin = (await vi.importActual('../../../static/cms/js/modules/cms.plugins')).default;
 class FakePlugin {
     constructor(container, opts) {
         this.options = opts;
@@ -39,6 +87,7 @@ FakePlugin.aliasPluginDuplicatesMap = {};
 FakePlugin._refreshPlugins = jasmine.createSpy().and.callFake(() => {
     originalPlugin._refreshPlugins();
 });
+
 FakePlugin.prototype._setupUI = jasmine.createSpy();
 FakePlugin.prototype._ensureData = jasmine.createSpy();
 FakePlugin.prototype._setGeneric = jasmine.createSpy();
@@ -56,8 +105,8 @@ describe('CMS.StructureBoard', function() {
         };
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        StructureBoard.__Rewire__('showLoader', showLoader);
-        StructureBoard.__Rewire__('hideLoader', hideLoader);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
     });
 
     afterEach(() => {
@@ -70,8 +119,8 @@ describe('CMS.StructureBoard', function() {
         FakePlugin.prototype._setPluginContentEvents.calls.reset();
         FakePlugin.prototype._setPluginStructureEvents.calls.reset();
         FakePlugin._refreshPlugins.calls.reset();
-        StructureBoard.__ResetDependency__('showLoader');
-        StructureBoard.__ResetDependency__('hideLoader');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     it('creates a StructureBoard class', function() {
@@ -1457,7 +1506,7 @@ describe('CMS.StructureBoard', function() {
         beforeEach(done => {
             fixture.load('plugins.html');
             board = new CMS.StructureBoard();
-            StructureBoard.__Rewire__('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
             spyOn(StructureBoard, 'actualizePluginCollapseStatus');
             spyOn(StructureBoard, 'actualizePlaceholders');
             spyOn(StructureBoard, 'actualizePluginsCollapsibleStatus');
@@ -1470,7 +1519,7 @@ describe('CMS.StructureBoard', function() {
 
         afterEach(() => {
             fixture.cleanup();
-            StructureBoard.__ResetDependency__('Plugin');
+            resetRewire('Plugin');
         });
 
         describe('itself', () => {
@@ -2009,13 +2058,13 @@ describe('CMS.StructureBoard', function() {
                     populate: jasmine.createSpy(),
                     _enableTriggers: jasmine.createSpy()
                 };
-                StructureBoard.__Rewire__('Clipboard', FakeClipboard);
-                StructureBoard.__Rewire__('Plugin', FakePlugin);
+                rewire('Clipboard', FakeClipboard);
+                rewire('Plugin', FakePlugin);
                 fixture.load('clipboard.html');
             });
             afterEach(() => {
-                StructureBoard.__ResetDependency__('Clipboard');
-                StructureBoard.__ResetDependency__('Plugin');
+                resetRewire('Clipboard');
+                resetRewire('Plugin');
             });
 
             it('updates the clipboard', () => {
@@ -2100,11 +2149,11 @@ describe('CMS.StructureBoard', function() {
 
         beforeEach(() => {
             board = new StructureBoard();
-            StructureBoard.__Rewire__('preloadImagesFromMarkup', preloadImages);
+            rewire('preloadImagesFromMarkup', preloadImages);
         });
 
         afterEach(() => {
-            StructureBoard.__ResetDependency__('preloadImagesFromMarkup');
+            resetRewire('preloadImagesFromMarkup');
             preloadImages.calls.reset();
         });
 
@@ -2204,12 +2253,12 @@ describe('CMS.StructureBoard', function() {
                     };
                 }
             });
-            StructureBoard.__Rewire__('Plugin', FakePlugin);
-            Plugin.__Rewire__('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
         });
         afterEach(() => {
-            StructureBoard.__ResetDependency__('Plugin');
-            Plugin.__ResetDependency__('Plugin', FakePlugin);
+            resetRewire('Plugin');
+            resetRewire('Plugin', FakePlugin);
         });
 
         it('resolves immediately when content mode is already loaded', done => {
@@ -2257,6 +2306,23 @@ describe('CMS.StructureBoard', function() {
 
             expect(board._loadedContent).not.toBeDefined();
             pluginConstructor.calls.reset();
+
+            // FakePlugin._refreshPlugins() delegates to the real implementation,
+            // and that one instantiates cms.plugins' own reference to itself -
+            // something vi.mock cannot swap, so the instances it creates are real
+            // plugins and the spies have to sit on the real prototype.
+            spyOn(originalPlugin.prototype, '_setupUI').and.callFake(function() {
+                const el = $('<div></div>');
+
+                el.data('cms', []);
+                this.ui = { container: el };
+            });
+            spyOn(originalPlugin.prototype, '_ensureData');
+            spyOn(originalPlugin.prototype, '_setGeneric');
+            spyOn(originalPlugin.prototype, '_setPluginContentEvents');
+
+            const instancesBefore = CMS._instances.length;
+
             board._loadContent().then(() => {
                 expect(showLoader).toHaveBeenCalled();
                 expect(hideLoader).toHaveBeenCalled();
@@ -2268,9 +2334,10 @@ describe('CMS.StructureBoard', function() {
                 expect($('.new-content')).toBeInDOM();
 
                 expect(FakePlugin.prototype._ensureData).toHaveBeenCalledTimes(3);
-                expect(FakePlugin.prototype._setGeneric).toHaveBeenCalledTimes(1);
+                expect(originalPlugin.prototype._ensureData).toHaveBeenCalledTimes(1);
+                expect(originalPlugin.prototype._setGeneric).toHaveBeenCalledTimes(1);
                 expect(FakePlugin.prototype._setPluginContentEvents).toHaveBeenCalledTimes(1);
-                expect(pluginConstructor).toHaveBeenCalledTimes(1);
+                expect(CMS._instances.length).toEqual(instancesBefore + 1);
 
                 $('.new-content').remove();
                 expect(board._loadedContent).toBe(true);
@@ -2315,10 +2382,10 @@ describe('CMS.StructureBoard', function() {
                     };
                 }
             });
-            StructureBoard.__Rewire__('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
         });
         afterEach(() => {
-            StructureBoard.__ResetDependency__('Plugin');
+            resetRewire('Plugin');
         });
 
         it('resolves immediately when structure mode is already loaded', done => {
@@ -2517,6 +2584,8 @@ describe('CMS.StructureBoard', function() {
         DiffDOM.prototype.diff = jasmine.createSpy();
         DiffDOM.prototype.apply = jasmine.createSpy();
 
+        let originalDOMParser;
+
         class FakeDOMParser {}
         FakeDOMParser.prototype.parseFromString = jasmine.createSpy().and.returnValue({
             head: 'fakeNewHead',
@@ -2524,8 +2593,10 @@ describe('CMS.StructureBoard', function() {
         });
 
         beforeEach(() => {
-            StructureBoard.__Rewire__('DiffDOM', DiffDOM);
-            StructureBoard.__Rewire__('DOMParser', FakeDOMParser);
+            rewire('DiffDOM', DiffDOM);
+            // DOMParser is a browser global in the module under test
+            originalDOMParser = window.DOMParser;
+            window.DOMParser = FakeDOMParser;
 
             board = new StructureBoard();
 
@@ -2540,8 +2611,8 @@ describe('CMS.StructureBoard', function() {
         });
 
         afterEach(() => {
-            StructureBoard.__ResetDependency__('DiffDOM');
-            StructureBoard.__ResetDependency__('DOMParser');
+            resetRewire('DiffDOM');
+            window.DOMParser = originalDOMParser;
         });
 
         it('resets loaded content flag', () => {
@@ -2665,9 +2736,7 @@ describe('CMS.StructureBoard', function() {
                 const div = document.createElement('div');
                 const _getWindow = jasmine.createSpy().and.returnValue(div);
 
-                StructureBoard.__Rewire__('Helpers', {
-                    _getWindow
-                });
+                spyOn(Helpers, '_getWindow').and.callFake(_getWindow);
 
                 const board = new StructureBoard();
 
@@ -2690,8 +2759,6 @@ describe('CMS.StructureBoard', function() {
                 expect(board._requestMode).toHaveBeenCalledWith(mode === 'content' ? 'structure' : 'content');
 
                 jasmine.clock().uninstall();
-
-                StructureBoard.__ResetDependency__('Helpers');
             });
         });
 
@@ -2699,9 +2766,7 @@ describe('CMS.StructureBoard', function() {
             const div = document.createElement('div');
             const _getWindow = jasmine.createSpy().and.returnValue(div);
 
-            StructureBoard.__Rewire__('Helpers', {
-                _getWindow
-            });
+            spyOn(Helpers, '_getWindow').and.callFake(_getWindow);
 
             const board = new StructureBoard();
 
@@ -2721,8 +2786,6 @@ describe('CMS.StructureBoard', function() {
             expect(board._requestMode).not.toHaveBeenCalled();
 
             jasmine.clock().uninstall();
-
-            StructureBoard.__ResetDependency__('Helpers');
         });
     });
 

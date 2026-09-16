@@ -552,37 +552,35 @@ class ToolbarTests(ToolbarTestBase):
 
     @override_settings(CMS_PERMISSION=True)
     def test_template_change_permission(self):
+        """The template lives on the page content, so the *change* permission
+        governs it -- not *change advanced settings*.
+        """
         page = create_page("test", "nav_playground.html", "en")
         page_content = self.get_pagecontent_obj(page)
         edit_url = get_object_edit_url(page_content)
 
-        # Staff user with change page permissions only
+        def get_template_items(user):
+            request = self.get_page_request(page, user, edit_url)
+            page_item = self.get_page_item(CMSToolbar(request))
+            return [item for item in page_item.items if force_str(getattr(item, "name", "")) == "Templates"]
+
+        # Staff user with change page permissions only -- no advanced settings.
         staff_user = self.get_staff_user_with_no_permissions()
         self.add_permission(staff_user, "change_page")
         global_permission = self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
-        # User should not see "Templates" option because he only has
-        # "change" permission.
-        request = self.get_page_request(page, staff_user, edit_url)
-        toolbar = CMSToolbar(request)
-        page_item = self.get_page_item(toolbar)
-        template_item = [item for item in page_item.items if force_str(getattr(item, "name", "")) == "Templates"]
-        self.assertEqual(len(template_item), 0)
+        template_item = get_template_items(staff_user)
+        self.assertEqual(len(template_item), 1)
+        self.assertFalse(template_item[0].disabled)
 
-        # Give the user change advanced settings permission
+        # Granting advanced settings on top changes nothing.
         global_permission.can_change_advanced_settings = True
         global_permission.save()
-
-        # Reload user to avoid stale caches
         staff_user = self.reload(staff_user)
 
-        # User should see "Templates" option because
-        # he has "change advanced settings" permission
-        request = self.get_page_request(page, staff_user, edit_url)
-        toolbar = CMSToolbar(request)
-        page_item = self.get_page_item(toolbar)
-        template_item = [item for item in page_item.items if force_str(getattr(item, "name", "")) == "Templates"]
+        template_item = get_template_items(staff_user)
         self.assertEqual(len(template_item), 1)
+        self.assertFalse(template_item[0].disabled)
 
     def test_markup(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
@@ -2014,6 +2012,77 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '"edit_plugin": "{}?language={}&amp;edit_fields=changelist"'.format(
                 admin_reverse("placeholderapp_example1_changelist"), "en"
+            ),
+        )
+
+    def test_changeform_url_is_marked_as_popup(self):
+        """The frontend editing modal opens the plain admin changeform, which only
+        renders without the admin chrome - and only closes the modal upon saving -
+        when the ``_popup`` flag is set."""
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_block instance %}
+    {{ instance }}
+{% endrender_model_block %}
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?language=en&amp;_popup=1"'.format(
+                admin_reverse("placeholderapp_example1_change", args=(ex1.pk,))
+            ),
+        )
+
+    def test_add_form_url_is_marked_as_popup(self):
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_add instance %}
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?_popup=1"'.format(admin_reverse("placeholderapp_example1_add")),
+        )
+
+    def test_edit_field_url_is_not_marked_as_popup(self):
+        """``edit_field`` is a cms view rendering its own chrome-less template: it
+        neither needs nor understands the ``_popup`` flag."""
+        user = self.get_staff()
+        page = create_page("Test", "col_two.html", "en")
+        page_content = self.get_pagecontent_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        ex1 = self._get_example_obj()
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "char_1" "char_1" %}</h1>
+{% endblock content %}
+"""
+        request = self.get_page_request(page, user, edit_url)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '"edit_plugin": "{}?language=en&amp;edit_fields=char_1"'.format(
+                admin_reverse("placeholderapp_example1_edit_field", args=(ex1.pk, "en"))
             ),
         )
 

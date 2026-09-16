@@ -89,8 +89,23 @@ it.
 #. Open ``http://localhost:8000/`` in a private browser window or a
    different browser where you are not logged in.
 
-You should see your Home page. If you see a 404 instead, you forgot
-the publish step.
+You should see your Home page.
+
+.. note::
+
+   If you end up on the **admin login page** instead, the page is not
+   published. When a request for the site root has no page content the
+   anonymous visitor may see, django CMS redirects to the page list in
+   the admin — a convenience for editors who are still setting the site
+   up — and the admin in turn bounces logged-out visitors to the login
+   form. Log in again as your superuser, open **Pages...**, and check
+   that *Home* is marked *Published*.
+
+   The same happens if your browser asks for a language you have no page
+   content in (say ``/de/`` while *Home* only exists in English).
+
+   For any other URL — ``/about/``, for example — an unpublished page
+   gives a plain 404 instead.
 
 .. image:: images/edit-vs-published.png
    :class: screenshot
