@@ -1,0 +1,197 @@
+name: django CMS upgrade test
+
+# Release PRs into a release branch bump cms/__init__.py. For those, install the
+# previous version into a fresh project, create content, upgrade to the PR's
+# version and check that migrations run through and the site still works on
+# all supported databases.
+
+on:
+  pull_request:
+    branches:
+      - 'release/*.x'
+    paths:
+      - 'cms/__init__.py'
+      - '.github/upgrade-test/**'
+      - '.github/workflows/test_upgrade.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-version-change:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.versions.outputs.changed }}
+      old-version: ${{ steps.versions.outputs.old-version }}
+      new-version: ${{ steps.versions.outputs.new-version }}
+      old-source: ${{ steps.versions.outputs.old-source }}
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        path: head
+        sparse-checkout: cms/__init__.py
+        sparse-checkout-cone-mode: false
+    - uses: actions/checkout@v7
+      with:
+        ref: ${{ github.event.pull_request.base.sha }}
+        path: base
+        sparse-checkout: cms/__init__.py
+        sparse-checkout-cone-mode: false
+    - name: Compare versions
+      id: versions
+      run: |
+        set -euo pipefail
+        get_version() {
+          sed -n "s/^__version__ = [\"']\(.*\)[\"']/\1/p" "$1/cms/__init__.py"
+        }
+        old=$(get_version base)
+        new=$(get_version head)
+        echo "Base version: $old"
+        echo "PR version:   $new"
+        echo "old-version=$old" >> "$GITHUB_OUTPUT"
+        echo "new-version=$new" >> "$GITHUB_OUTPUT"
+        if [ "$old" = "$new" ]; then
+          echo "changed=false" >> "$GITHUB_OUTPUT"
+          echo "Version unchanged, skipping upgrade test."
+          exit 0
+        fi
+        echo "changed=true" >> "$GITHUB_OUTPUT"
+        # Test the upgrade from the release users actually have installed. Fall
+        # back to the base branch's source if that version was never published.
+        if python3 -m pip download --no-deps --quiet --dest "$RUNNER_TEMP/dl" "django-cms==$old"; then
+          echo "old-source=pypi" >> "$GITHUB_OUTPUT"
+          echo "Previous version $old will be installed from PyPI."
+        else
+          echo "old-source=git" >> "$GITHUB_OUTPUT"
+          echo "Previous version $old is not on PyPI, installing from base commit."
+        fi
+
+  upgrade:
+    needs: detect-version-change
+    if: needs.detect-version-change.outputs.changed == 'true'
+    name: ${{ matrix.database }} / Django ${{ matrix.django.version }} (${{ needs.detect-version-change.outputs.old-version }} → ${{ needs.detect-version-change.outputs.new-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.13']
+        # Latest LTS and latest release supported by both versions
+        django:
+          - version: '5.2'
+            requirement: 'Django>=5.2,<6.0'
+          - version: '6.1'
+            requirement: 'Django>=6.1a1,<6.2'
+        database: [sqlite, postgres, mysql]
+
+    services:
+      # Services with an empty image are not started
+      postgres:
+        image: ${{ matrix.database == 'postgres' && 'postgres:18' || '' }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      mysql:
+        image: ${{ matrix.database == 'mysql' && 'mysql:8.4' || '' }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: djangocms_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    env:
+      OLD_VERSION: ${{ needs.detect-version-change.outputs.old-version }}
+      NEW_VERSION: ${{ needs.detect-version-change.outputs.new-version }}
+      PROJECT_DIR: ${{ github.workspace }}/project
+      # Empty for sqlite: the project then uses a local sqlite file
+      DATABASE_URL: ${{ matrix.database == 'postgres' && 'postgres://postgres:postgres@127.0.0.1/postgres' || matrix.database == 'mysql' && 'mysql://root@127.0.0.1/djangocms_test' || '' }}
+
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        path: head
+    - uses: actions/checkout@v7
+      if: needs.detect-version-change.outputs.old-source == 'git'
+      with:
+        ref: ${{ github.event.pull_request.base.sha }}
+        path: base
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v7
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install django CMS ${{ env.OLD_VERSION }}
+      env:
+        OLD_SOURCE: ${{ needs.detect-version-change.outputs.old-source }}
+      run: |
+        set -euo pipefail
+        python -m pip install --upgrade pip uv
+        if [ "$OLD_SOURCE" = pypi ]; then
+          old_package="django-cms==$OLD_VERSION"
+        else
+          old_package="./base"
+        fi
+        uv pip install --system \
+          "${{ matrix.django.requirement }}" \
+          "$old_package" \
+          djangocms-text \
+          dj-database-url \
+          -r head/test_requirements/databases.txt
+        # The test project lives outside the checkouts so that "import cms"
+        # picks up the installed package, not a source tree.
+        cp -R head/.github/upgrade-test "$PROJECT_DIR"
+        uv pip list --system | grep -Ei "^(django|django-cms|djangocms-text|django-treebeard) "
+        python -c "import cms; print('django CMS', cms.__version__, 'from', cms.__file__)"
+
+    - name: Create project and content with django CMS ${{ env.OLD_VERSION }}
+      working-directory: ${{ env.PROJECT_DIR }}
+      run: |
+        python manage.py migrate --no-input
+        python upgrade_check.py populate
+
+    - name: Upgrade to django CMS ${{ env.NEW_VERSION }}
+      run: |
+        set -euo pipefail
+        uv pip install --system --reinstall-package django-cms ./head
+        installed=$(cd "$PROJECT_DIR" && python -c "import cms; print(cms.__version__)")
+        echo "Installed django CMS $installed"
+        test "$installed" = "$NEW_VERSION"
+
+    - name: Run migrations
+      working-directory: ${{ env.PROJECT_DIR }}
+      run: |
+        set -euo pipefail
+        echo "::group::Migration plan"
+        python manage.py migrate --plan
+        echo "::endgroup::"
+        python manage.py migrate --no-input
+        # No unapplied migrations are left and no model changes lack a migration
+        python manage.py migrate --check
+        python manage.py makemigrations --check --dry-run
+        python manage.py check
+
+    - name: Verify content and test requests
+      working-directory: ${{ env.PROJECT_DIR }}
+      run: python upgrade_check.py verify
+
+    - name: Test requests against a running server
+      working-directory: ${{ env.PROJECT_DIR }}
+      run: |
+        set -euo pipefail
+        python manage.py runserver 127.0.0.1:8000 --noreload > server.log 2>&1 &
+        server_pid=$!
+        trap 'kill $server_pid; cat server.log' EXIT
+        for _ in $(seq 30); do
+          curl -s -o /dev/null http://127.0.0.1:8000/ && break
+          sleep 1
+        done
+        curl -fsS -o /dev/null -w "/ -> %{http_code}\n" http://127.0.0.1:8000/
+        curl -fsSL http://127.0.0.1:8000/en/ | grep -F upgrade-marker-home-en-0 > /dev/null
+        curl -fsSL http://127.0.0.1:8000/de/ | grep -F upgrade-marker-home-de-0 > /dev/null
+        curl -fsS -o /dev/null -w "/en/admin/login/ -> %{http_code}\n" http://127.0.0.1:8000/en/admin/login/
+        echo "Server responds correctly after upgrade"
