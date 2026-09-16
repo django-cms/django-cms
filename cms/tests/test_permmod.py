@@ -17,10 +17,10 @@ from cms.permissions.models import (
     GlobalPagePermission,
     PagePermission,
 )
+from cms.permissions.page_permissions import user_can_view_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils.page_permissions import user_can_view_page
 from cms.utils.urlutils import admin_reverse
 
 

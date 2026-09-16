@@ -17,12 +17,12 @@ from django.utils.translation import override as force_language
 from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings
-from cms.page_rendering import _handle_no_page
+from cms.pages.rendering import _handle_no_page
+from cms.pages.utils import get_page_from_request
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url, get_object_structure_url
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 from cms.views import details, login, render_object_structure
 from menus.menu_pool import menu_pool

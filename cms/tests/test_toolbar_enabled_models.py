@@ -9,7 +9,7 @@ from cms.api import create_page
 from cms.app_registration import get_cms_config_apps, get_cms_extension_apps
 from cms.cms_config import CMSCoreExtensions
 from cms.models import Page, PageContent
-from cms.page_rendering import render_pagecontent
+from cms.pages.rendering import render_pagecontent
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.setup import setup_cms_apps

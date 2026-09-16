@@ -19,7 +19,7 @@ from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS
 
 from cms.models import GlobalPagePermission, PagePermission
-from cms.signals import permissions as permission_signals
+from cms.permissions import signals as permission_signals
 from cms.test_utils.testcases import CMSTestCase
 
 User = get_user_model()

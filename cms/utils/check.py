@@ -416,7 +416,7 @@ def check_template_conf(output):
 
 @define_check
 def check_cmsapps_names(output):
-    from cms.apphook_pool import apphook_pool
+    from cms.pages.apphook_pool import apphook_pool
 
     with output.section("Apphooks") as section:
         apphooks = apphook_pool.get_apphooks()

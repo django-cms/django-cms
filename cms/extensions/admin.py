@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from cms.models import Page, PageContent
-from cms.utils.page_permissions import user_can_change_page
+from cms.permissions.page_permissions import user_can_change_page
 from cms.utils.urlutils import static_with_version
 
 

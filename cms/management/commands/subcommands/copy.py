@@ -6,8 +6,8 @@ from django.db import transaction
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import EmptyPageContent, Page, PageContent
+from cms.pages.utils import get_available_slug
 from cms.utils import get_language_list
-from cms.utils.page import get_available_slug
 
 User = get_user_model()
 

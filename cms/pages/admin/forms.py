@@ -13,8 +13,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import get_language, gettext, gettext_lazy as _
 
 from cms import api
-from cms.apphook_pool import apphook_pool
-from cms.cache.permissions import clear_permission_cache
 from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PluginLimitReached
@@ -42,29 +40,31 @@ from cms.operations.helpers import (
     send_post_page_operation,
     send_pre_page_operation,
 )
+from cms.pages.apphook_pool import apphook_pool
+from cms.pages.utils import get_clean_username
+from cms.permissions.cache import clear_permission_cache
 from cms.permissions.models import (
     EDIT_PERMISSION_REQUIRED_MESSAGES,
     User,
 )
-from cms.signals.apphook import set_restart_trigger
-from cms.utils import get_current_site
-from cms.utils.compat.forms import UserChangeForm
-from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_list, get_site_language_from_request
-from cms.utils.page import get_clean_username
-from cms.utils.page_permissions import (
+from cms.permissions.page_permissions import (
     user_can_add_page,
     user_can_add_subpage,
     user_can_change_page,
     user_can_view_page,
 )
-from cms.utils.permissions import (
+from cms.permissions.utils import (
     get_current_user,
     get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
     get_user_permission_level,
 )
+from cms.signals.apphook import set_restart_trigger
+from cms.utils import get_current_site
+from cms.utils.compat.forms import UserChangeForm
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.urlutils import static_with_version
 from menus.menu_pool import menu_pool
 

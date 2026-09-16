@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.utils.translation import activate, get_language
 
-from cms.apphook_pool import apphook_pool
+from cms.pages.apphook_pool import apphook_pool
 
 
 class NULL:

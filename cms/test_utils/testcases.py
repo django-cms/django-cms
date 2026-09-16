@@ -31,10 +31,10 @@ from cms.permissions.models import (
     PagePermission,
     PageUser,
 )
+from cms.permissions.utils import set_current_user
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 
@@ -329,7 +329,7 @@ class BaseCMSTestCase:
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
     def copy_page(self, page, target_page, position=0, target_site=None):
-        from cms.utils.page import get_available_slug
+        from cms.pages.utils import get_available_slug
 
         if target_site is None:
             target_site = target_page.site
@@ -487,7 +487,7 @@ class BaseCMSTestCase:
         return template_obj.render(context, request)
 
     def apphook_clear(self):
-        from cms.apphook_pool import apphook_pool
+        from cms.pages.apphook_pool import apphook_pool
         for name, label in list(apphook_pool.get_apphooks()):
             if apphook_pool.apps[name].__class__.__module__ in sys.modules:
                 del sys.modules[apphook_pool.apps[name].__class__.__module__]

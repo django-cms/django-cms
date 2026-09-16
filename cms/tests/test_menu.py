@@ -10,9 +10,9 @@ from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils.translation import activate, override as force_language
 
 from cms.api import create_page, create_page_content
-from cms.apphook_pool import apphook_pool
 from cms.cms_menus import CMSMenu, get_visible_page_contents
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, PageContent
+from cms.pages.apphook_pool import apphook_pool
 from cms.permissions.models import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (
     ExtendedMenusFixture,

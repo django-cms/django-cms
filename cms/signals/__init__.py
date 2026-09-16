@@ -12,6 +12,19 @@ from cms.models import (
     PageUser,
     PageUserGroup,
 )
+from cms.permissions.signals import (
+    post_save_user,
+    post_save_user_group,
+    pre_delete_globalpagepermission,
+    pre_delete_group,
+    pre_delete_pagepermission,
+    pre_delete_user,
+    pre_save_globalpagepermission,
+    pre_save_group,
+    pre_save_pagepermission,
+    pre_save_user,
+    user_m2m_changed,
+)
 from cms.shared.signals import page_caches_invalidated, placeholder_cache_cleared
 
 # Import pagecontent signal handlers to ensure they are connected
@@ -24,19 +37,6 @@ from cms.signals.cache import (
 from cms.signals.log_entries import (
     log_page_operations,
     log_placeholder_operations,
-)
-from cms.signals.permissions import (
-    post_save_user,
-    post_save_user_group,
-    pre_delete_globalpagepermission,
-    pre_delete_group,
-    pre_delete_pagepermission,
-    pre_delete_user,
-    pre_save_globalpagepermission,
-    pre_save_group,
-    pre_save_pagepermission,
-    pre_save_user,
-    user_m2m_changed,
 )
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting

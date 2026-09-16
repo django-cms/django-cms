@@ -17,14 +17,14 @@ from django.utils.translation import get_language, gettext_lazy as _, override a
 
 from cms import constants
 from cms.models.managers import PageManager, PageUrlManager
+from cms.pages.mptree import get_tree_base
+from cms.pages.utils import get_clean_username
 from cms.shared.resolvers import provide
 from cms.shared.signals import page_caches_invalidated
 from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
-from cms.utils.mptree import get_tree_base
-from cms.utils.page import get_clean_username
 
 logger = getLogger(__name__)
 
@@ -528,10 +528,10 @@ class Page(MP_Node):
         least the same scope are skipped, so repeated moves do not pile up
         redundant rows.
         """
-        from cms.cache.permissions import clear_permission_cache
         from cms.models import PagePermission
+        from cms.permissions.cache import clear_permission_cache
         from cms.permissions.models import MASK_DESCENDANTS
-        from cms.utils.permissions import clear_permission_lru_caches
+        from cms.permissions.utils import clear_permission_lru_caches
 
         if not restrictions or not get_cms_setting("PERMISSION"):
             return []
@@ -576,7 +576,7 @@ class Page(MP_Node):
         user=None,
     ):
         from cms.models import PageContent
-        from cms.utils.page import get_available_slug
+        from cms.pages.utils import get_available_slug
 
         assert parent_page is None or isinstance(parent_page, Page), f"{parent_page} is not an instance of Page."
         assert isinstance(user, get_user_model()), f"{user} is not an instance of User."
@@ -743,7 +743,7 @@ class Page(MP_Node):
             self.application_namespace = None
 
         created = not bool(self.pk)
-        from cms.utils.permissions import get_current_user_name
+        from cms.permissions.utils import get_current_user_name
 
         self.changed_by = get_current_user_name()
         if created:
@@ -1197,7 +1197,7 @@ class Page(MP_Node):
         return _("default")
 
     def has_view_permission(self, user):
-        from cms.utils.page_permissions import user_can_view_page
+        from cms.permissions.page_permissions import user_can_view_page
 
         return user_can_view_page(user, page=self)
 
@@ -1213,32 +1213,32 @@ class Page(MP_Node):
         """
         Has user ability to add page under current page?
         """
-        from cms.utils.page_permissions import user_can_add_subpage
+        from cms.permissions.page_permissions import user_can_add_subpage
 
         return user_can_add_subpage(user, self)
 
     def has_change_permission(self, user):
-        from cms.utils.page_permissions import user_can_change_page
+        from cms.permissions.page_permissions import user_can_change_page
 
         return user_can_change_page(user, page=self)
 
     def has_delete_permission(self, user):
-        from cms.utils.page_permissions import user_can_delete_page
+        from cms.permissions.page_permissions import user_can_delete_page
 
         return user_can_delete_page(user, page=self)
 
     def has_delete_translation_permission(self, user, language):
-        from cms.utils.page_permissions import user_can_delete_page_translation
+        from cms.permissions.page_permissions import user_can_delete_page_translation
 
         return user_can_delete_page_translation(user, page=self, language=language)
 
     def has_publish_permission(self, user):
-        from cms.utils.page_permissions import user_can_publish_page
+        from cms.permissions.page_permissions import user_can_publish_page
 
         return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import user_can_change_page_advanced_settings
+        from cms.permissions.page_permissions import user_can_change_page_advanced_settings
 
         return user_can_change_page_advanced_settings(user, page=self)
 
@@ -1246,13 +1246,13 @@ class Page(MP_Node):
         """
         Has user ability to change permissions for current page?
         """
-        from cms.utils.page_permissions import user_can_change_page_permissions
+        from cms.permissions.page_permissions import user_can_change_page_permissions
 
         return user_can_change_page_permissions(user, page=self)
 
     def has_move_page_permission(self, user):
         """Has user ability to move current page?"""
-        from cms.utils.page_permissions import user_can_move_page
+        from cms.permissions.page_permissions import user_can_move_page
 
         return user_can_move_page(user, page=self)
 
@@ -1395,7 +1395,7 @@ def _anonymous_can_view_page(page, site):
 
     from django.contrib.auth.models import AnonymousUser
 
-    from cms.utils.page_permissions import user_can_view_page
+    from cms.permissions.page_permissions import user_can_view_page
 
     return user_can_view_page(user=AnonymousUser(), page=page, site=site)
 

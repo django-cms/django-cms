@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import re_path
 
-from cms.apphook_pool import apphook_pool
+from cms.pages.apphook_pool import apphook_pool
 from cms.views import details
 
 if settings.APPEND_SLASH:
@@ -19,5 +19,5 @@ if apphook_pool.get_apphooks():
     """If there are some application urls, add special resolver, so we will
     have standard reverse support.
     """
-    from cms.appresolver import get_app_patterns
+    from cms.pages.appresolver import get_app_patterns
     urlpatterns = get_app_patterns() + urlpatterns

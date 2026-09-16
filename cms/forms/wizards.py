@@ -7,10 +7,10 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from cms.core.plugin_pool import plugin_pool
 from cms.pages.admin.forms import AddPageForm
-from cms.utils import permissions
+from cms.pages.utils import get_available_slug
+from cms.permissions import utils as permissions
+from cms.permissions.page_permissions import user_can_add_page, user_can_add_subpage
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import get_available_slug
-from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 
 try:
     # djangocms_text is not guaranteed to be available

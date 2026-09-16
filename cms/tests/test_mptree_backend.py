@@ -27,15 +27,15 @@ from treebeard.mp_tree import MP_Node
 
 from cms.api import create_page
 from cms.models import Page
-from cms.test_utils.project.sampleapp.models import Category
-from cms.test_utils.testcases import CMSTestCase
-from cms.utils.mptree import (
+from cms.pages.mptree import (
     MaterializedPath,
     MaterializedPathMixin,
     TreePathOverflow,
     get_tree_backend,
     get_tree_base,
 )
+from cms.test_utils.project.sampleapp.models import Category
+from cms.test_utils.testcases import CMSTestCase
 
 TEMPLATE = "nav_playground.html"
 

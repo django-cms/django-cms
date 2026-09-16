@@ -281,7 +281,7 @@ class PageContent(models.Model):
             return ""
 
         if app_hooks and self.page.application_urls:
-            from cms.apphook_pool import apphook_pool
+            from cms.pages.apphook_pool import apphook_pool
 
             apphook = apphook_pool.get_apphook(self.page.application_urls)
             if apphook is not None:

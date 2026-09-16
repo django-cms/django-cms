@@ -5,8 +5,9 @@ from collections.abc import Generator, Iterable
 from django.utils.functional import SimpleLazyObject
 
 from cms import constants
-from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, PagePermission, PageUrl
+from cms.pages.apphook_pool import apphook_pool
+from cms.permissions.page_permissions import user_can_view_all_pages
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
@@ -16,7 +17,6 @@ from cms.utils.i18n import (
     hide_untranslated,
     is_valid_site_language,
 )
-from cms.utils.page_permissions import user_can_view_all_pages
 from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
 

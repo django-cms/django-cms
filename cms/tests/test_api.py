@@ -20,10 +20,10 @@ from cms.api import (
     create_page,
     create_page_content,
 )
-from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.core.plugin_base import CMSPluginBase
 from cms.models import Page, PageContent, Placeholder
+from cms.pages.apphook_pool import apphook_pool
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME
@@ -84,7 +84,7 @@ class PythonAPITests(CMSTestCase):
         # variable, and must restore (not clobber) a user set by a surrounding
         # request context. Otherwise the creator leaks into the next operation
         # on the same thread when CurrentUserMiddleware is not installed.
-        from cms.utils.permissions import get_current_user, set_current_user
+        from cms.permissions.utils import get_current_user, set_current_user
 
         prior_user = self.get_superuser()
         creator = get_user_model().objects.create_user(
@@ -101,7 +101,7 @@ class PythonAPITests(CMSTestCase):
     def test_create_page_content_restores_current_user(self):
         # Same guarantee for a direct create_page_content() call, which sets
         # _current_user for attribution but must restore the previous value.
-        from cms.utils.permissions import get_current_user, set_current_user
+        from cms.permissions.utils import get_current_user, set_current_user
 
         prior_user = self.get_superuser()
         creator = get_user_model().objects.create_user(

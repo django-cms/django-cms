@@ -5,8 +5,8 @@ from django.db import models
 from django.db.models import Case, F, When
 
 from cms.exceptions import NoHomeFound
+from cms.pages.mptree import get_queryset_base, get_tree_backend
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
-from cms.utils.mptree import get_queryset_base, get_tree_backend
 
 # Resolved once at import time (same as the model base in pagemodel.py). In
 # mptree mode the base is a plain QuerySet and treebeard is never imported.

@@ -11,14 +11,14 @@ from django.utils.translation import gettext
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, PageUser, PageUserGroup
 from cms.pages.admin.forms import PageUserChangeForm, PageUserGroupForm
-from cms.utils.compat.forms import UserAdmin
-from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import (
+from cms.permissions.utils import (
     get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
     get_user_permission_level,
 )
+from cms.utils.compat.forms import UserAdmin
+from cms.utils.conf import get_cms_setting
 
 user_model = get_user_model()
 admin_class: type[ModelAdmin] = UserAdmin

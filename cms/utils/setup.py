@@ -16,7 +16,7 @@ def validate_dependencies():
     """
     Check for installed apps, their versions and configuration options
     """
-    from cms.utils.mptree import get_tree_backend
+    from cms.pages.mptree import get_tree_backend
 
     # treebeard is only required for the (default) treebeard tree backend; the
     # dependency-free mptree backend neither imports nor needs it.

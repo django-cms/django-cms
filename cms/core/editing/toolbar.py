@@ -9,12 +9,12 @@ from django.utils.translation import gettext_lazy as _
 
 from cms.constants import REFRESH_PAGE
 from cms.models import Placeholder
+from cms.permissions.utils import user_can_view_placeholder_source
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url, get_object_structure_url
 from cms.toolbar.base import CMSToolbar
 from cms.toolbar.items import ButtonList
 from cms.toolbar.pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import user_can_view_placeholder_source
 from cms.utils.urlutils import admin_reverse
 
 

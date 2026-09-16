@@ -1,0 +1,405 @@
+from collections import defaultdict
+from contextlib import contextmanager
+from contextvars import ContextVar
+from functools import lru_cache, wraps
+
+from django.contrib.auth import get_permission_codename, get_user_model
+from django.contrib.auth.models import Group
+from django.db.models import Q
+
+from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
+from cms.exceptions import NoPermissionsException
+from cms.models import GlobalPagePermission, PagePermission
+from cms.pages.utils import get_clean_username
+from cms.utils.compat.dj import available_attrs
+from cms.utils.conf import get_cms_setting
+
+
+class _CurrentUserRef:
+    """Identity-comparable holder for the value of :data:`_current_user`.
+
+    ``request.user`` is a ``SimpleLazyObject``, and asgiref compares context
+    variables when it restores a context after handing control back to the
+    event loop (``asgiref.sync._restore_context``). Comparing a lazy user
+    evaluates it, which runs the auth backend's database query on the event
+    loop thread and raises ``SynchronousOnlyOperation`` -- in some asgiref
+    versions before the result future is completed, hanging the request.
+
+    Storing the user behind this wrapper keeps the context variable cheap to
+    compare (default identity equality) so the user is only evaluated where
+    django CMS actually reads it, in synchronous code.
+    """
+
+    __slots__ = ('user',)
+
+    def __init__(self, user):
+        self.user = user
+
+
+# context variable support for async-safe user tracking
+_current_user: ContextVar = ContextVar('current_user', default=None)
+
+
+def set_current_user(user):
+    """
+    Assigns current user from request to context variable, used by
+    CurrentUserMiddleware.
+
+    Returns the ``contextvars.Token`` for the change, so callers can restore
+    the previous value with :func:`reset_current_user`.
+    """
+    return _current_user.set(_CurrentUserRef(user) if user is not None else None)
+
+
+def reset_current_user(token):
+    """
+    Restores the current user context variable to the value it held before the
+    ``set_current_user`` call that produced ``token``.
+    """
+    _current_user.reset(token)
+
+
+def get_current_user():
+    """
+    Returns current user, or None
+    """
+    ref = _current_user.get()
+    return ref.user if ref is not None else None
+
+
+def get_current_user_name():
+    current_user = get_current_user()
+
+    if not current_user:
+        return SCRIPT_USERNAME
+    return get_clean_username(current_user)
+
+
+@contextmanager
+def current_user(user):
+    """
+    Changes the current user just within a context.
+    """
+    old_user = get_current_user()
+    set_current_user(user)
+    yield
+    set_current_user(old_user)
+
+
+def get_model_permission_codename(model, action):
+    opts = model._meta
+    return opts.app_label + '.' + get_permission_codename(action, opts)
+
+
+def user_can_view_placeholder_source(user, source):
+    """Whether ``user`` may view the placeholders attached to ``source``.
+
+    Viewing the (read-only) structure board of a frontend-editable object
+    requires only *view* permission; mutating its plugins stays gated by
+    change permission at the plugin endpoints. This lets headless reviewers
+    inspect content structure without edit rights.
+
+    Honours a custom ``has_placeholder_view_permission`` hook on the object
+    and otherwise grants access to users holding the model/object ``view`` or
+    ``change`` permission (change implies the right to view).
+    """
+    if hasattr(source, "has_placeholder_view_permission"):
+        return source.has_placeholder_view_permission(user)
+    model = type(source)
+    perms = (
+        get_model_permission_codename(model, "view"),
+        get_model_permission_codename(model, "change"),
+    )
+    return any(user.has_perm(perm) or user.has_perm(perm, source) for perm in perms)
+
+
+def _has_global_permission(user, site, action):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_superuser:
+        return True
+
+    codename = get_model_permission_codename(GlobalPagePermission, action=action)
+
+    if not user.has_perm(codename):
+        return False
+
+    if not get_cms_setting('PERMISSION'):
+        return True
+
+    has_perm = (
+        GlobalPagePermission
+        .objects
+        .get_with_change_permissions(user, site.pk)
+        .exists()
+    )
+    return has_perm
+
+
+def user_can_add_global_permissions(user, site):
+    return _has_global_permission(user, site, action='add')
+
+
+def user_can_change_global_permissions(user, site):
+    return _has_global_permission(user, site, action='change')
+
+
+def user_can_delete_global_permissions(user, site):
+    return _has_global_permission(user, site, action='delete')
+
+
+def get_user_permission_level(user, site):
+    """
+    Returns highest user level from the page/permission hierarchy on which
+    user haves can_change_permission. Also takes look into user groups. Higher
+    level equals to lower number. Users on top of hierarchy have level 0. Level
+    is the same like page.depth attribute.
+
+    Example:
+                              A,W                    level 0
+                            /    \
+                          user    B,GroupE           level 1
+                        /     \
+                      C,X     D,Y,W                  level 2
+
+        Users A, W have user level 0. GroupE and all his users have user level 1
+        If user D is a member of GroupE, his user level will be 1, otherwise is
+        2.
+
+    """
+    if not user.is_authenticated:
+        raise NoPermissionsException
+
+    if user.is_superuser or not get_cms_setting('PERMISSION'):
+        return ROOT_USER_LEVEL
+
+    has_global_perms = (
+        GlobalPagePermission
+        .objects
+        .get_with_change_permissions(user, site.pk)
+        .exists()
+    )
+
+    if has_global_perms:
+        return ROOT_USER_LEVEL
+
+    try:
+        permission = (
+            PagePermission
+            .objects
+            .get_with_change_permissions(user, site)
+            .select_related('page')
+            .order_by('page__path')
+        )[0]
+    except IndexError:
+        # user isn't assigned to any node
+        raise NoPermissionsException
+    return permission.page.depth
+
+
+def cached_func(func):
+    @wraps(func, assigned=available_attrs(func))
+    def cached_func(user, *args, **kwargs):
+        func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+
+        if not hasattr(user, func_cache_name):
+            cached_func = lru_cache(maxsize=None)(func)
+            setattr(user, func_cache_name, cached_func)
+        return getattr(user, func_cache_name)(user, *args, **kwargs)
+
+    # Allows us to access the un-cached function
+    cached_func.without_cache = func
+    return cached_func
+
+
+def clear_func_cache(user, func):
+    func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+    if hasattr(user, func_cache_name):
+        delattr(user, func_cache_name)
+
+
+def clear_permission_lru_caches(user):
+    """
+    Clear all python lru caches used by the permission system
+    """
+    clear_func_cache(user, get_global_actions_for_user)
+    clear_func_cache(user, get_page_actions_for_user)
+
+
+@cached_func
+def get_global_actions_for_user(user, site):
+    actions = set()
+    global_perms = (
+        GlobalPagePermission
+        .objects
+        .get_with_site(user, site.pk)
+    )
+
+    for global_perm in global_perms.iterator():
+        actions.update(global_perm.get_configured_actions())
+    return actions
+
+
+@cached_func
+def get_page_actions_for_user(user, site):
+    actions = defaultdict(list)
+
+    page_permissions = (
+        PagePermission
+        .objects
+        .with_user(user)
+        .select_related('page')
+        .filter(page__site=site)
+    )
+
+    for perm in page_permissions.iterator():
+        permission_tuple = perm.grant_on, perm.page.path
+        for action in perm.get_configured_actions():
+            actions[action].append(permission_tuple)
+    return actions
+
+
+def has_global_permission(user, site, action, use_cache=True):
+    if use_cache:
+        actions = get_global_actions_for_user(user, site)
+    else:
+        actions = get_global_actions_for_user.without_cache(user, site)
+    return action in actions
+
+
+def get_subordinate_users(user, site):
+    """
+    Returns users queryset, containing all subordinate users to given user
+    including users created by given user and not assigned to any page.
+
+    Not assigned users must be returned, because they shouldn't get lost, and
+    user should still have possibility to see them.
+
+    Only users created_by given user which are on the same, or lover level are
+    returned.
+
+    If user haves global permissions or is a superuser, then he can see all the
+    users.
+
+    Superusers are never subordinate to a non-superuser, no matter how many
+    permissions the latter holds. Otherwise a delegated administrator could
+    manage - and take over - a superuser account.
+
+    This function is currently used in PagePermissionInlineAdminForm for limit
+    users in permission combobox.
+
+    Example:
+                              A,W                    level 0
+                            /    \
+                          user    B,GroupE           level 1
+                Z       /     \
+                      C,X     D,Y,W                  level 2
+
+        Rules: W was created by user, Z was created by user, but is not assigned
+        to any page.
+
+        Will return [user, C, X, D, Y, Z]. W was created by user, but is also
+        assigned to higher level.
+    """
+    from cms.permissions.page_permissions import get_change_permissions_perm_tuples
+
+    def without_superusers(qs):
+        # A non-superuser must never be handed a superuser as a subordinate:
+        # being able to manage the account means being able to take it over.
+        if user.is_superuser:
+            return qs
+        return qs.exclude(is_superuser=True)
+
+    try:
+        user_level = get_user_permission_level(user, site)
+    except NoPermissionsException:
+        # user has no Global or Page permissions.
+        # return only staff users created by user
+        # whose page permission record has no page attached.
+        qs = get_user_model().objects.distinct().filter(
+            Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
+        )
+        qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
+        return without_superusers(qs)
+
+    if user_level == ROOT_USER_LEVEL:
+        return without_superusers(get_user_model().objects.all())
+
+    from cms.models import PermissionTuple
+    allow_list = Q()
+    for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
+        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page")
+
+    # normal query
+    qs = get_user_model().objects.distinct().filter(
+        Q(is_staff=True) & (
+            allow_list & Q(pagepermission__page__depth__gte=user_level)
+        ) | (
+            Q(pageuser__created_by=user) & Q(pagepermission__page=None)
+        )
+    )
+    qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
+    return without_superusers(qs)
+
+
+def get_subordinate_groups(user, site):
+    """
+    Similar to get_subordinate_users, but returns queryset of Groups instead
+    of Users.
+    """
+    from cms.permissions.page_permissions import get_change_permissions_perm_tuples
+
+    try:
+        user_level = get_user_permission_level(user, site)
+    except NoPermissionsException:
+        # user has no Global or Page permissions.
+        # return only groups created by user
+        # whose page permission record has no page attached.
+        groups = (
+            Group
+            .objects
+            .filter(
+                Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
+            )
+            .distinct()
+        )
+        # no permission no records
+        # page_id_allow_list is empty
+        return groups
+
+    if user_level == ROOT_USER_LEVEL:
+        return Group.objects.all()
+
+    from cms.models import PermissionTuple
+    allow_list = Q()
+    for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
+        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page")
+
+    return Group.objects.distinct().filter(
+        (
+            allow_list & Q(pagepermission__page__depth__gte=user_level)
+        ) | (
+            Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
+        )
+    )
+
+
+def has_plugin_permission(user, plugin_type, permission_type):
+    """
+    Checks that a user has permissions for the plugin-type given to perform
+    the action defined in permission_type
+    permission_type should be 'add', 'change' or 'delete'.
+    """
+    from cms.core.plugin_pool import plugin_pool
+    try:
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+        codename = get_model_permission_codename(
+            plugin_class.model,
+            action=permission_type,
+        )
+        return user.has_perm(codename)
+    except KeyError:
+        # Grant all permissions for uninstalled plugins, so they do not block
+        # emptying placeholders.
+        return True

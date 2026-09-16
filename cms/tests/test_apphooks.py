@@ -24,10 +24,10 @@ from django.views.generic import TemplateView
 from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_page_content
 from cms.app_base import CMSApp
-from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.middleware.page import get_page
 from cms.models import PageContent
+from cms.pages.apphook_pool import apphook_pool
+from cms.pages.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl

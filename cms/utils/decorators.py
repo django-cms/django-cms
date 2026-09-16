@@ -5,9 +5,9 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import Http404
 from django.urls import resolve
 
-from cms.page_rendering import _handle_no_page
+from cms.pages.rendering import _handle_no_page
+from cms.permissions.page_permissions import user_can_view_page
 from cms.utils import get_current_site
-from cms.utils.page_permissions import user_can_view_page
 
 
 def cms_perms(func):

@@ -1,8 +1,8 @@
 from django.urls import NoReverseMatch
 
 from cms.models import PageContent
+from cms.permissions.page_permissions import user_can_change_page
 from cms.toolbar.base import CMSToolbar
-from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
 
 

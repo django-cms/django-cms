@@ -1,13 +1,13 @@
 from django.urls import NoReverseMatch
 from django.utils.translation import gettext_lazy as _
 
+from cms.permissions.page_permissions import user_can_change_page
 from cms.test_utils.project.extensionapp.models import (
     MyPageContentExtension,
     MyPageExtension,
 )
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
 
 

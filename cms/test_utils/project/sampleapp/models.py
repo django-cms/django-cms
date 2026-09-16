@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from cms.core.placeholders import get_placeholder_from_slot
 from cms.models.fields import PlaceholderRelationField
-from cms.utils.mptree import get_tree_base
+from cms.pages.mptree import get_tree_base
 
 MP_Node = get_tree_base()
 

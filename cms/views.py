@@ -29,19 +29,22 @@ from django.utils.timezone import now
 from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
-from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check
-from cms.cache.page import get_page_cache
 from cms.core.placeholders import get_declared_placeholders_for_obj, get_placeholder_conf
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models import Page, PageContent
-from cms.page_rendering import (
+from cms.pages.apphook_pool import apphook_pool
+from cms.pages.appresolver import applications_page_check
+from cms.pages.cache import get_page_cache
+from cms.pages.rendering import (
     _handle_no_apphook,
     _handle_no_page,
     _render_welcome_page,
     render_pagecontent,
 )
+from cms.pages.utils import get_page_from_request
+from cms.permissions.page_permissions import user_can_view_page
+from cms.permissions.utils import user_can_view_placeholder_source
 from cms.shared.editing_urls import get_object_preview_url
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -55,9 +58,6 @@ from cms.utils.i18n import (
     get_redirect_on_fallback,
     is_language_prefix_patterns_used,
 )
-from cms.utils.page import get_page_from_request
-from cms.utils.page_permissions import user_can_view_page
-from cms.utils.permissions import user_can_view_placeholder_source
 
 
 def _clean_redirect_url(redirect_url, language):

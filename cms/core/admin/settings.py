@@ -20,9 +20,9 @@ from django.views.decorators.csrf import csrf_protect
 from cms.models import UserSettings
 from cms.pages.admin.forms import RequestToolbarForm
 from cms.pages.models.content import PageContent
-from cms.utils.page import get_page_from_request
-from cms.utils.page_permissions import user_can_view_page
-from cms.utils.permissions import user_can_view_placeholder_source
+from cms.pages.utils import get_page_from_request
+from cms.permissions.page_permissions import user_can_view_page
+from cms.permissions.utils import user_can_view_placeholder_source
 from cms.utils.urlutils import admin_reverse
 
 

@@ -6,17 +6,6 @@ from sekizai.context import SekizaiContext
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cache import invalidate_cms_page_cache
-from cms.cache.page import (
-    _page_cache_key,
-    _page_url_key,
-    _page_vary_headers_cache_key,
-    _vary_on_hash,
-    get_page_cache,
-    get_page_url_cache,
-    get_xframe_cache,
-    set_page_url_cache,
-    set_xframe_cache,
-)
 from cms.core.cache import (
     _get_placeholder_cache_key,
     _get_placeholder_cache_version,
@@ -29,6 +18,17 @@ from cms.core.cache import (
 from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
+from cms.pages.cache import (
+    _page_cache_key,
+    _page_url_key,
+    _page_vary_headers_cache_key,
+    _vary_on_hash,
+    get_page_cache,
+    get_page_url_cache,
+    get_xframe_cache,
+    set_page_url_cache,
+    set_xframe_cache,
+)
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (

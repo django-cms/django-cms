@@ -19,12 +19,12 @@ from cms.constants import MODAL_HTML_REDIRECT, TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 from cms.models import Page, PageContent, UserSettings
 from cms.permissions.models import GlobalPagePermission
+from cms.permissions.page_permissions import user_can_add_subpage
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
 from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
-from cms.utils.page_permissions import user_can_add_subpage
 from cms.utils.setup import setup_cms_apps
 from cms.utils.urlutils import admin_reverse
 from cms.wizards.forms import WizardStep1Form, WizardStep2BaseForm, step2_form_factory

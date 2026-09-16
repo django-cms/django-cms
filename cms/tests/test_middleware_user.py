@@ -9,8 +9,7 @@ from django.urls import path
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import SimpleLazyObject
 
-from cms.signals.apphook import DISPATCH_UID, set_restart_trigger, trigger_restart
-from cms.utils.permissions import (
+from cms.permissions.utils import (
     _current_user,
     current_user,
     get_current_user,
@@ -18,6 +17,7 @@ from cms.utils.permissions import (
     reset_current_user,
     set_current_user,
 )
+from cms.signals.apphook import DISPATCH_UID, set_restart_trigger, trigger_restart
 
 
 @async_unsafe

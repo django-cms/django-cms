@@ -16,8 +16,8 @@ from cms.core.placeholders import get_placeholder_conf
 from cms.core.plugin_base import CMSPluginBase, _obj_from_deprecated_page
 from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PluginLimitReached
+from cms.permissions.utils import has_plugin_permission
 from cms.utils import get_language_from_request
-from cms.utils.permissions import has_plugin_permission
 
 logger = logging.getLogger(__name__)
 

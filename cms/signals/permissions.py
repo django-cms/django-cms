@@ -1,137 +1,32 @@
-from django.contrib.auth import get_user_model
+"""Moved to :mod:`cms.permissions.signals`.
 
-from cms.cache.permissions import clear_user_permission_cache
-from cms.models import PageUser, PageUserGroup
-from menus.menu_pool import menu_pool
+Kept importable because the ecosystem imports from this path, and because
+``cms.models`` star-imports it (see :mod:`cms.compat`).
+"""
 
-User = get_user_model()
+from cms.compat import moved
 
-#: Signals sent while a fixture is being loaded carry ``raw=True``. Related objects
-#: are not guaranteed to exist yet at that point, so receivers must not touch the
-#: database or the caches. See
-#: https://docs.djangoproject.com/en/stable/topics/db/fixtures/#how-fixtures-are-saved-to-the-database
-
-
-def post_save_user(instance, raw, created, **kwargs):
-    """Signal called when new user is created, required only when CMS_PERMISSION.
-    Assigns creator of the user to PageUserInfo model, so we know who had created
-    this user account.
-
-    Flushes permission cache for the user.
-
-    requires: CurrentUserMiddleware
-    """
-    if raw:
-        return
-
-    from cms.utils.permissions import get_current_user
-
-    # read current user from thread locals
-    creator = get_current_user()
-    if not creator or not created or creator.is_anonymous:
-        return
-
-    page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
-    page_user.__dict__.update(instance.__dict__)
-    page_user.save()
-
-    clear_user_permission_cache(instance)
-    menu_pool.clear(all=True)
-
-
-def post_save_user_group(instance, raw, created, **kwargs):
-    """The same like post_save_user, but for Group, required only when
-    CMS_PERMISSION.
-    Assigns creator of the group to PageUserGroupInfo model, so we know who had
-    created this user account.
-
-    requires: CurrentUserMiddleware
-    """
-    if raw:
-        return
-
-    from cms.utils.permissions import get_current_user
-
-    # read current user from thread locals
-    creator = get_current_user()
-    if not creator or not created or creator.is_anonymous:
-        return
-    page_user = PageUserGroup(group_ptr_id=instance.pk, created_by=creator)
-    page_user.__dict__.update(instance.__dict__)
-    page_user.save()
-
-
-def pre_save_user(instance, raw, **kwargs):
-    if raw:
-        return
-    clear_user_permission_cache(instance)
-    menu_pool.clear(all=True)
-
-
-def pre_delete_user(instance, **kwargs):
-    clear_user_permission_cache(instance)
-    menu_pool.clear(all=True)
-
-
-def pre_save_group(instance, raw, **kwargs):
-    if raw:
-        return
-    if instance.pk:
-        menu_pool.clear(all=True)
-        user_set = instance.user_set
-        for user in user_set.all():
-            clear_user_permission_cache(user)
-
-
-def pre_delete_group(instance, **kwargs):
-    user_set = instance.user_set
-    menu_pool.clear(all=True)
-    for user in user_set.all():
-        clear_user_permission_cache(user)
-
-
-def user_m2m_changed(instance, action, reverse, pk_set, raw=False, **kwargs):
-    # Django >= 6.1 forwards ``raw`` to m2m_changed; older versions never send it.
-    if raw:
-        return
-    if action in (
-        "pre_add",
-        "pre_remove",
-    ):
-        menu_pool.clear(all=True)
-        if reverse:
-            for user in User.objects.filter(pk__in=pk_set):
-                clear_user_permission_cache(user)
-        else:
-            clear_user_permission_cache(instance)
-
-
-def _clear_users_permissions(instance):
-    if instance.user:
-        clear_user_permission_cache(instance.user)
-        menu_pool.clear(all=True)
-    if instance.group:
-        user_set = instance.group.user_set
-        for user in user_set.all():
-            clear_user_permission_cache(user)
-        menu_pool.clear(all=True)
-
-
-def pre_save_pagepermission(instance, raw, **kwargs):
-    if raw:
-        return
-    _clear_users_permissions(instance)
-
-
-def pre_delete_pagepermission(instance, **kwargs):
-    _clear_users_permissions(instance)
-
-
-def pre_save_globalpagepermission(instance, raw, **kwargs):
-    if raw:
-        return
-    _clear_users_permissions(instance)
-
-
-def pre_delete_globalpagepermission(instance, **kwargs):
-    _clear_users_permissions(instance)
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {
+        "PageUser": "cms.permissions.signals.PageUser",
+        "PageUserGroup": "cms.permissions.signals.PageUserGroup",
+        "User": "cms.permissions.signals.User",
+        "clear_user_permission_cache": "cms.permissions.signals.clear_user_permission_cache",
+        "get_user_model": "cms.permissions.signals.get_user_model",
+        "menu_pool": "cms.permissions.signals.menu_pool",
+        "post_save_user": "cms.permissions.signals.post_save_user",
+        "post_save_user_group": "cms.permissions.signals.post_save_user_group",
+        "pre_delete_globalpagepermission": "cms.permissions.signals.pre_delete_globalpagepermission",
+        "pre_delete_group": "cms.permissions.signals.pre_delete_group",
+        "pre_delete_pagepermission": "cms.permissions.signals.pre_delete_pagepermission",
+        "pre_delete_user": "cms.permissions.signals.pre_delete_user",
+        "pre_save_globalpagepermission": "cms.permissions.signals.pre_save_globalpagepermission",
+        "pre_save_group": "cms.permissions.signals.pre_save_group",
+        "pre_save_pagepermission": "cms.permissions.signals.pre_save_pagepermission",
+        "pre_save_user": "cms.permissions.signals.pre_save_user",
+        "user_m2m_changed": "cms.permissions.signals.user_m2m_changed",
+    },
+    since="6.0",
+    fallback="cms.permissions.signals",
+)

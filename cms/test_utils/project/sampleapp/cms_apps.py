@@ -4,7 +4,7 @@ from django.urls import re_path, reverse
 from django.utils.translation import gettext_lazy as _
 
 from cms.app_base import CMSApp
-from cms.apphook_pool import apphook_pool
+from cms.pages.apphook_pool import apphook_pool
 from cms.test_utils.project.sampleapp.cms_menus import (
     SampleAppMenu,
     StaticMenu3,

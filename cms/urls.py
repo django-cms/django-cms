@@ -15,12 +15,12 @@ else:
 
 def _get_apphook_urlpatterns():
     # Avoid touching the DB / apphooks at import time.
-    from cms.apphook_pool import apphook_pool
+    from cms.pages.apphook_pool import apphook_pool
 
     if not apphook_pool.get_apphooks():
         return []
 
-    from cms.appresolver import get_app_patterns
+    from cms.pages.appresolver import get_app_patterns
 
     return get_app_patterns()
 

@@ -13,14 +13,15 @@ from django.utils.translation import gettext_lazy as _, override as force_langua
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Page, PageContent, PageType
+from cms.permissions import page_permissions
+from cms.permissions.page_permissions import user_can_change_page, user_can_delete_page
 from cms.shared.editing_urls import get_object_preview_url
 from cms.toolbar.base import CMSToolbar
 from cms.toolbar.chrome import ADMIN_MENU_IDENTIFIER, LANGUAGE_MENU_IDENTIFIER
 from cms.toolbar.pool import toolbar_pool
-from cms.utils import get_language_from_request, page_permissions
+from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict
-from cms.utils.page_permissions import user_can_change_page, user_can_delete_page
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 
 TEMPLATE_MENU_BREAK = "Template Menu Break"

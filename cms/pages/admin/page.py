@@ -60,11 +60,13 @@ from cms.pages.admin.forms import (
 )
 from cms.pages.models.page import AdminCacheDict
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
+from cms.permissions import page_permissions, utils as permissions
 from cms.permissions.admin import PERMISSION_ADMIN_INLINES
 from cms.permissions.models import PermissionTuple
+from cms.permissions.utils import clear_permission_lru_caches
 from cms.shared.editing_urls import get_object_edit_url
 from cms.shared.operations import OperationContext
-from cms.utils import get_current_site, page_permissions, permissions
+from cms.utils import get_current_site
 from cms.utils.admin import get_site_from_request, jsonify_request
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
@@ -74,7 +76,6 @@ from cms.utils.i18n import (
     get_language_tuple,
     get_site_language_from_request,
 )
-from cms.utils.permissions import clear_permission_lru_caches
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
@@ -874,7 +875,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if redirect == "1":
             from django.core.cache import cache
 
-            from cms.cache.permissions import get_cache_key, get_cache_permission_version
+            from cms.permissions.cache import get_cache_key, get_cache_permission_version
 
             cache.delete(
                 get_cache_key(request.user, obj.page.site, "change_page"),

@@ -320,8 +320,8 @@ class PagePermissionManager(BasicPagePermissionManager):
         Result of this is used in admin for page permissions inline.
         """
         # get user level
-        from cms.utils.page_permissions import get_change_permissions_perm_tuples
-        from cms.utils.permissions import get_user_permission_level
+        from cms.permissions.page_permissions import get_change_permissions_perm_tuples
+        from cms.permissions.utils import get_user_permission_level
 
         try:
             user_level = get_user_permission_level(user, site)

@@ -31,10 +31,10 @@ from cms.core.plugin_pool import PluginPool
 from cms.core.plugins import get_plugin_restrictions
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
+from cms.permissions.utils import has_plugin_permission
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import has_plugin_permission
 
 logger = logging.getLogger(__name__)
 

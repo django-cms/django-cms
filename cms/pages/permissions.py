@@ -12,7 +12,7 @@ a user will read is the service's job, so the wording stays with the operation.
 
 from __future__ import annotations
 
-from cms.utils import page_permissions
+from cms.permissions import page_permissions
 
 __all__ = [
     "AdminPageContentPermissions",

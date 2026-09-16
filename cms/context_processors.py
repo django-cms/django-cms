@@ -2,8 +2,8 @@ from functools import cache
 
 from django.utils.functional import lazy
 
+from cms.pages.utils import get_page_template_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import get_page_template_from_request
 
 
 def cms_settings(request):

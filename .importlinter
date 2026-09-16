@@ -118,14 +118,14 @@ source_modules =
     cms.core.placeholders
     cms.core.plugins
 forbidden_modules =
-    cms.cache.permissions
+    cms.permissions.cache
     cms.permissions.models
-    cms.utils.page_permissions
-    cms.utils.permissions
+    cms.permissions.page_permissions
+    cms.permissions.utils
 ignore_imports =
-    cms.core.models.placeholder -> cms.utils.permissions
-    cms.core.rendering -> cms.utils.permissions
-    cms.core.plugins -> cms.utils.permissions
+    cms.core.models.placeholder -> cms.permissions.utils
+    cms.core.rendering -> cms.permissions.utils
+    cms.core.plugins -> cms.permissions.utils
 
 # ---------------------------------------------------------------------------
 # Container: core -> toolbar  (RFC 6.5.1)
@@ -195,8 +195,8 @@ forbidden_modules =
     cms.pages.models.page
     cms.permissions.models
     cms.pages
-    cms.utils.page_permissions
-    cms.utils.permissions
+    cms.permissions.page_permissions
+    cms.permissions.utils
 
 # ---------------------------------------------------------------------------
 # Container: pages -> menus  (RFC 6.3)
@@ -227,10 +227,10 @@ name = permissions does not reach into core, pages or the toolbar
 type = forbidden
 allow_indirect_imports = True
 source_modules =
-    cms.cache.permissions
+    cms.permissions.cache
     cms.permissions.models
-    cms.utils.page_permissions
-    cms.utils.permissions
+    cms.permissions.page_permissions
+    cms.permissions.utils
 forbidden_modules =
     cms.admin
     cms.cache.page
@@ -242,7 +242,7 @@ forbidden_modules =
     cms.templatetags
     cms.toolbar
 ignore_imports =
-    cms.utils.permissions -> cms.core.plugin_pool
+    cms.permissions.utils -> cms.core.plugin_pool
 
 # ---------------------------------------------------------------------------
 # Layer: model  (RFC 5.1)
@@ -317,7 +317,7 @@ forbidden_modules =
     cms.permissions.models
     cms.page_rendering
     cms.utils.page
-    cms.utils.page_permissions
+    cms.permissions.page_permissions
     menus
 
 # ---------------------------------------------------------------------------

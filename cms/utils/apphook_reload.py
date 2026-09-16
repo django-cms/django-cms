@@ -71,7 +71,7 @@ def mark_urlconf_as_changed():
 
 
 def reload_urlconf(urlconf=None, new_revision=None):
-    from cms.appresolver import clear_app_resolvers, get_app_patterns
+    from cms.pages.appresolver import clear_app_resolvers, get_app_patterns
 
     if 'cms.urls' in sys.modules:
         reload(sys.modules['cms.urls'])

@@ -15,7 +15,7 @@ from cms.pages.admin.forms import (
     PagePermissionInlineAdminForm,
     ViewRestrictionInlineAdminForm,
 )
-from cms.utils import page_permissions, permissions
+from cms.permissions import page_permissions, utils as permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 

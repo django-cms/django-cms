@@ -11,13 +11,13 @@ from django.test.utils import override_settings
 
 from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import add_plugin, assign_user_to_page, create_page
-from cms.cache.permissions import (
+from cms.models import Page, PageContent
+from cms.permissions.cache import (
     clear_user_permission_cache,
     get_cache_key,
     get_permission_cache,
     set_permission_cache,
 )
-from cms.models import Page, PageContent
 from cms.permissions.models import (
     ACCESS_CHILDREN,
     ACCESS_DESCENDANTS,
@@ -28,15 +28,15 @@ from cms.permissions.models import (
     PagePermission,
     PermissionTuple,
 )
-from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
-from cms.utils.page_permissions import (
+from cms.permissions.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
     user_can_change_at_least_one_page,
     user_can_delete_page,
     user_can_publish_page,
 )
+from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
 
 @override_settings(

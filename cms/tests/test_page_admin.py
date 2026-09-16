@@ -23,12 +23,13 @@ from djangocms_text.models import Text
 from cms import constants
 from cms.admin.pageadmin import PAGE_SMART_LINK_MAX_RESULTS, PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
-from cms.appresolver import clear_app_resolvers
-from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.core.models.plugin import CMSPlugin
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models import PageContent
+from cms.pages.appresolver import clear_app_resolvers
 from cms.pages.models.page import Page, PageUrl
+from cms.pages.utils import get_page_from_request
+from cms.permissions.cache import get_permission_cache, set_permission_cache
 from cms.permissions.models import PagePermission
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
@@ -40,7 +41,6 @@ from cms.test_utils.util.context_managers import (
 )
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
 
