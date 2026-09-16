@@ -216,7 +216,7 @@ class PageContent(models.Model):
         """
         Rescan and if necessary create placeholders in the current template.
         """
-        from cms.utils.placeholder import rescan_placeholders_for_obj
+        from cms.core.placeholders import rescan_placeholders_for_obj
 
         return rescan_placeholders_for_obj(self)
 

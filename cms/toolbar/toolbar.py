@@ -72,19 +72,19 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def legacy_renderer(self):
-        from cms.plugin_rendering import LegacyRenderer
+        from cms.core.rendering import LegacyRenderer
 
         return LegacyRenderer(request=self.request)
 
     @cached_property
     def content_renderer(self):
-        from cms.plugin_rendering import ContentRenderer
+        from cms.core.rendering import ContentRenderer
 
         return ContentRenderer(request=self.request)
 
     @cached_property
     def structure_renderer(self):
-        from cms.plugin_rendering import StructureRenderer
+        from cms.core.rendering import StructureRenderer
 
         return StructureRenderer(request=self.request)
 

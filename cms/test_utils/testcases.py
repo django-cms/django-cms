@@ -23,6 +23,7 @@ from django.utils.timezone import now
 from django.utils.translation import activate, get_language
 
 from cms.api import add_plugin, create_page
+from cms.core.rendering import ContentRenderer, StructureRenderer
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, PageContent
 from cms.permissions.models import (
@@ -30,7 +31,6 @@ from cms.permissions.models import (
     PagePermission,
     PageUser,
 )
-from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
@@ -516,7 +516,7 @@ class BaseCMSTestCase:
         return page
 
     def get_plugin_model(self, plugin_type):
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         return plugin_pool.get_plugin(plugin_type).model
 

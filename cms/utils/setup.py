@@ -53,7 +53,7 @@ def setup():
     """
     Gather all checks and validations
     """
-    from cms.plugin_pool import plugin_pool
+    from cms.core.plugin_pool import plugin_pool
 
     validate_dependencies()
     validate_settings()

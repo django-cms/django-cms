@@ -1,21 +1,18 @@
-from django.utils.safestring import mark_safe
+"""Moved to :mod:`cms.core.plugin_processors`.
 
+Kept importable because the ecosystem imports from this path, and because
+``cms.models`` star-imports it (see :mod:`cms.compat`).
+"""
 
-def plugin_meta_context_processor(instance, placeholder, context):
-    return {
-        'plugin': {
-            'counter': instance._render_meta.index + 1,
-            'counter0': instance._render_meta.index,
-            'revcounter': instance._render_meta.total - instance._render_meta.index,
-            'revcounter0': instance._render_meta.total - instance._render_meta.index - 1,
-            'first': instance._render_meta.index == 0,
-            'last': instance._render_meta.index == instance._render_meta.total - 1,
-            'total': instance._render_meta.total,
-            'id_attr': 'plugin_%i_%i' % (instance.placeholder_id, instance.pk),
-            'instance': instance,
-        }
-    }
+from cms.compat import moved
 
-
-def mark_safe_plugin_processor(instance, placeholder, rendered_content, original_context):
-    return mark_safe(rendered_content)
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {
+        "mark_safe": "cms.core.plugin_processors.mark_safe",
+        "mark_safe_plugin_processor": "cms.core.plugin_processors.mark_safe_plugin_processor",
+        "plugin_meta_context_processor": "cms.core.plugin_processors.plugin_meta_context_processor",
+    },
+    since="6.0",
+    fallback="cms.core.plugin_processors",
+)

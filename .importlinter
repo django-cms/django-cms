@@ -50,7 +50,7 @@ forbidden_modules =
     cms.admin
     cms.api
     cms.models
-    cms.plugin_rendering
+    cms.core.rendering
     cms.templatetags
     cms.toolbar
     cms.toolbar_pool
@@ -60,7 +60,7 @@ forbidden_modules =
 # The placeholder/plugin core must not know that pages exist.
 #
 # Retired by: step 8 (the render_object_* endpoints move from cms.views into
-# core.editing, RFC 7.2). cms.cache.placeholder is core's own cache and only
+# core.editing, RFC 7.2). cms.core.cache is core's own cache and only
 # sits under cms.cache until step 7 re-homes it.
 #
 # Step 3 retired the Placeholder -> PageContent import: `Placeholder.page` now
@@ -72,17 +72,17 @@ type = forbidden
 allow_indirect_imports = True
 source_modules =
     cms.core.admin.placeholder
-    cms.cache.placeholder
+    cms.core.cache
     cms.core.models.aliasplugin
     cms.core.models.placeholder
     cms.core.models.placeholderplugin
     cms.core.models.plugin
     cms.operations
-    cms.plugin_base
-    cms.plugin_pool
-    cms.plugin_rendering
-    cms.utils.placeholder
-    cms.utils.plugins
+    cms.core.plugin_base
+    cms.core.plugin_pool
+    cms.core.rendering
+    cms.core.placeholders
+    cms.core.plugins
 forbidden_modules =
     cms.pages.admin.page
     cms.appresolver
@@ -95,8 +95,6 @@ forbidden_modules =
     cms.views
     menus
 ignore_imports =
-    cms.core.models.placeholder -> cms.cache.placeholder
-    cms.plugin_rendering -> cms.cache.placeholder
     cms.core.admin.placeholder -> cms.views
 
 # ---------------------------------------------------------------------------
@@ -114,11 +112,11 @@ source_modules =
     cms.core.admin.placeholder
     cms.core.models.placeholder
     cms.core.models.plugin
-    cms.plugin_base
-    cms.plugin_pool
-    cms.plugin_rendering
-    cms.utils.placeholder
-    cms.utils.plugins
+    cms.core.plugin_base
+    cms.core.plugin_pool
+    cms.core.rendering
+    cms.core.placeholders
+    cms.core.plugins
 forbidden_modules =
     cms.cache.permissions
     cms.permissions.models
@@ -126,8 +124,8 @@ forbidden_modules =
     cms.utils.permissions
 ignore_imports =
     cms.core.models.placeholder -> cms.utils.permissions
-    cms.plugin_rendering -> cms.utils.permissions
-    cms.utils.plugins -> cms.utils.permissions
+    cms.core.rendering -> cms.utils.permissions
+    cms.core.plugins -> cms.utils.permissions
 
 # ---------------------------------------------------------------------------
 # Container: core -> toolbar  (RFC 6.5.1)
@@ -144,11 +142,11 @@ source_modules =
     cms.core.admin.placeholder
     cms.core.models.placeholder
     cms.core.models.plugin
-    cms.plugin_base
-    cms.plugin_pool
-    cms.plugin_rendering
-    cms.utils.placeholder
-    cms.utils.plugins
+    cms.core.plugin_base
+    cms.core.plugin_pool
+    cms.core.rendering
+    cms.core.placeholders
+    cms.core.plugins
 forbidden_modules =
     cms.cms_toolbars
     cms.toolbar
@@ -160,15 +158,21 @@ forbidden_modules =
 # may use the toolbar framework).
 ignore_imports =
     cms.core.admin.placeholder -> cms.toolbar.utils
-    cms.plugin_rendering -> cms.toolbar.utils
+    cms.core.rendering -> cms.toolbar.utils
 
 # ---------------------------------------------------------------------------
 # Container: toolbar  (RFC 6.5.3)
 # The toolbar framework and chrome must not import pages or permissions; they
 # reach both through contracts.
 #
-# Currently KEPT only because `from cms.models import PageContent` hides behind
-# the facade (see blind spot above). Re-check after step 7.
+# `cms.core` is deliberately NOT forbidden: RFC 5.0 puts the toolbar *above*
+# core, because the clipboard is a Placeholder and the toolbar owns the content
+# renderers. Listing it here was an error that only surfaced once
+# cms.plugin_rendering moved into the core package.
+#
+# Still partly blind: `from cms.models import PageContent` resolves through the
+# facade shim, so a page import can hide there. Re-check once callers stop
+# importing the facade.
 # ---------------------------------------------------------------------------
 [importlinter:contract:toolbar-not-pages]
 name = toolbar does not depend on pages or permissions
@@ -187,7 +191,6 @@ forbidden_modules =
     cms.permissions.admin
     cms.cache.page
     cms.cms_toolbars
-    cms.core
     cms.pages.models.content
     cms.pages.models.page
     cms.permissions.models
@@ -233,13 +236,13 @@ forbidden_modules =
     cms.cache.page
     cms.pages.models.content
     cms.pages.models.page
-    cms.plugin_base
-    cms.plugin_pool
-    cms.plugin_rendering
+    cms.core.plugin_base
+    cms.core.plugin_pool
+    cms.core.rendering
     cms.templatetags
     cms.toolbar
 ignore_imports =
-    cms.utils.permissions -> cms.plugin_pool
+    cms.utils.permissions -> cms.core.plugin_pool
 
 # ---------------------------------------------------------------------------
 # Layer: model  (RFC 5.1)
@@ -271,7 +274,7 @@ forbidden_modules =
 # cms.utils is the de-facto shared package. Nothing in it may import a layer
 # above it.
 #
-# Retired by: step 5 (cms.utils.plugins -> cms.api becomes a service call),
+# Retired by: step 5 (cms.core.plugins -> cms.api becomes a service call),
 # step 7 (helpers/placeholder re-homed into core; is_editable_model and the
 # declared-placeholder scan are core, not shared).
 # ---------------------------------------------------------------------------
@@ -288,8 +291,8 @@ forbidden_modules =
     cms.toolbar
 ignore_imports =
     cms.utils.helpers -> cms.core.admin.placeholder
-    cms.utils.placeholder -> cms.templatetags.cms_tags
-    cms.utils.plugins -> cms.api
+    cms.core.placeholders -> cms.templatetags.cms_tags
+    cms.core.plugins -> cms.api
 
 # ---------------------------------------------------------------------------
 # Layer: core.editing  (RFC 7.2)
@@ -336,9 +339,9 @@ forbidden_modules =
     cms.cms_menus
     cms.core
     cms.models
-    cms.plugin_base
-    cms.plugin_pool
-    cms.plugin_rendering
+    cms.core.plugin_base
+    cms.core.plugin_pool
+    cms.core.rendering
     cms.templatetags
     cms.toolbar
     menus

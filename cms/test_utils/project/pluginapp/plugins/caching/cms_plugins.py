@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from django.utils import timezone
 
-from cms.plugin_base import CMSPluginBase
+from cms.core.plugin_base import CMSPluginBase
 
 
 class NoCachePlugin(CMSPluginBase):

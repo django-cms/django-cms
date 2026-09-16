@@ -178,7 +178,7 @@ class SignalTester:
 
 @contextmanager
 def override_placeholder_conf(CMS_PLACEHOLDER_CONF):
-    from cms.utils.placeholder import _clear_placeholder_conf_cache
+    from cms.core.placeholders import _clear_placeholder_conf_cache
 
     # Call _get_placeholder_settings after changing the setting
     with override_settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):

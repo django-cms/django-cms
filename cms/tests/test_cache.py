@@ -17,7 +17,7 @@ from cms.cache.page import (
     set_page_url_cache,
     set_xframe_cache,
 )
-from cms.cache.placeholder import (
+from cms.core.cache import (
     _get_placeholder_cache_key,
     _get_placeholder_cache_version,
     _get_placeholder_cache_version_key,
@@ -26,9 +26,9 @@ from cms.cache.placeholder import (
     get_placeholder_cache,
     set_placeholder_cache,
 )
+from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
-from cms.plugin_pool import plugin_pool
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (

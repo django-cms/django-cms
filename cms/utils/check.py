@@ -308,9 +308,9 @@ def check_plugin_instances(output):
 @define_check
 def check_copy_relations(output):
     from cms.core.models.plugin import CMSPlugin
+    from cms.core.plugin_pool import plugin_pool
     from cms.extensions import extension_pool
     from cms.extensions.models import BaseExtension
-    from cms.plugin_pool import plugin_pool
 
     def c_to_s(klass):
         return f"{klass.__module__}.{klass.__name__}"
@@ -431,7 +431,7 @@ def check_cmsapps_names(output):
 
 @define_check
 def check_plugin_parent_child_relations(output):
-    from cms.plugin_pool import plugin_pool
+    from cms.core.plugin_pool import plugin_pool
 
     with output.section("Plugin parent/child relations") as section:
         plugin_pool.discover_plugins()

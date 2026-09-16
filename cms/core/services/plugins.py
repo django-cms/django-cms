@@ -25,11 +25,11 @@ from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext as _
 
 from cms import operations
+from cms.core.plugins import copy_plugins_to_placeholder
 from cms.core.services.permissions import get_permissions
 from cms.models import CMSPlugin, PlaceholderReference
 from cms.shared.operations import OperationContext
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
-from cms.utils.plugins import copy_plugins_to_placeholder
 
 __all__ = [
     "add_plugins_from_placeholder",

@@ -1,6 +1,6 @@
 from cms.core.models.plugin import CMSPlugin
+from cms.core.plugin_pool import plugin_pool
 from cms.models import Page
-from cms.plugin_pool import plugin_pool
 
 from .base import SubcommandsCommand
 

@@ -38,6 +38,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from cms.constants import MODAL_HTML_REDIRECT
+from cms.core.plugin_pool import plugin_pool
 from cms.models import (
     CMSPlugin,
     GlobalPagePermission,
@@ -61,7 +62,6 @@ from cms.pages.models.page import AdminCacheDict
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
 from cms.permissions.admin import PERMISSION_ADMIN_INLINES
 from cms.permissions.models import PermissionTuple
-from cms.plugin_pool import plugin_pool
 from cms.shared.editing_urls import get_object_edit_url
 from cms.shared.operations import OperationContext
 from cms.utils import get_current_site, page_permissions, permissions

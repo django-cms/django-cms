@@ -32,6 +32,7 @@ from django.views.decorators.http import require_POST
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check
 from cms.cache.page import get_page_cache
+from cms.core.placeholders import get_declared_placeholders_for_obj, get_placeholder_conf
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models import Page, PageContent
@@ -57,7 +58,6 @@ from cms.utils.i18n import (
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_view_page
 from cms.utils.permissions import user_can_view_placeholder_source
-from cms.utils.placeholder import get_declared_placeholders_for_obj, get_placeholder_conf
 
 
 def _clean_redirect_url(redirect_url, language):

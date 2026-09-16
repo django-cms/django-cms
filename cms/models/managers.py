@@ -34,7 +34,7 @@ class PageManager(models.Manager):
 
         Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
         """
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         qs = self.get_queryset()
 

@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import operations
 from cms.cache.permissions import clear_permission_cache
+from cms.core.plugins import copy_plugins_to_placeholder, downcast_plugins
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
 from cms.pages.permissions import get_page_permissions
@@ -30,7 +31,6 @@ from cms.shared.operations import OperationContext
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 
 __all__ = [
     "change_template",

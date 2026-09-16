@@ -3,10 +3,10 @@ from functools import cached_property
 from django.db import models
 from django.urls import reverse
 
+from cms.core.placeholders import get_placeholder_from_slot
 from cms.models import ContentAdminManager
 from cms.models.fields import PlaceholderRelationField
 from cms.utils import get_language_from_request
-from cms.utils.placeholder import get_placeholder_from_slot
 from cms.utils.urlutils import admin_reverse
 
 

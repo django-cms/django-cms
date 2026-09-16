@@ -6,9 +6,9 @@ from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
 from cms.api import add_plugin, create_page
-from cms.cache.placeholder import get_placeholder_cache
+from cms.core.cache import get_placeholder_cache
+from cms.core.rendering import PluginContext
 from cms.models import EmptyPageContent, Page, Placeholder
-from cms.plugin_rendering import PluginContext
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
@@ -316,7 +316,7 @@ class RenderingTestCase(CMSTestCase):
         """
         from djangocms_text.cms_plugins import TextPlugin
 
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         instance = self.test_placeholders['main'].get_plugins('en').first().get_bound_plugin()
 
@@ -836,7 +836,7 @@ class RenderedPlaceholderTestCase(CMSTestCase):
 
     def test_rendered_placeholder_init(self):
         """Test RenderedPlaceholder initialization"""
-        from cms.plugin_rendering import RenderedPlaceholder
+        from cms.core.rendering import RenderedPlaceholder
 
         page = create_page("Test", TEMPLATE_NAME, "en")
         placeholder = page.get_placeholders("en").first()
@@ -859,7 +859,7 @@ class RenderedPlaceholderTestCase(CMSTestCase):
 
     def test_rendered_placeholder_equality(self):
         """Test RenderedPlaceholder equality comparison"""
-        from cms.plugin_rendering import RenderedPlaceholder
+        from cms.core.rendering import RenderedPlaceholder
 
         page = create_page("Test", TEMPLATE_NAME, "en")
         placeholders = page.get_placeholders("en")
@@ -888,7 +888,7 @@ class RenderedPlaceholderTestCase(CMSTestCase):
 
     def test_rendered_placeholder_inequality(self):
         """Test RenderedPlaceholder inequality comparison"""
-        from cms.plugin_rendering import RenderedPlaceholder
+        from cms.core.rendering import RenderedPlaceholder
 
         page = create_page("Test", TEMPLATE_NAME, "en")
         placeholders = list(page.get_placeholders("en"))
@@ -917,7 +917,7 @@ class RenderedPlaceholderTestCase(CMSTestCase):
 
     def test_rendered_placeholder_hash(self):
         """Test RenderedPlaceholder hash functionality"""
-        from cms.plugin_rendering import RenderedPlaceholder
+        from cms.core.rendering import RenderedPlaceholder
 
         page = create_page("Test", TEMPLATE_NAME, "en")
         placeholder = page.get_placeholders("en").first()
@@ -940,7 +940,7 @@ class RenderedPlaceholderTestCase(CMSTestCase):
 
     def test_rendered_placeholder_in_set(self):
         """Test RenderedPlaceholder can be used in a set"""
-        from cms.plugin_rendering import RenderedPlaceholder
+        from cms.core.rendering import RenderedPlaceholder
 
         page = create_page("Test", TEMPLATE_NAME, "en")
         placeholder = page.get_placeholders("en").first()
@@ -964,7 +964,7 @@ class RenderedPlaceholderTestCase(CMSTestCase):
 
     def test_rendered_placeholder_default_values(self):
         """Test RenderedPlaceholder default parameter values"""
-        from cms.plugin_rendering import RenderedPlaceholder
+        from cms.core.rendering import RenderedPlaceholder
 
         page = create_page("Test", TEMPLATE_NAME, "en")
         placeholder = page.get_placeholders("en").first()

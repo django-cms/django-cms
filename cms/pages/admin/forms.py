@@ -16,6 +16,7 @@ from cms import api
 from cms.apphook_pool import apphook_pool
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
+from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
 from cms.forms.fields import PageSmartLinkField
@@ -45,7 +46,6 @@ from cms.permissions.models import (
     EDIT_PERMISSION_REQUIRED_MESSAGES,
     User,
 )
-from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils import get_current_site
 from cms.utils.compat.forms import UserChangeForm
@@ -1498,7 +1498,7 @@ class PluginAddValidationForm(forms.Form):
         return plugin_type
 
     def clean(self):
-        from cms.utils.plugins import has_reached_plugin_limit
+        from cms.core.plugins import has_reached_plugin_limit
 
         data = self.cleaned_data
 

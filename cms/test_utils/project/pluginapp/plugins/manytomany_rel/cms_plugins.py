@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.utils.translation import gettext as _
 
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
+from cms.core.plugin_base import CMSPluginBase
+from cms.core.plugin_pool import plugin_pool
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     Article,
     ArticlePluginModel,

@@ -29,22 +29,22 @@ from cms.constants import SLUG_REGEXP
 from cms.core.editing.structure import create_child_plugin_references, get_plugin_content, get_plugin_tree
 from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
+from cms.core.plugin_base import CMSPluginBase
+from cms.core.plugin_pool import plugin_pool
+from cms.core.plugins import (
+    downcast_plugins,
+    get_plugin_disallowed_in_slot,
+    has_reached_plugin_limit,
+)
 from cms.core.services import plugins as plugin_services
 from cms.core.services.permissions import AdminPluginPermissions
 from cms.exceptions import PluginLimitReached
 from cms.pages.admin.forms import PluginAddValidationForm
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
 from cms.shared.operations import OperationContext
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.plugins import (
-    downcast_plugins,
-    get_plugin_disallowed_in_slot,
-    has_reached_plugin_limit,
-)
 from cms.views import (
     render_object_edit,
     render_object_preview,

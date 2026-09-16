@@ -71,7 +71,7 @@ class PlaceholderRelationField(GenericRelation):
 
     If you create a model which contains placeholders you first create the ``PlaceHolderRelationField``::
 
-        from cms.utils.placeholder import get_placeholder_from_slot
+        from cms.core.placeholders import get_placeholder_from_slot
 
         class Post(models.Model):
             ...

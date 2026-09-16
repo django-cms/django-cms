@@ -22,8 +22,8 @@ from cms.api import (
 )
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.core.plugin_base import CMSPluginBase
 from cms.models import Page, PageContent, Placeholder
-from cms.plugin_base import CMSPluginBase
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME

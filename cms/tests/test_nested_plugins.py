@@ -3,9 +3,9 @@ from djangocms_text.models import Text
 from cms.api import add_plugin, create_page
 from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
+from cms.core.plugins import copy_plugins_to_placeholder
 from cms.models import Page
 from cms.tests.test_plugins import PluginsTestBaseCase
-from cms.utils.plugins import copy_plugins_to_placeholder
 
 
 class NestedPluginsTestCase(PluginsTestBaseCase):

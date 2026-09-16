@@ -34,7 +34,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_add_plugin_rejected_in_disallowed_slot(self):
         """A plugin with allowed_slots cannot be added to a slot it does not allow."""
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot="sidebar")
@@ -55,7 +55,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_add_plugin_allowed_in_listed_slot(self):
         """A plugin with allowed_slots can be added to a slot it allows."""
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot="content")
@@ -116,7 +116,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_copy_plugins_rejected_into_disallowed_slot(self):
         """A plugin with allowed_slots cannot be copied into a slot it does not allow."""
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         superuser = self.get_superuser()
         source_placeholder = Placeholder.objects.create(slot="content")
@@ -141,7 +141,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_copy_plugins_allowed_into_listed_slot(self):
         """A plugin with allowed_slots can be copied into a slot it allows."""
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         superuser = self.get_superuser()
         source_placeholder = Placeholder.objects.create(slot="content")
@@ -590,7 +590,7 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
 
     def test_move_plugin_rejected_into_disallowed_slot(self):
         """A plugin with allowed_slots cannot be moved into a slot it does not allow."""
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         superuser = self.get_superuser()
         source = Placeholder.objects.create(slot="content")
@@ -616,7 +616,7 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
 
     def test_move_plugin_rejected_when_descendant_disallowed_in_slot(self):
         """Moving a subtree is rejected if any descendant is disallowed in the target slot."""
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         superuser = self.get_superuser()
         source = Placeholder.objects.create(slot="content")
@@ -644,7 +644,7 @@ class PlaceholderAdminSecurityTestCase(CMSTestCase):
 
     def test_move_plugin_allowed_into_listed_slot(self):
         """A plugin with allowed_slots can be moved into a slot it allows."""
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         superuser = self.get_superuser()
         source = Placeholder.objects.create(slot="content")

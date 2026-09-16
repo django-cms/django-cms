@@ -646,10 +646,10 @@ class NonPageContentStructureEndpointTests(CMSTestCase):
     """
 
     def setUp(self) -> None:
+        from cms.core.placeholders import rescan_placeholders_for_obj
         from cms.test_utils.project.placeholder_relation_field_app.models import (
             FancyPoll,
         )
-        from cms.utils.placeholder import rescan_placeholders_for_obj
 
         self.target = FancyPoll.objects.create(name="private-fancy-poll")
         self.placeholder = rescan_placeholders_for_obj(self.target)["content"]

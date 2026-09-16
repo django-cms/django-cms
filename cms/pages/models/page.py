@@ -1282,7 +1282,7 @@ class Page(MP_Node):
         return self.get_content_obj(language=language).rescan_placeholders()
 
     def get_declared_placeholders(self, language=None, fallback=True, force_reload=False):
-        from cms.utils.placeholder import get_declared_placeholders_for_obj
+        from cms.core.placeholders import get_declared_placeholders_for_obj
 
         content = self.get_content_obj(language, fallback, force_reload)
         if content:

@@ -2,9 +2,9 @@ from functools import cached_property
 
 from django.db import models
 
+from cms.core.placeholders import get_placeholder_from_slot
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderRelationField
-from cms.utils.placeholder import get_placeholder_from_slot
 
 
 class PlaceholderReference(CMSPlugin):

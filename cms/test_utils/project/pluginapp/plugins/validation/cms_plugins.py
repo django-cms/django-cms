@@ -1,4 +1,4 @@
-from cms.plugin_base import CMSPluginBase
+from cms.core.plugin_base import CMSPluginBase
 
 
 class NonExisitngRenderTemplate(CMSPluginBase):

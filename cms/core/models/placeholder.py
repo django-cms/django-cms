@@ -11,8 +11,8 @@ from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from cms.cache.placeholder import clear_placeholder_cache
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
+from cms.core.cache import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
 from cms.shared.resolvers import resolve
@@ -71,8 +71,8 @@ class Placeholder(models.Model):
         self.get_plugins(language).delete()
 
     def get_label(self):
+        from cms.core.placeholders import get_placeholder_conf
         from cms.models import PageContent
-        from cms.utils.placeholder import get_placeholder_conf
 
         template = None
         if isinstance(self.source, PageContent):
@@ -83,12 +83,12 @@ class Placeholder(models.Model):
         return name
 
     def get_extra_context(self, template=None):
-        from cms.utils.placeholder import get_placeholder_conf
+        from cms.core.placeholders import get_placeholder_conf
 
         return get_placeholder_conf("extra_context", self.slot, template, {})
 
     def get_extra_menu_items(self):
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         return plugin_pool.get_extra_placeholder_menu_items(self)
 
@@ -439,7 +439,7 @@ class Placeholder(models.Model):
         return sorted(list(vary_list))
 
     def copy_plugins(self, target_placeholder, language=None, root_plugin=None):
-        from cms.utils.plugins import copy_plugins_to_placeholder
+        from cms.core.plugins import copy_plugins_to_placeholder
 
         new_plugins = copy_plugins_to_placeholder(
             plugins=self.get_plugins_list(language),

@@ -121,7 +121,7 @@ def get_plugin_tree(
             - 'target_position': The position of the target_plugin (if given)
             - 'target_placeholder_id': The placeholder id of the target_plugin (if given)
     """
-    from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
+    from cms.core.plugins import downcast_plugins, get_plugin_restrictions
 
     tree_data = []
     tree_structure = []

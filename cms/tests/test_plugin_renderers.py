@@ -4,12 +4,12 @@ from django.template import Context
 from django.test.utils import override_settings
 
 from cms.api import add_plugin, create_page
-from cms.models import CMSPlugin, Placeholder
-from cms.plugin_rendering import (
+from cms.core.rendering import (
     ContentRenderer,
     LegacyRenderer,
     StructureRenderer,
 )
+from cms.models import CMSPlugin, Placeholder
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
@@ -185,7 +185,7 @@ class TestExceptionCatchers(CMSTestCase):
     def test_non_existent_plugins_creates_error_log_and_does_not_fail(self):
         self.placeholder_2_plugin_1.plugin_type = 'NonExistingPlugin'
         self.placeholder_2_plugin_1.save()
-        with self.assertLogs("cms.utils.plugins", level="ERROR") as logs:
+        with self.assertLogs("cms.core.plugins", level="ERROR") as logs:
             plugin_context = Context()
             self.renderer.render_placeholder(self.placeholder_2, plugin_context, "en")
             self.assertEqual(len(logs.output), 1)
@@ -194,7 +194,7 @@ class TestExceptionCatchers(CMSTestCase):
         self.placeholder_2_plugin_1.save()
 
     def test_exception_in_plugin_render_creates_error_log_and_does_not_fail(self):
-        with self.assertLogs("cms.plugin_rendering", level="ERROR") as logs:
+        with self.assertLogs("cms.core.rendering", level="ERROR") as logs:
             plugin_context = Context()
             self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en")
             self.assertEqual(len(logs.output), 1)
@@ -206,7 +206,7 @@ class TestExceptionCatchers(CMSTestCase):
         )
         link_template = LinkPlugin.render_template
         LinkPlugin.render_template = "pluginapp/link/bugs.html"
-        with self.assertLogs("cms.plugin_rendering", level="ERROR") as logs:
+        with self.assertLogs("cms.core.rendering", level="ERROR") as logs:
             plugin_context = Context()
             self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en")
             self.assertEqual(len(logs.output), 1)
@@ -216,7 +216,7 @@ class TestExceptionCatchers(CMSTestCase):
 
     def test_exception_in_plugin_render_shows_error_in_edit_mode(self):
         plugin_context = Context()
-        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+        with self.assertLogs("cms.core.rendering", level="ERROR"):
             markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=True)
         self.assertTrue(self.renderer.toolbar.edit_mode_active)
         self.assertIn('<div class="cms-rendering-exception">', markup)
@@ -237,7 +237,7 @@ class TestExceptionCatchers(CMSTestCase):
         placeholder = Placeholder.objects.get(pk=self.placeholder_1.pk)
 
         plugin_context = Context()
-        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+        with self.assertLogs("cms.core.rendering", level="ERROR"):
             markup = self.renderer.render_placeholder(placeholder, plugin_context, "en", editable=True)
 
         self.assertIn('<div class="cms-rendering-exception">', markup)
@@ -246,7 +246,7 @@ class TestExceptionCatchers(CMSTestCase):
 
     def test_exception_in_plugin_render_is_silent_in_preview_mode(self):
         plugin_context = Context()
-        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+        with self.assertLogs("cms.core.rendering", level="ERROR"):
             markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
         self.assertEqual('', markup)
 
@@ -260,7 +260,7 @@ class TestExceptionCatchers(CMSTestCase):
         self.request.toolbar = CMSToolbar(self.request)
         self.renderer = self.renderer_class(self.request)
 
-        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+        with self.assertLogs("cms.core.rendering", level="ERROR"):
             markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
         self.assertFalse(self.renderer.toolbar.edit_mode_active)
         self.assertEqual('', markup)
@@ -277,7 +277,7 @@ class TestExceptionCatchers(CMSTestCase):
         self.renderer = self.renderer_class(self.request)
 
         with self.assertRaises(ZeroDivisionError):
-            with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            with self.assertLogs("cms.core.rendering", level="ERROR"):
                 self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
 
 
@@ -300,8 +300,8 @@ class TestValidModelsFiltering(CMSTestCase):
     """
 
     def setUp(self):
-        from cms.plugin_base import CMSPluginBase
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_base import CMSPluginBase
+        from cms.core.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
         self.example = Example1.objects.create(
@@ -327,12 +327,12 @@ class TestValidModelsFiltering(CMSTestCase):
 
     def tearDown(self):
         # Unregister temporary plugins to avoid leaking into other tests
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
         plugin_pool.unregister_plugin(self.AllowedExamplePlugin)
         plugin_pool.unregister_plugin(self.DisallowedExamplePlugin)
 
     def test_get_placeholder_toolbar_js_allowed_models_filtering(self):
-        from cms.plugin_rendering import ContentRenderer
+        from cms.core.rendering import ContentRenderer
 
         request = self.get_request("/", "en")
         renderer = ContentRenderer(request)
@@ -346,9 +346,9 @@ class TestValidModelsFiltering(CMSTestCase):
 
     def test_get_placeholder_toolbar_js_pagecontent_allowed_models(self):
         from cms.api import create_page
-        from cms.plugin_base import CMSPluginBase
-        from cms.plugin_pool import plugin_pool
-        from cms.plugin_rendering import ContentRenderer
+        from cms.core.plugin_base import CMSPluginBase
+        from cms.core.plugin_pool import plugin_pool
+        from cms.core.rendering import ContentRenderer
 
         # Create a CMS page placeholder as source model cms.pagecontent
         cms_page = create_page("page", 'nav_playground.html', "en")
@@ -394,8 +394,8 @@ class TestAllowedPluginsFiltering(CMSTestCase):
     """
 
     def setUp(self):
-        from cms.plugin_base import CMSPluginBase
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_base import CMSPluginBase
+        from cms.core.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
         # Create an Example1 instance
@@ -426,7 +426,7 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         plugin_pool.register_plugin(DisallowedPlugin)
 
     def tearDown(self):
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
         plugin_pool.unregister_plugin(self.AllowedPluginA)
         plugin_pool.unregister_plugin(self.AllowedPluginB)
         plugin_pool.unregister_plugin(self.DisallowedPlugin)
@@ -437,7 +437,7 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         When allowed_plugins is None (not defined), no model-level filtering occurs.
         Only plugin-level filtering (allowed_models) is applied.
         """
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
         all_plugins = plugin_pool.get_all_plugins_for_model(Example1)
@@ -454,7 +454,7 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         When allowed_plugins is a list of plugin names, only those plugins
         (and those passing the allowed_models filter) are returned.
         """
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
         # Temporarily add allowed_plugins to Example1
@@ -483,7 +483,7 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         - []: Explicit restriction to allow no plugins
         - ['PluginA']: Explicit restriction to specific plugins
         """
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
         Example1.allowed_plugins = []
@@ -503,7 +503,7 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         The toolbar should only show plugins that pass both the plugin's allowed_models
         filter and the model's allowed_plugins filter.
         """
-        from cms.plugin_rendering import ContentRenderer
+        from cms.core.rendering import ContentRenderer
         from cms.test_utils.project.placeholderapp.models import Example1
 
         Example1.allowed_plugins = ['AllowedPluginA', 'AllowedPluginB']
@@ -520,7 +520,7 @@ class TestAllowedPluginsFiltering(CMSTestCase):
             self.assertNotIn('"DisallowedPlugin"', js)
         finally:
             delattr(Example1, 'allowed_plugins')
-            from cms.plugin_pool import plugin_pool
+            from cms.core.plugin_pool import plugin_pool
             plugin_pool.get_all_plugins_for_model.cache_clear()
 
     def test_allowed_plugins_with_nonexistent_plugin(self):
@@ -529,7 +529,7 @@ class TestAllowedPluginsFiltering(CMSTestCase):
         If allowed_plugins contains plugin names that don't exist or aren't registered,
         they are silently ignored without raising errors.
         """
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
         Example1.allowed_plugins = ['AllowedPluginA', 'NonExistentPlugin']
@@ -557,8 +557,8 @@ class TestAllowedPluginsFiltering(CMSTestCase):
 
         If either filter excludes the plugin, it won't be available.
         """
-        from cms.plugin_base import CMSPluginBase
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_base import CMSPluginBase
+        from cms.core.plugin_pool import plugin_pool
         from cms.test_utils.project.placeholderapp.models import Example1
 
         # Register a plugin with allowed_models restriction

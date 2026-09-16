@@ -35,6 +35,8 @@ from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
 
 # Local application imports
 from cms.cache.page import get_page_url_cache, set_page_url_cache
+from cms.core.placeholders import validate_placeholder_name
+from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PlaceholderNotFound
 from cms.models import (
     CMSPlugin,
@@ -42,12 +44,10 @@ from cms.models import (
     PageContent,
     Placeholder as PlaceholderModel,
 )
-from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_site_id
 from cms.utils.mail import MAIL_DELIVERY_ERRORS
-from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
 
 NULL = object()

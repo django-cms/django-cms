@@ -1,8 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 
 from cms.core.models.placeholderplugin import PlaceholderReference
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
+from cms.core.plugin_base import CMSPluginBase
+from cms.core.plugin_pool import plugin_pool
 
 
 class PlaceholderPlugin(CMSPluginBase):

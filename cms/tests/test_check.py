@@ -9,8 +9,8 @@ from djangocms_text.cms_plugins import TextPlugin
 from cms.api import add_plugin
 from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
+from cms.core.plugin_base import CMSPluginBase
+from cms.core.plugin_pool import plugin_pool
 from cms.test_utils.project.extensionapp.models import MyPageExtension
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.utils.check import FileOutputWrapper, FileSectionWrapper, check

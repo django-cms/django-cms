@@ -21,11 +21,12 @@ from djangocms_text.models import Text
 from cms import api
 from cms.api import create_page
 from cms.core.models.plugin import CMSPlugin
+from cms.core.plugin_base import CMSPluginBase
+from cms.core.plugin_pool import plugin_pool
+from cms.core.plugins import copy_plugins_to_placeholder, get_plugins
+from cms.core.rendering import ContentRenderer
 from cms.exceptions import DontUsePageAttributeWarning, PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
-from cms.plugin_rendering import ContentRenderer
 from cms.shared.editing_urls import get_object_edit_url
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, ArticlePluginModel, Section
@@ -46,7 +47,6 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.warnings import RemovedInDjangoCMS70Warning
-from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
 from cms.utils.urlutils import admin_reverse
 
 
@@ -812,7 +812,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
 
-        from cms.utils.placeholder import get_toolbar_plugin_struct
+        from cms.core.placeholders import get_toolbar_plugin_struct
 
         expected_struct_en = {
             "module": "Generic",
@@ -962,7 +962,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """``child_classes = "auto"`` with no plugin naming it as parent allows no children
         (and notably does not raise on the many installed plugins whose ``parent_classes`` is
         ``None``)."""
-        from cms.utils.plugins import get_plugin_restrictions
+        from cms.core.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
@@ -986,7 +986,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         whether any plugin can actually be added: falsy for ``allow_children = False`` *and*
         for an empty resolved ``child_classes`` (used to grey out the structure-editor
         "add plugin" button)."""
-        from cms.utils.plugins import get_plugin_restrictions
+        from cms.core.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
@@ -1035,7 +1035,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertFalse(allows_add_children(restricted_no))
 
     def test_plugin_child_classes_cache_ignores_uncachable_children(self):
-        from cms.utils.plugins import get_plugin_restrictions
+        from cms.core.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
@@ -1070,7 +1070,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn("ParentPlugin", child_classes)
 
     def test_plugin_child_classes_allows_add_by_uncachable_children(self):
-        from cms.utils.plugins import get_plugin_restrictions
+        from cms.core.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
@@ -1104,7 +1104,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn("ParentPlugin", child_classes)
 
     def test_plugin_child_classes_empty_list_replaced_with_none(self):
-        from cms.utils.plugins import get_plugin_restrictions
+        from cms.core.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
@@ -1130,7 +1130,7 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_plugin_child_classes_empty_list_allows_no_children(self):
         """An empty ``child_classes`` list means no plugins may be added as children, as
         opposed to ``None`` which allows any plugin."""
-        from cms.utils.plugins import get_plugin_restrictions
+        from cms.core.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
@@ -1187,7 +1187,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_plugin_child_classes_glob_no_match(self):
         """A child_classes glob matching no plugin means no children are allowed (like ``[]``)."""
-        from cms.utils.plugins import get_plugin_restrictions
+        from cms.core.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
@@ -1258,7 +1258,7 @@ class PluginsTestCase(PluginsTestBaseCase):
     def _create_plugin_tree(self, placeholder, n, downcast=False):
         import random
 
-        from cms.utils.plugins import downcast_plugins
+        from cms.core.plugins import downcast_plugins
 
         with register_plugins(CMSPluginBase):
             # Create n plugins, shuffle them and then create a linear tree of them
@@ -1309,7 +1309,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         querysets with prefetch_related (from custom managers) don't
         crash on Django 5.0+."""
         from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
-        from cms.utils.plugins import get_bound_plugins
+        from cms.core.plugins import get_bound_plugins
 
         placeholder = self.get_placeholder()
         with register_plugins(DumbFixturePlugin):
@@ -1317,7 +1317,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugins = CMSPlugin.objects.filter(pk=plugin.pk)
 
             with mock.patch(
-                "cms.utils.plugins.PLUGIN_ITERATOR_CHUNK_SIZE", 999
+                "cms.core.plugins.PLUGIN_ITERATOR_CHUNK_SIZE", 999
             ):
                 # Patch the queryset's iterator to inspect the chunk_size kwarg
                 original_iterator = None
@@ -1336,7 +1336,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                         list(get_bound_plugins(plugins))
 
     def test_downcast_plugins_with_direct_cmsplugin_proxy(self):
-        from cms.utils.plugins import downcast_plugins
+        from cms.core.plugins import downcast_plugins
 
         placeholder = self.get_placeholder()
         with register_plugins(DirectProxyCMSPlugin):
@@ -1350,7 +1350,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(downcasted[0].pk, plugin.pk)
 
     def test_get_bound_plugins_with_direct_cmsplugin_proxy(self):
-        from cms.utils.plugins import get_bound_plugins
+        from cms.core.plugins import get_bound_plugins
 
         placeholder = self.get_placeholder()
         with register_plugins(DirectProxyCMSPlugin):
@@ -1807,7 +1807,7 @@ class PluginPoolTestCase(CMSTestCase):
 
     def test_get_restrictions_cache_with_global_cache(self):
         """Test get_restrictions_cache returns global cache for cacheable plugins"""
-        from cms.plugin_base import template_slot_caching
+        from cms.core.plugin_base import template_slot_caching
 
         @plugin_pool.register_plugin
         class GlobalCachePlugin(CMSPluginBase):
@@ -1905,7 +1905,7 @@ class PluginPoolTestCase(CMSTestCase):
 
     def test_get_restrictions_cache_inherited_child_classes_is_global(self):
         """The inherited (decorated) get_child_classes keeps a plugin globally cacheable."""
-        from cms.plugin_base import template_slot_caching
+        from cms.core.plugin_base import template_slot_caching
 
         @plugin_pool.register_plugin
         class InheritedChildClassesPlugin(CMSPluginBase):
@@ -1945,7 +1945,7 @@ class PluginPoolTestCase(CMSTestCase):
 
     def test_get_restrictions_cache_different_templates(self):
         """Test get_restrictions_cache with different templates"""
-        from cms.plugin_base import template_slot_caching
+        from cms.core.plugin_base import template_slot_caching
 
         @plugin_pool.register_plugin
         class TemplateCachePlugin(CMSPluginBase):
@@ -1989,7 +1989,7 @@ class PluginPoolTestCase(CMSTestCase):
 
     def test_get_restrictions_cache_same_slot_different_objects(self):
         """Test get_restrictions_cache with same slot but different objects"""
-        from cms.plugin_base import template_slot_caching
+        from cms.core.plugin_base import template_slot_caching
         from cms.test_utils.project.placeholderapp.models import Example1
 
         @plugin_pool.register_plugin
@@ -2096,7 +2096,7 @@ class IsSlotPluginTestCase(PluginsTestBaseCase):
 
     def test_is_slot_disables_add_form_in_toolbar_struct(self):
         """Unit test: get_toolbar_plugin_struct disables add_form for slot plugins."""
-        from cms.utils.placeholder import get_toolbar_plugin_struct
+        from cms.core.placeholders import get_toolbar_plugin_struct
 
         SlotPlugin = type(
             "SlotPlugin",
@@ -2306,7 +2306,7 @@ class LegacyPageKeywordCompatTests(CMSTestCase):
                     call()
 
     def test_get_toolbar_plugin_struct_accepts_page_keyword(self):
-        from cms.utils.placeholder import get_toolbar_plugin_struct
+        from cms.core.placeholders import get_toolbar_plugin_struct
 
         obj = self._content_obj()
         with self.assertWarns(RemovedInDjangoCMS70Warning):
@@ -2316,7 +2316,7 @@ class LegacyPageKeywordCompatTests(CMSTestCase):
         self.assertEqual(with_page, with_obj)
 
     def test_obj_wins_over_page_when_both_given(self):
-        from cms.utils.placeholder import get_toolbar_plugin_struct
+        from cms.core.placeholders import get_toolbar_plugin_struct
 
         obj = self._content_obj()
         with self.assertWarns(RemovedInDjangoCMS70Warning):

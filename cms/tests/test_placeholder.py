@@ -20,8 +20,14 @@ from cms.api import add_plugin, create_page, create_page_content
 from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
 from cms.core.models.settings import UserSettings
+from cms.core.placeholders import (
+    _get_nodelist,
+    _scan_placeholders,
+    get_placeholder_conf,
+    get_placeholders,
+)
+from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import DuplicatePlaceholderWarning, PlaceholderNotFound
-from cms.plugin_pool import plugin_pool
 from cms.shared.editing_urls import get_object_edit_url, get_object_structure_url
 from cms.test_utils.project.placeholder_relation_field_app.models import (
     FancyPoll,
@@ -37,12 +43,6 @@ from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.placeholder import (
-    _get_nodelist,
-    _scan_placeholders,
-    get_placeholder_conf,
-    get_placeholders,
-)
 from cms.utils.urlutils import admin_reverse
 
 
@@ -1098,7 +1098,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         template tag where placeholders are created with the source field
         set to the current object.
         """
-        from cms.utils.placeholder import get_declared_placeholders_for_obj
+        from cms.core.placeholders import get_declared_placeholders_for_obj
 
         poll = FancyPoll.objects.create(name="poll 1")
 
@@ -1172,7 +1172,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         This tests the get slot method of PlaceholderRelationField
         """
 
-        from cms.utils.placeholder import get_placeholder_from_slot
+        from cms.core.placeholders import get_placeholder_from_slot
 
         poll = FancyPoll.objects.create(name="poll 1")
         slot_1 = get_placeholder_from_slot(poll.placeholders, slot="slot_1")  # Get placeholder
@@ -1346,7 +1346,7 @@ class PlaceholderConfTests(TestCase):
             self.assertIn(LinkPlugin, allowed)
 
     def test_get_plugin_disallowed_in_slot(self):
-        from cms.utils.plugins import get_plugin_disallowed_in_slot
+        from cms.core.plugins import get_plugin_disallowed_in_slot
 
         LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
 
@@ -1708,7 +1708,7 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
         tpl_main = django_engine.from_string('{% load cms_tags %}{% include "included_template.html" %}')
         tpl_included = django_engine.from_string('{% load cms_tags %}{% placeholder "included_slot" %}')
         # Patch get_template to return our included template
-        import cms.utils.placeholder as placeholder_utils
+        import cms.core.placeholders as placeholder_utils
 
         orig_get_template = placeholder_utils.get_template
 
@@ -1769,7 +1769,7 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
         """
         template_str = '{% load cms_tags %}{% placeholder "dup_slot" %}{% placeholder "dup_slot" %}'
         tpl_dup = Template(template_str)
-        import cms.utils.placeholder as placeholder_utils
+        import cms.core.placeholders as placeholder_utils
 
         orig_get_template = placeholder_utils.get_template
 

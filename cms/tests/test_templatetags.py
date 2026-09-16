@@ -24,6 +24,7 @@ from sekizai.context import SekizaiContext
 import cms
 from cms.admin.pageadmin import PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
+from cms.core.placeholders import get_placeholders
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import (
     EmptyPageContent,
@@ -45,7 +46,6 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting, get_site_id
-from cms.utils.placeholder import get_placeholders
 
 TEST_MANAGERS = ["Jenkins <tests@django-cms.org>"] if MAILERS_SUPPORTED else [("Jenkins", "tests@django-cms.org")]
 

@@ -1,6 +1,6 @@
 from cms.api import add_plugin
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
+from cms.core.plugin_base import CMSPluginBase
+from cms.core.plugin_pool import plugin_pool
 
 from .forms import MultiWrapForm
 

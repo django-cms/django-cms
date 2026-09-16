@@ -217,7 +217,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
     @cached_property
     def plugin_class(self):
-        from cms.plugin_pool import plugin_pool
+        from cms.core.plugin_pool import plugin_pool
 
         return plugin_pool.get_plugin(self.plugin_type)
 
