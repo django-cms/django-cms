@@ -29,6 +29,7 @@ from cms.admin.forms import PluginAddValidationForm
 from cms.constants import SLUG_REGEXP
 from cms.core.editing.structure import create_child_plugin_references, get_plugin_content, get_plugin_tree
 from cms.core.services import plugins as plugin_services
+from cms.core.services.permissions import AdminPluginPermissions
 from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -253,6 +254,14 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             and placeholder.check_source(request.user)
         )
         return obj.get_plugin_class_instance(admin=self.admin_site), has_permission
+
+    def _get_permissions(self, request):
+        """The permission backend the services should use for this request.
+
+        Routes back through this admin's overridable ``has_*_permission`` hooks,
+        so a package that replaces them keeps deciding admin requests.
+        """
+        return AdminPluginPermissions(self, request)
 
     def _get_operation_context(self, request):
         """The request-free context the services take.
@@ -514,62 +523,17 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             pk=source_plugin_id,
             language=source_language,
         )
-        old_plugins = [source_plugin] + list(source_plugin.get_descendants())
-        source_placeholder = source_plugin.placeholder
-
-        if not self.has_copy_plugins_permission(request, old_plugins):
-            message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(message)
-
-        # Check source-side permission as well: copying reads the source
-        # plugins, so a user without access to the source placeholder must not
-        # be able to exfiltrate its content into their clipboard.
-        if not source_placeholder.has_add_plugins_permission(request.user, old_plugins):
-            message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(message)
-
-        # Deliberately no ``source_placeholder.check_source()`` here: that is an
-        # editability gate (see ``placeholder_is_immutable``), and copying only
-        # reads the source. Editors must be able to copy out of content they may
-        # not edit, such as a published version or a draft another user has
-        # locked. Read access is covered by the permission check above.
-        if not target_placeholder.check_source(request.user):
-            message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(message)
-
         return plugin_services.copy_plugin_to_clipboard(
             source_plugin,
             target_placeholder,
             target_language,
             context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
         )
 
     def _copy_placeholder_to_clipboard(self, request, source_placeholder, target_placeholder):
         source_language = request.POST['source_language']
         target_language = request.POST['target_language']
-
-        # User is copying the whole placeholder to the clipboard.
-        old_plugins = source_placeholder.get_plugins_list(language=source_language)
-
-        if not self.has_copy_plugins_permission(request, old_plugins):
-            message = _('You do not have permission to copy this placeholder.')
-            raise PermissionDenied(message)
-
-        # Check source-side permission as well: copying reads the source
-        # plugins, so a user without access to the source placeholder must not
-        # be able to exfiltrate its content into their clipboard.
-        if not source_placeholder.has_add_plugins_permission(request.user, old_plugins):
-            message = _('You do not have permission to copy this placeholder.')
-            raise PermissionDenied(message)
-
-        # Deliberately no ``source_placeholder.check_source()`` here: that is an
-        # editability gate (see ``placeholder_is_immutable``), and copying only
-        # reads the source. Editors must be able to copy out of content they may
-        # not edit, such as a published version or a draft another user has
-        # locked. Read access is covered by the permission check above.
-        if not target_placeholder.check_source(request.user):
-            message = _('You do not have permission to copy this placeholder.')
-            raise PermissionDenied(message)
 
         return plugin_services.copy_placeholder_to_clipboard(
             source_placeholder,
@@ -577,6 +541,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             source_language,
             target_language,
             context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
         )
 
     def _add_plugins_from_placeholder(self, request, source_placeholder, target_placeholder):
@@ -585,31 +550,13 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         source_language = request.POST['source_language']
         target_language = request.POST['target_language']
 
-        old_plugins = source_placeholder.get_plugins_list(language=source_language)
-
-        # Check if the user can copy plugins from source placeholder to
-        # target placeholder.
-        has_permissions = self.has_copy_from_placeholder_permission(
-            request,
-            source_placeholder,
-            target_placeholder,
-            old_plugins,
-        )
-
-        if not has_permissions:
-            message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(message)
-
-        if not target_placeholder.check_source(request.user):
-            message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(message)
-
         return plugin_services.add_plugins_from_placeholder(
             source_placeholder,
             target_placeholder,
             source_language,
             target_language,
             context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
             sender=self.__class__,
         )
 
@@ -818,23 +765,6 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
 
     def _paste_plugin(self, request, plugin, target_language,
                       target_placeholder, target_position, target_parent=None):
-        plugins = [plugin] + list(plugin.get_descendants())
-
-        # Check the source side as well: the plugin is identified by a
-        # client-supplied id, so it is not necessarily one the user is allowed
-        # to read.
-        if not self.has_paste_from_source_permission(request, plugin.placeholder, plugins):
-            message = _("You have no permission to paste this plugin")
-            raise PermissionDenied(message)
-
-        if not self.has_copy_from_clipboard_permission(request, target_placeholder, plugins):
-            message = _("You have no permission to paste this plugin")
-            raise PermissionDenied(message)
-
-        if not target_placeholder.check_source(request.user):
-            message = _("You have no permission to paste this plugin")
-            raise PermissionDenied(message)
-
         return plugin_services.paste_plugin(
             plugin,
             target_language,
@@ -842,83 +772,40 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             target_position,
             target_parent=target_parent,
             context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
             sender=self.__class__,
         )
 
     def _paste_placeholder(self, request, plugin, target_language,
                            target_placeholder, target_position):
-        plugins = plugin.placeholder_ref.get_plugins_list()
-
-        # Check the source side as well: the plugin is identified by a
-        # client-supplied id, so it is not necessarily one the user is allowed
-        # to read. The plugins live in the reference placeholder, but that one
-        # is only reachable through the placeholder holding the reference
-        # plugin itself (normally the user's own clipboard).
-        if not self.has_paste_from_source_permission(request, plugin.placeholder, plugins):
-            message = _("You have no permission to paste this placeholder")
-            raise PermissionDenied(message)
-
-        if not self.has_copy_from_clipboard_permission(request, target_placeholder, plugins):
-            message = _("You have no permission to paste this placeholder")
-            raise PermissionDenied(message)
-
-        if not target_placeholder.check_source(request.user):
-            message = _("You have no permission to paste this placeholder")
-            raise PermissionDenied(message)
-
         return plugin_services.paste_placeholder(
             plugin,
             target_language,
             target_placeholder,
             target_position,
             context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
             sender=self.__class__,
         )
 
     def _move_plugin(self, request, plugin, target_position, target_placeholder=None, target_parent=None):
-        source_placeholder = plugin.placeholder
-
-        if not self.has_move_plugin_permission(request, plugin, source_placeholder):
-            message = _("You have no permission to move this plugin")
-            raise PermissionDenied(message)
-
-        if target_placeholder and not self.has_move_plugin_permission(request, plugin, target_placeholder):
-            message = _("You have no permission to move this plugin")
-            raise PermissionDenied(message)
-
-        if not source_placeholder.check_source(request.user):
-            message = _("You have no permission to move this plugin")
-            raise PermissionDenied(message)
-
-        if target_placeholder and not target_placeholder.check_source(request.user):
-            message = _("You have no permission to move this plugin")
-            raise PermissionDenied(message)
-
         return plugin_services.move_plugin(
             plugin,
             target_position,
             target_placeholder=target_placeholder,
             target_parent=target_parent,
             context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
             sender=self.__class__,
         )
 
     def _cut_plugin(self, request, plugin, target_language, target_placeholder):
-        source_placeholder = plugin.placeholder
-
-        if not self.has_move_plugin_permission(request, plugin, source_placeholder):
-            message = _("You have no permission to cut this plugin")
-            raise PermissionDenied(message)
-
-        if not source_placeholder.check_source(request.user):
-            message = _("You have no permission to cut this plugin")
-            raise PermissionDenied(message)
-
         return plugin_services.cut_plugin(
             plugin,
             target_language,
             target_placeholder,
             context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
             sender=self.__class__,
         )
 
@@ -926,13 +813,12 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
     def delete_plugin(self, request, plugin_id):
         plugin = self._get_plugin_from_id(plugin_id)
 
+        # Checked here as well as in the service: the admin answers a refusal
+        # with a 403 carrying this message, which the frontend editor reads,
+        # rather than with Django's PermissionDenied page.
         if not self.has_delete_plugin_permission(request, plugin):
             message = _("You do not have permission to delete this plugin")
             return HttpResponseForbidden(message)
-
-        if not plugin.placeholder.check_source(request.user):
-            message = _("You do not have permission to delete this plugin")
-            raise PermissionDenied(message)
 
         opts = plugin._meta
         get_deleted_objects_additional_kwargs = {'request': request}
@@ -950,6 +836,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             plugin_services.delete_plugin(
                 plugin,
                 context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
                 sender=self.__class__,
             )
 
@@ -1014,13 +901,13 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 }
             })
 
+        # The permission check is repeated here only because the editor expects
+        # a 403 carrying this message rather than Django's PermissionDenied
+        # page. The source check is left to the service, which raises the same
+        # PermissionDenied this used to.
         if not self.has_clear_placeholder_permission(request, placeholder, language):
             message = _("You do not have permission to clear this placeholder")
             return HttpResponseForbidden(message)
-
-        if not placeholder.check_source(request.user):
-            message = _("You do not have permission to clear this placeholder")
-            raise PermissionDenied(message)
 
         opts = Placeholder._meta
         plugins = placeholder.get_plugins_list(language)
@@ -1043,6 +930,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 placeholder,
                 language,
                 context=self._get_operation_context(request),
+            permissions=self._get_permissions(request),
                 site_id=get_current_site(request).pk,
                 sender=self.__class__,
             )

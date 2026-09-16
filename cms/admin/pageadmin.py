@@ -2,21 +2,19 @@ from __future__ import annotations
 
 import json
 import re
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 
 import django
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.options import IS_POPUP_VAR
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import (
     PermissionDenied,
     ValidationError,
 )
 from django.db import transaction
 from django.db.models import Prefetch, Q
-from django.db.models.query import QuerySet
 from django.forms import ModelForm
 from django.forms.fields import IntegerField
 from django.http import (
@@ -39,7 +37,6 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from cms import operations
 from cms.admin.forms import (
     AddPageForm,
     AdvancedSettingsForm,
@@ -51,7 +48,6 @@ from cms.admin.forms import (
     MovePageForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
-from cms.cache.permissions import clear_permission_cache
 from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import (
     CMSPlugin,
@@ -60,19 +56,14 @@ from cms.models import (
     PageContent,
     PagePermission,
     PageUrl,
-    Placeholder,
 )
 from cms.models.pagemodel import AdminCacheDict
 from cms.models.permissionmodels import PermissionTuple
-from cms.operations.helpers import (
-    send_post_page_operation,
-    send_pre_page_operation,
-)
 from cms.pages import services as page_services
+from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
 from cms.plugin_pool import plugin_pool
 from cms.shared.editing_urls import get_object_edit_url
 from cms.shared.operations import OperationContext
-from cms.signals.apphook import set_restart_trigger
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import get_site_from_request, jsonify_request
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
@@ -84,7 +75,6 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.permissions import clear_permission_lru_caches
-from cms.utils.plugins import copy_plugins_to_placeholder, downcast_plugins
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 require_POST = method_decorator(require_POST)
@@ -339,22 +329,13 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(object_id)
 
-        if not self.has_change_permission(request, page):
-            raise PermissionDenied("You do not have permission to set 'home'.")
-
         if not page.is_potential_home():
             return HttpResponseBadRequest(_("The page is not eligible to be home."))
-
-        # Setting a new home page demotes the current one and rewrites the url
-        # paths of both trees, so it takes change permission on both pages.
-        old_home = self.model.objects.filter(is_home=True, site=page.site_id).first()
-
-        if old_home and not self.has_change_permission(request, old_home):
-            raise PermissionDenied("You do not have permission to change the current home page.")
 
         page_services.set_home(
             page,
             context=OperationContext.from_request(request, language=request.GET.get("language")),
+            permissions=AdminPagePermissions(self, request),
         )
         return HttpResponse("ok")
 
@@ -415,41 +396,11 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return super().response_delete(request, obj_display, obj_id)
 
     def delete_model(self, request, obj):
-        operation_token = send_pre_page_operation(
-            request=request, operation=operations.DELETE_PAGE, obj=obj, sender=self.model
+        page_services.delete_page(
+            obj,
+            context=OperationContext.from_request(request),
+            permissions=AdminPagePermissions(self, request),
         )
-
-        cms_pages = [obj]
-
-        if obj.is_branch:
-            descendant_ids = obj.get_descendants().values_list("id", flat=True)
-            cms_pages.extend(self.model.objects.filter(id__in=descendant_ids))
-
-        # Delete all associated pages contents
-        ct_page_content = ContentType.objects.get_for_model(PageContent)
-        page_content_objs = PageContent.admin_manager.filter(page__in=cms_pages).values_list("pk", flat=True)
-        placeholders = Placeholder.objects.filter(
-            content_type=ct_page_content,
-            object_id__in=page_content_objs,
-        )
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
-        QuerySet.delete(plugins)
-        placeholders.delete()
-
-        super().delete_model(request, obj)
-
-        send_post_page_operation(
-            request=request,
-            operation=operations.DELETE_PAGE,
-            token=operation_token,
-            obj=obj,
-            sender=self.model,
-        )
-
-        clear_permission_cache()
-
-        if obj.application_urls:
-            set_restart_trigger()
 
     def get_copy_dialog(self, request, page_id):
         if not get_cms_setting("PERMISSION"):
@@ -550,37 +501,20 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page is None:
             return jsonify_request(HttpResponseBadRequest("error"))
 
-        user = request.user
         form = self.move_form(request.POST or None, page=page, site=page.site)
 
         if not form.is_valid():
             return jsonify_request(HttpResponseBadRequest(str(form.errors.get("__all__", _("error")))))
 
-        target = form.cleaned_data["target"]
-        can_move_page = self.has_move_page_permission(request, obj=page)
-
-        # Does the user have permissions to do this...?
-        if not can_move_page or (target and not target.has_add_permission(user)):
-            message = _("Error! You don't have permissions to move this page. Please reload the page")
-            return jsonify_request(HttpResponseForbidden(message))
-
-        # The whole subtree moves along, so authorize the whole subtree: the
-        # destination may grant access that the source did not.
-        target_page, position = form.get_tree_options()
-        if position in ("first-child", "last-child"):
-            parent_page = target_page
-        else:
-            parent_page = target_page.parent if target_page else None
-
-        if not page_permissions.user_can_move_descendants(user, page, page.site, parent_page):
-            message = _("Error! You don't have permissions to move this page. Please reload the page")
-            return jsonify_request(HttpResponseForbidden(message))
-
-        page_services.move_page(
-            page,
-            *form.get_tree_options(),
-            context=OperationContext.from_request(request, language=request.GET.get("language")),
-        )
+        try:
+            page_services.move_page(
+                page,
+                *form.get_tree_options(),
+                context=OperationContext.from_request(request, language=request.GET.get("language")),
+                permissions=AdminPagePermissions(self, request),
+            )
+        except PermissionDenied as error:
+            return jsonify_request(HttpResponseForbidden(str(error)))
         return jsonify_request(HttpResponse(status=200))
 
     def get_permissions(self, request, page_id):
@@ -646,39 +580,11 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page is None:
             return jsonify_request(HttpResponseBadRequest("error"))
 
-        user = request.user
         site = get_site_from_request(request)
         form = self.copy_form(request.POST or None, page=page, site=site)
 
         if not form.is_valid():
             return jsonify_request(HttpResponseBadRequest("error"))
-
-        target = form.cleaned_data["target"]
-
-        # User can only copy pages he can see
-        can_copy_page = page_permissions.user_can_view_page(user, page, page.site)
-
-        if can_copy_page and target:
-            # User can only copy a page into another one if he has permission
-            # to add a page under the target page.
-            can_copy_page = page_permissions.user_can_add_subpage(user, target, site)
-        elif can_copy_page:
-            # User can only copy / paste a page if he has permission to add a page
-            can_copy_page = page_permissions.user_can_add_page(user, site)
-
-        if can_copy_page:
-            target_page, position = form.get_tree_options()
-            if position in ("first-child", "last-child"):
-                parent_page = target_page
-            else:
-                parent_page = target_page.parent if target_page else None
-            can_copy_page = page_permissions.user_can_copy_descendants(
-                user, page, site, parent_page, form.cleaned_data["copy_permissions"]
-            )
-
-        if not can_copy_page:
-            message = _("Error! You don't have permissions to copy this page.")
-            return jsonify_request(HttpResponseForbidden(message))
 
         page_languages = page.get_languages()
         site_languages = get_language_list(site_id=site.pk)
@@ -690,7 +596,17 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             )
             return jsonify_request(HttpResponseBadRequest(message))
 
-        new_page = form.copy_page(user)
+        try:
+            new_page = page_services.copy_page_tree(
+                page,
+                *form.get_tree_options(),
+                target_site=site,
+                copy_permissions=form.cleaned_data.get("copy_permissions", False),
+                context=OperationContext.from_request(request),
+                permissions=AdminPagePermissions(self, request),
+            )
+        except PermissionDenied as error:
+            return jsonify_request(HttpResponseForbidden(str(error)))
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type="application/json")
 
     def edit_title_fields(self, request, page_id, language):
@@ -1204,17 +1120,14 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page_content is None:
             raise self._get_404_exception(object_id)
 
-        to_template = request.POST.get("template", None)
-
-        if get_cms_setting("TEMPLATES"):
-            if to_template not in dict(get_cms_setting("TEMPLATES")):
-                return HttpResponseBadRequest(_("Template not valid"))
-        else:
-            if to_template not in (placeholder_set[0] for placeholder_set in get_cms_setting("PLACEHOLDERS")):
-                return HttpResponseBadRequest(_("Placeholder selection not valid"))
-
-        page_content.template = to_template
-        page_content.save()
+        try:
+            page_services.change_template(
+                page_content,
+                request.POST.get("template", None),
+                context=OperationContext.from_request(request),
+            )
+        except ValidationError as error:
+            return HttpResponseBadRequest(error.messages[0])
 
         return HttpResponse(_("The template was successfully changed"))
 
@@ -1230,43 +1143,19 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if source_page_content is None:
             raise self._get_404_exception(object_id)
 
-        page = source_page_content.page
-
-        if not target_language or target_language not in get_language_list(site_id=page.site_id):
-            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
-
-        target_page_content = page.get_content_obj(target_language, fallback=False)
-
-        source_placeholders = list(source_page_content.get_placeholders())
-        target_placeholders = {
-            placeholder.slot: placeholder
-            for placeholder in target_page_content.get_placeholders()
-        }
-        source_plugins = downcast_plugins(
-            CMSPlugin.objects.filter(
-                placeholder_id__in=[placeholder.pk for placeholder in source_placeholders],
-                language=source_page_content.language,
-            ).order_by("position")
-        )
-        plugins_by_placeholder = defaultdict(list)
-        for plugin in source_plugins:
-            plugins_by_placeholder[plugin.placeholder_id].append(plugin)
-
-        for placeholder in source_placeholders:
-            target = target_placeholders.get(placeholder.slot)
-            if target is None:
-                messages.warning(request, _("Placeholder '%s' does not exist in target language") % placeholder.slot)
-                continue
-            plugins = plugins_by_placeholder[placeholder.pk]
-
-            if not target.has_add_plugins_permission(request.user, plugins):
-                return HttpResponseForbidden(_("You do not have permission to copy these plugins."))
-            copy_plugins_to_placeholder(
-                plugins,
-                target,
-                language=target_language,
-                plugins_are_downcast=True,
+        try:
+            missing_slots = page_services.copy_language(
+                source_page_content,
+                target_language,
+                context=OperationContext.from_request(request),
             )
+        except ValidationError as error:
+            return HttpResponseBadRequest(error.messages[0])
+        except PermissionDenied as error:
+            return HttpResponseForbidden(str(error) or _("You do not have permission to copy these plugins."))
+
+        for slot in missing_slots:
+            messages.warning(request, _("Placeholder '%s' does not exist in target language") % slot)
         return HttpResponse("ok")
 
     def delete_view(self, request, object_id, extra_context=None):
@@ -1286,43 +1175,14 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return super().delete_view(request, object_id, extra_context)
 
     def delete_model(self, request, obj):
-        ct_page_content = ContentType.objects.get_for_model(PageContent)
-        page_contents = PageContent.admin_manager.filter(page=obj.page, language=obj.language)
-        placeholders = Placeholder.objects.filter(
-            content_type=ct_page_content,
-            object_id__in=page_contents.values("pk"),
-        )
-        saved_plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
-        page_url = obj.page.urls.get(language=obj.language)
-
-        operation_token = send_pre_page_operation(
-            request=request,
-            operation=operations.DELETE_PAGE_TRANSLATION,
-            obj=obj.page,
-            translation=obj,
-            sender=self.model,
-        )
-
         message = _("Title and plugins with language %(language)s was deleted") % {
             "language": force_str(get_language_object(obj.language, site_id=obj.page.site_id)["name"])
         }
         messages.success(request, message)
-        if obj.page.admin_content_cache and obj.language in obj.page.admin_content_cache:
-            del obj.page.admin_content_cache[obj.language]
-        if obj.language in obj.page.page_content_cache:
-            del obj.page.page_content_cache[obj.language]
-
-        page_url.delete()
-        page_contents.delete()
-        saved_plugins.delete()
-
-        send_post_page_operation(
-            request=request,
-            operation=operations.DELETE_PAGE_TRANSLATION,
-            token=operation_token,
-            obj=obj.page,
-            translation=obj,
-            sender=self.model,
+        page_services.delete_translation(
+            obj,
+            context=OperationContext.from_request(request),
+            permissions=AdminPageContentPermissions(self, request),
         )
 
     @require_POST
@@ -1344,7 +1204,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page_content is None:
             raise self._get_404_exception(object_id)
 
-        page_content.toggle_in_navigation()
+        page_services.toggle_in_navigation(page_content, context=OperationContext.from_request(request))
         # 204 -> request was successful but no response returned.
         return HttpResponse(status=204)
 

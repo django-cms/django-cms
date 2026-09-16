@@ -8,24 +8,24 @@ Every function here follows the shape the placeholder admin established:
 4. emit the post-operation signal with the same token,
 5. return the changed object.
 
-**Permission checks are the caller's responsibility, and nothing here enforces
-them.** Calling a service directly performs the operation for any user, or for
-no user at all -- there is no check to fail and no error to catch. Enforcement
-lives in the admin's ``has_*_permission`` methods, which are documented,
-overridable hooks that djangocms-versioning and other packages replace; moving
-them here without a permission backend would silently drop those overrides.
-
-Until step 6 of the refactor supplies that backend, treat these functions as
-privileged: call them from code that has already decided the user may act, and
-do not expose them through a new entry point (a REST view, a command, a wizard)
-without checking first.
+**Every service enforces permissions** through a backend
+(:mod:`cms.core.services.permissions`), so a caller reaching an operation from
+outside the admin is checked the same way. Pass ``permissions=`` to supply a
+different backend for one call -- the placeholder admin does this, handing over
+an adapter that routes each predicate back through its own overridable
+``has_*_permission`` hooks -- or export a ``permissions`` contract to replace it
+for every caller at once.
 """
 
 from __future__ import annotations
 
 import uuid
 
+from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext as _
+
 from cms import operations
+from cms.core.services.permissions import get_permissions
 from cms.models import CMSPlugin, PlaceholderReference
 from cms.shared.operations import OperationContext
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
@@ -42,6 +42,14 @@ __all__ = [
     "paste_placeholder",
     "paste_plugin",
 ]
+
+
+def _guard(permissions, context: OperationContext):
+    return permissions if permissions is not None else get_permissions(context.user)
+
+
+def _deny(message: str):
+    raise PermissionDenied(message)
 
 
 def _start(operation: str, context: OperationContext, sender, **kwargs) -> str:
@@ -87,11 +95,23 @@ def move_plugin(
     target_parent=None,
     *,
     context: OperationContext,
+    permissions=None,
     sender=None,
 ) -> CMSPlugin:
     """Move ``plugin`` to ``target_position``, optionally into another placeholder."""
     language = plugin.language
     source_placeholder = plugin.placeholder
+    permissions = _guard(permissions, context)
+
+    if not permissions.can_move_plugin(plugin, source_placeholder):
+        _deny(_("You have no permission to move this plugin"))
+    if target_placeholder and not permissions.can_move_plugin(plugin, target_placeholder):
+        _deny(_("You have no permission to move this plugin"))
+    if not permissions.can_edit_source(source_placeholder):
+        _deny(_("You have no permission to move this plugin"))
+    if target_placeholder and not permissions.can_edit_source(target_placeholder):
+        _deny(_("You have no permission to move this plugin"))
+
     source_language = plugin.language
     source_parent_id = plugin.parent_id
     target_parent_id = target_parent.pk if target_parent else None
@@ -131,10 +151,18 @@ def cut_plugin(
     target_placeholder,
     *,
     context: OperationContext,
+    permissions=None,
     sender=None,
 ) -> CMSPlugin:
     """Move ``plugin`` into the clipboard, emptying whatever was there."""
     source_placeholder = plugin.placeholder
+    permissions = _guard(permissions, context)
+
+    if not permissions.can_move_plugin(plugin, source_placeholder):
+        _deny(_("You have no permission to cut this plugin"))
+    if not permissions.can_edit_source(source_placeholder):
+        _deny(_("You have no permission to cut this plugin"))
+
     source_language = plugin.language
     source_parent_id = plugin.parent_id
     source_order = source_placeholder.get_plugin_tree_order(source_language, source_parent_id)
@@ -199,11 +227,23 @@ def paste_plugin(
     target_parent=None,
     *,
     context: OperationContext,
+    permissions=None,
     sender=None,
 ) -> CMSPlugin:
     """Copy ``plugin`` and its descendants out of the clipboard into a placeholder."""
     plugins = [plugin] + list(plugin.get_descendants())
     target_parent_id = target_parent.pk if target_parent else None
+    permissions = _guard(permissions, context)
+
+    # Check the source side as well: the plugin is identified by a
+    # client-supplied id, so it is not necessarily one the user may read.
+    if not permissions.can_paste_from_source(plugin.placeholder, plugins):
+        _deny(_("You have no permission to paste this plugin"))
+    if not permissions.can_copy_from_clipboard(target_placeholder, plugins):
+        _deny(_("You have no permission to paste this plugin"))
+    if not permissions.can_edit_source(target_placeholder):
+        _deny(_("You have no permission to paste this plugin"))
+
 
     token = _start(
         operations.PASTE_PLUGIN,
@@ -250,10 +290,23 @@ def paste_placeholder(
     target_position: int,
     *,
     context: OperationContext,
+    permissions=None,
     sender=None,
 ) -> list[CMSPlugin]:
     """Copy a whole clipboard placeholder's plugins into a placeholder."""
     plugins = plugin.placeholder_ref.get_plugins_list()
+    permissions = _guard(permissions, context)
+
+    # The plugins live in the reference placeholder, which is only reachable
+    # through the placeholder holding the reference plugin -- normally the
+    # user's own clipboard -- so the source side is checked too.
+    if not permissions.can_paste_from_source(plugin.placeholder, plugins):
+        _deny(_("You have no permission to paste this placeholder"))
+    if not permissions.can_copy_from_clipboard(target_placeholder, plugins):
+        _deny(_("You have no permission to paste this placeholder"))
+    if not permissions.can_edit_source(target_placeholder):
+        _deny(_("You have no permission to paste this placeholder"))
+
 
     token = _start(
         operations.PASTE_PLACEHOLDER,
@@ -295,6 +348,7 @@ def copy_plugin_to_clipboard(
     target_language: str,
     *,
     context: OperationContext,
+    permissions=None,
 ) -> CMSPlugin:
     """Copy a plugin subtree into the clipboard.
 
@@ -302,6 +356,19 @@ def copy_plugin_to_clipboard(
     clipboard is private scratch space, not content.
     """
     old_plugins = [source_plugin] + list(source_plugin.get_descendants())
+    permissions = _guard(permissions, context)
+    source_placeholder = source_plugin.placeholder
+
+    if not permissions.can_copy_plugins(old_plugins):
+        _deny(_("You do not have permission to copy these plugins."))
+    # Copying reads the source plugins, so a user without access to the source
+    # placeholder must not be able to exfiltrate its content into their
+    # clipboard. Deliberately no ``can_edit_source`` on the source: that is an
+    # editability gate, and copying only reads.
+    if not permissions.can_copy_from_clipboard(source_placeholder, old_plugins):
+        _deny(_("You do not have permission to copy these plugins."))
+    if not permissions.can_edit_source(target_placeholder):
+        _deny(_("You do not have permission to copy these plugins."))
 
     # Empty the clipboard
     target_placeholder.clear()
@@ -321,6 +388,7 @@ def copy_placeholder_to_clipboard(
     target_language: str,
     *,
     context: OperationContext,
+    permissions=None,
 ) -> PlaceholderReference:
     """Copy a whole placeholder into the clipboard, wrapped in one reference plugin.
 
@@ -329,6 +397,14 @@ def copy_placeholder_to_clipboard(
     operation signals, as above.
     """
     old_plugins = source_placeholder.get_plugins_list(language=source_language)
+    permissions = _guard(permissions, context)
+
+    if not permissions.can_copy_plugins(old_plugins):
+        _deny(_("You do not have permission to copy this placeholder."))
+    if not permissions.can_copy_from_clipboard(source_placeholder, old_plugins):
+        _deny(_("You do not have permission to copy this placeholder."))
+    if not permissions.can_edit_source(target_placeholder):
+        _deny(_("You do not have permission to copy this placeholder."))
 
     # Empty the clipboard
     target_placeholder.clear()
@@ -354,10 +430,18 @@ def add_plugins_from_placeholder(
     target_language: str,
     *,
     context: OperationContext,
+    permissions=None,
     sender=None,
 ) -> list[CMSPlugin]:
     """Copy a placeholder's plugins into another placeholder ("copy from language")."""
     old_plugins = source_placeholder.get_plugins_list(language=source_language)
+    permissions = _guard(permissions, context)
+
+    if not permissions.can_copy_from_placeholder(source_placeholder, target_placeholder, old_plugins):
+        _deny(_("You do not have permission to copy these plugins."))
+    if not permissions.can_edit_source(target_placeholder):
+        _deny(_("You do not have permission to copy these plugins."))
+
     target_tree_order = target_placeholder.get_plugin_tree_order(language=target_language, parent_id=None)
 
     token = _start(
@@ -395,9 +479,18 @@ def add_plugins_from_placeholder(
     return new_plugins
 
 
-def delete_plugin(plugin: CMSPlugin, *, context: OperationContext, sender=None) -> list[int]:
+def delete_plugin(
+    plugin: CMSPlugin, *, context: OperationContext, permissions=None, sender=None
+) -> list[int]:
     """Delete a plugin and return the placeholder's resulting plugin tree order."""
     placeholder = plugin.placeholder
+    permissions = _guard(permissions, context)
+
+    if not permissions.can_delete_plugin(plugin):
+        _deny(_("You do not have permission to delete this plugin"))
+    if not permissions.can_edit_source(placeholder):
+        _deny(_("You do not have permission to delete this plugin"))
+
     tree_order = placeholder.get_plugin_tree_order(language=plugin.language)
 
     token = _start(
@@ -430,11 +523,19 @@ def clear_placeholder(
     language: str | None,
     *,
     context: OperationContext,
+    permissions=None,
     site_id: int | None = None,
     sender=None,
 ) -> None:
     """Remove every plugin in ``language`` from ``placeholder``."""
     plugins = placeholder.get_plugins_list(language)
+    permissions = _guard(permissions, context)
+
+    if not permissions.can_clear_placeholder(placeholder, language):
+        _deny(_("You do not have permission to clear this placeholder"))
+    if not permissions.can_edit_source(placeholder):
+        _deny(_("You do not have permission to clear this placeholder"))
+
 
     token = _start(
         operations.CLEAR_PLACEHOLDER,

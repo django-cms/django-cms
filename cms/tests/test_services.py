@@ -1,5 +1,11 @@
+from django.core.exceptions import PermissionDenied
+
 from cms.api import add_plugin, create_page
 from cms.core.services import plugins as plugin_services
+from cms.core.services.permissions import PluginPermissions, get_permissions
+from cms.models import Page, Placeholder, UserSettings
+from cms.pages import services as page_services
+from cms.pages.permissions import PagePermissions, get_page_permissions
 from cms.shared.operations import OperationContext
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.test_utils.testcases import CMSTestCase
@@ -126,3 +132,142 @@ class RequestFreeServiceTest(CMSTestCase):
         plugin_services.clear_placeholder(self.placeholder, "en", context=self._context())
 
         self.assertFalse(self.placeholder.get_plugins("en").exists())
+
+
+class ServicePermissionTest(CMSTestCase):
+    """Services enforce, so a non-admin caller is checked the same way.
+
+    This is what closes the gap left open in step 5: before, calling a service
+    directly performed the operation for anybody.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("home", "nav_playground.html", "en")
+        self.placeholder = self.page.get_placeholders("en").get(slot="body")
+        self.plugin = add_plugin(self.placeholder, "LinkPlugin", "en", name="one").cmsplugin_ptr
+
+    def _context(self, user):
+        return OperationContext(user=user, language="en", origin="/en/")
+
+    def test_service_denies_a_user_without_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+
+        with self.assertRaises(PermissionDenied):
+            plugin_services.move_plugin(self.plugin, target_position=1, context=self._context(staff))
+
+    def test_service_allows_a_user_with_permission(self):
+        plugin_services.move_plugin(
+            self.plugin, target_position=1, context=self._context(self.get_superuser())
+        )
+
+        self.assertEqual(self.placeholder.get_plugin_tree_order(language="en"), [self.plugin.pk])
+
+    def test_delete_is_guarded_too(self):
+        staff = self.get_staff_user_with_no_permissions()
+
+        with self.assertRaises(PermissionDenied):
+            plugin_services.delete_plugin(self.plugin, context=self._context(staff))
+
+        self.assertTrue(self.placeholder.get_plugins("en").exists())
+
+    def test_an_explicit_backend_overrides_the_default(self):
+        """``permissions=`` is how the admin keeps its overridable hooks in charge."""
+
+        class RefuseEverything(PluginPermissions):
+            def can_move_plugin(self, plugin, target_placeholder):
+                return False
+
+        with self.assertRaises(PermissionDenied):
+            plugin_services.move_plugin(
+                self.plugin,
+                target_position=1,
+                context=self._context(self.get_superuser()),
+                permissions=RefuseEverything(self.get_superuser()),
+            )
+
+    def test_default_backend_mirrors_the_admin_hooks(self):
+        """A stock install must decide exactly as the admin used to."""
+        superuser = self.get_superuser()
+        permissions = get_permissions(superuser)
+
+        self.assertTrue(permissions.can_move_plugin(self.plugin, self.placeholder))
+        self.assertTrue(permissions.can_delete_plugin(self.plugin))
+        self.assertTrue(permissions.can_edit_source(self.placeholder))
+        self.assertEqual(
+            permissions.can_clear_placeholder(self.placeholder, "en"),
+            self.placeholder.has_clear_permission(superuser, ["en"]),
+        )
+
+    def test_clipboard_resolves_without_a_request(self):
+        """The clipboard comes from UserSettings, not from a toolbar."""
+        superuser = self.get_superuser()
+        UserSettings.objects.create(
+            user=superuser, language="en", clipboard=Placeholder.objects.create(slot="clipboard")
+        )
+
+        self.assertIsNotNone(get_permissions(superuser).clipboard)
+
+    def test_no_user_settings_means_no_clipboard(self):
+        self.assertIsNone(get_permissions(self.get_superuser()).clipboard)
+
+
+class PageServicePermissionTest(CMSTestCase):
+    """The pages half of the same guarantee: page services enforce too."""
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("home", "nav_playground.html", "en")
+
+    def _context(self, user):
+        return OperationContext(user=user, language="en", origin="/en/")
+
+    def test_delete_page_denies_a_user_without_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+
+        with self.assertRaises(PermissionDenied):
+            page_services.delete_page(self.page, context=self._context(staff))
+
+        self.assertTrue(Page.objects.filter(pk=self.page.pk).exists())
+
+    def test_set_home_denies_a_user_without_permission(self):
+        other = create_page("other", "nav_playground.html", "en")
+        staff = self.get_staff_user_with_no_permissions()
+
+        with self.assertRaises(PermissionDenied):
+            page_services.set_home(other, context=self._context(staff))
+
+    def test_toggle_in_navigation_denies_a_user_without_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+        content = self.page.get_content_obj("en")
+
+        with self.assertRaises(PermissionDenied):
+            page_services.toggle_in_navigation(content, context=self._context(staff))
+
+    def test_superuser_is_allowed(self):
+        content = self.page.get_content_obj("en")
+        before = content.in_navigation
+
+        after = page_services.toggle_in_navigation(content, context=self._context(self.get_superuser()))
+
+        self.assertNotEqual(before, after)
+
+    def test_an_explicit_backend_overrides_the_default(self):
+        class RefuseEverything(PagePermissions):
+            def can_delete_page(self, page):
+                return False
+
+        with self.assertRaises(PermissionDenied):
+            page_services.delete_page(
+                self.page,
+                context=self._context(self.get_superuser()),
+                permissions=RefuseEverything(self.get_superuser()),
+            )
+
+    def test_default_backend_mirrors_the_admin_hooks(self):
+        superuser = self.get_superuser()
+        permissions = get_page_permissions(superuser)
+
+        self.assertTrue(permissions.can_change_page(self.page))
+        self.assertTrue(permissions.can_delete_page(self.page))
+        self.assertTrue(permissions.can_view_page(self.page))
