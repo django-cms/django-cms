@@ -194,15 +194,17 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     def _can_manage_grant(self, request, obj):
         """Only let a manager edit or delete a grant they could have created.
 
-        A grant holding flags the manager may not hand out on its sites is out of
-        reach: its ``user``, ``group`` and ``sites`` would otherwise let them move
-        those flags to themselves or to other sites (CWE-269).
+        A grant for a site the manager may not manage permissions on, or holding
+        flags they may not hand out on its sites, is out of reach: its ``user``,
+        ``group`` and ``sites`` would otherwise let them move those flags to
+        themselves or to other sites (CWE-269).
         """
         if obj is None:
             return True
         held = {flag for flag in GlobalPagePermission.get_all_permissions() if getattr(obj, flag)}
         site_ids = list(obj.sites.values_list("pk", flat=True))
-        return held <= permissions.get_grantable_global_permissions(request.user, site_ids)
+        grantable = permissions.get_grantable_global_permissions(request.user, site_ids)
+        return "can_change_permissions" in grantable and held <= grantable
 
     @classproperty
     def raw_id_fields(cls):

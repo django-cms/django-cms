@@ -147,6 +147,16 @@ def _global_permission_flags(queryset):
     return granted
 
 
+def _managed_global_permission_flags(queryset):
+    """Like :func:`_global_permission_flags`, but empty without ``can_change_permissions``.
+
+    Holding a flag on a site is not enough to hand it out there: the user must
+    also be allowed to manage permissions on that site.
+    """
+    granted = _global_permission_flags(queryset)
+    return granted if "can_change_permissions" in granted else set()
+
+
 def get_grantable_global_permissions(user, site_ids=None):
     """Return the ``can_*`` flags ``user`` may hand out through a global permission.
 
@@ -162,6 +172,10 @@ def get_grantable_global_permissions(user, site_ids=None):
     * a non-empty list -- the flags held on *every* one of those sites. A flag
       held on one site alone cannot be used to grant it on another.
 
+    For ``[]`` and a list of sites, nothing is grantable on a site where the user
+    lacks ``can_change_permissions``, so ``"can_change_permissions" in result``
+    tells whether the user may manage permissions on all of those sites.
+
     In every case a flag is only grantable if the user also holds the Django
     model permissions that page actions require alongside it.
     """
@@ -176,13 +190,13 @@ def get_grantable_global_permissions(user, site_ids=None):
     if site_ids is None:
         held = _global_permission_flags(GlobalPagePermission.objects.with_user(user))
     elif not site_ids:
-        held = _global_permission_flags(
+        held = _managed_global_permission_flags(
             GlobalPagePermission.objects.with_user(user).filter(sites__isnull=True)
         )
     else:
         held = all_flags
         for site_id in site_ids:
-            held &= _global_permission_flags(
+            held &= _managed_global_permission_flags(
                 GlobalPagePermission.objects.get_with_site(user, site_id)
             )
             if not held:

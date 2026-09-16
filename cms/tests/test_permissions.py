@@ -511,6 +511,9 @@ class GlobalPagePermissionEscalationTests(CMSTestCase):
     def test_flag_held_on_one_site_cannot_be_granted_on_another(self):
         other_site = Site.objects.create(domain='other.example.com', name='other')
         delegate, _grant = self._create_delegate(can_publish=True)
+        # Permission management on both sites, publishing on the current one only.
+        other_grant = self._create_grant(delegate, sites=[other_site], can_change_permissions=True)
+        delegate = self.reload(delegate)
 
         response = self._post(
             delegate,
@@ -520,7 +523,8 @@ class GlobalPagePermissionEscalationTests(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('can_publish', response.context_data['adminform'].form.errors)
         self.assertFalse(
-            GlobalPagePermission.objects.filter(user=delegate).exclude(pk=_grant.pk).exists()
+            GlobalPagePermission.objects.filter(user=delegate)
+            .exclude(pk__in=[_grant.pk, other_grant.pk]).exists()
         )
 
     def test_all_sites_grant_requires_unrestricted_rights(self):
@@ -529,7 +533,7 @@ class GlobalPagePermissionEscalationTests(CMSTestCase):
 
         response = self._post(delegate, sites=[], can_change='on', can_publish='on')
         self.assertEqual(response.status_code, 200)
-        self.assertIn('can_publish', response.context_data['adminform'].form.errors)
+        self.assertIn('sites', response.context_data['adminform'].form.errors)
 
     def _change_url(self, grant):
         return f'/en/admin/cms/globalpagepermission/{grant.pk}/change/'
@@ -650,6 +654,42 @@ class GlobalPagePermissionEscalationTests(CMSTestCase):
         self.assertTrue(new_grant.can_change)
         self.assertFalse(new_grant.can_publish)
         self.assertFalse(user_can_publish_page.without_cache(self.reload(target), page))
+
+    def _create_manager_of_other_site(self):
+        """A delegate managing permissions on the current site only, but publishing on another."""
+        other_site = Site.objects.create(domain='other.example.com', name='other')
+        delegate, _grant = self._create_delegate()
+        self._create_grant(delegate, sites=[other_site], can_publish=True)
+        return self.reload(delegate), other_site
+
+    def test_grant_requires_permission_management_on_every_selected_site(self):
+        delegate, other_site = self._create_manager_of_other_site()
+        target = self._create_user('target', is_staff=True)
+
+        response = self._post(
+            delegate, user=target.pk, sites=[other_site.pk], can_change='on', can_publish='on',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('sites', response.context_data['adminform'].form.errors)
+        self.assertFalse(GlobalPagePermission.objects.filter(user=target).exists())
+
+    def test_grant_on_site_without_permission_management_cannot_be_changed(self):
+        delegate, other_site = self._create_manager_of_other_site()
+        target = self._create_user('target', is_staff=True)
+        existing = self._create_grant(target, sites=[other_site], can_publish=True)
+
+        with self.login_user_context(delegate):
+            response = self.client.post(self._change_url(existing), {
+                'user': delegate.pk,
+                'group': '',
+                'sites': [other_site.pk],
+                'can_change': 'on',
+                'can_publish': 'on',
+                '_save': 'Save',
+            })
+        self.assertEqual(response.status_code, 403)
+        existing.refresh_from_db()
+        self.assertEqual(existing.user, target)
 
     def test_superuser_is_unrestricted(self):
         superuser = self.get_superuser()

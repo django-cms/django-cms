@@ -1341,6 +1341,18 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
         site_ids = [site.pk for site in cleaned_data.get("sites") or []]
         grantable = get_grantable_global_permissions(user, site_ids)
 
+        if "can_change_permissions" not in grantable:
+            # ``has_add_permission`` only checks the current site; a manager must
+            # be allowed to manage permissions on every site the grant covers.
+            self.add_error(
+                "sites" if "sites" in self.fields else None,
+                forms.ValidationError(
+                    _("You cannot manage permissions on every selected site."),
+                    code="sites_not_managed",
+                ),
+            )
+            return cleaned_data
+
         for field in self._meta.model.get_all_permissions():
             # Fields absent from the form were already excluded as ungrantable
             # on any site; this catches the narrower case of a flag the manager
