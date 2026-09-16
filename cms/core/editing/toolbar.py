@@ -8,8 +8,8 @@ anything else registered as frontend-editable. Moved here from
 from django.utils.translation import gettext_lazy as _
 
 from cms.constants import REFRESH_PAGE
+from cms.core.permissions import user_can_view_placeholder_source
 from cms.models import Placeholder
-from cms.permissions.utils import user_can_view_placeholder_source
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url, get_object_structure_url
 from cms.toolbar.base import CMSToolbar
 from cms.toolbar.items import ButtonList

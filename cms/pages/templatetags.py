@@ -1,4 +1,8 @@
-"""The page templatetags: ``{% page_url %}``, ``{% page_id_url %}``, ``{% page_attribute %}``.
+"""The page templatetags.
+
+``{% page_url %}``, ``{% page_id_url %}``, ``{% page_attribute %}``, and
+``{% show_placeholder %}`` -- which despite its name is a page lookup: it finds a
+page by ``reverse_id`` and renders one of its placeholders.
 
 Defined here and registered by ``cms.templatetags.cms_tags``, which stays the
 library ``{% load cms_tags %}`` names. Pages owns these the same way it owns its
@@ -17,8 +21,10 @@ from django.urls import NoReverseMatch
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 
-from cms.models import Page
+from cms.core.placeholders import validate_placeholder_name
+from cms.models import Page, PageContent, Placeholder as PlaceholderModel
 from cms.pages.cache import get_page_url_cache, set_page_url_cache
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_site_id
 from cms.utils.mail import MAIL_DELIVERY_ERRORS
@@ -194,3 +200,53 @@ class PageAttribute(AsTag):
                 ret_val = escape(ret_val)
             return ret_val
         return ""
+
+
+def _show_placeholder_by_id(context, placeholder_name, reverse_id, lang=None, site=None, use_cache=True):
+    validate_placeholder_name(placeholder_name)
+
+    request = context["request"]
+    toolbar = get_toolbar_from_request(request)
+    renderer = toolbar.get_content_renderer()
+
+    if site:
+        # Backwards compatibility.
+        # Assume user passed in a pk directly.
+        site_id = getattr(site, "pk", site)
+    else:
+        site_id = renderer.current_site.pk
+
+    page = _get_page_by_untyped_arg(reverse_id, request, site_id)
+
+    if not page:
+        return ""
+
+    if lang is None:
+        lang = renderer.request_language
+
+    try:
+        toolbar = get_toolbar_from_request(request)
+        admin_manager = toolbar.edit_mode_active or toolbar.preview_mode_active
+        placeholder = page.get_placeholders(lang, admin_manager=admin_manager).get(slot=placeholder_name)
+    except (PlaceholderModel.DoesNotExist, PageContent.DoesNotExist):
+        if settings.DEBUG:
+            raise
+        return ""
+    else:
+        # save a query. cache the page.
+        placeholder.page = page
+
+    content = renderer.render_placeholder(
+        placeholder=placeholder,
+        context=context,
+        language=lang,
+        page=page,
+        editable=False,
+        use_cache=use_cache,
+    )
+    return content
+
+
+def _show_uncached_placeholder_by_id(context, *args, **kwargs):
+    kwargs["use_cache"] = False
+    return _show_placeholder_by_id(context, *args, **kwargs)

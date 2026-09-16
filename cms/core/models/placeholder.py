@@ -12,10 +12,10 @@ from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
+from cms.core import permissions
 from cms.core.cache import clear_placeholder_cache
 from cms.core.models.managers import PlaceholderManager
 from cms.exceptions import LanguageError
-from cms.permissions import utils as permissions
 from cms.shared.resolvers import resolve
 from cms.shared.signals import placeholder_cache_cleared
 from cms.utils import get_language_from_request
@@ -97,7 +97,7 @@ class Placeholder(models.Model):
         """
         Returns ``True`` if user has permission to change all models attached to this placeholder.
         """
-        from cms.permissions.utils import get_model_permission_codename
+        from cms.shared.permissions import get_model_permission_codename
 
         if not self.object_id:
             # technically if placeholder is not attached to anything,

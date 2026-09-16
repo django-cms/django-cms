@@ -99,7 +99,10 @@ forbidden_modules =
 # Permission policy belongs in services, resolved through a contract, not in
 # the core model and renderer.
 #
-# Retired by: step 5 (services enforce) and step 6 (permission backend).
+# `has_plugin_permission` and `user_can_view_placeholder_source` used to live in
+# the page-permission module for historical reasons only -- both are about core's
+# own objects -- so they moved to cms.core.permissions and the generic codename
+# helper to cms.shared.permissions. That retired every exception here.
 # ---------------------------------------------------------------------------
 [importlinter:contract:core-not-permissions]
 name = core does not depend on permissions
@@ -119,10 +122,6 @@ forbidden_modules =
     cms.permissions.models
     cms.permissions.page_permissions
     cms.permissions.utils
-ignore_imports =
-    cms.core.models.placeholder -> cms.permissions.utils
-    cms.core.rendering -> cms.permissions.utils
-    cms.core.plugins -> cms.permissions.utils
 
 # ---------------------------------------------------------------------------
 # Container: core -> toolbar  (RFC 6.5.1)
@@ -216,8 +215,8 @@ forbidden_modules =
 # Container: permissions  (RFC 6.2)
 # Permissions is the most nearly isolated container and must stay that way.
 #
-# Retired by: step 6 -- has_plugin_permission moves behind the contract
-# instead of reaching into the plugin pool.
+# Fully satisfied: has_plugin_permission moved to cms.core.permissions, so the
+# permissions container no longer reaches into the plugin pool for it.
 # ---------------------------------------------------------------------------
 [importlinter:contract:permissions-isolated]
 name = permissions does not reach into core, pages or the toolbar
@@ -238,8 +237,6 @@ forbidden_modules =
     cms.core.rendering
     cms.templatetags
     cms.toolbar
-ignore_imports =
-    cms.permissions.utils -> cms.core.plugin_pool
 
 # ---------------------------------------------------------------------------
 # Layer: model  (RFC 5.1)
@@ -288,7 +285,6 @@ forbidden_modules =
     cms.toolbar
 ignore_imports =
     cms.utils.helpers -> cms.core.admin.placeholder
-    cms.core.placeholders -> cms.templatetags.cms_tags
     cms.core.plugins -> cms.api
 
 # ---------------------------------------------------------------------------

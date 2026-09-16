@@ -17,12 +17,12 @@ from django.utils.html import conditional_escape
 from django.utils.translation import override
 from django.views.decorators.csrf import csrf_protect
 
+from cms.core.permissions import user_can_view_placeholder_source
 from cms.models import UserSettings
 from cms.pages.admin.forms import RequestToolbarForm
 from cms.pages.models.content import PageContent
 from cms.pages.utils import get_page_from_request
 from cms.permissions.page_permissions import user_can_view_page
-from cms.permissions.utils import user_can_view_placeholder_source
 from cms.utils.urlutils import admin_reverse
 
 

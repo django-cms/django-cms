@@ -2,7 +2,7 @@
 Plugins
 #######
 
-.. autoclass:: cms.plugin_base.CMSPluginBase
+.. autoclass:: cms.core.plugin_base.CMSPluginBase
   :members:
 
 
@@ -46,9 +46,9 @@ Plugins
         plugin to be available in a slot.
 
 
-.. autoclass:: cms.plugin_base.PluginMenuItem
+.. autoclass:: cms.core.plugin_base.PluginMenuItem
 
-.. autoclass:: cms.models.pluginmodel.CMSPlugin
+.. autoclass:: cms.core.models.plugin.CMSPlugin
   :members:
 
   .. method:: add_structureboard_classes(self)
@@ -63,7 +63,7 @@ Plugins
 
         See :ref:`custom-plugins` for a full example.
 
-.. autoclass:: cms.plugin_pool.PluginPool
+.. autoclass:: cms.core.plugin_pool.PluginPool
   :members:
 
 
@@ -71,23 +71,23 @@ Plugins
 Plugin utility functions
 ************************
 
-.. autofunction:: cms.utils.plugins.assign_plugins
+.. autofunction:: cms.core.plugins.assign_plugins
 
-.. autofunction:: cms.utils.plugins.copy_plugins_to_placeholder
+.. autofunction:: cms.core.plugins.copy_plugins_to_placeholder
 
-.. autofunction:: cms.utils.plugins.downcast_plugins
+.. autofunction:: cms.core.plugins.downcast_plugins
 
-.. autofunction:: cms.utils.plugins.get_bound_plugins
+.. autofunction:: cms.core.plugins.get_bound_plugins
 
-.. autofunction:: cms.utils.plugins.get_plugin_class
+.. autofunction:: cms.core.plugins.get_plugin_class
 
-.. autofunction:: cms.utils.plugins.get_plugin_model
+.. autofunction:: cms.core.plugins.get_plugin_model
 
-.. autofunction:: cms.utils.plugins.get_plugin_restrictions
+.. autofunction:: cms.core.plugins.get_plugin_restrictions
 
-.. autofunction:: cms.utils.plugins.get_plugins
+.. autofunction:: cms.core.plugins.get_plugins
 
-.. autofunction:: cms.utils.plugins.get_plugins_as_layered_tree
+.. autofunction:: cms.core.plugins.get_plugins_as_layered_tree
 
-.. autofunction:: cms.utils.plugins.has_reached_plugin_limit
+.. autofunction:: cms.core.plugins.has_reached_plugin_limit
 

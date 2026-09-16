@@ -27,7 +27,7 @@ from cms.models import EmptyPageContent, Placeholder
 from cms.utils.conf import get_cms_setting
 
 if TYPE_CHECKING:
-    from cms.templatetags.cms_tags import DeclaredPlaceholder
+    from cms.core.editing.templatetags import DeclaredPlaceholder
 
 
 RANGE_START = 128
@@ -195,7 +195,7 @@ def restore_sekizai_context(context, changes):
 
 
 def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blocks=None):
-    from cms.templatetags.cms_tags import Placeholder
+    from cms.core.editing.templatetags import Placeholder
 
     if not node_class:
         node_class = Placeholder
@@ -405,7 +405,7 @@ def get_declared_placeholders_for_obj(obj: models.Model | EmptyPageContent | Non
         return get_placeholders(template)
 
     if hasattr(obj, "get_placeholder_slots"):
-        from cms.templatetags.cms_tags import DeclaredPlaceholder
+        from cms.core.editing.templatetags import DeclaredPlaceholder
 
         return [
             DeclaredPlaceholder(slot=slot, inherit=False) if isinstance(slot, str) else DeclaredPlaceholder(**slot)

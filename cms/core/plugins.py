@@ -12,11 +12,11 @@ from django.utils.translation import gettext as _
 
 from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
 from cms.core.models.plugin import CMSPlugin
+from cms.core.permissions import has_plugin_permission
 from cms.core.placeholders import get_placeholder_conf
 from cms.core.plugin_base import CMSPluginBase, _obj_from_deprecated_page
 from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PluginLimitReached
-from cms.permissions.utils import has_plugin_permission
 from cms.utils import get_language_from_request
 
 logger = logging.getLogger(__name__)

@@ -1,10 +1,10 @@
 Page contents
 =============
 
-.. autoclass:: cms.models.contentmodels.PageContent
+.. autoclass:: cms.pages.models.content.PageContent
     :members:
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
-.. autoclass:: cms.models.contentmodels.EmptyPageContent
+.. autoclass:: cms.pages.models.content.EmptyPageContent
     :members:
     :exclude-members: DoesNotExist, MultipleObjectsReturned

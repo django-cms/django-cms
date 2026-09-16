@@ -105,7 +105,7 @@ Classes and methods
     :members:
     :show-inheritance:
 
-..  module:: cms.toolbar_base
+..  module:: cms.toolbar.base
 
 ..  autoclass:: CMSToolbar
     :members:

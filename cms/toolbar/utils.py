@@ -43,7 +43,7 @@ __getattr__, __dir__, __all__ = moved(
         "get_object_preview_url": "cms.shared.editing_urls.get_object_preview_url",
         "get_object_structure_url": "cms.shared.editing_urls.get_object_structure_url",
     },
-    since="5.2",
+    since="6.0",
 )
 
 # ``moved()`` returns only the relocated names; this module still defines one.

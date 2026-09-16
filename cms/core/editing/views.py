@@ -19,8 +19,8 @@ from django.template.defaultfilters import title
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch
 
+from cms.core.permissions import user_can_view_placeholder_source
 from cms.core.placeholders import get_declared_placeholders_for_obj, get_placeholder_conf
-from cms.permissions.utils import user_can_view_placeholder_source
 from cms.shared.editing_urls import get_object_preview_url
 from cms.shared.resolvers import resolve
 from cms.toolbar.utils import get_toolbar_from_request

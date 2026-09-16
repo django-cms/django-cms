@@ -31,7 +31,7 @@ __getattr__, __dir__, __all__ = moved(
         "get_global_actions_for_user": "cms.permissions.utils.get_global_actions_for_user",
         "get_model_permission_codename": "cms.permissions.utils.get_model_permission_codename",
         "get_page_actions_for_user": "cms.permissions.utils.get_page_actions_for_user",
-        "get_permission_codename": "cms.permissions.utils.get_permission_codename",
+        "get_permission_codename": "django.contrib.auth.get_permission_codename",
         "get_subordinate_groups": "cms.permissions.utils.get_subordinate_groups",
         "get_subordinate_users": "cms.permissions.utils.get_subordinate_users",
         "get_user_model": "cms.permissions.utils.get_user_model",

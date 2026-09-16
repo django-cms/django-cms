@@ -1,17 +1,17 @@
 Pages
 =====
 
-.. autoclass:: cms.models.pagemodel.Page
+.. autoclass:: cms.pages.models.page.Page
     :members:
     :show-inheritance:
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
-.. autoclass:: cms.models.pagemodel.PageUrl
+.. autoclass:: cms.pages.models.page.PageUrl
     :members:
     :show-inheritance:
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
-.. autoclass:: cms.models.pagemodel.PageType
+.. autoclass:: cms.pages.models.page.PageType
     :members:
     :show-inheritance:
     :exclude-members: DoesNotExist, MultipleObjectsReturned

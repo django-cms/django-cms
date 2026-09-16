@@ -3,14 +3,19 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import lru_cache, wraps
 
-from django.contrib.auth import get_permission_codename, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
+from cms.core.permissions import (  # noqa: F401  -- re-exported for compatibility
+    has_plugin_permission,
+    user_can_view_placeholder_source,
+)
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
 from cms.pages.utils import get_clean_username
+from cms.shared.permissions import get_model_permission_codename
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 
@@ -84,33 +89,6 @@ def current_user(user):
     set_current_user(user)
     yield
     set_current_user(old_user)
-
-
-def get_model_permission_codename(model, action):
-    opts = model._meta
-    return opts.app_label + '.' + get_permission_codename(action, opts)
-
-
-def user_can_view_placeholder_source(user, source):
-    """Whether ``user`` may view the placeholders attached to ``source``.
-
-    Viewing the (read-only) structure board of a frontend-editable object
-    requires only *view* permission; mutating its plugins stays gated by
-    change permission at the plugin endpoints. This lets headless reviewers
-    inspect content structure without edit rights.
-
-    Honours a custom ``has_placeholder_view_permission`` hook on the object
-    and otherwise grants access to users holding the model/object ``view`` or
-    ``change`` permission (change implies the right to view).
-    """
-    if hasattr(source, "has_placeholder_view_permission"):
-        return source.has_placeholder_view_permission(user)
-    model = type(source)
-    perms = (
-        get_model_permission_codename(model, "view"),
-        get_model_permission_codename(model, "change"),
-    )
-    return any(user.has_perm(perm) or user.has_perm(perm, source) for perm in perms)
 
 
 def _has_global_permission(user, site, action):
@@ -385,21 +363,3 @@ def get_subordinate_groups(user, site):
     )
 
 
-def has_plugin_permission(user, plugin_type, permission_type):
-    """
-    Checks that a user has permissions for the plugin-type given to perform
-    the action defined in permission_type
-    permission_type should be 'add', 'change' or 'delete'.
-    """
-    from cms.core.plugin_pool import plugin_pool
-    try:
-        plugin_class = plugin_pool.get_plugin(plugin_type)
-        codename = get_model_permission_codename(
-            plugin_class.model,
-            action=permission_type,
-        )
-        return user.has_perm(codename)
-    except KeyError:
-        # Grant all permissions for uninstalled plugins, so they do not block
-        # emptying placeholders.
-        return True

@@ -3,7 +3,7 @@ Permissions
 ###########
 
 
-..  module:: cms.models.permissionmodels
+..  module:: cms.permissions.models
 
 .. autoclass:: AbstractPagePermission
     :members:

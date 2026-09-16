@@ -1,0 +1,664 @@
+"""The editor's templatetags: placeholders, plugins and ``{% render_model %}``.
+
+Generic over the edited model, like the rest of the editor -- ``{% render_model %}``
+links "a content extracted from a generic django model" to its admin change form,
+and ``{% placeholder %}`` works for whatever object declares it.
+
+Defined here and registered by :mod:`cms.templatetags.cms_tags`, which stays the
+library that ``{% load cms_tags %}`` names: Django finds template libraries by
+app-relative path, so the library cannot move, only the definitions.
+"""
+
+from collections import OrderedDict, namedtuple
+from copy import copy
+
+from classytags.arguments import Argument, MultiKeywordArgument, MultiValueArgument
+from classytags.core import Options, Tag
+from classytags.helpers import AsTag, InclusionTag
+from classytags.parser import Parser
+from classytags.utils import flatten_context
+from classytags.values import ListValue
+from django.contrib.admin.options import IS_POPUP_VAR
+from django.db.models import Model
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.encoding import smart_str
+from django.utils.http import urlencode
+from django.utils.translation import (
+    get_language,
+    gettext_lazy as _,
+    override as force_language,
+)
+
+from cms.core.placeholders import validate_placeholder_name
+from cms.core.plugin_pool import plugin_pool
+from cms.exceptions import PlaceholderNotFound
+from cms.models import CMSPlugin, Page, Placeholder as PlaceholderModel
+from cms.shared.templatetags import MultiValueArgumentBeforeKeywordArgument
+from cms.toolbar.utils import get_toolbar_from_request
+from cms.utils import get_language_from_request
+
+NULL = object()
+DeclaredPlaceholder = namedtuple("DeclaredPlaceholder", ["slot", "inherit"])
+
+
+def render_extra_menu_items(context, obj, template="cms/toolbar/dragitem_extra_menu.html"):
+    request = context["request"]
+    toolbar = get_toolbar_from_request(request)
+    template = toolbar.templates.get_cached_template(template)
+
+    if isinstance(obj, CMSPlugin):
+        items = []
+
+        for plugin_class in plugin_pool.plugins_with_extra_menu:
+            plugin_items = plugin_class.get_extra_plugin_menu_items(request, obj)
+            if plugin_items:
+                items.extend(plugin_items)
+    elif isinstance(obj, PlaceholderModel):
+        items = []
+
+        for plugin_class in plugin_pool.plugins_with_extra_placeholder_menu:
+            plugin_items = plugin_class.get_extra_placeholder_menu_items(request, obj)
+
+            if plugin_items:
+                items.extend(plugin_items)
+    else:
+        items = []
+
+    if not items:
+        return ""
+    return template.render({"items": items})
+
+
+def render_plugin(context, plugin):
+    request = context["request"]
+    toolbar = get_toolbar_from_request(request)
+    renderer = toolbar.get_content_renderer()
+    content = renderer.render_plugin(
+        instance=plugin,
+        context=context,
+        editable=renderer._placeholders_are_editable,
+    )
+    return content
+
+
+class PlaceholderParser(Parser):
+    def parse_blocks(self):
+        for bit in getattr(self.kwargs["extra_bits"], "value", self.kwargs["extra_bits"]):
+            if getattr(bit, "value", bit.var.value) == "or":
+                return super().parse_blocks()
+        return
+
+
+class PlaceholderOptions(Options):
+    def get_parser_class(self):
+        return PlaceholderParser
+
+
+class Placeholder(Tag):
+    """
+    This template node is used to output page content and
+    is also used in the admin to dynamically generate input fields.
+
+    eg: {% placeholder "placeholder_name" %}
+
+    {% placeholder "sidebar" inherit %}
+
+    {% placeholder "footer" inherit or %}
+        <a href="/about/">About us</a>
+    {% endplaceholder %}
+
+    Keyword arguments:
+    name -- the name of the placeholder
+    inherit -- optional argument which if given will result in inheriting
+        the content of the placeholder with the same name on parent pages
+    or -- optional argument which if given will make the template tag a block
+        tag whose content is shown if the placeholder is empty
+    """
+
+    name = "placeholder"
+    options = PlaceholderOptions(
+        Argument("name", resolve=False),
+        MultiValueArgument("extra_bits", required=False, resolve=False),
+        blocks=[
+            ("endplaceholder", "nodelist"),
+        ],
+    )
+
+    def render_tag(self, context, name, extra_bits, nodelist=None):
+        request = context.get("request")
+
+        if not request:
+            return ""
+
+        if name in context:
+            name = context[name]
+        validate_placeholder_name(name)
+
+        toolbar = get_toolbar_from_request(request)
+        renderer = toolbar.get_content_renderer()
+        inherit = "inherit" in extra_bits
+
+        try:
+            content = renderer.render_obj_placeholder(
+                slot=name,
+                context=context,
+                inherit=inherit,
+                nodelist=nodelist,
+            )
+        except PlaceholderNotFound:
+            content = ""
+
+        if not content and nodelist:
+            return nodelist.render(context)
+        return content
+
+    def get_declaration(self):
+        flags = self.kwargs["extra_bits"]
+        slot = self.kwargs["name"].var.value.strip('"').strip("'")
+
+        if isinstance(flags, ListValue):
+            inherit = any(extra.var.value.strip() == "inherit" for extra in flags)
+            return DeclaredPlaceholder(slot=slot, inherit=inherit)
+        return DeclaredPlaceholder(slot=slot, inherit=False)
+
+
+class RenderPluginBlock(InclusionTag):
+    """
+    Acts like the CMS's templatetag 'render_model_block' but with a plugin
+    instead of a model. This is used to link from a block of markup to a
+    plugin's changeform.
+
+    This is useful for UIs that have some plugins hidden from display in
+    preview mode, but the CMS author needs to expose a way to edit them
+    anyway. It is also useful for just making duplicate or alternate means of
+    triggering the change form for a plugin.
+    """
+
+    name = "render_plugin_block"
+    template = "cms/toolbar/render_plugin_block.html"
+    options = Options(
+        Argument("plugin"),
+        blocks=[("endrender_plugin_block", "nodelist")],
+    )
+
+    def get_context(self, context, plugin, nodelist):
+        context["inner"] = nodelist.render(context)
+        context["plugin"] = plugin
+        return context
+
+
+class CMSEditableObject(InclusionTag):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+    """
+
+    template = "cms/toolbar/content.html"
+    edit_template = "cms/toolbar/plugin.html"
+    name = "render_model"
+    options = Options(
+        Argument("instance"),
+        Argument("attribute"),
+        Argument("edit_fields", default=None, required=False),
+        Argument("language", default=None, required=False),
+        Argument("filters", default=None, required=False),
+        Argument("view_url", default=None, required=False),
+        Argument("view_method", default=None, required=False),
+        "as",
+        Argument("varname", required=False, resolve=False),
+    )
+
+    def __init__(self, parser, tokens):
+        self.parser = parser
+        super().__init__(parser, tokens)
+
+    def _is_editable(self, request):
+        return request and hasattr(request, "toolbar") and request.toolbar.edit_mode_active
+
+    def get_template(self, context, **kwargs):
+        if self._is_editable(context.get("request", None)):
+            return self.edit_template
+        return self.template
+
+    def render_tag(self, context, **kwargs):
+        """
+        Overridden from InclusionTag to push / pop context to avoid leaks
+        """
+        context.push()
+        template = self.get_template(context, **kwargs)
+        data = self.get_context(context, **kwargs)
+        output = render_to_string(template, flatten_context(data)).strip()
+        context.pop()
+        if kwargs.get("varname"):
+            context[kwargs["varname"]] = output
+            return ""
+        else:
+            return output
+
+    def _get_editable_context(
+        self, context, instance, language, edit_fields, view_method, view_url, querystring, editmode=True
+    ):
+        """
+        Populate the context with the requested attributes to trigger the changeform
+        """
+        request = context["request"]
+        if hasattr(request, "toolbar"):
+            lang = request.toolbar.toolbar_language
+        else:
+            lang = get_language()
+        opts = instance._meta
+        with force_language(lang):
+            extra_context = {}
+            if edit_fields == "changelist":
+                instance.get_plugin_name = lambda: f"{smart_str(_('Edit'))} {smart_str(opts.verbose_name)} list"
+                extra_context["attribute_name"] = "changelist"
+            elif editmode:
+                instance.get_plugin_name = lambda: f"{smart_str(_('Edit'))} {smart_str(opts.verbose_name)}"
+                if not context.get("attribute_name", None):
+                    # Make sure CMS.Plugin object will not clash in the frontend.
+                    extra_context["attribute_name"] = (
+                        "-".join(edit_fields) if edit_fields and not isinstance(edit_fields, str) else edit_fields
+                    )
+            else:
+                instance.get_plugin_name = lambda: f"{smart_str(_('Add'))} {smart_str(opts.verbose_name)}"
+                extra_context["attribute_name"] = "add"
+            extra_context["instance"] = instance
+            extra_context["generic"] = opts
+            # Django only renders an admin add/change form without the admin chrome
+            # (branding, nav sidebar, breadcrumbs) - and only answers a successful save
+            # with ``admin/popup_response.html``, which the CMS modal uses to close
+            # itself - if the ``_popup`` flag is present. The CMS' own frontend editing
+            # views (``edit_field``, the changelist) do not take the flag.
+            is_admin_changeform = False
+            # view_method has the precedence and we retrieve the corresponding
+            # attribute in the instance class.
+            # If view_method refers to a method it will be called passing the
+            # request; if it's an attribute, it's stored for later use
+            if view_method:
+                method = getattr(instance, view_method)
+                if callable(method):
+                    url_base = method(context["request"])
+                else:
+                    url_base = method
+            else:
+                # The default view_url is the default admin changeform for the
+                # current instance
+                if not editmode:
+                    view_url = f"admin:{opts.app_label}_{opts.model_name}_add"
+                    url_base = reverse(view_url)
+                    is_admin_changeform = True
+                elif not edit_fields:
+                    if not view_url:
+                        view_url = f"admin:{opts.app_label}_{opts.model_name}_change"
+                    if isinstance(instance, Page):
+                        url_base = reverse(view_url, args=(instance.pk, language))
+                    else:
+                        url_base = reverse(view_url, args=(instance.pk,))
+                    is_admin_changeform = True
+                else:
+                    if not view_url:
+                        if isinstance(instance, CMSPlugin):
+                            # Plugins do not have a registered admin. They are managed by the placeholder admin.
+                            view_url = "admin:cms_placeholder_edit_field"
+                        else:
+                            view_url = f"admin:{opts.app_label}_{opts.model_name}_edit_field"
+                    if view_url.endswith("_changelist"):
+                        url_base = reverse(view_url)
+                    else:
+                        url_base = reverse(view_url, args=(instance.pk, language))
+                    querystring["edit_fields"] = ",".join(context["edit_fields"])
+            if editmode:
+                if is_admin_changeform:
+                    querystring[IS_POPUP_VAR] = 1
+                extra_context["edit_url"] = f"{url_base}?{urlencode(querystring)}"
+            elif is_admin_changeform:
+                extra_context["edit_url"] = f"{url_base}?{urlencode({IS_POPUP_VAR: 1})}"
+            else:
+                extra_context["edit_url"] = "%s" % url_base
+            extra_context["refresh_page"] = True
+            # We may be outside the CMS (e.g.: an application which is not attached via Apphook)
+            # in this case we may only go back to the home page
+            if getattr(context["request"], "current_page", None):
+                extra_context["redirect_on_close"] = context["request"].current_page.get_absolute_url(language)
+            else:
+                extra_context["redirect_on_close"] = ""
+        return extra_context
+
+    def _get_content(self, context, instance, attribute, language, filters):
+        """
+        Renders the requested attribute
+        """
+        extra_context = copy(context)
+        attr_value = None
+        if hasattr(instance, "lazy_translation_getter"):
+            attr_value = instance.lazy_translation_getter(attribute, "")
+        if not attr_value:
+            attr_value = getattr(instance, attribute, "")
+        extra_context["content"] = attr_value
+        # This allows the requested item to be a method, a property or an
+        # attribute
+        if callable(extra_context["content"]):
+            if isinstance(instance, Page):
+                extra_context["content"] = extra_context["content"](language)
+            else:
+                extra_context["content"] = extra_context["content"](context["request"])
+        if filters:
+            expression = self.parser.compile_filter("content|%s" % (filters))
+            extra_context["content"] = expression.resolve(extra_context)
+        return extra_context
+
+    def _get_data_context(self, context, instance, attribute, edit_fields, language, filters, view_url, view_method):
+        """
+        Renders the requested attribute and attach changeform trigger to it
+
+        Uses `_get_empty_context`
+        """
+        if not attribute:
+            return context
+        attribute = attribute.strip()
+        # ugly-ish
+        if isinstance(instance, Page):
+            if attribute == "title":
+                attribute = "get_title"
+                if not edit_fields:
+                    edit_fields = "title"
+            elif attribute == "page_title":
+                attribute = "get_page_title"
+                if not edit_fields:
+                    edit_fields = "page_title"
+            elif attribute == "menu_title":
+                attribute = "get_menu_title"
+                if not edit_fields:
+                    edit_fields = "menu_title"
+            elif attribute == "titles":
+                attribute = "get_title"
+                if not edit_fields:
+                    edit_fields = "title,page_title,menu_title"
+            view_url = "admin:cms_page_edit_title_fields"
+        extra_context = copy(context)
+        extra_context["attribute_name"] = attribute
+        extra_context = self._get_empty_context(extra_context, instance, edit_fields, language, view_url, view_method)
+        extra_context.update(self._get_content(extra_context, instance, attribute, language, filters))
+        # content is for non-edit template content.html
+        # rendered_content is for edit template plugin.html
+        # in this templatetag both hold the same content
+        extra_context["content"] = extra_context["content"]
+        extra_context["rendered_content"] = extra_context["content"]
+        return extra_context
+
+    def _get_empty_context(self, context, instance, edit_fields, language, view_url, view_method, editmode=True):
+        """
+        Inject in a copy of the context the data requested to trigger the edit.
+
+        `content` and `rendered_content` is emptied.
+        """
+        if not language:
+            language = get_language_from_request(context["request"])
+        # This allow the requested item to be a method, a property or an
+        # attribute
+        if not instance and editmode:
+            return context
+        extra_context = copy(context)
+        # ugly-ish
+        if instance and isinstance(instance, Page):
+            if edit_fields == "titles":
+                edit_fields = "title,page_title,menu_title"
+            view_url = "admin:cms_page_edit_title_fields"
+        if edit_fields == "changelist":
+            view_url = f"admin:{instance._meta.app_label}_{instance._meta.model_name}_changelist"
+        querystring = OrderedDict((("language", language),))
+        if edit_fields:
+            extra_context["edit_fields"] = edit_fields.strip().split(",")
+        # If the toolbar is not enabled the following part is just skipped: it
+        # would cause a performance hit for no reason
+        if self._is_editable(context.get("request", None)):
+            extra_context.update(
+                self._get_editable_context(
+                    extra_context, instance, language, edit_fields, view_method, view_url, querystring, editmode
+                )
+            )
+        # content is for non-edit template content.html
+        # rendered_content is for edit template plugin.html
+        # in this templatetag both hold the same content
+        extra_context["content"] = ""
+        extra_context["rendered_content"] = ""
+        return extra_context
+
+    def get_context(self, context, **kwargs):
+        """
+        Uses _get_data_context to render the requested attributes
+        """
+        kwargs.pop("varname")
+        extra_context = self._get_data_context(context, **kwargs)
+        extra_context["render_model"] = True
+        return extra_context
+
+
+class CMSEditableObjectIcon(CMSEditableObject):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+
+    The output of this templatetag is just an icon to trigger the changeform.
+    """
+
+    name = "render_model_icon"
+    options = Options(
+        Argument("instance"),
+        Argument("edit_fields", default=None, required=False),
+        Argument("language", default=None, required=False),
+        Argument("view_url", default=None, required=False),
+        Argument("view_method", default=None, required=False),
+        "as",
+        Argument("varname", required=False, resolve=False),
+    )
+
+    def get_context(self, context, **kwargs):
+        """
+        Uses _get_empty_context and adds the `render_model_icon` variable.
+        """
+        kwargs.pop("varname")
+        extra_context = self._get_empty_context(context, **kwargs)
+        extra_context["render_model_icon"] = True
+        return extra_context
+
+
+class CMSEditableObjectAdd(CMSEditableObject):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+
+    The output of this templatetag is just an icon to trigger the changeform.
+    """
+
+    name = "render_model_add"
+    options = Options(
+        Argument("instance"),
+        Argument("language", default=None, required=False),
+        Argument("view_url", default=None, required=False),
+        Argument("view_method", default=None, required=False),
+        "as",
+        Argument("varname", required=False, resolve=False),
+    )
+
+    def get_context(self, context, instance, language, view_url, view_method, varname):
+        """
+        Uses _get_empty_context and adds the `render_model_icon` variable.
+        """
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
+        extra_context = self._get_empty_context(
+            context, instance, None, language, view_url, view_method, editmode=False
+        )
+        extra_context["render_model_add"] = True
+        return extra_context
+
+
+class CMSEditableObjectAddBlock(CMSEditableObject):
+    """
+    Templatetag that links arbitrary content to the addform for the specified
+    model (based on the provided model instance).
+    """
+
+    name = "render_model_add_block"
+    options = Options(
+        Argument("instance"),
+        Argument("language", default=None, required=False),
+        Argument("view_url", default=None, required=False),
+        Argument("view_method", default=None, required=False),
+        "as",
+        Argument("varname", required=False, resolve=False),
+        blocks=[("endrender_model_add_block", "nodelist")],
+    )
+
+    def render_tag(self, context, **kwargs):
+        """
+        Renders the block and then inject the resulting HTML in the template
+        context
+        """
+        context.push()
+        template = self.get_template(context, **kwargs)
+        data = self.get_context(context, **kwargs)
+        data["content"] = kwargs["nodelist"].render(data)
+        data["rendered_content"] = data["content"]
+        output = render_to_string(template, flatten_context(data))
+        context.pop()
+        if kwargs.get("varname"):
+            context[kwargs["varname"]] = output
+            return ""
+        else:
+            return output
+
+    def get_context(self, context, **kwargs):
+        """
+        Uses _get_empty_context and adds the `render_model_icon` variable.
+        """
+        instance = kwargs.pop("instance")
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
+        kwargs.pop("varname")
+        kwargs.pop("nodelist")
+        extra_context = self._get_empty_context(context, instance, None, editmode=False, **kwargs)
+        extra_context["render_model_add"] = True
+        return extra_context
+
+
+class CMSEditableObjectBlock(CMSEditableObject):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+
+    The rendered content is to be specified in the enclosed block.
+    """
+
+    name = "render_model_block"
+    options = Options(
+        Argument("instance"),
+        Argument("edit_fields", default=None, required=False),
+        Argument("language", default=None, required=False),
+        Argument("view_url", default=None, required=False),
+        Argument("view_method", default=None, required=False),
+        "as",
+        Argument("varname", required=False, resolve=False),
+        blocks=[("endrender_model_block", "nodelist")],
+    )
+
+    def render_tag(self, context, **kwargs):
+        """
+        Renders the block and then inject the resulting HTML in the template
+        context
+        """
+        context.push()
+        template = self.get_template(context, **kwargs)
+        data = self.get_context(context, **kwargs)
+        data["content"] = kwargs["nodelist"].render(data)
+        data["rendered_content"] = data["content"]
+        output = render_to_string(template, flatten_context(data))
+        context.pop()
+        if kwargs.get("varname"):
+            context[kwargs["varname"]] = output
+            return ""
+        else:
+            return output
+
+    def get_context(self, context, **kwargs):
+        """
+        Uses _get_empty_context and adds the `instance` object to the local
+        context. Context here is to be intended as the context of the nodelist
+        in the block.
+        """
+        kwargs.pop("varname")
+        kwargs.pop("nodelist")
+        extra_context = self._get_empty_context(context, **kwargs)
+        extra_context["instance"] = kwargs.get("instance")
+        extra_context["render_model_block"] = True
+        return extra_context
+
+
+class RenderPlaceholder(AsTag):
+    """
+    Render the content of the plugins contained in a placeholder.
+    The result can be assigned to a variable within the template's context by using the `as` keyword.
+    It behaves in the same way as the `PageAttribute` class, check its docstring for more details.
+    """
+
+    name = "render_placeholder"
+    options = Options(
+        Argument("placeholder"),
+        MultiValueArgumentBeforeKeywordArgument("args", required=False),
+        MultiKeywordArgument("kwargs", required=False),
+        "as",
+        Argument("varname", required=False, resolve=False),
+    )
+
+    def _get_value(self, context, editable=True, placeholder=None, nocache=False, args=None, kwargs=None):
+        request = context["request"]
+        toolbar = get_toolbar_from_request(request)
+        renderer = toolbar.get_content_renderer()
+        width = args.pop() if args else None
+        language = args.pop() if args else None
+        inherit = kwargs.get("inherit", False)
+
+        if not placeholder:
+            return ""
+
+        if isinstance(placeholder, str):
+            # When only a placeholder name is given, try to get the placeholder
+            # associated with the toolbar object's slot
+            return renderer.render_obj_placeholder(
+                placeholder,
+                context,
+                inherit,
+                editable=editable,
+            )
+
+        content = renderer.render_placeholder(
+            placeholder=placeholder,
+            context=context,
+            language=language or get_language(),
+            editable=editable,
+            use_cache=not nocache,
+            width=width,
+        )
+        return content
+
+    def get_value_for_context(self, context, **kwargs):
+        return self._get_value(context, editable=False, **kwargs)
+
+    def get_value(self, context, **kwargs):
+        return self._get_value(context, **kwargs)
+
+
+class RenderUncachedPlaceholder(RenderPlaceholder):
+    """
+    Uncached version of RenderPlaceholder
+    This templatetag will neither get the result from cache, nor will update
+    the cache value for the given placeholder
+    """
+
+    name = "render_uncached_placeholder"
+
+    def _get_value(self, context, editable=True, **kwargs):
+        kwargs["nocache"] = True
+        return super()._get_value(context, editable, **kwargs)

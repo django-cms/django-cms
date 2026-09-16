@@ -32,7 +32,7 @@ Grouper admin
 Pages
 *****
 
-.. module:: cms.utils.page
+.. module:: cms.pages.utils
 
 .. autofunction:: get_page_from_request
 
@@ -41,7 +41,7 @@ Pages
 Placeholders
 ************
 
-.. module:: cms.utils.placeholder
+.. module:: cms.core.placeholders
 
 .. autofunction:: get_placeholder_from_slot
 
@@ -52,7 +52,7 @@ Placeholders
 Plugins
 *******
 
-.. module:: cms.utils.plugins
+.. module:: cms.core.plugins
    :noindex:
 
 .. autofunction:: get_plugins

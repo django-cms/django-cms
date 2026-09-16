@@ -2,7 +2,7 @@
 Placeholders
 ############
 
-.. module:: cms.models.placeholdermodel
+.. module:: cms.core.models.placeholder
 
 .. autoclass:: Placeholder
     :members:
@@ -10,7 +10,7 @@ Placeholders
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
 
-.. module:: cms.admin.placeholderadmin
+.. module:: cms.core.admin.placeholder
 
 .. autoclass:: FrontendEditableAdminMixin
     :members:
