@@ -80,7 +80,7 @@ jobs:
           - version: '5.2'
             requirement: 'Django>=5.2,<6.0'
           - version: '6.1'
-            requirement: 'Django>=6.1a1,<6.2'
+            requirement: 'Django>=6.1,<6.2'
         database: [sqlite, postgres, mysql]
 
     services:
