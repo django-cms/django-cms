@@ -161,6 +161,9 @@ def get_grantable_global_permissions(user, site_ids=None):
       site", so granting requires an equally unrestricted grant of the flag.
     * a non-empty list -- the flags held on *every* one of those sites. A flag
       held on one site alone cannot be used to grant it on another.
+
+    In every case a flag is only grantable if the user also holds the Django
+    model permissions that page actions require alongside it.
     """
     all_flags = set(GlobalPagePermission.get_all_permissions())
 
@@ -171,21 +174,50 @@ def get_grantable_global_permissions(user, site_ids=None):
         return all_flags
 
     if site_ids is None:
-        return _global_permission_flags(GlobalPagePermission.objects.with_user(user))
-
-    if not site_ids:
-        return _global_permission_flags(
+        held = _global_permission_flags(GlobalPagePermission.objects.with_user(user))
+    elif not site_ids:
+        held = _global_permission_flags(
             GlobalPagePermission.objects.with_user(user).filter(sites__isnull=True)
         )
+    else:
+        held = all_flags
+        for site_id in site_ids:
+            held &= _global_permission_flags(
+                GlobalPagePermission.objects.get_with_site(user, site_id)
+            )
+            if not held:
+                break
+    return held & _flags_with_django_permissions(user)
 
-    granted = all_flags
-    for site_id in site_ids:
-        granted &= _global_permission_flags(
-            GlobalPagePermission.objects.get_with_site(user, site_id)
-        )
-        if not granted:
-            break
-    return granted
+
+# ``can_view`` has no Django permission counterpart: viewing restricted pages
+# is governed by CMS permissions alone.
+_global_permission_actions = {
+    "can_add": "add_page",
+    "can_change": "change_page",
+    "can_delete": "delete_page",
+    "can_publish": "publish_page",
+    "can_change_advanced_settings": "change_page_advanced_settings",
+    "can_change_permissions": "change_page_permissions",
+    "can_move_page": "move_page",
+}
+
+
+def _flags_with_django_permissions(user):
+    """Return the ``can_*`` flags whose Django model permissions ``user`` holds.
+
+    A CMS flag alone does not let a user act: the page permission checks also
+    require the corresponding Django permissions (``auth_permission_required``).
+    A manager holding the flag but not the Django permission does not have the
+    right, so they must not be able to hand it out either.
+    """
+    from cms.utils.page_permissions import _django_permissions_by_action
+
+    return {
+        flag for flag in GlobalPagePermission.get_all_permissions()
+        if flag not in _global_permission_actions
+        or user.has_perms(_django_permissions_by_action[_global_permission_actions[flag]])
+    }
 
 
 def user_can_add_global_permissions(user, site):

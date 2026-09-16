@@ -179,11 +179,30 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         site = Site.objects.get_current(request)
-        return permissions.user_can_change_global_permissions(request.user, site)
+        return (
+            permissions.user_can_change_global_permissions(request.user, site)
+            and self._can_manage_grant(request, obj)
+        )
 
     def has_delete_permission(self, request, obj=None):
         site = Site.objects.get_current(request)
-        return permissions.user_can_delete_global_permissions(request.user, site)
+        return (
+            permissions.user_can_delete_global_permissions(request.user, site)
+            and self._can_manage_grant(request, obj)
+        )
+
+    def _can_manage_grant(self, request, obj):
+        """Only let a manager edit or delete a grant they could have created.
+
+        A grant holding flags the manager may not hand out on its sites is out of
+        reach: its ``user``, ``group`` and ``sites`` would otherwise let them move
+        those flags to themselves or to other sites (CWE-269).
+        """
+        if obj is None:
+            return True
+        held = {flag for flag in GlobalPagePermission.get_all_permissions() if getattr(obj, flag)}
+        site_ids = list(obj.sites.values_list("pk", flat=True))
+        return held <= permissions.get_grantable_global_permissions(request.user, site_ids)
 
     @classproperty
     def raw_id_fields(cls):
