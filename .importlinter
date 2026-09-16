@@ -183,9 +183,12 @@ forbidden_modules =
     cms.api
     cms.appresolver
     cms.cache.page
+    cms.cms_toolbars
+    cms.core
     cms.models.contentmodels
     cms.models.pagemodel
     cms.models.permissionmodels
+    cms.pages
     cms.utils.page_permissions
     cms.utils.permissions
 
@@ -332,3 +335,21 @@ forbidden_modules =
     menus
 ignore_imports =
     cms.shared.editing_urls -> cms.models
+
+# ---------------------------------------------------------------------------
+# Container: pages toolbar  (RFC 6.5.2)
+# PageToolbar contributes to the shared menus by identifier, through the
+# pool-owned toolbar object. It may use the toolbar framework -- it is a
+# presentation layer -- but must not reach into the chrome classes.
+# ---------------------------------------------------------------------------
+[importlinter:contract:pages-toolbar-contributes]
+name = the page toolbar contributes to the chrome, it does not reach into it
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.pages.toolbar
+forbidden_modules =
+    cms.cms_toolbars
+    cms.toolbar.chrome.AppearanceToolbar
+    cms.toolbar.chrome.BasicToolbar
+    cms.toolbar.chrome.HelpToolbar

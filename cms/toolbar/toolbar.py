@@ -313,13 +313,10 @@ class CMSToolbarBase(BaseToolbar):
         return user_settings
 
     def _reorder_toolbars(self):
-        from cms.cms_toolbars import BasicToolbar
-        toolbars = list(self.toolbars.values())
-        basic_toolbar = [toolbar for toolbar in toolbars if toolbar.__class__ == BasicToolbar]
-        if basic_toolbar and basic_toolbar[0] in toolbars:
-            toolbars.remove(basic_toolbar[0])
-            toolbars.insert(0, basic_toolbar[0])
-        return toolbars
+        # Sorting is stable, so toolbars sharing a priority keep registration
+        # order. Previously this reached into cms.cms_toolbars for BasicToolbar
+        # by name; priority lets the chrome declare that itself.
+        return sorted(self.toolbars.values(), key=lambda toolbar: toolbar.priority)
 
     @property
     def csrf_token(self):

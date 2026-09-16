@@ -7,6 +7,7 @@ import iptools
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import site
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -37,7 +38,6 @@ from cms.cms_toolbars import (
     LANGUAGE_MENU_IDENTIFIER,
     PAGE_MENU_IDENTIFIER,
     PageToolbar,
-    get_user_model,
 )
 from cms.core.editing import structure
 from cms.core.editing.structure import get_plugin_tree

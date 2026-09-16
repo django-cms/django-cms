@@ -17,6 +17,7 @@ from django.utils.translation import get_language, gettext_lazy as _, override a
 
 from cms import constants
 from cms.models.managers import PageManager, PageUrlManager
+from cms.shared.resolvers import provide
 from cms.shared.signals import page_caches_invalidated
 from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
@@ -1375,3 +1376,28 @@ class PageType(Page):
 
     def is_potential_home(self):
         return False
+
+
+def _anonymous_can_view_page(page, site):
+    """Would an anonymous visitor still be able to see ``page``?
+
+    Registered with :mod:`cms.shared.resolvers` so the toolbar chrome can decide
+    whether logging out should refresh the current page or leave it, without
+    importing either the pages or the permissions container. Returns ``False``
+    when there is no page, which is also what a project without the pages
+    container gets.
+    """
+    # ``request.current_page`` is a SimpleLazyObject that may wrap None, so this
+    # has to be a truthiness test -- ``page is None`` would be False and then
+    # ``page.login_required`` would raise.
+    if not page or page.login_required:
+        return False
+
+    from django.contrib.auth.models import AnonymousUser
+
+    from cms.utils.page_permissions import user_can_view_page
+
+    return user_can_view_page(user=AnonymousUser(), page=page, site=site)
+
+
+provide("anonymous_can_view_page", _anonymous_can_view_page)

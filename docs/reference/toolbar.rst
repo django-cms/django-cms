@@ -176,13 +176,21 @@ django CMS constants used in toolbars
 ..  autodata:: REFRESH_PAGE
    :no-value:
 
-..  module:: cms.cms_toolbars
+All of these are also importable from ``cms.cms_toolbars``, which re-exports every
+toolbar name django CMS defines.
+
+..  module:: cms.toolbar.chrome
 
 ..  autodata:: ADMIN_MENU_IDENTIFIER
    :no-value:
 
 ..  autodata:: LANGUAGE_MENU_IDENTIFIER
    :no-value:
+
+..  autodata:: HELP_MENU_IDENTIFIER
+   :no-value:
+
+..  module:: cms.pages.toolbar
 
 ..  autodata:: PAGE_MENU_IDENTIFIER
    :no-value:

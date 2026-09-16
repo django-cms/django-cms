@@ -8,6 +8,12 @@ from cms.utils.i18n import get_language_code
 class CMSToolbar(metaclass=MediaDefiningClass):
     supported_apps = None
 
+    #: Toolbars are populated in ascending priority order. The CMS chrome that
+    #: creates the shared menus (the site and language menus) runs first, so
+    #: that container-specific toolbars can add items to menus that already
+    #: exist. Leave at 0 unless you must run before or after another toolbar.
+    priority = 0
+
     def __init__(self, request, toolbar, is_current_app, app_path):
         self.request = request
         self.toolbar = toolbar
