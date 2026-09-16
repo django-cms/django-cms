@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from cms.app_base import CMSAppConfig, CMSAppExtension
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.models import PageContent
+from cms.pages import editing  # noqa: F401  -- registers the page editing hooks
 from cms.pages.rendering import render_pagecontent
 from cms.wizards.wizard_base import Wizard
 

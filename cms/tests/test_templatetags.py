@@ -383,13 +383,13 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
 
     @override_settings(DEBUG=False, MIDDLEWARE=["django.middleware.common.BrokenLinkEmailsMiddleware"])
     def test_missing_page_mail_error(self):
-        with patch("cms.templatetags.cms_tags.mail_managers", side_effect=ConnectionError):
+        with patch("cms.pages.templatetags.mail_managers", side_effect=ConnectionError):
             page = _get_page_by_untyped_arg({"pk": 1003}, self.get_request("/"), 1)
         self.assertIsNone(page)
 
     @override_settings(DEBUG=False, MIDDLEWARE=["django.middleware.common.BrokenLinkEmailsMiddleware"])
     def test_missing_page_code_error(self):
-        with patch("cms.templatetags.cms_tags.mail_managers", side_effect=ValueError):
+        with patch("cms.pages.templatetags.mail_managers", side_effect=ValueError):
             with self.assertRaises(ValueError):
                 _get_page_by_untyped_arg({"pk": 1003}, self.get_request("/"), 1)
 

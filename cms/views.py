@@ -1,27 +1,10 @@
 from urllib.parse import quote, urlsplit, urlunsplit
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import (
-    Http404,
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseRedirect,
-)
-from django.shortcuts import render
-from django.template.defaultfilters import title
-from django.template.response import TemplateResponse
-from django.urls import (
-    NoReverseMatch,
-    Resolver404,
-    get_script_prefix,
-    resolve,
-    reverse,
-)
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import Resolver404, get_script_prefix, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -29,27 +12,15 @@ from django.utils.timezone import now
 from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
-from cms.core.placeholders import get_declared_placeholders_for_obj, get_placeholder_conf
+from cms.compat import moved
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
-from cms.models import Page, PageContent
-from cms.pages.apphook_pool import apphook_pool
-from cms.pages.appresolver import applications_page_check
+from cms.models import Page
 from cms.pages.cache import get_page_cache
-from cms.pages.rendering import (
-    _handle_no_apphook,
-    _handle_no_page,
-    _render_welcome_page,
-    render_pagecontent,
-)
+from cms.pages.rendering import _handle_no_page, _render_welcome_page, render_pagecontent
 from cms.pages.utils import get_page_from_request
-from cms.permissions.page_permissions import user_can_view_page
-from cms.permissions.utils import user_can_view_placeholder_source
-from cms.shared.editing_urls import get_object_preview_url
-from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import (
     get_default_language_for_site,
     get_fallback_languages,
@@ -309,141 +280,17 @@ def login(request):
     return HttpResponseRedirect(redirect_to)
 
 
-def render_object_structure(request, content_type_id, object_id):
-    try:
-        content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist as err:
-        raise Http404 from err
-
-    try:
-        if issubclass(content_type.model_class(), PageContent):
-            content_type_obj = PageContent._base_manager.select_related("page", "page__site").get(pk=object_id)
-            request.current_page = content_type_obj.page
-            # Enforce the same page-view permission as the edit and preview
-            # endpoints (which check it via render_page()). Without this, a
-            # staff user who cannot view a restricted page could still read its
-            # plugin structure through this endpoint.
-            if not user_can_view_page(request.user, content_type_obj.page):
-                raise Http404
-        else:
-            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-            # Viewing the structure board requires only view permission (as the
-            # page branch above does via user_can_view_page). Mutations remain
-            # gated by change permission at the plugin endpoints.
-            if not user_can_view_placeholder_source(request.user, content_type_obj):
-                raise Http404
-    except ObjectDoesNotExist as err:
-        raise Http404 from err
-
-    context = {
-        'object': content_type_obj,
-        'cms_toolbar': request.toolbar,
-    }
-    toolbar = get_toolbar_from_request(request)
-    toolbar.set_object(content_type_obj)
-    return render(request, 'cms/toolbar/structure.html', context)
-
-
-def render_placeholder_content(request, obj, context):
-    context["cms_placeholder_slots"] = (
-        (
-            placeholder.slot,
-            get_placeholder_conf("name", placeholder.slot, default=title(placeholder.slot)),
-            placeholder.inherit,
-        )
-        for placeholder in get_declared_placeholders_for_obj(obj)
-    )
-    return TemplateResponse(request, "cms/headless/placeholder.html", context)
-
-
-def render_object_endpoint(request, content_type_id, object_id, require_editable):
-    try:
-        content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist as err:
-        raise Http404 from err
-    else:
-        model = content_type.model_class()
-
-    if require_editable and not is_editable_model(model):
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
-
-    try:
-        if issubclass(model, PageContent):
-            # An apphook might be attached to a PageContent object
-            content_type_obj = model.admin_manager.select_related("page", "page__site").get(pk=object_id)
-            request.current_page = content_type_obj.page
-            if (
-                content_type_obj.page.application_urls and
-                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks()) and
-                (not require_editable or content_type_obj.is_editable(request))
-            ):
-                try:
-                    # If so, try get the absolute URL and pass it to the toolbar as request_path
-                    # The apphook's view function will be called.
-                    absolute_url = content_type_obj.get_absolute_url()
-                    from cms.toolbar.toolbar import CMSToolbar
-                    request.toolbar = CMSToolbar(request, request_path=absolute_url)
-                    # Make page content's placeholders available, can be overwritten by apphook view
-                    request.toolbar.set_object(content_type_obj)
-                    # Resolve the apphook's url to get its view function
-                    view_func, args, kwargs = resolve(absolute_url)
-                    if view_func is not details:
-                        return view_func(request, *args, **kwargs)
-                except Resolver404:
-                    # Apphook does not provide a view for its "root", show warning message
-                    return _handle_no_apphook(request)
-        else:
-            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-            # Enforce the same object-level view check as the structure endpoint
-            # (and, for the page branch above, render_page()'s user_can_view_page).
-            # Without this, any staff user could read the rendered plugin content
-            # of any frontend-editable object. Mutations remain gated by change
-            # permission at the plugin endpoints.
-            if not user_can_view_placeholder_source(request.user, content_type_obj):
-                raise Http404
-    except ObjectDoesNotExist as err:
-        raise Http404 from err
-
-    # Attempt to resolve current_page via the object's absolute URL (for apphooks)
-    if not getattr(request, "current_page", None):
-        try:
-            object_url = content_type_obj.get_absolute_url()
-        except (AttributeError, NoReverseMatch):
-            object_url = None
-
-        if object_url:
-            original_path_info = request.path_info
-            try:
-                # Temporarily patch the request object and use the appresolver
-                request.path_info = object_url
-                request.current_page = applications_page_check(request)
-            finally:
-                request.path_info = original_path_info
-
-    extension = apps.get_app_config('cms').cms_extension
-
-    if model not in extension.toolbar_enabled_models:
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
-
-    toolbar = get_toolbar_from_request(request)
-    toolbar.set_object(content_type_obj)
-    request.site = get_current_site(request)
-
-    redirect = getattr(content_type_obj, "redirect", None)
-    if isinstance(redirect, str):
-        toolbar.redirect_url = redirect
-
-    if require_editable and not toolbar.object_is_editable():
-        # If not editable, switch from edit to preview endpoint
-        return HttpResponseRedirect(get_object_preview_url(content_type_obj))
-
-    render_func = extension.toolbar_enabled_models[model]
-    return render_func(request, content_type_obj)
-
-
-def render_object_edit(request, content_type_id, object_id):
-    return render_object_endpoint(request, content_type_id, object_id, require_editable=True)
-
-
-def render_object_preview(request, content_type_id, object_id):
-    return render_object_endpoint(request, content_type_id, object_id, require_editable=False)
+# The frontend-editing endpoints moved to cms.core.editing.views; they are
+# generic over the edited model, while this module serves pages. Re-exported so
+# that `cms.views.render_object_edit` and friends keep resolving (cms.compat).
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {
+        "render_object_edit": "cms.core.editing.views.render_object_edit",
+        "render_object_endpoint": "cms.core.editing.views.render_object_endpoint",
+        "render_object_preview": "cms.core.editing.views.render_object_preview",
+        "render_object_structure": "cms.core.editing.views.render_object_structure",
+        "render_placeholder_content": "cms.core.editing.views.render_placeholder_content",
+    },
+    since="6.0",
+)

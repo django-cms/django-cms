@@ -27,6 +27,11 @@ from django.views.decorators.http import require_POST
 from cms import operations
 from cms.constants import SLUG_REGEXP
 from cms.core.editing.structure import create_child_plugin_references, get_plugin_content, get_plugin_tree
+from cms.core.editing.views import (
+    render_object_edit,
+    render_object_preview,
+    render_object_structure,
+)
 from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
 from cms.core.plugin_base import CMSPluginBase
@@ -45,11 +50,6 @@ from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.views import (
-    render_object_edit,
-    render_object_preview,
-    render_object_structure,
-)
 
 _no_default = object()
 
