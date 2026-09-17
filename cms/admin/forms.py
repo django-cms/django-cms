@@ -59,6 +59,7 @@ from cms.utils.page_permissions import (
 )
 from cms.utils.permissions import (
     get_current_user,
+    get_grantable_global_permissions,
     get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
@@ -1346,6 +1347,21 @@ class ViewRestrictionInlineAdminForm(BasePermissionAdminForm):
 
 
 class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
+    """Admin form for site-wide page permissions.
+
+    Unlike :class:`PagePermissionInlineAdminForm`, whose admin restricts the
+    rendered ``can_*`` flags in ``PagePermissionInlineAdmin.get_formset``, this
+    form is the only place where the "a manager cannot hand out rights they do
+    not hold themselves" invariant (see ``docs/explanation/permissions.rst``)
+    can be enforced for :class:`~cms.models.GlobalPagePermission`.
+
+    Without it, a delegate whose sole elevated right is ``can_change_permissions``
+    could grant themselves ``can_publish``, ``can_delete``,
+    ``can_change_advanced_settings`` and ``can_move_page`` site-wide (CWE-269).
+    """
+
+    _current_user = None
+
     class Meta:
         fields = [
             "user",
@@ -1361,6 +1377,73 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
             "sites",
         ]
         model = GlobalPagePermission
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not self.instance.pk:
+            return
+
+        # ``GlobalPagePermissionAdmin.get_form`` excludes the flags the manager
+        # may not grant, and ``BasePermissionAdminForm`` then blanks every
+        # excluded flag on the instance. That is right for a new row -- several
+        # ``can_*`` flags default to ``True`` on the model -- but on an existing
+        # one it would silently *revoke* rights the manager is equally
+        # unauthorized to touch, so restore the stored values here.
+        stored = (
+            self._meta.model._base_manager.filter(pk=self.instance.pk)
+            .values(*self._meta.model.get_all_permissions())
+            .first()
+        )
+        for field, value in (stored or {}).items():
+            if field not in self.fields:
+                setattr(self.instance, field, value)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        user = self._current_user or get_current_user()
+        if user is None:
+            # No acting user means the form is used outside an admin request --
+            # a script, data migration or test -- where there is no privilege
+            # boundary to enforce. ``GlobalPagePermissionAdmin.get_form`` always
+            # sets ``_current_user``, so the admin never takes this path.
+            return cleaned_data
+
+        # ``sites`` is excluded from ``cleaned_data`` when it failed validation;
+        # falling back to "all sites" then applies the strictest check.
+        site_ids = [site.pk for site in cleaned_data.get("sites") or []]
+        grantable = get_grantable_global_permissions(user, site_ids)
+
+        if "can_change_permissions" not in grantable:
+            # ``has_add_permission`` only checks the current site; a manager must
+            # be allowed to manage permissions on every site the grant covers.
+            self.add_error(
+                "sites" if "sites" in self.fields else None,
+                forms.ValidationError(
+                    _("You cannot manage permissions on every selected site."),
+                    code="sites_not_managed",
+                ),
+            )
+            return cleaned_data
+
+        for field in self._meta.model.get_all_permissions():
+            # Fields absent from the form were already excluded as ungrantable
+            # on any site; this catches the narrower case of a flag the manager
+            # holds on one site being granted for another.
+            if field in self.fields and cleaned_data.get(field) and field not in grantable:
+                self.add_error(
+                    field,
+                    forms.ValidationError(
+                        _(
+                            'You cannot grant "%(permission)s" because you do not hold it '
+                            "yourself on every selected site."
+                        ),
+                        code="permission_not_held",
+                        params={"permission": self.fields[field].label or field},
+                    ),
+                )
+        return cleaned_data
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
