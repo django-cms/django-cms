@@ -3,6 +3,16 @@
 
 Bug Fixes:
 ----------
+* AddPageForm did not check all required CMS permissions (#8822) (#8834) (1f219540e) -- Fabian Braun
+* Check page source when adding a apage (#8858) (#8869) (31f227e78) -- Fabian Braun
+* GrouperAdmin wrote to the wrong content object when one was selected by pk (#8826) (#8836) (0c4afbd58) -- Fabian Braun
+* Harden CMS permissions (#8874) (#8878) (560c2dac6) -- Fabian Braun
+* Preserve best-effort CMS mail delivery (#8842) (#8850) (a90dd95e5) -- Fabian Braun
+* Slug uniqueness ignored site (#8831) (#8838) (f18a849c0) -- Fabian Braun
+* Some inline editing modals did not contain _popup=1 query param for Django (#8816) (#8820) (c49972a8c) -- Fabian Braun
+* Wizard now rejects pages for other sites (#8848) (#8852) (db8718a87) -- Fabian Braun
+* cross-placeholder parent authorization in paste-a-copy (#8849) (#8880) (aae42ed6a) -- Fabian Braun
+* page-tree copy can disclose view-restrictions (#8840) (#8854) (#8856) (ebfa15e14) -- Fabian Braun
 * Edit and view endpoints did not check placeholder permissions (#8794) (#8809) (040a7b1ba) -- Fabian Braun
 * Grouper admin ignored read-only context for content objects without language field (#8799) (#8808) (c39fbe3e0) -- Fabian Braun
 * Manual page slug was overwritten when changing page title (#8796) (#8807) (95164e017) -- Fabian Braun
@@ -15,40 +25,15 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 8 changelog entries, created with the help of the following contributors
-(in alphabetical order):
+This release includes 33 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (8 changelog entries)
+* Fabian Braun (29 pull requests)
 
 With the review help of the following contributors:
 
-* Fabian Braun
+* Github Release Action
 * Vinit Kumar
-
-Thanks to all contributors for their efforts!
-
-5.0.10 (2026-08-06)
-===================
-
-Features:
----------
-* Offer replacement for djangotree-beard dependency (#8744) (#8755) (e358d7eab) -- Fabian Braun
-
-Bug Fixes:
-----------
-* EmptyToolbar missed clipboard and toolbar_language properties (#8745) (#8756) (8594f7c84) -- Fabian Braun
-* Paste-a-copy IDOR discloses unauthorized plugin content (#8746) (#8757) (551302612) -- Fabian Braun
-* Upon edit localized text within plugins were rendered in the wrong language (#8740) (2eaa0e573) -- Fabian Braun
-
-Statistics:
------------
-
-This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
-
-* Fabian Braun (6 pull requests)
-
-With the review help of the following contributors:
-
+* sourcery-ai[bot]
 
 Thanks to all contributors for their efforts!
 
