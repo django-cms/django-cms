@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Hindi (https://app.transifex.com/divio/teams/58664/hi/)\n"
@@ -33,6 +33,15 @@ msgstr "शीर्षक है कि URL में प्रयोग कि
 
 msgid "Page type"
 msgstr "पृष्ठ प्रकार"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -116,6 +125,15 @@ msgstr "उपयोगकर्ता"
 
 msgid "can_view"
 msgstr "देख सकते हैं"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "जोड़ना"
@@ -398,6 +416,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "प्लेसहोल्डर"
+
+msgid "Documentation"
+msgstr "दस्तावेज़ीकरण"
+
+msgid "User guide"
+msgstr "उपयोगकर्ता मार्गदर्शिका"
+
+msgid "Discord community"
+msgstr "Discord समुदाय"
+
+msgid "What's new"
+msgstr "नया क्या है"
 
 msgid "Create"
 msgstr "बनाएँ"
@@ -1485,12 +1515,6 @@ msgstr "स्थापना नोट्स"
 
 msgid "Support"
 msgstr "समर्थन"
-
-msgid "Documentation"
-msgstr "दस्तावेज़ीकरण"
-
-msgid "User guide"
-msgstr "उपयोगकर्ता मार्गदर्शिका"
 
 msgid "Give back"
 msgstr "वापस दें"

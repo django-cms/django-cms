@@ -10,19 +10,19 @@
 # Frédéric Roland, 2023
 # Adrien Delhorme, 2025
 # da27e4edd0c28b0ec121570dac46e169_947ca9c, 2025
-# Robin Durner, 2025
 # François Palmier <fp@kapt.mobi>, 2026
 # Sylvain Chiron <chironsylvain@orange.fr>, 2026
 # Fabian Braun <fsbraun@gmx.de>, 2026
 # Corentin Bettiol, 2026
+# Robin Durner, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Corentin Bettiol, 2026\n"
+"Last-Translator: Robin Durner, 2026\n"
 "Language-Team: French (https://app.transifex.com/divio/teams/58664/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,6 +44,15 @@ msgstr "Partie du titre qui doit être utilisée dans l'URL"
 
 msgid "Page type"
 msgstr "Type de page"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr "Vous n'avez pas la permission de modifier cette page."
@@ -130,6 +139,15 @@ msgstr "utilisateur"
 
 msgid "can_view"
 msgstr "can_view"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Ajouter"
@@ -418,6 +436,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Zone"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "User guide"
+msgstr "Manuel d'utilisation"
+
+msgid "Discord community"
+msgstr "Communauté Discord"
+
+msgid "What's new"
+msgstr "Quoi de neuf"
 
 msgid "Create"
 msgstr "Créer"
@@ -1517,12 +1547,6 @@ msgstr "Notes d’installation"
 
 msgid "Support"
 msgstr "Assistance"
-
-msgid "Documentation"
-msgstr "Documentation"
-
-msgid "User guide"
-msgstr "Manuel d'utilisation"
 
 msgid "Give back"
 msgstr "Contribuer"

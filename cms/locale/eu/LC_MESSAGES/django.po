@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Basque (https://app.transifex.com/divio/teams/58664/eu/)\n"
@@ -32,6 +32,15 @@ msgid "The part of the title that is used in the URL"
 msgstr "URLetan erabiltzen den izenburuaren zatia"
 
 msgid "Page type"
+msgstr ""
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
 msgstr ""
 
 msgid "You do not have permission to change this page."
@@ -113,6 +122,15 @@ msgstr "erabiltzailea"
 
 msgid "can_view"
 msgstr "Ikusi dezake"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Gehitu"
@@ -373,6 +391,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Biltegia"
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
+msgstr ""
+
+msgid "Discord community"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
 
 msgid "Create"
 msgstr ""
@@ -1392,12 +1422,6 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
 msgstr ""
 
 msgid "Give back"

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Thomas Thomas <tparobok@gmail.com>, 2026\n"
 "Language-Team: Slovak (https://app.transifex.com/divio/teams/58664/sk/)\n"
@@ -35,6 +35,15 @@ msgstr "Časť názvu, ktorá je použitá v URL"
 
 msgid "Page type"
 msgstr "Typ stránky"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -116,6 +125,15 @@ msgstr "užívateľ"
 
 msgid "can_view"
 msgstr "can_view"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Pridať"
@@ -384,6 +402,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Umiestňovač"
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
+msgstr ""
+
+msgid "Discord community"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
 
 msgid "Create"
 msgstr "Vytvoriť"
@@ -1414,12 +1444,6 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
 msgstr ""
 
 msgid "Give back"

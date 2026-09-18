@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Ukrainian (https://app.transifex.com/divio/teams/58664/uk/)\n"
@@ -39,6 +39,15 @@ msgstr "Частина назви, що використовується у ад
 
 msgid "Page type"
 msgstr "Тип сторінки"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -121,6 +130,15 @@ msgstr "користувач"
 
 msgid "can_view"
 msgstr "Може_переглянути"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Додати"
@@ -404,6 +422,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Заповнювач"
+
+msgid "Documentation"
+msgstr "Документація"
+
+msgid "User guide"
+msgstr "Посібник користувача"
+
+msgid "Discord community"
+msgstr "Спільнота в Discord"
+
+msgid "What's new"
+msgstr "Що нового"
 
 msgid "Create"
 msgstr "Створити"
@@ -1504,12 +1534,6 @@ msgstr "Нотатки з інсталяції"
 
 msgid "Support"
 msgstr "Підтримка"
-
-msgid "Documentation"
-msgstr "Документація"
-
-msgid "User guide"
-msgstr "Посібник користувача"
 
 msgid "Give back"
 msgstr "Віддячити"

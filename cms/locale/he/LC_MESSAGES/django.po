@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Fishfur A Banter <fishfurbanter@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fishfur A Banter <fishfurbanter@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Hebrew (https://app.transifex.com/divio/teams/58664/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,6 +34,15 @@ msgstr "החלק מהכותרת בשימוש ב-URL"
 
 msgid "Page type"
 msgstr "סוג דף"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -116,6 +125,15 @@ msgstr "משתמש"
 
 msgid "can_view"
 msgstr "ניתן לצפייה"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "הוספה"
@@ -389,6 +407,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "מציין מיקום"
+
+msgid "Documentation"
+msgstr "תיעוד"
+
+msgid "User guide"
+msgstr "מדריך למשתמש"
+
+msgid "Discord community"
+msgstr "קהילת Discord"
+
+msgid "What's new"
+msgstr "מה חדש"
 
 msgid "Create"
 msgstr "צור"
@@ -1466,12 +1496,6 @@ msgstr "הערות התקנה"
 
 msgid "Support"
 msgstr "תמיכה"
-
-msgid "Documentation"
-msgstr "תיעוד"
-
-msgid "User guide"
-msgstr "מדריך למשתמש"
 
 msgid "Give back"
 msgstr "תרום בחזרה"

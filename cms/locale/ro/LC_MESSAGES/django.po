@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Andrei Meliș <andrei.melis@eaudeweb.ro>, 2026\n"
 "Language-Team: Romanian (https://app.transifex.com/divio/teams/58664/ro/)\n"
@@ -35,6 +35,15 @@ msgstr "Parte a titlului, care este utilizat în URL"
 
 msgid "Page type"
 msgstr "Tip pagină"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -117,6 +126,15 @@ msgstr "utilizator"
 
 msgid "can_view"
 msgstr "poate_vedea"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Adaugă"
@@ -389,6 +407,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Înlocuitor"
+
+msgid "Documentation"
+msgstr ""
+
+msgid "User guide"
+msgstr ""
+
+msgid "Discord community"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
 
 msgid "Create"
 msgstr ""
@@ -1411,12 +1441,6 @@ msgid "Installation Notes"
 msgstr ""
 
 msgid "Support"
-msgstr ""
-
-msgid "Documentation"
-msgstr ""
-
-msgid "User guide"
 msgstr ""
 
 msgid "Give back"

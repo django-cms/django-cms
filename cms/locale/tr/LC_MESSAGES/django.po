@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Turkish (https://app.transifex.com/divio/teams/58664/tr/)\n"
@@ -35,6 +35,15 @@ msgstr "Başlığın URL'de kullanılan kısmı"
 
 msgid "Page type"
 msgstr "Sayfa tipi"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -118,6 +127,15 @@ msgstr "kullanıcı"
 
 msgid "can_view"
 msgstr "görebilir"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Ekle"
@@ -397,6 +415,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "yer tutucu"
+
+msgid "Documentation"
+msgstr "Dokümantasyon"
+
+msgid "User guide"
+msgstr "Kullanıcı kılavuzu"
+
+msgid "Discord community"
+msgstr "Discord topluluğu"
+
+msgid "What's new"
+msgstr "Yenilikler"
 
 msgid "Create"
 msgstr "Oluştur"
@@ -1490,12 +1520,6 @@ msgstr "Kurulum Notları"
 
 msgid "Support"
 msgstr "Destek"
-
-msgid "Documentation"
-msgstr "Dokümantasyon"
-
-msgid "User guide"
-msgstr "Kullanıcı kılavuzu"
 
 msgid "Give back"
 msgstr "Geri verin"

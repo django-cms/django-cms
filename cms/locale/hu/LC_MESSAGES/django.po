@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Hungarian (https://app.transifex.com/divio/teams/58664/hu/)\n"
@@ -35,6 +35,15 @@ msgstr "A cím része, ami az URL-ben használandó"
 
 msgid "Page type"
 msgstr "Oldal típus"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -119,6 +128,15 @@ msgstr "felhasználó"
 
 msgid "can_view"
 msgstr "megtekinthető"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Új"
@@ -400,6 +418,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Hely"
+
+msgid "Documentation"
+msgstr "Dokumentáció"
+
+msgid "User guide"
+msgstr "Felhasználói kézikönyv"
+
+msgid "Discord community"
+msgstr "Discord-közösség"
+
+msgid "What's new"
+msgstr "Újdonságok"
 
 msgid "Create"
 msgstr "Létrehoz"
@@ -1504,12 +1534,6 @@ msgstr "Telepítési Megjegyzések"
 
 msgid "Support"
 msgstr "Támogatás"
-
-msgid "Documentation"
-msgstr "Dokumentáció"
-
-msgid "User guide"
-msgstr "Felhasználói kézikönyv"
 
 msgid "Give back"
 msgstr "Adjon vissza"

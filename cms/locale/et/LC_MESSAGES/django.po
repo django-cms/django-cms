@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Rivo Zängov <eraser@eraser.ee>, 2026\n"
 "Language-Team: Estonian (https://app.transifex.com/divio/teams/58664/et/)\n"
@@ -35,6 +35,15 @@ msgstr "Osa pealkirjast, mida kasutatakse internetiaadressi koostamiseks"
 
 msgid "Page type"
 msgstr "Lehekülje tüüp"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -114,6 +123,15 @@ msgid "user"
 msgstr "kasutaja"
 
 msgid "can_view"
+msgstr ""
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
 msgstr ""
 
 msgid "Add"
@@ -374,6 +392,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Kohahoidja"
+
+msgid "Documentation"
+msgstr "Dokumentatsioon"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Discord community"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
 
 msgid "Create"
 msgstr "Loo"
@@ -1393,12 +1423,6 @@ msgstr "Paigaldamise märkmed"
 
 msgid "Support"
 msgstr "Kasutajatugi"
-
-msgid "Documentation"
-msgstr "Dokumentatsioon"
-
-msgid "User guide"
-msgstr ""
 
 msgid "Give back"
 msgstr ""

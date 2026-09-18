@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/divio/teams/58664/zh_TW/)\n"
@@ -34,6 +34,15 @@ msgstr "在 URL 中使用的部分標題"
 
 msgid "Page type"
 msgstr "頁面型態"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -114,6 +123,15 @@ msgstr "使用者"
 
 msgid "can_view"
 msgstr "can_view"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "新增"
@@ -373,6 +391,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "定位器"
+
+msgid "Documentation"
+msgstr "文件"
+
+msgid "User guide"
+msgstr "使用者指南"
+
+msgid "Discord community"
+msgstr "Discord 社群"
+
+msgid "What's new"
+msgstr "最新動態"
 
 msgid "Create"
 msgstr "建立"
@@ -1422,12 +1452,6 @@ msgstr "安裝備註"
 
 msgid "Support"
 msgstr "支持"
-
-msgid "Documentation"
-msgstr "文件"
-
-msgid "User guide"
-msgstr "使用者指南"
 
 msgid "Give back"
 msgstr "回饋"
