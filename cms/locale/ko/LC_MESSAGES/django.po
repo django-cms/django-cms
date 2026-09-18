@@ -6,16 +6,16 @@
 # Александр, 2022
 # Song M. Kim <songmink@hawaii.edu>, 2025
 # Fabian Braun <fsbraun@gmx.de>, 2026
-# Yeri Choi, 2026
 # MinJi Park, 2026
+# Yeri Choi, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: MinJi Park, 2026\n"
+"Last-Translator: Yeri Choi, 2026\n"
 "Language-Team: Korean (https://app.transifex.com/divio/teams/58664/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,6 +37,15 @@ msgstr "URL에 사용된 제목의 일부"
 
 msgid "Page type"
 msgstr "페이지 타입"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -119,6 +128,15 @@ msgstr "사용자"
 
 msgid "can_view"
 msgstr "조회_가능"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "추가"
@@ -386,6 +404,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "플레이스홀더"
+
+msgid "Documentation"
+msgstr "문서화"
+
+msgid "User guide"
+msgstr "사용자 가이드"
+
+msgid "Discord community"
+msgstr "디스코드 커뮤니티"
+
+msgid "What's new"
+msgstr "새로운 소식"
 
 msgid "Create"
 msgstr "만들기"
@@ -1447,12 +1477,6 @@ msgstr "설치 참고 사항"
 
 msgid "Support"
 msgstr "지원"
-
-msgid "Documentation"
-msgstr "문서화"
-
-msgid "User guide"
-msgstr "사용자 가이드"
 
 msgid "Give back"
 msgstr "돌려주기"

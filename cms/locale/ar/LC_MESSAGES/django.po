@@ -7,16 +7,16 @@
 # SHENKAR <sheeennn@gmail.com>, 2025
 # Mohammad Alsakhawy, 2026
 # Bashar Al-Abdulhadi, 2026
-# Fabian Braun <fsbraun@gmx.de>, 2026
 # Bashar Ghadanfar <10.tens@gmail.com>, 2026
+# Fabian Braun <fsbraun@gmx.de>, 2026
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Bashar Ghadanfar <10.tens@gmail.com>, 2026\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Arabic (https://app.transifex.com/divio/teams/58664/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,6 +38,15 @@ msgstr "الجزء من العنوان الذي يستخدم في الرابط"
 
 msgid "Page type"
 msgstr "نوع الصفحة"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -120,6 +129,15 @@ msgstr "مستخدم"
 
 msgid "can_view"
 msgstr "يستطيع_المشاهدة"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "أضف"
@@ -396,6 +414,18 @@ msgstr "نظام إدارة المحتوى جانغو"
 
 msgid "Placeholder"
 msgstr "موضع"
+
+msgid "Documentation"
+msgstr "توثيقات"
+
+msgid "User guide"
+msgstr "دليل المستخدم"
+
+msgid "Discord community"
+msgstr "مجتمع Discord"
+
+msgid "What's new"
+msgstr "ما الجديد"
 
 msgid "Create"
 msgstr "إنشاء"
@@ -1479,12 +1509,6 @@ msgstr "ملاحظات التنصيب"
 
 msgid "Support"
 msgstr "دعم"
-
-msgid "Documentation"
-msgstr "توثيقات"
-
-msgid "User guide"
-msgstr "دليل المستخدم"
 
 msgid "Give back"
 msgstr "رُدّ الجميل"

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Catalan (https://app.transifex.com/divio/teams/58664/ca/)\n"
@@ -34,6 +34,15 @@ msgstr "La part del títol que s'utilitza en la direcció URL"
 
 msgid "Page type"
 msgstr "Tipus de Pàgina"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -116,6 +125,15 @@ msgstr "usuari"
 
 msgid "can_view"
 msgstr "pot_veure"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Afegir"
@@ -397,6 +415,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Marcador de posició"
+
+msgid "Documentation"
+msgstr "Documentació"
+
+msgid "User guide"
+msgstr "Guia d'usuari"
+
+msgid "Discord community"
+msgstr "Comunitat de Discord"
+
+msgid "What's new"
+msgstr "Novetats"
 
 msgid "Create"
 msgstr "Crear"
@@ -1496,12 +1526,6 @@ msgstr "Notes de la instal·lació"
 
 msgid "Support"
 msgstr "Suport"
-
-msgid "Documentation"
-msgstr "Documentació"
-
-msgid "User guide"
-msgstr "Guia d'usuari"
 
 msgid "Give back"
 msgstr "Tornar quelcom a la comunitat"

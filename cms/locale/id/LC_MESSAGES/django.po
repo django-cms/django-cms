@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Indonesian (https://app.transifex.com/divio/teams/58664/id/)\n"
@@ -34,6 +34,15 @@ msgstr "Bagian dari judul yang digunakan di dalam URL"
 
 msgid "Page type"
 msgstr "Tipe halaman"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -117,6 +126,15 @@ msgstr "pengguna"
 
 msgid "can_view"
 msgstr "dapat melihat"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Tambah"
@@ -398,6 +416,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Placeholder"
+
+msgid "Documentation"
+msgstr "Dokumentasi"
+
+msgid "User guide"
+msgstr "Panduan pengguna"
+
+msgid "Discord community"
+msgstr "Komunitas Discord"
+
+msgid "What's new"
+msgstr "Apa yang baru"
 
 msgid "Create"
 msgstr "Buat"
@@ -1488,12 +1518,6 @@ msgstr "Catatan Instalasi"
 
 msgid "Support"
 msgstr "Dukungan"
-
-msgid "Documentation"
-msgstr "Dokumentasi"
-
-msgid "User guide"
-msgstr "Panduan pengguna"
 
 msgid "Give back"
 msgstr "Beri kembali"

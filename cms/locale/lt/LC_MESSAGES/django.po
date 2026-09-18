@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2026\n"
 "Language-Team: Lithuanian (https://app.transifex.com/divio/teams/58664/lt/)\n"
@@ -34,6 +34,15 @@ msgstr "Pavadinimo dalis, kuri yra naudojama URL"
 
 msgid "Page type"
 msgstr "Puslapio tipas"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr ""
@@ -117,6 +126,15 @@ msgstr "vartotojas"
 
 msgid "can_view"
 msgstr "gali peržiūrėti"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Pridėti"
@@ -399,6 +417,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Rezervuota vieta"
+
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+msgid "User guide"
+msgstr "Vartotojo vadovas"
+
+msgid "Discord community"
+msgstr "Discord bendruomenė"
+
+msgid "What's new"
+msgstr "Kas naujo"
 
 msgid "Create"
 msgstr "Kurti"
@@ -1500,12 +1530,6 @@ msgstr "Diegimo užrašai"
 
 msgid "Support"
 msgstr "Palaikymas"
-
-msgid "Documentation"
-msgstr "Dokumentacija"
-
-msgid "User guide"
-msgstr "Vartotojo vadovas"
 
 msgid "Give back"
 msgstr "Atsidėkokite"

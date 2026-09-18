@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2026\n"
 "Language-Team: Albanian (https://app.transifex.com/divio/teams/58664/sq/)\n"
@@ -34,6 +34,15 @@ msgstr "Pjesa e titullit që përdoret te URL-ja"
 
 msgid "Page type"
 msgstr "Lloj faqeje"
+
+msgid "You do not have permission to use this page type."
+msgstr ""
+
+msgid "A source page cannot be used when adding a translation."
+msgstr ""
+
+msgid "You do not have permission to add a page here."
+msgstr ""
 
 msgid "You do not have permission to change this page."
 msgstr "S’keni leje për ndryshim të kësaj faqeje"
@@ -117,6 +126,15 @@ msgstr "përdorues"
 
 msgid "can_view"
 msgstr "mund_të_shohë"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
 
 msgid "Add"
 msgstr "Shtoni"
@@ -399,6 +417,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Vendmbajtëse"
+
+msgid "Documentation"
+msgstr "Dokumentim"
+
+msgid "User guide"
+msgstr "Udhërrëfyes përdoruesish"
+
+msgid "Discord community"
+msgstr "Bashkësi Discord"
+
+msgid "What's new"
+msgstr "Ç’ka të re"
 
 msgid "Create"
 msgstr "Krijoje"
@@ -1495,12 +1525,6 @@ msgstr "Shënime Instalimi"
 
 msgid "Support"
 msgstr "Asistencë"
-
-msgid "Documentation"
-msgstr "Dokumentim"
-
-msgid "User guide"
-msgstr "Udhërrëfyes përdoruesish"
 
 msgid "Give back"
 msgstr "Jepni një ndihmesë"
