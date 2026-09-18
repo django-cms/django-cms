@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 11:47+0000\n"
+"POT-Creation-Date: 2026-09-18 20:47+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -33,6 +33,15 @@ msgstr "The part of the title that is used in the URL"
 
 msgid "Page type"
 msgstr "Page type"
+
+msgid "You do not have permission to use this page type."
+msgstr "You do not have permission to use this page type."
+
+msgid "A source page cannot be used when adding a translation."
+msgstr "A source page cannot be used when adding a translation."
+
+msgid "You do not have permission to add a page here."
+msgstr "You do not have permission to add a page here."
 
 msgid "You do not have permission to change this page."
 msgstr "You do not have permission to change this page."
@@ -115,6 +124,17 @@ msgstr "user"
 
 msgid "can_view"
 msgstr "can_view"
+
+msgid "You cannot manage permissions on every selected site."
+msgstr "You cannot manage permissions on every selected site."
+
+#, python-format
+msgid ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
+msgstr ""
+"You cannot grant \"%(permission)s\" because you do not hold it yourself on "
+"every selected site."
 
 msgid "Add"
 msgstr "Add"
@@ -394,6 +414,18 @@ msgstr "django CMS"
 
 msgid "Placeholder"
 msgstr "Placeholder"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "User guide"
+msgstr "User guide"
+
+msgid "Discord community"
+msgstr "Discord community"
+
+msgid "What's new"
+msgstr "What's new"
 
 msgid "Create"
 msgstr "Create"
@@ -1499,12 +1531,6 @@ msgstr "Installation Notes"
 
 msgid "Support"
 msgstr "Support"
-
-msgid "Documentation"
-msgstr "Documentation"
-
-msgid "User guide"
-msgstr "User guide"
 
 msgid "Give back"
 msgstr "Give back"
