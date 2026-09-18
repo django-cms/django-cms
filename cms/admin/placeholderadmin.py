@@ -822,8 +822,17 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         elif parent_id and placeholder is None:
             # ``plugin_parent`` names the plugin's current parent. Keeping it
             # only makes sense while the plugin stays in its placeholder; the
-            # parent does not travel to another one.
-            target_parent = plugin.parent
+            # parent does not travel to another one. It is still looked up
+            # within the plugin's own placeholder and language: a relation
+            # pointing elsewhere (e.g., created before the lookup above was
+            # scoped) must not be trusted, or its subtree ends up in the
+            # response.
+            target_parent = get_object_or_404(
+                CMSPlugin,
+                pk=parent_id,
+                language=plugin.language,
+                placeholder=plugin.placeholder_id,
+            )
         else:
             target_parent = None
 
