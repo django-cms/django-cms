@@ -26,7 +26,6 @@ Because django CMS is a community-driven project, we welcome everyone to `get in
 
     Security fixes will be backported to older branches by the core team as appropriate.
 
-
 ********
 Features
 ********
