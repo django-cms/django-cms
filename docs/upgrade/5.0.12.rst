@@ -4,15 +4,16 @@
 5.0.12 release notes
 ####################
 
-*Month DD, YYYY*
+*September 18, 2026*
 
 Welcome to django CMS 5.0.12!
 
-This is a patch release of the 5.0 series. It fixes broken access control in
-page-tree operations, which is why we recommend that all users of django CMS
-5.0.x upgrade as soon as possible. Read the security fixes and their
-backward-incompatible effects before updating an existing project. This release
-contains no migrations.
+This is a patch release of the 5.0 series. It contains **six security fixes**
+for broken access control in the page tree, the add-page form, the page wizard,
+the move-plugin endpoint and the global page permission admin, which is why we
+recommend that all users of django CMS 5.0.x upgrade as soon as possible. Read
+the security fixes and their backward-incompatible effects before updating an
+existing project. This release contains no migrations.
 
 The same fixes are contained in django CMS 5.1.3.
 
@@ -59,7 +60,13 @@ What's new in 5.0.12
 Security fixes
 ==============
 
-This issue is also fixed in django CMS 5.1.3.
+The same fixes are contained in django CMS 5.1.3. This release fixes six
+advisories. All of them require an authenticated staff account; none is
+exploitable anonymously. We recommend that all users upgrade as soon as
+possible.
+
+Page-tree copy, duplicate and move disclosed view-restricted pages
+------------------------------------------------------------------
 
 This release fixes broken access control in the page tree's *Copy*, *Duplicate*
 and *Move* operations. All three require ``CMS_PERMISSION = True`` and at least
@@ -67,7 +74,7 @@ one per-page view restriction: an installation that does not use the permission
 system has nothing to disclose, because ``Page.has_view_restrictions()`` is
 always ``False`` there. Each of them needs a staff session that may add pages;
 none is exploitable anonymously, but the content they expose is readable
-anonymously afterwards. We recommend that all users upgrade as soon as possible.
+anonymously afterwards.
 
 `GHSA-976q-w6ch-6w82 <https://github.com/django-cms/django-cms/security/advisories/GHSA-976q-w6ch-6w82>`_
 covers all three, which share a root cause, their prerequisites and their fix:
@@ -93,6 +100,91 @@ covers all three, which share a root cause, their prerequisites and their fix:
 No action beyond upgrading is required. Pages that were copied, duplicated or
 moved *before* the upgrade keep the permissions they were created with, so
 review restricted branches for unrestricted copies made earlier.
+
+Adding a page authorized the parent from the query string
+----------------------------------------------------------
+
+`GHSA-g52p-phr3-hvx9 <https://github.com/django-cms/django-cms/security/advisories/GHSA-g52p-phr3-hvx9>`_:
+with ``CMS_PERMISSION = True``, the add-page admin checked the add permission
+against the parent named in the query string (``?parent_page=``), while the page
+was created under the ``parent_page`` submitted in the form body -- which was
+only checked to belong to the current site. A staff user whose page permissions
+are confined to one part of the page tree could therefore create pages anywhere
+in it, including at root level. ``AddPageForm.clean_parent_page()`` now re-checks
+the permission against the parent the page is actually created under, and against
+the site when no parent is submitted. The flaw allowed page *insertion* only: no
+existing page could be read, changed or deleted through it.
+
+The page wizard allowed creating pages below a parent on another site
+---------------------------------------------------------------------
+
+`GHSA-ppqv-h89f-6q9p <https://github.com/django-cms/django-cms/security/advisories/GHSA-ppqv-h89f-6q9p>`_:
+in a multi-site installation, the *New page* and *New sub page* wizards accepted
+an origin page from any site. The add permission was then checked against the
+current site while the new page was attached to the foreign parent, so a staff
+user with add rights on one site could insert pages into the page tree of a site
+they have no rights on, leaving the new page with a parent on a different site.
+The wizard now only resolves origin pages on the current site, and the page
+creation form rejects a parent that belongs to another site -- for superusers and
+with ``CMS_PERMISSION = False`` as well.
+
+Adding a page from a page type disclosed restricted page types
+--------------------------------------------------------------
+
+`GHSA-7fqg-chmv-c89g <https://github.com/django-cms/django-cms/security/advisories/GHSA-7fqg-chmv-c89g>`_
+(low severity): with ``CMS_PERMISSION = True``, the *Page type* field of the
+add-page form narrowed the choices it rendered to the current site's page types,
+but validated a submitted value against *every* page type in the database. A
+staff user who may add a page could therefore submit the id of a page type on
+another site, or one protected by a view restriction, and have its placeholders,
+plugins and extensions copied into a page they own -- without the view
+restrictions of the source.
+
+Page types cannot be created through the interface in django CMS 4 and 5, so only
+databases that still carry page types migrated from django CMS 3, or created
+programmatically, are affected. The add-page form, the page wizard and
+*Duplicate* now accept only page types of the current site, require view
+permission on the source, and carry the source's view restrictions over to the
+new page.
+
+The move-plugin endpoint disclosed plugin content through ``plugin_parent``
+---------------------------------------------------------------------------
+
+`GHSA-79vf-xh44-8cpm <https://github.com/django-cms/django-cms/security/advisories/GHSA-79vf-xh44-8cpm>`_:
+the *paste* and *cut* paths of the move-plugin endpoint resolved the
+client-supplied ``plugin_parent`` without scoping it to the target placeholder.
+Because the endpoint renders its response from the new plugin's parent, a staff
+user with change permission on a single placeholder could name any plugin id and
+have that plugin's rendered subtree returned -- including plugins on pages they
+have no permission for, on other sites, and in other users' clipboards. The copy
+was also created with a parent outside its own placeholder.
+
+The parent is now looked up within the target placeholder and language on every
+path, including the case where ``plugin_parent`` names the plugin's existing
+parent. This flaw has been present since django CMS 3.0; unsupported release
+lines will not receive a patch.
+
+Delegated permission managers could grant themselves page rights
+-----------------------------------------------------------------
+
+`GHSA-cx9c-3cc5-gg94 <https://github.com/django-cms/django-cms/security/advisories/GHSA-cx9c-3cc5-gg94>`_:
+with ``CMS_PERMISSION = True``, the *Page global permissions* admin offered every
+``can_*`` flag regardless of the rights the acting user held. A non-superuser
+whose only elevated right was ``can_change_permissions`` could therefore grant
+themselves -- or anyone else -- ``can_publish``, ``can_delete``,
+``can_change_advanced_settings`` and ``can_move_page``, site-wide. The per-page
+permission inline had always restricted the offered flags; the global admin had
+no equivalent check.
+
+The admin now offers only the flags the manager holds, and refuses a grant of a
+flag they do not hold on every selected site. Grants that carry flags beyond the
+manager's rights, or that cover a site where they may not manage permissions, can
+no longer be changed or deleted by them, so their user, group or sites cannot be
+used to move those rights elsewhere. See the backward incompatible changes below.
+
+Because ``GlobalPagePermission`` rows carry no audit fields, review the existing
+rows after upgrading and check Django's admin log for entries created by
+non-superusers.
 
 .. _upgrade-5.0.12-backward-incompatible:
 
@@ -131,3 +223,86 @@ moves:
 
 See :doc:`/explanation/permissions` for the full picture of how permissions
 behave when pages are moved, copied or deleted.
+
+Page creation validates the page type and parent more strictly
+===============================================================
+
+* ``AddPageForm.clean_parent_page()`` requires add permission on the submitted
+  parent (``user_can_add_subpage()``), or on the site when no parent is
+  submitted (``user_can_add_page()``). Code that posts a ``parent_page``
+  differing from the ``?parent_page=`` query parameter, or that instantiates the
+  form for a user without add rights on that parent, gets a validation error.
+  Adding a translation (``cms_page``) is exempt.
+* ``AddPageForm.source`` only accepts page types below the current site's
+  page-type root. Previously only the rendered choices were narrowed; the field
+  now also narrows its queryset. Code that passes a page type from another site
+  to the form, or to ``CreateCMSPageForm``, gets a validation error.
+* ``AddPageForm`` gained ``clean_source()``, which requires view permission on
+  the source, and its ``from_source()`` now applies the source's view
+  restrictions to the new page. ``DuplicatePageForm`` inherits both instead of
+  defining its own. The denial message is set per form through the new
+  ``source_permission_denied`` class attribute.
+* Submitting both ``cms_page`` (adding a translation) and ``source`` to
+  ``AddPageForm`` is rejected: a translation reuses the existing page and would
+  bypass the view restrictions applied in ``from_source()``.
+* ``CreateCMSPageForm.clean_parent_page()`` rejects a parent on another site, and
+  ``WizardStep1Form`` only accepts pages of the current site. Custom wizards that
+  deliberately created pages across sites no longer work.
+
+Global page permissions are limited to the rights of the manager
+=================================================================
+
+The fix for GHSA-cx9c-3cc5-gg94 restricts what a non-superuser can do in the
+*Page global permissions* admin. Superusers and installations with
+``CMS_PERMISSION = False`` are unaffected.
+
+* A ``can_*`` flag can only be granted by a manager who holds it on *every* site
+  the grant covers. A grant with no sites selected covers all sites and requires
+  an equally unrestricted grant of the flag.
+* The manager must hold ``can_change_permissions`` on every site the grant
+  covers. Managing permissions on one site no longer reaches grants for another.
+* A flag counts only together with the Django permissions its page action
+  requires -- ``can_publish``, for instance, needs ``cms.change_page`` and
+  ``cms.publish_page``. ``can_view`` has no Django counterpart.
+* Grants outside those limits are no longer editable or deletable by that
+  manager: the change and delete views answer ``403``.
+* ``cms.utils.permissions`` gained ``get_grantable_global_permissions(user,
+  site_ids=None)``, the single source of truth for what a user may hand out.
+  Projects with their own permission admin should use it.
+
+Existing ``GlobalPagePermission`` rows are not changed by the upgrade. A row that
+was created through the old admin keeps its flags; only what managers may grant
+from now on is restricted.
+
+*********
+Bug Fixes
+*********
+
+* Restrict global page permission grants to the rights the acting manager holds
+  (#8874) (#8878) -- Fabian Braun
+* Scope the move-plugin parent lookup to the target placeholder on the paste and cut
+  paths (#8849) (#8880) -- Fabian Braun
+* Re-check the add permission against the parent a page is actually created under
+  (#8822) (#8834) -- Fabian Braun
+* Check permissions on the page type used as source when adding a page (#8858) (#8869)
+  -- Fabian Braun
+* Preserve view restrictions when copying, duplicating or moving pages in the page tree
+  (#8840) (#8856) -- Fabian Braun
+* Reject origin pages and parents from other sites in the page wizard (#8848) (#8852)
+  -- Fabian Braun
+* Keep CMS mail delivery best-effort: stop forwarding deprecated Django mail arguments
+  and suppress only transport errors and missing mailers (#8842) (#8850) -- Fabian Braun
+* Fix ``GrouperModelAdmin`` saving to the latest content object instead of the one
+  selected by pk (#8826) (#8836) -- Fabian Braun
+* Fix the slug uniqueness check ignoring the site (#8831) (#8838) -- Fabian Braun
+* Open inline editing and plugin/placeholder deletion modals as Django admin popups
+  (#8816) (#8820) -- Fabian Braun
+
+*************
+Documentation
+*************
+
+* Provide a redirect for the documentation link in the help menu (#8862) (#8865)
+  -- Fabian Braun
+
+Thanks to all contributors for their efforts!

@@ -1,4 +1,4 @@
-5.0.11 (2026-08-27)
+5.0.12 (2026-09-18)
 ===================
 
 Bug Fixes:
@@ -13,6 +13,32 @@ Bug Fixes:
 * Wizard now rejects pages for other sites (#8848) (#8852) (db8718a87) -- Fabian Braun
 * cross-placeholder parent authorization in paste-a-copy (#8849) (#8880) (aae42ed6a) -- Fabian Braun
 * page-tree copy can disclose view-restrictions (#8840) (#8854) (#8856) (ebfa15e14) -- Fabian Braun
+
+Documentation:
+--------------
+* Provide redirect for help menu (#8862) (#8865) (3692e22f2) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 11 changelog entries, created with the help of the following contributors
+(in alphabetical order):
+
+* Fabian Braun (11 changelog entries)
+
+With the review help of the following contributors:
+
+* Github Release Action
+* Vinit Kumar
+* sourcery-ai[bot]
+
+Thanks to all contributors for their efforts!
+
+5.0.11 (2026-08-27)
+===================
+
+Bug Fixes:
+----------
 * Edit and view endpoints did not check placeholder permissions (#8794) (#8809) (040a7b1ba) -- Fabian Braun
 * Grouper admin ignored read-only context for content objects without language field (#8799) (#8808) (c39fbe3e0) -- Fabian Braun
 * Manual page slug was overwritten when changing page title (#8796) (#8807) (95164e017) -- Fabian Braun
@@ -25,15 +51,40 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 33 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 8 changelog entries, created with the help of the following contributors
+(in alphabetical order):
 
-* Fabian Braun (29 pull requests)
+* Fabian Braun (8 changelog entries)
 
 With the review help of the following contributors:
 
-* Github Release Action
+* Fabian Braun
 * Vinit Kumar
-* sourcery-ai[bot]
+
+Thanks to all contributors for their efforts!
+
+5.0.10 (2026-08-06)
+===================
+
+Features:
+---------
+* Offer replacement for djangotree-beard dependency (#8744) (#8755) (e358d7eab) -- Fabian Braun
+
+Bug Fixes:
+----------
+* EmptyToolbar missed clipboard and toolbar_language properties (#8745) (#8756) (8594f7c84) -- Fabian Braun
+* Paste-a-copy IDOR discloses unauthorized plugin content (#8746) (#8757) (551302612) -- Fabian Braun
+* Upon edit localized text within plugins were rendered in the wrong language (#8740) (2eaa0e573) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull requests)
+
+With the review help of the following contributors:
+
 
 Thanks to all contributors for their efforts!
 
