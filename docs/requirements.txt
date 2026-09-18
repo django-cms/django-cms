@@ -49,7 +49,6 @@ django==5.2.16
     #   django-cms
     #   django-formtools
     #   django-sekizai
-    #   django-treebeard
 django-classy-tags==4.1.0
     # via
     #   django-cms
@@ -59,8 +58,6 @@ django-cms @ git+https://github.com/django-cms/django-cms@main
 django-formtools==2.6.1
     # via django-cms
 django-sekizai==4.1.0
-    # via django-cms
-django-treebeard==5.2.1
     # via django-cms
 djangocms-ecosystem @ git+https://github.com/django-cms/djangocms-ecosystem
     # via -r requirements.in
@@ -137,7 +134,7 @@ roman-numerals==4.1.0
     # via sphinx
 snowballstemmer==3.1.1
     # via sphinx
-soupsieve==2.8.4
+soupsieve==2.9
     # via beautifulsoup4
 sphinx==9.1.0
     # via
