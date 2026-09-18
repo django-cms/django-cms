@@ -316,6 +316,34 @@ page-user manager is to off-load routine account administration from
 the superuser. Hand the role only to people you would trust with the
 accounts it covers.
 
+Delegating global page permissions
+==================================
+
+A non-superuser with the ``add`` or ``change`` permission on
+:class:`~cms.models.permissionmodels.GlobalPagePermission` and
+``can_change_permissions`` of their own can manage global page
+permissions in the admin. The same rule applies as for users: **they
+cannot hand out rights they do not have** — not to others, and not to
+themselves.
+
+* The form offers only the ``can_*`` flags the manager holds, and saving
+  accepts a flag only if they hold it on *every* site the grant covers.
+  A flag held on one site cannot be granted for another. A grant with no sites selected covers
+  all sites, so it requires an equally unrestricted grant.
+* The manager must also hold ``can_change_permissions`` on every site
+  the grant covers. Managing permissions on one site does not extend to
+  sites where the manager merely holds other rights.
+* A flag counts only together with the Django permissions the matching
+  page action requires — ``can_publish``, for example, needs
+  ``cms.change_page`` and ``cms.publish_page``. A manager who holds the
+  flag but not those permissions cannot act on it, and so cannot grant
+  it either. ``can_view`` has no Django counterpart.
+* An existing grant is out of reach if it contains a flag the manager
+  could not grant on its sites, or covers a site where they cannot
+  manage permissions. They can neither change nor delete it, so its
+  user, group or sites cannot be used to move those rights elsewhere.
+
+
 
 ********
 Strategy
@@ -341,10 +369,12 @@ the start later wish they had not — the additional admin surface is
 real, and re-engineering away from it is harder than adopting it
 later.
 
-**Permissions are not a substitute for trust.** Anyone with the
-"change permissions" right can grant themselves more rights. The
-boundary that matters most in practice is who gets superuser; tighten
-that first.
+**Permissions are not a substitute for trust.** The "change
+permissions" right cannot be used to grant rights its holder does not
+have, but within those rights it is broad: a manager can hand them and
+their groups to any account in their subordinate set, and reactivate
+those accounts. The boundary that matters most in practice is who gets
+superuser; tighten that first.
 
 ****************
 Permission modes

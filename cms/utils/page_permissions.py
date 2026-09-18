@@ -42,7 +42,7 @@ def _get_all_placeholders(page, language=None):
     page_contents = PageContent.admin_manager.filter(page=page)
     if language:
         page_contents = page_contents.filter(language=language)
-    content_type = ContentType.objects.get_for_model(Placeholder)
+    content_type = ContentType.objects.get_for_model(PageContent)
     return Placeholder.objects.filter(
         content_type=content_type,
         object_id__in=page_contents.values_list('pk', flat=True)
