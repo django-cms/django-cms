@@ -844,12 +844,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         # Placeholder overrides are highest in priority
         child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
-        # Get all child plugin candidates
-        installed_plugins = cls.get_child_plugin_candidates(slot, page)
+        # Get all child plugin candidates - for the same source (and template) as the overrides
+        source = instance.placeholder.source if page is None and instance is not None else page
+        installed_plugins = cls.get_child_plugin_candidates(slot, source)
 
         if child_classes == "auto":
-            # Allow all plugins as children that explicitly declare this plugin as parent
-            return [plugin.__name__ for plugin in installed_plugins if cls.__name__ in (plugin.parent_classes or [])]
+            from cms.utils.placeholder import get_placeholder_conf
+
+            # Allow all plugins as children that explicitly declare this plugin as parent,
+            # either on the plugin class or in the placeholder configuration
+            template = cls._get_template_for_conf(page, instance)
+            conf_parent_classes = get_placeholder_conf("parent_classes", slot, template, default={})
+            return [
+                plugin.__name__
+                for plugin in installed_plugins
+                if cls.__name__ in (conf_parent_classes.get(plugin.__name__, plugin.parent_classes) or ())
+            ]
         elif child_classes is not None:
             # An explicit list of allowed child classes (possibly empty).
             # An empty list means that no plugins are allowed as children, whereas
