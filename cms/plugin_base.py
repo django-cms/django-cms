@@ -791,6 +791,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Returns a list of all plugin classes
         that will be considered when fetching
         all available child classes for this plugin.
+
+        These are the plugins allowed in the placeholder (its ``plugins`` setting) plus the
+        plugins explicitly related to this plugin, i.e., named literally in this plugin's
+        ``child_classes`` or naming this plugin literally in their ``parent_classes`` (either
+        on the plugin class or in ``CMS_PLACEHOLDER_CONF``). Glob patterns do not count as
+        explicit relations. ``excluded_plugins`` and ``allowed_slots`` always apply.
         """
         # Adding this as a separate method,
         # we allow other plugins to affect
@@ -798,8 +804,34 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Useful in cases like djangocms-text
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
+        from cms.utils.placeholder import get_placeholder_conf
 
-        return plugin_pool.get_all_plugins(slot, page, root_plugin=False)
+        template = cls._get_template_for_conf(page, None)
+        allowed_plugins = get_placeholder_conf("plugins", slot, template)
+        if not allowed_plugins:
+            # No restriction: All plugins are candidates anyway
+            return list(plugin_pool.get_all_plugins(slot, page, root_plugin=False))
+
+        declared_children = get_placeholder_conf("child_classes", slot, template, default={}).get(
+            cls.__name__, cls.child_classes
+        )
+        if isinstance(declared_children, str):  # "auto" is covered by the children's parent_classes
+            declared_children = None
+        # Membership tests below are literal: glob patterns never equal a plugin name
+        declared_children = set(declared_children or ())
+        conf_parent_classes = get_placeholder_conf("parent_classes", slot, template, default={})
+
+        def is_candidate(plugin: type[CMSPluginBase]) -> bool:
+            name = plugin.__name__
+            if name in allowed_plugins or name in declared_children:
+                return True
+            return cls.__name__ in (conf_parent_classes.get(name, plugin.parent_classes) or ())
+
+        return [
+            plugin
+            for plugin in plugin_pool.get_all_plugins(slot, page, setting_key=None, root_plugin=False)
+            if is_candidate(plugin)
+        ]
 
     @classmethod
     @template_slot_caching
