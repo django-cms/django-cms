@@ -771,8 +771,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         # Placeholder overrides are highest in priority
         child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
-        # Get all child plugin candidates
-        installed_plugins = cls.get_child_plugin_candidates(slot, page)
+        # Get all child plugin candidates - for the same source (and template) as the overrides
+        source = page
+        if page is None and instance is not None and hasattr(instance.placeholder.source, "get_template"):
+            source = instance.placeholder.source
+        installed_plugins = cls.get_child_plugin_candidates(slot, source)
 
         if child_classes:
             # Override skips check if current class is valid parent of child classes

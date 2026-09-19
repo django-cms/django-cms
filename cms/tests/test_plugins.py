@@ -289,6 +289,25 @@ class PluginsTestCase(PluginsTestBaseCase):
                     sorted(ParentPlugin.get_child_classes("body", page_content)),
                 )
 
+    def test_restricted_placeholder_child_classes_from_instance_template(self):
+        """Without a page, candidates are resolved for the template of the instance's placeholder source"""
+        # The template lookup is cached per (pk-equal) instance: Clear entries left by other tests
+        CMSPluginBase._get_template_for_conf.__func__.cache_clear()
+        page_content = api.create_page("page", "nav_playground.html", "en").get_admin_content("en")
+        placeholder = page_content.get_placeholders().get(slot="body")
+        multi_column = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
+        column = api.add_plugin(placeholder, "ColumnPlugin", "en", target=multi_column)
+        CMS_PLACEHOLDER_CONF = {
+            "body": {"plugins": ["TextPlugin"]},
+            "nav_playground.html body": {
+                "plugins": ["MultiColumnPlugin"],
+                "child_classes": {"ColumnPlugin": ["LinkPlugin"]},
+            },
+        }
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            child_plugins = column.get_plugin_class().get_child_classes("body", None, instance=column)
+            self.assertEqual(["LinkPlugin"], child_plugins)
+
     def test_restricted_placeholder_explicit_children_respect_exclusions(self):
         """excluded_plugins always wins over explicitly declared child plugins"""
         from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
