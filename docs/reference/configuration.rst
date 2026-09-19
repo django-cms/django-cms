@@ -286,10 +286,6 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     patterns are not considered explicit relations. Use ``excluded_plugins`` to remove such
     children from a placeholder.
 
-    .. versionchanged:: 5.2
-
-        Explicitly related child plugins no longer need to be listed in ``plugins``.
-
 ``text_only_plugins``
     A list of additional plugins available only in the TextPlugin, these
     plugins can't be added directly to this placeholder.
