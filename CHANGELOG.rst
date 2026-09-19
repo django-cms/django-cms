@@ -3,6 +3,7 @@
 
 Bug Fixes:
 ----------
+* Restricted placeholders hid explicitly declared child plugins (regression from #8215) (#8432) -- Fabian Braun
 * AddPageForm did not check all required CMS permissions (#8822) (#8834) (1f219540e) -- Fabian Braun
 * Check page source when adding a apage (#8858) (#8869) (31f227e78) -- Fabian Braun
 * GrouperAdmin wrote to the wrong content object when one was selected by pk (#8826) (#8836) (0c4afbd58) -- Fabian Braun

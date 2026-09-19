@@ -245,6 +245,65 @@ class PluginsTestCase(PluginsTestBaseCase):
             child_plugins = ColumnPlugin.get_child_classes("body", page)
             self.assertEqual(["TextPlugin"], child_plugins)
 
+    def test_restricted_placeholder_allows_explicit_child_classes(self):
+        """Children named explicitly in child_classes do not need to be listed in the
+        placeholder's plugins -- and do not become available at its root (#8432)"""
+        from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin, MultiColumnPlugin
+
+        page_content = api.create_page("page", "nav_playground.html", "en").get_admin_content("en")
+        CMS_PLACEHOLDER_CONF = {
+            "body": {
+                "plugins": ["MultiColumnPlugin"],
+                "child_classes": {"ColumnPlugin": ["TextPlugin", "LinkPlugin"]},
+            }
+        }
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            plugin_pool._clear_cached()
+            # Class-level child_classes
+            self.assertEqual(["ColumnPlugin"], MultiColumnPlugin.get_child_classes("body", page_content))
+            # Placeholder-level child_classes (transitively below MultiColumnPlugin)
+            self.assertEqual(
+                ["LinkPlugin", "TextPlugin"], sorted(ColumnPlugin.get_child_classes("body", page_content))
+            )
+            # Only the placeholder's plugins are available at its root
+            self.assertEqual(
+                ["MultiColumnPlugin"], [plugin.__name__ for plugin in plugin_pool.get_all_plugins("body", page_content)]
+            )
+
+    def test_restricted_placeholder_allows_explicit_parent_classes(self):
+        """Children naming a parent explicitly in parent_classes do not need to be listed in the
+        placeholder's plugins, but unrestricted parents still only get the placeholder's plugins"""
+        ParentPlugin = type(
+            "ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True)
+        )
+        ChildPlugin = type(
+            "ChildPlugin", (CMSPluginBase,), dict(render_plugin=False, parent_classes=["ParentPlugin"])
+        )
+        page_content = api.create_page("page", "nav_playground.html", "en").get_admin_content("en")
+        CMS_PLACEHOLDER_CONF = {"body": {"plugins": ["ParentPlugin", "TextPlugin"]}}
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+                self.assertEqual(
+                    ["ChildPlugin", "ParentPlugin", "TextPlugin"],
+                    sorted(ParentPlugin.get_child_classes("body", page_content)),
+                )
+
+    def test_restricted_placeholder_explicit_children_respect_exclusions(self):
+        """excluded_plugins always wins over explicitly declared child plugins"""
+        from cms.test_utils.project.pluginapp.plugins.multicolumn.cms_plugins import ColumnPlugin
+
+        page_content = api.create_page("page", "nav_playground.html", "en").get_admin_content("en")
+        CMS_PLACEHOLDER_CONF = {
+            "body": {
+                "plugins": ["MultiColumnPlugin"],
+                "excluded_plugins": ["LinkPlugin"],
+                "child_classes": {"ColumnPlugin": ["TextPlugin", "LinkPlugin"]},
+            }
+        }
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            self.assertEqual(["TextPlugin"], ColumnPlugin.get_child_classes("body", page_content))
+
     def test_excluded_plugin(self):
         """
         Test that you can't add a text plugin

@@ -146,14 +146,16 @@ class PluginPool:
             lazy(page.get_template, str)() if page else None
         )  # Make template lazy to avoid unnecessary db access
 
+        # ``setting_key=None`` skips the placeholder's allow list (``excluded_plugins`` still applies)
         allowed_plugins = (
             get_placeholder_conf(
                 setting_key,
                 placeholder,
                 template,
             )
-            or ()
-        )
+            if setting_key
+            else None
+        ) or ()
         excluded_plugins = (
             get_placeholder_conf(
                 "excluded_plugins",
