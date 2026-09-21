@@ -227,6 +227,7 @@ def _get_app_patterns(site):
     # Loop over all titles with an application hooked to them
     page_urls = (
         page_urls
+        .exclude(path__isnull=True)
         .exclude(page__application_urls=None)
         .exclude(page__application_urls='')
         .order_by('-page__path')
