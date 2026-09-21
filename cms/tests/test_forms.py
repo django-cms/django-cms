@@ -647,6 +647,16 @@ class ValidateUrlTestCase(CMSTestCase):
         "vbscript:msgbox(1)/x",
     ]
 
+    # Markup anywhere in the path -- ``relative_url_regex`` used to constrain only the
+    # first character after the first "/", so prefixing the markup with a safe character
+    # was enough to slip it through.
+    MARKUP = [
+        "foo/a<img src=x onerror=alert(1)>",
+        "/a<script>alert(1)</script>",
+        "foo/bar/<img src=x>",
+        "/en/x'\"><img src=x onerror=alert(1)>",
+    ]
+
     VALID_RELATIVE = [
         "/foo/bar",
         "/foo/bar/",
@@ -670,6 +680,14 @@ class ValidateUrlTestCase(CMSTestCase):
         from cms.forms.validators import validate_url
 
         for value in self.DANGEROUS:
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validate_url(value)
+
+    def test_markup_in_any_path_segment_is_rejected(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.MARKUP:
             with self.subTest(value=value):
                 with self.assertRaises(ValidationError):
                     validate_url(value)
@@ -730,11 +748,11 @@ class OverwriteUrlFormValidationTestCase(CMSTestCase):
 
     payload = "<img src=x onerror=alert(187)>"
 
-    def _post_overwrite_url(self, content, user):
+    def _post_overwrite_url(self, content, user, payload=None):
         data = {
             "title": content.title,
             "slug": content.slug,
-            "overwrite_url": self.payload,
+            "overwrite_url": self.payload if payload is None else payload,
             "template": "nav_playground.html",
             "_continue": "1",
         }
@@ -755,6 +773,20 @@ class OverwriteUrlFormValidationTestCase(CMSTestCase):
         response = self._post_overwrite_url(content, self._editor())
 
         self.assertEqual(response.status_code, 200)  # re-rendered with errors, not a 302 redirect
+        self.assertIn("overwrite_url", response.context["adminform"].form.errors)
+        content.refresh_from_db()
+        self.assertIsNone(content.overwrite_url)
+
+    def test_rejected_in_later_path_segment(self):
+        """Markup preceded by a safe character in a multi-segment path must not slip through."""
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        page = create_page("victim", "nav_playground.html", "en", parent=home)
+        content = page.get_content_obj("en")
+
+        response = self._post_overwrite_url(content, self._editor(), payload="foo/a<img src=x onerror=alert(187)>")
+
+        self.assertEqual(response.status_code, 200)
         self.assertIn("overwrite_url", response.context["adminform"].form.errors)
         content.refresh_from_db()
         self.assertIsNone(content.overwrite_url)
