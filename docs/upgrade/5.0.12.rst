@@ -318,6 +318,12 @@ The input validation above rejects values that earlier releases accepted:
   soon as one safe character preceded it (``foo/a<img src=x onerror=...>``).
 * ``validate_url_uniqueness()`` now validates single-segment paths as well.
   Paths without a ``/`` used to skip validation entirely.
+* ``validate_url()`` rejects ``<`` and ``>`` outright, before it decides between
+  the relative and the absolute branch. The absolute branch is Django's
+  ``URLValidator``, whose path pattern accepts both characters, so a value
+  carrying a scheme (``https://example.com/<script>…</script>``) used to bypass
+  the check above. This also covers the *Redirect* field, which renders into an
+  ``href``.
 * Two helpers back this up in ``cms.forms.validators``: ``validate_path()``
   dispatches on whether the value contains a ``/``, and ``validate_path_segment()``
   checks a single segment against the new ``path_segment_regex``. Code that
