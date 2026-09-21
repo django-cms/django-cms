@@ -34,6 +34,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
@@ -112,15 +113,22 @@ class PageDeleteMessageMixin:
                 item = recursively_remove(obj)
                 if isinstance(item, str):
                     if obj.startswith(f"{capfirst(Page._meta.verbose_name)}: "):
+                        # ``Page`` is registered in the admin, so Django built this entry with
+                        # ``format_html()`` as ``Page: <a href="...">title</a>``: the title inside the
+                        # anchor is already escaped and must not be escaped a second time.
                         text = re.findall(r">(.*)<", obj)
                         if text:
-                            result.append(mark_safe("<b>" + text[0] + "</b>"))
+                            result.append(format_html("<b>{}</b>", mark_safe(text[0])))
                         else:
+                            # No admin link, so this is Django's raw ``"Page: %s" % obj`` string.
                             result.append(
-                                mark_safe("<b>" + item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ") + "</b>")
+                                format_html("<b>{}</b>", item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: "))
                             )
                     elif obj.startswith(f"{capfirst(PageUrl._meta.verbose_name)}: "):
-                        result.insert(0, mark_safe(item.removeprefix(f"{capfirst(PageUrl._meta.verbose_name)}: ")))
+                        # ``PageUrl`` has no admin, so Django returns the raw, unescaped
+                        # ``"Page url: %s" % obj`` string. The path is author-controlled (it can be set
+                        # through "Overwrite URL"), so it must not be marked safe (CWE-79).
+                        result.insert(0, escape(item.removeprefix(f"{capfirst(PageUrl._meta.verbose_name)}: ")))
                 elif item:
                     result.append(item)
             return result

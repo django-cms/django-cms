@@ -22,6 +22,12 @@ any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
 # ../test/
 relative_url_regex = re.compile(r'^[^/<>]+/[^/<>].*$|^/[^/<>]*.*$', re.IGNORECASE)
 
+# checks validity of a single path segment, e.g. an "Overwrite URL" of "contact".
+# ``relative_url_regex`` only matches values containing a "/", so slug-like paths need
+# their own check. The character class mirrors the one above; the empty path is allowed
+# because that is the home page.
+path_segment_regex = re.compile(r'^[^/<>]*$', re.IGNORECASE)
+
 
 def levelize_path(path):
     """Splits given path to list of paths removing latest level in each step.
