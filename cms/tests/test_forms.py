@@ -646,6 +646,12 @@ class ValidateUrlTestCase(CMSTestCase):
         "/a<script>alert(1)</script>",
         "foo/bar/<img src=x>",
         "/en/x'\"><img src=x onerror=alert(1)>",
+        # A value carrying a scheme takes the ``URLValidator`` branch instead, whose path
+        # pattern accepts "<" and ">" as long as the value has no space. Markup must be
+        # rejected there too.
+        "https://example.com/<script>alert(1)</script>",
+        "https://example.com/<svg/onload=alert(1)>",
+        "https://example.com/a<b",
     ]
 
     VALID_RELATIVE = [
