@@ -10,6 +10,7 @@ Bug Fixes:
 * Preserve best-effort CMS mail delivery (#8842) (#8850) (a90dd95e5) -- Fabian Braun
 * Slug uniqueness ignored site (#8831) (#8838) (f18a849c0) -- Fabian Braun
 * Some inline editing modals did not contain _popup=1 query param for Django (#8816) (#8820) (c49972a8c) -- Fabian Braun
+* Validate path of overwrite url (#8888) (#8892) -- Fabian Braun
 * Wizard now rejects pages for other sites (#8848) (#8852) (db8718a87) -- Fabian Braun
 * appresolver get_app_patterns (#8887) (#8890) -- Venelin Stoykov
 * cross-placeholder parent authorization in paste-a-copy (#8849) (#8880) (aae42ed6a) -- Fabian Braun
@@ -22,10 +23,10 @@ Documentation:
 Statistics:
 -----------
 
-This release includes 12 changelog entries, created with the help of the following contributors
+This release includes 13 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
-* Fabian Braun (11 changelog entries)
+* Fabian Braun (12 changelog entries)
 * Venelin Stoykov (1 changelog entry)
 
 With the review help of the following contributors:

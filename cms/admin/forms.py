@@ -21,7 +21,7 @@ from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
 from cms.forms.fields import PageSmartLinkField
-from cms.forms.validators import validate_relative_url, validate_url_uniqueness
+from cms.forms.validators import validate_path, validate_relative_url, validate_url_uniqueness
 from cms.forms.widgets import (
     AppHookSelect,
     ApplicationConfigSelect,
@@ -720,6 +720,15 @@ class ChangePageForm(BasePageContentForm):
     @cached_property
     def _language(self):
         return self.instance.language
+
+    def clean_overwrite_url(self):
+        path = (self.cleaned_data.get("overwrite_url") or "").strip("/")
+        if path:
+            # Validate the characters here rather than in ``clean()``: that method returns early
+            # for the home page and for pages without a reachable path, but the value is persisted
+            # either way and becomes the live url as soon as the page stops being home.
+            validate_path(path)
+        return self.cleaned_data["overwrite_url"]
 
     def clean(self):
         data = super().clean()
