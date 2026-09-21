@@ -749,9 +749,10 @@ class OverwriteUrlFormValidationTestCase(CMSTestCase):
     payload = "<img src=x onerror=alert(187)>"
 
     def _post_overwrite_url(self, content, user, payload=None):
+        url_obj = content.page.get_url(content.language)
         data = {
             "title": content.title,
-            "slug": content.slug,
+            "slug": url_obj.slug,
             "overwrite_url": self.payload if payload is None else payload,
             "template": "nav_playground.html",
             "_continue": "1",
@@ -764,6 +765,13 @@ class OverwriteUrlFormValidationTestCase(CMSTestCase):
         self.add_permission(editor, "change_page")
         return editor
 
+    def _assert_url_untouched(self, page, expected_path):
+        """The overwrite url lives on ``PageUrl`` (``managed=False`` plus the verbatim path),
+        so a rejected value must leave the managed url in place."""
+        url_obj = page.get_url("en")
+        self.assertTrue(url_obj.managed)
+        self.assertEqual(url_obj.path, expected_path)
+
     def test_rejected_on_regular_page(self):
         home = create_page("home", "nav_playground.html", "en")
         home.set_as_homepage()
@@ -774,8 +782,7 @@ class OverwriteUrlFormValidationTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)  # re-rendered with errors, not a 302 redirect
         self.assertIn("overwrite_url", response.context["adminform"].form.errors)
-        content.refresh_from_db()
-        self.assertIsNone(content.overwrite_url)
+        self._assert_url_untouched(page, "victim")
 
     def test_rejected_in_later_path_segment(self):
         """Markup preceded by a safe character in a multi-segment path must not slip through."""
@@ -788,8 +795,7 @@ class OverwriteUrlFormValidationTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("overwrite_url", response.context["adminform"].form.errors)
-        content.refresh_from_db()
-        self.assertIsNone(content.overwrite_url)
+        self._assert_url_untouched(page, "victim")
 
     def test_rejected_on_home_page(self):
         home = create_page("home", "nav_playground.html", "en")
@@ -801,13 +807,10 @@ class OverwriteUrlFormValidationTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("overwrite_url", response.context["adminform"].form.errors)
-        content.refresh_from_db()
-        self.assertIsNone(content.overwrite_url)
+        self._assert_url_untouched(home, "")
 
         # the value must not resurface once the page is no longer the home page
         other.set_as_homepage()
         home = Page.objects.get(pk=home.pk)
-        home._clear_internal_cache()
-        home.update_urls_from_content("en")
         home._clear_internal_cache()
         self.assertEqual(home.urls.get(language="en").path, "home")

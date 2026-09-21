@@ -590,10 +590,10 @@ class ApphooksTestCase(BaseApphooksTestCase):
         create_page("live-app", "nav_playground.html", "en", parent=home, apphook='SampleApp')
         pathless = create_page("pathless-app", "nav_playground.html", "en", parent=home, apphook='SampleApp')
 
-        # Without page content the url keeps its slug but loses its path -- the core
-        # equivalent of an unpublished page.
+        # A url that keeps its slug but loses its path -- the state djangocms-versioning
+        # leaves behind when a page is unpublished.
         PageContent.objects.filter(page=pathless, language="en").delete()
-        pathless.update_urls_from_content("en")
+        pathless.update_urls("en", path=None)
         self.assertIsNone(pathless.urls.get(language="en").path)
 
         with force_language("en"):

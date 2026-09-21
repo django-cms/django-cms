@@ -549,10 +549,7 @@ class PageTest(PageTestBase):
         page = create_page("<script>alert('title')</script>", "nav_playground.html", "en", parent=homepage)
 
         # An overwrite url without a "/" bypasses ``validate_url`` and is stored verbatim
-        content = page.get_content_obj("en")
-        content.overwrite_url = "<img src=x onerror=alert('url')>"
-        content.save()
-        page.update_urls_from_content("en")
+        page.update_urls("en", path="<img src=x onerror=alert('url')>", managed=False)
         page._clear_internal_cache()
 
         with self.login_user_context(superuser):
