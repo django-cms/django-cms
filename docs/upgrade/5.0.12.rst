@@ -8,12 +8,13 @@
 
 Welcome to django CMS 5.0.12!
 
-This is a patch release of the 5.0 series. It contains **six security fixes**
+This is a patch release of the 5.0 series. It contains **seven security fixes**
 for broken access control in the page tree, the add-page form, the page wizard,
-the move-plugin endpoint and the global page permission admin, which is why we
-recommend that all users of django CMS 5.0.x upgrade as soon as possible. Read
-the security fixes and their backward-incompatible effects before updating an
-existing project. This release contains no migrations.
+the move-plugin endpoint and the global page permission admin, and for a stored
+XSS in the page delete confirmation, which is why we recommend that all users of
+django CMS 5.0.x upgrade as soon as possible. Read the security fixes and their
+backward-incompatible effects before updating an existing project. This release
+contains no migrations.
 
 The same fixes are contained in django CMS 5.1.3.
 
@@ -60,7 +61,7 @@ What's new in 5.0.12
 Security fixes
 ==============
 
-The same fixes are contained in django CMS 5.1.3. This release fixes six
+The same fixes are contained in django CMS 5.1.3. This release fixes seven
 advisories. All of them require an authenticated staff account; none is
 exploitable anonymously. We recommend that all users upgrade as soon as
 possible.
@@ -186,6 +187,39 @@ Because ``GlobalPagePermission`` rows carry no audit fields, review the existing
 rows after upgrading and check Django's admin log for entries created by
 non-superusers.
 
+Stored XSS in the page delete confirmation escalated editors to administrators
+------------------------------------------------------------------------------
+
+`GHSA-mgv8-5r6j-2gjq <https://github.com/django-cms/django-cms/security/advisories/GHSA-mgv8-5r6j-2gjq>`_:
+a staff user who may change a page could store markup in that page's url through
+the *Overwrite URL* field -- a value containing no ``/`` bypassed url validation
+entirely and was copied verbatim to ``PageUrl.path``. The page delete
+confirmation screen marked the url safe when rendering it, so the stored markup
+executed in the browser of whoever opened that screen, typically an
+administrator about to delete the page. The script runs on the admin origin: it
+cannot read the ``HttpOnly`` session cookie, but it can read the CSRF token and
+issue authenticated requests as its victim, which turns an ordinary content
+editor into an administrator.
+
+``CMS_PERMISSION = True`` is not a mitigation -- it only limits which pages an
+attacker can poison to the ones they may already edit. A second route stores the
+payload on the home page, where ``ChangePageForm.clean()`` returned early and
+never validated the value; it is ignored while the page is the home page and
+becomes the live ``PageUrl.path`` as soon as another page takes that role.
+
+Two changes fix this. The confirmation screen no longer marks the page url safe
+and builds the page entry with ``format_html()``, and a path without a ``/`` is
+now validated rather than skipped -- in the new
+``ChangePageForm.clean_overwrite_url()``, so that the home page is covered too.
+
+Upgrading is required even where every editor is trusted today: validation does
+not clean values that are already stored, and paths written through ``cms.api``
+or a direct model save never pass through the form at all. Only the output
+encoding protects those rows. Audit the existing data with::
+
+    from cms.models import PageUrl
+    PageUrl.objects.filter(path__regex=r"[<>]")
+
 .. _upgrade-5.0.12-backward-incompatible:
 
 ***************************************
@@ -274,10 +308,31 @@ Existing ``GlobalPagePermission`` rows are not changed by the upgrade. A row tha
 was created through the old admin keeps its flags; only what managers may grant
 from now on is restricted.
 
+Page paths reject angle brackets
+================================
+
+The input validation above rejects values that earlier releases accepted:
+
+* ``relative_url_regex`` no longer allows ``<`` and ``>`` anywhere in the value.
+  It previously excluded them from the leading segment only, so markup passed as
+  soon as one safe character preceded it (``foo/a<img src=x onerror=...>``).
+* ``validate_url_uniqueness()`` now validates single-segment paths as well.
+  Paths without a ``/`` used to skip validation entirely.
+* Two helpers back this up in ``cms.forms.validators``: ``validate_path()``
+  dispatches on whether the value contains a ``/``, and ``validate_path_segment()``
+  checks a single segment against the new ``path_segment_regex``. Code that
+  writes page paths outside the admin forms should call ``validate_path()``.
+
+Paths already stored in the database are left untouched; only new input is
+rejected. They are, however, escaped on output from now on.
+
 *********
 Bug Fixes
 *********
 
+* Reject markup in the *Overwrite URL* field, both in single-segment paths and in later
+  path segments, and escape page titles and urls on the page deletion confirmation screen
+  (#8888) (#8892) -- Fabian Braun
 * Skip page URLs without a path when collecting apphook URL patterns, so that
   ``get_app_patterns()`` no longer raises for unpublished pages with an attached
   application (#8887) (#8890) -- Venelin Stoykov
