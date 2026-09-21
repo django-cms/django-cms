@@ -20,7 +20,10 @@ any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
 # /test/
 # ./test/
 # ../test/
-relative_url_regex = re.compile(r'^[^/<>]+/[^/<>].*$|^/[^/<>]*.*$', re.IGNORECASE)
+# ``<`` and ``>`` are excluded over the *whole* value, not just the leading segment: a
+# trailing ``.*`` used to let markup through as soon as one safe character preceded it
+# (e.g. ``foo/a<img src=x onerror=alert(1)>``).
+relative_url_regex = re.compile(r'^[^/<>]+/[^/<>][^<>]*$|^/[^<>]*$', re.IGNORECASE)
 
 # checks validity of a single path segment, e.g. an "Overwrite URL" of "contact".
 # ``relative_url_regex`` only matches values containing a "/", so slug-like paths need
