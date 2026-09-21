@@ -9,10 +9,11 @@
 Welcome to django CMS 5.1.3!
 
 These release notes cover what has changed since django CMS 5.1.2. This patch
-release fixes broken access control in the page tree, the add-page form and the
-page wizard, and it repairs migration ``cms.0045`` on PostgreSQL. Read the
-security fixes and their backward-incompatible effects before updating an
-existing project.
+release fixes broken access control in the page tree, the add-page form, the
+page wizard, the move-plugin endpoint and the global page permission admin, a
+stored XSS in the page delete confirmation, and it repairs migration
+``cms.0045`` on PostgreSQL. Read the security fixes and their
+backward-incompatible effects before updating an existing project.
 
 If you are upgrading from django CMS 5.0.x or earlier, read the
 :ref:`5.1.0 release notes <upgrade-to-5.1.0>` first — they cover the backward
@@ -63,7 +64,7 @@ What's new in 5.1.3
 Security fixes
 ==============
 
-This release fixes three advisories. All of them require an authenticated
+This release fixes seven advisories. All of them require an authenticated
 staff account; none is exploitable anonymously. We recommend that all users
 upgrade as soon as possible.
 
@@ -103,6 +104,20 @@ No action beyond upgrading is required. Pages that were copied, duplicated or
 moved *before* the upgrade keep the permissions they were created with, so
 review restricted branches for unrestricted copies made earlier.
 
+Adding a page authorized the parent from the query string
+----------------------------------------------------------
+
+`GHSA-g52p-phr3-hvx9 <https://github.com/django-cms/django-cms/security/advisories/GHSA-g52p-phr3-hvx9>`_:
+with ``CMS_PERMISSION = True``, the add-page admin checked the add permission
+against the parent named in the query string (``?parent_page=``), while the page
+was created under the ``parent_page`` submitted in the form body -- which was
+only checked to belong to the current site. A staff user whose page permissions
+are confined to one part of the page tree could therefore create pages anywhere
+in it, including at root level. ``AddPageForm.clean_parent_page()`` now re-checks
+the permission against the parent the page is actually created under, and against
+the site when no parent is submitted. The flaw allowed page *insertion* only: no
+existing page could be read, changed or deleted through it.
+
 The page wizard allowed creating pages below a parent on another site
 ---------------------------------------------------------------------
 
@@ -134,6 +149,78 @@ created programmatically, are affected. The add-page form, the page wizard and
 *Duplicate* now accept only page types of the current site, require view
 permission on the source, and carry the source's view restrictions over to the
 new page.
+
+The move-plugin endpoint disclosed plugin content through ``plugin_parent``
+---------------------------------------------------------------------------
+
+`GHSA-79vf-xh44-8cpm <https://github.com/django-cms/django-cms/security/advisories/GHSA-79vf-xh44-8cpm>`_:
+the *paste* and *cut* paths of the move-plugin endpoint resolved the
+client-supplied ``plugin_parent`` without scoping it to the target placeholder.
+Because the endpoint renders its response from the new plugin's parent, a staff
+user with change permission on a single placeholder could name any plugin id and
+have that plugin's rendered subtree returned -- including plugins on pages they
+have no permission for, on other sites, and in other users' clipboards. The copy
+was also created with a parent outside its own placeholder.
+
+The parent is now looked up within the target placeholder and language on every
+path, including the case where ``plugin_parent`` names the plugin's existing
+parent. This flaw has been present since django CMS 3.0; unsupported release
+lines will not receive a patch.
+
+Delegated permission managers could grant themselves page rights
+-----------------------------------------------------------------
+
+`GHSA-cx9c-3cc5-gg94 <https://github.com/django-cms/django-cms/security/advisories/GHSA-cx9c-3cc5-gg94>`_:
+with ``CMS_PERMISSION = True``, the *Page global permissions* admin offered every
+``can_*`` flag regardless of the rights the acting user held. A non-superuser
+whose only elevated right was ``can_change_permissions`` could therefore grant
+themselves -- or anyone else -- ``can_publish``, ``can_delete``,
+``can_change_advanced_settings`` and ``can_move_page``, site-wide. The per-page
+permission inline had always restricted the offered flags; the global admin had
+no equivalent check.
+
+The admin now offers only the flags the manager holds, and refuses a grant of a
+flag they do not hold on every selected site. Grants that carry flags beyond the
+manager's rights, or that cover a site where they may not manage permissions, can
+no longer be changed or deleted by them, so their user, group or sites cannot be
+used to move those rights elsewhere. See the backward incompatible changes below.
+
+Because ``GlobalPagePermission`` rows carry no audit fields, review the existing
+rows after upgrading and check Django's admin log for entries created by
+non-superusers.
+
+Stored XSS in the page delete confirmation escalated editors to administrators
+------------------------------------------------------------------------------
+
+`GHSA-mgv8-5r6j-2gjq <https://github.com/django-cms/django-cms/security/advisories/GHSA-mgv8-5r6j-2gjq>`_:
+a staff user who may change a page could store markup in that page's url through
+the *Overwrite URL* field -- a value containing no ``/`` bypassed url validation
+entirely and was copied verbatim to ``PageUrl.path``. The page delete
+confirmation screen marked the url safe when rendering it, so the stored markup
+executed in the browser of whoever opened that screen, typically an
+administrator about to delete the page. The script runs on the admin origin: it
+cannot read the ``HttpOnly`` session cookie, but it can read the CSRF token and
+issue authenticated requests as its victim, which turns an ordinary content
+editor into an administrator.
+
+``CMS_PERMISSION = True`` is not a mitigation -- it only limits which pages an
+attacker can poison to the ones they may already edit. A second route stores the
+payload on the home page, where ``ChangePageForm.clean()`` returned early and
+never validated the value; it is ignored while the page is the home page and
+becomes the live ``PageUrl.path`` as soon as another page takes that role.
+
+Two changes fix this. The confirmation screen no longer marks the page url safe
+and builds the page entry with ``format_html()``, and a path without a ``/`` is
+now validated rather than skipped -- in the new
+``ChangePageForm.clean_overwrite_url()``, so that the home page is covered too.
+
+Upgrading is required even where every editor is trusted today: validation does
+not clean values that are already stored, and paths written through ``cms.api``
+or a direct model save never pass through the form at all. Only the output
+encoding protects those rows. Audit the existing data with::
+
+    from cms.models import PageUrl
+    PageUrl.objects.filter(path__regex=r"[<>]")
 
 .. _upgrade-5.1.3-backward-incompatible:
 
@@ -176,6 +263,12 @@ behave when pages are moved, copied or deleted.
 Page creation validates the page type and parent more strictly
 ================================================================
 
+* ``AddPageForm.clean_parent_page()`` requires add permission on the submitted
+  parent (``user_can_add_subpage()``), or on the site when no parent is
+  submitted (``user_can_add_page()``). Code that posts a ``parent_page``
+  differing from the ``?parent_page=`` query parameter, or that instantiates the
+  form for a user without add rights on that parent, gets a validation error.
+  Adding a translation (``cms_page``) is exempt.
 * ``AddPageForm.source`` only accepts page types below the current site's
   page-type root. Previously only the rendered choices were narrowed; the field
   now also narrows its queryset. Code that passes a page type from another site
@@ -192,6 +285,31 @@ Page creation validates the page type and parent more strictly
   and ``WizardStep1Form`` only accepts pages of the current site. Custom wizards
   that deliberately created pages across sites no longer work.
 
+Global page permissions are limited to the rights of the manager
+=================================================================
+
+The fix for GHSA-cx9c-3cc5-gg94 restricts what a non-superuser can do in the
+*Page global permissions* admin. Superusers and installations with
+``CMS_PERMISSION = False`` are unaffected.
+
+* A ``can_*`` flag can only be granted by a manager who holds it on *every* site
+  the grant covers. A grant with no sites selected covers all sites and requires
+  an equally unrestricted grant of the flag.
+* The manager must hold ``can_change_permissions`` on every site the grant
+  covers. Managing permissions on one site no longer reaches grants for another.
+* A flag counts only together with the Django permissions its page action
+  requires -- ``can_publish``, for instance, needs ``cms.change_page`` and
+  ``cms.publish_page``. ``can_view`` has no Django counterpart.
+* Grants outside those limits are no longer editable or deletable by that
+  manager: the change and delete views answer ``403``.
+* ``cms.utils.permissions`` gained ``get_grantable_global_permissions(user,
+  site_ids=None)``, the single source of truth for what a user may hand out.
+  Projects with their own permission admin should use it.
+
+Existing ``GlobalPagePermission`` rows are not changed by the upgrade. A row that
+was created through the old admin keeps its flags; only what managers may grant
+from now on is restricted.
+
 The current user is stored behind a wrapper
 ===========================================
 
@@ -201,13 +319,46 @@ user itself but a private wrapper. Use the public helpers
 ``get_current_user()``, ``set_current_user()`` and ``reset_current_user()``
 instead of accessing the context variable directly.
 
+Page paths reject angle brackets
+================================
+
+The input validation above rejects values that earlier releases accepted:
+
+* ``relative_url_regex`` no longer allows ``<`` and ``>`` anywhere in the value.
+  It previously excluded them from the leading segment only, so markup passed as
+  soon as one safe character preceded it (``foo/a<img src=x onerror=...>``).
+* ``validate_url_uniqueness()`` now validates single-segment paths as well.
+  Paths without a ``/`` used to skip validation entirely.
+* ``validate_url()`` rejects ``<`` and ``>`` outright, before it decides between
+  the relative and the absolute branch. The absolute branch is Django's
+  ``URLValidator``, whose path pattern accepts both characters, so a value
+  carrying a scheme (``https://example.com/<script>…</script>``) used to bypass
+  the check above. This also covers the *Redirect* field, which renders into an
+  ``href``.
+* Two helpers back this up in ``cms.forms.validators``: ``validate_path()``
+  dispatches on whether the value contains a ``/``, and ``validate_path_segment()``
+  checks a single segment against the new ``path_segment_regex``. Code that
+  writes page paths outside the admin forms should call ``validate_path()``.
+
+Paths already stored in the database are left untouched; only new input is
+rejected. They are, however, escaped on output from now on.
+
 **********
 Bug Fixes
 **********
 
+* Reject markup in the *Overwrite URL* field, both in single-segment paths and in later
+  path segments, and escape page titles and urls on the page deletion confirmation screen
+  (#8888) -- Fabian Braun
 * Skip page URLs without a path when collecting apphook URL patterns, so that
   ``get_app_patterns()`` no longer raises for unpublished pages with an attached
   application (#8887) -- Venelin Stoykov
+* Restrict global page permission grants to the rights the acting manager holds (#8874)
+  -- Fabian Braun
+* Re-check the add permission against the parent a page is actually created under (#8822)
+  -- Fabian Braun
+* Scope the move-plugin parent lookup to the target placeholder on the paste and cut paths
+  (#8849) -- Fabian Braun
 * Fix a hang of ``CurrentUserMiddleware`` in async (ASGI) mode (#8863) -- Fabian Braun
 * Check permissions on the page type used as source when adding a page (#8858) -- Fabian Braun
 * Preserve view restrictions when copying, duplicating or moving pages in the page tree (#8840)
@@ -234,10 +385,10 @@ Documentation
 Statistics
 **********
 
-This release includes 11 changelog entries, created with the help of the following contributors
+This release includes 15 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
-* Fabian Braun (10 changelog entries)
+* Fabian Braun (14 changelog entries)
 * Venelin Stoykov (1 changelog entry)
 
 With the review help of the following contributors:
