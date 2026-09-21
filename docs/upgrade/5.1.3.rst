@@ -205,6 +205,9 @@ instead of accessing the context variable directly.
 Bug Fixes
 **********
 
+* Skip page URLs without a path when collecting apphook URL patterns, so that
+  ``get_app_patterns()`` no longer raises for unpublished pages with an attached
+  application (#8887) -- Venelin Stoykov
 * Fix a hang of ``CurrentUserMiddleware`` in async (ASGI) mode (#8863) -- Fabian Braun
 * Check permissions on the page type used as source when adding a page (#8858) -- Fabian Braun
 * Preserve view restrictions when copying, duplicating or moving pages in the page tree (#8840)
@@ -231,10 +234,11 @@ Documentation
 Statistics
 **********
 
-This release includes 10 changelog entries, created with the help of the following contributors
+This release includes 11 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
 * Fabian Braun (10 changelog entries)
+* Venelin Stoykov (1 changelog entry)
 
 With the review help of the following contributors:
 

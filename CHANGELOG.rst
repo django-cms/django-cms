@@ -3,6 +3,7 @@
 
 Bug Fixes:
 ----------
+* appresolver get_app_patterns (#8887) (#8889) -- Venelin Stoykov
 * Check page source when adding a apage (#8858) (#8870) (9012be2ed) -- Fabian Braun
 * CurrentUserMiddleware hang in async mode (#8863) (#8867) (0e4bf8008) -- Fabian Braun
 * page-tree copy can disclose view-restrictions (#8840) (#8854) (d9bdb7ef8) -- Fabian Braun
@@ -20,10 +21,11 @@ Documentation:
 Statistics:
 -----------
 
-This release includes 10 changelog entries, created with the help of the following contributors
+This release includes 11 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
 * Fabian Braun (10 changelog entries)
+* Venelin Stoykov (1 changelog entry)
 
 With the review help of the following contributors:
 
