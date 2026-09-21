@@ -577,6 +577,33 @@ class ApphooksTestCase(BaseApphooksTestCase):
             url = resolver.reverse('sample-root')
             self.assertEqual(url, 'child/not-home/subchild/')
 
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls_2')
+    def test_apphook_on_page_without_path_is_skipped(self):
+        """A page whose ``PageUrl.path`` is ``None`` must not break url resolution.
+
+        Regression test for #8886: ``_get_app_patterns`` built ``page_url.path + "/"``
+        unconditionally, so a single such page raised ``TypeError`` and took down every
+        apphook on the site -- including the admin -- until the database was edited by hand.
+        Unpublishing a page with djangocms-versioning leaves exactly this state.
+        """
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("live-app", "nav_playground.html", "en", parent=home, apphook='SampleApp')
+        pathless = create_page("pathless-app", "nav_playground.html", "en", parent=home, apphook='SampleApp')
+
+        # A url that keeps its slug but loses its path -- the state djangocms-versioning
+        # leaves behind when a page is unpublished.
+        PageContent.objects.filter(page=pathless, language="en").delete()
+        pathless.update_urls("en", path=None)
+        self.assertIsNone(pathless.urls.get(language="en").path)
+
+        with force_language("en"):
+            self.reload_urls()
+            urlpatterns = get_app_patterns()  # must not raise TypeError
+
+            # the remaining apphook still resolves, i.e. the pathless page was skipped
+            # rather than the whole pattern list being abandoned
+            self.assertEqual(urlpatterns[0].reverse('sample-root'), 'live-app/')
+
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
     def test_apphook_urlpattern_order(self):
         # this one includes the actual cms.urls, so it can be tested if
