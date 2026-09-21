@@ -539,6 +539,30 @@ class PageTest(PageTestBase):
                 page_markup = row_markup % str(page_url)
                 self.assertContains(response, page_markup, html=True)
 
+    def test_delete_page_confirmation_escapes_related_objects(self):
+        """The confirmation screen lists page titles and page urls. Both are author-controlled
+        (a page url can be set verbatim through "Overwrite URL"), so neither may reach the
+        response as markup (CWE-79)."""
+        superuser = self.get_superuser()
+        homepage = create_page("home", "nav_playground.html", "en")
+        homepage.set_as_homepage()
+        page = create_page("<script>alert('title')</script>", "nav_playground.html", "en", parent=homepage)
+
+        # An overwrite url without a "/" bypasses ``validate_url`` and is stored verbatim
+        content = page.get_content_obj("en")
+        content.overwrite_url = "<img src=x onerror=alert('url')>"
+        content.save()
+        page.update_urls_from_content("en")
+        page._clear_internal_cache()
+
+        with self.login_user_context(superuser):
+            response = self.client.get(self.get_admin_url(Page, "delete", page.pk))
+
+        self.assertContains(response, "&lt;img src=x onerror=alert(&#x27;url&#x27;)&gt; (en)")
+        self.assertContains(response, "&lt;script&gt;alert(&#x27;title&#x27;)&lt;/script&gt;")
+        self.assertNotContains(response, "<img src=x")
+        self.assertNotContains(response, "<script>alert(")
+
     def test_homepage_with_children(self):
         homepage = create_page("home", "nav_playground.html", "en")
         homepage.set_as_homepage()
