@@ -791,6 +791,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Returns a list of all plugin classes
         that will be considered when fetching
         all available child classes for this plugin.
+
+        These are the plugins allowed in the placeholder (its ``plugins`` setting) plus the
+        plugins explicitly related to this plugin, i.e., named literally in this plugin's
+        ``child_classes`` or naming this plugin literally in their ``parent_classes`` (either
+        on the plugin class or in ``CMS_PLACEHOLDER_CONF``). Glob patterns do not count as
+        explicit relations. ``excluded_plugins`` and ``allowed_slots`` always apply.
         """
         # Adding this as a separate method,
         # we allow other plugins to affect
@@ -798,8 +804,34 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Useful in cases like djangocms-text
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
+        from cms.utils.placeholder import get_placeholder_conf
 
-        return plugin_pool.get_all_plugins(slot, page, root_plugin=False)
+        template = cls._get_template_for_conf(page, None)
+        allowed_plugins = get_placeholder_conf("plugins", slot, template)
+        if not allowed_plugins:
+            # No restriction: All plugins are candidates anyway
+            return list(plugin_pool.get_all_plugins(slot, page, root_plugin=False))
+
+        declared_children = get_placeholder_conf("child_classes", slot, template, default={}).get(
+            cls.__name__, cls.child_classes
+        )
+        if isinstance(declared_children, str):  # "auto" is covered by the children's parent_classes
+            declared_children = None
+        # Membership tests below are literal: glob patterns never equal a plugin name
+        declared_children = set(declared_children or ())
+        conf_parent_classes = get_placeholder_conf("parent_classes", slot, template, default={})
+
+        def is_candidate(plugin: type[CMSPluginBase]) -> bool:
+            name = plugin.__name__
+            if name in allowed_plugins or name in declared_children:
+                return True
+            return cls.__name__ in (conf_parent_classes.get(name, plugin.parent_classes) or ())
+
+        return [
+            plugin
+            for plugin in plugin_pool.get_all_plugins(slot, page, setting_key=None, root_plugin=False)
+            if is_candidate(plugin)
+        ]
 
     @classmethod
     @template_slot_caching
@@ -812,12 +844,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         # Placeholder overrides are highest in priority
         child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
-        # Get all child plugin candidates
-        installed_plugins = cls.get_child_plugin_candidates(slot, page)
+        # Get all child plugin candidates - for the same source (and template) as the overrides
+        source = instance.placeholder.source if page is None and instance is not None else page
+        installed_plugins = cls.get_child_plugin_candidates(slot, source)
 
         if child_classes == "auto":
-            # Allow all plugins as children that explicitly declare this plugin as parent
-            return [plugin.__name__ for plugin in installed_plugins if cls.__name__ in (plugin.parent_classes or [])]
+            from cms.utils.placeholder import get_placeholder_conf
+
+            # Allow all plugins as children that explicitly declare this plugin as parent,
+            # either on the plugin class or in the placeholder configuration
+            template = cls._get_template_for_conf(page, instance)
+            conf_parent_classes = get_placeholder_conf("parent_classes", slot, template, default={})
+            return [
+                plugin.__name__
+                for plugin in installed_plugins
+                if cls.__name__ in (conf_parent_classes.get(plugin.__name__, plugin.parent_classes) or ())
+            ]
         elif child_classes is not None:
             # An explicit list of allowed child classes (possibly empty).
             # An empty list means that no plugins are allowed as children, whereas

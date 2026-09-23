@@ -279,6 +279,13 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     A list of plugins that can be added to this placeholder. If not supplied,
     all plugins can be selected.
 
+    The list also applies to children of plugins that do not restrict their children.
+    Plugins that are explicitly related to an allowed plugin are available as its children
+    without being listed here: plugins named in its ``child_classes`` and plugins naming it
+    in their ``parent_classes`` (on the plugin class or in ``CMS_PLACEHOLDER_CONF``). Glob
+    patterns are not considered explicit relations. Use ``excluded_plugins`` to remove such
+    children from a placeholder.
+
 ``text_only_plugins``
     A list of additional plugins available only in the TextPlugin, these
     plugins can't be added directly to this placeholder.
