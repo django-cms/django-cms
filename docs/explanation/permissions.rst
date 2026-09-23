@@ -395,54 +395,33 @@ page-user manager is to off-load routine account administration from
 the superuser. Hand the role only to people you would trust with the
 accounts it covers.
 
+Delegating global page permissions
+==================================
 
-*******************************
-Delegated user management
-*******************************
+A non-superuser with the ``add`` or ``change`` permission on
+:class:`~cms.models.permissionmodels.GlobalPagePermission` and
+``can_change_permissions`` of their own can manage global page
+permissions in the admin. The same rule applies as for users: **they
+cannot hand out rights they do not have** — not to others, and not to
+themselves.
 
-With ``CMS_PERMISSION = True`` a non-superuser can be given the right
-to manage *other* users — the "Users" and "User groups" entries in the
-admin become available to anyone who has the ``change`` permission on
-the CMS user/group models and a page-permission level of their own.
-These users are **page-user managers**. They are not superusers, yet
-inside their own corner of the system they act with superuser-like
-authority.
+* The form offers only the ``can_*`` flags the manager holds, and saving
+  accepts a flag only if they hold it on *every* site the grant covers.
+  A flag held on one site cannot be granted for another. A grant with no sites selected covers
+  all sites, so it requires an equally unrestricted grant.
+* The manager must also hold ``can_change_permissions`` on every site
+  the grant covers. Managing permissions on one site does not extend to
+  sites where the manager merely holds other rights.
+* A flag counts only together with the Django permissions the matching
+  page action requires — ``can_publish``, for example, needs
+  ``cms.change_page`` and ``cms.publish_page``. A manager who holds the
+  flag but not those permissions cannot act on it, and so cannot grant
+  it either. ``can_view`` has no Django counterpart.
+* An existing grant is out of reach if it contains a flag the manager
+  could not grant on its sites, or covers a site where they cannot
+  manage permissions. They can neither change nor delete it, so its
+  user, group or sites cannot be used to move those rights elsewhere.
 
-The mental model is deliberate: **a page-user manager is a superuser
-for their subordinate users only.** A user is "subordinate" when the
-manager created them, or when they sit at the same or a lower level in
-the page tree the manager controls. Within that subordinate set, the
-manager can do almost everything a superuser could do to those
-accounts:
-
-* create new staff users (new page-users are made staff automatically);
-* grant and revoke any permission or group the manager *themselves*
-  holds — they cannot hand out rights they do not have;
-* edit account status fields, including ``is_staff`` (admin-login
-  capability) and ``is_active`` (whether the account may log in at
-  all).
-
-The single boundary a manager cannot cross is **superuser status**:
-``is_superuser`` is read-only for non-superusers, so a manager can
-never promote a subordinate (or themselves) to full superuser.
-
-**A manager can reverse a setting a superuser made.** This follows
-directly from the model and is worth stating plainly. If a superuser
-disables a subordinate account (``is_active = False``) or removes its
-staff flag (``is_staff = False``), a page-user manager with that user
-in their subordinate set can switch it back on. The manager's authority
-over a subordinate is not subordinate to the superuser's earlier edit;
-it is the *same* authority over that account, minus the ability to
-grant superuser. If you need a deactivation or a demotion to be
-permanent against a manager, the user must be moved out of that
-manager's subordinate set — for example by deleting the account, or by
-re-parenting it above the manager's page-tree level — rather than
-relying on the status flag alone.
-
-This is intentional delegation, not a gap: the whole point of a
-page-user manager is to off-load routine account administration from
-the superuser. Hand the role only to people you would trust with the
-accounts it covers.
 
 
 ********
@@ -469,10 +448,12 @@ the start later wish they had not — the additional admin surface is
 real, and re-engineering away from it is harder than adopting it
 later.
 
-**Permissions are not a substitute for trust.** Anyone with the
-"change permissions" right can grant themselves more rights. The
-boundary that matters most in practice is who gets superuser; tighten
-that first.
+**Permissions are not a substitute for trust.** The "change
+permissions" right cannot be used to grant rights its holder does not
+have, but within those rights it is broad: a manager can hand them and
+their groups to any account in their subordinate set, and reactivate
+those accounts. The boundary that matters most in practice is who gets
+superuser; tighten that first.
 
 ****************
 Where to go next

@@ -398,6 +398,12 @@ class PageTest(PageTestBase):
         endpoint = self.get_page_change_uri("en", page)
         redirect_to = self.get_pages_admin_list_uri("en")
         validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
+        # Values carrying markup are rejected by ``validate_url()`` itself, before it picks
+        # the relative or the absolute branch, so they carry its own message.
+        markup_error = (
+            '<ul class="errorlist" id="id_redirect_error">'
+            "<li>Enter a valid relative or absolute URL.</li></ul>"
+        )
 
         with self.subTest("Test that a redirect to the root page (valid)"):
             with self.login_user_context(superuser):
@@ -441,7 +447,7 @@ class PageTest(PageTestBase):
                 data["redirect"] = '<script>alert("test")</script>'
                 # Asserts users can't insert javascript call
                 response = self.client.post(endpoint, data)
-                self.assertContains(response, validation_error, html=True)
+                self.assertContains(response, markup_error, html=True)
 
     def test_meta_description_fields_from_admin(self):
         """
@@ -535,6 +541,30 @@ class PageTest(PageTestBase):
                 page_url = page.urls.filter(language="en").first()
                 page_markup = row_markup % str(page_url)
                 self.assertContains(response, page_markup, html=True)
+
+    def test_delete_page_confirmation_escapes_related_objects(self):
+        """The confirmation screen lists page titles and page urls. Both are author-controlled
+        (a page url can be set verbatim through "Overwrite URL"), so neither may reach the
+        response as markup (CWE-79)."""
+        superuser = self.get_superuser()
+        homepage = create_page("home", "nav_playground.html", "en")
+        homepage.set_as_homepage()
+        page = create_page("<script>alert('title')</script>", "nav_playground.html", "en", parent=homepage)
+
+        # An overwrite url without a "/" bypasses ``validate_url`` and is stored verbatim
+        content = page.get_content_obj("en")
+        content.overwrite_url = "<img src=x onerror=alert('url')>"
+        content.save()
+        page.update_urls_from_content("en")
+        page._clear_internal_cache()
+
+        with self.login_user_context(superuser):
+            response = self.client.get(self.get_admin_url(Page, "delete", page.pk))
+
+        self.assertContains(response, "&lt;img src=x onerror=alert(&#x27;url&#x27;)&gt; (en)")
+        self.assertContains(response, "&lt;script&gt;alert(&#x27;title&#x27;)&lt;/script&gt;")
+        self.assertNotContains(response, "<img src=x")
+        self.assertNotContains(response, "<script>alert(")
 
     def test_homepage_with_children(self):
         homepage = create_page("home", "nav_playground.html", "en")
@@ -3388,13 +3418,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
         endpoint = self.get_admin_url(Page, "advanced", page.pk) + "?language=en"
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         with self.login_user_context(self.get_superuser()):
             data = self._get_page_permissions_data(page=page.pk, user=staff_user.pk)
             data["_continue"] = "1"
             self.client.post(endpoint, data)
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_permission_cache_invalidation_on_group_add(self):
         """
@@ -3404,13 +3434,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         group = Group(name="test_group")
         group.save()
         staff_user.groups.add(group)
 
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_permission_cache_invalidation_on_group_remove(self):
         """
@@ -3424,11 +3454,11 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         group.save()
         staff_user.groups.add(group)
 
-        set_permission_cache(staff_user, "change_page", [page.pk])
+        set_permission_cache(staff_user, page.site, "change_page", [page.pk])
 
         group.user_set.remove(staff_user)
 
-        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+        self.assertIsNone(get_permission_cache(staff_user, page.site, "change_page"))
 
     def test_user_can_copy_page(self):
         """

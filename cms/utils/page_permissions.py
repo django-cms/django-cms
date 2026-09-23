@@ -62,7 +62,7 @@ def _get_page_permission_tuples_for_action(user, site, action, check_global=True
 
     if use_cache:
         # read from cache if possible
-        cached = get_permission_cache(user, action)
+        cached = get_permission_cache(user, site, action)
         get_page_actions = get_page_actions_for_user
     else:
         cached = None
@@ -74,7 +74,7 @@ def _get_page_permission_tuples_for_action(user, site, action, check_global=True
     page_actions = get_page_actions(user, site)
     # Set cache for all actions calculated
     for act, page_paths in page_actions.items():
-        set_permission_cache(user, act, list(page_paths))
+        set_permission_cache(user, site, act, list(page_paths))
     return page_actions[action]
 
 

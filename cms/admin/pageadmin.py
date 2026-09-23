@@ -34,6 +34,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
@@ -73,6 +74,7 @@ from cms.signals.apphook import set_restart_trigger
 from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import get_site_from_request, jsonify_request
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_language_list,
@@ -111,15 +113,22 @@ class PageDeleteMessageMixin:
                 item = recursively_remove(obj)
                 if isinstance(item, str):
                     if obj.startswith(f"{capfirst(Page._meta.verbose_name)}: "):
+                        # ``Page`` is registered in the admin, so Django built this entry with
+                        # ``format_html()`` as ``Page: <a href="...">title</a>``: the title inside the
+                        # anchor is already escaped and must not be escaped a second time.
                         text = re.findall(r">(.*)<", obj)
                         if text:
-                            result.append(mark_safe("<b>" + text[0] + "</b>"))
+                            result.append(format_html("<b>{}</b>", mark_safe(text[0])))
                         else:
+                            # No admin link, so this is Django's raw ``"Page: %s" % obj`` string.
                             result.append(
-                                mark_safe("<b>" + item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ") + "</b>")
+                                format_html("<b>{}</b>", item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: "))
                             )
                     elif obj.startswith(f"{capfirst(PageUrl._meta.verbose_name)}: "):
-                        result.insert(0, mark_safe(item.removeprefix(f"{capfirst(PageUrl._meta.verbose_name)}: ")))
+                        # ``PageUrl`` has no admin, so Django returns the raw, unescaped
+                        # ``"Page url: %s" % obj`` string. The path is author-controlled (it can be set
+                        # through "Overwrite URL"), so it must not be marked safe (CWE-79).
+                        result.insert(0, escape(item.removeprefix(f"{capfirst(PageUrl._meta.verbose_name)}: ")))
                 elif item:
                     result.append(item)
             return result
@@ -980,7 +989,10 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
             from cms.cache.permissions import get_cache_key, get_cache_permission_version
 
-            cache.delete(get_cache_key(request.user, "change_page"), version=get_cache_permission_version())
+            cache.delete(
+                get_cache_key(request.user, obj.page.site, "change_page"),
+                version=get_cache_permission_version(),
+            )
 
             # redirect to the edit view if added from the toolbar
             url = get_object_edit_url(obj)  # Redirects to preview if necessary
@@ -1101,11 +1113,38 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return user_sites
 
     def user_can_access_site(self, request):
+        """
+        .. deprecated:: 5.2
+            Unused. Site isolation is enforced by ``has_change_permission``,
+            which checks ``user_can_change_at_least_one_page`` against the site
+            of the request.
+        """
+        import warnings
+
+        warnings.warn(
+            "PageContentAdmin.user_can_access_site() is deprecated and unused. "
+            "Use has_change_permission(request) instead, which already scopes the check to the "
+            "site of the request.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         site = get_site_from_request(request)
         user_sites = self.get_sites_for_user(request.user)
         return site in user_sites
 
     def raise_site_permission_denied(self):
+        """
+        .. deprecated:: 5.2
+            Unused. Raise ``django.core.exceptions.PermissionDenied`` directly.
+        """
+        import warnings
+
+        warnings.warn(
+            "PageContentAdmin.raise_site_permission_denied() is deprecated and unused. "
+            "Raise django.core.exceptions.PermissionDenied directly instead.",
+            RemovedInDjangoCMS60Warning,
+            stacklevel=2,
+        )
         raise PermissionDenied(_("You do not have permission to access this site. Please contact your administrator."))
 
     def changelist_view(self, request, extra_context=None):
