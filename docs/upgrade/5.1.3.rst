@@ -9,16 +9,17 @@
 Welcome to django CMS 5.1.3!
 
 These release notes cover what has changed since django CMS 5.1.2. This patch
-release contains **six security fixes** for broken access control in the page
+release contains **seven security fixes**: broken access control in the page
 tree, the add-page form, the page wizard, the move-plugin endpoint and the
-global page permission admin, which is why we recommend that all users of
-django CMS 5.1.x upgrade as soon as possible. It also repairs migration
-``cms.0045`` on PostgreSQL and fixes a regression from django CMS 5.0.0 that hid
-explicitly declared child plugins in placeholders restricted by
-``CMS_PLACEHOLDER_CONF``. Read the security fixes and their
-backward-incompatible effects before updating an existing project.
+global page permission admin, and a stored XSS in the page delete confirmation.
+We therefore recommend that all users of django CMS 5.1.x upgrade as soon as
+possible. It also repairs migration ``cms.0045`` on PostgreSQL and fixes a
+regression from django CMS 5.0.0 that hid explicitly declared child plugins in
+placeholders restricted by ``CMS_PLACEHOLDER_CONF``. Read the security fixes
+and their backward-incompatible effects before updating an existing project.
 
-The same security fixes are contained in django CMS 5.0.12.
+Django CMS 5.0.12 contains the same security fixes, except the fix for the
+stored XSS in the page delete confirmation (GHSA-mgv8-5r6j-2gjq).
 
 If you are upgrading from django CMS 5.0.x or earlier, read the
 :ref:`5.1.0 release notes <upgrade-to-5.1.0>` first — they cover the backward
@@ -69,8 +70,8 @@ What's new in 5.1.3
 Security fixes
 ==============
 
-The same fixes are contained in django CMS 5.0.12. This release fixes six
-advisories. All of them require an authenticated staff account; none is exploitable anonymously. We recommend that all users
+Except for GHSA-mgv8-5r6j-2gjq, the same fixes are contained in django CMS
+5.0.12. This release fixes seven advisories. All of them require an authenticated staff account; none is exploitable anonymously. We recommend that all users
 upgrade as soon as possible.
 
 Page-tree copy, duplicate and move disclosed view-restricted pages
@@ -193,6 +194,39 @@ used to move those rights elsewhere. See the backward incompatible changes below
 Because ``GlobalPagePermission`` rows carry no audit fields, review the existing
 rows after upgrading and check Django's admin log for entries created by
 non-superusers.
+
+Stored XSS in the page delete confirmation escalated editors to administrators
+------------------------------------------------------------------------------
+
+`GHSA-mgv8-5r6j-2gjq <https://github.com/django-cms/django-cms/security/advisories/GHSA-mgv8-5r6j-2gjq>`_:
+a staff user who may change a page could store markup in that page's url through
+the *Overwrite URL* field -- a value containing no ``/`` bypassed url validation
+entirely and was copied verbatim to ``PageUrl.path``. The page delete
+confirmation screen marked the url safe when rendering it, so the stored markup
+executed in the browser of whoever opened that screen, typically an
+administrator about to delete the page. The script runs on the admin origin: it
+cannot read the ``HttpOnly`` session cookie, but it can read the CSRF token and
+issue authenticated requests as its victim, which turns an ordinary content
+editor into an administrator.
+
+``CMS_PERMISSION = True`` is not a mitigation -- it only limits which pages an
+attacker can poison to the ones they may already edit. A second route stores the
+payload on the home page, where ``ChangePageForm.clean()`` returned early and
+never validated the value; it is ignored while the page is the home page and
+becomes the live ``PageUrl.path`` as soon as another page takes that role.
+
+Two changes fix this. The confirmation screen no longer marks the page url safe
+and builds the page entry with ``format_html()``, and a path without a ``/`` is
+now validated rather than skipped -- in the new
+``ChangePageForm.clean_overwrite_url()``, so that the home page is covered too.
+
+Upgrading is required even where every editor is trusted today: validation does
+not clean values that are already stored, and paths written through ``cms.api``
+or a direct model save never pass through the form at all. Only the output
+encoding protects those rows. Audit the existing data with::
+
+    from cms.models import PageUrl
+    PageUrl.objects.filter(path__regex=r"[<>]")
 
 Placeholder restrictions honour explicitly declared child plugins again
 =======================================================================
@@ -334,6 +368,31 @@ To hide such a child plugin again, either add it to the placeholder's
 ``excluded_plugins``, or override the parent's ``child_classes`` for the
 placeholder in :setting:`CMS_PLACEHOLDER_CONF`.
 
+Page paths reject angle brackets
+================================
+
+The input validation for GHSA-mgv8-5r6j-2gjq rejects values that earlier
+releases accepted:
+
+* ``relative_url_regex`` no longer allows ``<`` and ``>`` anywhere in the value.
+  It previously excluded them from the leading segment only, so markup passed as
+  soon as one safe character preceded it (``foo/a<img src=x onerror=...>``).
+* ``validate_url_uniqueness()`` now validates single-segment paths as well.
+  Paths without a ``/`` used to skip validation entirely.
+* ``validate_url()`` rejects ``<`` and ``>`` outright, before it decides between
+  the relative and the absolute branch. The absolute branch is Django's
+  ``URLValidator``, whose path pattern accepts both characters, so a value
+  carrying a scheme (``https://example.com/<script>…</script>``) used to bypass
+  the check above. This also covers the *Redirect* field, which renders into an
+  ``href``.
+* Two helpers back this up in ``cms.forms.validators``: ``validate_path()``
+  dispatches on whether the value contains a ``/``, and ``validate_path_segment()``
+  checks a single segment against the new ``path_segment_regex``. Code that
+  writes page paths outside the admin forms should call ``validate_path()``.
+
+Paths already stored in the database are left untouched; only new input is
+rejected. They are, however, escaped on output from now on.
+
 The current user is stored behind a wrapper
 ===========================================
 
@@ -347,6 +406,8 @@ instead of accessing the context variable directly.
 Bug Fixes
 **********
 
+* Reject markup in the *Overwrite URL* and *Redirect* fields, and escape page titles and
+  urls on the page deletion confirmation screen (#8888) (#8894) -- Fabian Braun
 * Honour explicitly declared child plugins in placeholders restricted by
   ``CMS_PLACEHOLDER_CONF`` (regression from #8215) (#8883) -- Fabian Braun
 * Skip page URLs without a path when collecting apphook URL patterns, so that
@@ -384,10 +445,10 @@ Documentation
 Statistics
 **********
 
-This release includes 15 changelog entries, created with the help of the following contributors
+This release includes 16 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
-* Fabian Braun (14 changelog entries)
+* Fabian Braun (15 changelog entries)
 * Venelin Stoykov (1 changelog entry)
 
 With the review help of the following contributors:

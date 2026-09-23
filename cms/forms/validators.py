@@ -7,7 +7,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
-from cms.utils.urlutils import admin_reverse, relative_url_regex
+from cms.utils.urlutils import admin_reverse, path_segment_regex, relative_url_regex
 
 if TYPE_CHECKING:
     # Only needed for type hinting - avoid circular import
@@ -19,6 +19,16 @@ def validate_relative_url(value):
 
 
 def validate_url(value):
+    if "<" in value or ">" in value:
+        # ``relative_url_regex`` excludes angle brackets, but the absolute fallback below
+        # is Django's ``URLValidator``, whose path pattern accepts them as long as the
+        # value carries no space (``https://example.com/<script>alert(1)</script>``).
+        # Reject them before either branch runs, so markup cannot enter through a scheme.
+        raise ValidationError(
+            gettext("Enter a valid relative or absolute URL."),
+            code="invalid",
+        )
+
     try:
         # Validate relative urls first
         validate_relative_url(value)
@@ -42,14 +52,36 @@ def validate_url(value):
             )
 
 
+def validate_path_segment(value):
+    """Validate a single path segment, i.e. a path that contains no "/"."""
+    RegexValidator(
+        regex=path_segment_regex,
+        message=gettext("Enter a valid relative or absolute URL."),
+        code="invalid",
+    )(value)
+
+
+def validate_path(value):
+    """Validate a page path.
+
+    Unlike :func:`validate_url` this also accepts a single path segment such as ``contact``,
+    which ``relative_url_regex`` -- and therefore :func:`validate_url` -- never matches.
+    """
+    if "/" in value:
+        validate_url(value)
+    else:
+        validate_path_segment(value)
+
+
 def validate_url_uniqueness(
     site, path: str, language: str, user_language: str | None = None, exclude_page: Optional["Page"] = None
 ):
     """Checks for conflicting urls"""
     from cms.models.pagemodel import PageUrl
 
-    if "/" in path:
-        validate_url(path)
+    # Single-segment paths used to skip validation entirely, so an "Overwrite URL" without a
+    # "/" could hold arbitrary characters.
+    validate_path(path)
 
     path = path.strip("/")
     page_urls = PageUrl.objects.get_for_site(site, language=language).filter(path=path)

@@ -3,6 +3,7 @@
 
 Bug Fixes:
 ----------
+* Validate path of overwrite url (#8888) (#8894) -- Fabian Braun
 * Restricted placeholders hid explicitly declared child plugins (regression from #8215) (#8883) (#8885) (64bb2ca42) -- Fabian Braun
 * appresolver get_app_patterns (#8887) (#8889) (40bbf20c8) -- Venelin Stoykov
 * AddPageForm did not check all required CMS permissions (#8822) (#8879) (e1de2fb6a) -- Fabian Braun
@@ -25,10 +26,10 @@ Documentation:
 Statistics:
 -----------
 
-This release includes 15 changelog entries, created with the help of the following contributors
+This release includes 16 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
-* Fabian Braun (14 changelog entries)
+* Fabian Braun (15 changelog entries)
 * Venelin Stoykov (1 changelog entry)
 
 With the review help of the following contributors:
