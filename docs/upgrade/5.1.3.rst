@@ -4,15 +4,21 @@
 5.1.3 release notes
 ###################
 
-*September 16, 2026*
+*September 23, 2026*
 
 Welcome to django CMS 5.1.3!
 
 These release notes cover what has changed since django CMS 5.1.2. This patch
-release fixes broken access control in the page tree, the add-page form and the
-page wizard, and it repairs migration ``cms.0045`` on PostgreSQL. Read the
-security fixes and their backward-incompatible effects before updating an
-existing project.
+release contains **six security fixes** for broken access control in the page
+tree, the add-page form, the page wizard, the move-plugin endpoint and the
+global page permission admin, which is why we recommend that all users of
+django CMS 5.1.x upgrade as soon as possible. It also repairs migration
+``cms.0045`` on PostgreSQL and fixes a regression from django CMS 5.0.0 that hid
+explicitly declared child plugins in placeholders restricted by
+``CMS_PLACEHOLDER_CONF``. Read the security fixes and their
+backward-incompatible effects before updating an existing project.
+
+The same security fixes are contained in django CMS 5.0.12.
 
 If you are upgrading from django CMS 5.0.x or earlier, read the
 :ref:`5.1.0 release notes <upgrade-to-5.1.0>` first — they cover the backward
@@ -63,8 +69,8 @@ What's new in 5.1.3
 Security fixes
 ==============
 
-This release fixes three advisories. All of them require an authenticated
-staff account; none is exploitable anonymously. We recommend that all users
+The same fixes are contained in django CMS 5.0.12. This release fixes six
+advisories. All of them require an authenticated staff account; none is exploitable anonymously. We recommend that all users
 upgrade as soon as possible.
 
 Page-tree copy, duplicate and move disclosed view-restricted pages
@@ -103,6 +109,20 @@ No action beyond upgrading is required. Pages that were copied, duplicated or
 moved *before* the upgrade keep the permissions they were created with, so
 review restricted branches for unrestricted copies made earlier.
 
+Adding a page authorized the parent from the query string
+----------------------------------------------------------
+
+`GHSA-g52p-phr3-hvx9 <https://github.com/django-cms/django-cms/security/advisories/GHSA-g52p-phr3-hvx9>`_:
+with ``CMS_PERMISSION = True``, the add-page admin checked the add permission
+against the parent named in the query string (``?parent_page=``), while the page
+was created under the ``parent_page`` submitted in the form body -- which was
+only checked to belong to the current site. A staff user whose page permissions
+are confined to one part of the page tree could therefore create pages anywhere
+in it, including at root level. ``AddPageForm.clean_parent_page()`` now re-checks
+the permission against the parent the page is actually created under, and against
+the site when no parent is submitted. The flaw allowed page *insertion* only: no
+existing page could be read, changed or deleted through it.
+
 The page wizard allowed creating pages below a parent on another site
 ---------------------------------------------------------------------
 
@@ -134,6 +154,83 @@ created programmatically, are affected. The add-page form, the page wizard and
 *Duplicate* now accept only page types of the current site, require view
 permission on the source, and carry the source's view restrictions over to the
 new page.
+
+The move-plugin endpoint disclosed plugin content through ``plugin_parent``
+---------------------------------------------------------------------------
+
+`GHSA-79vf-xh44-8cpm <https://github.com/django-cms/django-cms/security/advisories/GHSA-79vf-xh44-8cpm>`_:
+the *paste* and *cut* paths of the move-plugin endpoint resolved the
+client-supplied ``plugin_parent`` without scoping it to the target placeholder.
+Because the endpoint renders its response from the new plugin's parent, a staff
+user with change permission on a single placeholder could name any plugin id and
+have that plugin's rendered subtree returned -- including plugins on pages they
+have no permission for, on other sites, and in other users' clipboards. The copy
+was also created with a parent outside its own placeholder.
+
+The parent is now looked up within the target placeholder and language on every
+path, including the case where ``plugin_parent`` names the plugin's existing
+parent. This flaw has been present since django CMS 3.0; unsupported release
+lines will not receive a patch.
+
+Delegated permission managers could grant themselves page rights
+-----------------------------------------------------------------
+
+`GHSA-cx9c-3cc5-gg94 <https://github.com/django-cms/django-cms/security/advisories/GHSA-cx9c-3cc5-gg94>`_:
+with ``CMS_PERMISSION = True``, the *Page global permissions* admin offered every
+``can_*`` flag regardless of the rights the acting user held. A non-superuser
+whose only elevated right was ``can_change_permissions`` could therefore grant
+themselves -- or anyone else -- ``can_publish``, ``can_delete``,
+``can_change_advanced_settings`` and ``can_move_page``, site-wide. The per-page
+permission inline had always restricted the offered flags; the global admin had
+no equivalent check.
+
+The admin now offers only the flags the manager holds, and refuses a grant of a
+flag they do not hold on every selected site. Grants that carry flags beyond the
+manager's rights, or that cover a site where they may not manage permissions, can
+no longer be changed or deleted by them, so their user, group or sites cannot be
+used to move those rights elsewhere. See the backward incompatible changes below.
+
+Because ``GlobalPagePermission`` rows carry no audit fields, review the existing
+rows after upgrading and check Django's admin log for entries created by
+non-superusers.
+
+Placeholder restrictions honour explicitly declared child plugins again
+=======================================================================
+
+Since django CMS 5.0.0, the ``plugins`` list of a placeholder in
+:setting:`CMS_PLACEHOLDER_CONF` also restricts which plugins can be added as
+*children* of other plugins (#6246). This was meant for container plugins that
+do not restrict their children, which previously offered every registered
+plugin. It also hid children that a container declared explicitly, so a
+placeholder allowing only a container plugin could not hold that container's
+children, unless they were listed in ``plugins`` -- which in turn made them
+available at the placeholder's root, too (#8432).
+
+Plugins that are explicitly related to an allowed plugin are now available as
+its children without being listed in ``plugins``:
+
+* plugins named in its ``child_classes``, and
+* plugins naming it in their ``parent_classes``,
+
+either on the plugin class or in :setting:`CMS_PLACEHOLDER_CONF`. Only literal
+plugin names count as explicit relations; glob patterns do not. The related
+plugins do not become available at the placeholder's root, and
+``excluded_plugins`` and ``allowed_slots`` still apply. Container plugins that
+do not restrict their children remain limited to the placeholder's ``plugins``.
+For example, the following configuration works again as it did before django CMS
+5.0::
+
+    CMS_PLACEHOLDER_CONF = {
+        "content sections": {
+            "plugins": ["ContentSectionPlugin"],
+            "child_classes": {
+                "ContentSectionPlugin": ["LinkPlugin", "PicturePlugin", "TextPlugin"],
+            },
+        },
+    }
+
+Configurations that list child plugins in ``plugins`` and confine them with
+``parent_classes`` keep working unchanged.
 
 .. _upgrade-5.1.3-backward-incompatible:
 
@@ -176,6 +273,12 @@ behave when pages are moved, copied or deleted.
 Page creation validates the page type and parent more strictly
 ================================================================
 
+* ``AddPageForm.clean_parent_page()`` requires add permission on the submitted
+  parent (``user_can_add_subpage()``), or on the site when no parent is
+  submitted (``user_can_add_page()``). Code that posts a ``parent_page``
+  differing from the ``?parent_page=`` query parameter, or that instantiates the
+  form for a user without add rights on that parent, gets a validation error.
+  Adding a translation (``cms_page``) is exempt.
 * ``AddPageForm.source`` only accepts page types below the current site's
   page-type root. Previously only the rendered choices were narrowed; the field
   now also narrows its queryset. Code that passes a page type from another site
@@ -192,6 +295,45 @@ Page creation validates the page type and parent more strictly
   and ``WizardStep1Form`` only accepts pages of the current site. Custom wizards
   that deliberately created pages across sites no longer work.
 
+Global page permissions are limited to the rights of the manager
+=================================================================
+
+The fix for GHSA-cx9c-3cc5-gg94 restricts what a non-superuser can do in the
+*Page global permissions* admin. Superusers and installations with
+``CMS_PERMISSION = False`` are unaffected.
+
+* A ``can_*`` flag can only be granted by a manager who holds it on *every* site
+  the grant covers. A grant with no sites selected covers all sites and requires
+  an equally unrestricted grant of the flag.
+* The manager must hold ``can_change_permissions`` on every site the grant
+  covers. Managing permissions on one site no longer reaches grants for another.
+* A flag counts only together with the Django permissions its page action
+  requires -- ``can_publish``, for instance, needs ``cms.change_page`` and
+  ``cms.publish_page``. ``can_view`` has no Django counterpart.
+* Grants outside those limits are no longer editable or deletable by that
+  manager: the change and delete views answer ``403``.
+* ``cms.utils.permissions`` gained ``get_grantable_global_permissions(user,
+  site_ids=None)``, the single source of truth for what a user may hand out.
+  Projects with their own permission admin should use it.
+
+Existing ``GlobalPagePermission`` rows are not changed by the upgrade. A row that
+was created through the old admin keeps its flags; only what managers may grant
+from now on is restricted.
+
+Restricted placeholders may offer additional child plugins
+==========================================================
+
+With the fix for explicitly declared child plugins above, editors may be offered
+child plugins that were hidden in django CMS 5.0.0 to 5.1.2: plugins declared in
+an allowed plugin's ``child_classes``, or declaring it in their
+``parent_classes``, even if they are not listed in the placeholder's
+``plugins``. Only what the structure board offers changes; stored content is
+not affected.
+
+To hide such a child plugin again, either add it to the placeholder's
+``excluded_plugins``, or override the parent's ``child_classes`` for the
+placeholder in :setting:`CMS_PLACEHOLDER_CONF`.
+
 The current user is stored behind a wrapper
 ===========================================
 
@@ -205,9 +347,17 @@ instead of accessing the context variable directly.
 Bug Fixes
 **********
 
+* Honour explicitly declared child plugins in placeholders restricted by
+  ``CMS_PLACEHOLDER_CONF`` (regression from #8215) (#8883) -- Fabian Braun
 * Skip page URLs without a path when collecting apphook URL patterns, so that
   ``get_app_patterns()`` no longer raises for unpublished pages with an attached
   application (#8887) -- Venelin Stoykov
+* Re-check the add permission against the parent a page is actually created under
+  (#8822) -- Fabian Braun
+* Restrict global page permission grants to the rights the acting manager holds
+  (#8874) -- Fabian Braun
+* Scope the move-plugin parent lookup to the target placeholder on the paste and cut
+  paths (#8849) -- Fabian Braun
 * Fix a hang of ``CurrentUserMiddleware`` in async (ASGI) mode (#8863) -- Fabian Braun
 * Check permissions on the page type used as source when adding a page (#8858) -- Fabian Braun
 * Preserve view restrictions when copying, duplicating or moving pages in the page tree (#8840)
@@ -234,10 +384,10 @@ Documentation
 Statistics
 **********
 
-This release includes 11 changelog entries, created with the help of the following contributors
+This release includes 15 changelog entries, created with the help of the following contributors
 (in alphabetical order):
 
-* Fabian Braun (10 changelog entries)
+* Fabian Braun (14 changelog entries)
 * Venelin Stoykov (1 changelog entry)
 
 With the review help of the following contributors:
