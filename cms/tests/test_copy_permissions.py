@@ -160,11 +160,11 @@ class CopyPermissionsTests(CMSTestCase):
                 user=self.actor,
             )
             # Simulate a concurrent request caching pre-commit permission rows.
-            set_permission_cache(self.actor, "change_page", [])
-            self.assertEqual(get_permission_cache(self.actor, "change_page"), [])
+            set_permission_cache(self.actor, self.source.site, "change_page", [])
+            self.assertEqual(get_permission_cache(self.actor, self.source.site, "change_page"), [])
 
         self.assertEqual(len(callbacks), 1)
-        self.assertIsNone(get_permission_cache(self.actor, "change_page"))
+        self.assertIsNone(get_permission_cache(self.actor, self.source.site, "change_page"))
 
     def test_readable_descendants_can_be_copied_without_permissions(self):
         self.add_page_permission(self.actor, self.secret, can_view=True, grant_on=ACCESS_PAGE)
