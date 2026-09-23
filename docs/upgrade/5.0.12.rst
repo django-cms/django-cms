@@ -332,6 +332,9 @@ Bug Fixes
 
 * Honour explicitly declared child plugins in placeholders restricted by
   ``CMS_PLACEHOLDER_CONF`` (regression from #8215) (#8432) -- Fabian Braun
+* Skip page URLs without a path when collecting apphook URL patterns, so that
+  ``get_app_patterns()`` no longer raises for unpublished pages with an attached
+  application (#8887) (#8890) -- Venelin Stoykov
 * Restrict global page permission grants to the rights the acting manager holds
   (#8874) (#8878) -- Fabian Braun
 * Scope the move-plugin parent lookup to the target placeholder on the paste and cut
