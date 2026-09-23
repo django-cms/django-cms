@@ -189,7 +189,7 @@ rows after upgrading and check Django's admin log for entries created by
 non-superusers.
 
 Placeholder restrictions honour explicitly declared child plugins again
-======================================================================
+=======================================================================
 
 Since django CMS 5.0.0, the ``plugins`` list of a placeholder in
 :setting:`CMS_PLACEHOLDER_CONF` also restricts which plugins can be added as
