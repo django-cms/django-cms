@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
+from django.test import override_settings
 from django.utils.translation import override as force_language
 
 from cms.admin import forms
@@ -25,7 +26,7 @@ from cms.forms.utils import (
     update_site_and_page_choices,
 )
 from cms.forms.widgets import ApplicationConfigSelect
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, Page
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, Page, PageContent
 from cms.test_utils.testcases import (
     URL_CMS_PAGE_ADVANCED_CHANGE,
     URL_CMS_PAGE_PERMISSIONS,
@@ -646,6 +647,22 @@ class ValidateUrlTestCase(CMSTestCase):
         "vbscript:msgbox(1)/x",
     ]
 
+    # Markup anywhere in the path -- ``relative_url_regex`` used to constrain only the
+    # first character after the first "/", so prefixing the markup with a safe character
+    # was enough to slip it through.
+    MARKUP = [
+        "foo/a<img src=x onerror=alert(1)>",
+        "/a<script>alert(1)</script>",
+        "foo/bar/<img src=x>",
+        "/en/x'\"><img src=x onerror=alert(1)>",
+        # A value carrying a scheme takes the ``URLValidator`` branch instead, whose path
+        # pattern accepts "<" and ">" as long as the value has no space. Markup must be
+        # rejected there too.
+        "https://example.com/<script>alert(1)</script>",
+        "https://example.com/<svg/onload=alert(1)>",
+        "https://example.com/a<b",
+    ]
+
     VALID_RELATIVE = [
         "/foo/bar",
         "/foo/bar/",
@@ -673,6 +690,14 @@ class ValidateUrlTestCase(CMSTestCase):
                 with self.assertRaises(ValidationError):
                     validate_url(value)
 
+    def test_markup_in_any_path_segment_is_rejected(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.MARKUP:
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validate_url(value)
+
     def test_valid_relative_urls_are_accepted(self):
         from cms.forms.validators import validate_url
 
@@ -686,3 +711,112 @@ class ValidateUrlTestCase(CMSTestCase):
         for value in self.VALID_ABSOLUTE:
             with self.subTest(value=value):
                 validate_url(value)  # must not raise
+
+
+class ValidatePathSegmentTestCase(CMSTestCase):
+    """``validate_url_uniqueness`` only ran ``validate_url`` on paths containing a "/", so a
+    single-segment "Overwrite URL" such as ``<img src=x onerror=alert(1)>`` skipped validation
+    altogether and was stored verbatim.
+    """
+
+    def test_markup_is_rejected(self):
+        from cms.forms.validators import validate_path_segment
+
+        for value in ("<img src=x onerror=alert(1)>", "a<b", "a>b"):
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validate_path_segment(value)
+
+    def test_plain_segments_are_accepted(self):
+        from cms.forms.validators import validate_path_segment
+
+        # "" is the home page's path
+        for value in ("", "contact", "contact-us", "Kontakt", "a.b_c"):
+            with self.subTest(value=value):
+                validate_path_segment(value)  # must not raise
+
+    def test_validate_url_uniqueness_rejects_markup(self):
+        from cms.forms.validators import validate_url_uniqueness
+
+        page = create_page("home", "nav_playground.html", "en")
+        with self.assertRaises(ValidationError):
+            validate_url_uniqueness(page.site, path="<img src=x onerror=alert(1)>", language="en", exclude_page=page)
+
+
+@override_settings(CMS_PERMISSION=False)
+class OverwriteUrlFormValidationTestCase(CMSTestCase):
+    """``ChangePageForm`` must reject markup in "Overwrite URL".
+
+    ``clean()`` returns early for the home page, so the check cannot live there: the value is
+    persisted regardless and becomes the live ``PageUrl.path`` as soon as the page stops being
+    the home page.
+    """
+
+    payload = "<img src=x onerror=alert(187)>"
+
+    def _post_overwrite_url(self, content, user, payload=None):
+        url_obj = content.page.get_url(content.language)
+        data = {
+            "title": content.title,
+            "slug": url_obj.slug,
+            "overwrite_url": self.payload if payload is None else payload,
+            "template": "nav_playground.html",
+            "_continue": "1",
+        }
+        with self.login_user_context(user):
+            return self.client.post(self.get_admin_url(PageContent, "change", content.pk), data)
+
+    def _editor(self):
+        editor = self.get_staff_user_with_no_permissions()
+        self.add_permission(editor, "change_page")
+        return editor
+
+    def _assert_url_untouched(self, page, expected_path):
+        """The overwrite url lives on ``PageUrl`` (``managed=False`` plus the verbatim path),
+        so a rejected value must leave the managed url in place."""
+        url_obj = page.get_url("en")
+        self.assertTrue(url_obj.managed)
+        self.assertEqual(url_obj.path, expected_path)
+
+    def test_rejected_on_regular_page(self):
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        page = create_page("victim", "nav_playground.html", "en", parent=home)
+        content = page.get_content_obj("en")
+
+        response = self._post_overwrite_url(content, self._editor())
+
+        self.assertEqual(response.status_code, 200)  # re-rendered with errors, not a 302 redirect
+        self.assertIn("overwrite_url", response.context["adminform"].form.errors)
+        self._assert_url_untouched(page, "victim")
+
+    def test_rejected_in_later_path_segment(self):
+        """Markup preceded by a safe character in a multi-segment path must not slip through."""
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        page = create_page("victim", "nav_playground.html", "en", parent=home)
+        content = page.get_content_obj("en")
+
+        response = self._post_overwrite_url(content, self._editor(), payload="foo/a<img src=x onerror=alert(187)>")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("overwrite_url", response.context["adminform"].form.errors)
+        self._assert_url_untouched(page, "victim")
+
+    def test_rejected_on_home_page(self):
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        other = create_page("other", "nav_playground.html", "en")
+        content = home.get_content_obj("en")
+
+        response = self._post_overwrite_url(content, self._editor())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("overwrite_url", response.context["adminform"].form.errors)
+        self._assert_url_untouched(home, "")
+
+        # the value must not resurface once the page is no longer the home page
+        other.set_as_homepage()
+        home = Page.objects.get(pk=home.pk)
+        home._clear_internal_cache()
+        self.assertEqual(home.urls.get(language="en").path, "home")
