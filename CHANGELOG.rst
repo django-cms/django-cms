@@ -1,3 +1,24 @@
+5.0.13 (2026-09-24)
+===================
+
+Bug Fixes:
+----------
+* Validate path of overwrite url (#8888) (#8892) (#8895) (36882321a) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 1 changelog entry, created with the help of the following contributors
+(in alphabetical order):
+
+* Fabian Braun (1 changelog entry)
+
+With the review help of the following contributors:
+
+* Claude Opus 5.5 (1M context)
+
+Thanks to all contributors for their efforts!
+
 5.0.12 (2026-09-18)
 ===================
 
