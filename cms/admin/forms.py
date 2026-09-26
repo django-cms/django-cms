@@ -1023,19 +1023,22 @@ class MovePageForm(PageTreeForm):
         target_page, position = self.get_tree_options()
         new_parent = self._determine_new_parent(target_page, position)
 
-        language = self.page.get_content_obj().language
-        slug = self.page.get_slug(language)
+        # Moving affects every URL, regardless of the active admin language or
+        # whether public content is available. Never-published pages may have
+        # no URLs yet; their URLs will be validated when they are published.
+        for url in self.page.urls.all():
+            language, slug = url.language, url.slug
 
-        if position not in ("first-child", "last-child"):
-            self._validate_slug_uniqueness(new_parent, language, slug)
+            if position not in ("first-child", "last-child"):
+                self._validate_slug_uniqueness(new_parent, language, slug)
 
-        if new_parent:
-            parent_path = new_parent.get_path(language)
-            new_path = f"{parent_path}/{slug}" if parent_path else slug
-        else:
-            new_path = slug
+            if new_parent:
+                parent_path = new_parent.get_path(language)
+                new_path = f"{parent_path}/{slug}" if parent_path else slug
+            else:
+                new_path = slug
 
-        self._validate_url_uniqueness(new_path, language)
+            self._validate_url_uniqueness(new_path, language)
 
         return cleaned_data
 
