@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.test import override_settings
@@ -10,6 +11,7 @@ from cms.models import (
     ACCESS_PAGE,
     ACCESS_PAGE_AND_DESCENDANTS,
     CMSPlugin,
+    GlobalPagePermission,
     Page,
     PageContent,
     PagePermission,
@@ -419,6 +421,130 @@ class DuplicatePermissionsTests(CMSTestCase):
         self.assertEqual(PagePermission.objects.count(), count)
         self.assertFalse(copy.has_view_restrictions(copy.site))
         self.assertContains(self.client.get(copy.get_absolute_url()), self.marker)
+
+
+@override_settings(
+    CMS_PERMISSION=True, CMS_PUBLIC_FOR="all",
+    CMS_LANGUAGES={"default": {"fallbacks": ["en"], "public": True}},
+)
+class DuplicateSitePermissionsTests(CMSTestCase):
+    """Duplicate must enforce both source scope and destination permissions."""
+
+    def setUp(self):
+        super().setUp()
+        self.forbidden_site = Site.objects.get_current()
+        self.forbidden_site.domain = "forbidden.example"
+        self.forbidden_site.save()
+        self.allowed_site = Site.objects.create(domain="allowed.example", name="Allowed")
+        self.allowed = create_page("allowed", "nav_playground.html", "en", site=self.allowed_site)
+        self.forbidden = create_page("forbidden", "nav_playground.html", "en", site=self.forbidden_site)
+        self.actor = self.get_staff_user_with_no_permissions()
+        for codename in ("add_page", "change_page", "view_page"):
+            self.add_permission(self.actor, codename)
+        grant = GlobalPagePermission.objects.create(user=self.actor, can_add=True, can_change=True)
+        grant.sites.add(self.allowed_site)
+        site_settings = override_settings(
+            SITE_ID=None,
+            ALLOWED_HOSTS=["allowed.example", "forbidden.example", "testserver"],
+            MIDDLEWARE=[*settings.MIDDLEWARE, "django.contrib.sites.middleware.CurrentSiteMiddleware"],
+        )
+        site_settings.enable()
+        self.addCleanup(site_settings.disable)
+
+    def duplicate(self, selected_site, site_in, host, query_parent=None, body_parent=None, source=None):
+        # Keep the URL object on the editor's own site. Destination tests default
+        # to a source on the selected site so source scoping cannot mask a write bypass.
+        endpoint = self.get_admin_url(PageContent, "duplicate", self.allowed.get_admin_content("en").pk)
+        if source is None:
+            source = self.allowed if selected_site == self.allowed_site else self.forbidden
+        query = {"language": "en"}
+        data = {"title": "duplicate", "slug": f"duplicate-{(site_in or 'host').lower()}", "source": source.pk, "_save": 1}
+        if query_parent:
+            query["parent_page"] = query_parent.pk
+        if body_parent:
+            data["parent_page"] = body_parent.pk
+        if site_in:
+            (query if site_in == "GET" else data)["site"] = selected_site.pk
+        query_string = "&".join(f"{key}={value}" for key, value in query.items())
+        with self.login_user_context(self.actor):
+            return self.client.post(f"{endpoint}?{query_string}", data, HTTP_HOST=host)
+
+    def assert_cross_site_source_rejected(self):
+        add_plugin(
+            self.forbidden.get_placeholders("en").get(slot="body"),
+            "TextPlugin", "en", body="CROSS-SITE-SOURCE-SECRET",
+        )
+        counts = (Page.objects.count(), PageContent.objects.count(), CMSPlugin.objects.count())
+        # Resolve the destination from Host, with no explicit site parameter.
+        # The URL object and both parents belong to the editor's allowed site;
+        # only the hidden source field points to the other site.
+        response = self.duplicate(
+            self.allowed_site, None, "allowed.example", self.allowed, self.allowed,
+            source=self.forbidden,
+        )
+        self.assertEqual(response.status_code, 200)
+        form = response.context["adminform"].form
+        self.assertEqual(form.errors.as_data()["source"][0].code, "invalid_choice")
+        self.assertEqual(
+            (Page.objects.count(), PageContent.objects.count(), CMSPlugin.objects.count()), counts,
+        )
+
+    def test_cross_site_source_is_rejected(self):
+        self.assert_cross_site_source_rejected()
+
+    def test_cross_site_source_without_reachable_path_is_rejected(self):
+        # An unreachable source must not become public through duplication.
+        # This models a null URL path, not a djangocms-versioning draft.
+        self.forbidden.urls.update(path=None)
+        self.assert_cross_site_source_rejected()
+
+    def test_same_site_source_is_allowed_with_host_resolution(self):
+        marker = "SAME-SITE-SOURCE-CONTENT"
+        add_plugin(self.allowed.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=marker)
+        response = self.duplicate(
+            self.allowed_site, None, "allowed.example", self.allowed, self.allowed,
+            source=self.allowed,
+        )
+        self.assertEqual(response.status_code, 302)
+        copy = self.allowed.get_child_pages().get()
+        self.assertEqual(copy.site_id, self.allowed_site.pk)
+        self.assertContains(self.client.get(copy.get_absolute_url(), HTTP_HOST="allowed.example"), marker)
+
+    def test_unauthorized_site_selection_is_denied(self):
+        for site_in in ("GET", "POST"):
+            for host in ("allowed.example", "forbidden.example"):
+                for parent in (None, self.forbidden):
+                    with self.subTest(site_in=site_in, host=host, parent=parent):
+                        count = Page.objects.count()
+                        response = self.duplicate(self.forbidden_site, site_in, host, parent, parent)
+                        self.assertEqual(response.status_code, 403)
+                        self.assertEqual(Page.objects.count(), count)
+
+    def test_allowed_query_parent_cannot_authorize_writes_to_another_site(self):
+        for site_in in ("GET", "POST"):
+            for host in ("allowed.example", "forbidden.example"):
+                for parent in (None, self.forbidden):
+                    with self.subTest(site_in=site_in, host=host, parent=parent):
+                        count = Page.objects.count()
+                        response = self.duplicate(
+                            self.forbidden_site, site_in, host, self.allowed, parent,
+                        )
+                        self.assertEqual(response.status_code, 200)
+                        form = response.context["adminform"].form
+                        self.assertNotIn("source", form.errors)
+                        self.assertIn("You do not have permission to add a page here.", form.errors["parent_page"])
+                        self.assertEqual(Page.objects.count(), count)
+
+    def test_authorized_site_can_be_selected_from_another_host(self):
+        for site_in in ("GET", "POST"):
+            with self.subTest(site_in=site_in):
+                response = self.duplicate(
+                    self.allowed_site, site_in, "forbidden.example", self.allowed, self.allowed,
+                )
+                self.assertEqual(response.status_code, 302)
+                copy = Page.objects.get(pagecontent_set__slug=f"duplicate-{site_in.lower()}")
+                self.assertEqual(copy.site_id, self.allowed_site.pk)
+                self.assertEqual(copy.parent_id, self.allowed.pk)
 
 
 @override_settings(CMS_PERMISSION=True, CMS_PUBLIC_FOR="all")
