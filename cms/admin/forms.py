@@ -1032,6 +1032,11 @@ class MovePageForm(PageTreeForm):
             if position not in ("first-child", "last-child"):
                 self._validate_slug_uniqueness(new_parent, language, slug)
 
+            if not url.managed:
+                # Overwritten URLs keep their fixed path when the page moves,
+                # so there is no new path to check.
+                continue
+
             if new_parent:
                 parent_path = new_parent.get_path(language)
                 new_path = f"{parent_path}/{slug}" if parent_path else slug
