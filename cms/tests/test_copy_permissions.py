@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.test import override_settings
@@ -382,7 +381,7 @@ class DuplicatePermissionsTests(CMSTestCase):
         source = create_page("source", "nav_playground.html", "en")
         add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
         self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
-        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.add_page_permission(self.actor, source, can_view=True, can_change=True, grant_on=ACCESS_PAGE)
         self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
 
         response, copy = self.duplicate(source)
@@ -398,7 +397,9 @@ class DuplicatePermissionsTests(CMSTestCase):
     def test_duplicate_preserves_inherited_restriction(self):
         ancestor = create_page("ancestor", "nav_playground.html", "en")
         self.add_page_permission(self.admin, ancestor, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
-        self.add_page_permission(self.actor, ancestor, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        self.add_page_permission(
+            self.actor, ancestor, can_view=True, can_change=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+        )
         source = create_page("source", "nav_playground.html", "en", parent=ancestor)
         add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
 
@@ -411,9 +412,23 @@ class DuplicatePermissionsTests(CMSTestCase):
         child = create_page("child", "nav_playground.html", "en", parent=copy)
         self.assertFalse(page_permissions.user_can_view_page(AnonymousUser(), child))
 
+    def test_duplicate_requires_change_permission_on_source(self):
+        # Frontend view rights are not enough: ``Page.copy()`` reads the admin
+        # content of the source, which the admin only shows to users who may
+        # change the page.
+        source = create_page("source", "nav_playground.html", "en")
+        add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
+        self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
+        self.assertFalse(page_permissions.user_can_change_page(self.actor, source))
+
+        response, copy = self.duplicate(source)
+        self.assertEqual(response.status_code, 403)
+        self.assertIsNone(copy)
+
     def test_duplicate_of_unrestricted_page_adds_no_permissions(self):
         source = create_page("source", "nav_playground.html", "en")
         add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
+        self.add_page_permission(self.actor, source, can_change=True, grant_on=ACCESS_PAGE)
         count = PagePermission.objects.count()
 
         response, copy = self.duplicate(source)
@@ -446,17 +461,17 @@ class DuplicateSitePermissionsTests(CMSTestCase):
         site_settings = override_settings(
             SITE_ID=None,
             ALLOWED_HOSTS=["allowed.example", "forbidden.example", "testserver"],
-            MIDDLEWARE=[*settings.MIDDLEWARE, "django.contrib.sites.middleware.CurrentSiteMiddleware"],
         )
         site_settings.enable()
         self.addCleanup(site_settings.disable)
 
     def duplicate(self, selected_site, site_in, host, query_parent=None, body_parent=None, source=None):
-        # Keep the URL object on the editor's own site. Destination tests default
-        # to a source on the selected site so source scoping cannot mask a write bypass.
+        # Keep the URL object and the default source on the editor's own site, so
+        # destination tests fail on the destination check alone and the source
+        # check cannot mask a write bypass.
         endpoint = self.get_admin_url(PageContent, "duplicate", self.allowed.get_admin_content("en").pk)
         if source is None:
-            source = self.allowed if selected_site == self.allowed_site else self.forbidden
+            source = self.allowed
         query = {"language": "en"}
         data = {"title": "duplicate", "slug": f"duplicate-{(site_in or 'host').lower()}", "source": source.pk, "_save": 1}
         if query_parent:
@@ -469,34 +484,68 @@ class DuplicateSitePermissionsTests(CMSTestCase):
         with self.login_user_context(self.actor):
             return self.client.post(f"{endpoint}?{query_string}", data, HTTP_HOST=host)
 
-    def assert_cross_site_source_rejected(self):
-        add_plugin(
-            self.forbidden.get_placeholders("en").get(slot="body"),
-            "TextPlugin", "en", body="CROSS-SITE-SOURCE-SECRET",
-        )
+    def assert_source_rejected(self, source):
         counts = (Page.objects.count(), PageContent.objects.count(), CMSPlugin.objects.count())
         # Resolve the destination from Host, with no explicit site parameter.
         # The URL object and both parents belong to the editor's allowed site;
-        # only the hidden source field points to the other site.
+        # only the hidden source field is under the client's control.
         response = self.duplicate(
-            self.allowed_site, None, "allowed.example", self.allowed, self.allowed,
-            source=self.forbidden,
+            self.allowed_site, None, "allowed.example", self.allowed, self.allowed, source=source,
         )
         self.assertEqual(response.status_code, 200)
         form = response.context["adminform"].form
-        self.assertEqual(form.errors.as_data()["source"][0].code, "invalid_choice")
+        self.assertIn("You do not have permission to copy this page.", form.errors["source"])
         self.assertEqual(
             (Page.objects.count(), PageContent.objects.count(), CMSPlugin.objects.count()), counts,
         )
 
-    def test_cross_site_source_is_rejected(self):
-        self.assert_cross_site_source_rejected()
+    def test_unauthorized_cross_site_source_is_rejected(self):
+        add_plugin(
+            self.forbidden.get_placeholders("en").get(slot="body"),
+            "TextPlugin", "en", body="CROSS-SITE-SOURCE-SECRET",
+        )
+        self.assert_source_rejected(self.forbidden)
 
-    def test_cross_site_source_without_reachable_path_is_rejected(self):
-        # An unreachable source must not become public through duplication.
-        # This models a null URL path, not a djangocms-versioning draft.
-        self.forbidden.urls.update(path=None)
-        self.assert_cross_site_source_rejected()
+    def test_authorized_cross_site_source_is_allowed(self):
+        # Cross-site duplication stays possible for a user with rights on both
+        # sites: the source is checked against *its* site, not the destination.
+        grant = GlobalPagePermission.objects.create(user=self.actor, can_change=True)
+        grant.sites.add(self.forbidden_site)
+        marker = "CROSS-SITE-SOURCE-CONTENT"
+        add_plugin(self.forbidden.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=marker)
+        response = self.duplicate(
+            self.allowed_site, None, "allowed.example", self.allowed, self.allowed,
+            source=self.forbidden,
+        )
+        self.assertEqual(response.status_code, 302)
+        copy = self.allowed.get_child_pages().get()
+        self.assertEqual(copy.site_id, self.allowed_site.pk)
+        self.assertContains(self.client.get(copy.get_absolute_url(), HTTP_HOST="allowed.example"), marker)
+
+    def test_same_site_source_requires_change_permission(self):
+        # An unreachable source must not become public through duplication, on
+        # the same site too. This models a null URL path, not a djangocms-versioning
+        # draft; both are admin-only content that ``Page.copy()`` would carry over.
+        unreachable = create_page("unreachable", "nav_playground.html", "en", site=self.allowed_site)
+        unreachable.urls.update(path=None)
+        add_plugin(
+            unreachable.get_placeholders("en").get(slot="body"),
+            "TextPlugin", "en", body="SAME-SITE-SOURCE-SECRET",
+        )
+        # Keep add rights on the site, but confine change rights to ``allowed``.
+        GlobalPagePermission.objects.filter(user=self.actor).update(can_change=False)
+        PagePermission.objects.create(
+            user=self.actor, page=self.allowed, can_add=True, can_change=True, grant_on=ACCESS_PAGE,
+        )
+        self.assert_source_rejected(unreachable)
+
+    def test_duplicate_view_requires_permission_on_source(self):
+        # ``GET`` on the endpoint of a content object the user may not open in the
+        # admin fails at the view rather than rendering an unsubmittable form.
+        endpoint = self.get_admin_url(PageContent, "duplicate", self.forbidden.get_admin_content("en").pk)
+        with self.login_user_context(self.actor):
+            response = self.client.get(f"{endpoint}?language=en", HTTP_HOST="allowed.example")
+        self.assertEqual(response.status_code, 403)
 
     def test_same_site_source_is_allowed_with_host_resolution(self):
         marker = "SAME-SITE-SOURCE-CONTENT"
@@ -642,7 +691,9 @@ class PageTypeSourcePermissionsTests(CMSTestCase):
     def test_rejects_source_when_adding_translation(self):
         source = self.create_page_type("restricted-type")
         self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
-        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        # ``can_change`` lets the actor past the duplicate view's gate on the
+        # source, so the form rule below is exercised on both endpoints.
+        self.add_page_permission(self.actor, source, can_view=True, can_change=True, grant_on=ACCESS_PAGE)
         destination = create_page("destination", "nav_playground.html", "de")
         self.add_page_permission(self.actor, destination, can_change=True, grant_on=ACCESS_PAGE)
         self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
