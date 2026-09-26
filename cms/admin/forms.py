@@ -300,6 +300,8 @@ class AddPageForm(BasePageContentForm):
             page_field.queryset = page_field.queryset.filter(site=self._site)
 
         source_field = self.fields.get("source")
+        if source_field:
+            source_field.queryset = source_field.queryset.filter(site=self._site)
 
         if not source_field or source_field.widget.is_hidden:
             return
