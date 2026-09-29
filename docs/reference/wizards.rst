@@ -43,13 +43,10 @@ When instantiating a Wizard object, use the keywords:
                        for toolbar enabled models.
 
 
-.. important::
+.. versionchanged:: 6.0
 
-    As of version 4 of django CMS wizards are no longer registered with the
-    ``wizard_pool``. Instead you need to create a app config in ``cms_config.py``
-    to register wizards.
-
-.. versionadded:: 4.0
+    The ``wizard_pool``, deprecated since django CMS 4.0, is removed. Wizards
+    are registered in ``cms_config.py``.
 
 Wizards are made available to the CMS by adding a :class:`cms.app_base.CMSAppConfig`
 subclass to your apps's `cms_config.py`. As an example, here's how the CMS itself
@@ -85,22 +82,4 @@ Wizard class
 ..  autofunction:: entry_choices
 
 
-
-***********
-wizard_pool
-***********
-
-.. warning::
-
-    The wizard pool is deprecated since version 4.0 and will be removed in a future
-    version.
-
-..  module:: cms.wizards.wizard_pool
-
-..  autodata:: cms.wizards.wizard_pool.wizard_pool
-    :no-value:
-
-..  autoclass:: cms.wizards.wizard_pool.WizardPool
-    :members:
-    :inherited-members:
 

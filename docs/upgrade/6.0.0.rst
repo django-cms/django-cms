@@ -464,4 +464,46 @@ For contributors
 Removal of deprecated functionality
 ===================================
 
-Empty sections are to be removed before release.
+These features were deprecated in django CMS 4 or 5 and are removed in 6.0:
+
+* **Tree nodes.** ``Page.node``, and ``node``/``node__`` lookups in
+  ``select_related()``, ``filter()`` and ``order_by()`` of page querysets. The
+  tree fields are attributes of ``Page`` itself: use ``page.path``,
+  ``page.is_leaf()``, ``path__startswith=...``.
+* **Page methods and attributes:** ``parent_page`` and ``get_parent_page()``
+  (use ``parent``), ``set_tree_node()`` (use ``add_to_tree()``), ``languages``
+  (use ``get_languages()``), ``get_published_languages()`` (use
+  ``get_languages(admin_manager=False)``), ``set_translations_cache()`` (use
+  ``get_content_obj()``), and the no-ops ``remove_language()`` and
+  ``update_languages()``. The ``parent_node`` argument of ``Page.copy()`` and
+  ``Page.copy_with_descendants()`` is removed; use ``parent_page``.
+* ``PageContentManager.get_title()``; use ``page.get_content_obj()`` or
+  ``page.get_admin_content()``.
+* ``PagePermission.get_page_ids()``; use ``get_page_permission_tuple()``.
+* ``cms.utils.page.get_page_queryset()``; use ``Page.objects.on_site(site)``.
+* ``PageContentAdmin.user_can_access_site()`` and
+  ``PageContentAdmin.raise_site_permission_denied()``, which were unused.
+* The ``parents`` argument of ``CMSPlugin.get_plugin_info()``,
+  ``cms.core.editing.structure.get_plugin_toolbar_info()`` and
+  ``get_plugin_toolbar_js()``. Parent restrictions are no longer sent to the
+  frontend.
+* The ``move_page`` signal; use the ``pre_obj_operation`` and
+  ``post_obj_operation`` signals with ``operation == operations.MOVE_PAGE``.
+* ``cms.wizards.wizard_pool.wizard_pool`` and its ``WizardPool`` class;
+  register wizards with ``cms_wizards`` in your ``cms_config.py``, and use
+  ``cms.wizards.wizard_base.get_entry()`` and ``get_entries()``.
+* The ``cms.wizards.helpers`` module; import ``get_entry`` and ``get_entries``
+  from ``cms.wizards.wizard_base``.
+* ``RemovedInDjangoCMS60Warning``.
+
+Arguments that were optional with a deprecation warning are now required:
+
+* ``site_id`` of ``cms.utils.i18n.get_languages()``, ``get_language_code()``,
+  ``get_language_list()``, ``get_language_tuple()``, ``get_language_dict()``,
+  ``get_public_languages()``, ``get_language_object()`` and
+  ``get_language_objects()``;
+* ``request`` of ``cms.utils.get_current_site()``;
+* ``site`` of ``cms.permissions.page_permissions.user_can_add_page()``.
+
+``has_generic_permission()`` still takes the site from the page if no ``site``
+is given; only calling it without both is no longer possible.
