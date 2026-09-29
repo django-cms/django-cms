@@ -339,6 +339,28 @@ class FormsTestCase(CMSTestCase):
         self.assertEqual(page.parent_id, target.pk)
         self.assertEqual(page.get_path("de"), "custom")
 
+    def test_move_page_form_keeps_overwritten_urls_next_to_sibling(self):
+        source = create_page("Source", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind", overwrite_url="custom")
+        create_page("Other", "nav_playground.html", "en", parent=target)
+        # A sibling with the same German slug does not collide with the
+        # overwritten German URL, whatever the insert position.
+        create_page("Kind", "nav_playground.html", "de", parent=target, slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 1}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertEqual(page.get_path("de"), "custom")
+
     def test_move_page_form_positions(self):
         """Test different position options in MovePageForm"""
         parent = create_page("Parent", "nav_playground.html", "en")
