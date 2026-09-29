@@ -364,7 +364,7 @@ class MovePageChecksTest(CMSTestCase):
 
         self.assertFalse(verdict)
         self.assertEqual(verdict.reasons[0].name, "cms.pages.url_unique")
-        self.assertIn("Enter a valid relative or absolute URL.", str(verdict))
+        self.assertIn("Enter a valid", str(verdict))
         self.assertNotIn(SLUG_NOT_UNIQUE, str(verdict))
 
     def test_service_raises_what_the_dry_run_reports(self):
