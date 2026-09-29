@@ -103,9 +103,6 @@ class CopyLangCommand(SubcommandsCommand):
                             else new_title["slug"]
                     new_content = PageContent.objects.with_user(user).create(**new_title)
 
-                    if to_lang not in page.get_languages():
-                        page.update_languages(page.get_languages() + [to_lang])
-
                     if new_content.is_public():
                         # The page URL is derived from public content only; drafts
                         # created by a versioning package get theirs on publish.

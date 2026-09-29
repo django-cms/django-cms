@@ -456,10 +456,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().get_urls().filter(slug="page-2-3"))
 
+
 class TestPageWizardSubmission(CMSTestCase):
     def test_page_wizard_submission(self):
-        from cms.wizards.helpers import get_entries
-
         page = create_page("home", "nav_playground.html", "en")
         entry_id = get_entries()[0].id
         endpoint = admin_reverse("cms_wizard_create")

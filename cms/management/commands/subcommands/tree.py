@@ -90,7 +90,7 @@ class FixTreeCommand(SubcommandsCommand):
                 last_page = page
 
     def _update_url_path_recursive(self, page, language):
-        if page.node.is_leaf() or language not in page.get_languages():
+        if page.is_leaf() or language not in page.get_languages():
             return
 
         pages = page.get_child_pages()

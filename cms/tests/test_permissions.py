@@ -86,7 +86,7 @@ class PermissionCacheTests(CMSTestCase):
         cached_permissions_permissions = get_permission_cache(
             self.user_normal, Site.objects.get_current(), "change_page"
         )
-        self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
+        self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
     def test_cached_permission_precedence(self):
