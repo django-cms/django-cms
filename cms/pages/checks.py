@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import operations
 from cms.core.plugins import downcast_plugins
-from cms.forms.validators import validate_url_uniqueness
+from cms.forms.validators import validate_path, validate_url_uniqueness
 from cms.models import CMSPlugin, Page
 from cms.pages.permissions import get_page_permissions
 from cms.shared.checks import register_core_check
@@ -103,6 +103,9 @@ def check_move_url_unique(context, *, page, target_page, position, **kwargs):
             new_path = f"{parent_path}/{url.slug}" if parent_path else url.slug
         else:
             new_path = url.slug
+        # An invalid path (a parent path stored before paths were validated,
+        # say) is reported as such, not as a slug conflict.
+        validate_path(new_path)
         try:
             validate_url_uniqueness(page.site, path=new_path, language=url.language, exclude_page=page)
         except ValidationError:

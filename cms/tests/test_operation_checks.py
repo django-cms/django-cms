@@ -354,6 +354,19 @@ class MovePageChecksTest(CMSTestCase):
 
         self.assertSlugNotUnique(self.can_move(child, grandparent.pk, 2))
 
+    def test_invalid_parent_path_is_not_reported_as_a_slug_conflict(self):
+        target = create_page("Target", "nav_playground.html", "en")
+        # A path stored before paths were validated.
+        target.urls.filter(language="en").update(path="tar<get>")
+        page = create_page("Child", "nav_playground.html", "en")
+
+        verdict = self.can_move(page, target.pk, 0)
+
+        self.assertFalse(verdict)
+        self.assertEqual(verdict.reasons[0].name, "cms.pages.url_unique")
+        self.assertIn("Enter a valid relative or absolute URL.", str(verdict))
+        self.assertNotIn(SLUG_NOT_UNIQUE, str(verdict))
+
     def test_service_raises_what_the_dry_run_reports(self):
         parent1 = create_page("Parent 1", "nav_playground.html", "en")
         parent2 = create_page("Parent 2", "nav_playground.html", "en")
