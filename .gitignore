@@ -57,3 +57,6 @@ webpack-stats.json
 .better_test.db
 .vscode/
 _*.md
+
+# Transifex CLI binary
+/tx
