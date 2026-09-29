@@ -361,6 +361,48 @@ class FormsTestCase(CMSTestCase):
         self.assertEqual(page.parent_id, target.pk)
         self.assertEqual(page.get_path("de"), "custom")
 
+    def test_move_page_form_reorders_home_page(self):
+        home = create_page("Home", "nav_playground.html", "en")
+        create_page_content("de", "Start", home, slug="start")
+        home.set_as_homepage()
+        other = create_page("Other", "nav_playground.html", "en")
+        # Matches the German slug of the home page, whose URLs never change
+        # when it is reordered among the root pages.
+        create_page_content("de", "Andere", other, slug="andere", overwrite_url="start")
+
+        with force_language("en"):
+            form = forms.MovePageForm(data={"target": "", "position": 1}, page=home, site=self.site)
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        home.refresh_from_db()
+        self.assertTrue(home.is_home)
+        self.assertEqual(home.get_path("de"), "")
+
+    def test_move_page_form_below_unreachable_parent(self):
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        # The German translation of the target has no public path.
+        target.urls.filter(language="de").update(path=None)
+        source = create_page("Source", "nav_playground.html", "en")
+        create_page_content("de", "Quelle", source, slug="quelle")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind")
+        # Would collide if the page were checked as a root page, but below an
+        # unreachable parent its German URL stays unreachable.
+        create_page("Kind", "nav_playground.html", "de", slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 0}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertIsNone(page.get_path("de"))
+
     def test_move_page_form_positions(self):
         """Test different position options in MovePageForm"""
         parent = create_page("Parent", "nav_playground.html", "en")
