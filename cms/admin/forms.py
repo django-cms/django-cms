@@ -1097,22 +1097,39 @@ class MovePageForm(PageTreeForm):
             )
             return cleaned_data
 
+        if self.page.is_home:
+            # The home page can only be reordered among the root pages, which
+            # changes neither its URLs nor those of its descendants.
+            return cleaned_data
+
         target_page, position = self.get_tree_options()
         new_parent = self._determine_new_parent(target_page, position)
 
-        language = self.page.get_content_obj().language
-        slug = self.page.get_slug(language)
+        # Moving affects every URL, regardless of the active admin language or
+        # whether public content is available. Never-published pages may have
+        # no URLs yet; their URLs will be validated when they are published.
+        for url in self.page.urls.all():
+            if not url.managed:
+                # Overwritten URLs keep their fixed path when the page moves,
+                # so they cannot collide at the new position.
+                continue
 
-        if position not in ("first-child", "last-child"):
-            self._validate_slug_uniqueness(new_parent, language, slug)
+            language, slug = url.language, url.slug
 
-        if new_parent:
-            parent_path = new_parent.get_path(language)
-            new_path = f"{parent_path}/{slug}" if parent_path else slug
-        else:
-            new_path = slug
+            if position not in ("first-child", "last-child"):
+                self._validate_slug_uniqueness(new_parent, language, slug)
 
-        self._validate_url_uniqueness(new_path, language)
+            if new_parent:
+                parent_path = new_parent.get_path(language)
+                if parent_path is None:
+                    # Below an unreachable parent the page is unreachable, too.
+                    # Its URL is validated once the parent gets a path.
+                    continue
+                new_path = f"{parent_path}/{slug}" if parent_path else slug
+            else:
+                new_path = slug
+
+            self._validate_url_uniqueness(new_path, language)
 
         return cleaned_data
 
