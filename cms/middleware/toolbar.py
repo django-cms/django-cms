@@ -10,6 +10,11 @@ from cms.compat import moved
 
 __getattr__, __dir__, __all__ = moved(
     __name__,
-    {"ToolbarMiddleware": "cms.toolbar.middleware.ToolbarMiddleware"},
+    {
+        "ToolbarMiddleware": "cms.toolbar.middleware.ToolbarMiddleware",
+        "cms_endpoints": "cms.toolbar.middleware.cms_endpoints",
+        "get_request_ip": "cms.toolbar.middleware.get_request_ip",
+    },
     since="6.0",
+    fallback="cms.toolbar.middleware",
 )

@@ -1073,6 +1073,39 @@ class ApphooksTestCase(BaseApphooksTestCase):
         self.assertEqual(menu_nodes[1].selected, True)
 
     @override_settings(CMS_APPHOOKS=['cms.test_utils.project.sampleapp.cms_apps.SampleApp3'],)
+    def test_apphook_edit_endpoint_uses_the_content_language(self):
+        """The editor hands an apphooked page over at the URL of the edited
+        translation, whatever language the endpoint itself is called in."""
+        from cms.utils.urlutils import admin_reverse
+
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        page = create_page(
+            "apphook-root",
+            "nav_playground.html",
+            "en",
+            created_by=superuser,
+            apphook="SampleApp3",
+        )
+        german = create_page_content("de", "apphook-wurzel", page, slug="apphook-wurzel")
+        self.reload_urls()
+
+        content_type = ContentType.objects.get_for_model(german)
+        with force_language("en"):
+            # An editor whose admin runs in English opens the German translation.
+            edit_url = admin_reverse(
+                "cms_placeholder_render_object_edit", args=(content_type.pk, german.pk)
+            )
+        with self.login_user_context(superuser):
+            response = self.client.get(edit_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Sample App 3 Response')
+        toolbar = response.wsgi_request.toolbar
+        self.assertEqual(toolbar.request_path, german.get_absolute_url())
+        self.assertTrue(toolbar.request_path.startswith("/de/"), toolbar.request_path)
+        self.assertEqual(toolbar.obj, german)
+
     def test_apphook_root_page_placeholders_in_endpoints(self):
         """
         Test that page content placeholders are available in edit and preview endpoints

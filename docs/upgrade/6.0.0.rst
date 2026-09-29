@@ -237,6 +237,11 @@ Minor features
 Bug fixes
 =========
 
+* Opening the editor for a translation of a page with an apphook in another
+  language than the translation's own (for example from an admin running in
+  English) showed "This page has no preview!" instead of the apphook. The
+  editor now resolves and renders the apphook in the translation's language.
+
 * Deleting a translation that was never published, and so has no URL, no longer
   raises ``PageUrl.DoesNotExist``.
 * Copying plugins to a language the page has no content in is refused with an
@@ -449,8 +454,6 @@ Notes:
   ``cms.toolbar.templatetags`` and ``cms.shared.templatetags``;
   ``{% load cms_tags %}`` and importing the classes from
   ``cms.templatetags.cms_tags`` work as before.
-* TODO: ``cms.middleware.toolbar`` no longer provides ``cms_endpoints`` and
-  ``get_request_ip``; restore or document before release.
 
 For contributors
 ================

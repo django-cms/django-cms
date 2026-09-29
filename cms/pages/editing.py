@@ -62,21 +62,26 @@ def _editing_alternate_response(obj, request, editable):
         return None
 
     from django.urls import Resolver404, resolve as resolve_url
+    from django.utils.translation import override
 
     from cms.pages.rendering import _handle_no_apphook
     from cms.toolbar.toolbar import CMSToolbar
     from cms.views import details
 
     try:
-        # Point the toolbar at the URL the visitor would use, not the endpoint.
-        absolute_url = page.get_absolute_url()
-        request.toolbar = CMSToolbar(request, request_path=absolute_url)
-        # Make the page content's placeholders available; the apphook view may
-        # overwrite this with an object of its own.
-        request.toolbar.set_object(obj)
-        view_func, args, kwargs = resolve_url(absolute_url)
-        if view_func is not details:
-            return view_func(request, *args, **kwargs)
+        # The editor endpoint may be called in another language than the edited
+        # translation (an admin running in English, say). The apphook's URLs are
+        # resolved per language, so resolve and render in the translation's.
+        with override(obj.language):
+            # Point the toolbar at the URL the visitor would use, not the endpoint.
+            absolute_url = obj.get_absolute_url()
+            request.toolbar = CMSToolbar(request, request_path=absolute_url)
+            # Make the page content's placeholders available; the apphook view may
+            # overwrite this with an object of its own.
+            request.toolbar.set_object(obj)
+            view_func, args, kwargs = resolve_url(absolute_url)
+            if view_func is not details:
+                return view_func(request, *args, **kwargs)
     except Resolver404:
         # Apphook provides no view for its root; show the warning page.
         return _handle_no_apphook(request)
