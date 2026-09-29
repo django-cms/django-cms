@@ -13,6 +13,8 @@ CLEAR_PLACEHOLDER = 'clear_placeholder'
 CHANGE_PAGE = 'change_page'
 MOVE_PAGE = 'move_page'
 DELETE_PAGE = 'delete_page'
+SET_HOME = 'set_home'
+COPY_PAGE = 'copy_page'
 
 # Page translation operations
 ADD_PAGE_TRANSLATION = 'add_page_translation'
@@ -20,14 +22,20 @@ CHANGE_PAGE_TRANSLATION = 'change_page_translation'
 DELETE_PAGE_TRANSLATION = 'delete_page_translation'
 PUBLISH_PAGE_TRANSLATION = 'publish_page_translation'
 REVERT_PAGE_TRANSLATION_TO_LIVE = 'revert_page_translation_to_live'
+CHANGE_PAGE_TEMPLATE = 'change_page_template'
+COPY_PAGE_LANGUAGE = 'copy_page_language'
+TOGGLE_PAGE_IN_NAVIGATION = 'toggle_page_in_navigation'
 
 # Static placeholder operations
 PUBLISH_STATIC_PLACEHOLDER = 'publish_static_placeholder'
 
-PAGE_OPERATIONS = [MOVE_PAGE, DELETE_PAGE]
+PAGE_OPERATIONS = [MOVE_PAGE, DELETE_PAGE, SET_HOME, COPY_PAGE]
 PAGE_TRANSLATION_OPERATIONS = [
     DELETE_PAGE_TRANSLATION,
     PUBLISH_PAGE_TRANSLATION,
     REVERT_PAGE_TRANSLATION_TO_LIVE,
+    CHANGE_PAGE_TEMPLATE,
+    COPY_PAGE_LANGUAGE,
+    TOGGLE_PAGE_IN_NAVIGATION,
 ]
 STATIC_PLACEHOLDER_OPERATIONS = [PUBLISH_STATIC_PLACEHOLDER]

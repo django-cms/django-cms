@@ -145,6 +145,9 @@ signals the admin sends, so packages such as djangocms-versioning see the
 operation whoever performed it. The admin now calls these services instead of
 doing the work in its views.
 
+See :ref:`operations_reference` for the services, their arguments and the
+signals they send.
+
 Permission backends
 ===================
 
@@ -199,8 +202,13 @@ Checks raise Django's own ``PermissionDenied`` or ``ValidationError``.
 Permission checks run first, so a refusal never tells a user about content they
 may not see.
 
-In 6.0, moving a page runs through operation checks. The other page and plugin
-operations follow. See :ref:`operation_checks` for the concepts.
+In 6.0, all page operations run through operation checks: moving, copying,
+deleting, setting the home page, deleting a translation, changing the template,
+copying a language and toggling the navigation status. ``cms.operations`` has
+new names for the operations that had none: ``SET_HOME``, ``COPY_PAGE``,
+``CHANGE_PAGE_TEMPLATE``, ``COPY_PAGE_LANGUAGE`` and
+``TOGGLE_PAGE_IN_NAVIGATION``. The plugin operations follow. See
+:ref:`operation_checks` for the concepts and the list of checks.
 
 One frame for all services
 ==========================
@@ -228,6 +236,11 @@ Minor features
 
 Bug fixes
 =========
+
+* Deleting a translation that was never published, and so has no URL, no longer
+  raises ``PageUrl.DoesNotExist``.
+* Copying plugins to a language the page has no content in is refused with an
+  error message instead of failing with an ``AttributeError``.
 
 * Moving a page that was never published no longer raises a ``TypeError``
   (#8897).
@@ -280,8 +293,9 @@ Before                                            6.0
 
 Importing these classes from ``cms.cms_toolbars`` still works. Code that looks
 toolbars up by their key in ``toolbar_pool.toolbars`` or
-``request.toolbar.toolbars`` must use the new keys. TODO: check the
-``CMS_TOOLBARS`` setting with old keys before release.
+``request.toolbar.toolbars`` must use the new keys. The ``CMS_TOOLBARS``
+setting accepts both the old and the new paths, because it imports the classes
+by path and ``cms.cms_toolbars`` still provides them.
 
 Cache invalidation
 ==================
@@ -300,6 +314,41 @@ Plugins
 * ``CMSPluginBase.page_only`` is removed; it had no effect. Defining it on a
   plugin now issues a ``UserWarning``. The ``include_page_only`` argument of
   ``plugin_pool.get_all_plugins()`` is accepted and ignored.
+
+Page services
+=============
+
+The page services apply the same rules as the admin, which some of them
+previously left to the admin views:
+
+* ``set_home()`` refuses a page that is not a root page or already the home
+  page (``ValidationError``).
+* ``delete_translation()`` refuses to delete a page's only translation
+  (``ValidationError``).
+* ``copy_page_tree()`` refuses a page that has none of the target site's
+  languages (``ValidationError``).
+* ``copy_language()`` refuses a target language the page has no content in
+  (``ValidationError``).
+* ``copy_language()`` checks the permission for every target placeholder before
+  copying anything, so that a refusal leaves no partial copy behind, also
+  outside a database transaction.
+* Changing the template, toggling the navigation status and copying plugins to
+  another language ask the permission backend's new
+  ``can_change_content(page_content)``. In the admin it asks
+  ``PageContentAdmin.has_change_permission(request, page_content)``, as the
+  views did before, so admin classes overriding it keep deciding. Copying
+  plugins to another language now requires permission to change the *target*
+  translation, which the copy changes, instead of the source translation.
+
+``set_home()``, ``copy_page_tree()``, ``change_template()``,
+``copy_language()`` and ``toggle_in_navigation()`` now send the
+``pre_obj_operation`` and ``post_obj_operation`` signals, as ``move_page()`` and
+``delete_page()`` always did. ``obj`` is the page; the operations on one
+translation also send it as ``translation``, and the post signal of a copy
+carries the copy as ``new_page``. Receivers that react to every page operation,
+not only to the ones they know, now see these operations, too.
+djangocms-versioning, for example, updates the modified date of the page's
+content.
 
 Miscellaneous
 =============

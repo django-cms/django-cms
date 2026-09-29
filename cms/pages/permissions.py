@@ -40,6 +40,14 @@ class PagePermissions:
     def can_move_page(self, page) -> bool:
         return page_permissions.user_can_move_page(user=self.user, page=page, site=page.site)
 
+    def can_change_content(self, page_content) -> bool:
+        """May the user change this translation of a page?
+
+        The same as changing the page, unless a backend decides per content
+        object -- a versioning package, for one, only lets drafts be changed.
+        """
+        return self.can_change_page(page_content.page)
+
     def can_add_page(self, site) -> bool:
         return page_permissions.user_can_add_page(self.user, site)
 
@@ -91,6 +99,9 @@ class AdminPageContentPermissions(PagePermissions):
         super().__init__(request.user)
         self.model_admin = model_admin
         self.request = request
+
+    def can_change_content(self, page_content) -> bool:
+        return bool(self.model_admin.has_change_permission(self.request, page_content))
 
     def can_delete_translation(self, page, language) -> bool:
         return bool(

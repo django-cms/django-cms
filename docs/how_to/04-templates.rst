@@ -232,7 +232,7 @@ well-defined business logic which is normally hard-coded in the template.
 However the same templates might include areas of "static" content, i.e.
 content that editors wish to manage. The django CMS :ttag:`placeholder` tag
 works in templates attached to the django CMS
-:class:`~cms.models.pagemodel.Page` model, or in templates rendered by apphook
+:class:`~cms.pages.models.page.Page` model, or in templates rendered by apphook
 views (see :ref:`using_placeholders_on_apphooked_pages`). For content areas
 that are not tied to a page or apphook,
 `djangocms-alias <https://github.com/django-cms/djangocms-alias>`_

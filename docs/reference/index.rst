@@ -14,6 +14,7 @@ Technical reference material.
     app_base
     fields
     navigation
+    operations
     pages
     pagecontents
     extensions

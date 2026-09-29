@@ -836,7 +836,7 @@ This setting may also be set to an `IpRangeList` from the external package
 address ranges.
 
 The client IP address is obtained via the :setting:`CMS_REQUEST_IP_RESOLVER`
-in the ``cms.middleware.toolbar.ToolbarMiddleware`` middleware.
+in the ``cms.toolbar.middleware.ToolbarMiddleware`` middleware.
 
 
 ..  setting:: CMS_REQUEST_IP_RESOLVER
@@ -1082,9 +1082,9 @@ Example::
 
     CMS_TOOLBARS = [
         # CMS Toolbars
-        'cms.cms_toolbars.PlaceholderToolbar',
-        'cms.cms_toolbars.BasicToolbar',
-        'cms.cms_toolbars.PageToolbar',
+        'cms.core.editing.toolbar.PlaceholderToolbar',
+        'cms.toolbar.chrome.BasicToolbar',
+        'cms.pages.toolbar.PageToolbar',
 
         # third-party Toolbar
         'aldryn_blog.cms_toolbars.BlogToolbar',

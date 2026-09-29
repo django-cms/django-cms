@@ -31,7 +31,6 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
-from importlib import import_module
 
 from django.core.exceptions import PermissionDenied, ValidationError
 
@@ -44,11 +43,6 @@ __all__ = [
     "run_checks",
 ]
 
-#: Modules registering the core checks, imported on first use so that the
-#: registry is complete however the caller reached it.
-CORE_CHECK_MODULES = ("cms.pages.checks",)
-
-
 @dataclass(frozen=True)
 class _Entry:
     name: str
@@ -59,7 +53,6 @@ class _Entry:
 # operation -> name -> entry. Dicts keep insertion order, which is check order.
 _core: dict[str, dict[str, _Entry]] = {}
 _extensions: dict[str, dict[str, _Entry]] = {}
-_core_loaded = False
 
 
 def _register(registry, operation, name, check, requires):
@@ -67,7 +60,11 @@ def _register(registry, operation, name, check, requires):
 
 
 def register_core_check(operation: str, name: str, check: Callable, *, requires: Iterable[str] = ()) -> None:
-    """Register a django CMS core check. Apps use :func:`register_check`."""
+    """Register a django CMS core check. Apps use :func:`register_check`.
+
+    Core checks are kept apart from the apps' checks, so that an app can replace
+    one by name whichever of the two registers first.
+    """
     _register(_core, operation, name, check, requires)
 
 
@@ -81,17 +78,8 @@ def register_check(operation: str, name: str, check: Callable, *, requires: Iter
     _register(_extensions, operation, name, check, requires)
 
 
-def _load_core_checks():
-    global _core_loaded
-    if not _core_loaded:
-        _core_loaded = True
-        for module in CORE_CHECK_MODULES:
-            import_module(module)
-
-
 def get_checks(operation: str) -> list[_Entry]:
     """The checks for ``operation``, in the order they run."""
-    _load_core_checks()
     extensions = dict(_extensions.get(operation, {}))
     entries = [extensions.pop(name, entry) for name, entry in _core.get(operation, {}).items()]
     return entries + list(extensions.values())

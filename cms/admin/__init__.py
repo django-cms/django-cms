@@ -10,7 +10,7 @@ The implementations live with the container that owns them:
 =============================== =========================================
 ``PlaceholderAdmin`` and the plugin endpoints
                                 :mod:`cms.core.admin.placeholder`
-``UserSettingsAdmin``           :mod:`cms.core.admin.settings`
+``SettingsAdmin``               :mod:`cms.core.admin.settings`
 ``PageAdmin``, ``PageContentAdmin``, the page forms
                                 :mod:`cms.pages.admin.page`, :mod:`cms.pages.admin.forms`
 ``PagePermissionInlineAdmin`` and friends

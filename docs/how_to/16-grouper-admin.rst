@@ -13,9 +13,9 @@ language independent and language specific content.
 
 django CMS defines grouper-content structure for Page-PageContent as follows:
 
-- The :class:`~cms.models.pagemodel.Page` is the grouper model which represents base
+- The :class:`~cms.pages.models.page.Page` is the grouper model which represents base
   unit, that can have multiple content objects attached
-- The :class:`~cms.models.contentmodels.PageContent` is the content model which
+- The :class:`~cms.pages.models.content.PageContent` is the content model which
   represents page content that can be different for its grouping field - ``language`` in
   our case. It also includes the placeholders for the frontend editor.
 
@@ -29,14 +29,14 @@ language-specific content is collected in the content model.
     objects and not the grouper objects.
 
     To this end, if you want to create models that should be versionable like the
-    :class:`~cms.models.contentmodels.PageContent` of a
-    :class:`~cms.models.pagemodel.Page` objects you need to define a grouper and a
+    :class:`~cms.pages.models.content.PageContent` of a
+    :class:`~cms.pages.models.page.Page` objects you need to define a grouper and a
     content model.
 
 **Extra grouping fields** define fields of the content model by which they are grouped:
-:class:`~cms.models.contentmodels.PageContent` uses ``language`` as an extra grouping
-field. This means that one :class:`~cms.models.pagemodel.Page` object can have multiple
-:class:`~cms.models.contentmodels.PageContent` objects assign to which differ in their
+:class:`~cms.pages.models.content.PageContent` uses ``language`` as an extra grouping
+field. This means that one :class:`~cms.pages.models.page.Page` object can have multiple
+:class:`~cms.pages.models.content.PageContent` objects assign to which differ in their
 language.
 
 If not extra grouping fields are given each grouper object can have at most one content

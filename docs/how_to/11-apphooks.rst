@@ -33,7 +33,7 @@ example:
 .. code-block::
 
     from cms.app_base import CMSApp
-    from cms.apphook_pool import apphook_pool
+    from cms.pages.apphook_pool import apphook_pool
 
     @apphook_pool.register
     class MyApphook(CMSApp):
@@ -166,7 +166,7 @@ in your apphook's templates.
 
 By default (when the apphook view does not call ``request.toolbar.set_object()``), the
 :ttag:`placeholder` tag resolves against the current page's
-:class:`~cms.models.contentmodels.PageContent`, exactly as it would on a regular CMS page —
+:class:`~cms.pages.models.content.PageContent`, exactly as it would on a regular CMS page —
 including ``inherit`` walking up the page tree.
 
 For example, in the template used by your app's view:

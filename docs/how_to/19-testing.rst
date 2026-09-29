@@ -73,7 +73,7 @@ it or the context provided to its template::
 
     from cms.api import add_plugin
     from cms.models import Placeholder
-    from cms.plugin_rendering import ContentRenderer
+    from cms.core.rendering import ContentRenderer
 
     from myapp.cms_plugins import MyPlugin
     from myapp.models import MyappPlugin

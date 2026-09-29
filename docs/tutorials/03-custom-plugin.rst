@@ -41,7 +41,7 @@ Add it to ``INSTALLED_APPS`` in ``settings.py``:
 --------------------------
 
 Plugin data is stored in the database. Django CMS plugin models inherit
-from :class:`~cms.models.pluginmodel.CMSPlugin`, **not** from
+from :class:`~cms.core.models.plugin.CMSPlugin`, **not** from
 ``models.Model``.
 
 Open ``coffeeshop/models.py`` and replace its contents with:
@@ -78,8 +78,8 @@ Create ``coffeeshop/cms_plugins.py``:
 
 .. code-block:: python
 
-    from cms.plugin_base import CMSPluginBase
-    from cms.plugin_pool import plugin_pool
+    from cms.core.plugin_base import CMSPluginBase
+    from cms.core.plugin_pool import plugin_pool
 
     from coffeeshop.models import CoffeeCard
 
@@ -94,6 +94,11 @@ Create ``coffeeshop/cms_plugins.py``:
         def render(self, context, instance, placeholder):
             context["instance"] = instance
             return context
+
+.. note::
+
+    Before django CMS 6.0, ``CMSPluginBase`` and ``plugin_pool`` lived in
+    ``cms.plugin_base`` and ``cms.plugin_pool``. These import paths still work.
 
 4. Add the render template
 --------------------------

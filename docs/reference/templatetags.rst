@@ -30,10 +30,10 @@ django CMS provides two template tags for placeholders:
   for the declaration only; the actual rendering happens in a separate user-facing template
   via :ttag:`render_placeholder`.
 - :ttag:`render_placeholder` **only renders** an existing placeholder; it does not declare
-  one. It takes a :class:`~cms.models.placeholdermodel.Placeholder` instance as a parameter,
+  one. It takes a :class:`~cms.core.models.placeholder.Placeholder` instance as a parameter,
   which the model must provide — typically by retrieving it from a
   :class:`~cms.models.fields.PlaceholderRelationField` via
-  :func:`~cms.utils.placeholder.get_placeholder_from_slot`. Use it for existing apphooks that
+  :func:`~cms.core.placeholders.get_placeholder_from_slot`. Use it for existing apphooks that
   already pass a placeholder instance, and for models that expose pre-defined placeholders
   this way.
 
@@ -126,7 +126,7 @@ of its placeholders in the template.
 
 The :ttag:`render_placeholder` tag takes the following parameters:
 
-* :class:`~cms.models.placeholdermodel.Placeholder` instance
+* :class:`~cms.core.models.placeholder.Placeholder` instance
 * ``width`` parameter for context sensitive plugins (optional)
 * ``language`` keyword plus ``language-code`` string to render content in the
   specified language (optional)

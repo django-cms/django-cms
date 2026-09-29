@@ -37,6 +37,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
+from cms import operations
 from cms.constants import MODAL_HTML_REDIRECT
 from cms.core.plugin_pool import plugin_pool
 from cms.models import (
@@ -64,6 +65,7 @@ from cms.permissions import page_permissions, utils as permissions
 from cms.permissions.admin import PERMISSION_ADMIN_INLINES
 from cms.permissions.models import PermissionTuple
 from cms.permissions.utils import clear_permission_lru_caches
+from cms.shared.checks import can
 from cms.shared.editing_urls import get_object_edit_url
 from cms.shared.operations import OperationContext
 from cms.utils import get_current_site
@@ -330,14 +332,14 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(object_id)
 
-        if not page.is_potential_home():
-            return HttpResponseBadRequest(_("The page is not eligible to be home."))
-
-        page_services.set_home(
-            page,
-            context=OperationContext.from_request(request, language=request.GET.get("language")),
-            permissions=AdminPagePermissions(self, request),
-        )
+        try:
+            page_services.set_home(
+                page,
+                context=OperationContext.from_request(request, language=request.GET.get("language")),
+                permissions=AdminPagePermissions(self, request),
+            )
+        except ValidationError as error:
+            return HttpResponseBadRequest(" ".join(error.messages))
         return HttpResponse("ok")
 
     def get_list(self, request):
@@ -589,16 +591,6 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if not form.is_valid():
             return jsonify_request(HttpResponseBadRequest("error"))
 
-        page_languages = page.get_languages()
-        site_languages = get_language_list(site_id=site.pk)
-
-        if not any(lang in page_languages for lang in site_languages):
-            message = _(
-                "Error! "
-                "The page you're pasting is not translated in any of the languages configured by the target site."
-            )
-            return jsonify_request(HttpResponseBadRequest(message))
-
         try:
             new_page = page_services.copy_page_tree(
                 page,
@@ -610,6 +602,8 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             )
         except PermissionDenied as error:
             return jsonify_request(HttpResponseForbidden(str(error)))
+        except ValidationError as error:
+            return jsonify_request(HttpResponseBadRequest(" ".join(error.messages)))
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type="application/json")
 
     def edit_title_fields(self, request, page_id, language):
@@ -1117,10 +1111,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     def change_template(self, request, object_id):
         page_content = self.get_object(request, object_id=object_id)
 
-        if not self.has_change_permission(request, obj=page_content):
-            raise PermissionDenied("No permissions to change the template")
-
         if page_content is None:
+            if not self.has_change_permission(request):
+                raise PermissionDenied("No permissions to change the template")
             raise self._get_404_exception(object_id)
 
         try:
@@ -1128,6 +1121,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 page_content,
                 request.POST.get("template", None),
                 context=OperationContext.from_request(request),
+                permissions=AdminPageContentPermissions(self, request),
             )
         except ValidationError as error:
             return HttpResponseBadRequest(error.messages[0])
@@ -1140,10 +1134,9 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         target_language = request.POST.get("target_language")
         source_page_content = self.get_object(request, object_id=object_id)
 
-        if not self.has_change_permission(request, obj=source_page_content):
-            raise PermissionDenied
-
         if source_page_content is None:
+            if not self.has_change_permission(request):
+                raise PermissionDenied
             raise self._get_404_exception(object_id)
 
         try:
@@ -1151,6 +1144,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 source_page_content,
                 target_language,
                 context=OperationContext.from_request(request),
+                permissions=AdminPageContentPermissions(self, request),
             )
         except ValidationError as error:
             return HttpResponseBadRequest(error.messages[0])
@@ -1167,13 +1161,17 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page_content is None:
             raise self._get_404_exception(object_id)
 
-        page = page_content.page
-
-        if not self.has_delete_translation_permission(request, page_content.language, page):
-            return HttpResponseForbidden(_("You do not have permission to delete this page"))
-
-        if not len(list(page.get_languages())) > 1:
-            return HttpResponseBadRequest("There only exists one translation for this page")
+        # Ask before showing the confirmation page, not only when it is posted.
+        verdict = can(
+            operations.DELETE_PAGE_TRANSLATION,
+            OperationContext.from_request(request),
+            page_content=page_content,
+            permissions=AdminPageContentPermissions(self, request),
+        )
+        if not verdict:
+            if verdict.reasons[0].kind == "permission":
+                return HttpResponseForbidden(str(verdict))
+            return HttpResponseBadRequest(str(verdict))
 
         return super().delete_view(request, object_id, extra_context)
 
@@ -1195,19 +1193,20 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         """
         page_content = self.get_object(request, object_id=object_id)
 
-        if not self.has_change_permission(request, obj=page_content):
-            if self.has_change_permission(request):
-                # General (permission) problem
-                message = "You do not have permission to change a page's navigation status"
-            else:
-                # Only this page? Can be permissions or versioning, or ...
-                message = "You cannot change this page's navigation status"
-            return HttpResponseForbidden(_(message))
-
         if page_content is None:
+            if not self.has_change_permission(request):
+                return HttpResponseForbidden(_("You do not have permission to change a page's navigation status"))
             raise self._get_404_exception(object_id)
 
-        page_services.toggle_in_navigation(page_content, context=OperationContext.from_request(request))
+        try:
+            page_services.toggle_in_navigation(
+                page_content,
+                context=OperationContext.from_request(request),
+                permissions=AdminPageContentPermissions(self, request),
+            )
+        except PermissionDenied as error:
+            # Only this page? Can be permissions or versioning, or ...
+            return HttpResponseForbidden(str(error))
         # 204 -> request was successful but no response returned.
         return HttpResponse(status=204)
 

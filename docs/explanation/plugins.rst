@@ -52,20 +52,20 @@ Components of a plugin
 A django CMS plugin is fundamentally composed of three components, that correspond to
 Django's familiar Model-View-Template scheme:
 
-=================== ============================= ===================================
+=================== ============================= =======================================
 What                Function                      Subclass of
-=================== ============================= ===================================
+=================== ============================= =======================================
 model (if required) plugin instance configuration :class:`CMSPlugin
-                                                  <cms.models.pluginmodel.CMSPlugin>`
+                                                  <cms.core.models.plugin.CMSPlugin>`
 view                display logic                 :class:`CMSPluginBase
-                                                  <cms.plugin_base.CMSPluginBase>`
+                                                  <cms.core.plugin_base.CMSPluginBase>`
 template            rendering                     --
-=================== ============================= ===================================
+=================== ============================= =======================================
 
-:class:`CMSPlugin <cms.models.pluginmodel.CMSPlugin>`
+:class:`CMSPlugin <cms.core.models.plugin.CMSPlugin>`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The plugin **model**, the sub-class of :class:`cms.models.pluginmodel.CMSPlugin`, is
+The plugin **model**, the sub-class of :class:`cms.core.models.plugin.CMSPlugin`, is
 optional.
 
 You could have a plugin that doesn't need to be configured, because it only ever does
@@ -79,13 +79,13 @@ you wouldn't be able to use the same plugin for the best-selling release of the 
 Usually, you find that it is useful to be able to configure your plugin, and this will
 require a model.
 
-:class:`CMSPluginBase <cms.plugin_base.CMSPluginBase>`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:class:`CMSPluginBase <cms.core.plugin_base.CMSPluginBase>`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:class:`cms.plugin_base.CMSPluginBase` is actually a sub-class of
+:class:`cms.core.plugin_base.CMSPluginBase` is actually a sub-class of
 :class:`django:django.contrib.admin.ModelAdmin`.
 
-Because :class:`~cms.plugin_base.CMSPluginBase` sub-classes ``ModelAdmin`` several
+Because :class:`~cms.core.plugin_base.CMSPluginBase` sub-classes ``ModelAdmin`` several
 important ``ModelAdmin`` options are also available to CMS plugin developers. These
 options are often used:
 

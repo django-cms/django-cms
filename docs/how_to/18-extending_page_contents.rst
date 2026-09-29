@@ -1,8 +1,8 @@
 How to extend Page & PageContent models
 =======================================
 
-You can extend the :class:`cms.models.pagemodel.Page` and
-:class:`cms.models.contentmodels.PageContent` models with your own fields (e.g. adding
+You can extend the :class:`cms.pages.models.page.Page` and
+:class:`cms.pages.models.content.PageContent` models with your own fields (e.g. adding
 an icon for every page) by using the extension models: ``cms.extensions.PageExtension``
 and ``cms.extensions.PageContentExtension``, respectively.
 
@@ -17,8 +17,8 @@ PageContent vs Page extensions
 ------------------------------
 
 The difference between a **page extension** and a **page content extension** is related
-to the difference between the :class:`cms.models.pagemodel.Page` and
-:class:`cms.models.contentmodels.PageContent` models.
+to the difference between the :class:`cms.pages.models.page.Page` and
+:class:`cms.pages.models.content.PageContent` models.
 
 - ``PageExtension``: use to add fields that should have **the same values** for the
   different language versions of a page - for example, an icon.
@@ -117,7 +117,7 @@ icon* field can be edited.
 
 .. code-block::
 
-    from cms.toolbar_pool import toolbar_pool
+    from cms.toolbar.pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
     from django.utils.translation import gettext_lazy as _
     from .models import IconExtension
@@ -192,7 +192,7 @@ menu with those.
 
 .. code-block::
 
-    from cms.toolbar_pool import toolbar_pool
+    from cms.toolbar.pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
     from django.utils.translation import gettext_lazy as _
     from .models import RatingExtension
@@ -338,10 +338,10 @@ still use the low-level API to edit the toolbar according to your needs:
 .. code-block::
 
     from cms.api import get_page_draft
-    from cms.toolbar_pool import toolbar_pool
-    from cms.toolbar_base import CMSToolbar
+    from cms.toolbar.pool import toolbar_pool
+    from cms.toolbar.base import CMSToolbar
     from cms.utils import get_cms_setting
-    from cms.utils.page_permissions import user_can_change_page
+    from cms.permissions.page_permissions import user_can_change_page
     from django.urls import reverse, NoReverseMatch
     from django.utils.translation import gettext_lazy as _
     from .models import IconExtension

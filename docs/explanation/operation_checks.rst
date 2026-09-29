@@ -8,6 +8,7 @@ Before django CMS changes content (moving a page, adding a plugin), it asks one
 question: *may this operation happen?* This page explains where that question is
 answered, how packages add their own answers to it, and how anything, from the
 page tree to an API or an assistant, can ask it without changing anything.
+The functions and signals are listed in :ref:`operations_reference`.
 
 .. note::
 
@@ -225,6 +226,15 @@ does this, so that its overridable ``has_*_permission`` methods keep deciding
 admin requests), or for every caller with a ``page_permissions`` contract. A
 permission-related check from a package should raise ``PermissionDenied``.
 
+Operations on one translation of a page (changing its template, toggling its
+navigation status, copying plugins into it) ask the backend's
+``can_change_content(page_content)``. By default it answers the same as
+``can_change_page(page)``, but a backend can decide per translation: a
+versioning package, for example, only lets drafts be changed. In the admin,
+``can_change_content`` asks ``PageContentAdmin.has_change_permission(request,
+page_content)``, so a package overriding that method decides for these
+operations, too.
+
 
 ********************
 What checks are not
@@ -243,32 +253,100 @@ What checks are not
 Current status
 **************
 
-In django CMS 6.0, moving a page (``operations.MOVE_PAGE``) runs through
-operation checks:
+In django CMS 6.0, the page operations run through operation checks. The
+services in ``cms.pages.services`` perform them; the arguments in the second
+column are what a check receives and what a dry run passes to ``can()``.
 
 .. list-table::
     :header-rows: 1
-    :widths: 35 65
+    :widths: 30 25 45
 
-    * - Check
-      - Refuses the move if
-    * - ``cms.pages.move_permission``
-      - the user may not move the page.
-    * - ``cms.pages.move_target_permission``
-      - the user may not add pages at the target, or may not move every page of
-        the subtree there.
-    * - ``cms.pages.home_stays_root``
-      - the home page would end up below another page.
-    * - ``cms.pages.slug_unique``
-      - a new sibling has the same slug in any language.
-    * - ``cms.pages.url_unique``
-      - any of the page's URLs would collide with the URL of another page.
+    * - Operation and service
+      - Arguments
+      - Checks, in order
+    * - ``MOVE_PAGE``
+
+        ``move_page``
+      - ``page``, ``target_page``, ``position``
+      - ``cms.pages.move_permission``: the user may move the page.
+
+        ``cms.pages.move_target_permission``: the user may add pages below the
+        new parent and move every page of the subtree there.
+
+        ``cms.pages.home_stays_root``: the home page does not end up below
+        another page.
+
+        ``cms.pages.slug_unique``: no new sibling has the same slug in any
+        language.
+
+        ``cms.pages.url_unique``: none of the page's URLs collides with the URL
+        of another page.
+    * - ``COPY_PAGE``
+
+        ``copy_page_tree``
+      - ``page``, ``target_page``, ``position``, ``target_site``,
+        ``copy_permissions``
+      - ``cms.pages.copy_permission``: the user may view the page.
+
+        ``cms.pages.copy_target_permission``: the user may add pages below the
+        new parent (or at the root) and copy every page of the subtree there.
+
+        ``cms.pages.copy_languages``: the page has a language the target site
+        offers.
+    * - ``SET_HOME``
+
+        ``set_home``
+      - ``page``
+      - ``cms.pages.set_home_permission``: the user may change the page and the
+        current home page.
+
+        ``cms.pages.home_candidate``: the page is a root page and not the home
+        page yet.
+    * - ``DELETE_PAGE``
+
+        ``delete_page``
+      - ``page``
+      - ``cms.pages.delete_permission``: the user may delete the page.
+    * - ``DELETE_PAGE_TRANSLATION``
+
+        ``delete_translation``
+      - ``page_content``
+      - ``cms.pages.delete_translation_permission``: the user may delete the
+        translation.
+
+        ``cms.pages.not_last_translation``: the page has another translation.
+    * - ``CHANGE_PAGE_TEMPLATE``
+
+        ``change_template``
+      - ``page_content``, ``template``
+      - ``cms.pages.change_template_permission``: the user may change the page.
+
+        ``cms.pages.template_valid``: the project offers the template.
+    * - ``COPY_PAGE_LANGUAGE``
+
+        ``copy_language``
+      - ``page_content``, ``target_language``
+      - ``cms.pages.copy_language_permission``: the user may change the page.
+
+        ``cms.pages.target_language``: the site offers the language and the
+        page has content in it.
+
+        ``cms.pages.copy_language_plugin_permission``: the user may add the
+        plugins to every target placeholder. Checked before anything is copied.
+    * - ``TOGGLE_PAGE_IN_NAVIGATION``
+
+        ``toggle_in_navigation``
+      - ``page_content``
+      - ``cms.pages.navigation_permission``: the user may change the page.
+
+Every check also receives ``permissions``, the permission backend a caller
+passed to the service.
 
 Code that customised move validation by overriding ``MovePageForm.clean()``
 should register a check instead, see
 :ref:`upgrade-6.0-backward-incompatible`.
 
-The other page and plugin operations follow. The plan is to move
+The plugin and placeholder operations follow. The plan is to move
 ``PlaceholderRelationField.default_checks`` and the version conditions of
 ``djangocms-versioning`` onto the same registry, so that one mechanism answers
 "may this happen?" for every operation.

@@ -89,7 +89,7 @@ Before the CMS view runs, Django's middleware stack fires in order.
 -----------------
 
 The request arrives at :func:`cms.views.details` via the CMS URLconf.
-The view calls :func:`~cms.utils.page.get_page_from_request`, which
+The view calls :func:`~cms.pages.utils.get_page_from_request`, which
 matches the URL slug against the ``PageUrl`` table.
 
 The ``PageUrl`` model stores one row per ``(page, language)`` pair,
@@ -198,7 +198,7 @@ cache write, ensuring it always outlives the entries it protects.
 
 The cache duration is the shortest of ``CMS_CACHE_DURATIONS['content']``
 and the TTL returned by each rendered placeholder's
-:meth:`~cms.models.placeholdermodel.Placeholder.get_cache_expiration`.
+:meth:`~cms.core.models.placeholder.Placeholder.get_cache_expiration`.
 If any placeholder returns ``EXPIRE_NOW`` (0), the page is not cached
 at all.
 
@@ -235,7 +235,7 @@ step.
 ------------------------
 
 For each ``{% placeholder %}`` tag in the template, the CMS resolves
-the corresponding :class:`~cms.models.placeholdermodel.Placeholder`
+the corresponding :class:`~cms.core.models.placeholder.Placeholder`
 object — scoped to the current ``PageContent`` — and renders it.
 
 Before loading plugins, the CMS checks the placeholder cache. This
@@ -264,7 +264,7 @@ given ``(template, slot)`` are cached in-process in
 render.
 
 **Plugin rendering.** The tree is walked depth-first. For each plugin,
-:meth:`CMSPluginBase.render() <cms.plugin_base.CMSPluginBase.render>`
+:meth:`CMSPluginBase.render() <cms.core.plugin_base.CMSPluginBase.render>`
 returns an HTML fragment. Context flows from parent to child through
 the :setting:`CMS_PLUGIN_CONTEXT_PROCESSORS` pipeline.
 

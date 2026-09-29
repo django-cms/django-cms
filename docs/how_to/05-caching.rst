@@ -20,7 +20,7 @@ In your middleware settings be sure to add ``django.middleware.cache.UpdateCache
             'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
+            'cms.toolbar.middleware.ToolbarMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ],
 

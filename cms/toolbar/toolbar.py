@@ -134,13 +134,13 @@ class BaseToolbar(ToolbarAPIMixin):
 class CMSToolbarBase(BaseToolbar):
     """
     The toolbar is an instance of the :class:`~cms.toolbar.toolbar.CMSToolbar` class. This should not be
-    confused with the :class:`~cms.toolbar_base.CMSToolbar`, the base class for *toolbar modifier
+    confused with the :class:`~cms.toolbar.base.CMSToolbar`, the base class for *toolbar modifier
     classes* in other applications, that add items to and otherwise manipulates the toolbar.
 
     It is strongly recommended that you **only** interact with the toolbar in your own code via:
 
     #. the APIs documented here
-    #. toolbar modifier classes based on :class:`~cms.toolbar_base.CMSToolbar`
+    #. toolbar modifier classes based on :class:`~cms.toolbar.base.CMSToolbar`
 
     Several of the following methods to create and add objects other objects to the toolbar are
     inherited from :class:`~cms.toolbar.items.ToolbarAPIMixin`.

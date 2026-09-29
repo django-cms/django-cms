@@ -183,7 +183,7 @@ Create ``coffeeshop/cms_apps.py``:
 .. code-block:: python
 
     from cms.app_base import CMSApp
-    from cms.apphook_pool import apphook_pool
+    from cms.pages.apphook_pool import apphook_pool
 
 
     @apphook_pool.register

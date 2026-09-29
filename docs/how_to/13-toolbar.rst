@@ -19,7 +19,7 @@ Create a ``cms_toolbars.py`` file
 *********************************
 
 In order to interact with the toolbar API, you need to create a
-:class:`~cms.toolbar_base.CMSToolbar` sub-class in your own code, and register it.
+:class:`~cms.toolbar.base.CMSToolbar` sub-class in your own code, and register it.
 
 This class should be created in your application's ``cms_toolbars.py`` file, where it will be
 discovered automatically when the Django runserver starts.
@@ -53,15 +53,20 @@ Define and register a ``CMSToolbar`` sub-class
 
 ..  code-block:: python
 
-    from cms.toolbar_base import CMSToolbar
-    from cms.toolbar_pool import toolbar_pool
+    from cms.toolbar.base import CMSToolbar
+    from cms.toolbar.pool import toolbar_pool
 
     class MyToolbarClass(CMSToolbar):
         [...]
 
     toolbar_pool.register(MyToolbarClass)
 
-The ``cms.toolbar_pool.ToolbarPool.register`` method can also be used as a decorator:
+..  note::
+
+    Before django CMS 6.0, ``CMSToolbar`` and ``toolbar_pool`` lived in
+    ``cms.toolbar_base`` and ``cms.toolbar_pool``. These import paths still work.
+
+The ``cms.toolbar.pool.ToolbarPool.register`` method can also be used as a decorator:
 
 ..  code-block:: python
     :emphasize-lines: 1
@@ -409,7 +414,7 @@ and since the ``ItemSearchResult`` can be cast to an integer, you could even do:
 Control how and when the toolbar appears
 ****************************************
 
-By default, your :class:`~cms.toolbar_base.CMSToolbar` sub-class will be active (i.e. its
+By default, your :class:`~cms.toolbar.base.CMSToolbar` sub-class will be active (i.e. its
 ``populate`` methods will be called) in the toolbar on every page, when the user ``is_staff``.
 Sometimes however a ``CMSToolbar`` sub-class should only populate the toolbar when visiting pages
 associated with a particular application.
@@ -459,7 +464,7 @@ need to modify that to refer to the new one instead.
 An example, in which we unregister the original and register our own::
 
 
-    from cms.toolbar_pool import toolbar_pool
+    from cms.toolbar.pool import toolbar_pool
     from third_party_app.cms_toolbar import ThirdPartyToolbar
 
     @toolbar_pool.register

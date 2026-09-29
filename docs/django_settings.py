@@ -28,7 +28,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
-    'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.toolbar.middleware.ToolbarMiddleware',
     'cms.middleware.language.LanguageCookieMiddleware',
 ]
 

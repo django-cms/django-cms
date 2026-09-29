@@ -193,7 +193,7 @@ Add to :setting:`django:MIDDLEWARE` (order matters):
         # ... existing middleware ...
         "cms.middleware.user.CurrentUserMiddleware",
         "cms.middleware.page.CurrentPageMiddleware",
-        "cms.middleware.toolbar.ToolbarMiddleware",
+        "cms.toolbar.middleware.ToolbarMiddleware",
         "cms.middleware.language.LanguageCookieMiddleware",
     ]
 

@@ -8,32 +8,32 @@ Difference between django CMS v3 and v4 plugins
 
 The main difference between plugins of django CMS version 3 and django CMS v4 is how the
 tree is stored in the database. Up to django CMS version 3, the plugin model
-:class:`~cms.models.pluginmodel.CMSPlugin` inherited from a tree model ``MP_Node``
+:class:`~cms.core.models.plugin.CMSPlugin` inherited from a tree model ``MP_Node``
 declared in `the django-treebeard library
 <https://github.com/django-treebeard/django-treebeard>`_.
 
-As of django CMS version 4, :class:`~cms.models.pluginmodel.CMSPlugin` inherits directly
+As of django CMS version 4, :class:`~cms.core.models.plugin.CMSPlugin` inherits directly
 from :class:`django.db.models.Model` and manages the tree structure with the two fields
-:attr:`~cms.models.pluginmodel.CMSPlugin.parent` and
-:attr:`~cms.models.pluginmodel.CMSPlugin.position` using SQL Common Table Expressions
+:attr:`~cms.core.models.plugin.CMSPlugin.parent` and
+:attr:`~cms.core.models.plugin.CMSPlugin.position` using SQL Common Table Expressions
 (CTE) which allow recursive SQL statements. Consequently all model fields originating
 with treebeard are not available in django CMS v4+.
 
 .. warning::
 
     Django CMS 4 removes the following fields form
-    :class:`~cms.models.pluginmodel.CMSPlugin`:
+    :class:`~cms.core.models.plugin.CMSPlugin`:
 
     - ``depth``
     - ``numchild``
     - ``path``
 
-Also, the meaning of the :attr:`~cms.models.pluginmodel.CMSPlugin.position` field has
+Also, the meaning of the :attr:`~cms.core.models.plugin.CMSPlugin.position` field has
 changed. Im django CMS v3 it was unique for each
-:attr:`~cms.models.pluginmodel.CMSPlugin.parent` value (including ``None`` for plugins
+:attr:`~cms.core.models.plugin.CMSPlugin.parent` value (including ``None`` for plugins
 at root level). From django CMS v4 on, it is unique for each
-:attr:`~cms.models.pluginmodel.CMSPlugin.placeholder` and
-:attr:`~cms.models.pluginmodel.CMSPlugin.language` entry. Also, positions are counted
+:attr:`~cms.core.models.plugin.CMSPlugin.placeholder` and
+:attr:`~cms.core.models.plugin.CMSPlugin.language` entry. Also, positions are counted
 from 1 to *n* for all *n* plugins of a placeholder language combination. There must not
 be gaps in the position field (i.e., a missing position value).
 
@@ -167,7 +167,7 @@ Similarly, it deletes plugins:
 .. note::
 
     Please consider the different counting schemes for the
-    :attr:`~cms.models.pluginmodel.CMSPlugin.position` field.
+    :attr:`~cms.core.models.plugin.CMSPlugin.position` field.
 
 Adapting your test suite
 ------------------------

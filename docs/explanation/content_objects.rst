@@ -106,7 +106,7 @@ The two-part pattern is most visible on the page model:
      └── PageUrl rows           (per-language routing table, derived
                                  from the published content)
 
-The `Page <cms.models.pagemodel.Page>` docstring puts it plainly:
+The `Page <cms.pages.models.page.Page>` docstring puts it plainly:
 
     A ``Page`` is an abstract entity. It does not have any content
     associated with it, nor does it provide any slugs to build a URL.

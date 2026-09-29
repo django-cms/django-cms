@@ -16,9 +16,9 @@ Place your plugins in ``cms_plugins.py``. For our example, include the following
 
 .. code-block::
 
-    from cms.plugin_base import CMSPluginBase
-    from cms.plugin_pool import plugin_pool
-    from cms.models.pluginmodel import CMSPlugin
+    from cms.core.plugin_base import CMSPluginBase
+    from cms.core.plugin_pool import plugin_pool
+    from cms.models import CMSPlugin
     from django.utils.translation import gettext_lazy as _
 
     @plugin_pool.register_plugin
@@ -26,6 +26,11 @@ Place your plugins in ``cms_plugins.py``. For our example, include the following
         model = CMSPlugin
         render_template = "hello_plugin.html"
         cache = False
+
+.. note::
+
+    Before django CMS 6.0, ``CMSPluginBase`` and ``plugin_pool`` lived in
+    ``cms.plugin_base`` and ``cms.plugin_pool``. These import paths still work.
 
 Now we're almost done. All that's left is to add the template. Add the following into
 the root template directory in a file called ``hello_plugin.html``:
@@ -38,14 +43,14 @@ This plugin will now greet the users on your website either by their name if the
 logged in, or as Guest if they're not.
 
 Now let's take a closer look at what we did there. The ``cms_plugins.py`` files are
-where you should define your sub-classes of :class:`cms.plugin_base.CMSPluginBase`,
+where you should define your sub-classes of :class:`cms.core.plugin_base.CMSPluginBase`,
 these classes define the different plugins.
 
 There are two required attributes on those classes:
 
 - ``model``: The model you wish to use for storing information about this plugin. If you
   do not require any special information, for example configuration, to be stored for
-  your plugins, you can simply use :class:`cms.models.pluginmodel.CMSPlugin` (we'll look
+  your plugins, you can simply use :class:`cms.core.models.plugin.CMSPlugin` (we'll look
   at that model more closely in a bit). In a normal admin class, you don't need to
   supply this information because ``admin.site.register(Model, Admin)`` takes care of
   it, but a plugin is not registered in that way.
@@ -65,13 +70,13 @@ And one of the following **must** be defined if ``render_plugin`` attribute is `
   with.
 
 In addition to those attributes, you can also override the
-:meth:`~cms.plugin_base.CMSPluginBase.render()` method which determines the template
+:meth:`~cms.core.plugin_base.CMSPluginBase.render()` method which determines the template
 context variables that are used to render your plugin. By default, this method only adds
 ``instance`` and ``placeholder`` objects to your context, but plugins can override this
 to include any context that is required.
 
 A number of other methods are available for overriding on your CMSPluginBase
-sub-classes. See: :class:`~cms.plugin_base.CMSPluginBase` for further details.
+sub-classes. See: :class:`~cms.core.plugin_base.CMSPluginBase` for further details.
 
 Troubleshooting
 ---------------
@@ -98,7 +103,7 @@ choose the amount of entries shown. Another example would be a gallery plugin wh
 want to choose the pictures to show for the plugin.
 
 To do so, you create a Django model by sub-classing
-:class:`cms.models.pluginmodel.CMSPlugin` in the ``models.py`` of an installed
+:class:`cms.core.models.plugin.CMSPlugin` in the ``models.py`` of an installed
 application.
 
 Let's improve our ``HelloPlugin`` from above by making its fallback name for
@@ -108,7 +113,7 @@ In our ``models.py`` we add the following:
 
 .. code-block::
 
-    from cms.models.pluginmodel import CMSPlugin
+    from cms.models import CMSPlugin
 
     from django.db import models
 
@@ -117,15 +122,15 @@ In our ``models.py`` we add the following:
 
 If you followed the Django tutorial, this shouldn't look too new to you. The only
 difference to normal models is that you sub-class
-:class:`cms.models.pluginmodel.CMSPlugin` rather than :class:`django.db.models.Model`.
+:class:`cms.core.models.plugin.CMSPlugin` rather than :class:`django.db.models.Model`.
 
 Now we need to change our plugin definition to use this model, so our new
 ``cms_plugins.py`` looks like this:
 
 .. code-block::
 
-    from cms.plugin_base import CMSPluginBase
-    from cms.plugin_pool import plugin_pool
+    from cms.core.plugin_base import CMSPluginBase
+    from cms.core.plugin_pool import plugin_pool
     from django.utils.translation import gettext_lazy as _
 
     from .models import Hello
@@ -166,7 +171,7 @@ instance.guest_name }}`` instead of the hard-coded ``Guest`` string in the else 
     ``twitterrecententries`` and ``video``.
 
     Additionally, it is *recommended* that you avoid using ``page`` as a model field, as
-    it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`. While the
+    it is declared as a property of :class:`cms.core.models.plugin.CMSPlugin`. While the
     use of ``CMSPlugin.page`` is deprecated the property still exists as a compatibility
     shim.
 
@@ -182,7 +187,7 @@ related objects, if required, whenever the CMS copies the plugin - **it won't do
 you automatically**.
 
 Every plugin model inherits the empty
-:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` method from the base class, and
+:meth:`cms.core.models.plugin.CMSPlugin.copy_relations` method from the base class, and
 it's called when your plugin is copied. So, it's there for you to adapt to your purposes
 as required.
 
@@ -290,7 +295,7 @@ prevent the disappearance of existing plugin instances, as discussed in `Issue #
    .. code-block:: python
 
        from django.db import models
-       from cms.models.pluginmodel import CMSPlugin
+       from cms.models import CMSPlugin
 
        class MyPluginModel(CMSPlugin):
            title = models.CharField(max_length=100, default='Default Title')  # Add defaults
@@ -305,8 +310,8 @@ prevent the disappearance of existing plugin instances, as discussed in `Issue #
 
    .. code-block:: python
 
-       from cms.plugin_base import CMSPluginBase
-       from cms.plugin_pool import plugin_pool
+       from cms.core.plugin_base import CMSPluginBase
+       from cms.core.plugin_pool import plugin_pool
        from django.utils.translation import gettext_lazy as _
        from .models import MyPluginModel
 
@@ -416,7 +421,7 @@ the inline admin form for your foreign key references:
 Plugin form
 ~~~~~~~~~~~
 
-Since :class:`cms.plugin_base.CMSPluginBase` extends
+Since :class:`cms.core.plugin_base.CMSPluginBase` extends
 :class:`django:django.contrib.admin.ModelAdmin`, you can customise the form for your
 plugins just as you would customise your admin interfaces.
 
@@ -428,7 +433,7 @@ If you want to customise this the best way to do it is:
 - create a template of your own that extends
   ``cms/templates/admin/cms/page/plugin/change_form.html`` to provide the functionality
   you require;
-- provide your :class:`cms.plugin_base.CMSPluginBase` sub-class with a
+- provide your :class:`cms.core.plugin_base.CMSPluginBase` sub-class with a
   ``change_form_template`` attribute pointing at your new template.
 
 Extending ``admin/cms/page/plugin/change_form.html`` ensures that you'll keep a unified
@@ -599,8 +604,8 @@ search index) benefits:
     import nh3
     from django import forms
 
-    from cms.plugin_base import CMSPluginBase
-    from cms.plugin_pool import plugin_pool
+    from cms.core.plugin_base import CMSPluginBase
+    from cms.core.plugin_pool import plugin_pool
 
     from .models import Teaser
 
@@ -1036,8 +1041,8 @@ There are three possibilities to extend the context menus of placeholders or plu
 
 For this purpose you can overwrite the two methods on CMSPluginBase.
 
-- :meth:`~cms.plugin_base.CMSPluginBase.get_extra_placeholder_menu_items`
-- :meth:`~cms.plugin_base.CMSPluginBase.get_extra_plugin_menu_items`
+- :meth:`~cms.core.plugin_base.CMSPluginBase.get_extra_placeholder_menu_items`
+- :meth:`~cms.core.plugin_base.CMSPluginBase.get_extra_plugin_menu_items`
 
 Example:
 
@@ -1153,7 +1158,7 @@ database entries for the plugins the placeholders make all necessary changes to 
 entire plugin tree. **Not using the placeholders to create or delete plugins can lead to
 corrupted plugin trees.**
 
-- Use :meth:`cms.models.placeholdermodel.Placeholder.add_plugin` or
+- Use :meth:`cms.core.models.placeholder.Placeholder.add_plugin` or
   :func:`cms.api.add_plugin` to create plugins:
 
   .. code-block::
@@ -1178,7 +1183,7 @@ corrupted plugin trees.**
           data=dict(plugin_data="secret"),
       )
 
-- Use :meth:`cms.models.placeholdermodel.Placeholder.delete_plugin` to delete a plugin
+- Use :meth:`cms.core.models.placeholder.Placeholder.delete_plugin` to delete a plugin
       **including its children**:
 
       .. code-block::
@@ -1201,15 +1206,15 @@ Marking plugins as slots
 .. versionadded:: 5.1
 
 You can mark a plugin as a *slot* — a structural container that is not directly editable
-by the user — by setting the :attr:`~cms.plugin_base.CMSPluginBase.is_slot` attribute to
+by the user — by setting the :attr:`~cms.core.plugin_base.CMSPluginBase.is_slot` attribute to
 ``True`` on the plugin class. The plugin will still render normally, but double-clicking
 it in the structure board will not open the edit dialog. Moving the plugin or adding child
 plugins is not affected.
 
 .. code-block::
 
-    from cms.plugin_base import CMSPluginBase
-    from cms.plugin_pool import plugin_pool
+    from cms.core.plugin_base import CMSPluginBase
+    from cms.core.plugin_pool import plugin_pool
 
     @plugin_pool.register_plugin
     class SeparatorPlugin(CMSPluginBase):
@@ -1224,7 +1229,7 @@ Marking third-party plugins as slots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can also mark plugins provided by third-party apps as slots without modifying
-their source code. To do so, set :attr:`~cms.plugin_base.CMSPluginBase.is_slot` on
+their source code. To do so, set :attr:`~cms.core.plugin_base.CMSPluginBase.is_slot` on
 the plugin class in your app's ``AppConfig.ready()`` method:
 
 .. code-block::
@@ -1235,7 +1240,7 @@ the plugin class in your app's ``AppConfig.ready()`` method:
         name = "myapp"
 
         def ready(self):
-            from cms.plugin_pool import plugin_pool
+            from cms.core.plugin_pool import plugin_pool
 
             # Mark a third-party plugin as a slot to simplify
             # the editor experience
@@ -1262,7 +1267,7 @@ glance.
 .. code-block::
 
     from django.db import models
-    from cms.models.pluginmodel import CMSPlugin
+    from cms.models import CMSPlugin
 
     class AlertPlugin(CMSPlugin):
         message = models.CharField(max_length=200)

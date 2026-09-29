@@ -175,7 +175,7 @@ Let us quickly create the new app:
        from django.urls import reverse
 
        from cms.app_base import CMSApp
-       from cms.apphook_pool import apphook_pool
+       from cms.pages.apphook_pool import apphook_pool
 
        from .models import FaqConfigModel
 
@@ -247,7 +247,7 @@ Let us quickly create the new app:
        from django.urls import Resolver404, resolve
        from django.utils.translation import override
 
-       from cms.apphook_pool import apphook_pool
+       from cms.pages.apphook_pool import apphook_pool
        from cms.utils import get_language_from_request
 
        from . import models

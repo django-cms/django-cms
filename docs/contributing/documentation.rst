@@ -269,7 +269,7 @@ Inline markup
 
         .. code-block::
 
-            The ``cms.models.pagemodel`` contains several important methods.
+            The ``cms.pages.models.page`` contains several important methods.
 
       - filenames:
 

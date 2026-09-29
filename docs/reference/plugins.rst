@@ -53,7 +53,7 @@ Plugins
 
   .. method:: add_structureboard_classes(self)
 
-        Optional method on a :class:`~cms.models.pluginmodel.CMSPlugin` subclass. If
+        Optional method on a :class:`~cms.core.models.plugin.CMSPlugin` subclass. If
         defined, its return value is added as CSS classes to the ``cms-draggable``
         container in the structure board. This can be used together with custom CSS to
         visually style a plugin or its children — for example, to mark deactivated

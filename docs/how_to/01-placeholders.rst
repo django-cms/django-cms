@@ -18,12 +18,12 @@ or any other plugin to a webpage, using the same frontend editing as the CMS pag
       CMS.
     - Also, views need to tell the toolbar if they contain a frontend-editable model.
 
-Placeholders can be viewed as containers for :class:`~cms.models.pluginmodel.CMSPlugin`
+Placeholders can be viewed as containers for :class:`~cms.core.models.plugin.CMSPlugin`
 instances, and can be used outside the CMS in custom applications using the
 :class:`~cms.models.fields.PlaceholderRelationField`.
 
 By defining a :class:`~cms.models.fields.PlaceholderRelationField` on a custom model you
-can take advantage of the full power of :class:`~cms.models.pluginmodel.CMSPlugin` in
+can take advantage of the full power of :class:`~cms.core.models.plugin.CMSPlugin` in
 one or more placeholders.
 
 .. warning::
@@ -41,7 +41,7 @@ A quick glossary:
   (for example ``"content"``). Slot names are also used by :setting:`CMS_PLACEHOLDER_CONF`
   to configure which plugins can be inserted.
 - A **placeholder** is the per-instance container (a
-  :class:`~cms.models.placeholdermodel.Placeholder` object) that holds the plugins for a
+  :class:`~cms.core.models.placeholder.Placeholder` object) that holds the plugins for a
   given slot on a given model instance.
 - The **structure board** is django CMS's frontend editor view where editors add, remove
   and reorder plugins.
@@ -52,7 +52,7 @@ django CMS offers two template tags for placeholders on your own models:
   your view renders and what django CMS scans to discover slot names for the structure
   board.
 - :ttag:`render_placeholder` — *only renders* a placeholder instance that the model exposes
-  as a property (typically via :func:`~cms.utils.placeholder.get_placeholder_from_slot`).
+  as a property (typically via :func:`~cms.core.placeholders.get_placeholder_from_slot`).
   Because this tag does not declare its slot, the model also needs a separate
   declaration-only template for the structure board to discover the slots.
 
@@ -120,7 +120,7 @@ Load the view with the frontend editor active to add plugins to each slot — se
 Approach 2: Using ``{% render_placeholder %}``
 ----------------------------------------------
 
-In this approach the model exposes a :class:`~cms.models.placeholdermodel.Placeholder`
+In this approach the model exposes a :class:`~cms.core.models.placeholder.Placeholder`
 instance per slot, and the user-facing template passes that instance to
 :ttag:`render_placeholder`. Because :ttag:`render_placeholder` does not declare its slot,
 the model also needs a **separate declaration-only template**. Unlike Approach 1, the
@@ -135,7 +135,7 @@ you'll create in Step 2:
     from django.db import models
     from django.utils.functional import cached_property
     from cms.models.fields import PlaceholderRelationField
-    from cms.utils.placeholder import get_placeholder_from_slot
+    from cms.core.placeholders import get_placeholder_from_slot
 
     class MyModel(models.Model):
         # your fields
@@ -152,7 +152,7 @@ you'll create in Step 2:
         def sidebar_placeholder(self):
             return get_placeholder_from_slot(self.placeholders, "sidebar")
 
-:func:`~cms.utils.placeholder.get_placeholder_from_slot` retrieves — or, if needed,
+:func:`~cms.core.placeholders.get_placeholder_from_slot` retrieves — or, if needed,
 creates — the placeholder object for the given slot name. Add one cached property per slot.
 
 Step 2 — Create the declaration-only template. This file is never rendered to the visitor;
@@ -211,7 +211,7 @@ Approach 1 — for resolving :ttag:`placeholder` tags against your model.
 **set_object(obj)**
     Associates a Django model instance with the toolbar. This method only sets the object if
     one hasn't already been set. The object is typically a model instance that contains
-    placeholders, such as a :class:`~cms.models.contentmodels.PageContent` object or any
+    placeholders, such as a :class:`~cms.pages.models.content.PageContent` object or any
     other model that supports editable placeholders through a
     :class:`~cms.models.fields.PlaceholderRelationField`.
 

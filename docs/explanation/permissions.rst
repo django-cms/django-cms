@@ -171,9 +171,9 @@ the simpler mode, every CMS permission applies to every page.
 
 The two models that implement the *where* dimension are:
 
-* :class:`~cms.models.permissionmodels.GlobalPagePermission` — applies
+* :class:`~cms.permissions.models.GlobalPagePermission` — applies
   to all pages of one or more sites.
-* :class:`~cms.models.permissionmodels.PagePermission` — applies to a
+* :class:`~cms.permissions.models.PagePermission` — applies to a
   specific page, optionally cascading to its descendants.
 
 
@@ -341,9 +341,9 @@ the page tree the manager controls.
 
 The size of that set depends on where the manager's own authority comes
 from. A manager whose ``can_change_permissions`` right is granted by a
-:class:`~cms.models.permissionmodels.PagePermission` on part of the tree
+:class:`~cms.permissions.models.PagePermission` on part of the tree
 has only the users at or below that point. A manager granted the right
-by a :class:`~cms.models.permissionmodels.GlobalPagePermission` sits at
+by a :class:`~cms.permissions.models.GlobalPagePermission` sits at
 the top of the hierarchy, and every non-superuser account on the site is
 subordinate to them — not merely the ones they created. Grant global
 permissions with that in mind.

@@ -6,12 +6,12 @@ post-operation signal, return the changed object. The model layer keeps the
 mechanics (``Placeholder.move_plugin`` and friends); what moved up here is the
 orchestration that the admin was the only way to reach.
 
-Permission enforcement is the caller's responsibility, and nothing here enforces
-it. The admin's ``has_*_permission`` methods are documented, overridable hooks
-that djangocms-versioning and others replace, so they stay where subclasses can
-still reach them. Step 6 of the refactor gives services a permission backend of
-their own; until then these functions are privileged and must not be exposed
-through a new entry point without a check in front of them.
+Every service enforces permissions through a backend
+(:mod:`cms.core.services.permissions`), so an operation reached from outside the
+admin is checked the same way. The placeholder admin passes ``permissions=``, an
+adapter that asks its overridable ``has_*_permission`` methods, which
+djangocms-versioning and others replace; a ``permissions`` contract replaces the
+backend for every caller.
 """
 
 from cms.core.services.plugins import (

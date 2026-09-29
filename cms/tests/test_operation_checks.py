@@ -1,13 +1,17 @@
+from unittest.mock import patch
+
+from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils.translation import override as force_language
 
 from cms import operations
-from cms.api import create_page, create_page_content
+from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_config import CMSCoreExtensions
-from cms.models import Page
+from cms.models import CMSPlugin, Page, Placeholder
 from cms.pages import services as page_services
 from cms.pages.admin.forms import MovePageForm
+from cms.pages.admin.page import PageContentAdmin
 from cms.pages.permissions import PagePermissions
 from cms.shared import checks
 from cms.shared.checks import can
@@ -411,3 +415,229 @@ class MovePageChecksTest(CMSTestCase):
         )
 
         self.assertTrue(verdict, str(verdict))
+
+
+class PageOperationChecksTest(CMSTestCase):
+    """The core checks of the page operations other than moving."""
+
+    def setUp(self):
+        super().setUp()
+        self.site = Site.objects.get(pk=1)
+        self.context = OperationContext(user=self.get_superuser())
+        self.sent = []
+        post_obj_operation.connect(self.receive)
+        self.addCleanup(post_obj_operation.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        self.sent.append(kwargs)
+
+    def test_set_home_refuses_a_page_that_is_not_a_root(self):
+        parent = create_page("Parent", "nav_playground.html", "en")
+        child = create_page("Child", "nav_playground.html", "en", parent=parent)
+
+        verdict = can(operations.SET_HOME, self.context, page=child)
+        self.assertFalse(verdict)
+        self.assertEqual(verdict.reasons[0].name, "cms.pages.home_candidate")
+        with self.assertRaises(ValidationError):
+            page_services.set_home(child, context=self.context)
+
+    def test_set_home_is_announced(self):
+        page = create_page("Page", "nav_playground.html", "en")
+
+        page_services.set_home(page, context=self.context)
+
+        page.refresh_from_db()
+        self.assertTrue(page.is_home)
+        self.assertEqual([(kw["operation"], kw["obj"]) for kw in self.sent], [(operations.SET_HOME, page)])
+
+    def test_copy_checks_the_new_parent_not_the_sibling(self):
+        parent = create_page("Parent", "nav_playground.html", "en")
+        sibling = create_page("Sibling", "nav_playground.html", "en", parent=parent)
+        page = create_page("Page", "nav_playground.html", "en")
+        asked = []
+
+        class Recording(PagePermissions):
+            def can_add_subpage(self, target, site):
+                asked.append(target)
+                return target == parent
+
+        verdict = can(
+            operations.COPY_PAGE,
+            self.context,
+            page=page,
+            target_page=sibling,
+            position="right",
+            target_site=self.site,
+            permissions=Recording(self.context.user),
+        )
+
+        self.assertTrue(verdict, str(verdict))
+        self.assertEqual(asked, [parent])
+
+    def test_copy_refuses_a_page_without_a_language_of_the_target_site(self):
+        site2 = Site.objects.create(pk=2, domain="site2.com", name="site2")
+        page = create_page("Page", "nav_playground.html", "en")
+
+        with self.settings(CMS_LANGUAGES={2: [{"code": "de", "name": "German"}]}):
+            verdict = can(
+                operations.COPY_PAGE, self.context, page=page, target_page=None, position="last-child", target_site=site2
+            )
+
+        self.assertFalse(verdict)
+        self.assertEqual(verdict.reasons[0].name, "cms.pages.copy_languages")
+
+    def test_copy_announces_the_copy(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+
+        new_page = page_services.copy_page_tree(
+            page, target, "first-child", target_site=self.site, context=self.context
+        )
+
+        (kwargs,) = self.sent
+        self.assertEqual((kwargs["operation"], kwargs["obj"], kwargs["new_page"]), (operations.COPY_PAGE, page, new_page))
+
+    def test_the_last_translation_cannot_be_deleted(self):
+        page = create_page("Page", "nav_playground.html", "en")
+
+        with self.assertRaisesMessage(ValidationError, "There only exists one translation for this page"):
+            page_services.delete_translation(page.get_content_obj("en"), context=self.context)
+        self.assertEqual(page.get_languages(), ["en"])
+
+    def test_a_translation_without_url_can_be_deleted(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        german = create_page_content("de", "Seite", page)
+        page.urls.filter(language="de").delete()
+
+        page_services.delete_translation(german, context=self.context)
+
+        self.assertEqual(list(page.pagecontent_set(manager="admin_manager").values_list("language", flat=True)), ["en"])
+
+    def test_change_template_validates_the_template(self):
+        page = create_page("Page", "nav_playground.html", "en")
+
+        verdict = can(
+            operations.CHANGE_PAGE_TEMPLATE, self.context, page_content=page.get_content_obj("en"), template="nope.html"
+        )
+
+        self.assertFalse(verdict)
+        self.assertEqual(verdict.reasons[0].name, "cms.pages.template_valid")
+
+    def test_copy_language_needs_content_in_the_target_language(self):
+        page = create_page("Page", "nav_playground.html", "en")
+
+        with self.assertRaisesMessage(ValidationError, "The page has no content in the target language."):
+            page_services.copy_language(page.get_content_obj("en"), "de", context=self.context)
+
+    def test_copy_language_copies_nothing_when_one_placeholder_is_refused(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        create_page_content("de", "Seite", page.reload(), template="nav_playground.html")
+        source = page.get_content_obj("en")
+        for slot in ("body", "right-column"):
+            add_plugin(source.get_placeholders().get(slot=slot), "TextPlugin", "en", body=slot)
+        refused_slot = "right-column"
+
+        def has_add_plugins_permission(placeholder, user, plugins):
+            return placeholder.slot != refused_slot
+
+        with patch.object(Placeholder, "has_add_plugins_permission", has_add_plugins_permission):
+            with self.assertRaises(PermissionDenied):
+                page_services.copy_language(source, "de", context=self.context)
+
+        self.assertFalse(CMSPlugin.objects.filter(language="de").exists())
+        self.assertEqual(self.sent, [])
+
+    def test_content_operations_announce_the_page_and_the_translation(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        create_page_content("de", "Seite", page)
+        content = page.get_content_obj("en")
+
+        page_services.change_template(content, "nav_playground.html", context=self.context)
+        page_services.toggle_in_navigation(content, context=self.context)
+        page_services.copy_language(content, "de", context=self.context)
+
+        self.assertEqual(
+            [(kw["operation"], kw["obj"], kw["translation"]) for kw in self.sent],
+            [
+                (operations.CHANGE_PAGE_TEMPLATE, page, content),
+                (operations.TOGGLE_PAGE_IN_NAVIGATION, page, content),
+                (operations.COPY_PAGE_LANGUAGE, page, content),
+            ],
+        )
+
+    def test_toggle_in_navigation_checks_permission(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        staff = OperationContext(user=self._create_user("staff", is_staff=True))
+
+        with self.assertRaises(PermissionDenied):
+            page_services.toggle_in_navigation(page.get_content_obj("en"), context=staff)
+
+
+class ContentPermissionTest(CMSTestCase):
+    """``can_change_content`` lets a backend decide per translation."""
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("Page", "nav_playground.html", "en")
+        self.german = create_page_content("de", "Seite", self.page.reload(), template="nav_playground.html")
+        self.context = OperationContext(user=self.get_superuser())
+
+    def only_english(self):
+        class OnlyEnglish(PagePermissions):
+            def can_change_content(self, page_content):
+                return page_content.language == "en"
+
+        return OnlyEnglish(self.context.user)
+
+    def test_content_operations_ask_about_the_content(self):
+        permissions = self.only_english()
+        english = self.page.get_content_obj("en")
+
+        self.assertTrue(
+            can(operations.TOGGLE_PAGE_IN_NAVIGATION, self.context, page_content=english, permissions=permissions)
+        )
+        for operation_name, target in (
+            (operations.TOGGLE_PAGE_IN_NAVIGATION, {}),
+            (operations.CHANGE_PAGE_TEMPLATE, {"template": "nav_playground.html"}),
+        ):
+            with self.subTest(operation=operation_name):
+                verdict = can(operation_name, self.context, page_content=self.german, permissions=permissions, **target)
+                self.assertEqual([r.kind for r in verdict.reasons], ["permission"])
+
+    def test_copy_language_asks_about_the_target(self):
+        permissions = self.only_english()
+        english = self.page.get_content_obj("en")
+
+        self.assertFalse(
+            can(
+                operations.COPY_PAGE_LANGUAGE,
+                self.context,
+                page_content=english,
+                target_language="de",
+                permissions=permissions,
+            )
+        )
+        self.assertTrue(
+            can(
+                operations.COPY_PAGE_LANGUAGE,
+                self.context,
+                page_content=self.german,
+                target_language="en",
+                permissions=permissions,
+            )
+        )
+
+    def test_the_admin_decides_through_its_hook(self):
+        class ReadOnlyGermanAdmin(PageContentAdmin):
+            def has_change_permission(self, request, obj=None):
+                if obj is not None and obj.language == "de":
+                    return False
+                return super().has_change_permission(request, obj)
+
+        model_admin = ReadOnlyGermanAdmin(type(self.german), admin.site)
+        with self.login_user_context(self.get_superuser()):
+            request = self.get_request(post_data={"no": "data"})
+            response = model_admin.change_innavigation(request, self.german.pk)
+            self.assertEqual(response.status_code, 403)
+            response = model_admin.change_innavigation(request, self.page.get_content_obj("en").pk)
+            self.assertEqual(response.status_code, 204)

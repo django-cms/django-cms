@@ -120,7 +120,7 @@ Configure the model's admin class
 Configure your admin class by adding the ``FrontendEditableAdminMixin`` mixin to it (see
 :mod:`Django admin documentation <django.contrib.admin>` for general Django admin information)::
 
-    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
+    from cms.core.admin.placeholder import FrontendEditableAdminMixin
     from django.contrib import admin
 
 
@@ -152,7 +152,7 @@ Set up the admin
 You need to add to your model admin a tuple of fields editable from the frontend
 admin::
 
-    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
+    from cms.core.admin.placeholder import FrontendEditableAdminMixin
     from django.contrib import admin
 
 
