@@ -33,7 +33,7 @@ class PlaceholderToolbar(CMSToolbar):
         self.render_object_editable_buttons()
 
     def add_wizard_button(self):
-        from cms.wizards.wizard_pool import entry_choices
+        from cms.wizards.wizard_base import entry_choices
 
         title = _("Create")
 

@@ -432,6 +432,7 @@ Old path                                   New path
 ``cms.toolbar.utils``                      ``cms.core.editing.structure``,
                                            ``cms.shared.editing_urls``
 ``cms.views`` (``render_object_*``)        ``cms.core.editing.views``
+``cms.wizards.wizard_pool``                ``cms.wizards.wizard_base``
 =========================================  ============================================
 
 Notes:
@@ -489,9 +490,11 @@ These features were deprecated in django CMS 4 or 5 and are removed in 6.0:
   frontend.
 * The ``move_page`` signal; use the ``pre_obj_operation`` and
   ``post_obj_operation`` signals with ``operation == operations.MOVE_PAGE``.
-* ``cms.wizards.wizard_pool.wizard_pool`` and its ``WizardPool`` class;
-  register wizards with ``cms_wizards`` in your ``cms_config.py``, and use
-  ``cms.wizards.wizard_base.get_entry()`` and ``get_entries()``.
+* ``cms.wizards.wizard_pool.wizard_pool``, its ``WizardPool`` class and
+  ``AlreadyRegisteredException``; register wizards with ``cms_wizards`` in your
+  ``cms_config.py``, and use ``cms.wizards.wizard_base.get_entry()`` and
+  ``get_entries()``. ``entry_choices``, ``get_entries`` and ``get_entry`` can
+  still be imported from ``cms.wizards.wizard_pool``.
 * The ``cms.wizards.helpers`` module; import ``get_entry`` and ``get_entries``
   from ``cms.wizards.wizard_base``.
 * ``RemovedInDjangoCMS60Warning``.
