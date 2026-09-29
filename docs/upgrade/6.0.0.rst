@@ -316,6 +316,11 @@ in tests, may need adjusting.
 Plugins
 =======
 
+* The plugin services ``move_plugin()`` and ``paste_plugin()`` raise
+  ``ValidationError`` for a ``target_parent`` outside the target placeholder or
+  language, and ``move_plugin()`` also for the plugin itself or one of its
+  descendants. The admin checked this before; callers outside the admin now get
+  the same protection.
 * ``CMSPluginBase.page_only`` is removed; it had no effect. Defining it on a
   plugin now issues a ``UserWarning``. The ``include_page_only`` argument of
   ``plugin_pool.get_all_plugins()`` is accepted and ignored.

@@ -233,7 +233,7 @@ class PluginPool:
         self,
         placeholder: str | None = None,
         obj: models.Model | None = None,
-        setting_key: str = "plugins",
+        setting_key: str | None = "plugins",
         include_page_only: bool = True,
         root_plugin: bool = False,
         *,
@@ -253,14 +253,16 @@ class PluginPool:
             lazy(obj.get_template, str)() if obj and hasattr(obj, "get_template") else None
         )  # Make template lazy to avoid unnecessary db access
 
+        # ``setting_key=None`` skips the placeholder's allow list (``excluded_plugins`` still applies)
         allowed_plugins = (
             get_placeholder_conf(
                 setting_key,
                 placeholder,
                 template,
             )
-            or ()
-        )
+            if setting_key
+            else None
+        ) or ()
         excluded_plugins = (
             get_placeholder_conf(
                 "excluded_plugins",

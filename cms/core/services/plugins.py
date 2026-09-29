@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import uuid
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils.translation import gettext as _
 
 from cms import operations
@@ -50,6 +50,22 @@ def _guard(permissions, context: OperationContext):
 
 def _deny(message: str):
     raise PermissionDenied(message)
+
+
+def _check_parent(parent, placeholder, language, plugin=None) -> None:
+    """Refuse a parent the plugin cannot end up under.
+
+    The parent must live in the placeholder and language the plugin ends up in:
+    anything else parents the plugin across placeholders and exposes the foreign
+    parent's subtree. For a move, the parent must not be the plugin itself or one
+    of its descendants, which would create a cycle in the plugin tree.
+    """
+    if parent is None:
+        return
+    if parent.placeholder_id != placeholder.pk or parent.language != language:
+        raise ValidationError(_("The parent plugin must be in the target placeholder and language."))
+    if plugin is not None and (parent.pk == plugin.pk or parent.pk in plugin._get_descendants_ids()):
+        raise ValidationError(_("A plugin cannot be moved inside itself or one of its descendants."))
 
 
 def _start(operation: str, context: OperationContext, sender, **kwargs) -> str:
@@ -98,7 +114,11 @@ def move_plugin(
     permissions=None,
     sender=None,
 ) -> CMSPlugin:
-    """Move ``plugin`` to ``target_position``, optionally into another placeholder."""
+    """Move ``plugin`` to ``target_position``, optionally into another placeholder.
+
+    :raises ValidationError: if ``target_parent`` is not in the target placeholder and
+        the plugin's language, or is the plugin itself or one of its descendants.
+    """
     language = plugin.language
     source_placeholder = plugin.placeholder
     permissions = _guard(permissions, context)
@@ -111,6 +131,7 @@ def move_plugin(
         _deny(_("You have no permission to move this plugin"))
     if target_placeholder and not permissions.can_edit_source(target_placeholder):
         _deny(_("You have no permission to move this plugin"))
+    _check_parent(target_parent, target_placeholder or source_placeholder, language, plugin=plugin)
 
     source_language = plugin.language
     source_parent_id = plugin.parent_id
@@ -230,7 +251,11 @@ def paste_plugin(
     permissions=None,
     sender=None,
 ) -> CMSPlugin:
-    """Copy ``plugin`` and its descendants out of the clipboard into a placeholder."""
+    """Copy ``plugin`` and its descendants out of the clipboard into a placeholder.
+
+    :raises ValidationError: if ``target_parent`` is not in ``target_placeholder`` and
+        ``target_language``.
+    """
     plugins = [plugin] + list(plugin.get_descendants())
     target_parent_id = target_parent.pk if target_parent else None
     permissions = _guard(permissions, context)
@@ -243,7 +268,7 @@ def paste_plugin(
         _deny(_("You have no permission to paste this plugin"))
     if not permissions.can_edit_source(target_placeholder):
         _deny(_("You have no permission to paste this plugin"))
-
+    _check_parent(target_parent, target_placeholder, target_language)
 
     token = _start(
         operations.PASTE_PLUGIN,

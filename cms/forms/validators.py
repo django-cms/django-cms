@@ -19,6 +19,16 @@ def validate_relative_url(value):
 
 
 def validate_url(value):
+    if "<" in value or ">" in value:
+        # ``relative_url_regex`` excludes angle brackets, but the absolute fallback below
+        # is Django's ``URLValidator``, whose path pattern accepts them as long as the
+        # value carries no space (``https://example.com/<script>alert(1)</script>``).
+        # Reject them before either branch runs, so markup cannot enter through a scheme.
+        raise ValidationError(
+            gettext("Enter a valid relative or absolute URL."),
+            code="invalid",
+        )
+
     try:
         # Validate relative urls first
         validate_relative_url(value)

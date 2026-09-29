@@ -1,4 +1,4 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 
 from cms.api import add_plugin, create_page
 from cms.core.services import plugins as plugin_services
@@ -132,6 +132,70 @@ class RequestFreeServiceTest(CMSTestCase):
         plugin_services.clear_placeholder(self.placeholder, "en", context=self._context())
 
         self.assertFalse(self.placeholder.get_plugins("en").exists())
+
+
+class PluginParentGuardTest(CMSTestCase):
+    """The parent a service puts a plugin under is checked, as the admin view does."""
+
+    def setUp(self):
+        super().setUp()
+        self.context = OperationContext(user=self.get_superuser(), language="en")
+        page = create_page("home", "nav_playground.html", "en")
+        placeholders = page.get_placeholders("en")
+        self.body = placeholders.get(slot="body")
+        self.other = placeholders.get(slot="right-column")
+        self.sent = []
+        pre_placeholder_operation.connect(self.receive)
+        self.addCleanup(pre_placeholder_operation.disconnect, self.receive)
+
+    def receive(self, **kwargs):
+        self.sent.append(kwargs["operation"])
+
+    def test_move_refuses_a_parent_in_another_placeholder(self):
+        plugin = add_plugin(self.body, "TextPlugin", "en", body="moved")
+        foreign = add_plugin(self.other, "MultiColumnPlugin", "en")
+
+        with self.assertRaises(ValidationError):
+            plugin_services.move_plugin(plugin, 0, target_parent=foreign, context=self.context)
+
+        plugin.refresh_from_db()
+        self.assertIsNone(plugin.parent_id)
+        self.assertEqual(self.sent, [])
+
+    def test_move_refuses_a_parent_in_another_language(self):
+        plugin = add_plugin(self.body, "TextPlugin", "en", body="moved")
+        german = add_plugin(self.body, "MultiColumnPlugin", "de")
+
+        with self.assertRaises(ValidationError):
+            plugin_services.move_plugin(plugin, 0, target_parent=german, context=self.context)
+
+    def test_move_refuses_its_own_descendant(self):
+        parent = add_plugin(self.body, "MultiColumnPlugin", "en")
+        child = add_plugin(self.body, "ColumnPlugin", "en", target=parent)
+
+        with self.assertRaisesMessage(ValidationError, "cannot be moved inside itself"):
+            plugin_services.move_plugin(parent, 0, target_parent=child, context=self.context)
+
+    def test_move_accepts_a_parent_in_the_target_placeholder(self):
+        plugin = add_plugin(self.body, "TextPlugin", "en", body="moved")
+        parent = add_plugin(self.other, "MultiColumnPlugin", "en")
+
+        plugin_services.move_plugin(
+            plugin, 1, target_placeholder=self.other, target_parent=parent, context=self.context
+        )
+
+        plugin.refresh_from_db()
+        self.assertEqual((plugin.placeholder_id, plugin.parent_id), (self.other.pk, parent.pk))
+
+    def test_paste_refuses_a_parent_in_another_placeholder(self):
+        plugin = add_plugin(self.body, "TextPlugin", "en", body="copied")
+        foreign = add_plugin(self.other, "MultiColumnPlugin", "en")
+
+        with self.assertRaises(ValidationError):
+            plugin_services.paste_plugin(
+                plugin, "en", self.body, 1, target_parent=foreign, context=self.context
+            )
+        self.assertEqual(self.sent, [])
 
 
 class ServicePermissionTest(CMSTestCase):

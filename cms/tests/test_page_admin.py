@@ -398,6 +398,12 @@ class PageTest(PageTestBase):
         endpoint = self.get_page_change_uri("en", page)
         redirect_to = self.get_pages_admin_list_uri("en")
         validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
+        # Values carrying markup are rejected by ``validate_url()`` itself, before it picks
+        # the relative or the absolute branch, so they carry its own message.
+        markup_error = (
+            '<ul class="errorlist" id="id_redirect_error">'
+            "<li>Enter a valid relative or absolute URL.</li></ul>"
+        )
 
         with self.subTest("Test that a redirect to the root page (valid)"):
             with self.login_user_context(superuser):
@@ -441,7 +447,7 @@ class PageTest(PageTestBase):
                 data["redirect"] = '<script>alert("test")</script>'
                 # Asserts users can't insert javascript call
                 response = self.client.post(endpoint, data)
-                self.assertContains(response, validation_error, html=True)
+                self.assertContains(response, markup_error, html=True)
 
     def test_meta_description_fields_from_admin(self):
         """
