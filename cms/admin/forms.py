@@ -1104,15 +1104,15 @@ class MovePageForm(PageTreeForm):
         # whether public content is available. Never-published pages may have
         # no URLs yet; their URLs will be validated when they are published.
         for url in self.page.urls.all():
+            if not url.managed:
+                # Overwritten URLs keep their fixed path when the page moves,
+                # so they cannot collide at the new position.
+                continue
+
             language, slug = url.language, url.slug
 
             if position not in ("first-child", "last-child"):
                 self._validate_slug_uniqueness(new_parent, language, slug)
-
-            if not url.managed:
-                # Overwritten URLs keep their fixed path when the page moves,
-                # so there is no new path to check.
-                continue
 
             if new_parent:
                 parent_path = new_parent.get_path(language)
