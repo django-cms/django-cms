@@ -27,7 +27,8 @@ from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
 from cms.pages.permissions import get_page_permissions
 from cms.permissions.cache import clear_permission_cache
-from cms.shared.operations import OperationContext
+from cms.shared.operations import OperationContext, operation
+from cms.signals import PAGE_OPERATION_SIGNALS
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
@@ -73,40 +74,23 @@ def move_page(
 
     Callers working from JSTree coordinates should resolve them first; the
     translation between the two coordinate systems belongs to the form, not here.
+
+    Runs the :data:`~cms.operations.MOVE_PAGE` checks first (see
+    :mod:`cms.pages.checks`); ``can(MOVE_PAGE, context, page=..., ...)`` asks the
+    same question without moving anything.
+
+    :raises PermissionDenied: if the user may not move the page there.
+    :raises ValidationError: if the move would break the page's URLs.
     """
-    permissions = _guard(permissions, context)
-    denied = _("Error! You don't have permissions to move this page. Please reload the page")
-
-    if not permissions.can_move_page(page):
-        _deny(denied)
-    if target_page and not permissions.can_add_subpage(target_page, page.site):
-        _deny(denied)
-    # The whole subtree moves along, so authorise the whole subtree: the
-    # destination may grant access the source did not.
-    parent_page = (
-        target_page
-        if position in ("first-child", "last-child")
-        else (target_page.parent if target_page else None)
-    )
-    if not permissions.can_move_descendants(page, page.site, parent_page):
-        _deny(denied)
-
-    token = send_pre_page_operation(
-        context=context,
-        operation=operations.MOVE_PAGE,
-        obj=page,
+    with operation(
+        operations.MOVE_PAGE,
+        context,
+        checks={"page": page, "target_page": target_page, "position": position, "permissions": permissions},
+        signals=PAGE_OPERATION_SIGNALS,
         sender=Page,
-    )
-
-    page.move_page(target_page, position, user=context.user)
-
-    send_post_page_operation(
-        context=context,
-        operation=operations.MOVE_PAGE,
-        token=token,
         obj=page,
-        sender=Page,
-    )
+    ):
+        page.move_page(target_page, position, user=context.user)
     return page
 
 

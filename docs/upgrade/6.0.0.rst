@@ -1,0 +1,418 @@
+.. _upgrade-to-6.0.0:
+
+###################
+6.0.0 release notes
+###################
+
+*Month DD, YYYY*
+
+Welcome to django CMS 6.0.0!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you need to consider when upgrading from django CMS
+5.x. Read the upgrade instructions and the backward incompatible changes
+before updating an existing project.
+
+.. note::
+
+    These release notes are collected while django CMS 6.0 is developed. Empty
+    sections and TODOs are removed before the release.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS 6.0 supports **Django 5.2, 6.0 and 6.1**. We highly recommend and
+only support the latest release of each supported series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13 and 3.14**.
+
+******************
+Release highlights
+******************
+
+django CMS 6.0 reorganises the code base into clearly separated parts and makes
+every content operation available without the admin, so that the same rules
+apply whether content is changed in the admin, by a management command, an API
+or an assistant.
+
+* **A modular code base.** Placeholders and plugins, pages, permissions and the
+  toolbar live in separate packages with enforced boundaries. Old import paths
+  keep working.
+
+* **Services.** Moving, copying, deleting and pasting pages and plugins are
+  plain functions that need no ``HttpRequest`` and check permissions
+  themselves.
+
+* **Operation checks.** One registry answers "may this operation happen?" for
+  every caller, and anything can ask it as a dry run without changing content.
+  See :ref:`operation_checks`.
+
+***********************
+How to upgrade to 6.0.0
+***********************
+
+Before upgrading, back up your database and uploaded media and review the
+:ref:`backward incompatible changes <upgrade-6.0-backward-incompatible>` below.
+
+Upgrade django CMS::
+
+    python -m pip install --upgrade "django-cms==6.0.0"
+
+Modules have moved (see :ref:`upgrade-6.0-moved-modules`), but the old import
+paths keep working without warnings in 6.0. You do not need to change imports
+to upgrade; switch to the new paths when your package no longer needs to support
+django CMS 5.x.
+
+Then apply migrations, collect static files, and run the django CMS checks::
+
+    python manage.py migrate
+    python manage.py collectstatic --noinput
+    python manage.py cms check
+
+*******************
+What's new in 6.0.0
+*******************
+
+A modular code base
+===================
+
+The ``cms`` package is split into parts with one job each:
+
+==========================  ===================================================
+Package                     Contents
+==========================  ===================================================
+``cms.core``                Placeholders, plugins, their models, admin, cache
+                            and rendering. Does not depend on pages.
+``cms.core.editing``        The frontend editor (structure mode, edit and
+                            preview endpoints), generic over the edited model.
+``cms.pages``               Pages and page contents, the page admin, apphooks,
+                            the page cache, the page toolbar and template tags.
+``cms.permissions``         Page permission models, their admin, cache and
+                            utilities.
+``cms.toolbar``             The toolbar framework and the menus the toolbar
+                            itself owns (``cms.toolbar.chrome``).
+``cms.shared``              Helpers the other parts use, depending on none of
+                            them.
+==========================  ===================================================
+
+The boundaries between the parts are enforced with `import-linter
+<https://import-linter.readthedocs.io/>`_ (see *For contributors* below).
+Parts talk to each other through two new, documented mechanisms instead of
+imports:
+
+* **Signals** in ``cms.shared.signals``: ``placeholder_cache_cleared`` and
+  ``page_caches_invalidated``. For example, clearing a placeholder's cache no
+  longer clears the page cache directly; a receiver does.
+* **Resolvers** in ``cms.shared.resolvers``: late-bound lookups registered with
+  ``provide(name, func)`` and called with ``resolve(name, ...)``. A project can
+  replace a registered provider, for example ``placeholder_page``, which finds
+  the page a placeholder belongs to.
+
+The public entry points stay where they were: ``cms.api``, ``cms.models``,
+``cms.admin``, ``cms.app_base``, ``cms.cms_toolbars`` and
+``{% load cms_tags %}`` re-export what moved. Modules that moved to a new path
+remain importable from the old one, see :ref:`upgrade-6.0-moved-modules`.
+
+Services
+========
+
+Content operations are available as **services**: plain functions that take the
+objects to act on and an ``OperationContext`` instead of an ``HttpRequest``.
+
+* ``cms.core.services``: ``move_plugin``, ``cut_plugin``, ``paste_plugin``,
+  ``paste_placeholder``, ``copy_plugin_to_clipboard``,
+  ``copy_placeholder_to_clipboard``, ``add_plugins_from_placeholder``,
+  ``delete_plugin`` and ``clear_placeholder``.
+* ``cms.pages.services``: ``move_page``, ``set_home``, ``copy_page_tree``,
+  ``delete_page``, ``delete_translation``, ``change_template``,
+  ``copy_language``, ``toggle_in_navigation`` and ``rebuild_urls``.
+
+.. code-block:: python
+
+    from cms.pages import services as page_services
+    from cms.shared.operations import OperationContext
+
+    page_services.move_page(page, target, "first-child",
+                            context=OperationContext(user=user))
+
+``cms.shared.operations.OperationContext`` carries the acting ``user``, the
+``language``, the ``origin`` of the operation and, for the admin only, the
+``request``. ``OperationContext.from_request(request)`` builds one in a view.
+
+Every service sends the same ``pre_*_operation`` and ``post_*_operation``
+signals the admin sends, so packages such as djangocms-versioning see the
+operation whoever performed it. The admin now calls these services instead of
+doing the work in its views.
+
+Permission backends
+===================
+
+Every service checks permissions itself, through a **permission backend**:
+
+* ``cms.core.services.permissions.PluginPermissions`` for plugins and
+  placeholders,
+* ``cms.pages.permissions.PagePermissions`` for pages.
+
+Each backend is an object with one predicate per permission
+(``can_move_page(page)``, ``can_add_plugin(...)``, ...). The default backends
+decide exactly as django CMS always has. A backend can be replaced
+
+* **for one call**, by passing ``permissions=`` to a service. The admin does
+  this with an adapter that asks its ``has_*_permission`` methods, so admin
+  classes overriding those methods keep deciding admin requests;
+* **for every caller**, by exporting a ``permissions`` or ``page_permissions``
+  contract from a ``CMSAppExtension``:
+  ``contract = ("page_permissions", MyPagePermissions)``.
+
+Operation checks
+================
+
+Before django CMS changes content, it now runs the **operation checks**
+registered for that operation, whoever the caller is: the admin, a management
+command, an API view or a test. The same checks run as a **dry run** through
+``cms.shared.checks.can()``, which changes nothing and returns a ``Verdict``
+listing every reason an operation would be refused. The admin UI, an API or an
+assistant can use it to answer "can I move this page there?" before trying.
+
+.. code-block:: python
+
+    from cms import operations
+    from cms.shared.checks import can
+
+    verdict = can(operations.MOVE_PAGE, context, page=page,
+                  target_page=target_page, position="first-child")
+    if not verdict:
+        print(verdict)  # the reasons, for the user
+
+Packages add their own checks, or replace a core check by name, in their
+``cms_config``:
+
+.. code-block:: python
+
+    class MyAppConfig(CMSAppConfig):
+        cms_checks = {
+            operations.MOVE_PAGE: [("myapp.page_unlocked", page_is_unlocked, ["page"])],
+        }
+
+Checks raise Django's own ``PermissionDenied`` or ``ValidationError``.
+Permission checks run first, so a refusal never tells a user about content they
+may not see.
+
+In 6.0, moving a page runs through operation checks. The other page and plugin
+operations follow. See :ref:`operation_checks` for the concepts.
+
+One frame for all services
+==========================
+
+``cms.shared.operations.operation()`` is the frame every service runs its work
+in: it runs the operation checks, sends the pre-operation signal, runs the
+service's own code and sends the post-operation signal. A failing check raises
+before any signal is sent, and a failing operation sends no post-operation
+signal. ``cms.signals.PAGE_OPERATION_SIGNALS`` and
+``cms.signals.PLACEHOLDER_OPERATION_SIGNALS`` name the signal pairs.
+
+Minor features
+==============
+
+* Page and placeholder operation signals carry the acting ``user``. Their
+  ``request`` is ``None`` when a service is called outside a request; the admin
+  log entries fall back to ``user``.
+* ``cms.shared.editing_urls`` bundles the helpers building edit, preview,
+  structure and live URLs for an object (previously in ``cms.toolbar.utils``).
+* The toolbar's own menus are available as ``cms.toolbar.chrome`` (admin,
+  language and help menus) and ``cms.pages.toolbar`` (page menus).
+
+* The page tree reports why a move was refused, including "You can't move the
+  home page inside another page", which was previously shown as "error".
+
+Bug fixes
+=========
+
+* Moving a page that was never published no longer raises a ``TypeError``
+  (#8897).
+* Moving a page checks the URLs of all its languages, not only the language
+  shown in the admin (#8897).
+* Overwritten URLs keep their path when a page moves, so they are no longer
+  checked for conflicts at the new position (#8897, #8901).
+* The home page can be reordered among the root pages, and pages can be moved
+  below a parent that has no URL in a language, without false URL conflicts
+  (#8901).
+
+.. _upgrade-6.0-backward-incompatible:
+
+**************************************
+Backward incompatible changes in 6.0.0
+**************************************
+
+Moving pages
+============
+
+* ``MovePageForm`` only turns a drop in the page tree into a target page and a
+  position. It no longer validates the move: its ``clean()`` method and the
+  ``_determine_new_parent()``, ``_validate_slug_uniqueness()`` and
+  ``_validate_url_uniqueness()`` helpers are removed. Code that customised move
+  validation by overriding them should register an operation check for
+  ``operations.MOVE_PAGE`` instead.
+* ``cms.pages.services.move_page()`` validates the move and raises
+  ``ValidationError`` if it would break the page's URLs. Callers of the service
+  outside the admin, which previously could create conflicting URLs, now get
+  the error.
+* Permissions are checked before the URLs. A user who may not move a page gets
+  a 403 even if the move would also cause a URL conflict, where they previously
+  got a 400 describing the conflict.
+
+Toolbar pool keys
+=================
+
+The toolbar pool identifies toolbars by ``module.ClassName``. The built-in
+toolbars moved, so their keys changed:
+
+================================================  =====================================================
+Before                                            6.0
+================================================  =====================================================
+``cms.cms_toolbars.PlaceholderToolbar``           ``cms.core.editing.toolbar.PlaceholderToolbar``
+``cms.cms_toolbars.BasicToolbar``                 ``cms.toolbar.chrome.BasicToolbar``
+``cms.cms_toolbars.AppearanceToolbar``            ``cms.toolbar.chrome.AppearanceToolbar``
+``cms.cms_toolbars.HelpToolbar``                  ``cms.toolbar.chrome.HelpToolbar``
+``cms.cms_toolbars.PageToolbar``                  ``cms.pages.toolbar.PageToolbar``
+================================================  =====================================================
+
+Importing these classes from ``cms.cms_toolbars`` still works. Code that looks
+toolbars up by their key in ``toolbar_pool.toolbars`` or
+``request.toolbar.toolbars`` must use the new keys. TODO: check the
+``CMS_TOOLBARS`` setting with old keys before release.
+
+Cache invalidation
+==================
+
+``Placeholder.clear_cache()`` and ``Page.clear_cache()`` no longer clear the
+page and menu caches directly. They send ``placeholder_cache_cleared`` and
+``page_caches_invalidated`` (``cms.shared.signals``), and django CMS clears the
+page and menu caches in receivers. The page cache is now cleared after the
+placeholder cache instead of before. Code that disconnects all receivers of
+these signals, or patches ``invalidate_cms_page_cache`` or ``menu_pool.clear``
+in tests, may need adjusting.
+
+Plugins
+=======
+
+* ``CMSPluginBase.page_only`` is removed; it had no effect. Defining it on a
+  plugin now issues a ``UserWarning``. The ``include_page_only`` argument of
+  ``plugin_pool.get_all_plugins()`` is accepted and ignored.
+
+Miscellaneous
+=============
+
+* Page operation signals (``pre_obj_operation`` and ``post_obj_operation``)
+  sent by services also carry ``language`` and ``origin``, like the placeholder
+  operation signals, and are not sent for an ``OperationContext`` with
+  ``emit_signals=False``. Receivers must accept ``**kwargs``, as all Django
+  signal receivers must.
+
+Features deprecated in 6.0.0
+============================
+
+* The ``page`` argument of the plugin API is renamed to ``obj``, because
+  placeholders no longer need to belong to a page. The second positional
+  parameter is now called ``obj``; passing ``page=`` still works but issues a
+  ``RemovedInDjangoCMS70Warning``. Affected are ``CMSPluginBase``'s
+  ``requires_parent_plugin()``, ``get_require_parent()``,
+  ``get_child_class_overrides()``, ``get_child_plugin_candidates()``,
+  ``get_child_classes()`` and ``get_parent_classes()``, ``plugin_pool``'s
+  ``get_all_plugins()`` and ``get_text_enabled_plugins()``,
+  ``BaseRenderer.get_placeholder_plugin_menu()`` and
+  ``cms.core.plugins.get_plugin_restrictions()``. The ``page=`` argument of
+  ``get_placeholder_toolbar_js()`` and ``get_toolbar_plugin_struct()``, which
+  was due for removal in 6.0, is kept until 7.0 with the same warning.
+* Moved modules (see below) are not deprecated yet: their old paths work
+  without warnings in 6.0, so that packages can support django CMS 5.x and 6.x
+  with the same imports.
+
+.. _upgrade-6.0-moved-modules:
+
+Moved modules
+=============
+
+These modules moved. Their old paths remain importable and return the same
+objects, so ``isinstance()`` checks and signal ``sender`` comparisons keep
+working.
+
+=========================================  ============================================
+Old path                                   New path
+=========================================  ============================================
+``cms.models.pagemodel``                   ``cms.pages.models.page``
+``cms.models.contentmodels``               ``cms.pages.models.content``
+``cms.models.query``                       ``cms.pages.models.query``
+``cms.models.apphooks_reload``             ``cms.pages.models.apphooks_reload``
+``cms.models.placeholdermodel``            ``cms.core.models.placeholder``
+``cms.models.pluginmodel``                 ``cms.core.models.plugin``
+``cms.models.placeholderpluginmodel``      ``cms.core.models.placeholderplugin``
+``cms.models.aliaspluginmodel``            ``cms.core.models.aliasplugin``
+``cms.models.settingmodels``               ``cms.core.models.settings``
+``cms.models.permissionmodels``            ``cms.permissions.models``
+``cms.models.managers``                    ``cms.pages.models.managers``,
+                                           ``cms.core.models.managers``,
+                                           ``cms.permissions.managers``
+``cms.admin.pageadmin``                    ``cms.pages.admin.page``
+``cms.admin.forms``                        ``cms.pages.admin.forms``
+``cms.admin.placeholderadmin``             ``cms.core.admin.placeholder``
+``cms.admin.settingsadmin``                ``cms.core.admin.settings``
+``cms.admin.permissionadmin``              ``cms.permissions.admin``
+``cms.admin.useradmin``                    ``cms.permissions.useradmin``
+``cms.plugin_base``                        ``cms.core.plugin_base``
+``cms.plugin_pool``                        ``cms.core.plugin_pool``
+``cms.plugin_processors``                  ``cms.core.plugin_processors``
+``cms.plugin_rendering``                   ``cms.core.rendering``
+``cms.utils.plugins``                      ``cms.core.plugins``
+``cms.utils.placeholder``                  ``cms.core.placeholders``
+``cms.cache.placeholder``                  ``cms.core.cache``
+``cms.cache.page``                         ``cms.pages.cache``
+``cms.cache.permissions``                  ``cms.permissions.cache``
+``cms.utils.page``                         ``cms.pages.utils``
+``cms.utils.mptree``                       ``cms.pages.mptree``
+``cms.utils.page_permissions``             ``cms.permissions.page_permissions``
+``cms.utils.permissions``                  ``cms.permissions.utils``
+``cms.apphook_pool``                       ``cms.pages.apphook_pool``
+``cms.appresolver``                        ``cms.pages.appresolver``
+``cms.page_rendering``                     ``cms.pages.rendering``
+``cms.signals.permissions``                ``cms.permissions.signals``
+``cms.toolbar_base``                       ``cms.toolbar.base``
+``cms.toolbar_pool``                       ``cms.toolbar.pool``
+``cms.middleware.toolbar``                 ``cms.toolbar.middleware``
+``cms.toolbar.utils``                      ``cms.core.editing.structure``,
+                                           ``cms.shared.editing_urls``
+``cms.views`` (``render_object_*``)        ``cms.core.editing.views``
+=========================================  ============================================
+
+Notes:
+
+* ``cms.toolbar.utils.get_toolbar_from_request`` stays where it is; the page
+  views stay in ``cms.views``.
+* From ``cms.utils.permissions``, ``has_plugin_permission`` and
+  ``user_can_view_placeholder_source`` moved to ``cms.core.permissions``,
+  ``get_model_permission_codename`` to ``cms.shared.permissions``, and
+  ``get_permission_codename`` is Django's
+  ``django.contrib.auth.get_permission_codename``.
+* The template tag classes of ``cms_tags`` moved to
+  ``cms.core.editing.templatetags``, ``cms.pages.templatetags``,
+  ``cms.toolbar.templatetags`` and ``cms.shared.templatetags``;
+  ``{% load cms_tags %}`` and importing the classes from
+  ``cms.templatetags.cms_tags`` work as before.
+* TODO: ``cms.middleware.toolbar`` no longer provides ``cms_endpoints`` and
+  ``get_request_ip``; restore or document before release.
+
+For contributors
+================
+
+* ``.importlinter`` defines the boundaries between the packages above as import
+  contracts; CI runs ``lint-imports``. A remaining exception in
+  ``ignore_imports`` that no longer matches an import fails the run, so remove
+  it together with the import.
+* Code moved to a new module must stay importable from its old path through
+  ``cms.compat.moved()``; ``cms/tests/test_compat_shims.py`` covers the shims.
+
+Removal of deprecated functionality
+===================================
+
+Empty sections are to be removed before release.

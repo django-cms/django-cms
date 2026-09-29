@@ -81,6 +81,11 @@ pre_placeholder_operation = Signal()
 
 post_placeholder_operation = Signal()
 
+# The (pre, post) signal pairs a service announces its operation with, see
+# :func:`cms.shared.operations.operation`.
+PAGE_OPERATION_SIGNALS = (pre_obj_operation, post_obj_operation)
+PLACEHOLDER_OPERATION_SIGNALS = (pre_placeholder_operation, post_placeholder_operation)
+
 
 # ################## apphook reloading ###################
 

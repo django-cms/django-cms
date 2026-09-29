@@ -29,6 +29,7 @@ explore how that philosophy is reflected throughout the CMS.
    publishing
    multiple_languages
    permissions
+   operation_checks
    menu_system
    frontend-integration
    commonly_used_plugins

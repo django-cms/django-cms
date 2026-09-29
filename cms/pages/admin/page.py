@@ -516,6 +516,8 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             )
         except PermissionDenied as error:
             return jsonify_request(HttpResponseForbidden(str(error)))
+        except ValidationError as error:
+            return jsonify_request(HttpResponseBadRequest(" ".join(error.messages)))
         return jsonify_request(HttpResponse(status=200))
 
     def get_permissions(self, request, page_id):

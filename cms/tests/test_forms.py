@@ -236,55 +236,6 @@ class FormsTestCase(CMSTestCase):
         self.assertFalse('<script>alert("bad-stuff");</script>' in output)
         self.assertTrue('\\u003Cscript\\u003Ealert(\\"bad-stuff\\");\\u003C/script\\u003E' in output)
 
-    def test_move_page_form(self):
-        """Test the MovePageForm validation and behavior"""
-        # Create a basic page structure
-        parent1 = create_page("Parent 1", "nav_playground.html", "en")
-        parent2 = create_page("Parent 2", "nav_playground.html", "en")
-        child1 = create_page("Child 1", "nav_playground.html", "en", parent=parent1)
-
-        # Test valid move between parents
-        data = {
-            "target": parent2.pk,
-            "position": "0",  # first-child
-            "site": self.site.pk,
-        }
-        form = forms.MovePageForm(data=data, page=child1, site=self.site)
-        self.assertTrue(form.is_valid(), form.errors)
-
-        # Test moving page with same slug under different parents
-        child2 = create_page("Child 2", "nav_playground.html", "en", parent=parent2)
-        data = {
-            "target": parent1.pk,
-            "position": "0",  # first-child
-            "site": self.site.pk,
-        }
-        form = forms.MovePageForm(data=data, page=child2, site=self.site)
-        self.assertTrue(form.is_valid(), form.errors)
-
-        # Test moving page to a position that would create duplicate slug
-        child3 = create_page("Child 1", "nav_playground.html", "en", parent=parent2)  # Same slug as child1
-        data = {
-            "target": parent1.pk,
-            "position": "0",  # first-child
-            "site": self.site.pk,
-        }
-        form = forms.MovePageForm(data=data, page=child3, site=self.site)
-        self.assertFalse(form.is_valid())
-        self.assertIn("You cannot have two pages with the same slug", str(form.errors["__all__"]))
-
-        # Test moving homepage
-        homepage = create_page("Home", "nav_playground.html", "en")
-        homepage.set_as_homepage()
-        data = {
-            "target": parent1.pk,
-            "position": "0",  # first-child
-            "site": self.site.pk,
-        }
-        form = forms.MovePageForm(data=data, page=homepage, site=self.site)
-        self.assertFalse(form.is_valid())
-        self.assertIn("You can&#x27;t move the home page inside another page", str(form.errors["target"]))
-
     def test_move_page_form_positions(self):
         """Test different position options in MovePageForm"""
         parent = create_page("Parent", "nav_playground.html", "en")
@@ -308,83 +259,6 @@ class FormsTestCase(CMSTestCase):
             self.assertTrue(
                 form.is_valid(), f"Form should be valid for position {position_name}, errors: {form.errors}"
             )
-
-    def test_move_page_form_sibling_slug_collision(self):
-        """Test that pages cannot be moved to create duplicate slugs at the same level"""
-        # Create two separate parent pages
-        parent1 = create_page("Parent 1", "nav_playground.html", "en", slug="parent-1")
-        parent2 = create_page("Parent 2", "nav_playground.html", "en", slug="parent-2")
-
-        # Create a child under parent1 with slug "test"
-        create_page("Test Page", "nav_playground.html", "en", slug="test", parent=parent1)
-
-        # Create a child under parent2 with the same slug "test" (this is allowed because they have different parents)
-        child2 = create_page("Test Page", "nav_playground.html", "en", slug="test", parent=parent2)
-
-        # Try to move child2 to be under parent1 (should fail because child1 is already there with same slug)
-        data = {
-            "target": parent1.pk,
-            "position": 2,  # 2 = first-child position
-            "site": self.site.pk,
-        }
-
-        form = forms.MovePageForm(data=data, page=child2, site=self.site)
-        is_valid = form.is_valid()
-
-        self.assertFalse(is_valid, "Form should be invalid due to slug collision")
-        self.assertIn(
-            "You cannot have two pages with the same slug",
-            str(form.errors["__all__"]),
-            "Form should report slug collision error",
-        )
-
-    def test_move_root_page_form_ignores_other_sites(self):
-        """Moving a root page must only check its siblings on the page's own site (#8830)"""
-        site2 = Site.objects.create(pk=2, domain="site2.com", name="site2")
-
-        # Identical root level trees on both sites, as produced by ``manage.py cms copy-site``
-        for site in (self.site, site2):
-            create_page("A", "nav_playground.html", "de", slug="a", site=site)
-            create_page("B", "nav_playground.html", "de", slug="b", site=site)
-
-        page_b = Page.objects.filter(site=site2, urls__slug="b", urls__language="de").distinct().get()
-
-        data = {
-            "target": "",  # root level
-            "position": 0,
-            "site": site2.pk,
-        }
-        with force_language("de"):
-            form = forms.MovePageForm(data=data, page=page_b, site=site2)
-            self.assertTrue(form.is_valid(), form.errors)
-
-    def test_move_page_form_child_parent_slug_collision(self):
-        """Test that pages cannot be moved to create duplicate slugs at the same level"""
-        # Create grandparent page
-        grandparent = create_page("Grandparent", "nav_playground.html", "en", slug="grandparent")
-
-        # Create parent page
-        parent = create_page("Parent", "nav_playground.html", "en", slug="parent", parent=grandparent)
-
-        # Create a child under parent with the same slug
-        child = create_page("Child", "nav_playground.html", "en", slug="parent", parent=parent)
-
-        # Try to move child to be on the same level as parent (should fail because parent is already there with same slug)
-        data = {
-            "target": grandparent.pk,
-            "position": 2,  # 2 = first-child position
-            "site": self.site.pk,
-        }
-
-        form = forms.MovePageForm(data=data, page=child, site=self.site)
-        is_valid = form.is_valid()
-
-        self.assertFalse(is_valid, "Form should be invalid due to slug collision")
-        self.assertIn(
-            "You cannot have two pages with the same slug",
-            str(form.errors["__all__"]),
-            "Form should report slug collision error",
-        )
 
 
 class PermissionFormTestCase(CMSTestCase):

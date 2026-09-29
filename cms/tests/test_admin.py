@@ -1403,6 +1403,24 @@ class AdminPageTreeTests(AdminTestsBase):
                 response = pagecontent_admin.get_tree(request)
                 self.assertContains(response, f'href="{add_url}?parent_page={page[language].id}&language={language}"')
 
+    def test_move_node_reports_a_url_conflict(self):
+        admin_user, staff = self._get_guys()
+        page_admin = self.page_admin_class
+        alpha = create_page("Alpha", "nav_playground.html", "en")
+        create_page("Child", "nav_playground.html", "en", parent=alpha)
+        beta = create_page("Beta", "nav_playground.html", "en")
+        child = create_page("Child", "nav_playground.html", "en", parent=beta)
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data={"id": child.pk, "position": 0, "target": alpha.pk})
+            response = page_admin.move_page(request, page_id=child.pk)
+            data = json.loads(response.content.decode("utf8"))
+
+        self.assertEqual(data["status"], 400)
+        self.assertIn("You cannot have two pages with the same slug", data["content"])
+        child.refresh_from_db()
+        self.assertEqual(child.parent_id, beta.pk)
+
 
 class AdminInputSanitationTests(AdminTestsBase):
     @property

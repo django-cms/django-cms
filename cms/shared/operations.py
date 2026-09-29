@@ -13,12 +13,15 @@ for programmatic callers, and receivers must cope with that.
 
 from __future__ import annotations
 
+import uuid
 import warnings
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import parse_qsl, urlparse
 
-__all__ = ["OperationContext"]
+__all__ = ["OperationContext", "operation"]
 
 CMS_PATH_MISSING = (
     'All custom placeholder admin endpoints require a "cms_path" GET query '
@@ -93,3 +96,53 @@ class OperationContext:
             language = get_language_code(language, site_id=get_current_site(request).pk)
 
         return cls(user=request.user, language=language, origin=parsed_url.path, request=request)
+
+
+@contextmanager
+def operation(
+    name: str,
+    context: OperationContext,
+    *,
+    checks: dict | None = None,
+    signals: tuple | None = None,
+    sender=None,
+    **signal_kwargs,
+) -> Iterator[dict]:
+    """The frame every service runs its work in.
+
+    Runs the checks registered for the operation ``name`` against ``checks`` (the
+    service's arguments, see :mod:`cms.shared.checks`), sends the pre signal of
+    the ``signals`` pair, runs the body of the ``with`` block, and sends the post
+    signal. A failing check raises before anything is announced; a failing body
+    sends no post signal.
+
+    Yields the signal kwargs; a service updates them for the post signal, for
+    example with the object as it is after the operation::
+
+        with operation(MOVE_PAGE, context, checks={...}, signals=PAGE_OPERATION_SIGNALS,
+                       sender=Page, obj=page) as signal_kwargs:
+            page.move_page(target_page, position)
+    """
+    if checks is not None:
+        from cms.shared.checks import run_checks
+
+        run_checks(name, context, **checks)
+
+    token = str(uuid.uuid4())
+    signal_kwargs = {
+        "operation": name,
+        "request": context.request,
+        "user": context.user,
+        "language": context.language,
+        "origin": context.origin,
+        "token": token,
+        **signal_kwargs,
+    }
+    pre, post = signals or (None, None)
+    emit = pre is not None and context.emit_signals
+
+    if emit:
+        pre.send(sender=sender, **signal_kwargs)
+    yield signal_kwargs
+    if emit:
+        post.send(sender=sender, **signal_kwargs)

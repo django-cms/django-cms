@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from functools import cached_property
 from logging import getLogger
 
@@ -9,6 +9,7 @@ from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.models import PageContent
 from cms.pages import editing  # noqa: F401  -- registers the page editing hooks
 from cms.pages.rendering import render_pagecontent
+from cms.shared.checks import register_check
 from cms.wizards.wizard_base import Wizard
 
 logger = getLogger(__name__)
@@ -77,6 +78,20 @@ class CMSCoreExtensions(CMSAppExtension):
             raise ImproperlyConfigured("cms_toolbar_mixin must be class")
         self.toolbar_mixins.append(cms_config.cms_toolbar_mixin)
 
+    def configure_checks(self, cms_config):
+        """Registers the operation checks of an app, see :mod:`cms.shared.checks`.
+
+        ``cms_checks`` maps an operation name to ``(name, check)`` or
+        ``(name, check, requires)`` tuples.
+        """
+        if not isinstance(cms_config.cms_checks, Mapping):
+            raise ImproperlyConfigured("cms_checks must be a mapping of operation names to checks")
+        for operation, checks in cms_config.cms_checks.items():
+            for name, check, *requires in checks:
+                if not callable(check):
+                    raise ImproperlyConfigured(f"Check {name!r} for {operation!r} is not callable")
+                register_check(operation, name, check, requires=requires[0] if requires else ())
+
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here
         # just move on.
@@ -86,3 +101,5 @@ class CMSCoreExtensions(CMSAppExtension):
             self.configure_toolbar_enabled_models(cms_config)
         if hasattr(cms_config, 'cms_toolbar_mixin'):
             self.configure_toolbar_mixin(cms_config)
+        if hasattr(cms_config, 'cms_checks'):
+            self.configure_checks(cms_config)
