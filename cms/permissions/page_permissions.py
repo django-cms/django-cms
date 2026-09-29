@@ -121,21 +121,7 @@ def skip_if_permissions_disabled(func):
 
 @cached_func
 @auth_permission_required('add_page')
-def user_can_add_page(user, site=None):
-    if site is None:
-        import warnings
-
-        from django.contrib.sites.models import Site
-
-        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
-
-        warnings.warn(
-            "user_can_add_page() called without site. This may lead to unexpected behavior. "
-            "Use user_can_add_page(user, site) instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        site = Site.objects.get_current()
+def user_can_add_page(user, site):
     return has_global_permission(user, site, action='add_page')
 
 
@@ -532,22 +518,10 @@ def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
 
 
 def has_generic_permission(page, user, action, site=None, check_global=True, use_cache=True):
-    from django.contrib.sites.models import Site
-    if page is None and site is None:
-        import warnings
+    if site is None:
+        from django.contrib.sites.models import Site
 
-        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
-
-        warnings.warn(
-            "has_generic_permission() called without site. This may lead to unexpected behavior. "
-            "Use has_generic_permission(page, user, action, site) instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        site = Site.objects.get_current()
-    elif site is None:
         site = Site.objects._get_site_by_id(page.site_id)
-
     page_path = page.path
     actions_map = {
         'add_page': get_add_perm_tuples,

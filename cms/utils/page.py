@@ -19,7 +19,6 @@ __getattr__, __dir__, __all__ = moved(
         "get_current_site": "cms.pages.utils.get_current_site",
         "get_language_from_request": "cms.pages.utils.get_language_from_request",
         "get_page_from_request": "cms.pages.utils.get_page_from_request",
-        "get_page_queryset": "cms.pages.utils.get_page_queryset",
         "get_page_template_from_request": "cms.pages.utils.get_page_template_from_request",
         "re": "cms.pages.utils.re",
         "reverse": "cms.pages.utils.reverse",

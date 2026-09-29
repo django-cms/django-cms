@@ -21,7 +21,6 @@ __getattr__, __dir__, __all__ = moved(
         "PageUrl": "cms.pages.models.page.PageUrl",
         "PageUrlManager": "cms.pages.models.page.PageUrlManager",
         "Prefetch": "cms.pages.models.page.Prefetch",
-        "RemovedInDjangoCMS60Warning": "cms.pages.models.page.RemovedInDjangoCMS60Warning",
         "Site": "cms.pages.models.page.Site",
         "UniqueConstraint": "cms.pages.models.page.UniqueConstraint",
         "connection": "cms.pages.models.page.connection",

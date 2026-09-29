@@ -22,7 +22,6 @@ from cms.pages.utils import get_clean_username
 from cms.shared.resolvers import provide
 from cms.shared.signals import page_caches_invalidated
 from cms.utils import i18n
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
 
@@ -171,15 +170,6 @@ class Page(MP_Node):
         return display
 
     @property
-    def node(self):
-        warnings.warn(
-            "The `node` has been removed from Page objects. Access the TreeNode attributes directly.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        return self
-
-    @property
     def is_branch(self):
         return bool(self.numchild)
 
@@ -218,15 +208,6 @@ class Page(MP_Node):
 
         if hasattr(self, "_prefetched_objects_cache"):
             del self._prefetched_objects_cache
-
-    @property
-    def parent_page(self):
-        warnings.warn(
-            "Attribute `parent_page` is deprecated. Instead use the attribute `parent`.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        return self.parent
 
     def has_valid_url(self, language):
         return self.urls.filter(language=language, path__isnull=False).exists()
@@ -402,16 +383,6 @@ class Page(MP_Node):
             except NoReverseMatch:
                 return None
 
-    def set_tree_node(self, site, target=None, position="first-child"):
-        warnings.warn(
-            "Method `set_tree_node` is deprecated. Use `add_to_tree` instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        self.site = site
-        self.parent = target
-        return self.add_to_tree(position=position)
-
     def add_to_tree(self, position="first-child"):
         assert position in ("last-child", "first-child", "left", "right")
 
@@ -568,7 +539,6 @@ class Page(MP_Node):
         self,
         site,
         parent_page=None,
-        parent_node=None,
         language=None,
         translations=True,
         permissions=False,
@@ -580,14 +550,6 @@ class Page(MP_Node):
 
         assert parent_page is None or isinstance(parent_page, Page), f"{parent_page} is not an instance of Page."
         assert isinstance(user, get_user_model()), f"{user} is not an instance of User."
-
-        if parent_node is not None:
-            warnings.warn(
-                "Argument `parent_node` is deprecated. Use `parent_page` instead.",
-                RemovedInDjangoCMS60Warning,
-                stacklevel=2,
-            )
-            parent_page = parent_page or parent_node
 
         if parent_page:
             new_page = parent_page.add_child(site=site, login_required=self.login_required)
@@ -657,20 +619,12 @@ class Page(MP_Node):
         return new_page
 
     def copy_with_descendants(
-        self, target_page=None, target_node=None, position=None, copy_permissions=True, target_site=None, user=None
+        self, target_page=None, position=None, copy_permissions=True, target_site=None, user=None
     ):
         """
         Copy a page [ and all its descendants to a new location ]
         """
         from cms.models import PageContent
-
-        if target_node is not None:
-            warnings.warn(
-                "Argument `parent_node` is deprecated. Use `parent_page` instead.",
-                RemovedInDjangoCMS60Warning,
-                stacklevel=2,
-            )
-            target_page = target_page or target_node
 
         if position in ("first-child", "last-child"):
             parent_page = target_page
@@ -812,23 +766,6 @@ class Page(MP_Node):
             path=self.path[0 : self.steplen]
         )
 
-    def get_parent_page(self):
-        warnings.warn(
-            "Method `get_parent_page()` is deprecated. Instead use the `parent` attribute.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        return self.parent
-
-    @property
-    def languages(self):
-        warnings.warn(
-            "Attribute `languages` is deprecated. Use `get_languages` instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        return ",".join(self.get_languages())
-
     def get_languages(self, admin_manager=True):
         """Returns available languages for the page. This is potentially costly."""
         if admin_manager:
@@ -838,38 +775,6 @@ class Page(MP_Node):
         if not self.page_content_cache:
             self._get_page_content_cache(get_language(), fallback=False, force_reload=False)
         return list(self.page_content_cache.keys())
-
-    def remove_language(self, language):
-        warnings.warn(
-            "Method `remove_language` is deprecated and has no effect any more.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-
-    def update_languages(self, languages):
-        warnings.warn(
-            "Method `update_languages` is deprecated and has no effect any more.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-
-    def get_published_languages(self):
-        warnings.warn(
-            "Method `get_published_languages` is deprecated. Use `get_languages(admin_manager=False)` instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        return self.get_languages(admin_manager=False)
-
-    def set_translations_cache(self):
-        warnings.warn(
-            "Method `set_translations_cache` is deprecated. Use `get_content_obj` instead. "
-            "For admin views use `set_admin_content_cache` instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        for translation in self.pagecontent_set.all():
-            self.page_content_cache.setdefault(translation.language, translation)
 
     def set_admin_content_cache(self):
         self.admin_content_cache = AdminCacheDict()

@@ -8,7 +8,6 @@ from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_current_site
 from cms.utils.admin import get_site_from_request
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
 
 class SiteTestCase(CMSTestCase):
@@ -71,15 +70,6 @@ class GetCurrentSiteTests(CMSTestCase):
             req.site = self.site2
             site = get_current_site(req)
             self.assertEqual(site.pk, self.site2.pk)
-
-    @override_settings(SITE_ID=1)
-    def test_warns_without_request_and_returns_current(self):
-        with self.settings(SITE_ID=self.site1.id):
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter('always')
-                site = get_current_site()
-                self.assertTrue(any(issubclass(wi.category, RemovedInDjangoCMS60Warning) for wi in w))
-            self.assertEqual(site.pk, self.site1.pk)
 
     @override_settings(SITE_ID=1)
     def test_fallback_to_default_site(self):

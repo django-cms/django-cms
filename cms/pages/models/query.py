@@ -6,7 +6,6 @@ from django.db.models import Case, F, When
 
 from cms.exceptions import NoHomeFound
 from cms.pages.mptree import get_queryset_base, get_tree_backend
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
 # Resolved once at import time (same as the model base in pagemodel.py). In
 # mptree mode the base is a plain QuerySet and treebeard is never imported.
@@ -86,48 +85,3 @@ class PageQuerySet(get_queryset_base()):
 
     def root_only(self):
         return self.filter(depth=1)
-
-    def select_related(self, *fieldnames):
-        modified = []
-        for f in fieldnames:
-            if isinstance(f, str) and f.startswith('node'):
-                warnings.warn(
-                    self.node_warning,
-                    RemovedInDjangoCMS60Warning,
-                    stacklevel=2,
-                )
-                if f != 'node':
-                    modified.append(f.replace('node__', ''))
-            else:
-                modified.append(f)
-        return super().select_related(*modified)
-
-    def filter(self, *args, **kwargs):
-        modified = {}
-        for key, val in kwargs.items():
-            if isinstance(key, str) and key.startswith('node'):
-                warnings.warn(
-                    self.node_warning,
-                    RemovedInDjangoCMS60Warning,
-                    stacklevel=2,
-                )
-                if key == 'node':
-                    continue
-                modified[key[6:]] = val
-            else:
-                modified[key] = val
-        return super().filter(*args, **modified)
-
-    def order_by(self, *fieldnames):
-        modified = []
-        for f in fieldnames:
-            if isinstance(f, str) and f.startswith("node__"):
-                warnings.warn(
-                    self.node_warning,
-                    RemovedInDjangoCMS60Warning,
-                    stacklevel=2,
-                )
-                modified.append(f[6:])
-            else:
-                modified.append(f)
-        return super().order_by(*modified)

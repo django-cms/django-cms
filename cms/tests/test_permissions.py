@@ -36,7 +36,6 @@ from cms.permissions.page_permissions import (
     user_can_publish_page,
 )
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
 
 @override_settings(
@@ -385,38 +384,3 @@ class PermissionCacheSiteIsolationTests(CMSTestCase):
 
         self.assertIsNone(get_permission_cache(self.user, self.site_a, 'change_page'))
         self.assertIsNone(get_permission_cache(self.user, self.site_b, 'change_page'))
-
-
-@override_settings(CMS_PERMISSION=True)
-class DeprecatedSiteAccessHelperTests(CMSTestCase):
-    """``user_can_access_site``/``raise_site_permission_denied`` are unused.
-
-    Site isolation is enforced by ``PageContentAdmin.has_change_permission()``.
-    """
-
-    def get_admin(self):
-        return admin.site._registry[PageContent]
-
-    def test_user_can_access_site_warns(self):
-        request = self.get_request("/en/")
-        request.user = self.get_superuser()
-
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
-            self.assertTrue(self.get_admin().user_can_access_site(request))
-
-        self.assertTrue(
-            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
-            "Expected a deprecation warning from user_can_access_site().",
-        )
-
-    def test_raise_site_permission_denied_warns(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
-            with self.assertRaises(PermissionDenied):
-                self.get_admin().raise_site_permission_denied()
-
-        self.assertTrue(
-            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
-            "Expected a deprecation warning from raise_site_permission_denied().",
-        )

@@ -9,8 +9,6 @@ from django.db import models
 from django.db.models import Q
 
 from cms.pages.models.query import PageQuerySet
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
-from cms.utils.i18n import get_fallback_languages
 
 
 class PageManager(models.Manager):
@@ -80,37 +78,7 @@ class PageUrlManager(WithUserMixin, models.Manager):
 
 
 class PageContentManager(WithUserMixin, models.Manager):
-    def get_title(self, page, language, language_fallback=False):
-        """
-        Gets the latest content for a particular page and language. Falls back
-        to another language if wanted.
-        """
-        import warnings
-
-        warnings.warn(
-            "PageContentManager.get_title is deprecated and will be removed in a future release. "
-            "Please use page.get_page_content() or page.get_admin_content() instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        try:
-            title = self.get(language=language, page=page)
-            return title
-        except self.model.DoesNotExist:
-            if language_fallback:
-                try:
-                    titles = self.filter(page=page)
-                    fallbacks = get_fallback_languages(language, site_id=page.site_id)
-                    for lang in fallbacks:
-                        for title in titles:
-                            if lang == title.language:
-                                return title
-                    return None
-                except self.model.DoesNotExist:
-                    pass
-            else:
-                raise
-        return None
+    pass
 
 
 class ContentAdminQuerySet(models.QuerySet):

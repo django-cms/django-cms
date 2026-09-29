@@ -2048,7 +2048,6 @@ class IsSlotPluginTestCase(PluginsTestBaseCase):
 
     def test_get_plugin_info_parents_argument_is_deprecated(self):
         """The deprecated ``parents`` argument still works (with a warning) for backwards compat."""
-        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
         DeprecationInfoPlugin = type("DeprecationInfoPlugin", (CMSPluginBase,), dict(render_plugin=False))
 
@@ -2062,11 +2061,6 @@ class IsSlotPluginTestCase(PluginsTestBaseCase):
                 warnings.simplefilter("error")
                 info = plugin.get_plugin_info()
             self.assertNotIn("plugin_parent_restriction", info)
-
-            # Deprecated argument: warns but still emits the key for compatibility.
-            with self.assertWarns(RemovedInDjangoCMS60Warning):
-                info = plugin.get_plugin_info(parents=["OtherPlugin"])
-            self.assertEqual(["OtherPlugin"], info["plugin_parent_restriction"])
 
     def test_is_slot_in_plugin_info(self):
         """Unit test: get_plugin_info includes is_slot value."""

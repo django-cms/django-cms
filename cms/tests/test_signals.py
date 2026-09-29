@@ -8,11 +8,10 @@ from cms.api import create_page
 from cms.cache import _get_cache_version
 from cms.models import Page, UrlconfRevision
 from cms.shared.signals import page_caches_invalidated, placeholder_cache_cleared
-from cms.signals import move_page, urls_need_reloading
+from cms.signals import urls_need_reloading
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks, signal_tester
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from menus.menu_pool import menu_pool
 
 overrides = {
@@ -23,19 +22,6 @@ overrides = {
 
 @override_settings(**overrides)
 class SignalTests(CMSTestCase):
-    def test_move_page_signal_warns_on_connect(self):
-        def receiver(**kwargs):
-            return None
-
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
-            move_page.connect(receiver)
-
-        self.assertTrue(
-            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
-            "Expected deprecation warning when connecting to move_page signal.",
-        )
-
     def test_urls_need_reloading_signal_set_apphook(self):
         superuser = self.get_superuser()
 

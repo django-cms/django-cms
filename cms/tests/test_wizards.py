@@ -21,20 +21,13 @@ from cms.models import Page, PageContent, UserSettings
 from cms.permissions.models import GlobalPagePermission
 from cms.permissions.page_permissions import user_can_add_subpage
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
-from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.setup import setup_cms_apps
 from cms.utils.urlutils import admin_reverse
 from cms.wizards.forms import WizardStep1Form, WizardStep2BaseForm, step2_form_factory
-from cms.wizards.helpers import get_entries, get_entry
-from cms.wizards.wizard_base import Wizard
-from cms.wizards.wizard_pool import (
-    AlreadyRegisteredException,
-    entry_choices,
-    wizard_pool,
-)
+from cms.wizards.wizard_base import Wizard, entry_choices, get_entries, get_entry
 
 CreateCMSPageForm = step2_form_factory(
     mixin_cls=WizardStep2BaseForm,
@@ -81,7 +74,6 @@ class WizardTestMixin:
         super().setUpClass()
         # This prevents auto-discovery, which would otherwise occur as soon as
         # tests start, creating unexpected starting conditions.
-        wizard_pool._discovered = True
 
         class PageWizard(Wizard):
             pass
@@ -208,130 +200,6 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
         with self.login_user_context(staff_active):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
-
-
-class TestWizardPool(WizardTestMixin, CMSTestCase):
-    def tearDown(self):
-        # Clean up in case anything has been removed or added to the
-        # registered wizards, so other tests don't have problems
-        extension = apps.get_app_config("cms").cms_extension
-        # Reset the cached property 'wizards'
-        if hasattr(extension, "wizards"):
-            del extension.wizards
-        configs_with_wizards = [
-            app.cms_config for app in app_registration.get_cms_config_apps() if hasattr(app.cms_config, "cms_wizards")
-        ]
-        for config in configs_with_wizards:
-            extension.configure_wizards(config)
-        # Clean up in case cached apps are different than the defaults
-        app_registration.get_cms_extension_apps.cache_clear()
-        app_registration.get_cms_config_apps.cache_clear()
-
-    def test_is_registered_for_registered_wizard(self):
-        """
-        Test for backwards compatibility of is_registered when checking
-        a registered wizard.
-        """
-        from django.apps import apps
-
-        self.assertTrue(apps.get_app_config("cms").cms_extension.wizards)
-        is_registered = wizard_pool.is_registered(cms_page_wizard)
-        self.assertTrue(is_registered)
-
-    def test_is_registered_for_unregistered_wizard(self):
-        """
-        Test for backwards compatibility of is_registered when checking
-        an unregistered wizard.
-        """
-        is_registered = wizard_pool.is_registered(self.page_wizard)
-        self.assertFalse(is_registered)
-
-    def test_unregister_registered_wizard(self):
-        """
-        Test for backwards compatibility of the unregister method.
-        Removes a wizard from the wizards dict.
-        """
-        was_unregistered = wizard_pool.unregister(cms_page_wizard)
-        registered_wizards = apps.get_app_config("cms").cms_extension.wizards
-        self.assertNotIn(cms_page_wizard.id, registered_wizards)
-        self.assertTrue(was_unregistered)
-
-    def test_unregister_unregistered_wizard(self):
-        """
-        Test for backwards compatibility of the unregister method.
-        Returns False if wizard not found.
-        """
-        was_unregistered = wizard_pool.unregister(self.page_wizard)
-        self.assertFalse(was_unregistered)
-
-    def test_register_already_registered_wizard(self):
-        """
-        Test for backwards compatibility of the register method.
-        Raises AlreadyRegisteredException if the wizard is already
-        registered.
-        """
-        with self.assertRaises(AlreadyRegisteredException):
-            wizard_pool.register(cms_page_wizard)
-
-    def test_register_unregistered_wizard(self):
-        """
-        Test for backwards compatibility of the register method.
-        Adds the wizard to the wizards dict.
-        """
-        wizard_pool.register(self.page_wizard)
-        registered_wizards = apps.get_app_config("cms").cms_extension.wizards
-        self.assertIn(self.page_wizard.id, registered_wizards)
-
-    @patch("cms.wizards.wizard_pool.get_entry")
-    def test_get_entry(self, mocked_get_entry):
-        """
-        Test for backwards compatibility of wizard_pool.get_entry.
-        Checking we use the new get_entry under the hood.
-        """
-        wizard_pool.get_entry(cms_page_wizard)
-        mocked_get_entry.assert_called_once()
-
-    def test_old_registration_still_works(self):
-        """
-        Integration-like test checking that if you register your wizard
-        by adding wizard_pool.register(wizard) to cms_wizards.py it will
-        correctly register the wizard. This ensures backwards
-        compatibility.
-        """
-        # NOTE: Because of how the override_settings decorator works,
-        # we can't use it for this test as the app registry first
-        # gets loaded with the default apps and then again with
-        # the overridden ones.
-        INSTALLED_APPS = [
-            "cms",
-            "treebeard",
-            "cms.test_utils.project.backwards_wizards",
-        ]
-        mocked_apps = Apps(installed_apps=INSTALLED_APPS)
-        # clear out app registration cache now that installed apps have
-        # changed
-        app_registration.get_cms_extension_apps.cache_clear()
-        app_registration.get_cms_config_apps.cache_clear()
-        # Run the setup with the mocked installed apps. Due to the order
-        # of imports and other fun things, apps have to be patched
-        # in multiple places. If functions are moved around the code
-        # this could get worse.
-        with patch("cms.app_registration.apps", mocked_apps):
-            with patch("cms.wizards.wizard_pool.apps", mocked_apps):
-                setup_cms_apps()
-        # Check the wizards built into the cms app and the wizard from
-        # the backwards_wizards app have been picked up.
-        # The backwards_wizards app does not have a cms_config.py but
-        # registers its wizard by adding wizard_pool.register(wizard)
-        # to cms_wizards.py which is the old way we want backwards
-        # compatibility with.
-        cms_app = mocked_apps.get_app_config("cms")
-        expected_wizards = {
-            cms_page_wizard.id: cms_page_wizard,
-            cms_subpage_wizard.id: cms_subpage_wizard,
-            wizard.id: wizard,
-        }
-        self.assertDictEqual(cms_app.cms_extension.wizards, expected_wizards)
 
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):

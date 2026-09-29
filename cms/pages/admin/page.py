@@ -70,7 +70,6 @@ from cms.shared.editing_urls import get_object_edit_url
 from cms.shared.operations import OperationContext
 from cms.utils import get_current_site
 from cms.utils.admin import get_site_from_request, jsonify_request
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_language_list,
@@ -995,41 +994,6 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         user_sites = [site for site in sites if _has_perm(user, site)]
         user._cms_user_sites = user_sites
         return user_sites
-
-    def user_can_access_site(self, request):
-        """
-        .. deprecated:: 5.2
-            Unused. Site isolation is enforced by ``has_change_permission``,
-            which checks ``user_can_change_at_least_one_page`` against the site
-            of the request.
-        """
-        import warnings
-
-        warnings.warn(
-            "PageContentAdmin.user_can_access_site() is deprecated and unused. "
-            "Use has_change_permission(request) instead, which already scopes the check to the "
-            "site of the request.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        site = get_site_from_request(request)
-        user_sites = self.get_sites_for_user(request.user)
-        return site in user_sites
-
-    def raise_site_permission_denied(self):
-        """
-        .. deprecated:: 5.2
-            Unused. Raise ``django.core.exceptions.PermissionDenied`` directly.
-        """
-        import warnings
-
-        warnings.warn(
-            "PageContentAdmin.raise_site_permission_denied() is deprecated and unused. "
-            "Raise django.core.exceptions.PermissionDenied directly instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
-        raise PermissionDenied(_("You do not have permission to access this site. Please contact your administrator."))
 
     def changelist_view(self, request, extra_context=None):
         from django.contrib.admin.views.main import ERROR_FLAG

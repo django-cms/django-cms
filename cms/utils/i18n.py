@@ -6,23 +6,7 @@ from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import LanguageError
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting, get_site_id
-
-
-def _ensure_site_id(site_id, name):
-    """
-    Ensure that the site_id is an integer.
-    """
-    if site_id is None:
-        import warnings
-
-        warnings.warn(
-            f"{name} called without specifying 'site_id'. This may lead to unexpected behavior. "
-            f"Call {name} with 'site_id=<some_id>' instead.", RemovedInDjangoCMS60Warning, stacklevel=3
-        )
-        return get_site_id(None)
-    return site_id
 
 
 @contextmanager
@@ -34,8 +18,7 @@ def force_language(new_lang):
     translation.activate(old_lang)
 
 
-def get_languages(site_id=None):
-    site_id = _ensure_site_id(site_id, "get_languages")
+def get_languages(site_id):
     site_id = get_site_id(site_id)
     result = get_cms_setting('LANGUAGES').get(site_id)
     if not result:
@@ -69,14 +52,13 @@ def get_site_language_from_request(request, site_id=None):
     return get_default_language_for_site(site_id=site_id)
 
 
-def get_language_code(language_code, site_id=None):
+def get_language_code(language_code, site_id):
     """
     Returns language code while making sure it's in LANGUAGES
     """
     if not language_code:
         return None
 
-    site_id = _ensure_site_id(site_id, "get_language_code")
     languages = get_language_list(site_id)
 
     if language_code in languages:  # direct hit
@@ -117,57 +99,51 @@ def get_current_language():
     return language_code
 
 
-def get_language_list(site_id=None):
+def get_language_list(site_id):
     """
     :return: returns a list of iso2codes for this site
     """
-    site_id = _ensure_site_id(site_id, "get_language_list")
     return ([lang['code'] for lang in get_languages(site_id)] if settings.USE_I18N
             else [settings.LANGUAGE_CODE])
 
 
-def get_language_tuple(site_id=None):
+def get_language_tuple(site_id):
     """
     :return: returns an list of tuples like the old CMS_LANGUAGES or the LANGUAGES for this site
     """
-    site_id = _ensure_site_id(site_id, "get_language_tuple")
     return [(lang['code'], lang['name']) for lang in get_languages(site_id)]
 
 
-def get_language_dict(site_id=None):
+def get_language_dict(site_id):
     """
     :return: returns an dict of cms languages
     """
-    site_id = _ensure_site_id(site_id, "get_language_dict")
     return dict(get_language_tuple(site_id))
 
 
-def get_public_languages(site_id=None):
+def get_public_languages(site_id):
     """
     :return: list of iso2codes of public languages for this site
     """
-    site_id = _ensure_site_id(site_id, "get_public_languages")
     return [lang['code'] for lang in get_language_objects(site_id)
             if lang.get('public', True)]
 
 
-def get_language_object(language_code, site_id=None):
+def get_language_object(language_code, site_id):
     """
     :param language_code: RFC5646 language code
     :return: the language object filled up by defaults
     """
-    site_id = _ensure_site_id(site_id, "get_language_object")
     for language in get_languages(site_id):
         if language['code'] == get_language_code(language_code, site_id):
             return language
     raise LanguageError('Language not found: %s' % language_code)
 
 
-def get_language_objects(site_id=None):
+def get_language_objects(site_id):
     """
     returns list of all language objects filled up by default values
     """
-    site_id = _ensure_site_id(site_id, "get_language_objects")
     return list(get_languages(site_id))
 
 
@@ -178,7 +154,6 @@ def get_default_language(language_code=None, site_id=None):
 
     Returns: language_code
     """
-    site_id = _ensure_site_id(site_id, "get_default_language")
     if not language_code:
         language_code = get_language_code(settings.LANGUAGE_CODE, site_id=site_id)
 
@@ -201,11 +176,10 @@ def get_default_language_for_site(site_id):
     return get_language_list(site_id)[0]
 
 
-def get_fallback_languages(language, site_id=None):
+def get_fallback_languages(language, site_id):
     """
     returns a list of fallback languages for the given language
     """
-    site_id = _ensure_site_id(site_id, "get_fallback_languages")
     try:
         language = get_language_object(language, site_id)
     except LanguageError:
@@ -213,26 +187,24 @@ def get_fallback_languages(language, site_id=None):
     return language.get('fallbacks', [])
 
 
-def get_redirect_on_fallback(language, site_id=None):
+def get_redirect_on_fallback(language, site_id):
     """
     returns if you should redirect on language fallback
     :param language:
     :param site_id:
     :return: Boolean
     """
-    site_id = _ensure_site_id(site_id, "get_redirect_on_fallback")
     language = get_language_object(language, site_id)
     return language.get('redirect_on_fallback', True)
 
 
-def hide_untranslated(language, site_id=None):
+def hide_untranslated(language, site_id):
     """
     Should untranslated pages in this language be hidden?
     :param language:
     :param site_id:
     :return: A Boolean
     """
-    site_id = _ensure_site_id(site_id, "hide_untranslated")
     obj = get_language_object(language, site_id)
     return obj.get('hide_untranslated', True)
 

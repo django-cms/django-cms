@@ -14,7 +14,6 @@ __getattr__, __dir__, __all__ = moved(
         "F": "cms.pages.models.query.F",
         "NoHomeFound": "cms.pages.models.query.NoHomeFound",
         "PageQuerySet": "cms.pages.models.query.PageQuerySet",
-        "RemovedInDjangoCMS60Warning": "cms.pages.models.query.RemovedInDjangoCMS60Warning",
         "When": "cms.pages.models.query.When",
         "get_queryset_base": "cms.pages.models.query.get_queryset_base",
         "get_tree_backend": "cms.pages.models.query.get_tree_backend",

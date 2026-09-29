@@ -3,7 +3,7 @@ from django import forms
 from cms.models import Page
 from cms.utils.urlutils import static_with_version
 
-from .wizard_pool import entry_choices, wizard_pool
+from .wizard_base import entry_choices, get_entry
 
 
 def step2_form_factory(mixin_cls, entry_form_class, attrs=None):
@@ -46,7 +46,7 @@ class WizardOptionWidgets(forms.RadioSelect):
     template_name = 'cms/wizards/wizardoptionwidget.html'
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        wizard = wizard_pool.get_entry(value)
+        wizard = get_entry(value)
         attrs.update(wizard.widget_attributes)
         return super().create_option(name, value, label, selected, index, subindex, attrs)
 
@@ -90,7 +90,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
     def get_wizard_entries(self):
         for entry in self['entry']:
-            wizard = wizard_pool.get_entry(entry.choice_value)
+            wizard = get_entry(entry.choice_value)
             yield entry, wizard
 
 

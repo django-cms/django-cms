@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 
 from django.http import HttpRequest
 
-from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.i18n import (
     get_current_language,
     get_default_language,
@@ -15,21 +14,11 @@ if TYPE_CHECKING:
     from django.contrib.sites.models import Site
 
 
-def get_current_site(request: HttpRequest = None) -> "Site":
+def get_current_site(request: HttpRequest) -> "Site":
     """
     Returns the current Site instance associated with the given request.
     """
     from django.contrib.sites.models import Site
-
-    if request is None:
-        import warnings
-
-        warnings.warn(
-            "get_current_site() called without request. This may lead to unexpected behavior. "
-            "Use get_current_site(request) instead.",
-            RemovedInDjangoCMS60Warning,
-            stacklevel=2,
-        )
 
     # Allow middleware to identify the site
     request_site = getattr(request, "site", None) if request else None
