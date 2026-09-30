@@ -39,10 +39,29 @@ check also receives ``permissions``.
     * - ``MOVE_PAGE``
       - :func:`cms.pages.services.move_page`
       - ``page``, ``target_page``, ``position``
+    * - ``ADD_PAGE``
+      - :func:`cms.pages.services.add_page`
+      - ``site``, ``parent_page``
+    * - ``ADD_PAGE_TRANSLATION``
+      - :func:`cms.pages.services.add_translation`
+      - ``page``
+    * - ``CHANGE_PAGE_TRANSLATION``
+      - :func:`cms.pages.services.change_page_content`
+      - ``page_content``
+    * - ``CHANGE_PAGE_ADVANCED_SETTINGS``
+      - :func:`cms.pages.services.change_advanced_settings`
+      - ``page``
+    * - ``CHANGE_PAGE_PERMISSIONS``
+      - :func:`cms.pages.services.save_page_permissions`
+      - ``page``
     * - ``COPY_PAGE``
       - :func:`cms.pages.services.copy_page_tree`
       - ``page``, ``target_page``, ``position``, ``target_site``,
         ``copy_permissions``
+    * - ``COPY_PAGE_FROM_SOURCE``
+      - :func:`cms.pages.services.copy_page_from_source`
+      - ``source``, ``target_site``, ``parent_page``,
+        ``allow_view_only_page_type``
     * - ``SET_HOME``
       - :func:`cms.pages.services.set_home`
       - ``page``
@@ -66,8 +85,9 @@ The plugin services in ``cms.core.services`` (``MOVE_PLUGIN``,
 ``CUT_PLUGIN``, ``PASTE_PLUGIN``, ``PASTE_PLACEHOLDER``,
 ``ADD_PLUGINS_FROM_PLACEHOLDER``, ``DELETE_PLUGIN``, ``CLEAR_PLACEHOLDER``)
 check permissions through their backend and do not run operation checks yet.
-``ADD_PLUGIN``, ``CHANGE_PLUGIN``, ``ADD_PAGE_TRANSLATION`` and
-``CHANGE_PAGE_TRANSLATION`` are performed by the admin only.
+``ADD_PLUGIN`` and ``CHANGE_PLUGIN`` are performed by the admin only.
+The global page grant and user/group permission services enforce their own
+scope checks instead of using the operation check registry.
 
 
 ****************
@@ -122,8 +142,17 @@ Page services
 *************
 
 .. automodule:: cms.pages.services
-    :members: move_page, copy_page_tree, set_home, delete_page, delete_translation,
+    :members: add_page, add_translation, change_page_content,
+        change_advanced_settings, set_user_permissions, save_page_permissions,
+        save_global_page_permission, delete_global_page_permission,
+        delete_global_page_permissions, move_page, copy_page_tree,
+        copy_page_from_source, set_home, delete_page, delete_translation,
         change_template, copy_language, toggle_in_navigation, rebuild_urls
+
+Page lookup uses the normal queryset or admin ``get_object()`` path. A caller
+that exposes page data checks the appropriate view permission before returning
+it. Each mutating service checks permission for its own operation, even when
+the caller has already fetched the page.
 
 
 ***************

@@ -161,6 +161,66 @@ register_core_check(operations.SET_HOME, "cms.pages.set_home_permission", check_
 register_core_check(operations.SET_HOME, "cms.pages.home_candidate", check_home_candidate, requires=["page"])
 
 
+# Create and edit pages
+
+
+def check_add_page_permission(context, *, site, parent_page=None, permissions=None, **kwargs):
+    permissions = _permissions(permissions, context)
+    if parent_page:
+        allowed = parent_page.site_id == site.pk and permissions.can_add_subpage(parent_page, site)
+    else:
+        allowed = permissions.can_add_page(site)
+    if not allowed:
+        raise PermissionDenied(_("You do not have permission to add a page here."))
+
+
+def check_add_translation_permission(context, *, page, permissions=None, **kwargs):
+    if not _permissions(permissions, context).can_change_page(page):
+        raise PermissionDenied(_("You do not have permission to change this page."))
+
+
+def check_change_translation_permission(context, *, page_content, permissions=None, **kwargs):
+    if not _permissions(permissions, context).can_change_content(page_content):
+        raise PermissionDenied(_("You do not have permission to change this page."))
+
+
+def check_advanced_settings_permission(context, *, page, permissions=None, **kwargs):
+    if not _permissions(permissions, context).can_change_advanced_settings(page):
+        raise PermissionDenied(_("You do not have permission to change advanced settings."))
+
+
+def check_page_permissions_permission(context, *, page, permissions=None, **kwargs):
+    if not _permissions(permissions, context).can_change_page_permissions(page):
+        raise PermissionDenied(_("You do not have permission to change page permissions."))
+
+
+register_core_check(operations.ADD_PAGE, "cms.pages.add_permission", check_add_page_permission, requires=["site"])
+register_core_check(
+    operations.ADD_PAGE_TRANSLATION,
+    "cms.pages.add_translation_permission",
+    check_add_translation_permission,
+    requires=["page"],
+)
+register_core_check(
+    operations.CHANGE_PAGE_TRANSLATION,
+    "cms.pages.change_translation_permission",
+    check_change_translation_permission,
+    requires=["page_content"],
+)
+register_core_check(
+    operations.CHANGE_PAGE_ADVANCED_SETTINGS,
+    "cms.pages.advanced_settings_permission",
+    check_advanced_settings_permission,
+    requires=["page"],
+)
+register_core_check(
+    operations.CHANGE_PAGE_PERMISSIONS,
+    "cms.pages.change_permissions_permission",
+    check_page_permissions_permission,
+    requires=["page"],
+)
+
+
 # Copy page
 
 

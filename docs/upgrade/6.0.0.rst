@@ -124,9 +124,14 @@ objects to act on and an ``OperationContext`` instead of an ``HttpRequest``.
   ``paste_placeholder``, ``copy_plugin_to_clipboard``,
   ``copy_placeholder_to_clipboard``, ``add_plugins_from_placeholder``,
   ``delete_plugin`` and ``clear_placeholder``.
-* ``cms.pages.services``: ``move_page``, ``set_home``, ``copy_page_tree``,
-  ``delete_page``, ``delete_translation``, ``change_template``,
-  ``copy_language``, ``toggle_in_navigation`` and ``rebuild_urls``.
+* ``cms.pages.services``: ``add_page``, ``add_translation``,
+  ``change_page_content``, ``change_advanced_settings``,
+  ``save_page_permissions``, ``set_user_permissions``,
+  ``save_global_page_permission``, ``delete_global_page_permission``,
+  ``delete_global_page_permissions``, ``move_page``, ``set_home``,
+  ``copy_page_tree``, ``copy_page_from_source``, ``delete_page``,
+  ``delete_translation``, ``change_template``, ``copy_language``,
+  ``toggle_in_navigation`` and ``rebuild_urls``.
 
 .. code-block:: python
 
@@ -140,10 +145,13 @@ objects to act on and an ``OperationContext`` instead of an ``HttpRequest``.
 ``language``, the ``origin`` of the operation and, for the admin only, the
 ``request``. ``OperationContext.from_request(request)`` builds one in a view.
 
-Every service sends the same ``pre_*_operation`` and ``post_*_operation``
-signals the admin sends, so packages such as djangocms-versioning see the
-operation whoever performed it. The admin now calls these services instead of
-doing the work in its views.
+Page creation and translation edit services send the same
+``pre_*_operation`` and ``post_*_operation`` signals as the admin, so packages
+such as djangocms-versioning see the operation whoever performed it. The admin
+calls services instead of doing the work in its views or forms. Forms still
+validate input and attach errors to fields; their ``save()`` methods pass
+validated values to the services, which enforce operation permissions before
+writing. The permission-grant helpers enforce their own field and site scopes.
 
 See :ref:`operations_reference` for the services, their arguments and the
 signals they send.

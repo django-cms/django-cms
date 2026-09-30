@@ -258,7 +258,32 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             form = super().get_form(request, obj, **kwargs)
         form._site = get_site_from_request(request)
         form._request = request
+        form._page_admin = self
         return form
+
+    def save_model(self, request, obj, form, change):
+        # Permission-only changes use an empty advanced-settings form. Its
+        # inline grants are saved separately below.
+        if form.changed_data:
+            page_services.change_advanced_settings(
+                obj,
+                changed_fields=form.changed_data,
+                context=OperationContext.from_request(request),
+                permissions=AdminPagePermissions(self, request),
+            )
+
+    def save_formset(self, request, form, formset, change):
+        if formset.model is not PagePermission:
+            return super().save_formset(request, form, formset, change)
+        grants = formset.save(commit=False)
+        page_services.save_page_permissions(
+            form.instance,
+            save=grants,
+            delete=formset.deleted_objects,
+            context=OperationContext.from_request(request),
+            permissions=AdminPagePermissions(self, request),
+        )
+        formset.save_m2m()
 
     def actions_menu(self, request, object_id, extra_context=None):
         page = self.get_object(request, object_id=object_id)
@@ -649,7 +674,12 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if not cancel_clicked and request.method == "POST":
             form = PageTitleForm(instance=translation, data=request.POST)
             if form.is_valid():
-                form.save()
+                page_services.change_page_content(
+                    form.save(commit=False),
+                    data=form.cleaned_data,
+                    changed_fields=form.changed_data,
+                    context=OperationContext.from_request(request, language=language),
+                )
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=translation)
@@ -786,6 +816,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         form = super().get_form(request, obj, form=self.get_form_class(request, obj), **kwargs)
         form._site = get_site_from_request(request)
         form._request = request
+        form._page_admin = self
         return form
 
     def duplicate(self, request, object_id):

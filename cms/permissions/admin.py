@@ -10,12 +10,14 @@ from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
+from cms.pages import services as page_services
 from cms.pages.admin.forms import (
     GlobalPagePermissionAdminForm,
     PagePermissionInlineAdminForm,
     ViewRestrictionInlineAdminForm,
 )
 from cms.permissions import page_permissions, utils as permissions
+from cms.shared.operations import OperationContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 
@@ -172,6 +174,28 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
         # shared mutation of the declared form class.
         form_class._current_user = request.user
         return form_class
+
+    def save_model(self, request, obj, form, change):
+        page_services.save_global_page_permission(
+            obj,
+            sites=form.cleaned_data.get("sites") or [],
+            context=OperationContext.from_request(request),
+        )
+
+    def save_related(self, request, form, formsets, change):
+        # The service already saved the only M2M field, ``sites``.
+        for formset in formsets:
+            self.save_formset(request, form, formset, change)
+
+    def delete_model(self, request, obj):
+        page_services.delete_global_page_permission(
+            obj, context=OperationContext.from_request(request),
+        )
+
+    def delete_queryset(self, request, queryset):
+        page_services.delete_global_page_permissions(
+            queryset, context=OperationContext.from_request(request),
+        )
 
     def has_add_permission(self, request):
         site = Site.objects.get_current(request)

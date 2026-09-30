@@ -11,6 +11,10 @@ CLEAR_PLACEHOLDER = 'clear_placeholder'
 
 # Page operations
 CHANGE_PAGE = 'change_page'
+ADD_PAGE = 'add_page'
+CHANGE_PAGE_ADVANCED_SETTINGS = 'change_page_advanced_settings'
+CHANGE_PAGE_PERMISSIONS = 'change_page_permissions'
+CHANGE_GLOBAL_PAGE_PERMISSION = 'change_global_page_permission'
 MOVE_PAGE = 'move_page'
 DELETE_PAGE = 'delete_page'
 SET_HOME = 'set_home'

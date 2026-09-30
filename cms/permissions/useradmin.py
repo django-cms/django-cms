@@ -48,6 +48,7 @@ class GenericCmsPermissionAdmin:
     def get_form(self, request, obj=None, **kwargs):
         form_class = super().get_form(request, obj, **kwargs)
         form_class._current_user = request.user
+        form_class._request = request
         return form_class
 
     def get_queryset(self, request):

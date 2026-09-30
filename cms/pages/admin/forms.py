@@ -7,16 +7,13 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.translation import get_language, gettext, gettext_lazy as _
 
-from cms import api
 from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PluginLimitReached
-from cms.extensions import extension_pool
 from cms.forms.fields import PageSmartLinkField
 from cms.forms.validators import validate_path, validate_relative_url, validate_url_uniqueness
 from cms.forms.widgets import (
@@ -35,15 +32,10 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
-from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION, COPY_PAGE_FROM_SOURCE
-from cms.operations.helpers import (
-    send_post_page_operation,
-    send_pre_page_operation,
-)
+from cms.operations import COPY_PAGE_FROM_SOURCE
 from cms.pages import services as page_services
 from cms.pages.apphook_pool import apphook_pool
-from cms.pages.utils import get_clean_username
-from cms.permissions.cache import clear_permission_cache
+from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
 from cms.permissions.models import (
     EDIT_PERMISSION_REQUIRED_MESSAGES,
     User,
@@ -63,7 +55,6 @@ from cms.permissions.utils import (
 )
 from cms.shared.checks import can
 from cms.shared.operations import OperationContext
-from cms.signals.apphook import set_restart_trigger
 from cms.utils import get_current_site
 from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
@@ -122,40 +113,16 @@ def get_main_language_page_content_template(new_page):
 
 
 # Permission actions managed by the CMS permission forms (Django's defaults).
-CMS_PERMISSION_ACTIONS = ("add", "change", "delete")
+CMS_PERMISSION_ACTIONS = page_services.CMS_PERMISSION_ACTIONS
 
 # Maps each ``can_<action>_<name>`` permission group to the model whose
 # permission governs it. Used to render, read and authorize the checkboxes.
-CMS_PERMISSION_MODELS = (
-    (Page, "page"),
-    (PageUser, "pageuser"),
-    (PagePermission, "pagepermission"),
-)
+CMS_PERMISSION_MODELS = page_services.CMS_PERMISSION_MODELS
 
 
 def save_permissions(data, obj):
-    # ``PageUserGroup`` shares the ``pageuser`` field with ``PageUser`` but has
-    # its own content type, so the permission must be (un)assigned on both.
-    models = (*CMS_PERMISSION_MODELS, (PageUserGroup, "pageuser"))
-
-    if not obj.pk:
-        # save obj, otherwise we can't assign permissions to him
-        obj.save()
-
-    permission_accessor = get_permission_accessor(obj)
-
-    for model, name in models:
-        content_type = ContentType.objects.get_for_model(model)
-        for key in CMS_PERMISSION_ACTIONS:
-            # add permission `key` for model `model`
-            codename = get_permission_codename(key, model._meta)
-            permission = Permission.objects.get(content_type=content_type, codename=codename)
-            field = f"can_{key}_{name}"
-
-            if data.get(field):
-                permission_accessor.add(permission)
-            elif field in data:
-                permission_accessor.remove(permission)
+    """Compatibility wrapper for the trusted :mod:`cms.api` caller."""
+    return page_services.set_user_permissions(data, obj)
 
 
 class CopyPermissionForm(forms.Form):
@@ -214,6 +181,7 @@ class SlugWidget(forms.widgets.TextInput):
 class BasePageContentForm(forms.ModelForm):
     _site = None
     _request = None
+    _page_admin = None
 
     title = forms.CharField(
         label=PageContent._meta.get_field("title").verbose_name.capitalize(),
@@ -266,6 +234,7 @@ class BasePageContentForm(forms.ModelForm):
 
 class AddPageForm(BasePageContentForm):
     source_requires_change = False
+    creates_page_type = False
     source = forms.ModelChoiceField(
         label=_("Page type"),
         queryset=Page.objects.filter(is_page_type=True),
@@ -342,12 +311,8 @@ class AddPageForm(BasePageContentForm):
             return data
 
         parent_page = data.get("parent_page")
-        if parent_page:
-            slug = data["slug"]
-            parent_path = parent_page.get_path(self._language)
-            path = f"{parent_path}/{slug}" if parent_path else slug
-        else:
-            path = data["slug"]
+        parent_path = self.get_parent_path(parent_page)
+        path = f"{parent_path}/{data['slug']}" if parent_path else data["slug"]
 
         try:
             # Validate the url
@@ -362,6 +327,9 @@ class AddPageForm(BasePageContentForm):
         else:
             data["path"] = path
         return data
+
+    def get_parent_path(self, parent_page):
+        return parent_page.get_path(self._language) if parent_page else ""
 
     def user_can_use_source(self, source):
         return can(
@@ -410,16 +378,13 @@ class AddPageForm(BasePageContentForm):
             raise ValidationError(_("You do not have permission to change this page."))
         return page
 
-    def create_translation(self, page, main_language_page_content_template=None):
+    def get_translation_data(self):
         data = self.cleaned_data
         title_kwargs = {
-            "page": page,
-            "language": self._language,
             "slug": data["slug"],
             "path": data["path"],
             "title": data["title"],
             "template": self.get_template(),
-            "created_by": self._user,
         }
         title_kwargs.update(self.content_defaults)
 
@@ -432,10 +397,19 @@ class AddPageForm(BasePageContentForm):
         if "meta_description" in data:
             title_kwargs["meta_description"] = data["meta_description"]
 
-        if main_language_page_content_template:
-            title_kwargs["template"] = main_language_page_content_template
+        return title_kwargs
 
-        return api.create_page_content(**title_kwargs)
+    def create_translation(self, page, main_language_page_content_template=None):
+        """Compatibility entry point for callers creating a translation directly."""
+        data = self.get_translation_data()
+        if main_language_page_content_template:
+            data["template"] = main_language_page_content_template
+        return page_services.add_translation(
+            page,
+            language=self._language,
+            content_data=data,
+            context=OperationContext.from_request(self._request, language=self._language),
+        )
 
     def from_source(self, source, parent=None):
         return page_services.copy_page_from_source(
@@ -457,56 +431,27 @@ class AddPageForm(BasePageContentForm):
         page = self.cleaned_data.get("cms_page")
         source = self.cleaned_data.get("source")
         parent = self.cleaned_data.get("parent_page")
-
-        operation_token = send_pre_page_operation(
-            request=self._request,
-            operation=ADD_PAGE_TRANSLATION,
-            language=self._language,
-        )
-
         if page:
-            new_page = page
-        elif source:
-            new_page = self.from_source(source, parent=parent)
-        else:
-            new_page = Page(site=self._site, parent=parent)
-            new_page.add_to_tree(position="last-child")
-            new_page.save()
-
-        translation = self.create_translation(
-            new_page, main_language_page_content_template=get_main_language_page_content_template(new_page)
-        )
-        new_page.page_content_cache[translation.language] = translation
-
-        if source:
-            extension_pool.copy_extensions(
-                source_page=source,
-                target_page=new_page,
-                languages=[translation.language],
+            return page_services.add_translation(
+                page,
+                language=self._language,
+                content_data=self.get_translation_data(),
+                context=OperationContext.from_request(self._request, language=self._language),
+                permissions=(
+                    AdminPageContentPermissions(self._page_admin, self._request)
+                    if self._page_admin else None
+                ),
             )
-            placeholders = source.get_placeholders(translation.language)
-
-            for source_placeholder in placeholders:
-                target_placeholder = translation.placeholders.create(
-                    slot=source_placeholder.slot,
-                    default_width=source_placeholder.default_width,
-                )
-                source_placeholder.copy_plugins(target_placeholder, language=translation.language)
-
-        is_first = not (Page.objects.on_site(self._site).exclude(pk=new_page.id).exists())
-
-        if is_first and not new_page.is_page_type:
-            # it's the first page. Make it the homepage
-            new_page.set_as_homepage(self._user)
-
-        send_post_page_operation(
-            request=self._request,
-            operation=ADD_PAGE_TRANSLATION,
-            token=operation_token,
-            obj=new_page,
+        return page_services.add_page(
+            site=self._site,
+            parent_page=parent,
+            source=source,
             language=self._language,
+            content_data=self.get_translation_data(),
+            is_page_type=self.creates_page_type,
+            allow_view_only_page_type=not self.source_requires_change,
+            context=OperationContext.from_request(self._request, language=self._language),
         )
-        return translation
 
     def save_m2m(self):
         return
@@ -514,6 +459,7 @@ class AddPageForm(BasePageContentForm):
 
 class AddPageTypeForm(AddPageForm):
     source_requires_change = True
+    creates_page_type = True
     menu_title = None
     meta_description = None
     page_title = None
@@ -527,26 +473,12 @@ class AddPageTypeForm(AddPageForm):
     }
 
     def get_or_create_root(self):
-        """
-        Creates the root node used to store all page types
-        for the current site if it doesn't exist.
-        """
-        root_page = PageType.get_root_page(site=self._site)
-        if not root_page:
-            root_page = Page(is_page_type=True)
-            root_page.set_tree_node(self._site)
-            root_page.save()
+        return page_services.get_or_create_page_type_root(self._site, language=self._language)
 
-        if not root_page.has_translation(self._language):
-            api.create_page_content(
-                language=self._language,
-                title=gettext("Page Types"),
-                page=root_page,
-                slug=PAGE_TYPES_ID,
-                path=PAGE_TYPES_ID,
-                in_navigation=False,
-            )
-        return root_page
+    def get_parent_path(self, parent_page):
+        if parent_page is None or parent_page == PageType.get_root_page(site=self._site):
+            return super().get_parent_path(parent_page) or PAGE_TYPES_ID
+        return super().get_parent_path(parent_page)
 
     def clean_parent_page(self):
         parent_page = super().clean_parent_page()
@@ -555,9 +487,8 @@ class AddPageTypeForm(AddPageForm):
             raise ValidationError("Parent has to be a page type.")
 
         if not parent_page:
-            # parent was not explicitly selected.
-            # fallback to the page types root
-            parent_page = self.get_or_create_root()
+            # The service creates the root when saving. Validation must not write.
+            return PageType.get_root_page(site=self._site)
         return parent_page
 
     def from_source(self, source, parent=None):
@@ -571,13 +502,7 @@ class AddPageTypeForm(AddPageForm):
         )
 
     def save(self, *args, **kwargs):
-        new_page = super().save(*args, **kwargs)
-
-        if not self.cleaned_data.get("source"):
-            # User has created a page-type via "Add page"
-            # instead of from another page.
-            new_page.update(is_page_type=True)
-        return new_page
+        return super().save(*args, **kwargs)
 
 
 class DuplicatePageForm(AddPageForm):
@@ -736,44 +661,23 @@ class ChangePageForm(BasePageContentForm):
         return xframe_options
 
     def save(self, commit=True):
-        operation_token = send_pre_page_operation(
-            request=self._request,
-            operation=CHANGE_PAGE_TRANSLATION,
-            language=self._language,
-        )
-
-        data = self.cleaned_data.copy()
-        page = self.instance.page
-        data["overwrite_url"] = (data.get("overwrite_url") or "").strip("/") or None
         page_content = super().save(commit=False)
-        page_content.update(
-            changed_by=get_clean_username(self._request.user),
-            changed_date=timezone.now(),
-            **data,
+        return page_services.change_page_content(
+            page_content,
+            data=self.cleaned_data,
+            changed_fields=self.changed_data,
+            context=OperationContext.from_request(self._request, language=self._language),
+            permissions=(
+                AdminPageContentPermissions(self._page_admin, self._request)
+                if self._page_admin else None
+            ),
         )
-        if page_content.is_public():
-            # This content is what visitors see (nothing like a versioning
-            # package hides it), so the page URL follows the change right away.
-            # Otherwise the URL is only updated once this content is published.
-            page.update_urls_from_content(self._language)
-
-            if page.application_urls and "slug" in self.changed_data:
-                # Connects the apphook restart handler to the request finished signal
-                set_restart_trigger()
-        page.clear_cache(menu=True)
-        send_post_page_operation(
-            request=self._request,
-            operation=CHANGE_PAGE_TRANSLATION,
-            token=operation_token,
-            obj=page,
-            language=self._language,
-        )
-        return page_content
 
 
 class AdvancedSettingsForm(forms.ModelForm):
     _site = None
     _request = None
+    _page_admin = None
 
     application_urls = forms.ChoiceField(
         label=_("Application"),
@@ -957,13 +861,19 @@ class AdvancedSettingsForm(forms.ModelForm):
         return "application_namespace" in changed_data
 
     def save(self, *args, **kwargs):
-        page = super().save(*args, **kwargs)
-        page.clear_cache(menu=True)
-        clear_permission_cache()
-
-        if self.has_changed_apphooks():
-            set_restart_trigger()
-        return page
+        commit = kwargs.get("commit", args[0] if args else True)
+        page = super().save(commit=False)
+        if not commit:
+            return page
+        return page_services.change_advanced_settings(
+            page,
+            changed_fields=self.changed_data,
+            context=OperationContext.from_request(self._request, language=self._language),
+            permissions=(
+                AdminPagePermissions(self._page_admin, self._request)
+                if self._page_admin else None
+            ),
+        )
 
 
 class PageTreeForm(forms.Form):
@@ -1442,9 +1352,15 @@ class GenericCmsPermissionForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.save()
-        save_permissions(self.cleaned_data, instance)
-        return instance
+        return page_services.set_user_permissions(
+            self.cleaned_data,
+            instance,
+            context=(
+                OperationContext.from_request(self._request)
+                if self._current_user and getattr(self, "_request", None)
+                else OperationContext(user=self._current_user) if self._current_user else None
+            ),
+        )
 
 
 class PageUserAddForm(forms.ModelForm):

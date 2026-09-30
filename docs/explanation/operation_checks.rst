@@ -281,6 +281,45 @@ column are what a check receives and what a dry run passes to ``can()``.
 
         ``cms.pages.url_unique``: none of the page's URLs collides with the URL
         of another page.
+    * - ``ADD_PAGE``
+
+        ``add_page``
+      - ``site``, ``parent_page``
+      - ``cms.pages.add_permission``: the user may add a page at the root or
+        below the chosen parent.
+    * - ``ADD_PAGE_TRANSLATION``
+
+        ``add_translation``
+      - ``page``
+      - ``cms.pages.add_translation_permission``: the user may change the page.
+    * - ``CHANGE_PAGE_TRANSLATION``
+
+        ``change_page_content``
+      - ``page_content``
+      - ``cms.pages.change_translation_permission``: the user may change this
+        translation's content.
+    * - ``CHANGE_PAGE_ADVANCED_SETTINGS``
+
+        ``change_advanced_settings``
+      - ``page``
+      - ``cms.pages.advanced_settings_permission``: the user may change the
+        page's advanced settings.
+    * - ``CHANGE_PAGE_PERMISSIONS``
+
+        ``save_page_permissions``
+      - ``page``
+      - ``cms.pages.change_permissions_permission``: the user may change the
+        page's permissions. The service also checks each grant being saved.
+    * - ``COPY_PAGE_FROM_SOURCE``
+
+        ``copy_page_from_source``; also called by ``add_page`` when copying
+      - ``source``, ``target_site``, ``parent_page``,
+        ``allow_view_only_page_type``
+      - ``cms.pages.source_copy_permission``: the user may change the source,
+        or view a page type from the target site when that exception applies.
+
+        ``cms.pages.source_copy_target_permission``: the user may add a page
+        below the target parent or at the root.
     * - ``COPY_PAGE``
 
         ``copy_page_tree``

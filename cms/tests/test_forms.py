@@ -450,6 +450,23 @@ class DuplicatePageFormSecurityTestCase(CMSTestCase):
 
 
 class AddPageFormSecurityTestCase(CMSTestCase):
+    def test_page_type_validation_does_not_create_root(self):
+        from cms.pages.admin.forms import AddPageTypeForm
+
+        request = self.get_request("/en/admin/cms/pagecontent/add/")
+        request.user = self.get_superuser()
+        site = Site.objects.get_current()
+        form_cls = type("PageTypeForm", (AddPageTypeForm,), {"_site": site, "_request": request})
+        count = Page.objects.count()
+        form = form_cls(data={"title": "type", "slug": "type"})
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(Page.objects.count(), count)
+        self.assertEqual(form.cleaned_data["path"], "page_types/type")
+        content = form.save()
+        self.assertEqual(content.page.get_path("en"), "page_types/type")
+        self.assertEqual(content.page.parent.get_path("en"), "page_types")
+
     def _build_form(self, user, page, site):
         request = self.get_request("/en/")
         request.user = user

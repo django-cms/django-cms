@@ -31,6 +31,12 @@ class PagePermissions:
     def can_change_page(self, page) -> bool:
         return page_permissions.user_can_change_page(self.user, page=page, site=page.site)
 
+    def can_change_advanced_settings(self, page) -> bool:
+        return page_permissions.user_can_change_page_advanced_settings(self.user, page=page, site=page.site)
+
+    def can_change_page_permissions(self, page) -> bool:
+        return page_permissions.user_can_change_page_permissions(self.user, page=page, site=page.site)
+
     def can_view_page(self, page) -> bool:
         return page_permissions.user_can_view_page(self.user, page=page, site=page.site)
 
@@ -84,6 +90,12 @@ class AdminPagePermissions(PagePermissions):
 
     def can_change_page(self, page) -> bool:
         return bool(self.model_admin.has_change_permission(self.request, page))
+
+    def can_change_advanced_settings(self, page) -> bool:
+        return bool(self.model_admin.has_change_advanced_settings_permission(self.request, page))
+
+    def can_change_page_permissions(self, page) -> bool:
+        return bool(self.model_admin.has_change_permissions_permission(self.request, page))
 
     def can_delete_page(self, page) -> bool:
         return bool(self.model_admin.has_delete_permission(self.request, page))

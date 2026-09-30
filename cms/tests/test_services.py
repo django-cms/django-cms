@@ -1,9 +1,10 @@
+from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ValidationError
 
 from cms.api import add_plugin, create_page
 from cms.core.services import plugins as plugin_services
 from cms.core.services.permissions import PluginPermissions, get_permissions
-from cms.models import Page, Placeholder, UserSettings
+from cms.models import GlobalPagePermission, Page, PageContent, PagePermission, Placeholder, UserSettings
 from cms.pages import services as page_services
 from cms.pages.permissions import PagePermissions, get_page_permissions
 from cms.shared.operations import OperationContext
@@ -65,6 +66,88 @@ class RequestFreeServiceTest(CMSTestCase):
 
     def _context(self, **kwargs):
         return OperationContext(user=self.user, language="en", origin="/en/", **kwargs)
+
+    def test_add_page_service_creates_content_without_a_request(self):
+        content = page_services.add_page(
+            site=self.page.site,
+            parent_page=self.page,
+            source=None,
+            language="en",
+            content_data={"title": "new", "slug": "new", "path": "home/new", "template": "nav_playground.html"},
+            context=self._context(),
+        )
+        self.assertEqual(content.page.parent_id, self.page.pk)
+        self.assertEqual(content.title, "new")
+
+    def test_page_write_services_reject_an_unprivileged_caller(self):
+        actor = self.get_staff_user_with_no_permissions()
+        context = OperationContext(user=actor, language="en")
+        count = Page.objects.count()
+        with self.assertRaises(PermissionDenied):
+            page_services.add_page(
+                site=self.page.site, parent_page=self.page, source=None, language="en",
+                content_data={"title": "new", "slug": "new", "path": "home/new", "template": "nav_playground.html"},
+                context=context,
+            )
+        with self.assertRaises(PermissionDenied):
+            page_services.add_translation(
+                self.page, language="de",
+                content_data={"title": "Neu", "slug": "neu", "path": "neu", "template": "nav_playground.html"},
+                context=context,
+            )
+        content = self.page.get_admin_content("en")
+        with self.assertRaises(PermissionDenied):
+            page_services.change_page_content(
+                content, data={"title": "changed"}, changed_fields=["title"], context=context,
+            )
+        with self.assertRaises(PermissionDenied):
+            page_services.change_advanced_settings(self.page, changed_fields=["login_required"], context=context)
+        with self.assertRaises(PermissionDenied):
+            page_services.save_page_permissions(self.page, context=context)
+        self.assertEqual(Page.objects.count(), count)
+        content.refresh_from_db()
+        self.assertEqual(content.title, "home")
+
+    def test_change_services_only_write_supported_fields(self):
+        other_site = Site.objects.create(domain="other.example", name="Other")
+        content = self.page.get_admin_content("en")
+        with self.assertRaises(ValidationError):
+            page_services.change_page_content(
+                content, data={"page": self.page}, changed_fields=["page"], context=self._context(),
+            )
+        self.page.site = other_site
+        self.page.login_required = True
+        page_services.change_advanced_settings(
+            self.page, changed_fields=["login_required"], context=self._context(),
+        )
+        self.page.refresh_from_db()
+        self.assertNotEqual(self.page.site_id, other_site.pk)
+        self.assertTrue(self.page.login_required)
+
+    def test_permission_services_reject_unprivileged_caller(self):
+        actor = self.get_staff_user_with_no_permissions()
+        context = OperationContext(user=actor)
+        with self.assertRaises(PermissionDenied):
+            page_services.set_user_permissions({"can_add_page": True}, actor, context=context)
+        grant = GlobalPagePermission(user=actor, can_add=True, can_change=True)
+        with self.assertRaises(PermissionDenied):
+            page_services.save_global_page_permission(grant, sites=[Site.objects.get_current()], context=context)
+        self.assertFalse(GlobalPagePermission.objects.filter(user=actor).exists())
+
+    def test_permission_services_apply_and_remove_grants(self):
+        actor = self.get_staff_user_with_no_permissions()
+        page_grant = PagePermission(user=actor, page=self.page)
+        page_services.save_page_permissions(self.page, save=[page_grant], context=self._context())
+        self.assertTrue(PagePermission.objects.filter(pk=page_grant.pk).exists())
+        page_services.save_page_permissions(self.page, delete=[page_grant], context=self._context())
+        self.assertFalse(PagePermission.objects.filter(pk=page_grant.pk).exists())
+
+        global_grant = GlobalPagePermission(user=actor)
+        site = Site.objects.get_current()
+        page_services.save_global_page_permission(global_grant, sites=[site], context=self._context())
+        self.assertEqual(list(global_grant.sites.all()), [site])
+        page_services.delete_global_page_permissions([global_grant], context=self._context())
+        self.assertFalse(GlobalPagePermission.objects.filter(pk=global_grant.pk).exists())
 
     def test_move_plugin_without_a_request(self):
         first = add_plugin(self.placeholder, "LinkPlugin", "en", name="first")
