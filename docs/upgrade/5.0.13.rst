@@ -1,0 +1,127 @@
+.. _upgrade-to-5.0.13:
+
+####################
+5.0.13 release notes
+####################
+
+*September 24, 2026*
+
+Welcome to django CMS 5.0.13!
+
+This is a patch release of the 5.0 series. It contains **one security fix** for
+a stored XSS in the page delete confirmation, which is why we recommend that all
+users of django CMS 5.0.x upgrade as soon as possible. Read the security fix and
+its backward-incompatible effects before updating an existing project. This
+release contains no migrations.
+
+The same fix is contained in django CMS 5.1.3.
+
+If you are upgrading from django CMS 4.1 or earlier, read the release notes of
+all versions in between, in particular the :ref:`5.0.0 release notes
+<upgrade-to-5.0.0>`.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and
+only support the latest release of each series.
+
+It supports **Python 3.9, 3.10, 3.11, 3.12, and 3.13**. As for Django we highly
+recommend and only support the latest release of each series.
+
+************************
+How to upgrade to 5.0.13
+************************
+
+Before upgrading, back up your database and review the
+:ref:`backward-incompatible changes <upgrade-5.0.13-backward-incompatible>`
+below.
+
+Update your project's ``requirements.txt`` file to require (at least) django CMS
+5.0.13 and run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+********************
+What's new in 5.0.13
+********************
+
+Security fixes
+==============
+
+Stored XSS in the page delete confirmation escalated editors to administrators
+------------------------------------------------------------------------------
+
+`GHSA-mgv8-5r6j-2gjq <https://github.com/django-cms/django-cms/security/advisories/GHSA-mgv8-5r6j-2gjq>`_:
+a staff user who may change a page could store markup in that page's url through
+the *Overwrite URL* field -- a value containing no ``/`` bypassed url validation
+entirely and was copied verbatim to ``PageUrl.path``. The page delete
+confirmation screen marked the url safe when rendering it, so the stored markup
+executed in the browser of whoever opened that screen, typically an
+administrator about to delete the page. The script runs on the admin origin: it
+cannot read the ``HttpOnly`` session cookie, but it can read the CSRF token and
+issue authenticated requests as its victim, which turns an ordinary content
+editor into an administrator.
+
+``CMS_PERMISSION = True`` is not a mitigation -- it only limits which pages an
+attacker can poison to the ones they may already edit. A second route stores the
+payload on the home page, where ``ChangePageForm.clean()`` returned early and
+never validated the value; it is ignored while the page is the home page and
+becomes the live ``PageUrl.path`` as soon as another page takes that role.
+
+Two changes fix this. The confirmation screen no longer marks the page url safe
+and builds the page entry with ``format_html()``, and a path without a ``/`` is
+now validated rather than skipped -- in the new
+``ChangePageForm.clean_overwrite_url()``, so that the home page is covered too.
+
+Upgrading is required even where every editor is trusted today: validation does
+not clean values that are already stored, and paths written through ``cms.api``
+or a direct model save never pass through the form at all. Only the output
+encoding protects those rows. Audit the existing data with::
+
+    from cms.models import PageUrl
+    PageUrl.objects.filter(path__regex=r"[<>]")
+
+.. _upgrade-5.0.13-backward-incompatible:
+
+***************************************
+Backward incompatible changes in 5.0.13
+***************************************
+
+Page paths reject angle brackets
+================================
+
+The input validation above rejects values that earlier releases accepted:
+
+* ``relative_url_regex`` no longer allows ``<`` and ``>`` anywhere in the value.
+  It previously excluded them from the leading segment only, so markup passed as
+  soon as one safe character preceded it (``foo/a<img src=x onerror=...>``).
+* ``validate_url_uniqueness()`` now validates single-segment paths as well.
+  Paths without a ``/`` used to skip validation entirely.
+* ``validate_url()`` rejects ``<`` and ``>`` outright, before it decides between
+  the relative and the absolute branch. The absolute branch is Django's
+  ``URLValidator``, whose path pattern accepts both characters, so a value
+  carrying a scheme (``https://example.com/<script>…</script>``) used to bypass
+  the check above. This also covers the *Redirect* field, which renders into an
+  ``href``.
+* Two helpers back this up in ``cms.forms.validators``: ``validate_path()``
+  dispatches on whether the value contains a ``/``, and ``validate_path_segment()``
+  checks a single segment against the new ``path_segment_regex``. Code that
+  writes page paths outside the admin forms should call ``validate_path()``.
+
+Paths already stored in the database are left untouched; only new input is
+rejected. They are, however, escaped on output from now on.
+
+*********
+Bug Fixes
+*********
+
+* Reject markup in the *Overwrite URL* field, both in single-segment paths and in later
+  path segments, and escape page titles and urls on the page deletion confirmation screen
+  (#8888) (#8892) -- Fabian Braun
+
+Thanks to all contributors for their efforts!

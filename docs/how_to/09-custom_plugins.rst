@@ -703,6 +703,8 @@ Example:
         '''
         return {'verbose_name': instance._meta.verbose_name}
 
+.. _plugin-processors:
+
 Plugin Processors
 ~~~~~~~~~~~~~~~~~
 

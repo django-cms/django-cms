@@ -441,12 +441,12 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
     def get_action_urls(self, js_compat=True):
         """
-        .. versionadd: 4.0
+        .. versionadded:: 4.0
 
         :return: dict of action urls for edit, add, delete, copy, and move plugin.
 
-        This method replaces the set of legacy methods `get_add_url`, ``get_edit_url`, `get_move_url`,
-        `get_delete_url`, `get_copy_url`.
+        This method replaces the set of legacy methods ``get_add_url``, ``get_edit_url``,
+        ``get_move_url``, ``get_delete_url``, ``get_copy_url``.
         """
         if not hasattr(CMSPlugin, '_edit_url'):
             CMSPlugin._edit_url = admin_reverse('cms_placeholder_edit_plugin', args=(0,))

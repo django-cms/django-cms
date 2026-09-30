@@ -220,7 +220,7 @@ Documentation structure
 
 Our documentation is divided into the following main sections:
 
-- :doc:`/introduction/index` (``introduction``): step-by-step, beginning-to-end
+- :doc:`/tutorials/index` (``tutorials``): step-by-step, beginning-to-end
   tutorials to get you up and running
 - :doc:`/how_to/index` (``how_to``): step-by-step guides covering more advanced
   development

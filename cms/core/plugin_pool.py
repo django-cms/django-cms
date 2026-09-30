@@ -65,7 +65,7 @@ class PluginPool:
         plugins.
 
         The result is memoized; the cache is cleared whenever plugins are (un)registered
-        (see :meth:`_clear_cached`), so the registry is only scanned on the first use of a
+        (see ``_clear_cached()``), so the registry is only scanned on the first use of a
         given pattern tuple. This keeps restriction evaluation -- which is on the critical
         rendering path -- cheap.
         """

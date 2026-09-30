@@ -15,7 +15,7 @@ For the conceptual model ("mount points" and what it means for request routing),
 :ref:`about_apphooks`.
 
 The :ref:`Tutorials <tutorials>` section contains a basic guide to :ref:`getting started
-with apphooks <apphooks_introduction>`. This document assumes more familiarity with the
+with apphooks <tutorial_apphook>`. This document assumes more familiarity with the
 CMS generally.
 
 The basics of apphook creation

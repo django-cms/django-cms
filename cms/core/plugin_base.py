@@ -189,7 +189,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             render_template = "cms/plugins/my_plugin.html"
             change_form_template = "admin/cms/page/plugin_change_form.html"
 
-    See also: :attr:`frontend_edit_template`.
     """
     # If True, displays a preview in the admin. Not used any more.
     admin_preview = False
@@ -217,7 +216,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     #. set this to ``True``
     #. make sure your plugin provides its own :meth:`icon_alt`, this will be used as a tooltip in
-      the text-editor and comes in handy when you use multiple plugins in your text.
+       the text-editor and comes in handy when you use multiple plugins in your text.
 
     See also: :meth:`icon_alt`, :meth:`icon_src`."""
 
@@ -581,28 +580,19 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         after an edit action has taken place. It allows the javascript frontend
         to update the structure and content on the edit endpoints.
 
-        Args:
-            request (HttpRequest): The HTTP request object.
-            obj (CMSPlugin): The CMS plugin instance being rendered.
-            action (Optional[str]): The action being performed on the plugin.
-                Defaults to "edit". Possible values are "add", "edit", "move", and "delete".
-            extra_data (Optional[Context]): Additional data to include in
-                the data bridge to the frontend. Defaults to None.
-            extra_context (Optional[Context]): Additional context to include in
-                the rendering. Defaults to None.
+        :param request: The HTTP request object.
+        :param obj: The CMS plugin instance being rendered.
+        :param action: The action being performed on the plugin: ``"add"``, ``"edit"``
+            (the default), ``"move"`` or ``"delete"``.
+        :param extra_data: Additional data to include in the data bridge to the frontend.
+        :param extra_context: Additional context to include in the rendering.
+        :return: The rendered confirmation form.
+        :raises ~django.core.exceptions.ObjectDoesNotExist: If the parent plugin is a ghost plugin and the plugin tree
+            cannot be fetched.
 
-        Returns:
-            HttpResponse: The rendered confirmation form as an HTTP response.
-
-        Raises:
-            ObjectDoesNotExist: If the parent plugin is a ghost plugin and the
-                plugin tree cannot be fetched.
-
-        Notes:
-            - Handles edge cases where the parent plugin is a ghost plugin.
-            - Constructs the plugin tree structure and gathers plugin-specific
-              data for rendering.
-            - Includes messages from the request in the context.
+        It handles the edge case of a ghost parent plugin, builds the plugin tree structure,
+        gathers plugin-specific data for rendering and includes the request's messages in the
+        context.
         """
 
         dj_messages = [
@@ -996,7 +986,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         To add one or more custom context menu items that are displayed in the context menu for all placeholders when
         in structure mode, override this method in a related plugin to return a list of
-        :class:`cms.plugin_base.PluginMenuItem` instances.
+        :class:`cms.core.plugin_base.PluginMenuItem` instances.
         """
         pass
 
@@ -1006,7 +996,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         To add one or more custom context menu items that are displayed in the context menu for all plugins when in
         structure mode, override this method in a related plugin to return a list of
-        :class:`cms.plugin_base.PluginMenuItem` instances.
+        :class:`cms.core.plugin_base.PluginMenuItem` instances.
         """
         pass
 

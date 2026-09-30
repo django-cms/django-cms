@@ -62,7 +62,7 @@ check also receives ``permissions``.
       - :func:`cms.pages.services.toggle_in_navigation`
       - ``page_content``
 
-The plugin services in :mod:`cms.core.services` (``MOVE_PLUGIN``,
+The plugin services in ``cms.core.services`` (``MOVE_PLUGIN``,
 ``CUT_PLUGIN``, ``PASTE_PLUGIN``, ``PASTE_PLACEHOLDER``,
 ``ADD_PLUGINS_FROM_PLACEHOLDER``, ``DELETE_PLUGIN``, ``CLEAR_PLACEHOLDER``)
 check permissions through their backend and do not run operation checks yet.
@@ -73,6 +73,8 @@ check permissions through their backend and do not run operation checks yet.
 ****************
 Operation checks
 ****************
+
+.. py:module:: cms.shared.checks
 
 .. autofunction:: cms.shared.checks.can
 
@@ -105,6 +107,15 @@ Registering checks from an app
 ``ValidationError``. Registering a check under the name of an existing one
 replaces it.
 
+Core checks
+===========
+
+.. py:module:: cms.pages.checks
+
+The checks django CMS registers for the page operations live in
+``cms.pages.checks``. :ref:`operation_checks` lists them by operation, with
+their names.
+
 
 *************
 Page services
@@ -129,6 +140,8 @@ Plugin services
 Permission backends
 *******************
 
+.. py:module:: cms.pages.permissions
+
 .. autoclass:: cms.pages.permissions.PagePermissions
     :members:
 
@@ -137,6 +150,8 @@ Permission backends
 .. autoclass:: cms.pages.permissions.AdminPageContentPermissions
 
 .. autofunction:: cms.pages.permissions.get_page_permissions
+
+.. py:module:: cms.core.services.permissions
 
 .. autoclass:: cms.core.services.permissions.PluginPermissions
     :members:
@@ -150,7 +165,7 @@ Permission backends
 Operation signals
 *****************
 
-Every operation is announced by a pair of signals in :mod:`cms.signals`, sent
+Every operation is announced by a pair of signals in ``cms.signals``, sent
 before and after it. ``cms.signals.PAGE_OPERATION_SIGNALS`` and
 ``cms.signals.PLACEHOLDER_OPERATION_SIGNALS`` name the pairs.
 

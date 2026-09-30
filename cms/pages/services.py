@@ -64,12 +64,12 @@ def move_page(
     Callers working from JSTree coordinates should resolve them first; the
     translation between the two coordinate systems belongs to the form, not here.
 
-    Runs the :data:`~cms.operations.MOVE_PAGE` checks first (see
+    Runs the ``MOVE_PAGE`` checks first (see
     :mod:`cms.pages.checks`); ``can(MOVE_PAGE, context, page=..., ...)`` asks the
     same question without moving anything.
 
-    :raises PermissionDenied: if the user may not move the page there.
-    :raises ValidationError: if the move would break the page's URLs.
+    :raises ~django.core.exceptions.PermissionDenied: if the user may not move the page there.
+    :raises ~django.core.exceptions.ValidationError: if the move would break the page's URLs.
     """
     with operation(
         operations.MOVE_PAGE,
@@ -90,7 +90,7 @@ def set_home(page: Page, *, context: OperationContext, permissions=None) -> Page
     takes change permission on both. If either tree contains an apphook the URL
     patterns have to be rebuilt, so the apphook restart trigger fires.
 
-    :raises ValidationError: if ``page`` cannot be the home page (see ``Page.is_potential_home``).
+    :raises ~django.core.exceptions.ValidationError: if ``page`` cannot be the home page (see ``Page.is_potential_home``).
     """
     with operation(
         operations.SET_HOME,
@@ -129,7 +129,7 @@ def copy_page_tree(
 
     The post-operation signal carries the copy as ``new_page``.
 
-    :raises ValidationError: if the page has no language the target site offers.
+    :raises ~django.core.exceptions.ValidationError: if the page has no language the target site offers.
     """
     with operation(
         operations.COPY_PAGE,
@@ -198,7 +198,7 @@ def delete_translation(
 ) -> None:
     """Delete one language of a page: its content, URL and plugins.
 
-    :raises ValidationError: if it is the page's only translation.
+    :raises ~django.core.exceptions.ValidationError: if it is the page's only translation.
     """
     page = page_content.page
     language = page_content.language
@@ -232,7 +232,7 @@ def change_template(
 ) -> PageContent:
     """Switch a page content to another template.
 
-    :raises ValidationError: if ``template`` is not one this project offers.
+    :raises ~django.core.exceptions.ValidationError: if ``template`` is not one this project offers.
     """
     with operation(
         operations.CHANGE_PAGE_TEMPLATE,
@@ -260,9 +260,9 @@ def copy_language(
     Returns the slots that had no counterpart in the target language, so the
     caller can report them; those placeholders are skipped rather than created.
 
-    :raises ValidationError: if ``target_language`` is not configured for the site
+    :raises ~django.core.exceptions.ValidationError: if ``target_language`` is not configured for the site
         or the page has no content in it.
-    :raises PermissionDenied: if the user may not add the plugins to a target placeholder.
+    :raises ~django.core.exceptions.PermissionDenied: if the user may not add the plugins to a target placeholder.
     """
     plan = LanguageCopyPlan(source_page_content, target_language)
     with operation(

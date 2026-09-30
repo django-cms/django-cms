@@ -80,8 +80,8 @@ class PageContent(models.Model):
         help_text=_("Redirects to this URL."),
     )
     #: The slug and overwrite URL are authored per page content object. The routable
-    #: :class:`~cms.models.pagemodel.PageUrl` objects are derived from the publicly
-    #: visible page content only (see :meth:`cms.models.pagemodel.Page.update_urls_from_content`),
+    #: :class:`~cms.pages.models.page.PageUrl` objects are derived from the publicly
+    #: visible page content only (see :meth:`cms.pages.models.page.Page.update_urls_from_content`),
     #: so changing the slug of a draft version does not affect the published URL.
     slug = models.SlugField(
         verbose_name=_("slug"),
@@ -332,7 +332,7 @@ class PageContent(models.Model):
         the default manager returns it. Without a versioning package every saved
         page content is public; with a versioning package installed only published
         versions are. The page's URL is only derived from public content
-        (see :meth:`cms.models.pagemodel.Page.update_urls_from_content`).
+        (see :meth:`cms.pages.models.page.Page.update_urls_from_content`).
 
         :rtype: ``bool``
         """
@@ -375,7 +375,7 @@ class PageContent(models.Model):
 
 class EmptyPageContent:
     """
-    Empty title object, can be returned from :meth:`cms.models.pagemodel.Page.get_content_obj` if required
+    Empty title object, can be returned from :meth:`cms.pages.models.page.Page.get_content_obj` if required
     title object doesn't exist.
     """
 

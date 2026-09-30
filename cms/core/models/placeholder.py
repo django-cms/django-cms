@@ -229,7 +229,7 @@ class Placeholder(models.Model):
     def page_setter(self, value):
         self._page = value
 
-    #: Gives the page object if the placeholder belongs to a :class:`cms.models.titlemodels.PageContent` object
+    #: Gives the page object if the placeholder belongs to a :class:`cms.pages.models.content.PageContent` object
     #: (and not to some other model.) If the placeholder is not attached to a page it returns ``None``
     page = property(page_getter, page_setter)
 

@@ -10,7 +10,6 @@ application, and provide your users with a streamlined editing experience.
 
 ..  seealso::
 
-    * :ref:`Extending the Toolbar <toolbar_introduction>` in the tutorial
     * :ref:`Toolbar API reference <toolbar-api-reference>`
 
 
@@ -144,8 +143,7 @@ A common case is to provide a URL that opens in a sideframe or modal dialog on t
 *Administration...* in the site menu, that opens the Django admin in a sideframe, is a good
 example of this. Both the sideframe and modal are HTML iframes.
 
-A typical use for a sideframe is to display an admin list (similar to that used in the
-:ref:`tutorial example <add-nodes-to-polls-menu>`):
+A typical use for a sideframe is to display an admin list:
 
 ..  code-block:: python
     :emphasize-lines: 1, 8-11

@@ -127,7 +127,7 @@ The Divio Cloud offers an easy way to set up django CMS projects. In the `Divio 
 Using the django CMS Installer
 ==============================
 
-See our :ref:`installation guide in the tutorial <install-django-cms-tutorial>`. However, make
+See our installation guide in the tutorial. However, make
 sure that you:
 
 * have installed the latest version of django CMS Installer (at least version ``0.9.8``)

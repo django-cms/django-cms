@@ -172,8 +172,8 @@ def create_page(
     page_title=None,
 ):
     """
-    Creates a :class:`cms.models.Page` instance and returns it. Also
-    creates a :class:`cms.models.PageContent` instance for the specified
+    Creates a :class:`~cms.pages.models.page.Page` instance and returns it. Also
+    creates a :class:`~cms.pages.models.content.PageContent` instance for the specified
     language.
 
     .. warning::
@@ -193,7 +193,7 @@ def create_page(
     :param created_by: User that is creating this page
     :type created_by: str of :class:`django.contrib.auth.models.User` instance
     :param parent: Parent page of this page
-    :type parent: :class:`cms.models.Page` instance
+    :type parent: :class:`~cms.pages.models.page.Page` instance
     :param bool in_navigation: Whether this page should be in the navigation or not
     :param bool soft_root: Whether this page is a soft root or not
     :param str reverse_id: Reverse ID of this page (for template tags)
@@ -202,7 +202,7 @@ def create_page(
     :type site: :class:`django.contrib.sites.models.Site` instance
     :param bool login_required: Whether users must be logged in or not to view this page
     :param limit_visibility_in_menu: Limits visibility of this page in the menu
-    :type limit_visibility_in_menu: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
+    :type limit_visibility_in_menu: :data:`~cms.constants.VISIBILITY_ALL` or :data:`~cms.constants.VISIBILITY_USERS` or :data:`~cms.constants.VISIBILITY_ANONYMOUS`
     :param str position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param str   overwrite_url: Overwritten path for this page
     :param int xframe_options: X Frame Option value for Clickjacking protection
@@ -331,20 +331,20 @@ def create_page_content(
     xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
 ):
     """
-    Creates a :class:`cms.models.PageContent` instance and returns it.
+    Creates a :class:`~cms.pages.models.content.PageContent` instance and returns it.
 
     ``parent`` is only used if slug=None.
 
     :param str language: Language code for this page. Must be in :setting:`django:LANGUAGES`
     :param str title: Title of the page
     :param page: The page for which to create this title
-    :type page: :class:`cms.models.Page` instance
+    :type page: :class:`~cms.pages.models.page.Page` instance
     :param str menu_title: Menu title for this page
     :param str slug: Slug for the page, by default uses a slugified version of *title*
     :param str redirect: URL redirect
     :param str meta_description: Description of this page for SEO
     :param parent: Used for automated slug generation
-    :type parent: :class:`cms.models.Page` instance
+    :type parent: :class:`~cms.pages.models.page.Page` instance
     :param str overwrite_url: Overwritten path for this page
     :param str page_title: Overridden page title for HTML title tag
 
@@ -441,7 +441,7 @@ def add_plugin(placeholder, plugin_type, language, position="last-child", target
     :param placeholder: Placeholder to add the plugin to
     :type placeholder: :class:`cms.core.models.placeholder.Placeholder` instance
     :param plugin_type: What type of plugin to add
-    :type plugin_type: str or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
+    :type plugin_type: str or :class:`cms.core.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
     :param str language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
     :param str position: Position to add this plugin to the placeholder. Allowed positions are ``"last-child"``
                          (default), ``"first-child"``, ``"left"``, ``"right"``.
@@ -568,16 +568,16 @@ def assign_user_to_page(
 ):
     """
     Assigns a user to a page and gives them some permissions. Returns the
-    :class:`cms.models.PagePermission` object that gets
+    :class:`~cms.permissions.models.PagePermission` object that gets
     created.
 
     :param page: The page to assign the user to
-    :type page: :class:`cms.models.Page` instance
+    :type page: :class:`~cms.pages.models.page.Page` instance
     :param user: The user to assign to the page
     :type user: :class:`django.contrib.auth.models.User` instance
     :param grant_on: Controls which pages are affected
-    :type grant_on: :data:`cms.models.ACCESS_PAGE`, :data:`cms.models.ACCESS_CHILDREN`,
-    :data:`cms.models.ACCESS_DESCENDANTS` or :data:`cms.models.ACCESS_PAGE_AND_DESCENDANTS`
+    :type grant_on: :data:`~cms.permissions.models.ACCESS_PAGE`, :data:`~cms.permissions.models.ACCESS_CHILDREN`,
+        :data:`~cms.permissions.models.ACCESS_DESCENDANTS` or :data:`~cms.permissions.models.ACCESS_PAGE_AND_DESCENDANTS`
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
     """
@@ -713,7 +713,7 @@ def can_change_page(request):
     to permission checking.
 
     :param request: The request object from which the user will be taken.
-    :type request: :class:`HttpRequest` instance
+    :type request: :class:`~django.http.HttpRequest` instance
 
     """
     from cms.permissions import page_permissions

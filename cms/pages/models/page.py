@@ -54,8 +54,8 @@ class Page(MP_Node):
     <http://django-treebeard.readthedocs.io/en/latest/>`_ library.
 
     A ``Page`` is an abstract entity. It does not have any content associated with it, nor does is provide any slugs to
-    build a URL. This is part of the model :class:`~cms.models.contentmodels.PageContent` and
-    :class:`~cms.models.pagemodel.PageUrl` respectively.
+    build a URL. This is part of the model :class:`~cms.pages.models.content.PageContent` and
+    :class:`~cms.pages.models.page.PageUrl` respectively.
     """
 
     parent = models.ForeignKey(
@@ -827,7 +827,7 @@ class Page(MP_Node):
         return path
 
     def get_url_data(self, slug, overwrite_url, language):
-        """Derive the :class:`~cms.models.pagemodel.PageUrl` fields (``slug``,
+        """Derive the :class:`~cms.pages.models.page.PageUrl` fields (``slug``,
         ``path``, ``managed``) from an authored slug and overwrite URL."""
         if overwrite_url and not self.is_home:
             path = overwrite_url.strip("/")
@@ -884,8 +884,8 @@ class Page(MP_Node):
         return page_urls_qs.update(**data)
 
     def update_urls_from_content(self, language):
-        """Derive this page's :class:`~cms.models.pagemodel.PageUrl` for ``language``
-        from the publicly visible :class:`~cms.models.contentmodels.PageContent`
+        """Derive this page's :class:`~cms.pages.models.page.PageUrl` for ``language``
+        from the publicly visible :class:`~cms.pages.models.content.PageContent`
         object, then update the paths of all descendant pages.
 
         The slug and overwrite URL are authored on the page content object.

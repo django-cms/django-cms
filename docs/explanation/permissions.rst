@@ -73,7 +73,7 @@ permissions to enable their features. Sometimes documentation for such needed pe
 missing, in that case you can compare the list of available permissions with the package enabled
 and disabled on your site.
 
-See :ref:`use-permissions-on-groups` below on applying permissions to groups rather than users.
+See :ref:`Apply permissions to groups <use-permissions-on-groups>` below on applying permissions to groups rather than users.
 
 
 ************************************
@@ -429,6 +429,8 @@ Strategy
 ********
 
 A few guidelines that hold regardless of which mode you are in:
+
+.. _use-permissions-on-groups:
 
 **Apply permissions to Groups, not Users.** Per-user permissions
 drift quickly. After a year, no one will remember why a specific

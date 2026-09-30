@@ -91,7 +91,7 @@ Example::
 .. note::
 
     All templates defined in :setting:`CMS_TEMPLATES` **must** contain at least the ``js`` and ``css`` sekizai
-    namespaces. For an example, see :ref:`basic_template`.
+    namespaces. For an example, see :ref:`tutorial_templates`.
 
 .. note::
 
@@ -458,7 +458,7 @@ default
     ``[]``
 
 A list of plugin processors. Plugin processors are callables that modify all
-plugins' output *after* rendering. See :doc:`/how_to/10-custom_plugins`
+plugins' output *after* rendering. See :ref:`plugin-processors`
 for more information.
 
 ..  setting:: CMS_APPHOOKS

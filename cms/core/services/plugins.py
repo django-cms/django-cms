@@ -116,7 +116,7 @@ def move_plugin(
 ) -> CMSPlugin:
     """Move ``plugin`` to ``target_position``, optionally into another placeholder.
 
-    :raises ValidationError: if ``target_parent`` is not in the target placeholder and
+    :raises ~django.core.exceptions.ValidationError: if ``target_parent`` is not in the target placeholder and
         the plugin's language, or is the plugin itself or one of its descendants.
     """
     language = plugin.language
@@ -253,7 +253,7 @@ def paste_plugin(
 ) -> CMSPlugin:
     """Copy ``plugin`` and its descendants out of the clipboard into a placeholder.
 
-    :raises ValidationError: if ``target_parent`` is not in ``target_placeholder`` and
+    :raises ~django.core.exceptions.ValidationError: if ``target_parent`` is not in ``target_placeholder`` and
         ``target_language``.
     """
     plugins = [plugin] + list(plugin.get_descendants())

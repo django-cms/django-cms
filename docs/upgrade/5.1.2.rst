@@ -1,0 +1,184 @@
+.. _upgrade-to-5.1.2:
+
+###################
+5.1.2 release notes
+###################
+
+*August 27, 2026*
+
+Welcome to django CMS 5.1.2!
+
+These release notes cover what has changed since django CMS 5.1.1. This is a
+patch release. It contains no new migrations, but it fixes the 5.1.1 migrations
+so that they also apply on SQLite, and it tightens authorization on several
+endpoints. Projects that could not apply the 5.1.1 migrations should upgrade
+directly to 5.1.2.
+
+If you are upgrading from django CMS 5.0.x or earlier, read the
+:ref:`5.1.0 release notes <upgrade-to-5.1.0>` first — they cover the backward
+incompatible changes, deprecations, and removals of the 5.1 series.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS 5.1 supports **Django 5.2, 6.0, and 6.1**. Django 4.2, 5.0, and
+5.1 are no longer supported because those series no longer receive upstream
+maintenance. We highly recommend and only support the latest release of each
+supported series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13, and 3.14**.
+
+******************
+Release highlights
+******************
+
+* **Authorization fixes.** The edit and view endpoints did not check
+  placeholder permissions, so a user without change permission on a
+  placeholder could still reach its editing endpoints. Setting a new home page
+  no longer only requires permission on the new page, but also on the page that
+  is being demoted.
+
+* **The 5.1.1 migrations now apply on SQLite.** ``cms.0044`` failed on SQLite
+  when djangocms-versioning was installed, which blocked the upgrade to 5.1.1
+  for those projects. The migration itself is unchanged in what it produces, so
+  no new migration is added and databases already migrated on 5.1.1 are
+  unaffected.
+
+* **Manually entered page slugs are kept.** Changing a page title overwrote a
+  slug that had been entered by hand — a regression from moving the slug onto
+  ``PageContent`` in 5.1.1.
+
+* **Content Security Policy nonces on Django 6.1.** The admin, toolbar and
+  wizard templates emit the nonce Django 6.1 provides, so django CMS works
+  under a nonce-based CSP without ``unsafe-inline``.
+
+***********************
+How to upgrade to 5.1.2
+***********************
+
+This release adds no migrations and no backward incompatible changes. Upgrade
+django CMS::
+
+    python -m pip install --upgrade "django-cms==5.1.2"
+
+Then collect static files and run the django CMS checks::
+
+    python manage.py collectstatic --noinput
+    python manage.py cms check
+
+Collecting static files is required: this release changes the toolbar
+JavaScript and the path from which the welcome page loads ``welcome.js``.
+
+Projects upgrading from 5.1.0 also have to apply the migrations introduced in
+5.1.1::
+
+    python manage.py migrate
+
+Those are the two migrations described in the
+:ref:`5.1.1 release notes <upgrade-to-5.1.1>`. 5.1.2 only repairs
+``cms.0044_pagecontent_slug_overwrite_url`` so that it also runs on SQLite when
+djangocms-versioning is installed; the resulting schema and data are unchanged,
+so databases that migrated successfully on 5.1.1 need no further action.
+
+*******************
+What's new in 5.1.2
+*******************
+
+Security fixes
+==============
+
+Editing endpoints did not check placeholder permissions
+-------------------------------------------------------
+
+``render_object_endpoint()`` resolved the requested object and rendered it
+without an object-level view check, unlike the structure endpoint and, for
+pages, ``render_page()``. Any staff user could therefore read the rendered
+plugin content of any frontend-editable object, including placeholders they
+have no access to. The endpoint now calls
+``user_can_view_placeholder_source()`` and raises ``Http404`` when the check
+fails. Mutations were, and remain, gated by change permission at the plugin
+endpoints.
+
+Setting a home page did not require permission on the previous one
+-------------------------------------------------------------------
+
+``PageAdmin.set_home()`` only checked change permission on the page being
+promoted. Promoting a page demotes the current home page and rewrites the URL
+paths of both trees, so a user with change permission on a single page could
+change the URLs of a page tree they have no permission for. Change permission
+on the current home page is now required as well.
+
+Editable content could inject markup into the toolbar
+------------------------------------------------------
+
+When refreshing the toolbar, ``Toolbar._refreshMarkup()`` copied the children
+of *every* element matching ``.cms-toolbar`` on the page. Editable content that
+renders an element with that class — plugin content, for instance — had its
+markup copied into the live toolbar. Only the first match is used now.
+
+CSRF form for POST toolbar items was assembled from a string
+--------------------------------------------------------------
+
+``Toolbar._sendPostRequest()`` built its hidden form by concatenating the item's
+``href`` and the CSRF token into an HTML string, so a quote or angle bracket in
+either could break out of the attribute it was placed in. The form and its token
+input are now created through DOM APIs, which puts both values in attribute
+positions that cannot be escaped.
+
+Release pipeline
+----------------
+
+The PyPI publishing workflows were split into a build job and a publish job, so
+that the job running third-party code — pip, the build backend,
+``check-wheel-contents`` — no longer holds the ``id-token: write`` permission
+needed to mint an OIDC token for trusted publishing. The build tooling is
+hash-pinned in ``.github/requirements/build.txt`` and installed with
+``--require-hashes``, the distribution is built with ``--no-isolation`` so the
+backend comes from those pins, and ``pypa/gh-action-pypi-publish`` is pinned to
+a commit instead of the mutable ``release/v1`` branch.
+
+Features
+========
+
+* Support Content Security Policy nonces introduced in Django 6.1 (#8792) -- Fabian Braun
+
+Bug Fixes
+=========
+
+* Enforce placeholder permissions on the edit and view endpoints (#8794) -- Fabian Braun
+* Fix ``GrouperModelAdmin`` ignoring the read-only context for content objects without a language
+  field (#8799) -- Fabian Braun
+* Prevent a manually entered page slug from being overwritten when changing the page title (#8796)
+  -- Fabian Braun
+* Avoid needlessly clearing the permission caches on Django 6.1 signals (#8791) -- Fabian Braun
+* Allow copying plugins from write-protected (published) content (#8786) -- Fabian Braun
+* Harden the toolbar JavaScript (#8790) -- Fabian Braun
+* Require permission to change the previous home page before setting a new one (#8789) -- Fabian Braun
+* Explicitly escape the CSRF token used for POST requests (#8787) -- Fabian Braun
+* Harden the PyPI publish workflows (#8788) -- Fabian Braun
+* Fix copying a page dropping its login-required property (#8785) -- Fabian Braun
+* Limit the number of plugins displayed in the plugin deletion confirmation (#8784) -- Fabian Braun
+* Fix migration 0044 failing on SQLite when versioning was installed (#8777, #8779) -- Fabian Braun
+* Fix the language column in the page tree ignoring multi-hyphen language codes such as ``de-x-l``
+  (#8781) -- Fabian Braun
+* Fix the wrong ``welcome.js`` path (#8761) -- Fabian Braun
+* Add PostgreSQL 15 minimum version coverage for Django 6.1 to CI (#8774) -- Atiqur Rahman
+
+
+Statistics
+==========
+
+This release includes 16 changelog entries, created with the help of the following contributors
+(in alphabetical order):
+
+* Atiqur Rahman (1 changelog entry)
+* Fabian Braun (15 changelog entries)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
