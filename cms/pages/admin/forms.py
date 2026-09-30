@@ -35,11 +35,12 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
-from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
+from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION, COPY_PAGE_FROM_SOURCE
 from cms.operations.helpers import (
     send_post_page_operation,
     send_pre_page_operation,
 )
+from cms.pages import services as page_services
 from cms.pages.apphook_pool import apphook_pool
 from cms.pages.utils import get_clean_username
 from cms.permissions.cache import clear_permission_cache
@@ -51,7 +52,6 @@ from cms.permissions.page_permissions import (
     user_can_add_page,
     user_can_add_subpage,
     user_can_change_page,
-    user_can_view_page,
 )
 from cms.permissions.utils import (
     get_current_user,
@@ -61,6 +61,8 @@ from cms.permissions.utils import (
     get_subordinate_users,
     get_user_permission_level,
 )
+from cms.shared.checks import can
+from cms.shared.operations import OperationContext
 from cms.signals.apphook import set_restart_trigger
 from cms.utils import get_current_site
 from cms.utils.compat.forms import UserChangeForm
@@ -263,6 +265,7 @@ class BasePageContentForm(forms.ModelForm):
 
 
 class AddPageForm(BasePageContentForm):
+    source_requires_change = False
     source = forms.ModelChoiceField(
         label=_("Page type"),
         queryset=Page.objects.filter(is_page_type=True),
@@ -360,13 +363,20 @@ class AddPageForm(BasePageContentForm):
             data["path"] = path
         return data
 
+    def user_can_use_source(self, source):
+        return can(
+            COPY_PAGE_FROM_SOURCE,
+            OperationContext.from_request(self._request, language=self._language),
+            source=source,
+            target_site=self._site,
+            allow_view_only_page_type=not self.source_requires_change,
+        ).allowed
+
     def clean_source(self):
         source = self.cleaned_data.get("source")
-        # ``source`` is a hidden field whose value is fully controlled by the
-        # client on POST and ``has_add_permission`` only checks that the user may
-        # create *a* page, not that they may read ``source`` -- whose placeholders,
-        # plugins and extensions ``save()`` copies into the new page.
-        if source and not user_can_view_page(self._user, source):
+        # The source can be client-controlled on POST. Ask the same operation
+        # check that the service enforces before copying its admin content.
+        if source and not self.user_can_use_source(source):
             raise ValidationError(self.source_permission_denied)
         return source
 
@@ -428,21 +438,14 @@ class AddPageForm(BasePageContentForm):
         return api.create_page_content(**title_kwargs)
 
     def from_source(self, source, parent=None):
-        new_page = source.copy(
-            site=self._site,
+        return page_services.copy_page_from_source(
+            source,
+            target_site=self._site,
             parent_page=parent,
             language=self._language,
-            translations=False,
-            permissions=False,
-            extensions=False,
-            user=self._user,
+            allow_view_only_page_type=not self.source_requires_change,
+            context=OperationContext.from_request(self._request, language=self._language),
         )
-        new_page.update(is_page_type=False)
-        # ``Page.copy()`` is called with ``permissions=False``, so a copy of a
-        # view-restricted source would be world-readable. Carry the source's view
-        # restrictions -- its own and the ones it inherits -- over to the copy.
-        new_page.apply_view_restrictions(source.get_view_restrictions(), user=self._user)
-        return new_page
 
     def get_template(self):
         source = self.cleaned_data.get("source")
@@ -510,6 +513,7 @@ class AddPageForm(BasePageContentForm):
 
 
 class AddPageTypeForm(AddPageForm):
+    source_requires_change = True
     menu_title = None
     meta_description = None
     page_title = None
@@ -557,16 +561,14 @@ class AddPageTypeForm(AddPageForm):
         return parent_page
 
     def from_source(self, source, parent=None):
-        new_page = source.copy(
-            site=self._site,
+        return page_services.copy_page_from_source(
+            source,
+            target_site=self._site,
             parent_page=parent,
             language=self._language,
-            translations=False,
-            permissions=False,
-            extensions=False,
+            create_page_type=True,
+            context=OperationContext.from_request(self._request, language=self._language),
         )
-        new_page.update(is_page_type=True)
-        return new_page
 
     def save(self, *args, **kwargs):
         new_page = super().save(*args, **kwargs)
@@ -579,6 +581,7 @@ class AddPageTypeForm(AddPageForm):
 
 
 class DuplicatePageForm(AddPageForm):
+    source_requires_change = True
     source = forms.ModelChoiceField(
         queryset=Page.objects.all(),
         required=True,

@@ -34,6 +34,7 @@ __all__ = [
     "change_template",
     "copy_language",
     "copy_page_tree",
+    "copy_page_from_source",
     "delete_page",
     "delete_translation",
     "move_page",
@@ -154,6 +155,49 @@ def copy_page_tree(
             user=context.user,
         )
         signal_kwargs["new_page"] = new_page
+    return new_page
+
+
+def copy_page_from_source(
+    source: Page,
+    *,
+    target_site,
+    parent_page: Page | None,
+    language: str,
+    create_page_type: bool = False,
+    allow_view_only_page_type: bool = False,
+    context: OperationContext,
+    permissions=None,
+) -> Page:
+    """Create a page from one source without copying its translations.
+
+    The caller creates the new translation and copies its plugins afterward.
+    The operation checks run before any source content is read or written.
+    """
+    with operation(
+        operations.COPY_PAGE_FROM_SOURCE,
+        context,
+        checks={
+            "source": source,
+            "target_site": target_site,
+            "parent_page": parent_page,
+            "allow_view_only_page_type": allow_view_only_page_type,
+            "permissions": permissions,
+        },
+    ):
+        new_page = source.copy(
+            site=target_site,
+            parent_page=parent_page,
+            language=language,
+            translations=False,
+            permissions=False,
+            extensions=False,
+            user=context.user,
+        )
+        new_page.update(is_page_type=create_page_type)
+        if not create_page_type:
+            # The source's restrictions must survive copying without permissions.
+            new_page.apply_view_restrictions(source.get_view_restrictions(), user=context.user)
     return new_page
 
 

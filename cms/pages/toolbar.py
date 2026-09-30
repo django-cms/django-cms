@@ -272,7 +272,7 @@ class PageToolbar(CMSToolbar):
             add_page_menu.add_modal_item(
                 _("Duplicate this Page"),
                 url=add_url_parameters(duplicate_page_url, {"language": self.toolbar.request_language}),
-                disabled=not can_add_sibling_page,
+                disabled=not (can_add_sibling_page and can_change),
             )
 
             # first break

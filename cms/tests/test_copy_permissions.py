@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied
 from django.test import override_settings
 
 from cms.api import add_plugin, create_page
@@ -9,11 +10,14 @@ from cms.models import (
     ACCESS_PAGE,
     ACCESS_PAGE_AND_DESCENDANTS,
     CMSPlugin,
+    GlobalPagePermission,
     Page,
     PageContent,
     PagePermission,
 )
+from cms.pages import services as page_services
 from cms.permissions.cache import get_permission_cache, set_permission_cache
+from cms.shared.operations import OperationContext
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import page_permissions
 
@@ -380,7 +384,7 @@ class DuplicatePermissionsTests(CMSTestCase):
         source = create_page("source", "nav_playground.html", "en")
         add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
         self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
-        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.add_page_permission(self.actor, source, can_view=True, can_change=True, grant_on=ACCESS_PAGE)
         self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
 
         response, copy = self.duplicate(source)
@@ -396,7 +400,9 @@ class DuplicatePermissionsTests(CMSTestCase):
     def test_duplicate_preserves_inherited_restriction(self):
         ancestor = create_page("ancestor", "nav_playground.html", "en")
         self.add_page_permission(self.admin, ancestor, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
-        self.add_page_permission(self.actor, ancestor, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        self.add_page_permission(
+            self.actor, ancestor, can_view=True, can_change=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+        )
         source = create_page("source", "nav_playground.html", "en", parent=ancestor)
         add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
 
@@ -412,6 +418,7 @@ class DuplicatePermissionsTests(CMSTestCase):
     def test_duplicate_of_unrestricted_page_adds_no_permissions(self):
         source = create_page("source", "nav_playground.html", "en")
         add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=self.marker)
+        self.add_page_permission(self.actor, source, can_change=True, grant_on=ACCESS_PAGE)
         count = PagePermission.objects.count()
 
         response, copy = self.duplicate(source)
@@ -419,6 +426,114 @@ class DuplicatePermissionsTests(CMSTestCase):
         self.assertEqual(PagePermission.objects.count(), count)
         self.assertFalse(copy.has_view_restrictions(copy.site))
         self.assertContains(self.client.get(copy.get_absolute_url()), self.marker)
+
+    def test_duplicate_requires_change_permission_on_source(self):
+        source = create_page("source", "nav_playground.html", "en")
+        self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
+        self.assertFalse(page_permissions.user_can_change_page(self.actor, source))
+        response, copy = self.duplicate(source)
+        self.assertEqual(response.status_code, 403)
+        self.assertIsNone(copy)
+
+    def test_service_rejects_source_without_change_permission(self):
+        source = create_page("source", "nav_playground.html", "en")
+        count = Page.objects.count()
+        with self.assertRaises(PermissionDenied):
+            page_services.copy_page_from_source(
+                source,
+                target_site=self.target.site,
+                parent_page=self.target,
+                language="en",
+                context=OperationContext(user=self.actor, language="en"),
+            )
+        self.assertEqual(Page.objects.count(), count)
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR="all",
+    CMS_LANGUAGES={"default": {"fallbacks": ["en"], "public": True}},
+)
+class DuplicateSitePermissionsTests(CMSTestCase):
+    def setUp(self):
+        super().setUp()
+        self.forbidden_site = Site.objects.get_current()
+        self.forbidden_site.domain = "forbidden.example"
+        self.forbidden_site.save()
+        self.allowed_site = Site.objects.create(domain="allowed.example", name="Allowed")
+        self.allowed = create_page("allowed", "nav_playground.html", "en", site=self.allowed_site)
+        self.forbidden = create_page("forbidden", "nav_playground.html", "en", site=self.forbidden_site)
+        self.actor = self.get_staff_user_with_no_permissions()
+        for codename in ("add_page", "change_page", "view_page"):
+            self.add_permission(self.actor, codename)
+        grant = GlobalPagePermission.objects.create(user=self.actor, can_add=True, can_change=True)
+        grant.sites.add(self.allowed_site)
+        settings = override_settings(
+            SITE_ID=None,
+            ALLOWED_HOSTS=["allowed.example", "forbidden.example", "testserver"],
+        )
+        settings.enable()
+        self.addCleanup(settings.disable)
+
+    def duplicate(self, source):
+        endpoint = self.get_admin_url(PageContent, "duplicate", self.allowed.get_admin_content("en").pk)
+        with self.login_user_context(self.actor):
+            return self.client.post(
+                f"{endpoint}?language=en&parent_page={self.allowed.pk}",
+                {
+                    "title": "duplicate",
+                    "slug": "duplicate",
+                    "source": source.pk,
+                    "parent_page": self.allowed.pk,
+                    "_save": 1,
+                },
+                HTTP_HOST="allowed.example",
+            )
+
+    def test_hidden_source_from_forbidden_site_is_rejected(self):
+        count = Page.objects.count()
+        response = self.duplicate(self.forbidden)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("source", response.context["adminform"].form.errors)
+        self.assertEqual(Page.objects.count(), count)
+
+    def test_hidden_source_without_change_permission_on_same_site_is_rejected(self):
+        source = create_page("view-only", "nav_playground.html", "en", site=self.allowed_site)
+        GlobalPagePermission.objects.filter(user=self.actor).update(can_change=False)
+        PagePermission.objects.create(
+            user=self.actor, page=self.allowed, can_add=True, can_change=True, grant_on=ACCESS_PAGE,
+        )
+        count = Page.objects.count()
+        response = self.duplicate(source)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("source", response.context["adminform"].form.errors)
+        self.assertEqual(Page.objects.count(), count)
+
+    def test_duplicate_view_requires_source_permission(self):
+        endpoint = self.get_admin_url(PageContent, "duplicate", self.forbidden.get_admin_content("en").pk)
+        with self.login_user_context(self.actor):
+            response = self.client.get(f"{endpoint}?language=en", HTTP_HOST="allowed.example")
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorized_cross_site_source_is_allowed(self):
+        grant = GlobalPagePermission.objects.create(user=self.actor, can_change=True)
+        grant.sites.add(self.forbidden_site)
+        response = self.duplicate(self.forbidden)
+        self.assertEqual(response.status_code, 302)
+        copy = self.allowed.get_child_pages().get()
+        self.assertEqual(copy.site_id, self.allowed_site.pk)
+
+    def test_service_rejects_forbidden_destination(self):
+        count = Page.objects.count()
+        with self.assertRaises(PermissionDenied):
+            page_services.copy_page_from_source(
+                self.allowed,
+                target_site=self.forbidden_site,
+                parent_page=self.forbidden,
+                language="en",
+                context=OperationContext(user=self.actor, language="en"),
+            )
+        self.assertEqual(Page.objects.count(), count)
 
 
 @override_settings(CMS_PERMISSION=True, CMS_PUBLIC_FOR="all")
@@ -504,7 +619,7 @@ class PageTypeSourcePermissionsTests(CMSTestCase):
     def test_restricted_page_type_keeps_its_restriction(self):
         source = self.create_page_type("restricted-type")
         self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
-        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.add_page_permission(self.actor, source, can_view=True, can_change=True, grant_on=ACCESS_PAGE)
         self.assertTrue(page_permissions.user_can_view_page(self.actor, source))
 
         response, copy = self.add_from_source(source)
@@ -516,7 +631,7 @@ class PageTypeSourcePermissionsTests(CMSTestCase):
     def test_rejects_source_when_adding_translation(self):
         source = self.create_page_type("restricted-type")
         self.add_page_permission(self.admin, source, can_view=True, grant_on=ACCESS_PAGE)
-        self.add_page_permission(self.actor, source, can_view=True, grant_on=ACCESS_PAGE)
+        self.add_page_permission(self.actor, source, can_view=True, can_change=True, grant_on=ACCESS_PAGE)
         destination = create_page("destination", "nav_playground.html", "de")
         self.add_page_permission(self.actor, destination, can_change=True, grant_on=ACCESS_PAGE)
         self.assertTrue(page_permissions.user_can_view_page(self.actor, source))

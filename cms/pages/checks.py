@@ -164,6 +164,55 @@ register_core_check(operations.SET_HOME, "cms.pages.home_candidate", check_home_
 # Copy page
 
 
+def check_source_copy_permission(
+    context, *, source, target_site, allow_view_only_page_type=False, permissions=None, **kwargs
+):
+    permissions = _permissions(permissions, context)
+    if allow_view_only_page_type:
+        # The ordinary add form offers only page types from the destination
+        # site. A caller must not use this exception for an arbitrary page.
+        allowed = (
+            source.is_page_type
+            and source.site_id == target_site.pk
+            and permissions.can_view_page(source)
+        )
+    else:
+        # Page.copy() reads admin content, including drafts when versioning is
+        # installed. Check the source on its own site, not the target site.
+        allowed = permissions.can_change_page(source)
+    if not allowed:
+        raise PermissionDenied(COPY_DENIED)
+
+
+def check_source_copy_target_permission(
+    context, *, parent_page, target_site, permissions=None, **kwargs
+):
+    permissions = _permissions(permissions, context)
+    if parent_page:
+        allowed = (
+            parent_page.site_id == target_site.pk
+            and permissions.can_add_subpage(parent_page, target_site)
+        )
+    else:
+        allowed = permissions.can_add_page(target_site)
+    if not allowed:
+        raise PermissionDenied(COPY_DENIED)
+
+
+register_core_check(
+    operations.COPY_PAGE_FROM_SOURCE,
+    "cms.pages.source_copy_permission",
+    check_source_copy_permission,
+    requires=["source", "target_site"],
+)
+register_core_check(
+    operations.COPY_PAGE_FROM_SOURCE,
+    "cms.pages.source_copy_target_permission",
+    check_source_copy_target_permission,
+    requires=["parent_page", "target_site"],
+)
+
+
 def check_copy_permission(context, *, page, permissions=None, **kwargs):
     # A page can only be copied by someone who can see it.
     if not _permissions(permissions, context).can_view_page(page):

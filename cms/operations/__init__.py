@@ -15,6 +15,7 @@ MOVE_PAGE = 'move_page'
 DELETE_PAGE = 'delete_page'
 SET_HOME = 'set_home'
 COPY_PAGE = 'copy_page'
+COPY_PAGE_FROM_SOURCE = 'copy_page_from_source'
 
 # Page translation operations
 ADD_PAGE_TRANSLATION = 'add_page_translation'

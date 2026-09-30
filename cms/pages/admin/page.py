@@ -797,6 +797,11 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if obj is None:
             raise self._get_404_exception(object_id)
 
+        # The source's admin content is copied, so require permission to open it.
+        # This hook is independent of versioning's change permission override.
+        if not self.has_view_permission(request, obj):
+            raise PermissionDenied
+
         if request.method == "GET":
             # source is a field in the form
             # because its value is in the url,
