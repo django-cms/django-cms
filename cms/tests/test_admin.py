@@ -271,6 +271,21 @@ class AdminTestCase(AdminTestsBase):
         self.assertFalse(PageUrl.objects.filter(page=page, language="de").exists())
         self.assertFalse(PageUrl.objects.filter(page=page, language="es-mx").exists())
 
+    def test_delete_translation_without_page_url(self):
+        # A translation may exist without a PageUrl (e.g., never published with versioning)
+        admin_user = self.get_superuser()
+        page = create_page("delete-page-translation", "nav_playground.html", "en", created_by=admin_user)
+        create_page_content("de", "delete-page-translation-de", page, slug="delete-page-translation-de")
+        PageUrl.objects.filter(page=page, language="de").delete()
+
+        with self.login_user_context(admin_user):
+            response = self.client.post(self.get_page_delete_translation_uri("de", page), data={"post": "yes"})
+            self.assertRedirects(response, self.get_pages_admin_list_uri("de"))
+
+        self.assertTrue(PageContent.objects.filter(page=page, language="en").exists())
+        self.assertTrue(PageUrl.objects.filter(page=page, language="en").exists())
+        self.assertFalse(PageContent.objects.filter(page=page, language="de").exists())
+
     def test_change_template(self):
         template = get_cms_setting("TEMPLATES")[0][0]
         admin_user, staff = (self.get_superuser(), self.get_staff_user_with_no_permissions())
