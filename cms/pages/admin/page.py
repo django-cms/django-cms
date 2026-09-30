@@ -267,7 +267,6 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if form.changed_data:
             page_services.change_advanced_settings(
                 obj,
-                changed_fields=form.changed_data,
                 context=OperationContext.from_request(request),
                 permissions=AdminPagePermissions(self, request),
             )
@@ -677,7 +676,6 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 page_services.change_page_content(
                     form.save(commit=False),
                     data=form.cleaned_data,
-                    changed_fields=form.changed_data,
                     context=OperationContext.from_request(request, language=language),
                 )
                 saved_successfully = True

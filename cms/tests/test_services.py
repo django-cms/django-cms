@@ -1,14 +1,27 @@
+from unittest.mock import patch
+
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.test import override_settings
 
+from cms import operations
 from cms.api import add_plugin, create_page
 from cms.core.services import plugins as plugin_services
 from cms.core.services.permissions import PluginPermissions, get_permissions
-from cms.models import GlobalPagePermission, Page, PageContent, PagePermission, Placeholder, UserSettings
+from cms.models import GlobalPagePermission, Page, PageContent, PagePermission, PageType, Placeholder, UserSettings
 from cms.pages import services as page_services
 from cms.pages.permissions import PagePermissions, get_page_permissions
+from cms.shared import checks
+from cms.shared.checks import can
 from cms.shared.operations import OperationContext
-from cms.signals import post_placeholder_operation, pre_placeholder_operation
+from cms.signals import (
+    PAGE_OPERATION_SIGNALS,
+    post_obj_operation,
+    post_placeholder_operation,
+    pre_obj_operation,
+    pre_placeholder_operation,
+)
 from cms.test_utils.testcases import CMSTestCase
 
 
@@ -98,10 +111,10 @@ class RequestFreeServiceTest(CMSTestCase):
         content = self.page.get_admin_content("en")
         with self.assertRaises(PermissionDenied):
             page_services.change_page_content(
-                content, data={"title": "changed"}, changed_fields=["title"], context=context,
+                content, data={"title": "changed"}, context=context,
             )
         with self.assertRaises(PermissionDenied):
-            page_services.change_advanced_settings(self.page, changed_fields=["login_required"], context=context)
+            page_services.change_advanced_settings(self.page, context=context)
         with self.assertRaises(PermissionDenied):
             page_services.save_page_permissions(self.page, context=context)
         self.assertEqual(Page.objects.count(), count)
@@ -113,16 +126,45 @@ class RequestFreeServiceTest(CMSTestCase):
         content = self.page.get_admin_content("en")
         with self.assertRaises(ValidationError):
             page_services.change_page_content(
-                content, data={"page": self.page}, changed_fields=["page"], context=self._context(),
+                content, data={"page": self.page}, context=self._context(),
             )
         self.page.site = other_site
         self.page.login_required = True
-        page_services.change_advanced_settings(
-            self.page, changed_fields=["login_required"], context=self._context(),
-        )
+        page_services.change_advanced_settings(self.page, context=self._context())
         self.page.refresh_from_db()
         self.assertNotEqual(self.page.site_id, other_site.pk)
         self.assertTrue(self.page.login_required)
+
+    def test_change_advanced_settings_reloads_urls_for_any_apphook_change(self):
+        # The caller does not have to say what changed: the service compares
+        # with the stored page.
+        self.page.application_urls = "SampleApp"
+        with patch("cms.pages.services.set_restart_trigger") as restart:
+            page_services.change_advanced_settings(self.page, context=self._context())
+        restart.assert_called_once()
+
+        self.page.refresh_from_db()
+        self.assertEqual(self.page.application_urls, "SampleApp")
+        self.page.login_required = True
+        with patch("cms.pages.services.set_restart_trigger") as restart:
+            page_services.change_advanced_settings(self.page, context=self._context())
+        restart.assert_not_called()
+
+    def test_change_page_content_reloads_urls_when_the_path_changes(self):
+        self.page.update(application_urls="SampleApp")
+        content = self.page.get_admin_content("en")
+
+        with patch("cms.pages.services.set_restart_trigger") as restart:
+            page_services.change_page_content(content, data={"title": "renamed"}, context=self._context())
+        restart.assert_not_called()
+
+        # An overwritten URL changes the path as much as a new slug does.
+        with patch("cms.pages.services.set_restart_trigger") as restart:
+            page_services.change_page_content(
+                content, data={"overwrite_url": "elsewhere"}, context=self._context()
+            )
+        restart.assert_called_once()
+        self.assertEqual(self.page.get_path("en", fallback=False), "elsewhere")
 
     def test_permission_services_reject_unprivileged_caller(self):
         actor = self.get_staff_user_with_no_permissions()
@@ -278,6 +320,195 @@ class PluginParentGuardTest(CMSTestCase):
             plugin_services.paste_plugin(
                 plugin, "en", self.body, 1, target_parent=foreign, context=self.context
             )
+        self.assertEqual(self.sent, [])
+
+
+class GrantServiceTest(CMSTestCase):
+    """The permission-grant services run registered checks, and cms.api runs as the system."""
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("home", "nav_playground.html", "en")
+        self.site = Site.objects.get_current()
+        self.admin = OperationContext(user=self.get_superuser())
+        self.staff = OperationContext(user=self.get_staff_user_with_no_permissions())
+
+    def test_set_user_permissions_needs_a_context(self):
+        with self.assertRaises(TypeError):
+            page_services.set_user_permissions({"can_add_page": True}, self.staff.user)
+
+    def test_a_system_context_grants_without_permission_checks(self):
+        target = self._create_user("target", is_staff=True)
+
+        page_services.set_user_permissions(
+            {"can_add_page": True}, target, context=OperationContext.system("tests")
+        )
+
+        self.assertTrue(target.user_permissions.filter(codename="add_page").exists())
+
+    def test_cms_api_creates_page_users_as_the_system(self):
+        from cms.api import create_page_user
+
+        user = self._create_user("created", is_staff=True)
+        create_page_user(self.get_superuser(), user, can_add_page=True, can_change_page=True)
+
+        self.assertTrue(user.user_permissions.filter(codename="add_page").exists())
+
+    def test_dry_runs_for_grant_operations(self):
+        grant = GlobalPagePermission(user=self.staff.user, can_add=True, can_change=True)
+        verdict = can(operations.CHANGE_GLOBAL_PAGE_PERMISSION, self.staff, grant=grant, sites=[self.site])
+        self.assertFalse(verdict)
+        self.assertEqual(verdict.reasons[0].name, "cms.permissions.global_grant_grantable")
+        self.assertTrue(can(operations.CHANGE_GLOBAL_PAGE_PERMISSION, self.admin, grant=grant, sites=[self.site]))
+
+        # Nobody manages themselves ...
+        verdict = can(operations.CHANGE_USER_PERMISSIONS, self.staff, obj=self.staff.user, data={})
+        self.assertEqual(verdict.reasons[0].name, "cms.permissions.manage_user_or_group")
+        # ... and only permissions one holds can be handed out, also to a new user.
+        new_user = get_user_model()(username="new")
+        verdict = can(operations.CHANGE_USER_PERMISSIONS, self.staff, obj=new_user, data={"can_add_page": True})
+        self.assertEqual(verdict.reasons[0].name, "cms.permissions.grantable_user_permissions")
+
+    def test_a_grant_of_another_page_is_refused(self):
+        other = create_page("other", "nav_playground.html", "en")
+        grant = PagePermission.objects.create(user=self.staff.user, page=other, can_view=True)
+
+        with self.assertRaisesMessage(ValidationError, "belongs to another page"):
+            page_services.save_page_permissions(self.page, delete=[grant], context=self.admin)
+        self.assertTrue(PagePermission.objects.filter(pk=grant.pk).exists())
+
+    def test_deleting_global_grants_is_all_or_nothing(self):
+        first = GlobalPagePermission.objects.create(user=self.staff.user)
+        second = GlobalPagePermission.objects.create(user=self.get_superuser())
+        # ``delete()`` clears the instance's pk, and a rollback does not restore it.
+        ids = [first.pk, second.pk]
+
+        def refuse_second(context, *, grant, **kwargs):
+            if grant.pk == second.pk:
+                raise PermissionDenied("Not this one")
+
+        checks.register_check(
+            operations.DELETE_GLOBAL_PAGE_PERMISSION, "tests.refuse_second", refuse_second, kind=checks.PERMISSION
+        )
+        self.addCleanup(checks._extensions[operations.DELETE_GLOBAL_PAGE_PERMISSION].pop, "tests.refuse_second")
+
+        with self.assertRaises(PermissionDenied):
+            page_services.delete_global_page_permissions([first, second], context=self.admin)
+        self.assertEqual(GlobalPagePermission.objects.filter(pk__in=ids).count(), 2)
+
+
+@override_settings(CMS_PERMISSION=True)
+class PageGrantRecipientTest(CMSTestCase):
+    """Editing rights on a page only go to users and groups the actor manages."""
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("home", "nav_playground.html", "en")
+        delegate = self._create_user("delegate", is_staff=True, add_default_permissions=True)
+        self.add_global_permission(delegate, can_change=True, can_change_permissions=True, can_view=True)
+        self.context = OperationContext(user=delegate)
+
+    def verdict(self, **flags):
+        # The model's flags default to True; only the ones under test are set.
+        grant = PagePermission(
+            user=self.get_superuser(),
+            page=self.page,
+            **{**dict.fromkeys(PagePermission.get_all_permissions(), False), **flags},
+        )
+        return can(operations.CHANGE_PAGE_PERMISSIONS, self.context, page=self.page, save=[grant])
+
+    def test_editing_rights_go_to_managed_users_only(self):
+        # A flag the delegate holds, for a user they do not manage (a superuser).
+        verdict = self.verdict(can_change_permissions=True)
+
+        self.assertFalse(verdict)
+        self.assertEqual(verdict.reasons[0].name, "cms.pages.grant_recipients")
+
+    def test_view_restrictions_may_name_anyone(self):
+        verdict = self.verdict(can_view=True)
+
+        self.assertNotIn("cms.pages.grant_recipients", [reason.name for reason in verdict.reasons])
+
+
+class AddPageServiceTest(CMSTestCase):
+    def setUp(self):
+        super().setUp()
+        self.site = Site.objects.get_current()
+        self.context = OperationContext(user=self.get_superuser(), language="en")
+        self.sent = []
+        for signal in PAGE_OPERATION_SIGNALS:
+            signal.connect(self.receive)
+            self.addCleanup(signal.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        self.sent.append((signal, kwargs["operation"], kwargs.get("obj")))
+
+    def add(self, **kwargs):
+        options = {
+            "site": self.site,
+            "parent_page": None,
+            "source": None,
+            "language": "en",
+            "content_data": {"title": "new", "slug": "new", "path": "new", "template": "nav_playground.html"},
+            "context": self.context,
+        }
+        return page_services.add_page(**{**options, **kwargs})
+
+    def test_is_announced_as_adding_a_translation(self):
+        content = self.add()
+
+        self.assertEqual(
+            self.sent,
+            [
+                (pre_obj_operation, operations.ADD_PAGE_TRANSLATION, None),
+                (post_obj_operation, operations.ADD_PAGE_TRANSLATION, content.page),
+            ],
+        )
+
+    def test_a_refused_add_announces_nothing(self):
+        staff = OperationContext(user=self.get_staff_user_with_no_permissions())
+        with self.assertRaises(PermissionDenied):
+            self.add(context=staff)
+        self.assertEqual(self.sent, [])
+
+    def test_page_types_get_the_page_types_root(self):
+        self.assertIsNone(PageType.get_root_page(site=self.site))
+
+        content = self.add(is_page_type=True, content_data={
+            "title": "type", "slug": "type", "path": "page_types/type", "template": "nav_playground.html",
+        })
+
+        root = PageType.get_root_page(site=self.site)
+        self.assertEqual(content.page.parent, root)
+        self.assertTrue(content.page.is_page_type)
+        self.assertTrue(root.has_translation("en"))
+
+    def test_a_page_from_a_source_copies_it(self):
+        source = create_page("source", "nav_playground.html", "en")
+        add_plugin(source.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body="copied")
+
+        content = self.add(source=source)
+
+        self.assertNotEqual(content.page.pk, source.pk)
+        # Every slot exists once: the copy reuses the placeholders the new content got.
+        slots = list(content.placeholders.values_list("slot", flat=True))
+        self.assertEqual(sorted(slots), sorted(set(slots)))
+        self.assertEqual(
+            [plugin.get_bound_plugin().body for plugin in content.page.get_placeholders("en").get(slot="body").get_plugins("en")],
+            ["copied"],
+        )
+
+    def test_a_source_the_user_may_not_copy_is_refused_before_anything_happens(self):
+        source = create_page("source", "nav_playground.html", "en")
+
+        class NoCopies(PagePermissions):
+            def can_change_page(self, page):
+                return page != source
+
+        count = Page.objects.count()
+        with self.assertRaises(PermissionDenied):
+            self.add(source=source, permissions=NoCopies(self.context.user))
+        self.assertEqual(Page.objects.count(), count)
         self.assertEqual(self.sent, [])
 
 

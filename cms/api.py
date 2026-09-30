@@ -517,7 +517,8 @@ def create_page_user(
     :param bool can_*: Permissions to give the user
     :param bool grant_all: Grant all permissions to the user
     """
-    from cms.pages.admin.forms import save_permissions
+    from cms.pages import services as page_services
+    from cms.shared.operations import OperationContext
 
     if grant_all:
         # just be lazy
@@ -546,7 +547,9 @@ def create_page_user(
         setattr(page_user, field, getattr(user, field))
     user.save()
     page_user.save()
-    save_permissions(data, page_user)
+    page_services.set_user_permissions(
+        data, page_user, context=OperationContext.system("cms.api.create_page_user", user=created_by)
+    )
     return user
 
 

@@ -8,11 +8,11 @@ from django.utils.translation import override as force_language
 from cms import operations
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_config import CMSCoreExtensions
-from cms.models import CMSPlugin, Page, Placeholder
+from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from cms.pages import services as page_services
 from cms.pages.admin.forms import MovePageForm
-from cms.pages.admin.page import PageContentAdmin
-from cms.pages.permissions import PagePermissions
+from cms.pages.admin.page import PageAdmin, PageContentAdmin
+from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions, PagePermissions
 from cms.shared import checks
 from cms.shared.checks import can
 from cms.shared.operations import OperationContext, operation
@@ -76,6 +76,65 @@ class CheckRegistryTest(RegistryIsolationMixin, CMSTestCase):
 
         entry = checks.get_checks(operations.MOVE_PAGE)[-1]
         self.assertEqual((entry.name, entry.check, entry.requires), ("tests.config", check, ("page",)))
+
+    def test_cms_config_registers_a_check_kind(self):
+        def check(context, **kwargs):
+            pass
+
+        class Config:
+            cms_checks = {operations.MOVE_PAGE: [("tests.kind", check, ["page"], checks.PERMISSION)]}
+
+        CMSCoreExtensions().configure_app(Config)
+
+        entry = checks.get_checks(operations.MOVE_PAGE)[-1]
+        self.assertEqual((entry.name, entry.kind), ("tests.kind", checks.PERMISSION))
+
+    def test_app_checks_default_to_validation(self):
+        checks.register_check(operations.MOVE_PAGE, "tests.default", lambda context, **kwargs: None)
+        self.assertEqual(checks.get_checks(operations.MOVE_PAGE)[-1].kind, checks.VALIDATION)
+
+    def test_a_check_kind_is_validated(self):
+        with self.assertRaises(ValueError):
+            checks.register_check(operations.MOVE_PAGE, "tests.bad", lambda context, **kwargs: None, kind="other")
+        with self.assertRaises(TypeError):
+            # Core checks must say which kind they are.
+            checks.register_core_check(operations.MOVE_PAGE, "tests.core", lambda context, **kwargs: None)
+
+    def test_every_core_check_declares_its_kind(self):
+        for entries in checks._core.values():
+            for entry in entries.values():
+                with self.subTest(check=entry.name):
+                    self.assertIn(entry.kind, checks.KINDS)
+
+    def test_a_system_context_skips_permission_checks_only(self):
+        def refuse(context, **kwargs):
+            raise PermissionDenied("Not you")
+
+        def invalid(context, **kwargs):
+            raise ValidationError("Never valid")
+
+        checks.register_check(operations.MOVE_PAGE, "tests.refuse", refuse, kind=checks.PERMISSION)
+        system = OperationContext.system("tests")
+        target = {"page": self.page, "target_page": self.page, "position": "right"}
+
+        checks.run_checks(operations.MOVE_PAGE, system, **target)  # the permission check is skipped
+        self.assertTrue(can(operations.MOVE_PAGE, system, **target))
+        staff = OperationContext(user=self._create_user("staff", is_staff=True))
+        self.assertFalse(can(operations.MOVE_PAGE, staff, **target))
+
+        checks.register_check(operations.MOVE_PAGE, "tests.invalid", invalid)
+        with self.assertRaisesMessage(ValidationError, "Never valid"):
+            checks.run_checks(operations.MOVE_PAGE, system, **target)
+        verdict = can(operations.MOVE_PAGE, system, **target)
+        self.assertEqual([r.name for r in verdict.reasons], ["tests.invalid"])
+        self.assertTrue(verdict.complete)
+
+    def test_a_system_context_names_its_caller(self):
+        with self.assertRaises(ValueError):
+            OperationContext.system("")
+        context = OperationContext.system("tests", user=self.get_superuser())
+        self.assertTrue(context.is_system)
+        self.assertFalse(self.context.is_system)
 
     def test_dry_run_collects_every_validation_failure(self):
         def fail(message):
@@ -654,3 +713,90 @@ class ContentPermissionTest(CMSTestCase):
             self.assertEqual(response.status_code, 403)
             response = model_admin.change_innavigation(request, self.page.get_content_obj("en").pk)
             self.assertEqual(response.status_code, 204)
+
+
+class AdminAddPermissionTest(CMSTestCase):
+    """The page content admin's ``has_add_permission`` decides adds, but only as a veto."""
+
+    def setUp(self):
+        super().setUp()
+        self.site = Site.objects.get_current()
+
+    def adapter(self, user, allow):
+        class Admin(PageContentAdmin):
+            def has_add_permission(self, request):
+                return allow
+
+        request = self.get_request()
+        request.user = user
+        return AdminPageContentPermissions(Admin(PageContent, admin.site), request)
+
+    def test_the_admin_can_refuse_an_add(self):
+        user = self.get_superuser()
+        context = OperationContext(user=user)
+        permissions = self.adapter(user, allow=False)
+
+        verdict = can(operations.ADD_PAGE, context, site=self.site, parent_page=None, permissions=permissions)
+
+        self.assertFalse(verdict)
+        self.assertEqual(verdict.reasons[0].name, "cms.pages.add_permission")
+        with self.assertRaises(PermissionDenied):
+            page_services.add_page(
+                site=self.site,
+                parent_page=None,
+                source=None,
+                language="en",
+                content_data={"title": "new", "slug": "new", "path": "new", "template": "nav_playground.html"},
+                context=context,
+                permissions=permissions,
+            )
+
+    def test_the_admin_cannot_allow_an_add_on_its_own(self):
+        # The hook only knows the query string's parent, not the parent the page gets.
+        user = self._create_user("staff", is_staff=True)
+        parent = create_page("Parent", "nav_playground.html", "en")
+
+        for parent_page in (None, parent):
+            with self.subTest(parent=parent_page):
+                self.assertFalse(
+                    can(
+                        operations.ADD_PAGE,
+                        OperationContext(user=user),
+                        site=self.site,
+                        parent_page=parent_page,
+                        permissions=self.adapter(user, allow=True),
+                    )
+                )
+
+
+class AdminPagePermissionHookTest(CMSTestCase):
+    """The page admin's overridable hooks decide advanced settings and page permissions."""
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("Page", "nav_playground.html", "en")
+        self.context = OperationContext(user=self.get_superuser())
+
+        class LockedAdmin(PageAdmin):
+            def has_change_advanced_settings_permission(self, request, obj=None):
+                return False
+
+            def has_change_permissions_permission(self, request, obj=None):
+                return False
+
+        request = self.get_request()
+        request.user = self.context.user
+        self.permissions = AdminPagePermissions(LockedAdmin(Page, admin.site), request)
+
+    def test_advanced_settings(self):
+        self.page.login_required = True
+        with self.assertRaises(PermissionDenied):
+            page_services.change_advanced_settings(self.page, context=self.context, permissions=self.permissions)
+        self.page.refresh_from_db()
+        self.assertFalse(self.page.login_required)
+
+    def test_page_permissions(self):
+        verdict = can(
+            operations.CHANGE_PAGE_PERMISSIONS, self.context, page=self.page, permissions=self.permissions
+        )
+        self.assertEqual(verdict.reasons[0].name, "cms.pages.change_permissions_permission")

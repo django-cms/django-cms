@@ -16,7 +16,7 @@ Operation context
 *****************
 
 .. autoclass:: cms.shared.operations.OperationContext
-    :members: from_request, from_placeholder_request
+    :members: from_request, from_placeholder_request, system, is_system
 
 .. autofunction:: cms.shared.operations.operation
 
@@ -41,7 +41,7 @@ check also receives ``permissions``.
       - ``page``, ``target_page``, ``position``
     * - ``ADD_PAGE``
       - :func:`cms.pages.services.add_page`
-      - ``site``, ``parent_page``
+      - ``site``, ``parent_page``, ``source``, ``allow_view_only_page_type``
     * - ``ADD_PAGE_TRANSLATION``
       - :func:`cms.pages.services.add_translation`
       - ``page``
@@ -53,7 +53,16 @@ check also receives ``permissions``.
       - ``page``
     * - ``CHANGE_PAGE_PERMISSIONS``
       - :func:`cms.pages.services.save_page_permissions`
-      - ``page``
+      - ``page``, ``save``, ``delete``
+    * - ``CHANGE_USER_PERMISSIONS``
+      - :func:`cms.pages.services.set_user_permissions`
+      - ``obj``, ``data``
+    * - ``CHANGE_GLOBAL_PAGE_PERMISSION``
+      - :func:`cms.pages.services.save_global_page_permission`
+      - ``grant``, ``sites``
+    * - ``DELETE_GLOBAL_PAGE_PERMISSION``
+      - :func:`cms.pages.services.delete_global_page_permission`
+      - ``grant``
     * - ``COPY_PAGE``
       - :func:`cms.pages.services.copy_page_tree`
       - ``page``, ``target_page``, ``position``, ``target_site``,
@@ -86,8 +95,6 @@ The plugin services in ``cms.core.services`` (``MOVE_PLUGIN``,
 ``ADD_PLUGINS_FROM_PLACEHOLDER``, ``DELETE_PLUGIN``, ``CLEAR_PLACEHOLDER``)
 check permissions through their backend and do not run operation checks yet.
 ``ADD_PLUGIN`` and ``CHANGE_PLUGIN`` are performed by the admin only.
-The global page grant and user/group permission services enforce their own
-scope checks instead of using the operation check registry.
 
 
 ****************
@@ -103,6 +110,10 @@ Operation checks
 .. autofunction:: cms.shared.checks.register_check
 
 .. autofunction:: cms.shared.checks.get_checks
+
+.. autodata:: cms.shared.checks.PERMISSION
+
+.. autodata:: cms.shared.checks.VALIDATION
 
 .. autoclass:: cms.shared.checks.Verdict
     :members: complete
@@ -121,8 +132,10 @@ Registering checks from an app
             ],
         }
 
-``cms_checks`` maps an operation name to a list of ``(name, check)`` or
-``(name, check, requires)`` tuples. A check is a callable
+``cms_checks`` maps an operation name to a list of ``(name, check)``,
+``(name, check, requires)`` or ``(name, check, requires, kind)`` tuples.
+``kind`` is ``"validation"`` (the default) or ``"permission"``; a system
+context skips permission checks. A check is a callable
 ``check(context, **target)`` raising ``PermissionDenied`` or
 ``ValidationError``. Registering a check under the name of an existing one
 replaces it.
@@ -132,8 +145,11 @@ Core checks
 
 .. py:module:: cms.pages.checks
 
+.. py:module:: cms.permissions.checks
+
 The checks django CMS registers for the page operations live in
-``cms.pages.checks``. :ref:`operation_checks` lists them by operation, with
+``cms.pages.checks``, the ones for permission grants in
+``cms.permissions.checks``. :ref:`operation_checks` lists them by operation, with
 their names.
 
 

@@ -47,6 +47,26 @@ class OperationContext:
     #: this to ``False`` when a request arrives without ``cms_path``, which is a
     #: backwards-compatible shim rather than a deliberate silence.
     emit_signals: bool = True
+    #: Set for code acting on the system's own behalf rather than a user's, see
+    #: :meth:`system`. Names the caller, e.g. ``"cms.api"``.
+    system_reason: str | None = None
+
+    @property
+    def is_system(self) -> bool:
+        return self.system_reason is not None
+
+    @classmethod
+    def system(cls, reason: str, *, user=None, language: str | None = None) -> OperationContext:
+        """A context for code acting on the system's own behalf.
+
+        Services skip their *permission* checks for it -- nobody asks whether
+        :mod:`cms.api` or a management command may do something -- but still run
+        every *validation* check. ``reason`` names the caller; ``user``, if given,
+        is recorded as the author (``created_by`` and log entries).
+        """
+        if not reason:
+            raise ValueError("A system context needs a reason naming its caller.")
+        return cls(user=user, language=language, system_reason=reason)
 
     @classmethod
     def from_request(cls, request, language: str | None = None) -> OperationContext:
@@ -106,6 +126,7 @@ def operation(
     checks: dict | None = None,
     signals: tuple | None = None,
     sender=None,
+    signal_operation: str | None = None,
     **signal_kwargs,
 ) -> Iterator[dict]:
     """The frame every service runs its work in.
@@ -115,6 +136,10 @@ def operation(
     the ``signals`` pair, runs the body of the ``with`` block, and sends the post
     signal. A failing check raises before anything is announced; a failing body
     sends no post signal.
+
+    ``signal_operation`` is the operation name the signals announce, if it is not
+    ``name``: adding a page runs the ``ADD_PAGE`` checks but has always been
+    announced to receivers as ``ADD_PAGE_TRANSLATION``.
 
     Yields the signal kwargs; a service updates them for the post signal, for
     example with the object as it is after the operation::
@@ -130,7 +155,7 @@ def operation(
 
     token = str(uuid.uuid4())
     signal_kwargs = {
-        "operation": name,
+        "operation": signal_operation or name,
         "request": context.request,
         "user": context.user,
         "language": context.language,

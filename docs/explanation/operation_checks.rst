@@ -125,6 +125,34 @@ release without breaking them.
 Every check has a unique name, such as ``"cms.pages.url_unique"``. The name
 identifies the check in a dry run's result and makes it replaceable.
 
+Every check also has a *kind*:
+
+* A **permission** check asks whether the acting user may do this, for example
+  ``cms.pages.move_permission``.
+* A **validation** check asks whether the result would be valid at all, whoever
+  acts, for example ``cms.pages.url_unique``.
+
+Acting on the system's behalf
+=============================
+
+Some code acts on the system's own behalf rather than a user's:
+:mod:`cms.api`, management commands, data migrations. It passes a *system
+context*:
+
+.. code-block:: python
+
+    context = OperationContext.system("myapp.import_pages", user=author)
+
+A system context skips the permission checks, because nobody asks whether the
+system may do something. It **still runs every validation check**: pages
+created through :mod:`cms.api` get unique URLs just like pages created in the
+admin. ``reason`` names the caller; ``user``, if given, is recorded as the
+author.
+
+Forms never use a system context. A form processes input a user sent, so its
+``save()`` passes the acting user's context, and the service checks that user's
+permissions, even though the form has already validated its fields.
+
 Order
 =====
 
@@ -191,8 +219,11 @@ Adding and replacing checks
 ******************************
 
 A package registers checks in its :doc:`cms_config </how_to/20-cms-config>`,
-under ``cms_checks``. It maps an operation to a list of ``(name, check)`` or
-``(name, check, requires)`` tuples:
+under ``cms_checks``. It maps an operation to a list of ``(name, check)``,
+``(name, check, requires)`` or ``(name, check, requires, kind)`` tuples.
+``kind`` is ``"validation"`` unless the tuple says ``"permission"``, so a
+system context runs a package's checks unless the package marks them as
+permission checks:
 
 .. code-block:: python
 
@@ -234,6 +265,14 @@ versioning package, for example, only lets drafts be changed. In the admin,
 ``can_change_content`` asks ``PageContentAdmin.has_change_permission(request,
 page_content)``, so a package overriding that method decides for these
 operations, too.
+
+Adding a page is the one case where the admin's method cannot decide on its
+own. ``PageContentAdmin.has_add_permission(request)`` only knows the parent
+named in the query string, while the page is created under the parent the form
+posts. So in the admin, adding a page needs both: the admin's
+``has_add_permission`` and the backend's ``can_add_page``/``can_add_subpage``
+for the parent the page actually gets. An admin subclass can refuse adds this
+way, but not allow an add the backend refuses.
 
 
 ********************
@@ -284,9 +323,14 @@ column are what a check receives and what a dry run passes to ``can()``.
     * - ``ADD_PAGE``
 
         ``add_page``
-      - ``site``, ``parent_page``
+      - ``site``, ``parent_page``, ``source``, ``allow_view_only_page_type``
       - ``cms.pages.add_permission``: the user may add a page at the root or
-        below the chosen parent.
+        below the parent the page gets (for page types, the page-types root).
+
+        ``cms.pages.add_source_permission``: for a page created from a source,
+        the user may copy the source.
+
+        Announced to signal receivers as ``ADD_PAGE_TRANSLATION``.
     * - ``ADD_PAGE_TRANSLATION``
 
         ``add_translation``
@@ -307,9 +351,42 @@ column are what a check receives and what a dry run passes to ``can()``.
     * - ``CHANGE_PAGE_PERMISSIONS``
 
         ``save_page_permissions``
-      - ``page``
+      - ``page``, ``save``, ``delete``
       - ``cms.pages.change_permissions_permission``: the user may change the
-        page's permissions. The service also checks each grant being saved.
+        page's permissions.
+
+        ``cms.pages.grants_belong_to_page`` (validation): every grant belongs to
+        this page.
+
+        ``cms.pages.grantable_page_permissions``: the user holds every flag set
+        on a saved grant.
+
+        ``cms.pages.grant_recipients``: editing rights go only to users and
+        groups the user manages; view restrictions may name anyone.
+    * - ``CHANGE_USER_PERMISSIONS``
+
+        ``set_user_permissions``
+      - ``obj``, ``data``
+      - ``cms.permissions.manage_user_or_group``: the user manages this user or
+        group.
+
+        ``cms.permissions.grantable_user_permissions``: the user holds every
+        permission set or cleared.
+    * - ``CHANGE_GLOBAL_PAGE_PERMISSION``
+
+        ``save_global_page_permission``
+      - ``grant``, ``sites``
+      - ``cms.permissions.global_grant_manageable``: the user could have
+        granted the stored grant.
+
+        ``cms.permissions.global_grant_grantable``: the user holds every flag
+        of the new grant on its sites.
+    * - ``DELETE_GLOBAL_PAGE_PERMISSION``
+
+        ``delete_global_page_permission``
+      - ``grant``
+      - ``cms.permissions.global_grant_deletable``: the user could have granted
+        the grant.
     * - ``COPY_PAGE_FROM_SOURCE``
 
         ``copy_page_from_source``; also called by ``add_page`` when copying

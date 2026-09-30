@@ -12,7 +12,8 @@ from cms.pages import (
     editing,  # noqa: F401  -- registers the page editing hooks
 )
 from cms.pages.rendering import render_pagecontent
-from cms.shared.checks import register_check
+from cms.permissions import checks as permission_checks  # noqa: F401  -- registers the grant checks
+from cms.shared.checks import VALIDATION, register_check
 from cms.wizards.wizard_base import Wizard
 
 logger = getLogger(__name__)
@@ -84,16 +85,22 @@ class CMSCoreExtensions(CMSAppExtension):
     def configure_checks(self, cms_config):
         """Registers the operation checks of an app, see :mod:`cms.shared.checks`.
 
-        ``cms_checks`` maps an operation name to ``(name, check)`` or
-        ``(name, check, requires)`` tuples.
+        ``cms_checks`` maps an operation name to ``(name, check)``,
+        ``(name, check, requires)`` or ``(name, check, requires, kind)`` tuples.
+        ``kind`` defaults to ``"validation"``: a check that holds whoever acts.
         """
         if not isinstance(cms_config.cms_checks, Mapping):
             raise ImproperlyConfigured("cms_checks must be a mapping of operation names to checks")
         for operation, checks in cms_config.cms_checks.items():
-            for name, check, *requires in checks:
+            for name, check, *options in checks:
                 if not callable(check):
                     raise ImproperlyConfigured(f"Check {name!r} for {operation!r} is not callable")
-                register_check(operation, name, check, requires=requires[0] if requires else ())
+                requires = options[0] if options else ()
+                kind = options[1] if len(options) > 1 else VALIDATION
+                try:
+                    register_check(operation, name, check, requires=requires, kind=kind)
+                except ValueError as error:
+                    raise ImproperlyConfigured(str(error)) from error
 
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here

@@ -115,6 +115,17 @@ class AdminPageContentPermissions(PagePermissions):
     def can_change_content(self, page_content) -> bool:
         return bool(self.model_admin.has_change_permission(self.request, page_content))
 
+    # ``has_add_permission(request)`` cannot say *where* a page may be added: it
+    # reads the parent from the query string, while the page is created under the
+    # parent the form posts. So the admin's hook may refuse an add, but never allow
+    # one on its own -- the parent the page actually gets is always checked, too.
+
+    def can_add_page(self, site) -> bool:
+        return super().can_add_page(site) and bool(self.model_admin.has_add_permission(self.request))
+
+    def can_add_subpage(self, target, site) -> bool:
+        return super().can_add_subpage(target, site) and bool(self.model_admin.has_add_permission(self.request))
+
     def can_delete_translation(self, page, language) -> bool:
         return bool(
             self.model_admin.has_delete_translation_permission(self.request, language, page)

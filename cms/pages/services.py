@@ -1,10 +1,13 @@
 """Page operations, callable without an HttpRequest.
 
-Page operations run their checks in the :func:`~cms.shared.operations.operation`
-frame. ``can()`` from :mod:`cms.shared.checks` runs the same checks as a dry run.
-The user and global-grant helpers enforce their field and site scopes directly.
+Every service runs its operation's checks (:mod:`cms.pages.checks`,
+:mod:`cms.permissions.checks`) in the :func:`~cms.shared.operations.operation`
+frame, the permission grants included. ``can()`` from :mod:`cms.shared.checks`
+runs the same checks as a dry run. Code acting on the system's own behalf, such
+as :mod:`cms.api`, passes ``OperationContext.system()``: it skips the permission
+checks, never the validation checks.
 
-Page operations enforce permissions through a backend
+Page operations ask a permission backend
 (:mod:`cms.pages.permissions`), so an operation reached from outside the admin is
 checked the same way. Pass ``permissions=`` for one call -- the page admin hands
 over an adapter routing each predicate through its own overridable
@@ -38,11 +41,9 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
-from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
 from cms.pages.checks import LanguageCopyPlan
 from cms.pages.utils import get_clean_username
 from cms.permissions.cache import clear_permission_cache
-from cms.shared.checks import run_checks
 from cms.shared.operations import OperationContext, operation
 from cms.signals import PAGE_OPERATION_SIGNALS
 from cms.signals.apphook import set_restart_trigger
@@ -85,77 +86,49 @@ def permission_accessor(obj):
 
 
 @transaction.atomic
-def set_user_permissions(data, obj, *, context=None):
-    """Apply the CMS auth permission fields to a user or group.
+def set_user_permissions(data, obj, *, context: OperationContext):
+    """Apply the CMS model permission fields in ``data`` to a user or group.
 
-    ``context=None`` serves the trusted, permission-free :mod:`cms.api` path.
-    Admin callers provide a context so a forged form cannot grant or revoke a
-    permission the acting user does not hold.
+    ``data`` maps ``can_<action>_<name>`` fields to booleans; a field that is
+    missing is left as it is. The ``CHANGE_USER_PERMISSIONS``
+    checks make sure the acting user manages ``obj`` and holds every permission
+    they set or clear. :mod:`cms.api` passes ``OperationContext.system()``.
+
+    :raises ~django.core.exceptions.PermissionDenied: if the acting user may not.
     """
-    if context is not None:
-        if obj.pk and not context.user.is_superuser:
-            from django.contrib.sites.models import Site
-
-            from cms.permissions.utils import get_subordinate_groups, get_subordinate_users
-
-            site = Site.objects.get_current(context.request)
-            subordinates = (
-                get_subordinate_users(context.user, site)
-                if isinstance(obj, PageUser)
-                else get_subordinate_groups(context.user, site)
-            )
-            if not subordinates.filter(pk=obj.pk).exists():
-                raise PermissionDenied("You may not manage this user or group.")
-        for model, name in CMS_PERMISSION_MODELS:
+    with operation(operations.CHANGE_USER_PERMISSIONS, context, checks={"obj": obj, "data": data}):
+        if not obj.pk:
+            obj.save()
+        accessor = permission_accessor(obj)
+        for model, name in (*CMS_PERMISSION_MODELS, (PageUserGroup, "pageuser")):
+            content_type = ContentType.objects.get_for_model(model)
             for action in CMS_PERMISSION_ACTIONS:
                 field = f"can_{action}_{name}"
-                if field in data and not context.user.has_perm(f"{model._meta.app_label}.{get_permission_codename(action, model._meta)}"):
-                    raise PermissionDenied("You may not manage this permission.")
-    if not obj.pk:
-        obj.save()
-    accessor = permission_accessor(obj)
-    for model, name in (*CMS_PERMISSION_MODELS, (PageUserGroup, "pageuser")):
-        content_type = ContentType.objects.get_for_model(model)
-        for action in CMS_PERMISSION_ACTIONS:
-            field = f"can_{action}_{name}"
-            if field not in data:
-                continue
-            codename = get_permission_codename(action, model._meta)
-            permission = Permission.objects.get(content_type=content_type, codename=codename)
-            if data[field]:
-                accessor.add(permission)
-            else:
-                accessor.remove(permission)
+                if field not in data:
+                    continue
+                codename = get_permission_codename(action, model._meta)
+                permission = Permission.objects.get(content_type=content_type, codename=codename)
+                if data[field]:
+                    accessor.add(permission)
+                else:
+                    accessor.remove(permission)
     return obj
 
 
 @transaction.atomic
-def save_page_permissions(page, *, save=(), delete=(), context, permissions=None):
-    """Apply page permission inline changes for one page."""
+def save_page_permissions(page, *, save=(), delete=(), context: OperationContext, permissions=None):
+    """Save and delete the page permission grants of one page.
+
+    :raises ~django.core.exceptions.PermissionDenied: if the acting user may not
+        change the page's permissions, or not grant a flag set on a saved grant.
+    :raises ~django.core.exceptions.ValidationError: if a grant belongs to another page.
+    """
+    save, delete = list(save), list(delete)
     with operation(
         operations.CHANGE_PAGE_PERMISSIONS,
         context,
-        checks={"page": page, "permissions": permissions},
+        checks={"page": page, "save": save, "delete": delete, "permissions": permissions},
     ):
-        checks = {
-            "can_add": page.has_add_permission,
-            "can_change": page.has_change_permission,
-            "can_delete": page.has_delete_permission,
-            "can_publish": page.has_publish_permission,
-            "can_change_advanced_settings": page.has_advanced_settings_permission,
-            "can_change_permissions": page.has_change_permissions_permission,
-            "can_move_page": page.has_move_page_permission,
-            "can_view": page.has_view_permission,
-        }
-        for grant in save:
-            if grant.page_id not in (None, page.pk):
-                raise PermissionDenied("The permission belongs to another page.")
-            for flag, has_permission in checks.items():
-                if getattr(grant, flag) and not has_permission(context.user):
-                    raise PermissionDenied("You may not grant this page permission.")
-        for grant in delete:
-            if grant.page_id != page.pk:
-                raise PermissionDenied("The permission belongs to another page.")
         for grant in delete:
             grant.delete()
         for grant in save:
@@ -163,46 +136,39 @@ def save_page_permissions(page, *, save=(), delete=(), context, permissions=None
             grant.save()
 
 
-def _global_grant_allowed(grant, site_ids, user):
-    from cms.permissions.utils import get_grantable_global_permissions
-
-    grantable = get_grantable_global_permissions(user, site_ids)
-    held = {flag for flag in GlobalPagePermission.get_all_permissions() if getattr(grant, flag)}
-    return "can_change_permissions" in grantable and held <= grantable
-
-
 @transaction.atomic
-def save_global_page_permission(grant, *, sites, context):
-    """Save a site-wide page grant after checking its old and new scope."""
-    site_ids = [site.pk for site in sites]
-    if grant.pk:
-        stored = GlobalPagePermission.objects.get(pk=grant.pk)
-        old_sites = list(stored.sites.values_list("pk", flat=True))
-        if not _global_grant_allowed(stored, old_sites, context.user):
-            raise PermissionDenied("You may not change this global page permission.")
-    if not _global_grant_allowed(grant, site_ids, context.user):
-        raise PermissionDenied("You may not grant these global page permissions.")
-    grant.save()
-    grant.sites.set(sites)
+def save_global_page_permission(grant, *, sites, context: OperationContext):
+    """Save a site-wide page grant for ``sites``.
+
+    The ``CHANGE_GLOBAL_PAGE_PERMISSION`` checks compare both
+    the stored grant and the new one with what the acting user may hand out.
+
+    :raises ~django.core.exceptions.PermissionDenied: if the acting user may not.
+    """
+    sites = list(sites)
+    with operation(
+        operations.CHANGE_GLOBAL_PAGE_PERMISSION, context, checks={"grant": grant, "sites": sites}
+    ):
+        grant.save()
+        grant.sites.set(sites)
     return grant
 
 
 @transaction.atomic
-def delete_global_page_permission(grant, *, context):
-    """Delete a site-wide grant only if its current scope is manageable."""
-    delete_global_page_permissions([grant], context=context)
+def delete_global_page_permission(grant, *, context: OperationContext):
+    """Delete a site-wide grant if the acting user could have granted it.
+
+    :raises ~django.core.exceptions.PermissionDenied: if the acting user may not.
+    """
+    with operation(operations.DELETE_GLOBAL_PAGE_PERMISSION, context, checks={"grant": grant}):
+        grant.delete()
 
 
 @transaction.atomic
-def delete_global_page_permissions(grants, *, context):
-    """Validate an entire batch before deleting any global grants."""
-    grants = list(grants)
-    for grant in grants:
-        site_ids = list(grant.sites.values_list("pk", flat=True))
-        if not _global_grant_allowed(grant, site_ids, context.user):
-            raise PermissionDenied("You may not delete this global page permission.")
-    for grant in grants:
-        grant.delete()
+def delete_global_page_permissions(grants, *, context: OperationContext):
+    """Delete several site-wide grants: all of them, or none if one is refused."""
+    for grant in list(grants):
+        delete_global_page_permission(grant, context=context)
 
 
 def _page_content_placeholders(page_contents) -> QuerySet:
@@ -213,8 +179,9 @@ def _page_content_placeholders(page_contents) -> QuerySet:
     )
 
 
-def _main_language_template(page):
-    languages = page.get_languages()
+def main_language_template(page):
+    """The template of ``page``'s first translation, which a new translation inherits."""
+    languages = page.get_languages() if page else []
     if languages:
         content = page.get_admin_content(languages[0])
         if content:
@@ -224,7 +191,7 @@ def _main_language_template(page):
 
 def _create_translation(page, *, source, language, content_data, context):
     data = dict(content_data, page=page, language=language, created_by=context.user)
-    template = _main_language_template(page)
+    template = main_language_template(page)
     if template:
         data["template"] = template
     translation = api.create_page_content(**data)
@@ -232,13 +199,33 @@ def _create_translation(page, *, source, language, content_data, context):
 
     if source:
         extension_pool.copy_extensions(source_page=source, target_page=page, languages=[language])
+        # ``create_page_content`` has already created the template's placeholders;
+        # reuse them, or each slot would exist twice.
+        target_placeholders = {placeholder.slot: placeholder for placeholder in translation.placeholders.all()}
         for source_placeholder in source.get_placeholders(language):
-            target_placeholder = translation.placeholders.create(
-                slot=source_placeholder.slot,
-                default_width=source_placeholder.default_width,
-            )
+            target_placeholder = target_placeholders.get(source_placeholder.slot)
+            if target_placeholder is None:
+                target_placeholder = translation.placeholders.create(
+                    slot=source_placeholder.slot,
+                    default_width=source_placeholder.default_width,
+                )
             source_placeholder.copy_plugins(target_placeholder, language=language)
     return translation
+
+
+def resolve_add_parent(site, parent_page, *, is_page_type=False):
+    """The parent a new page gets.
+
+    Page types live below the site's page-types root: a page type added at the
+    root, or below that root, gets it as parent. Returns ``None`` while the root
+    does not exist yet; :func:`add_page` creates it. Forms use this to check the
+    same parent the service will.
+    """
+    from cms.models import PageType
+
+    if is_page_type and (parent_page is None or (parent_page.depth == 1 and parent_page.is_page_type)):
+        return PageType.get_root_page(site=site)
+    return parent_page
 
 
 @transaction.atomic
@@ -246,35 +233,39 @@ def add_page(
     *, site, parent_page, source, language, content_data, context,
     is_page_type=False, allow_view_only_page_type=False, permissions=None,
 ) -> PageContent:
-    """Create a page and its first translation from validated content values."""
+    """Create a page and its first translation from validated content values.
+
+    Runs the ``ADD_PAGE`` checks -- for a page created from ``source``, including
+    the permission to copy it -- and announces the operation to signal receivers as
+    ``ADD_PAGE_TRANSLATION``, as the admin always has.
+
+    :raises ~django.core.exceptions.PermissionDenied: if the user may not add the
+        page there, or not copy ``source``.
+    """
+    parent_page = resolve_add_parent(site, parent_page, is_page_type=is_page_type)
     with operation(
         operations.ADD_PAGE,
         context,
-        checks={"site": site, "parent_page": parent_page, "permissions": permissions},
-    ):
-        if source:
-            run_checks(
-                operations.COPY_PAGE_FROM_SOURCE,
-                context,
-                source=source,
-                target_site=site,
-                parent_page=parent_page,
-                allow_view_only_page_type=allow_view_only_page_type,
-                permissions=permissions,
-            )
-        token = send_pre_page_operation(context=context, operation=operations.ADD_PAGE_TRANSLATION, language=language)
-        if is_page_type and (parent_page is None or (parent_page.depth == 1 and parent_page.is_page_type)):
+        checks={
+            "site": site,
+            "parent_page": parent_page,
+            "source": source,
+            "allow_view_only_page_type": allow_view_only_page_type,
+            "permissions": permissions,
+        },
+        signals=PAGE_OPERATION_SIGNALS,
+        sender=Page,
+        signal_operation=operations.ADD_PAGE_TRANSLATION,
+        language=language,
+    ) as signal_kwargs:
+        if is_page_type and parent_page is None:
             parent_page = get_or_create_page_type_root(site, language=language)
+        elif is_page_type and parent_page.depth == 1 and parent_page.is_page_type:
+            get_or_create_page_type_root(site, language=language)  # the root's translation
         if source:
-            page = copy_page_from_source(
-                source,
-                target_site=site,
-                parent_page=parent_page,
-                language=language,
-                create_page_type=is_page_type,
-                allow_view_only_page_type=allow_view_only_page_type,
-                context=context,
-                permissions=permissions,
+            page = _copy_from_source(
+                source, target_site=site, parent_page=parent_page, language=language,
+                create_page_type=is_page_type, user=context.user,
             )
         else:
             page = Page(site=site, parent=parent_page, is_page_type=is_page_type)
@@ -285,28 +276,27 @@ def add_page(
         )
         if not page.is_page_type and not Page.objects.on_site(site).exclude(pk=page.pk).exists():
             page.set_as_homepage(context.user)
-        send_post_page_operation(
-            context=context, operation=operations.ADD_PAGE_TRANSLATION,
-            token=token, obj=page, language=language,
-        )
+        signal_kwargs["obj"] = page
     return translation
 
 
 @transaction.atomic
 def add_translation(page, *, language, content_data, context, permissions=None) -> PageContent:
-    """Add one translation to an existing page."""
+    """Add one translation to an existing page.
+
+    :raises ~django.core.exceptions.PermissionDenied: if the user may not change the page.
+    """
     with operation(
         operations.ADD_PAGE_TRANSLATION,
         context,
         checks={"page": page, "permissions": permissions},
+        signals=PAGE_OPERATION_SIGNALS,
+        sender=Page,
+        obj=page,
+        language=language,
     ):
-        token = send_pre_page_operation(context=context, operation=operations.ADD_PAGE_TRANSLATION, language=language)
         translation = _create_translation(
             page, source=None, language=language, content_data=content_data, context=context,
-        )
-        send_post_page_operation(
-            context=context, operation=operations.ADD_PAGE_TRANSLATION,
-            token=token, obj=page, language=language,
         )
     return translation
 
@@ -330,8 +320,15 @@ def get_or_create_page_type_root(site, *, language):
 
 
 @transaction.atomic
-def change_page_content(page_content, *, data, changed_fields, context, permissions=None) -> PageContent:
-    """Update a page translation and its public URL when applicable."""
+def change_page_content(page_content, *, data, context, permissions=None) -> PageContent:
+    """Update a page translation and its public URL when applicable.
+
+    ``data`` holds the fields to write. The apphook URL patterns are reloaded
+    when the page's public path changed, whichever field changed it.
+
+    :raises ~django.core.exceptions.ValidationError: if ``data`` names a field
+        that cannot be changed this way.
+    """
     editable = {
         "title", "slug", "template", "page_title", "meta_description",
         "overwrite_url", "redirect", "soft_root", "menu_title",
@@ -339,16 +336,18 @@ def change_page_content(page_content, *, data, changed_fields, context, permissi
     }
     if set(data) - editable:
         raise ValidationError("Unknown page content field.")
+    page = page_content.page
+    language = page_content.language
     with operation(
         operations.CHANGE_PAGE_TRANSLATION,
         context,
         checks={"page_content": page_content, "permissions": permissions},
+        signals=PAGE_OPERATION_SIGNALS,
+        sender=Page,
+        obj=page,
+        language=language,
     ):
-        language = page_content.language
-        page = page_content.page
-        token = send_pre_page_operation(
-            context=context, operation=operations.CHANGE_PAGE_TRANSLATION, language=language,
-        )
+        old_path = page.urls.filter(language=language).values_list("path", flat=True).first()
         values = dict(data)
         if "overwrite_url" in values:
             values["overwrite_url"] = (values["overwrite_url"] or "").strip("/") or None
@@ -357,38 +356,50 @@ def change_page_content(page_content, *, data, changed_fields, context, permissi
         )
         if page_content.is_public():
             page.update_urls_from_content(language)
-            if page.application_urls and "slug" in changed_fields:
+            new_path = page.urls.filter(language=language).values_list("path", flat=True).first()
+            if page.application_urls and new_path != old_path:
                 set_restart_trigger()
         page.clear_cache(menu=True)
-        send_post_page_operation(
-            context=context, operation=operations.CHANGE_PAGE_TRANSLATION,
-            token=token, obj=page, language=language,
-        )
     return page_content
 
 
+ADVANCED_SETTINGS_FIELDS = (
+    "login_required",
+    "reverse_id",
+    "navigation_extenders",
+    "application_urls",
+    "application_namespace",
+)
+
+
 @transaction.atomic
-def change_advanced_settings(page, *, changed_fields, context, permissions=None) -> Page:
-    """Save advanced page settings and invalidate their dependent caches."""
-    allowed_model_fields = {
-        "login_required", "reverse_id", "navigation_extenders",
-        "application_urls", "application_namespace",
-    }
-    if set(changed_fields) - allowed_model_fields - {"application_configs"}:
-        raise ValidationError("Unknown advanced settings field.")
+def change_advanced_settings(page, *, context, permissions=None) -> Page:
+    """Save the advanced settings changed on ``page`` and invalidate dependent caches.
+
+    ``page`` is an unsaved, modified copy of a stored page. The service compares it
+    with the stored page and writes the advanced settings that differ; changes to
+    any other field are not saved. The apphook URL patterns are reloaded when the
+    apphook or its namespace changed.
+    """
     saved_page = Page.objects.get(pk=page.pk)
+    changes = {
+        field: getattr(page, field)
+        for field in ADVANCED_SETTINGS_FIELDS
+        if getattr(page, field) != getattr(saved_page, field)
+    }
     with operation(
         operations.CHANGE_PAGE_ADVANCED_SETTINGS,
         context,
         checks={"page": saved_page, "permissions": permissions},
     ):
-        for field in allowed_model_fields:
-            setattr(saved_page, field, getattr(page, field))
-        saved_page.save()
-        saved_page.clear_cache(menu=True)
-        clear_permission_cache()
-        if {"application_urls", "application_namespace", "application_configs"} & set(changed_fields):
-            set_restart_trigger()
+        if changes:
+            for field, value in changes.items():
+                setattr(saved_page, field, value)
+            saved_page.save()
+            saved_page.clear_cache(menu=True)
+            clear_permission_cache()
+            if {"application_urls", "application_namespace"} & changes.keys():
+                set_restart_trigger()
     return saved_page
 
 
@@ -525,19 +536,27 @@ def copy_page_from_source(
             "permissions": permissions,
         },
     ):
-        new_page = source.copy(
-            site=target_site,
-            parent_page=parent_page,
-            language=language,
-            translations=False,
-            permissions=False,
-            extensions=False,
-            user=context.user,
+        return _copy_from_source(
+            source, target_site=target_site, parent_page=parent_page, language=language,
+            create_page_type=create_page_type, user=context.user,
         )
-        new_page.update(is_page_type=create_page_type)
-        if not create_page_type:
-            # The source's restrictions must survive copying without permissions.
-            new_page.apply_view_restrictions(source.get_view_restrictions(), user=context.user)
+
+
+def _copy_from_source(source, *, target_site, parent_page, language, create_page_type, user) -> Page:
+    """The work of :func:`copy_page_from_source`, for callers that ran its checks."""
+    new_page = source.copy(
+        site=target_site,
+        parent_page=parent_page,
+        language=language,
+        translations=False,
+        permissions=False,
+        extensions=False,
+        user=user,
+    )
+    new_page.update(is_page_type=create_page_type)
+    if not create_page_type:
+        # The source's restrictions must survive copying without permissions.
+        new_page.apply_view_restrictions(source.get_view_restrictions(), user=user)
     return new_page
 
 

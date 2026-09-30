@@ -6,10 +6,12 @@ from django.utils.text import slugify
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms.core.plugin_pool import plugin_pool
+from cms.operations import ADD_PAGE
 from cms.pages.admin.forms import AddPageForm
 from cms.pages.utils import get_available_slug
 from cms.permissions import utils as permissions
-from cms.permissions.page_permissions import user_can_add_page, user_can_add_subpage
+from cms.shared.checks import can
+from cms.shared.operations import OperationContext
 from cms.utils.conf import get_cms_setting
 
 try:
@@ -125,14 +127,10 @@ class CreateCMSPageForm(AddPageForm):
         else:
             parent_page = None
 
-        if parent_page:
-            if parent_page.site_id != self._site.pk:
-                raise ValidationError("Site doesn't match the parent's page site")
-            has_perm = user_can_add_subpage(self._user, target=parent_page, site=self._site)
-        else:
-            has_perm = user_can_add_page(self._user, site=self._site)
-
-        if not has_perm:
+        if parent_page and parent_page.site_id != self._site.pk:
+            raise ValidationError("Site doesn't match the parent's page site")
+        # The same ``ADD_PAGE`` checks the page service runs when the page is saved.
+        if not can(ADD_PAGE, OperationContext.from_request(self._request), site=self._site, parent_page=parent_page):
             message = gettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
         return parent_page if parent_page else None

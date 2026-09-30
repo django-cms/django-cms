@@ -32,7 +32,7 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
-from cms.operations import COPY_PAGE_FROM_SOURCE
+from cms.operations import ADD_PAGE, COPY_PAGE_FROM_SOURCE
 from cms.pages import services as page_services
 from cms.pages.apphook_pool import apphook_pool
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
@@ -40,7 +40,7 @@ from cms.permissions.models import (
     EDIT_PERMISSION_REQUIRED_MESSAGES,
     User,
 )
-from cms.permissions.page_permissions import (
+from cms.permissions.page_permissions import (  # the add checks stay importable from cms.admin.forms
     user_can_add_page,
     user_can_add_subpage,
     user_can_change_page,
@@ -64,19 +64,7 @@ from menus.menu_pool import menu_pool
 
 
 def get_permission_accessor(obj):
-    User = get_user_model()
-
-    if isinstance(
-        obj,
-        (
-            PageUser,
-            User,
-        ),
-    ):
-        rel_name = "user_permissions"
-    else:
-        rel_name = "permissions"
-    return getattr(obj, rel_name)
+    return page_services.permission_accessor(obj)
 
 
 def get_page_changed_by_filter_choices():
@@ -98,18 +86,7 @@ def get_page_template_filter_choices():
 
 
 def get_main_language_page_content_template(new_page):
-    # If you have djangocms-versioning installed, this will get the latest version of the page content, and ignore drafts.
-    # Get the main language page content template if available
-    if new_page:
-        try:
-            main_language = new_page.get_languages()[0]
-            main_language_page_content = new_page.get_admin_content(language=main_language)
-            return main_language_page_content.template if main_language_page_content else None
-        except (IndexError, AttributeError):
-            # Handle cases where get_languages() returns empty list
-            # or if there's any attribute access error
-            pass
-    return None
+    return page_services.main_language_template(new_page)
 
 
 # Permission actions managed by the CMS permission forms (Django's defaults).
@@ -121,8 +98,15 @@ CMS_PERMISSION_MODELS = page_services.CMS_PERMISSION_MODELS
 
 
 def save_permissions(data, obj):
-    """Compatibility wrapper for the trusted :mod:`cms.api` caller."""
-    return page_services.set_user_permissions(data, obj)
+    """Apply CMS model permissions without checks, as this function always did.
+
+    Kept for compatibility. It acts on the system's behalf; code acting for a user
+    should call :func:`cms.pages.services.set_user_permissions` with that user's
+    context instead.
+    """
+    return page_services.set_user_permissions(
+        data, obj, context=OperationContext.system("cms.pages.admin.forms.save_permissions")
+    )
 
 
 class CopyPermissionForm(forms.Form):
@@ -360,16 +344,21 @@ class AddPageForm(BasePageContentForm):
 
         # ``parent_page`` is a hidden field whose value is fully controlled by the
         # client on POST, while ``has_add_permission`` only validated the parent
-        # taken from the query string. Re-check the permission against the parent
-        # the page is actually created under -- this is to prevent people from
-        # possible form-hacking.
-        if parent_page:
-            has_perm = user_can_add_subpage(self._user, target=parent_page, site=self._site)
-        else:
-            has_perm = user_can_add_page(self._user, site=self._site)
-
-        if not has_perm:
-            raise ValidationError(_("You do not have permission to add a page here."))
+        # taken from the query string. Check the parent the page is actually
+        # created under -- the same ``ADD_PAGE`` checks the service runs on save.
+        verdict = can(
+            ADD_PAGE,
+            OperationContext.from_request(self._request, language=self._language),
+            site=self._site,
+            parent_page=page_services.resolve_add_parent(
+                self._site, parent_page, is_page_type=self.creates_page_type
+            ),
+            permissions=(
+                AdminPageContentPermissions(self._page_admin, self._request) if self._page_admin else None
+            ),
+        )
+        if not verdict:
+            raise ValidationError(str(verdict))
         return parent_page
 
     def clean_cms_page(self):
@@ -451,6 +440,9 @@ class AddPageForm(BasePageContentForm):
             is_page_type=self.creates_page_type,
             allow_view_only_page_type=not self.source_requires_change,
             context=OperationContext.from_request(self._request, language=self._language),
+            permissions=(
+                AdminPageContentPermissions(self._page_admin, self._request) if self._page_admin else None
+            ),
         )
 
     def save_m2m(self):
@@ -500,9 +492,6 @@ class AddPageTypeForm(AddPageForm):
             create_page_type=True,
             context=OperationContext.from_request(self._request, language=self._language),
         )
-
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
 
 
 class DuplicatePageForm(AddPageForm):
@@ -665,7 +654,6 @@ class ChangePageForm(BasePageContentForm):
         return page_services.change_page_content(
             page_content,
             data=self.cleaned_data,
-            changed_fields=self.changed_data,
             context=OperationContext.from_request(self._request, language=self._language),
             permissions=(
                 AdminPageContentPermissions(self._page_admin, self._request)
@@ -867,7 +855,6 @@ class AdvancedSettingsForm(forms.ModelForm):
             return page
         return page_services.change_advanced_settings(
             page,
-            changed_fields=self.changed_data,
             context=OperationContext.from_request(self._request, language=self._language),
             permissions=(
                 AdminPagePermissions(self._page_admin, self._request)
@@ -1355,10 +1342,13 @@ class GenericCmsPermissionForm(forms.ModelForm):
         return page_services.set_user_permissions(
             self.cleaned_data,
             instance,
+            # Always the acting user's context, never a system one: a form
+            # processes untrusted input. Without a current user nothing may be
+            # granted -- ``clean()`` has already dropped every permission field.
             context=(
                 OperationContext.from_request(self._request)
-                if self._current_user and getattr(self, "_request", None)
-                else OperationContext(user=self._current_user) if self._current_user else None
+                if getattr(self, "_request", None)
+                else OperationContext(user=self._current_user)
             ),
         )
 

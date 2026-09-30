@@ -15,9 +15,9 @@ from django.utils.translation import gettext_lazy as _
 from cms import operations
 from cms.core.plugins import downcast_plugins
 from cms.forms.validators import validate_path, validate_url_uniqueness
-from cms.models import CMSPlugin, Page
+from cms.models import CMSPlugin, Page, PagePermission
 from cms.pages.permissions import get_page_permissions
-from cms.shared.checks import register_core_check
+from cms.shared.checks import PERMISSION, VALIDATION, register_core_check
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 
@@ -112,29 +112,39 @@ def check_move_url_unique(context, *, page, target_page, position, **kwargs):
             raise ValidationError(SLUG_NOT_UNIQUE)
 
 
-register_core_check(operations.MOVE_PAGE, "cms.pages.move_permission", check_move_permission, requires=["page"])
+register_core_check(
+    operations.MOVE_PAGE,
+    "cms.pages.move_permission",
+    check_move_permission,
+    kind=PERMISSION,
+    requires=["page"],
+)
 register_core_check(
     operations.MOVE_PAGE,
     "cms.pages.move_target_permission",
     check_move_target_permission,
+    kind=PERMISSION,
     requires=["page", "target_page", "position"],
 )
 register_core_check(
     operations.MOVE_PAGE,
     "cms.pages.home_stays_root",
     check_home_stays_root,
+    kind=VALIDATION,
     requires=["page", "target_page", "position"],
 )
 register_core_check(
     operations.MOVE_PAGE,
     "cms.pages.slug_unique",
     check_move_slug_unique,
+    kind=VALIDATION,
     requires=["page", "target_page", "position"],
 )
 register_core_check(
     operations.MOVE_PAGE,
     "cms.pages.url_unique",
     check_move_url_unique,
+    kind=VALIDATION,
     requires=["page", "target_page", "position"],
 )
 
@@ -157,8 +167,20 @@ def check_home_candidate(context, *, page, **kwargs):
         raise ValidationError(_("The page is not eligible to be home."))
 
 
-register_core_check(operations.SET_HOME, "cms.pages.set_home_permission", check_set_home_permission, requires=["page"])
-register_core_check(operations.SET_HOME, "cms.pages.home_candidate", check_home_candidate, requires=["page"])
+register_core_check(
+    operations.SET_HOME,
+    "cms.pages.set_home_permission",
+    check_set_home_permission,
+    kind=PERMISSION,
+    requires=["page"],
+)
+register_core_check(
+    operations.SET_HOME,
+    "cms.pages.home_candidate",
+    check_home_candidate,
+    kind=VALIDATION,
+    requires=["page"],
+)
 
 
 # Create and edit pages
@@ -194,29 +216,138 @@ def check_page_permissions_permission(context, *, page, permissions=None, **kwar
         raise PermissionDenied(_("You do not have permission to change page permissions."))
 
 
-register_core_check(operations.ADD_PAGE, "cms.pages.add_permission", check_add_page_permission, requires=["site"])
+register_core_check(
+    operations.ADD_PAGE,
+    "cms.pages.add_permission",
+    check_add_page_permission,
+    kind=PERMISSION,
+    requires=["site"],
+)
+
+
+def check_add_source_permission(
+    context, *, site, source=None, allow_view_only_page_type=False, permissions=None, **kwargs
+):
+    """A page created from a source may only copy a source the user may copy."""
+    if source is not None:
+        check_source_copy_permission(
+            context,
+            source=source,
+            target_site=site,
+            allow_view_only_page_type=allow_view_only_page_type,
+            permissions=permissions,
+        )
+
+
+register_core_check(
+    operations.ADD_PAGE,
+    "cms.pages.add_source_permission",
+    check_add_source_permission,
+    kind=PERMISSION,
+    requires=["site"],
+)
 register_core_check(
     operations.ADD_PAGE_TRANSLATION,
     "cms.pages.add_translation_permission",
     check_add_translation_permission,
+    kind=PERMISSION,
     requires=["page"],
 )
 register_core_check(
     operations.CHANGE_PAGE_TRANSLATION,
     "cms.pages.change_translation_permission",
     check_change_translation_permission,
+    kind=PERMISSION,
     requires=["page_content"],
 )
 register_core_check(
     operations.CHANGE_PAGE_ADVANCED_SETTINGS,
     "cms.pages.advanced_settings_permission",
     check_advanced_settings_permission,
+    kind=PERMISSION,
     requires=["page"],
 )
 register_core_check(
     operations.CHANGE_PAGE_PERMISSIONS,
     "cms.pages.change_permissions_permission",
     check_page_permissions_permission,
+    kind=PERMISSION,
+    requires=["page"],
+)
+
+
+def check_grants_belong_to_page(context, *, page, save=(), delete=(), **kwargs):
+    """Grants to save are new or this page's; grants to delete are this page's."""
+    if any(grant.page_id not in (None, page.pk) for grant in save) or any(
+        grant.page_id != page.pk for grant in delete
+    ):
+        raise ValidationError(_("The permission belongs to another page."))
+
+
+def check_grantable_page_permissions(context, *, page, save=(), **kwargs):
+    """Every flag set on a saved grant must be one the acting user holds on the page."""
+    held = {
+        "can_add": page.has_add_permission,
+        "can_change": page.has_change_permission,
+        "can_delete": page.has_delete_permission,
+        "can_publish": page.has_publish_permission,
+        "can_change_advanced_settings": page.has_advanced_settings_permission,
+        "can_change_permissions": page.has_change_permissions_permission,
+        "can_move_page": page.has_move_page_permission,
+        "can_view": page.has_view_permission,
+    }
+    for grant in save:
+        for flag, has_permission in held.items():
+            if getattr(grant, flag) and not has_permission(context.user):
+                raise PermissionDenied(_("You may not grant this page permission."))
+
+
+register_core_check(
+    operations.CHANGE_PAGE_PERMISSIONS,
+    "cms.pages.grants_belong_to_page",
+    check_grants_belong_to_page,
+    kind=VALIDATION,
+    requires=["page"],
+)
+register_core_check(
+    operations.CHANGE_PAGE_PERMISSIONS,
+    "cms.pages.grantable_page_permissions",
+    check_grantable_page_permissions,
+    kind=PERMISSION,
+    requires=["page"],
+)
+
+
+def check_grant_recipients(context, *, page, save=(), **kwargs):
+    """Editing rights may only go to users and groups the acting user manages.
+
+    Mirrors the choices ``PagePermissionInlineAdminForm`` offers. View
+    restrictions (grants with ``can_view`` only) have no such limit in the admin
+    and have none here.
+    """
+    user = context.user
+    if user is None or user.is_superuser:
+        return
+    edit_flags = [flag for flag in PagePermission.get_all_permissions() if flag != "can_view"]
+    grants = [grant for grant in save if any(getattr(grant, flag) for flag in edit_flags)]
+    if not grants:
+        return
+    from cms.permissions.utils import get_subordinate_groups, get_subordinate_users
+
+    users = get_subordinate_users(user, page.site)
+    groups = get_subordinate_groups(user, page.site)
+    for grant in grants:
+        if (grant.user_id and not users.filter(pk=grant.user_id).exists()) or (
+            grant.group_id and not groups.filter(pk=grant.group_id).exists()
+        ):
+            raise PermissionDenied(_("You may not grant page permissions to this user or group."))
+
+
+register_core_check(
+    operations.CHANGE_PAGE_PERMISSIONS,
+    "cms.pages.grant_recipients",
+    check_grant_recipients,
+    kind=PERMISSION,
     requires=["page"],
 )
 
@@ -263,12 +394,14 @@ register_core_check(
     operations.COPY_PAGE_FROM_SOURCE,
     "cms.pages.source_copy_permission",
     check_source_copy_permission,
+    kind=PERMISSION,
     requires=["source", "target_site"],
 )
 register_core_check(
     operations.COPY_PAGE_FROM_SOURCE,
     "cms.pages.source_copy_target_permission",
     check_source_copy_target_permission,
+    kind=PERMISSION,
     requires=["parent_page", "target_site"],
 )
 
@@ -305,15 +438,26 @@ def check_copy_languages(context, *, page, target_site, **kwargs):
         )
 
 
-register_core_check(operations.COPY_PAGE, "cms.pages.copy_permission", check_copy_permission, requires=["page"])
+register_core_check(
+    operations.COPY_PAGE,
+    "cms.pages.copy_permission",
+    check_copy_permission,
+    kind=PERMISSION,
+    requires=["page"],
+)
 register_core_check(
     operations.COPY_PAGE,
     "cms.pages.copy_target_permission",
     check_copy_target_permission,
+    kind=PERMISSION,
     requires=["page", "target_page", "position", "target_site"],
 )
 register_core_check(
-    operations.COPY_PAGE, "cms.pages.copy_languages", check_copy_languages, requires=["page", "target_site"]
+    operations.COPY_PAGE,
+    "cms.pages.copy_languages",
+    check_copy_languages,
+    kind=VALIDATION,
+    requires=["page", "target_site"],
 )
 
 
@@ -336,18 +480,24 @@ def check_not_last_translation(context, *, page_content, **kwargs):
 
 
 register_core_check(
-    operations.DELETE_PAGE, "cms.pages.delete_permission", check_delete_permission, requires=["page"]
+    operations.DELETE_PAGE,
+    "cms.pages.delete_permission",
+    check_delete_permission,
+    kind=PERMISSION,
+    requires=["page"],
 )
 register_core_check(
     operations.DELETE_PAGE_TRANSLATION,
     "cms.pages.delete_translation_permission",
     check_delete_translation_permission,
+    kind=PERMISSION,
     requires=["page_content"],
 )
 register_core_check(
     operations.DELETE_PAGE_TRANSLATION,
     "cms.pages.not_last_translation",
     check_not_last_translation,
+    kind=VALIDATION,
     requires=["page_content"],
 )
 
@@ -372,10 +522,15 @@ register_core_check(
     operations.CHANGE_PAGE_TEMPLATE,
     "cms.pages.change_template_permission",
     check_change_template_permission,
+    kind=PERMISSION,
     requires=["page_content"],
 )
 register_core_check(
-    operations.CHANGE_PAGE_TEMPLATE, "cms.pages.template_valid", check_template_valid, requires=["template"]
+    operations.CHANGE_PAGE_TEMPLATE,
+    "cms.pages.template_valid",
+    check_template_valid,
+    kind=VALIDATION,
+    requires=["template"],
 )
 
 
@@ -461,18 +616,21 @@ register_core_check(
     operations.COPY_PAGE_LANGUAGE,
     "cms.pages.copy_language_permission",
     check_copy_language_permission,
+    kind=PERMISSION,
     requires=["page_content"],
 )
 register_core_check(
     operations.COPY_PAGE_LANGUAGE,
     "cms.pages.target_language",
     check_target_language,
+    kind=VALIDATION,
     requires=["page_content", "target_language"],
 )
 register_core_check(
     operations.COPY_PAGE_LANGUAGE,
     "cms.pages.copy_language_plugin_permission",
     check_copy_language_plugin_permission,
+    kind=PERMISSION,
     requires=["page_content", "target_language"],
 )
 
@@ -489,5 +647,6 @@ register_core_check(
     operations.TOGGLE_PAGE_IN_NAVIGATION,
     "cms.pages.navigation_permission",
     check_navigation_permission,
+    kind=PERMISSION,
     requires=["page_content"],
 )

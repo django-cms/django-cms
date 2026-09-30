@@ -1,9 +1,10 @@
 from html import unescape
 
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import override_settings
 from django.utils.translation import override as force_language
 
@@ -466,6 +467,31 @@ class AddPageFormSecurityTestCase(CMSTestCase):
         content = form.save()
         self.assertEqual(content.page.get_path("en"), "page_types/type")
         self.assertEqual(content.page.parent.get_path("en"), "page_types")
+
+    def test_the_admin_can_refuse_the_add(self):
+        from cms.pages.admin.forms import AddPageForm
+        from cms.pages.admin.page import PageContentAdmin
+
+        class RefusingAdmin(PageContentAdmin):
+            def has_add_permission(self, request):
+                return False
+
+        request = self.get_request("/en/admin/cms/pagecontent/add/")
+        request.user = self.get_superuser()
+        site = Site.objects.get_current()
+        form_cls = type(
+            "RefusedAddPageForm",
+            (AddPageForm,),
+            {"_site": site, "_request": request, "_page_admin": RefusingAdmin(PageContent, admin.site)},
+        )
+        count = Page.objects.count()
+        form = form_cls(data={"title": "new", "slug": "new"})
+
+        # The form runs the ADD_PAGE checks with the admin's adapter, as the service
+        # does on save: the refusal is a form error, not a 403 after validation.
+        self.assertFalse(form.is_valid())
+        self.assertIn("You do not have permission to add a page here.", str(form.errors["parent_page"]))
+        self.assertEqual(Page.objects.count(), count)
 
     def _build_form(self, user, page, site):
         request = self.get_request("/en/")
