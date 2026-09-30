@@ -353,7 +353,7 @@ def create_page_content(
     try:
         from cms.forms.validators import validate_url_uniqueness
 
-        validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+        validate_url_uniqueness(page.site, path, language, exclude_page=page)
     except ValidationError as e:
         raise IntegrityError(e)
 
