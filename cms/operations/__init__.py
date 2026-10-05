@@ -91,6 +91,8 @@ PASTE_PLUGIN = 'paste_plugin'
 PASTE_PLACEHOLDER = 'paste_placeholder'
 ADD_PLUGINS_FROM_PLACEHOLDER = 'add_plugins_from_placeholder'
 CLEAR_PLACEHOLDER = 'clear_placeholder'
+COPY_PLUGIN_TO_CLIPBOARD = 'copy_plugin_to_clipboard'
+COPY_PLACEHOLDER_TO_CLIPBOARD = 'copy_placeholder_to_clipboard'
 
 # Page operations
 CHANGE_PAGE = 'change_page'

@@ -1,43 +1,38 @@
 """Placeholder and plugin operations, callable without an HttpRequest.
 
-Every function here follows the shape the placeholder admin established:
+Every service runs in the :func:`~cms.shared.operations.operation` frame:
 
-1. emit the pre-operation signal and keep the token,
-2. call the model primitive (``Placeholder.move_plugin`` and friends),
-3. invalidate the affected placeholder caches,
+1. run the checks registered for the operation (:mod:`cms.core.checks` and any
+   an app adds), raising ``PermissionDenied``, ``OperationBlocked`` or
+   ``ValidationError``,
+2. emit the pre-operation signal,
+3. call the model primitive (``Placeholder.move_plugin`` and friends) and
+   invalidate the affected placeholder caches,
 4. emit the post-operation signal with the same token,
 5. return the changed object.
 
-**Every service enforces permissions** through a backend
-(:mod:`cms.core.services.permissions`), so a caller reaching an operation from
-outside the admin is checked the same way. Pass ``permissions=`` to supply a
-different backend for one call -- the placeholder admin does this, handing over
-an adapter that routes each predicate back through its own overridable
-``has_*_permission`` hooks -- or export a ``permissions`` contract to replace it
-for every caller at once.
-
-**Every service with an operation id runs the operation checks** registered for
-it (:mod:`cms.shared.checks`) before it announces or changes anything, so a
-check that refuses an operation in a dry run (``can()``) refuses the operation
-itself. The permission and parent checks above are still made inline, ahead of
-the registered checks.
+The permission checks ask a backend (:mod:`cms.core.services.permissions`), so a
+caller reaching an operation from outside the admin is checked the same way. Pass
+``permissions=`` to supply a different backend for one call -- the placeholder
+admin does this, handing over an adapter that routes each predicate back through
+its own overridable ``has_*_permission`` hooks -- or export a ``permissions``
+contract to replace it for every caller at once.
 """
 
 from __future__ import annotations
 
 import uuid
 
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.utils.translation import gettext as _, gettext_lazy as _lazy
+from django.utils.translation import gettext_lazy as _lazy
 
 from cms import operations
+from cms.core import checks as core_checks  # noqa: F401  -- registers the plugin operation checks
 from cms.core.plugins import copy_plugins_to_placeholder
 from cms.core.services.permissions import get_permissions
 from cms.models import CMSPlugin, PlaceholderReference
 from cms.operations import Operation, register_operation
-from cms.shared.checks import run_checks
-from cms.shared.operations import OperationContext
-from cms.signals import post_placeholder_operation, pre_placeholder_operation
+from cms.shared.operations import OperationContext, operation
+from cms.signals import PLACEHOLDER_OPERATION_SIGNALS, post_placeholder_operation, pre_placeholder_operation
 
 __all__ = [
     "add_plugins_from_placeholder",
@@ -56,31 +51,12 @@ def _guard(permissions, context: OperationContext):
     return permissions if permissions is not None else get_permissions(context.user)
 
 
-def _deny(message: str):
-    raise PermissionDenied(message)
-
-
-def _check_parent(parent, placeholder, language, plugin=None) -> None:
-    """Refuse a parent the plugin cannot end up under.
-
-    The parent must live in the placeholder and language the plugin ends up in:
-    anything else parents the plugin across placeholders and exposes the foreign
-    parent's subtree. For a move, the parent must not be the plugin itself or one
-    of its descendants, which would create a cycle in the plugin tree.
-    """
-    if parent is None:
-        return
-    if parent.placeholder_id != placeholder.pk or parent.language != language:
-        raise ValidationError(_("The parent plugin must be in the target placeholder and language."))
-    if plugin is not None and (parent.pk == plugin.pk or parent.pk in plugin._get_descendants_ids()):
-        raise ValidationError(_("A plugin cannot be moved inside itself or one of its descendants."))
-
-
 def _start(operation: str, context: OperationContext, sender, **kwargs) -> str:
     """Announce an operation about to happen and return its correlation token.
 
-    The token is generated even when signals are silenced, so a caller can always
-    pair its pre and post calls.
+    For callers that cannot use the :func:`~cms.shared.operations.operation`
+    frame, such as ``CMSPluginBase.save_model()``. The token is generated even
+    when signals are silenced, so a caller can always pair its pre and post calls.
     """
     token = str(uuid.uuid4())
     if context.emit_signals:
@@ -125,61 +101,46 @@ def move_plugin(
     """Move ``plugin`` to ``target_position``, optionally into another placeholder.
 
     :raises ~django.core.exceptions.ValidationError: if ``target_parent`` is not in the target placeholder and
-        the plugin's language, or is the plugin itself or one of its descendants.
+        the plugin's language, or is the plugin itself or one of its descendants, or if the plugin or one of its
+        descendants is not allowed in the target placeholder's slot.
     """
     language = plugin.language
     source_placeholder = plugin.placeholder
-    permissions = _guard(permissions, context)
 
-    if not permissions.can_move_plugin(plugin, source_placeholder):
-        _deny(_("You have no permission to move this plugin"))
-    if target_placeholder and not permissions.can_move_plugin(plugin, target_placeholder):
-        _deny(_("You have no permission to move this plugin"))
-    if not permissions.can_edit_source(source_placeholder):
-        _deny(_("You have no permission to move this plugin"))
-    if target_placeholder and not permissions.can_edit_source(target_placeholder):
-        _deny(_("You have no permission to move this plugin"))
-    run_checks(
+    with operation(
         operations.MOVE_PLUGIN,
         context,
+        checks={
+            "plugin": plugin,
+            "target_position": target_position,
+            "target_placeholder": target_placeholder,
+            "target_parent": target_parent,
+            "permissions": _guard(permissions, context),
+        },
+        signals=PLACEHOLDER_OPERATION_SIGNALS,
+        sender=sender,
         plugin=plugin,
-        target_position=target_position,
-        target_placeholder=target_placeholder,
-        target_parent=target_parent,
-        permissions=permissions,
-    )
-    _check_parent(target_parent, target_placeholder or source_placeholder, language, plugin=plugin)
+        source_language=language,
+        source_placeholder=source_placeholder,
+        source_parent_id=plugin.parent_id,
+        target_language=language,
+        target_placeholder=target_placeholder or source_placeholder,
+        target_parent_id=target_parent.pk if target_parent else None,
+    ) as signal_kwargs:
+        source_placeholder.move_plugin(
+            plugin=plugin,
+            target_position=target_position,
+            target_placeholder=target_placeholder,
+            target_plugin=target_parent,
+        )
 
-    source_language = plugin.language
-    source_parent_id = plugin.parent_id
-    target_parent_id = target_parent.pk if target_parent else None
+        # Refresh plugin to get new position values
+        updated_plugin = plugin.reload()
+        if target_placeholder:
+            target_placeholder.clear_cache(language)
+        source_placeholder.clear_cache(language)
 
-    signal_kwargs = {
-        "plugin": plugin,
-        "source_language": source_language,
-        "source_placeholder": source_placeholder,
-        "source_parent_id": source_parent_id,
-        "target_language": language,
-        "target_placeholder": (target_placeholder or source_placeholder),
-        "target_parent_id": target_parent_id,
-    }
-    token = _start(operations.MOVE_PLUGIN, context, sender, **signal_kwargs)
-
-    source_placeholder.move_plugin(
-        plugin=plugin,
-        target_position=target_position,
-        target_placeholder=target_placeholder,
-        target_plugin=target_parent,
-    )
-
-    # Refresh plugin to get new position values
-    updated_plugin = plugin.reload()
-    if target_placeholder:
-        target_placeholder.clear_cache(language)
-    source_placeholder.clear_cache(language)
-
-    signal_kwargs["plugin"] = updated_plugin.get_bound_plugin()
-    _finish(operations.MOVE_PLUGIN, context, token, sender, **signal_kwargs)
+        signal_kwargs["plugin"] = updated_plugin.get_bound_plugin()
     return updated_plugin
 
 
@@ -194,63 +155,41 @@ def cut_plugin(
 ) -> CMSPlugin:
     """Move ``plugin`` into the clipboard, emptying whatever was there."""
     source_placeholder = plugin.placeholder
-    permissions = _guard(permissions, context)
-
-    if not permissions.can_move_plugin(plugin, source_placeholder):
-        _deny(_("You have no permission to cut this plugin"))
-    if not permissions.can_edit_source(source_placeholder):
-        _deny(_("You have no permission to cut this plugin"))
-    run_checks(
-        operations.CUT_PLUGIN,
-        context,
-        plugin=plugin,
-        target_language=target_language,
-        target_placeholder=target_placeholder,
-        permissions=permissions,
-    )
-
     source_language = plugin.language
     source_parent_id = plugin.parent_id
-    source_order = source_placeholder.get_plugin_tree_order(source_language, source_parent_id)
 
-    token = _start(
+    with operation(
         operations.CUT_PLUGIN,
         context,
-        sender,
+        checks={
+            "plugin": plugin,
+            "target_language": target_language,
+            "target_placeholder": target_placeholder,
+            "permissions": _guard(permissions, context),
+        },
+        signals=PLACEHOLDER_OPERATION_SIGNALS,
+        sender=sender,
         plugin=plugin,
         clipboard=target_placeholder,
         clipboard_language=target_language,
         source_language=source_language,
         source_placeholder=source_placeholder,
         source_parent_id=source_parent_id,
-        source_order=source_order,
-    )
+        source_order=source_placeholder.get_plugin_tree_order(source_language, source_parent_id),
+    ) as signal_kwargs:
+        # Empty the clipboard
+        target_placeholder.clear()
+        source_placeholder.move_plugin(
+            plugin,
+            target_position=1,
+            target_placeholder=target_placeholder,
+            target_plugin=None,
+        )
+        source_placeholder.clear_cache(plugin.language)
+        updated_plugin = plugin.reload()
 
-    # Empty the clipboard
-    target_placeholder.clear()
-    source_placeholder.move_plugin(
-        plugin,
-        target_position=1,
-        target_placeholder=target_placeholder,
-        target_plugin=None,
-    )
-    source_placeholder.clear_cache(plugin.language)
-    updated_plugin = plugin.reload()
-    source_order = source_placeholder.get_plugin_tree_order(source_language, source_parent_id)
-
-    _finish(
-        operations.CUT_PLUGIN,
-        context,
-        token,
-        sender,
-        plugin=updated_plugin.get_bound_plugin(),
-        clipboard=target_placeholder,
-        clipboard_language=target_language,
-        source_language=source_language,
-        source_placeholder=source_placeholder,
-        source_parent_id=source_parent_id,
-        source_order=source_order,
-    )
+        signal_kwargs["plugin"] = updated_plugin.get_bound_plugin()
+        signal_kwargs["source_order"] = source_placeholder.get_plugin_tree_order(source_language, source_parent_id)
     return updated_plugin
 
 
@@ -279,67 +218,44 @@ def paste_plugin(
     """Copy ``plugin`` and its descendants out of the clipboard into a placeholder.
 
     :raises ~django.core.exceptions.ValidationError: if ``target_parent`` is not in ``target_placeholder`` and
-        ``target_language``.
+        ``target_language``, or if one of the plugins is not allowed in the target placeholder's slot.
     """
-    plugins = [plugin] + list(plugin.get_descendants())
-    target_parent_id = target_parent.pk if target_parent else None
-    permissions = _guard(permissions, context)
+    plugins = [plugin, *plugin.get_descendants()]
 
-    # Check the source side as well: the plugin is identified by a
-    # client-supplied id, so it is not necessarily one the user may read.
-    if not permissions.can_paste_from_source(plugin.placeholder, plugins):
-        _deny(_("You have no permission to paste this plugin"))
-    if not permissions.can_copy_from_clipboard(target_placeholder, plugins):
-        _deny(_("You have no permission to paste this plugin"))
-    if not permissions.can_edit_source(target_placeholder):
-        _deny(_("You have no permission to paste this plugin"))
-    run_checks(
+    with operation(
         operations.PASTE_PLUGIN,
         context,
+        checks={
+            "plugin": plugin,
+            "target_language": target_language,
+            "target_placeholder": target_placeholder,
+            "target_position": target_position,
+            "target_parent": target_parent,
+            "permissions": _guard(permissions, context),
+            "plugins": plugins,
+        },
+        signals=PLACEHOLDER_OPERATION_SIGNALS,
+        sender=sender,
         plugin=plugin,
         target_language=target_language,
         target_placeholder=target_placeholder,
-        target_position=target_position,
-        target_parent=target_parent,
-        permissions=permissions,
-    )
-    _check_parent(target_parent, target_placeholder, target_language)
+        target_parent_id=target_parent.pk if target_parent else None,
+    ) as signal_kwargs:
+        _make_room(target_placeholder, target_language, target_position, len(plugins))
 
-    token = _start(
-        operations.PASTE_PLUGIN,
-        context,
-        sender,
-        plugin=plugin,
-        target_language=target_language,
-        target_placeholder=target_placeholder,
-        target_parent_id=target_parent_id,
-    )
+        new_plugins = copy_plugins_to_placeholder(
+            plugins,
+            placeholder=target_placeholder,
+            language=target_language,
+            root_plugin=target_parent,
+            start_positions={target_language: target_position},
+        )
+        root_plugin = new_plugins[0]
+        target_placeholder.clear_cache(target_language)
 
-    _make_room(target_placeholder, target_language, target_position, len(plugins))
-
-    new_plugins = copy_plugins_to_placeholder(
-        plugins,
-        placeholder=target_placeholder,
-        language=target_language,
-        root_plugin=target_parent,
-        start_positions={target_language: target_position},
-    )
-    root_plugin = new_plugins[0]
-    target_placeholder.clear_cache(target_language)
-
-    # Fetch from db to update position and other tree values
-    root_plugin.refresh_from_db()
-
-    _finish(
-        operations.PASTE_PLUGIN,
-        context,
-        token,
-        sender,
-        plugin=root_plugin.get_bound_plugin(),
-        target_language=target_language,
-        target_placeholder=target_placeholder,
-        target_parent_id=target_parent_id,
-    )
+        # Fetch from db to update position and other tree values
+        root_plugin.refresh_from_db()
+        signal_kwargs["plugin"] = root_plugin.get_bound_plugin()
     return root_plugin
 
 
@@ -353,60 +269,43 @@ def paste_placeholder(
     permissions=None,
     sender=None,
 ) -> list[CMSPlugin]:
-    """Copy a whole clipboard placeholder's plugins into a placeholder."""
+    """Copy a whole clipboard placeholder's plugins into a placeholder.
+
+    :raises ~django.core.exceptions.ValidationError: if one of the plugins is not allowed in the target
+        placeholder's slot.
+    """
     plugins = plugin.placeholder_ref.get_plugins_list()
-    permissions = _guard(permissions, context)
 
-    # The plugins live in the reference placeholder, which is only reachable
-    # through the placeholder holding the reference plugin -- normally the
-    # user's own clipboard -- so the source side is checked too.
-    if not permissions.can_paste_from_source(plugin.placeholder, plugins):
-        _deny(_("You have no permission to paste this placeholder"))
-    if not permissions.can_copy_from_clipboard(target_placeholder, plugins):
-        _deny(_("You have no permission to paste this placeholder"))
-    if not permissions.can_edit_source(target_placeholder):
-        _deny(_("You have no permission to paste this placeholder"))
-    run_checks(
+    with operation(
         operations.PASTE_PLACEHOLDER,
         context,
-        plugin=plugin,
-        target_language=target_language,
-        target_placeholder=target_placeholder,
-        target_position=target_position,
-        permissions=permissions,
-    )
-
-    token = _start(
-        operations.PASTE_PLACEHOLDER,
-        context,
-        sender,
+        checks={
+            "plugin": plugin,
+            "target_language": target_language,
+            "target_placeholder": target_placeholder,
+            "target_position": target_position,
+            "permissions": _guard(permissions, context),
+            "plugins": plugins,
+        },
+        signals=PLACEHOLDER_OPERATION_SIGNALS,
+        sender=sender,
         plugins=plugins,
         target_language=target_language,
         target_placeholder=target_placeholder,
-    )
+    ) as signal_kwargs:
+        _make_room(target_placeholder, target_language, target_position, len(plugins))
 
-    _make_room(target_placeholder, target_language, target_position, len(plugins))
+        new_plugins = copy_plugins_to_placeholder(
+            plugins,
+            placeholder=target_placeholder,
+            language=target_language,
+            start_positions={target_language: target_position},
+        )
+        new_plugin_ids = (new.pk for new in new_plugins)
+        target_placeholder.clear_cache(target_language)
 
-    new_plugins = copy_plugins_to_placeholder(
-        plugins,
-        placeholder=target_placeholder,
-        language=target_language,
-        start_positions={target_language: target_position},
-    )
-    new_plugin_ids = (new.pk for new in new_plugins)
-    target_placeholder.clear_cache(target_language)
-
-    new_plugins = list(CMSPlugin.objects.filter(pk__in=new_plugin_ids).select_related("placeholder"))
-
-    _finish(
-        operations.PASTE_PLACEHOLDER,
-        context,
-        token,
-        sender,
-        plugins=new_plugins,
-        target_language=target_language,
-        target_placeholder=target_placeholder,
-    )
+        new_plugins = list(CMSPlugin.objects.filter(pk__in=new_plugin_ids).select_related("placeholder"))
+        signal_kwargs["plugins"] = new_plugins
     return new_plugins
 
 
@@ -423,29 +322,27 @@ def copy_plugin_to_clipboard(
     Emits no operation signals, matching the behaviour this replaced: the
     clipboard is private scratch space, not content.
     """
-    old_plugins = [source_plugin] + list(source_plugin.get_descendants())
-    permissions = _guard(permissions, context)
-    source_placeholder = source_plugin.placeholder
+    old_plugins = [source_plugin, *source_plugin.get_descendants()]
 
-    if not permissions.can_copy_plugins(old_plugins):
-        _deny(_("You do not have permission to copy these plugins."))
-    # Copying reads the source plugins, so a user without access to the source
-    # placeholder must not be able to exfiltrate its content into their
-    # clipboard. Deliberately no ``can_edit_source`` on the source: that is an
-    # editability gate, and copying only reads.
-    if not permissions.can_copy_from_clipboard(source_placeholder, old_plugins):
-        _deny(_("You do not have permission to copy these plugins."))
-    if not permissions.can_edit_source(target_placeholder):
-        _deny(_("You do not have permission to copy these plugins."))
+    with operation(
+        operations.COPY_PLUGIN_TO_CLIPBOARD,
+        context,
+        checks={
+            "source_plugin": source_plugin,
+            "target_placeholder": target_placeholder,
+            "target_language": target_language,
+            "permissions": _guard(permissions, context),
+            "plugins": old_plugins,
+        },
+    ):
+        # Empty the clipboard
+        target_placeholder.clear()
 
-    # Empty the clipboard
-    target_placeholder.clear()
-
-    copied_plugins = copy_plugins_to_placeholder(
-        old_plugins,
-        placeholder=target_placeholder,
-        language=target_language,
-    )
+        copied_plugins = copy_plugins_to_placeholder(
+            old_plugins,
+            placeholder=target_placeholder,
+            language=target_language,
+        )
     return copied_plugins[0]
 
 
@@ -465,29 +362,33 @@ def copy_placeholder_to_clipboard(
     operation signals, as above.
     """
     old_plugins = source_placeholder.get_plugins_list(language=source_language)
-    permissions = _guard(permissions, context)
 
-    if not permissions.can_copy_plugins(old_plugins):
-        _deny(_("You do not have permission to copy this placeholder."))
-    if not permissions.can_copy_from_clipboard(source_placeholder, old_plugins):
-        _deny(_("You do not have permission to copy this placeholder."))
-    if not permissions.can_edit_source(target_placeholder):
-        _deny(_("You do not have permission to copy this placeholder."))
+    with operation(
+        operations.COPY_PLACEHOLDER_TO_CLIPBOARD,
+        context,
+        checks={
+            "source_placeholder": source_placeholder,
+            "target_placeholder": target_placeholder,
+            "source_language": source_language,
+            "target_language": target_language,
+            "permissions": _guard(permissions, context),
+            "plugins": old_plugins,
+        },
+    ):
+        # Empty the clipboard
+        target_placeholder.clear()
 
-    # Empty the clipboard
-    target_placeholder.clear()
-
-    reference = PlaceholderReference.objects.create(
-        name=source_placeholder.get_label(),
-        plugin_type="PlaceholderPlugin",
-        language=target_language,
-        placeholder=target_placeholder,
-    )
-    copy_plugins_to_placeholder(
-        old_plugins,
-        placeholder=reference.placeholder_ref,
-        language=target_language,
-    )
+        reference = PlaceholderReference.objects.create(
+            name=source_placeholder.get_label(),
+            plugin_type="PlaceholderPlugin",
+            language=target_language,
+            placeholder=target_placeholder,
+        )
+        copy_plugins_to_placeholder(
+            old_plugins,
+            placeholder=reference.placeholder_ref,
+            language=target_language,
+        )
     return reference
 
 
@@ -501,58 +402,43 @@ def add_plugins_from_placeholder(
     permissions=None,
     sender=None,
 ) -> list[CMSPlugin]:
-    """Copy a placeholder's plugins into another placeholder ("copy from language")."""
+    """Copy a placeholder's plugins into another placeholder ("copy from language").
+
+    :raises ~django.core.exceptions.ValidationError: if one of the plugins is not allowed in the target
+        placeholder's slot.
+    """
     old_plugins = source_placeholder.get_plugins_list(language=source_language)
-    permissions = _guard(permissions, context)
 
-    if not permissions.can_copy_from_placeholder(source_placeholder, target_placeholder, old_plugins):
-        _deny(_("You do not have permission to copy these plugins."))
-    if not permissions.can_edit_source(target_placeholder):
-        _deny(_("You do not have permission to copy these plugins."))
-    run_checks(
+    with operation(
         operations.ADD_PLUGINS_FROM_PLACEHOLDER,
         context,
-        source_placeholder=source_placeholder,
-        target_placeholder=target_placeholder,
-        source_language=source_language,
-        target_language=target_language,
-        permissions=permissions,
-    )
-
-    target_tree_order = target_placeholder.get_plugin_tree_order(language=target_language, parent_id=None)
-
-    token = _start(
-        operations.ADD_PLUGINS_FROM_PLACEHOLDER,
-        context,
-        sender,
+        checks={
+            "source_placeholder": source_placeholder,
+            "target_placeholder": target_placeholder,
+            "source_language": source_language,
+            "target_language": target_language,
+            "permissions": _guard(permissions, context),
+            "plugins": old_plugins,
+        },
+        signals=PLACEHOLDER_OPERATION_SIGNALS,
+        sender=sender,
         plugins=old_plugins,
         source_language=source_language,
         source_placeholder=source_placeholder,
         target_language=target_language,
         target_placeholder=target_placeholder,
-        target_order=target_tree_order,
-    )
+        target_order=target_placeholder.get_plugin_tree_order(language=target_language, parent_id=None),
+    ) as signal_kwargs:
+        copied_plugins = copy_plugins_to_placeholder(old_plugins, target_placeholder, language=target_language)
+        new_plugin_ids = (new.pk for new in copied_plugins)
 
-    copied_plugins = copy_plugins_to_placeholder(old_plugins, target_placeholder, language=target_language)
-    new_plugin_ids = (new.pk for new in copied_plugins)
+        target_placeholder.clear_cache(target_language)
 
-    target_placeholder.clear_cache(target_language)
-
-    new_plugins = list(CMSPlugin.objects.filter(pk__in=new_plugin_ids))
-    target_tree_order = target_placeholder.get_plugin_tree_order(language=target_language, parent_id=None)
-
-    _finish(
-        operations.ADD_PLUGINS_FROM_PLACEHOLDER,
-        context,
-        token,
-        sender,
-        plugins=new_plugins,
-        source_language=source_language,
-        source_placeholder=source_placeholder,
-        target_language=target_language,
-        target_placeholder=target_placeholder,
-        target_order=target_tree_order,
-    )
+        new_plugins = list(CMSPlugin.objects.filter(pk__in=new_plugin_ids))
+        signal_kwargs["plugins"] = new_plugins
+        signal_kwargs["target_order"] = target_placeholder.get_plugin_tree_order(
+            language=target_language, parent_id=None
+        )
     return new_plugins
 
 
@@ -561,38 +447,21 @@ def delete_plugin(
 ) -> list[int]:
     """Delete a plugin and return the placeholder's resulting plugin tree order."""
     placeholder = plugin.placeholder
-    permissions = _guard(permissions, context)
 
-    if not permissions.can_delete_plugin(plugin):
-        _deny(_("You do not have permission to delete this plugin"))
-    if not permissions.can_edit_source(placeholder):
-        _deny(_("You do not have permission to delete this plugin"))
-    run_checks(operations.DELETE_PLUGIN, context, plugin=plugin, permissions=permissions)
-
-    tree_order = placeholder.get_plugin_tree_order(language=plugin.language)
-
-    token = _start(
+    with operation(
         operations.DELETE_PLUGIN,
         context,
-        sender,
+        checks={"plugin": plugin, "permissions": _guard(permissions, context)},
+        signals=PLACEHOLDER_OPERATION_SIGNALS,
+        sender=sender,
         plugin=plugin,
         placeholder=placeholder,
-        tree_order=tree_order,
-    )
-
-    placeholder.delete_plugin(plugin)
-    placeholder.clear_cache(plugin.language)
-    tree_order = placeholder.get_plugin_tree_order(language=plugin.language)
-
-    _finish(
-        operations.DELETE_PLUGIN,
-        context,
-        token,
-        sender,
-        plugin=plugin,
-        placeholder=placeholder,
-        tree_order=tree_order,
-    )
+        tree_order=placeholder.get_plugin_tree_order(language=plugin.language),
+    ) as signal_kwargs:
+        placeholder.delete_plugin(plugin)
+        placeholder.clear_cache(plugin.language)
+        tree_order = placeholder.get_plugin_tree_order(language=plugin.language)
+        signal_kwargs["tree_order"] = tree_order
     return tree_order
 
 
@@ -606,36 +475,17 @@ def clear_placeholder(
     sender=None,
 ) -> None:
     """Remove every plugin in ``language`` from ``placeholder``."""
-    plugins = placeholder.get_plugins_list(language)
-    permissions = _guard(permissions, context)
-
-    if not permissions.can_clear_placeholder(placeholder, language):
-        _deny(_("You do not have permission to clear this placeholder"))
-    if not permissions.can_edit_source(placeholder):
-        _deny(_("You do not have permission to clear this placeholder"))
-    run_checks(
-        operations.CLEAR_PLACEHOLDER, context, placeholder=placeholder, language=language, permissions=permissions
-    )
-
-    token = _start(
+    with operation(
         operations.CLEAR_PLACEHOLDER,
         context,
-        sender,
-        plugins=plugins,
+        checks={"placeholder": placeholder, "language": language, "permissions": _guard(permissions, context)},
+        signals=PLACEHOLDER_OPERATION_SIGNALS,
+        sender=sender,
+        plugins=placeholder.get_plugins_list(language),
         placeholder=placeholder,
-    )
-
-    placeholder.clear(language)
-    placeholder.clear_cache(language, site_id=site_id)
-
-    _finish(
-        operations.CLEAR_PLACEHOLDER,
-        context,
-        token,
-        sender,
-        plugins=plugins,
-        placeholder=placeholder,
-    )
+    ):
+        placeholder.clear(language)
+        placeholder.clear_cache(language, site_id=site_id)
 
 
 # -- operation registry -------------------------------------------------------
@@ -722,6 +572,24 @@ for _declaration in (
             "permission to clear the placeholder."
         ),
         service=clear_placeholder,
+    ),
+    Operation(
+        operations.COPY_PLUGIN_TO_CLIPBOARD,
+        summary=_lazy("Copy a plugin to the clipboard"),
+        description=(
+            "Replace the acting user's clipboard with a copy of a plugin and its children. Requires "
+            "permission to read the plugin's placeholder and to copy the plugins."
+        ),
+        service=copy_plugin_to_clipboard,
+    ),
+    Operation(
+        operations.COPY_PLACEHOLDER_TO_CLIPBOARD,
+        summary=_lazy("Copy a placeholder to the clipboard"),
+        description=(
+            "Replace the acting user's clipboard with a copy of all plugins of a placeholder in one "
+            "language. Requires permission to read the placeholder and to copy the plugins."
+        ),
+        service=copy_placeholder_to_clipboard,
     ),
 ):
     register_operation(_declaration)

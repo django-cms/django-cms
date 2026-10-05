@@ -412,7 +412,10 @@ The plugin services run the same three kinds of check:
   respected, the parent is in the target placeholder and language, a plugin is
   not moved into itself, and the language belongs to the site.
 
-.. TODO: register the field-level ``PlaceholderRelationField`` checks as policy
+.. TODO: not yet core checks: the plugin limit (the admin still checks it, with
+   the template from ``get_placeholder_template()``), ``parent_classes`` and
+   ``child_classes``, and the site language; they follow with ``add_plugin``.
+   Register the field-level ``PlaceholderRelationField`` checks as policy
    checks, keeping the field hook for compatibility.
 
 Plugin data
@@ -621,20 +624,73 @@ Code that customised move validation by overriding ``MovePageForm.clean()``
 should register a check instead, see
 :ref:`upgrade-6.0-backward-incompatible`.
 
+The placeholder and plugin operations run through operation checks, too. The
+services in ``cms.core.services`` perform them; the arguments are listed in
+:ref:`operations_reference`. ``permissions`` is the plugin permission backend,
+and ``plugins``, if a service passes it, the plugins it copies.
+
+.. list-table::
+    :header-rows: 1
+    :widths: 30 70
+
+    * - Operation
+      - Checks, in order
+    * - ``MOVE_PLUGIN``
+      - ``cms.core.move_permission``: the user may move the plugin out of its
+        placeholder and into the target placeholder.
+
+        ``cms.core.source_editable`` (policy): both placeholders' content may be
+        edited.
+
+        ``cms.core.parent_valid``: the new parent is in the target placeholder
+        and language, and is neither the plugin nor one of its descendants.
+
+        ``cms.core.allowed_in_slot``: the plugin and its descendants are allowed
+        in the target slot (not checked within a placeholder or into the
+        clipboard).
+    * - ``CUT_PLUGIN``
+      - ``cms.core.cut_permission``: the user may move the plugin.
+
+        ``cms.core.source_editable`` (policy): its placeholder's content may be
+        edited.
+    * - ``PASTE_PLUGIN``
+      - ``cms.core.paste_permission``: the user may read the source placeholder
+        and add the plugins to the target.
+
+        ``cms.core.target_editable`` (policy): the target's content may be
+        edited.
+
+        ``cms.core.parent_valid``: the parent is in the target placeholder and
+        language.
+
+        ``cms.core.allowed_in_slot``: the plugins are allowed in the target slot.
+    * - ``PASTE_PLACEHOLDER``
+      - ``cms.core.paste_permission``, ``cms.core.target_editable`` and
+        ``cms.core.allowed_in_slot``, for the plugins of the copied placeholder.
+    * - ``COPY_PLUGIN_TO_CLIPBOARD``,
+
+        ``COPY_PLACEHOLDER_TO_CLIPBOARD``
+      - ``cms.core.copy_permission``: the user may copy the plugins and read
+        their placeholder.
+
+        ``cms.core.target_editable`` (policy): the clipboard may be edited.
+    * - ``ADD_PLUGINS_FROM_PLACEHOLDER``
+      - ``cms.core.copy_permission``, ``cms.core.target_editable`` and
+        ``cms.core.allowed_in_slot``.
+    * - ``DELETE_PLUGIN``
+      - ``cms.core.delete_permission`` and ``cms.core.source_editable``.
+    * - ``CLEAR_PLACEHOLDER``
+      - ``cms.core.clear_permission`` and ``cms.core.source_editable``.
+
 .. TODO: the following is not implemented yet and must be updated as it lands:
 
    * the page checks above are all permission or validation checks so far;
      those about an object's state become policy checks;
-   * core checks for the placeholder and plugin operations: the plugin
-     services run the checks apps register, but their own permission and
-     parent checks are still made inline and are invisible to ``can()``;
-   * the ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD``
-     operations, and the ``add_plugin`` and ``change_plugin`` services with the
-     plugin data hook;
+   * the ``add_plugin`` and ``change_plugin`` services with the plugin data
+     hook, and the plugin limit, ``parent_classes``/``child_classes`` and site
+     language as core checks;
    * the services and checks for ``cms.extensions``.
 
-The placeholder and plugin operations follow the same structure, see
-*Placeholder and plugin checks* above. The version conditions of
-``djangocms-versioning`` and ``PlaceholderRelationField`` checks become policy
-checks on the same registry, so that one mechanism answers "may this happen?"
-for every operation.
+The version conditions of ``djangocms-versioning`` and
+``PlaceholderRelationField`` checks become policy checks on the same registry,
+so that one mechanism answers "may this happen?" for every operation.

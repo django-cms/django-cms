@@ -9,6 +9,7 @@ from django.utils.translation import override as force_language
 from cms import operations
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_config import CMSCoreExtensions
+from cms.core.plugin_pool import plugin_pool
 from cms.core.services import plugins as plugin_services
 from cms.models import CMSPlugin, Page, PageContent, Placeholder, UserSettings
 from cms.pages import services as page_services
@@ -515,6 +516,136 @@ class PluginServiceChecksTest(RegistryIsolationMixin, CMSTestCase):
 
         self.assertEqual(self.sent, [operations.MOVE_PLUGIN, operations.MOVE_PLUGIN])
         self.assertEqual(CMSPlugin.objects.get(pk=self.plugin.pk).placeholder_id, self.other.pk)
+
+
+class CorePluginChecksTest(RegistryIsolationMixin, CMSTestCase):
+    """The core checks of the plugin operations, seen by the services and by ``can()``."""
+
+    def setUp(self):
+        super().setUp()
+        self.superuser = self.get_superuser()
+        self.context = OperationContext(user=self.superuser, language="en")
+        page = create_page("Page", "nav_playground.html", "en")
+        placeholders = page.get_placeholders("en")
+        self.body = placeholders.get(slot="body")
+        self.other = placeholders.get(slot="right-column")
+        self.plugin = add_plugin(self.body, "TextPlugin", "en", body="Text").cmsplugin_ptr
+        self.sent = []
+        for signal in PLACEHOLDER_OPERATION_SIGNALS:
+            signal.connect(self.receive)
+            self.addCleanup(signal.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        self.sent.append(kwargs["operation"])
+
+    def only_in_body(self):
+        return patch.object(plugin_pool.get_plugin("TextPlugin"), "allowed_slots", ["body"])
+
+    def test_every_plugin_operation_has_permission_and_policy_checks(self):
+        for operation_id in (
+            operations.MOVE_PLUGIN,
+            operations.CUT_PLUGIN,
+            operations.PASTE_PLUGIN,
+            operations.PASTE_PLACEHOLDER,
+            operations.COPY_PLUGIN_TO_CLIPBOARD,
+            operations.COPY_PLACEHOLDER_TO_CLIPBOARD,
+            operations.ADD_PLUGINS_FROM_PLACEHOLDER,
+            operations.DELETE_PLUGIN,
+            operations.CLEAR_PLACEHOLDER,
+        ):
+            with self.subTest(operation=operation_id):
+                operations.get_operation(operation_id)
+                kinds = {entry.kind for entry in checks.get_checks(operation_id) if entry.name.startswith("cms.core.")}
+                self.assertLessEqual({checks.PERMISSION, checks.POLICY}, kinds)
+
+    def test_the_dry_run_sees_the_core_permission_check(self):
+        staff = OperationContext(user=self.get_staff_user_with_no_permissions(), language="en")
+
+        verdict = can(operations.MOVE_PLUGIN, staff, plugin=self.plugin, target_placeholder=self.other)
+
+        self.assertEqual([(r.name, r.kind) for r in verdict.reasons], [("cms.core.move_permission", checks.PERMISSION)])
+        with self.assertRaises(PermissionDenied) as raised:
+            plugin_services.move_plugin(self.plugin, 1, self.other, context=staff)
+        self.assertNotIsInstance(raised.exception, OperationBlocked)
+        self.assertEqual(self.sent, [])
+
+    def test_content_that_cannot_be_edited_blocks_the_operation(self):
+        with patch.object(Placeholder, "check_source", return_value=False):
+            verdict = can(operations.DELETE_PLUGIN, self.context, plugin=self.plugin)
+            with self.assertRaises(OperationBlocked):
+                plugin_services.delete_plugin(self.plugin, context=self.context)
+
+        self.assertEqual([(r.name, r.kind) for r in verdict.reasons], [("cms.core.source_editable", checks.POLICY)])
+        self.assertEqual(self.sent, [])
+        self.assertTrue(CMSPlugin.objects.filter(pk=self.plugin.pk).exists())
+
+    def test_a_system_context_skips_permissions_but_not_policy(self):
+        system = OperationContext.system("tests")
+
+        with patch.object(Placeholder, "check_source", return_value=False):
+            with self.assertRaises(OperationBlocked):
+                plugin_services.clear_placeholder(self.body, "en", context=system)
+            plugin_services.clear_placeholder(
+                self.body, "en", context=OperationContext.system("tests.migration", policy=False)
+            )
+
+        self.assertFalse(self.body.get_plugins("en").exists())
+
+    def test_a_system_context_can_move_without_a_user(self):
+        moved = plugin_services.move_plugin(self.plugin, 1, self.other, context=OperationContext.system("tests"))
+
+        self.assertEqual(moved.placeholder_id, self.other.pk)
+
+    def test_moving_into_a_slot_the_plugin_is_not_allowed_in_is_refused(self):
+        with self.only_in_body():
+            verdict = can(operations.MOVE_PLUGIN, self.context, plugin=self.plugin, target_placeholder=self.other)
+            with self.assertRaisesMessage(ValidationError, "is not allowed in placeholder 'right-column'"):
+                plugin_services.move_plugin(self.plugin, 1, self.other, context=self.context)
+            # Moving within the placeholder is not affected.
+            plugin_services.move_plugin(self.plugin, 1, context=self.context)
+
+        self.assertEqual([(r.name, r.kind) for r in verdict.reasons], [("cms.core.allowed_in_slot", checks.VALIDATION)])
+        self.assertEqual(CMSPlugin.objects.get(pk=self.plugin.pk).placeholder_id, self.body.pk)
+
+    def test_copying_into_a_slot_checks_every_copied_plugin(self):
+        clipboard = Placeholder.objects.create(slot="clipboard")
+        UserSettings.objects.create(user=self.superuser, language="en", clipboard=clipboard)
+        reference = plugin_services.copy_placeholder_to_clipboard(
+            self.body, clipboard, "en", "en", context=self.context
+        )
+
+        with self.only_in_body():
+            with self.assertRaises(ValidationError):
+                plugin_services.paste_placeholder(reference, "en", self.other, 1, context=self.context)
+            with self.assertRaises(ValidationError):
+                plugin_services.add_plugins_from_placeholder(self.body, self.other, "en", "en", context=self.context)
+            # The clipboard takes any plugin.
+            plugin_services.cut_plugin(self.plugin, "en", clipboard, context=self.context)
+
+        self.assertFalse(self.other.get_plugins("en").exists())
+
+    def test_the_admin_answers_a_disallowed_slot_with_400(self):
+        clipboard = Placeholder.objects.create(slot="clipboard")
+        UserSettings.objects.create(user=self.superuser, language="en", clipboard=clipboard)
+        reference = plugin_services.copy_placeholder_to_clipboard(
+            self.body, clipboard, "en", "en", context=self.context
+        )
+        moves = {
+            "move": {"plugin_id": self.plugin.pk, "placeholder_id": self.other.pk},
+            "paste placeholder": {"plugin_id": reference.pk, "placeholder_id": self.other.pk, "move_a_copy": "true"},
+        }
+
+        with self.only_in_body(), self.login_user_context(self.superuser):
+            for label, data in moves.items():
+                with self.subTest(label):
+                    response = self.client.post(
+                        self.get_move_plugin_uri(self.plugin),
+                        {**data, "target_language": "en", "target_position": 1},
+                    )
+                    self.assertEqual(response.status_code, 400)
+                    self.assertIn("not allowed in placeholder", response.content.decode())
+
+        self.assertFalse(self.other.get_plugins("en").exists())
 
 
 class MovePageChecksTest(CMSTestCase):

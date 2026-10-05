@@ -249,10 +249,6 @@ through operation checks, too, and ``cms.operations`` adds
 ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD``. See
 :ref:`operation_checks` for the concepts and the list of checks.
 
-.. TODO: the plugin services run the checks apps register, but their own
-   permission and parent checks are not registered core checks yet, and the
-   clipboard copy constants do not exist yet.
-
 Operation registry
 ==================
 
@@ -367,6 +363,20 @@ Moving pages
 Placeholder and plugin operations
 =================================
 
+* The plugin services check whether every plugin they move, paste or copy is
+  allowed in the target slot (``CMSPluginBase.allowed_slots``), and raise
+  ``ValidationError`` otherwise. The admin checked this for moves and copies
+  before; pasting a copied placeholder now checks the plugins it contains
+  instead of only the placeholder plugin, and is refused with a 400 if one of
+  them is not allowed in the target slot. Callers outside the admin get the same
+  protection.
+* An operation refused because the object owning the placeholder is not
+  editable (``check_source()``, for example published content under
+  djangocms-versioning) raises ``OperationBlocked``, a subclass of
+  ``PermissionDenied``, instead of ``PermissionDenied``.
+* A system context (``OperationContext.system()``) skips the plugin permission
+  checks, as it does for pages, but not the editability checks.
+
 .. TODO: not implemented yet; confirm each point as it lands.
 
 * The placeholder admin performs adding, changing, moving, copying, pasting,
@@ -374,10 +384,7 @@ Placeholder and plugin operations
   subclasses overriding the private helpers of these views (``_move_plugin()``,
   ``_paste_plugin()``, ...) should override the ``has_*_permission`` methods or
   register an operation check instead.
-* An operation refused because the object owning the placeholder is not
-  editable (``check_source()``, for example published content under
-  djangocms-versioning) raises ``OperationBlocked`` and the admin answers 409
-  instead of 403.
+* The admin answers ``OperationBlocked`` with 409 instead of 403.
 * ``CMSPluginBase.save_model()`` calls the ``change_plugin`` or ``add_plugin``
   service and no longer looks up the placeholder admin in ``admin.site``.
 * Plugin data passed to the services is cleaned through the plugin's form for

@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.http import (
     HttpResponse,
@@ -38,7 +38,6 @@ from cms.core.plugin_base import CMSPluginBase
 from cms.core.plugin_pool import plugin_pool
 from cms.core.plugins import (
     downcast_plugins,
-    get_plugin_disallowed_in_slot,
     has_reached_plugin_limit,
 )
 from cms.core.services import plugins as plugin_services
@@ -481,35 +480,29 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         copy_to_clipboard = clipboard is not None and target_placeholder.pk == clipboard.pk
         source_plugin_id = request.POST.get('source_plugin_id', None)
 
-        if copy_to_clipboard and source_plugin_id:
-            new_plugin = self._copy_plugin_to_clipboard(
-                request,
-                target_placeholder,
-            )
-            new_plugins = [new_plugin]
-        elif copy_to_clipboard:
-            new_plugin = self._copy_placeholder_to_clipboard(
-                request,
-                source_placeholder,
-                target_placeholder,
-            )
-            new_plugins = [new_plugin]
-        else:
-            source_language = request.POST['source_language']
-            source_plugins = source_placeholder.get_plugins_list(language=source_language)
-            disallowed = get_plugin_disallowed_in_slot(
-                (plugin.plugin_type for plugin in source_plugins),
-                target_placeholder.slot,
-            )
-            if disallowed:
-                return HttpResponseBadRequest(
-                    f"Plugin {disallowed} is not allowed in placeholder '{target_placeholder.slot}'."
+        try:
+            if copy_to_clipboard and source_plugin_id:
+                new_plugin = self._copy_plugin_to_clipboard(
+                    request,
+                    target_placeholder,
                 )
-            new_plugins = self._add_plugins_from_placeholder(
-                request,
-                source_placeholder,
-                target_placeholder,
-            )
+                new_plugins = [new_plugin]
+            elif copy_to_clipboard:
+                new_plugin = self._copy_placeholder_to_clipboard(
+                    request,
+                    source_placeholder,
+                    target_placeholder,
+                )
+                new_plugins = [new_plugin]
+            else:
+                # The service checks that every plugin is allowed in the target slot.
+                new_plugins = self._add_plugins_from_placeholder(
+                    request,
+                    source_placeholder,
+                    target_placeholder,
+                )
+        except ValidationError as error:
+            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
         data = get_plugin_tree(request, new_plugins)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -647,15 +640,8 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         source_placeholder = plugin.placeholder
 
         if placeholder and placeholder != source_placeholder:
-            if not move_to_clipboard:
-                # The whole subtree moves with the plugin, so every descendant must
-                # also be allowed in the target slot, not just the moved plugin itself.
-                moved_types = [plugin.plugin_type, *plugin.get_descendants().values_list("plugin_type", flat=True)]
-                disallowed = get_plugin_disallowed_in_slot(moved_types, placeholder.slot)
-                if disallowed:
-                    return HttpResponseBadRequest(
-                        f"Plugin {disallowed} is not allowed in placeholder '{placeholder.slot}'."
-                    )
+            # Whether the plugins are allowed in the target slot is an operation
+            # check of the services; the limit depends on this admin's template.
             try:
                 template = self.get_placeholder_template(request, placeholder)
                 has_reached_plugin_limit(placeholder, plugin.plugin_type,
@@ -717,43 +703,46 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         old_parent = None
         fetch_tree = True
 
-        if move_a_copy and plugin.plugin_type == "PlaceholderPlugin":
-            fetch_tree = False
-            new_plugin = None
-            new_plugins = self._paste_placeholder(
-                request,
-                plugin=plugin,
-                target_language=target_language,
-                target_placeholder=placeholder,
-                target_position=target_position,
-            )
-        elif move_a_copy:
-            new_plugin = self._paste_plugin(
-                request,
-                plugin=plugin,
-                target_parent=target_parent,
-                target_language=target_language,
-                target_placeholder=placeholder,
-                target_position=target_position,
-            )
-        elif move_to_clipboard:
-            old_parent = plugin.parent  # Previous parent needs content update, too
-            new_plugin = self._cut_plugin(
-                request,
-                plugin=plugin,
-                target_language=target_language,
-                target_placeholder=placeholder,
-            )
-            new_plugins = [plugin]
-        else:
-            old_parent = plugin.parent  # Previous parent needs content update, too
-            new_plugin = self._move_plugin(
-                request,
-                plugin=plugin,
-                target_parent=target_parent,
-                target_position=target_position,
-                target_placeholder=placeholder,
-            )
+        try:
+            if move_a_copy and plugin.plugin_type == "PlaceholderPlugin":
+                fetch_tree = False
+                new_plugin = None
+                new_plugins = self._paste_placeholder(
+                    request,
+                    plugin=plugin,
+                    target_language=target_language,
+                    target_placeholder=placeholder,
+                    target_position=target_position,
+                )
+            elif move_a_copy:
+                new_plugin = self._paste_plugin(
+                    request,
+                    plugin=plugin,
+                    target_parent=target_parent,
+                    target_language=target_language,
+                    target_placeholder=placeholder,
+                    target_position=target_position,
+                )
+            elif move_to_clipboard:
+                old_parent = plugin.parent  # Previous parent needs content update, too
+                new_plugin = self._cut_plugin(
+                    request,
+                    plugin=plugin,
+                    target_language=target_language,
+                    target_placeholder=placeholder,
+                )
+                new_plugins = [plugin]
+            else:
+                old_parent = plugin.parent  # Previous parent needs content update, too
+                new_plugin = self._move_plugin(
+                    request,
+                    plugin=plugin,
+                    target_parent=target_parent,
+                    target_position=target_position,
+                    target_placeholder=placeholder,
+                )
+        except ValidationError as error:
+            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
 
         if new_plugin and fetch_tree:
             root = (new_plugin.parent or new_plugin)

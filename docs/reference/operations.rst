@@ -189,16 +189,10 @@ The placeholder and plugin operations are performed by the services in
       - ``placeholder``, ``language``
 
 The services run the checks registered for their operation, with the
-arguments in the third column, before they announce or change anything. Their
-own permission and parent checks still run inline, ahead of the registered
-checks, and are not yet registered as core checks themselves.
+arguments in the third column, before they announce or change anything.
 
 .. TODO: ``add_plugin`` and ``change_plugin`` do not exist yet (the admin
-   performs these operations), the inline checks are not registered core checks
-   yet, and ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD``
-   have no constants yet, so the clipboard copies run no registered checks. The
-   arguments of ``add_plugin`` and ``change_plugin`` follow the proposal in
-   #8868.
+   performs these operations). Their arguments follow the proposal in #8868.
 
 
 ****************
@@ -256,9 +250,12 @@ Core checks
 
 .. py:module:: cms.permissions.checks
 
+.. py:module:: cms.core.checks
+
 The checks django CMS registers for the page operations live in
 ``cms.pages.checks``, the ones for permission grants in
-``cms.permissions.checks``. :ref:`operation_checks` lists them by operation, with
+``cms.permissions.checks`` and the ones for placeholder and plugin operations in
+``cms.core.checks``. :ref:`operation_checks` lists them by operation, with
 their names.
 
 
