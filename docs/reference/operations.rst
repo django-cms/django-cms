@@ -100,17 +100,23 @@ checks receive; every check also receives ``permissions``.
       - :func:`cms.pages.services.change_advanced_settings`
       - ``page``
     * - ``CHANGE_PAGE_PERMISSIONS``
-      - :func:`cms.pages.services.save_page_permissions`
+      - :func:`cms.permissions.services.save_page_permissions`
       - ``page``, ``save``, ``delete``
     * - ``CHANGE_USER_PERMISSIONS``
-      - :func:`cms.pages.services.set_user_permissions`
+      - :func:`cms.permissions.services.set_user_permissions`
       - ``obj``, ``data``
     * - ``CHANGE_GLOBAL_PAGE_PERMISSION``
-      - :func:`cms.pages.services.save_global_page_permission`
+      - :func:`cms.permissions.services.save_global_page_permission`
       - ``grant``, ``sites``
     * - ``DELETE_GLOBAL_PAGE_PERMISSION``
-      - :func:`cms.pages.services.delete_global_page_permission`
+      - :func:`cms.permissions.services.delete_global_page_permission`
       - ``grant``
+    * - ``SAVE_EXTENSION``
+      - :func:`cms.extensions.services.save_extension`
+      - ``extension``
+    * - ``DELETE_EXTENSION``
+      - :func:`cms.extensions.services.delete_extension`
+      - ``extension``
     * - ``COPY_PAGE``
       - :func:`cms.pages.services.copy_page_tree`
       - ``page``, ``target_page``, ``position``, ``target_site``,
@@ -253,10 +259,12 @@ Core checks
 
 .. py:module:: cms.core.checks
 
+.. py:module:: cms.extensions.checks
+
 The checks django CMS registers for the page operations live in
 ``cms.pages.checks``, the ones for permission grants in
-``cms.permissions.checks`` and the ones for placeholder and plugin operations in
-``cms.core.checks``. :ref:`operation_checks` lists them by operation, with
+``cms.permissions.checks``, the ones for extensions in ``cms.extensions.checks``
+and the ones for placeholder and plugin operations in ``cms.core.checks``. :ref:`operation_checks` lists them by operation, with
 their names.
 
 
@@ -266,9 +274,7 @@ Page services
 
 .. automodule:: cms.pages.services
     :members: add_page, add_translation, change_page_content,
-        change_advanced_settings, set_user_permissions, save_page_permissions,
-        save_global_page_permission, delete_global_page_permission,
-        delete_global_page_permissions, move_page, copy_page_tree,
+        change_advanced_settings, move_page, copy_page_tree,
         copy_page_from_source, set_home, delete_page, delete_translation,
         change_template, copy_language, toggle_in_navigation, rebuild_urls
 
@@ -276,6 +282,23 @@ Page lookup uses the normal queryset or admin ``get_object()`` path. A caller
 that exposes page data checks the appropriate view permission before returning
 it. Each mutating service checks permission for its own operation, even when
 the caller has already fetched the page.
+
+
+*******************
+Permission services
+*******************
+
+.. automodule:: cms.permissions.services
+    :members: set_user_permissions, save_page_permissions,
+        save_global_page_permission, delete_global_page_permission,
+        delete_global_page_permissions
+
+******************
+Extension services
+******************
+
+.. automodule:: cms.extensions.services
+    :members: save_extension, delete_extension
 
 
 ***************

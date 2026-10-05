@@ -129,16 +129,16 @@ objects to act on and an ``OperationContext`` instead of an ``HttpRequest``.
   ``copy_placeholder_to_clipboard``, ``add_plugins_from_placeholder``,
   ``delete_plugin`` and ``clear_placeholder``.
 * ``cms.pages.services``: ``add_page``, ``add_translation``,
-  ``change_page_content``, ``change_advanced_settings``,
-  ``save_page_permissions``, ``set_user_permissions``,
-  ``save_global_page_permission``, ``delete_global_page_permission``,
-  ``delete_global_page_permissions``, ``move_page``, ``set_home``,
+  ``change_page_content``, ``change_advanced_settings``, ``move_page``,
+  ``set_home``,
   ``copy_page_tree``, ``copy_page_from_source``, ``delete_page``,
   ``delete_translation``, ``change_template``, ``copy_language``,
   ``toggle_in_navigation`` and ``rebuild_urls``.
-* ``cms.extensions``: saving and deleting page and translation extensions.
-
-.. TODO: the ``cms.extensions`` services are not implemented yet.
+* ``cms.permissions.services``: ``save_page_permissions``,
+  ``set_user_permissions``, ``save_global_page_permission``,
+  ``delete_global_page_permission`` and ``delete_global_page_permissions``.
+* ``cms.extensions.services``: ``save_extension`` and ``delete_extension``,
+  announced as the page operations ``SAVE_EXTENSION`` and ``DELETE_EXTENSION``.
 
 Each part owns the operations on its own content: ``cms.core`` the placeholder
 and plugin operations, for any placeholder owner and without depending on
@@ -232,10 +232,17 @@ Every check is one of three kinds, run in this order:
   ``ValidationError``; the admin answers 400.
 
 Permission checks run first, so a refusal never tells a user about content they
-may not see. Code acting on the system's own behalf -- :mod:`cms.api`,
-management commands -- passes ``OperationContext.system("reason")``: it skips
-the permission checks, runs the policy checks unless it explicitly opts out,
-and always runs every validation check. A package's checks are validation
+may not see. Code acting on the system's own behalf -- management commands,
+imports -- passes ``OperationContext.system("reason")``: it skips the permission
+checks, runs the policy checks unless it explicitly opts out, and always runs
+every validation check.
+
+The functions of ``cms.api`` that create content (``create_page``,
+``create_page_content``, ``add_plugin``, ``assign_user_to_page``,
+``create_page_user``) are unchanged by default: nothing is checked or
+announced, so fixtures and tests keep working. They accept a keyword-only
+``context=``; with it, they run as their operation, with checks, signals and a
+transaction, and ``add_plugin`` cleans its data with the plugin's form. A package's checks are validation
 checks unless its ``cms_checks`` entry says ``"permission"`` or ``"policy"``.
 
 In 6.0, all page operations run through operation checks: moving, copying,
@@ -426,11 +433,6 @@ Placeholder and plugin operations
   and raise a ``UserWarning``; its operation is now announced with an empty
   ``origin``.
 
-.. TODO: not implemented yet; confirm each point as it lands.
-
-* Writing into content that a policy check protects, for example published
-  content, through :mod:`cms.api` or another system context is refused unless
-  the context explicitly opts out of policy checks.
 
 Toolbar pool keys
 =================
@@ -511,6 +513,22 @@ carries the copy as ``new_page``. Receivers that react to every page operation,
 not only to the ones they know, now see these operations, too.
 djangocms-versioning, for example, updates the modified date of the page's
 content.
+
+Extensions
+==========
+
+* The page and page content extension admins save and delete extensions through
+  ``cms.extensions.services``. Deleting extensions in bulk from the admin checks
+  every extension, instead of deleting the queryset unchecked.
+* Saving and deleting an extension is announced with the ``pre_obj_operation``
+  and ``post_obj_operation`` signals (``SAVE_EXTENSION``, ``DELETE_EXTENSION``),
+  ``obj`` being the page and ``translation`` the page content of a page content
+  extension. Receivers reacting to every page operation see these, too;
+  djangocms-versioning, for example, updates the modified date of the page's
+  content.
+* A page content extension asks the page permission backend's
+  ``can_change_content()`` for its translation, instead of whether the user may
+  change the page; by default both answer the same.
 
 Miscellaneous
 =============

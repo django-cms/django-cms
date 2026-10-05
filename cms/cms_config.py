@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from cms.app_base import CMSAppConfig, CMSAppExtension
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.core.services import plugins as plugin_services  # noqa: F401  -- declares the plugin operations
+from cms.extensions import services as extension_services  # noqa: F401  -- declares the extension operations
 from cms.models import PageContent
 from cms.operations import Operation, register_operation
 from cms.pages import (
@@ -15,7 +16,10 @@ from cms.pages import (
     services as page_services,  # noqa: F401  -- declares the page operations
 )
 from cms.pages.rendering import render_pagecontent
-from cms.permissions import checks as permission_checks  # noqa: F401  -- registers the grant checks
+from cms.permissions import (
+    checks as permission_checks,  # noqa: F401  -- registers the grant checks
+    services as permission_services,  # noqa: F401  -- declares the grant operations
+)
 from cms.shared.checks import VALIDATION, register_check
 from cms.wizards.wizard_base import Wizard
 

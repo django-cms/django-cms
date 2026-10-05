@@ -36,6 +36,7 @@ from cms.operations import ADD_PAGE, COPY_PAGE_FROM_SOURCE
 from cms.pages import services as page_services
 from cms.pages.apphook_pool import apphook_pool
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
+from cms.permissions import checks as permission_checks, services as permission_services
 from cms.permissions.models import (
     EDIT_PERMISSION_REQUIRED_MESSAGES,
     User,
@@ -64,7 +65,7 @@ from menus.menu_pool import menu_pool
 
 
 def get_permission_accessor(obj):
-    return page_services.permission_accessor(obj)
+    return permission_services.permission_accessor(obj)
 
 
 def get_page_changed_by_filter_choices():
@@ -90,21 +91,21 @@ def get_main_language_page_content_template(new_page):
 
 
 # Permission actions managed by the CMS permission forms (Django's defaults).
-CMS_PERMISSION_ACTIONS = page_services.CMS_PERMISSION_ACTIONS
+CMS_PERMISSION_ACTIONS = permission_checks.CMS_PERMISSION_ACTIONS
 
 # Maps each ``can_<action>_<name>`` permission group to the model whose
 # permission governs it. Used to render, read and authorize the checkboxes.
-CMS_PERMISSION_MODELS = page_services.CMS_PERMISSION_MODELS
+CMS_PERMISSION_MODELS = permission_checks.cms_permission_models()
 
 
 def save_permissions(data, obj):
     """Apply CMS model permissions without checks, as this function always did.
 
     Kept for compatibility. It acts on the system's behalf; code acting for a user
-    should call :func:`cms.pages.services.set_user_permissions` with that user's
+    should call :func:`cms.permissions.services.set_user_permissions` with that user's
     context instead.
     """
-    return page_services.set_user_permissions(
+    return permission_services.set_user_permissions(
         data, obj, context=OperationContext.system("cms.pages.admin.forms.save_permissions")
     )
 
@@ -1339,7 +1340,7 @@ class GenericCmsPermissionForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        return page_services.set_user_permissions(
+        return permission_services.set_user_permissions(
             self.cleaned_data,
             instance,
             # Always the acting user's context, never a system one: a form

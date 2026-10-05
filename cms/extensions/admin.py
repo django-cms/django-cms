@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
-from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
+from cms.extensions import services as extension_services
 from cms.models import Page, PageContent
-from cms.permissions.page_permissions import user_can_change_page
+from cms.shared.operations import OperationContext
 from cms.utils.urlutils import static_with_version
 
 
@@ -16,23 +17,26 @@ class ExtensionAdmin(admin.ModelAdmin):
     class Media:
         css = {"all": (static_with_version("cms/css/cms.admin.css"),)}
 
+    def save_model(self, request, obj, form, change):
+        # The service checks that the user may change what the extension extends.
+        extension_services.save_extension(obj, context=OperationContext.from_request(request))
+
+    def delete_model(self, request, obj):
+        extension_services.delete_extension(obj, context=OperationContext.from_request(request))
+
+    def delete_queryset(self, request, queryset):
+        context = OperationContext.from_request(request)
+        with transaction.atomic():
+            for extension in queryset:
+                extension_services.delete_extension(extension, context=context)
+
 
 class PageExtensionAdmin(ExtensionAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change and 'extended_object' in request.GET:
             obj.extended_object = Page.objects.get(pk=request.GET['extended_object'])
-            page = Page.objects.get(pk=request.GET['extended_object'])
-        else:
-            page = obj.extended_object
-        if not user_can_change_page(request.user, page):
-            raise PermissionDenied()
         super().save_model(request, obj, form, change)
-
-    def delete_model(self, request, obj):
-        if not obj.extended_object.has_change_permission(request.user):
-            raise PermissionDenied()
-        obj.delete()
 
     def get_model_perms(self, request):
         """
@@ -67,19 +71,7 @@ class PageContentExtensionAdmin(ExtensionAdmin):
     def save_model(self, request, obj, form, change):
         if not change and 'extended_object' in request.GET:
             obj.extended_object = PageContent.admin_manager.get(pk=request.GET['extended_object'])
-            content = PageContent.admin_manager.get(pk=request.GET['extended_object'])
-        else:
-            content = obj.extended_object
-        if not user_can_change_page(request.user, page=content.page):
-            raise PermissionDenied()
         super().save_model(request, obj, form, change)
-
-    def delete_model(self, request, obj):
-        page = obj.extended_object.page
-
-        if not user_can_change_page(request.user, page):
-            raise PermissionDenied()
-        obj.delete()
 
     def get_model_perms(self, request):
         """

@@ -118,6 +118,10 @@ CHANGE_PAGE_TEMPLATE = 'change_page_template'
 COPY_PAGE_LANGUAGE = 'copy_page_language'
 TOGGLE_PAGE_IN_NAVIGATION = 'toggle_page_in_navigation'
 
+# Page and page content extensions
+SAVE_EXTENSION = 'save_extension'
+DELETE_EXTENSION = 'delete_extension'
+
 # Static placeholder operations
 PUBLISH_STATIC_PLACEHOLDER = 'publish_static_placeholder'
 

@@ -209,9 +209,8 @@ register policy checks.
 Acting on the system's behalf
 =============================
 
-Some code acts on the system's own behalf rather than a user's:
-:mod:`cms.api`, management commands, data migrations. It passes a *system
-context*:
+Some code acts on the system's own behalf rather than a user's: management
+commands, imports, data migrations. It passes a *system context*:
 
 .. code-block:: python
 
@@ -222,13 +221,29 @@ A system context
 
 * **skips the permission checks**, because nobody asks whether the system may do
   something;
-* **runs the policy checks**: by default, :mod:`cms.api` writing into published
+* **runs the policy checks**: by default, an import writing into published
   content is refused just as an editor's change would be. A caller that has to
   write regardless, such as a data migration, opts out explicitly when it
   creates the context: ``OperationContext.system("myapp.migration",
   policy=False)``. Only a system context can opt out;
-* **always runs every validation check**: pages created through :mod:`cms.api`
-  get unique URLs just like pages created in the admin.
+* **always runs every validation check**: pages created by an import get unique
+  URLs just like pages created in the admin.
+
+The functions of :mod:`cms.api` stay unchecked by default, as in previous
+versions, so that fixtures and tests building content keep working. Passing
+``context=`` makes them run as their operation: ``create_page`` and
+``create_page_content`` as ``ADD_PAGE`` and ``ADD_PAGE_TRANSLATION``,
+``add_plugin`` through the ``add_plugin`` service (cleaning the data with the
+plugin's form), ``assign_user_to_page`` and ``create_page_user`` through the
+grant services:
+
+.. code-block:: python
+
+    from cms.api import add_plugin, create_page
+
+    page = create_page("News", "page.html", "en", parent=home, context=context)
+    add_plugin(placeholder, "LinkPlugin", "en", name="django CMS",
+               external_link="https://www.django-cms.org", context=context)
 
 Forms never use a system context. A form processes input a user sent, so its
 ``save()`` passes the acting user's context, and the service checks that user's
@@ -545,16 +560,16 @@ column are what a check receives and what a dry run passes to ``can()``.
 
         ``save_page_permissions``
       - ``page``, ``save``, ``delete``
-      - ``cms.pages.change_permissions_permission``: the user may change the
+      - ``cms.permissions.change_page_permissions``: the user may change the
         page's permissions.
 
-        ``cms.pages.grants_belong_to_page`` (validation): every grant belongs to
-        this page.
+        ``cms.permissions.grants_belong_to_page`` (validation): every grant
+        belongs to this page.
 
-        ``cms.pages.grantable_page_permissions``: the user holds every flag set
-        on a saved grant.
+        ``cms.permissions.grantable_page_permissions``: the user holds every
+        flag set on a saved grant.
 
-        ``cms.pages.grant_recipients``: editing rights go only to users and
+        ``cms.permissions.grant_recipients``: editing rights go only to users and
         groups the user manages; view restrictions may name anyone.
     * - ``CHANGE_USER_PERMISSIONS``
 
@@ -647,6 +662,15 @@ column are what a check receives and what a dry run passes to ``can()``.
         ``toggle_in_navigation``
       - ``page_content``
       - ``cms.pages.navigation_permission``: the user may change the page.
+    * - ``SAVE_EXTENSION``, ``DELETE_EXTENSION``
+
+        ``cms.extensions.services.save_extension``, ``delete_extension``
+      - ``extension``
+      - ``cms.extensions.change_permission``: the user may change the page, or
+        the translation a page content extension belongs to.
+
+        ``cms.extensions.one_per_object`` (validation, saving only): the object
+        has no extension of this kind yet.
 
 Every check also receives ``permissions``, the permission backend a caller
 passed to the service.
@@ -761,7 +785,6 @@ and ``plugins``, if a service passes it, the plugins it copies.
 
    * the page checks above are all permission or validation checks so far;
      those about an object's state become policy checks;
-   * the services and checks for ``cms.extensions``.
 
 The version conditions of ``djangocms-versioning`` and
 ``PlaceholderRelationField`` checks become policy checks on the same registry,

@@ -12,6 +12,7 @@ from cms.core.services.permissions import PluginPermissions, get_permissions
 from cms.models import GlobalPagePermission, Page, PageContent, PagePermission, PageType, Placeholder, UserSettings
 from cms.pages import services as page_services
 from cms.pages.permissions import PagePermissions, get_page_permissions
+from cms.permissions import services as permission_services
 from cms.shared import checks
 from cms.shared.checks import can
 from cms.shared.operations import OperationContext
@@ -105,7 +106,7 @@ class RequestFreeServiceTest(CMSTestCase):
         with self.assertRaises(PermissionDenied):
             page_services.change_advanced_settings(self.page, context=context)
         with self.assertRaises(PermissionDenied):
-            page_services.save_page_permissions(self.page, context=context)
+            permission_services.save_page_permissions(self.page, context=context)
         self.assertEqual(Page.objects.count(), count)
         content.refresh_from_db()
         self.assertEqual(content.title, "home")
@@ -159,25 +160,25 @@ class RequestFreeServiceTest(CMSTestCase):
         actor = self.get_staff_user_with_no_permissions()
         context = OperationContext(user=actor)
         with self.assertRaises(PermissionDenied):
-            page_services.set_user_permissions({"can_add_page": True}, actor, context=context)
+            permission_services.set_user_permissions({"can_add_page": True}, actor, context=context)
         grant = GlobalPagePermission(user=actor, can_add=True, can_change=True)
         with self.assertRaises(PermissionDenied):
-            page_services.save_global_page_permission(grant, sites=[Site.objects.get_current()], context=context)
+            permission_services.save_global_page_permission(grant, sites=[Site.objects.get_current()], context=context)
         self.assertFalse(GlobalPagePermission.objects.filter(user=actor).exists())
 
     def test_permission_services_apply_and_remove_grants(self):
         actor = self.get_staff_user_with_no_permissions()
         page_grant = PagePermission(user=actor, page=self.page)
-        page_services.save_page_permissions(self.page, save=[page_grant], context=self._context())
+        permission_services.save_page_permissions(self.page, save=[page_grant], context=self._context())
         self.assertTrue(PagePermission.objects.filter(pk=page_grant.pk).exists())
-        page_services.save_page_permissions(self.page, delete=[page_grant], context=self._context())
+        permission_services.save_page_permissions(self.page, delete=[page_grant], context=self._context())
         self.assertFalse(PagePermission.objects.filter(pk=page_grant.pk).exists())
 
         global_grant = GlobalPagePermission(user=actor)
         site = Site.objects.get_current()
-        page_services.save_global_page_permission(global_grant, sites=[site], context=self._context())
+        permission_services.save_global_page_permission(global_grant, sites=[site], context=self._context())
         self.assertEqual(list(global_grant.sites.all()), [site])
-        page_services.delete_global_page_permissions([global_grant], context=self._context())
+        permission_services.delete_global_page_permissions([global_grant], context=self._context())
         self.assertFalse(GlobalPagePermission.objects.filter(pk=global_grant.pk).exists())
 
     def test_move_plugin_without_a_request(self):
@@ -324,12 +325,12 @@ class GrantServiceTest(CMSTestCase):
 
     def test_set_user_permissions_needs_a_context(self):
         with self.assertRaises(TypeError):
-            page_services.set_user_permissions({"can_add_page": True}, self.staff.user)
+            permission_services.set_user_permissions({"can_add_page": True}, self.staff.user)
 
     def test_a_system_context_grants_without_permission_checks(self):
         target = self._create_user("target", is_staff=True)
 
-        page_services.set_user_permissions(
+        permission_services.set_user_permissions(
             {"can_add_page": True}, target, context=OperationContext.system("tests")
         )
 
@@ -363,7 +364,7 @@ class GrantServiceTest(CMSTestCase):
         grant = PagePermission.objects.create(user=self.staff.user, page=other, can_view=True)
 
         with self.assertRaisesMessage(ValidationError, "belongs to another page"):
-            page_services.save_page_permissions(self.page, delete=[grant], context=self.admin)
+            permission_services.save_page_permissions(self.page, delete=[grant], context=self.admin)
         self.assertTrue(PagePermission.objects.filter(pk=grant.pk).exists())
 
     def test_deleting_global_grants_is_all_or_nothing(self):
@@ -382,7 +383,7 @@ class GrantServiceTest(CMSTestCase):
         self.addCleanup(checks._extensions[operations.DELETE_GLOBAL_PAGE_PERMISSION].pop, "tests.refuse_second")
 
         with self.assertRaises(PermissionDenied):
-            page_services.delete_global_page_permissions([first, second], context=self.admin)
+            permission_services.delete_global_page_permissions([first, second], context=self.admin)
         self.assertEqual(GlobalPagePermission.objects.filter(pk__in=ids).count(), 2)
 
 
@@ -411,12 +412,12 @@ class PageGrantRecipientTest(CMSTestCase):
         verdict = self.verdict(can_change_permissions=True)
 
         self.assertFalse(verdict)
-        self.assertEqual(verdict.reasons[0].name, "cms.pages.grant_recipients")
+        self.assertEqual(verdict.reasons[0].name, "cms.permissions.grant_recipients")
 
     def test_view_restrictions_may_name_anyone(self):
         verdict = self.verdict(can_view=True)
 
-        self.assertNotIn("cms.pages.grant_recipients", [reason.name for reason in verdict.reasons])
+        self.assertNotIn("cms.permissions.grant_recipients", [reason.name for reason in verdict.reasons])
 
 
 class AddPageServiceTest(CMSTestCase):

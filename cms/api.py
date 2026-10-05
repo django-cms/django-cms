@@ -47,7 +47,7 @@ from django.db import IntegrityError, models, transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 
-from cms import constants
+from cms import constants, operations
 from cms.app_base import CMSApp
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.core.models.placeholder import Placeholder
@@ -170,6 +170,8 @@ def create_page(
     overwrite_url=None,
     xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
     page_title=None,
+    *,
+    context=None,
 ):
     """
     Creates a :class:`~cms.pages.models.page.Page` instance and returns it. Also
@@ -207,7 +209,15 @@ def create_page(
     :param str   overwrite_url: Overwritten path for this page
     :param int xframe_options: X Frame Option value for Clickjacking protection
     :param str page_title: Overridden page title for HTML title tag
+
+    :param context: An :class:`~cms.shared.operations.OperationContext`. If given,
+        the page is created as the ``ADD_PAGE`` operation: its checks run, it is
+        announced to the operation signals and runs in a transaction. Without it,
+        nothing is checked or announced, as in previous versions.
     """
+    if context is not None:
+        call = {name: value for name, value in locals().items() if name not in ("context", "call")}
+        return _create_page_as_operation(call, context)
     if published is not None or publication_date is not None or publication_end_date is not None:
         warnings.warn(
             'This API function no longer accepts a "published", "publication_date", or '
@@ -310,6 +320,55 @@ def create_page(
         reset_current_user(user_token)
 
 
+def _create_page_as_operation(call, context):
+    """Run :func:`create_page` as the ``ADD_PAGE`` operation."""
+    from cms.pages.checks import get_new_parent
+    from cms.shared.operations import operation
+    from cms.signals import PAGE_OPERATION_SIGNALS
+
+    parent = call["parent"]
+    site = call["site"] or (parent.site if parent else Site.objects.get_current())
+    if call["created_by"] == "python-api" and context.user is not None:
+        call["created_by"] = context.user
+    with operation(
+        operations.ADD_PAGE,
+        context,
+        checks={
+            "site": site,
+            "parent_page": get_new_parent(parent, call["position"]) if parent else None,
+            "source": None,
+            "allow_view_only_page_type": False,
+            "permissions": None,
+        },
+        signals=PAGE_OPERATION_SIGNALS,
+        sender=Page,
+        signal_operation=operations.ADD_PAGE_TRANSLATION,
+        language=call["language"],
+    ) as signal_kwargs:
+        page = create_page(**call)
+        signal_kwargs["obj"] = page
+    return page
+
+
+def _create_page_content_as_operation(call, context):
+    """Run :func:`create_page_content` as the ``ADD_PAGE_TRANSLATION`` operation."""
+    from cms.shared.operations import operation
+    from cms.signals import PAGE_OPERATION_SIGNALS
+
+    if call["created_by"] == "python-api" and context.user is not None:
+        call["created_by"] = context.user
+    with operation(
+        operations.ADD_PAGE_TRANSLATION,
+        context,
+        checks={"page": call["page"], "permissions": None},
+        signals=PAGE_OPERATION_SIGNALS,
+        sender=Page,
+        obj=call["page"],
+        language=call["language"],
+    ):
+        return create_page_content(**call)
+
+
 @transaction.atomic
 def create_page_content(
     language,
@@ -329,6 +388,8 @@ def create_page_content(
     template=TEMPLATE_INHERITANCE_MAGIC,
     limit_visibility_in_menu=constants.VISIBILITY_ALL,
     xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
+    *,
+    context=None,
 ):
     """
     Creates a :class:`~cms.pages.models.content.PageContent` instance and returns it.
@@ -348,7 +409,15 @@ def create_page_content(
     :param str overwrite_url: Overwritten path for this page
     :param str page_title: Overridden page title for HTML title tag
 
+
+    :param context: An :class:`~cms.shared.operations.OperationContext`. If given,
+        the translation is created as the ``ADD_PAGE_TRANSLATION`` operation: its
+        checks run, it is announced and runs in a transaction. Without it, nothing
+        is checked or announced, as in previous versions.
     """
+    if context is not None:
+        call = {name: value for name, value in locals().items() if name not in ("context", "call")}
+        return _create_page_content_as_operation(call, context)
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
         assert template in [tpl[0] for tpl in get_cms_setting("TEMPLATES")]
@@ -434,7 +503,7 @@ def create_page_content(
 
 
 @transaction.atomic
-def add_plugin(placeholder, plugin_type, language, position="last-child", target=None, **data):
+def add_plugin(placeholder, plugin_type, language, position="last-child", target=None, *, context=None, **data):
     """
     Adds a plugin to a placeholder and returns it.
 
@@ -447,12 +516,24 @@ def add_plugin(placeholder, plugin_type, language, position="last-child", target
                          (default), ``"first-child"``, ``"left"``, ``"right"``.
     :param target: Parent plugin. Must be plugin instance
     :param data: Data for the plugin type instance
+    :param context: An :class:`~cms.shared.operations.OperationContext`. If given,
+        the plugin is added by :func:`cms.core.services.plugins.add_plugin`: the
+        operation's checks run, ``data`` is cleaned by the plugin's form, and the
+        operation is announced and runs in a transaction. Without it, nothing is
+        checked, cleaned or announced, as in previous versions.
     """
     # validate placeholder
     assert isinstance(placeholder, Placeholder)
 
     # validate and normalize plugin type
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
+
+    if context is not None:
+        from cms.core.services import plugins as plugin_services
+
+        return plugin_services.add_plugin(
+            placeholder, plugin_type, language, data, position=position, target=target, context=context
+        )
 
     if target:
         if position == "last-child":
@@ -506,6 +587,8 @@ def create_page_user(
     can_change_pagepermission=True,
     can_delete_pagepermission=True,
     grant_all=False,
+    *,
+    context=None,
 ):
     """
     Creates a page user for the user provided and returns that page user.
@@ -517,12 +600,14 @@ def create_page_user(
     :param bool can_*: Permissions to give the user
     :param bool grant_all: Grant all permissions to the user
     """
-    from cms.pages import services as page_services
+    from cms.permissions import services as permission_services
     from cms.shared.operations import OperationContext
 
     if grant_all:
         # just be lazy
-        return create_page_user(created_by, user, True, True, True, True, True, True, True, True, True, True, True)
+        return create_page_user(
+            created_by, user, True, True, True, True, True, True, True, True, True, True, True, context=context
+        )
 
     # validate created_by
     assert isinstance(created_by, get_user_model())
@@ -547,8 +632,11 @@ def create_page_user(
         setattr(page_user, field, getattr(user, field))
     user.save()
     page_user.save()
-    page_services.set_user_permissions(
-        data, page_user, context=OperationContext.system("cms.api.create_page_user", user=created_by)
+    # Without a context, the permissions are set on the system's behalf, unchecked
+    # as in previous versions; with one, the acting user may only hand out what
+    # they hold.
+    permission_services.set_user_permissions(
+        data, page_user, context=context or OperationContext.system("cms.api.create_page_user", user=created_by)
     )
     return user
 
@@ -568,6 +656,8 @@ def assign_user_to_page(
     can_view=False,
     grant_all=False,
     global_permission=False,
+    *,
+    context=None,
 ):
     """
     Assigns a user to a page and gives them some permissions. Returns the
@@ -583,6 +673,10 @@ def assign_user_to_page(
         :data:`~cms.permissions.models.ACCESS_DESCENDANTS` or :data:`~cms.permissions.models.ACCESS_PAGE_AND_DESCENDANTS`
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
+    :param context: An :class:`~cms.shared.operations.OperationContext`. If given,
+        the grants are saved by :mod:`cms.permissions.services`, so the acting user
+        may only grant what they hold. Without it, nothing is checked, as in
+        previous versions.
     """
 
     grant_all = grant_all and not global_permission
@@ -598,11 +692,19 @@ def assign_user_to_page(
     }
 
     page_permission = PagePermission(page=page, user=user, grant_on=grant_on, **data)
-    page_permission.save()
+    if context is not None:
+        from cms.permissions import services as permission_services
+
+        permission_services.save_page_permissions(page, save=[page_permission], context=context)
+    else:
+        page_permission.save()
     if global_permission:
         page_permission = GlobalPagePermission(user=user, can_recover_page=can_recover_page, **data)
-        page_permission.save()
-        page_permission.sites.add(page.site)
+        if context is not None:
+            permission_services.save_global_page_permission(page_permission, sites=[page.site], context=context)
+        else:
+            page_permission.save()
+            page_permission.sites.add(page.site)
     return page_permission
 
 
@@ -662,7 +764,9 @@ def copy_plugins_to_language(page, source_language, target_language, only_empty=
     By default, plugins are copied only if placeholder has no plugin for the
     target language; use ``only_empty=False`` to change this.
 
-    .. warning: This function skips permissions checks
+    .. warning: This function skips permissions checks and is not announced
+        to the operation signals. To copy a translation's plugins into another
+        translation with checks, use :func:`cms.pages.services.copy_language`.
 
     :param page: the page to copy
     :type page: :class:`cms.pages.models.page.Page` instance

@@ -62,7 +62,7 @@ from cms.pages.admin.forms import (
 )
 from cms.pages.models.page import AdminCacheDict
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
-from cms.permissions import page_permissions, utils as permissions
+from cms.permissions import page_permissions, services as permission_services, utils as permissions
 from cms.permissions.admin import PERMISSION_ADMIN_INLINES
 from cms.permissions.models import PermissionTuple
 from cms.permissions.utils import clear_permission_lru_caches
@@ -275,7 +275,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if formset.model is not PagePermission:
             return super().save_formset(request, form, formset, change)
         grants = formset.save(commit=False)
-        page_services.save_page_permissions(
+        permission_services.save_page_permissions(
             form.instance,
             save=grants,
             delete=formset.deleted_objects,

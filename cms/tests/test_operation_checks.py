@@ -981,6 +981,137 @@ class PlaceholderAdminAdapterTest(RegistryIsolationMixin, CMSTestCase):
             type("TemplatePlaceholderAdmin", (PlaceholderAdmin,), {"get_placeholder_template": lambda *args: None})
 
 
+class ExtensionServicesTest(CMSTestCase):
+    """Saving and deleting extensions is changing what they extend."""
+
+    def setUp(self):
+        super().setUp()
+        from cms.extensions import services as extension_services
+        from cms.test_utils.project.extensionapp.models import MyPageContentExtension, MyPageExtension
+
+        self.services = extension_services
+        self.page = create_page("Page", "nav_playground.html", "en")
+        self.content = self.page.get_content_obj("en")
+        self.page_extension = MyPageExtension(extended_object=self.page, extra="Extra")
+        self.content_extension = MyPageContentExtension(extended_object=self.content, extra_title="Title")
+        self.context = OperationContext(user=self.get_superuser(), language="en")
+        self.sent = []
+        post_obj_operation.connect(self.receive)
+        self.addCleanup(post_obj_operation.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        self.sent.append(kwargs)
+
+    def test_save_and_delete_are_announced_as_page_operations(self):
+        self.services.save_extension(self.page_extension, context=self.context)
+        self.services.save_extension(self.content_extension, context=self.context)
+        self.services.delete_extension(self.content_extension, context=self.context)
+
+        self.assertEqual(
+            [(kwargs["operation"], kwargs["obj"], kwargs.get("translation")) for kwargs in self.sent],
+            [
+                (operations.SAVE_EXTENSION, self.page, None),
+                (operations.SAVE_EXTENSION, self.page, self.content),
+                (operations.DELETE_EXTENSION, self.page, self.content),
+            ],
+        )
+        self.assertTrue(type(self.page_extension).objects.filter(extended_object=self.page).exists())
+        self.assertFalse(type(self.content_extension).objects.filter(extended_object=self.content).exists())
+
+    def test_the_user_must_be_allowed_to_change_the_page(self):
+        staff = OperationContext(user=self.get_staff_user_with_no_permissions())
+
+        for extension in (self.page_extension, self.content_extension):
+            with self.subTest(type(extension).__name__), self.assertRaises(PermissionDenied):
+                self.services.save_extension(extension, context=staff)
+        self.services.save_extension(self.page_extension, context=OperationContext.system("tests"))
+        with self.assertRaises(PermissionDenied):
+            self.services.delete_extension(self.page_extension, context=staff)
+
+    def test_an_object_has_one_extension_of_a_kind(self):
+        self.services.save_extension(self.page_extension, context=self.context)
+
+        second = type(self.page_extension)(extended_object=self.page)
+        with self.assertRaises(ValidationError):
+            self.services.save_extension(second, context=self.context)
+        verdict = can(operations.SAVE_EXTENSION, self.context, extension=second)
+        self.assertEqual([r.name for r in verdict.reasons], ["cms.extensions.one_per_object"])
+
+
+class ApiContextTest(CMSTestCase):
+    """``cms.api`` is unchecked by default and checked when given a context."""
+
+    def setUp(self):
+        super().setUp()
+        self.superuser = self.get_superuser()
+        self.editor = OperationContext(user=self.superuser, language="en")
+        self.staff = OperationContext(user=self.get_staff_user_with_no_permissions(), language="en")
+        self.page = create_page("Page", "nav_playground.html", "en")
+        self.body = self.page.get_placeholders("en").get(slot="body")
+        self.sent = []
+        for signal in (*PAGE_OPERATION_SIGNALS, *PLACEHOLDER_OPERATION_SIGNALS):
+            signal.connect(self.receive)
+            self.addCleanup(signal.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        if signal in (post_obj_operation, post_placeholder_operation):
+            self.sent.append(kwargs)
+
+    def test_without_a_context_nothing_is_checked_or_announced(self):
+        # Incomplete data and a forbidden tree, as fixtures build them.
+        columns = add_plugin(self.body, "MultiColumnPlugin", "en")
+        add_plugin(self.body, "TextPlugin", "en", target=columns, body="Text")
+        add_plugin(self.body, "LinkPlugin", "en")
+        create_page("Other", "nav_playground.html", "en")
+
+        self.assertEqual(self.sent, [])
+
+    def test_add_plugin_with_a_context_goes_through_the_service(self):
+        plugin = add_plugin(
+            self.body, "LinkPlugin", "en", name="  A link  ", external_link="https://www.django-cms.org",
+            context=self.editor,
+        )
+
+        self.assertEqual(plugin.name, "A link")
+        self.assertEqual([kwargs["operation"] for kwargs in self.sent], [operations.ADD_PLUGIN])
+        with self.assertRaises(ValidationError):
+            add_plugin(self.body, "LinkPlugin", "en", context=self.editor)
+        with self.assertRaises(PermissionDenied):
+            add_plugin(self.body, "LinkPlugin", "en", name="A", external_link="https://a.org", context=self.staff)
+
+    def test_create_page_with_a_context_is_the_add_page_operation(self):
+        page = create_page("Child", "nav_playground.html", "en", parent=self.page, context=self.editor)
+
+        (kwargs,) = self.sent
+        self.assertEqual((kwargs["operation"], kwargs["obj"]), (operations.ADD_PAGE_TRANSLATION, page))
+        self.assertEqual(page.get_content_obj("en").created_by, str(self.superuser))
+        with self.assertRaises(PermissionDenied):
+            create_page("Refused", "nav_playground.html", "en", parent=self.page, context=self.staff)
+        self.assertFalse(Page.objects.filter(pagecontent_set__title="Refused").exists())
+
+    def test_create_page_content_with_a_context_is_checked(self):
+        content = create_page_content("de", "Seite", self.page, context=self.editor)
+
+        (kwargs,) = self.sent
+        self.assertEqual((kwargs["operation"], kwargs["obj"]), (operations.ADD_PAGE_TRANSLATION, self.page))
+        self.assertEqual(content.language, "de")
+        with self.assertRaises(PermissionDenied):
+            create_page_content("fr", "Page", self.page, context=self.staff)
+
+    def test_grants_with_a_context_only_hand_out_what_the_user_holds(self):
+        from cms.api import assign_user_to_page, create_page_user
+
+        recipient = self._create_user("recipient", is_staff=True)
+        with self.settings(CMS_PERMISSION=True):
+            with self.assertRaises(PermissionDenied):
+                assign_user_to_page(self.page, recipient, grant_all=True, context=self.staff)
+            grant = assign_user_to_page(self.page, recipient, grant_all=True, context=self.editor)
+            with self.assertRaises(PermissionDenied):
+                create_page_user(self.staff.user, self._create_user("other", is_staff=True), context=self.staff)
+
+        self.assertTrue(grant.pk)
+
+
 class MovePageChecksTest(CMSTestCase):
     """The ``MOVE_PAGE`` core checks, reached the way the page tree reaches them."""
 
@@ -1548,4 +1679,4 @@ class AdminPagePermissionHookTest(CMSTestCase):
         verdict = can(
             operations.CHANGE_PAGE_PERMISSIONS, self.context, page=self.page, permissions=self.permissions
         )
-        self.assertEqual(verdict.reasons[0].name, "cms.pages.change_permissions_permission")
+        self.assertEqual(verdict.reasons[0].name, "cms.permissions.change_page_permissions")
