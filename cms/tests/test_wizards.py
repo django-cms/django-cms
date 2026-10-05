@@ -326,6 +326,37 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 self.assertContains(response, expected, status_code=200)
                 self.assertNotContains(response, unexpected, status_code=200)
 
+    def test_wizard_content_is_added_as_an_operation(self):
+        """The wizard's content plugin is added by the plugin service, for the acting user."""
+        from cms import operations
+        from cms.signals import post_placeholder_operation
+
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            request = self.get_request()
+        templates = get_cms_setting("TEMPLATES") + [("page_wizard.html", "page_wizard.html")]
+        sent = []
+
+        def receive(**kwargs):
+            sent.append(kwargs)
+
+        post_placeholder_operation.connect(receive)
+        self.addCleanup(post_placeholder_operation.disconnect, receive)
+        with override_settings(CMS_TEMPLATES=templates, CMS_PAGE_WIZARD_DEFAULT_TEMPLATE="page_wizard.html"):
+            page = create_page("wizard home", "page_wizard.html", "en")
+            form = CreateCMSPageForm(
+                data={"title": "page 1", "slug": "page_1", "page_type": None, "content": "<p>Content</p>"},
+                wizard_page=page,
+                wizard_site=self.site,
+                wizard_language="en",
+                wizard_request=request,
+            )
+            self.assertTrue(form.is_valid())
+            form.save()
+
+        (kwargs,) = sent
+        self.assertEqual((kwargs["operation"], kwargs["user"]), (operations.ADD_PLUGIN, superuser))
+
     def test_wizard_content_placeholder_bad_setting(self):
         """
         Tests that the PageWizard won't respect a 'bad' setting such as

@@ -6,10 +6,9 @@ from django.utils.text import slugify
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms.core.plugin_pool import plugin_pool
-from cms.operations import ADD_PAGE
+from cms.operations import ADD_PAGE, ADD_PLUGIN
 from cms.pages.admin.forms import AddPageForm
 from cms.pages.utils import get_available_slug
-from cms.permissions import utils as permissions
 from cms.shared.checks import can
 from cms.shared.operations import OperationContext
 from cms.utils.conf import get_cms_setting
@@ -154,18 +153,14 @@ class CreateCMSPageForm(AddPageForm):
         plugin_body = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN_BODY')
         slot = get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER')
 
-        if plugin_type in plugin_pool.plugins and plugin_body:
-            if content and permissions.has_plugin_permission(
-                    self._user, plugin_type, "add"):
-                placeholder = self.get_placeholder(new_translation, slot=slot)
-                if placeholder:
-                    opts = {
-                        'placeholder': placeholder,
-                        'plugin_type': plugin_type,
-                        'language': self.language_code,
-                        plugin_body: content,
-                    }
-                    add_plugin(**opts)
+        if plugin_type in plugin_pool.plugins and plugin_body and content:
+            placeholder = self.get_placeholder(new_translation, slot=slot)
+            context = OperationContext.from_request(self._request)
+            target = {"placeholder": placeholder, "plugin_type": plugin_type, "language": self.language_code}
+            # A user who may not add the plugin gets the page without it, as
+            # before; the service cleans the content with the plugin's form.
+            if placeholder and can(ADD_PLUGIN, context, **target):
+                add_plugin(**target, context=context, **{plugin_body: content})
         return new_page
 
 

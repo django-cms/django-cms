@@ -514,6 +514,21 @@ not only to the ones they know, now see these operations, too.
 djangocms-versioning, for example, updates the modified date of the page's
 content.
 
+Callers outside the admin
+=========================
+
+* The page wizard adds its content plugin through the ``add_plugin`` service,
+  for the acting user: the content is cleaned with the plugin's form and the
+  operation is announced. A user who may not add the plugin still gets the page
+  without it.
+* ``cms copy lang`` announces every translation it adds as
+  ``ADD_PAGE_TRANSLATION``, acting on the system's behalf for the given user.
+  ``cms copy site``, ``cms delete-orphaned-plugins`` and ``cms uninstall`` are
+  maintenance commands and keep working on the models directly.
+* The admin history (``LogEntry``) records every declared page operation. The
+  operations logged before keep their messages; the others are logged with the
+  summary from the operation registry, for example "Set the home page".
+
 Extensions
 ==========
 

@@ -3,10 +3,13 @@ from django.contrib.sites.models import Site
 from django.core.management import CommandError
 from django.db import transaction
 
+from cms import operations
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import EmptyPageContent, Page, PageContent
 from cms.pages.utils import get_available_slug
+from cms.shared.operations import OperationContext, operation
+from cms.signals import PAGE_OPERATION_SIGNALS
 from cms.utils import get_language_list
 
 User = get_user_model()
@@ -101,12 +104,22 @@ class CopyLangCommand(SubcommandsCommand):
                     if title.overwrite_url:
                         new_title["overwrite_url"] = '{}/{}'.format(base, new_title["slug"]) if base \
                             else new_title["slug"]
-                    new_content = PageContent.objects.with_user(user).create(**new_title)
+                    # Adding the translation is announced like any other; the
+                    # command acts on the system's behalf, for ``user``.
+                    with operation(
+                        operations.ADD_PAGE_TRANSLATION,
+                        OperationContext.system("cms.copy_lang", user=user, language=to_lang),
+                        checks={"page": page, "permissions": None},
+                        signals=PAGE_OPERATION_SIGNALS,
+                        sender=Page,
+                        obj=page,
+                    ):
+                        new_content = PageContent.objects.with_user(user).create(**new_title)
 
-                    if new_content.is_public():
-                        # The page URL is derived from public content only; drafts
-                        # created by a versioning package get theirs on publish.
-                        page.update_urls_from_content(to_lang)
+                        if new_content.is_public():
+                            # The page URL is derived from public content only; drafts
+                            # created by a versioning package get theirs on publish.
+                            page.update_urls_from_content(to_lang)
 
                 if copy_content:
                     # copy plugins using API
@@ -165,6 +178,9 @@ class CopySiteCommand(SubcommandsCommand):
             .order_by('path')
         )
 
+        # Cloning a site is maintenance, like repairing the tree: it copies the
+        # model as it is, also to a site whose languages are not configured
+        # yet, which the copy_page_tree service rightly refuses an editor.
         with transaction.atomic():
             for page in pages:
                 new_page = page.copy_with_descendants(

@@ -34,6 +34,22 @@ _page_operations_map = {
     },
 }
 
+def _page_operation_handler(operation):
+    """How to log a page operation.
+
+    The operations django CMS has always logged keep their short messages. Every
+    other declared page operation is logged with its summary from the operation
+    registry, so that the history shows it, too.
+    """
+    if operation in _page_operations_map:
+        return _page_operations_map[operation]
+    try:
+        declaration = operations.get_operation(operation)
+    except LookupError:
+        return None
+    return {'message': declaration.summary, 'flag': CHANGE}
+
+
 _placeholder_operations_map = {
     operations.ADD_PLUGIN: {
         'message': _("Added Plugin"),
@@ -128,8 +144,8 @@ def log_page_operations(sender, **kwargs):
 
     # Check that we have instructions for the operation
     # and an instance of Page to link to in the log
-    if user is not None and operation_type in _page_operations_map and _is_valid_page_instance(obj):
-        operation_handler = _page_operations_map[operation_type]
+    operation_handler = _page_operation_handler(operation_type)
+    if user is not None and operation_handler and _is_valid_page_instance(obj):
         content_type_id = ContentType.objects.get_for_model(obj).pk
         create_log_entry(
             user_id=user.pk,
@@ -137,7 +153,7 @@ def log_page_operations(sender, **kwargs):
             object_id=obj.pk,
             object_repr=str(obj),
             action_flag=operation_handler['flag'],
-            change_message=operation_handler['message'],
+            change_message=str(operation_handler['message']),
         )
 
 

@@ -1112,6 +1112,44 @@ class ApiContextTest(CMSTestCase):
         self.assertTrue(grant.pk)
 
 
+class OperationCallersTest(CMSTestCase):
+    """Callers outside the admin announce what they do, and the history shows it."""
+
+    def test_copying_a_language_announces_each_new_translation(self):
+        from io import StringIO
+
+        from django.core import management
+
+        page = create_page("Page", "nav_playground.html", "en")
+        sent = []
+
+        def receive(**kwargs):
+            sent.append(kwargs)
+
+        post_obj_operation.connect(receive)
+        self.addCleanup(post_obj_operation.disconnect, receive)
+        management.call_command(
+            "cms", "copy", "lang", "--from-lang=en", "--to-lang=de", f"--userid={self.get_superuser().pk}",
+            interactive=False, stdout=StringIO(),
+        )
+
+        (kwargs,) = sent
+        self.assertEqual(
+            (kwargs["operation"], kwargs["obj"], kwargs["language"]), (operations.ADD_PAGE_TRANSLATION, page, "de")
+        )
+        self.assertTrue(page.get_content_obj("de", fallback=False))
+
+    def test_declared_page_operations_are_logged_with_their_summary(self):
+        from django.contrib.admin.models import LogEntry
+
+        create_page("Home", "nav_playground.html", "en")
+        page = create_page("Page", "nav_playground.html", "en")
+        page_services.set_home(page, context=OperationContext(user=self.get_superuser()))
+
+        entry = LogEntry.objects.latest("pk")
+        self.assertEqual((entry.object_id, entry.change_message), (str(page.pk), "Set the home page"))
+
+
 class MovePageChecksTest(CMSTestCase):
     """The ``MOVE_PAGE`` core checks, reached the way the page tree reaches them."""
 
