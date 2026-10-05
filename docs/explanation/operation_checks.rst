@@ -625,13 +625,12 @@ should register a check instead, see
 
    * the page checks above are all permission or validation checks so far;
      those about an object's state become policy checks;
-   * operation checks for the placeholder and plugin operations
-     (``ADD_PLUGIN``, ``CHANGE_PLUGIN``, ``MOVE_PLUGIN``, ``CUT_PLUGIN``,
-     ``PASTE_PLUGIN``, ``PASTE_PLACEHOLDER``, ``COPY_PLUGIN_TO_CLIPBOARD``,
-     ``COPY_PLACEHOLDER_TO_CLIPBOARD``, ``ADD_PLUGINS_FROM_PLACEHOLDER``,
-     ``DELETE_PLUGIN``, ``CLEAR_PLACEHOLDER``), which currently check through
-     their permission backend only, and the ``add_plugin`` and
-     ``change_plugin`` services with the plugin data hook;
+   * core checks for the placeholder and plugin operations: the plugin
+     services run the checks apps register, but their own permission and
+     parent checks are still made inline and are invisible to ``can()``;
+   * the ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD``
+     operations, and the ``add_plugin`` and ``change_plugin`` services with the
+     plugin data hook;
    * the services and checks for ``cms.extensions``.
 
 The placeholder and plugin operations follow the same structure, see

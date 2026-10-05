@@ -9,7 +9,8 @@ from django.utils.translation import override as force_language
 from cms import operations
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_config import CMSCoreExtensions
-from cms.models import CMSPlugin, Page, PageContent, Placeholder
+from cms.core.services import plugins as plugin_services
+from cms.models import CMSPlugin, Page, PageContent, Placeholder, UserSettings
 from cms.pages import services as page_services
 from cms.pages.admin.forms import MovePageForm
 from cms.pages.admin.page import PageAdmin, PageContentAdmin
@@ -17,7 +18,12 @@ from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissi
 from cms.shared import checks
 from cms.shared.checks import OperationBlocked, can
 from cms.shared.operations import OperationContext, operation
-from cms.signals import PAGE_OPERATION_SIGNALS, post_obj_operation, pre_obj_operation
+from cms.signals import (
+    PAGE_OPERATION_SIGNALS,
+    PLACEHOLDER_OPERATION_SIGNALS,
+    post_obj_operation,
+    pre_obj_operation,
+)
 from cms.test_utils.testcases import CMSTestCase
 
 SLUG_NOT_UNIQUE = "You cannot have two pages with the same slug"
@@ -397,6 +403,118 @@ class OperationRegistryTest(RegistryIsolationMixin, CMSTestCase):
         for config in (NotAnOperation, Duplicate):
             with self.subTest(config=config.__name__), self.assertRaises(ImproperlyConfigured):
                 CMSCoreExtensions().configure_app(config)
+
+
+class PluginServiceChecksTest(RegistryIsolationMixin, CMSTestCase):
+    """The plugin services run the checks registered for their operation."""
+
+    def setUp(self):
+        super().setUp()
+        self.context = OperationContext(user=self.get_superuser(), language="en")
+        page = create_page("Page", "nav_playground.html", "en")
+        placeholders = page.get_placeholders("en")
+        self.body = placeholders.get(slot="body")
+        self.other = placeholders.get(slot="right-column")
+        self.plugin = add_plugin(self.body, "TextPlugin", "en", body="Text").cmsplugin_ptr
+        add_plugin(self.body, "TextPlugin", "en", body="Second")
+        self.clipboard = Placeholder.objects.create(slot="clipboard")
+        UserSettings.objects.create(user=self.context.user, language="en", clipboard=self.clipboard)
+        self.reference = plugin_services.copy_placeholder_to_clipboard(
+            self.body, self.clipboard, "en", "en", context=self.context
+        )
+        self.sent = []
+        for signal in PLACEHOLDER_OPERATION_SIGNALS:
+            signal.connect(self.receive)
+            self.addCleanup(signal.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        self.sent.append(kwargs["operation"])
+
+    def calls(self):
+        """Each service with an operation id, its call, and the arguments its checks receive."""
+        return [
+            (
+                operations.MOVE_PLUGIN,
+                lambda: plugin_services.move_plugin(self.plugin, 1, self.other, context=self.context),
+                {"plugin": self.plugin, "target_position": 1, "target_placeholder": self.other, "target_parent": None},
+            ),
+            (
+                operations.CUT_PLUGIN,
+                lambda: plugin_services.cut_plugin(self.plugin, "en", self.clipboard, context=self.context),
+                {"plugin": self.plugin, "target_language": "en", "target_placeholder": self.clipboard},
+            ),
+            (
+                operations.PASTE_PLUGIN,
+                lambda: plugin_services.paste_plugin(self.plugin, "en", self.other, 1, context=self.context),
+                {
+                    "plugin": self.plugin,
+                    "target_language": "en",
+                    "target_placeholder": self.other,
+                    "target_position": 1,
+                    "target_parent": None,
+                },
+            ),
+            (
+                operations.PASTE_PLACEHOLDER,
+                lambda: plugin_services.paste_placeholder(self.reference, "en", self.other, 1, context=self.context),
+                {"plugin": self.reference, "target_language": "en", "target_placeholder": self.other, "target_position": 1},
+            ),
+            (
+                operations.ADD_PLUGINS_FROM_PLACEHOLDER,
+                lambda: plugin_services.add_plugins_from_placeholder(
+                    self.body, self.other, "en", "en", context=self.context
+                ),
+                {"source_placeholder": self.body, "target_placeholder": self.other, "source_language": "en", "target_language": "en"},
+            ),
+            (
+                operations.DELETE_PLUGIN,
+                lambda: plugin_services.delete_plugin(self.plugin, context=self.context),
+                {"plugin": self.plugin},
+            ),
+            (
+                operations.CLEAR_PLACEHOLDER,
+                lambda: plugin_services.clear_placeholder(self.body, "en", context=self.context),
+                {"placeholder": self.body, "language": "en"},
+            ),
+        ]
+
+    def snapshot(self):
+        return list(
+            CMSPlugin.objects.order_by("pk").values_list("pk", "placeholder_id", "language", "parent_id", "position")
+        )
+
+    def test_a_blocking_check_stops_the_service_before_anything_happens(self):
+        for operation_id, call, arguments in self.calls():
+            with self.subTest(operation=operation_id):
+                received = []
+
+                def published(context, received=received, **kwargs):
+                    received.append(kwargs)
+                    raise OperationBlocked("Published content is read-only")
+
+                checks.register_check(operation_id, "tests.published", published, kind=checks.POLICY)
+                self.addCleanup(checks._extensions[operation_id].pop, "tests.published")
+                before = self.snapshot()
+
+                with self.assertRaisesMessage(OperationBlocked, "Published content is read-only"):
+                    call()
+
+                self.assertEqual(self.sent, [])
+                self.assertEqual(self.snapshot(), before)
+                (kwargs,) = received
+                self.assertEqual({key: kwargs[key] for key in arguments}, arguments)
+                self.assertIn("permissions", kwargs)
+                # The dry run with the same arguments agrees.
+                verdict = can(operation_id, self.context, **arguments)
+                self.assertEqual([(r.name, r.kind) for r in verdict.reasons], [("tests.published", checks.POLICY)])
+
+    def test_a_passing_check_lets_the_service_run(self):
+        checks.register_check(operations.MOVE_PLUGIN, "tests.allowed", lambda context, **kwargs: None)
+
+        plugin_services.move_plugin(self.plugin, 1, self.other, context=self.context)
+
+        self.assertEqual(self.sent, [operations.MOVE_PLUGIN, operations.MOVE_PLUGIN])
+        self.assertEqual(CMSPlugin.objects.get(pk=self.plugin.pk).placeholder_id, self.other.pk)
 
 
 class MovePageChecksTest(CMSTestCase):

@@ -249,7 +249,9 @@ through operation checks, too, and ``cms.operations`` adds
 ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD``. See
 :ref:`operation_checks` for the concepts and the list of checks.
 
-.. TODO: plugin operation checks and the new constants are not implemented yet.
+.. TODO: the plugin services run the checks apps register, but their own
+   permission and parent checks are not registered core checks yet, and the
+   clipboard copy constants do not exist yet.
 
 Operation registry
 ==================

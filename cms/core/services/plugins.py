@@ -15,6 +15,12 @@ different backend for one call -- the placeholder admin does this, handing over
 an adapter that routes each predicate back through its own overridable
 ``has_*_permission`` hooks -- or export a ``permissions`` contract to replace it
 for every caller at once.
+
+**Every service with an operation id runs the operation checks** registered for
+it (:mod:`cms.shared.checks`) before it announces or changes anything, so a
+check that refuses an operation in a dry run (``can()``) refuses the operation
+itself. The permission and parent checks above are still made inline, ahead of
+the registered checks.
 """
 
 from __future__ import annotations
@@ -29,6 +35,7 @@ from cms.core.plugins import copy_plugins_to_placeholder
 from cms.core.services.permissions import get_permissions
 from cms.models import CMSPlugin, PlaceholderReference
 from cms.operations import Operation, register_operation
+from cms.shared.checks import run_checks
 from cms.shared.operations import OperationContext
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 
@@ -132,6 +139,15 @@ def move_plugin(
         _deny(_("You have no permission to move this plugin"))
     if target_placeholder and not permissions.can_edit_source(target_placeholder):
         _deny(_("You have no permission to move this plugin"))
+    run_checks(
+        operations.MOVE_PLUGIN,
+        context,
+        plugin=plugin,
+        target_position=target_position,
+        target_placeholder=target_placeholder,
+        target_parent=target_parent,
+        permissions=permissions,
+    )
     _check_parent(target_parent, target_placeholder or source_placeholder, language, plugin=plugin)
 
     source_language = plugin.language
@@ -184,6 +200,14 @@ def cut_plugin(
         _deny(_("You have no permission to cut this plugin"))
     if not permissions.can_edit_source(source_placeholder):
         _deny(_("You have no permission to cut this plugin"))
+    run_checks(
+        operations.CUT_PLUGIN,
+        context,
+        plugin=plugin,
+        target_language=target_language,
+        target_placeholder=target_placeholder,
+        permissions=permissions,
+    )
 
     source_language = plugin.language
     source_parent_id = plugin.parent_id
@@ -269,6 +293,16 @@ def paste_plugin(
         _deny(_("You have no permission to paste this plugin"))
     if not permissions.can_edit_source(target_placeholder):
         _deny(_("You have no permission to paste this plugin"))
+    run_checks(
+        operations.PASTE_PLUGIN,
+        context,
+        plugin=plugin,
+        target_language=target_language,
+        target_placeholder=target_placeholder,
+        target_position=target_position,
+        target_parent=target_parent,
+        permissions=permissions,
+    )
     _check_parent(target_parent, target_placeholder, target_language)
 
     token = _start(
@@ -332,7 +366,15 @@ def paste_placeholder(
         _deny(_("You have no permission to paste this placeholder"))
     if not permissions.can_edit_source(target_placeholder):
         _deny(_("You have no permission to paste this placeholder"))
-
+    run_checks(
+        operations.PASTE_PLACEHOLDER,
+        context,
+        plugin=plugin,
+        target_language=target_language,
+        target_placeholder=target_placeholder,
+        target_position=target_position,
+        permissions=permissions,
+    )
 
     token = _start(
         operations.PASTE_PLACEHOLDER,
@@ -467,6 +509,15 @@ def add_plugins_from_placeholder(
         _deny(_("You do not have permission to copy these plugins."))
     if not permissions.can_edit_source(target_placeholder):
         _deny(_("You do not have permission to copy these plugins."))
+    run_checks(
+        operations.ADD_PLUGINS_FROM_PLACEHOLDER,
+        context,
+        source_placeholder=source_placeholder,
+        target_placeholder=target_placeholder,
+        source_language=source_language,
+        target_language=target_language,
+        permissions=permissions,
+    )
 
     target_tree_order = target_placeholder.get_plugin_tree_order(language=target_language, parent_id=None)
 
@@ -516,6 +567,7 @@ def delete_plugin(
         _deny(_("You do not have permission to delete this plugin"))
     if not permissions.can_edit_source(placeholder):
         _deny(_("You do not have permission to delete this plugin"))
+    run_checks(operations.DELETE_PLUGIN, context, plugin=plugin, permissions=permissions)
 
     tree_order = placeholder.get_plugin_tree_order(language=plugin.language)
 
@@ -561,7 +613,9 @@ def clear_placeholder(
         _deny(_("You do not have permission to clear this placeholder"))
     if not permissions.can_edit_source(placeholder):
         _deny(_("You do not have permission to clear this placeholder"))
-
+    run_checks(
+        operations.CLEAR_PLACEHOLDER, context, placeholder=placeholder, language=language, permissions=permissions
+    )
 
     token = _start(
         operations.CLEAR_PLACEHOLDER,

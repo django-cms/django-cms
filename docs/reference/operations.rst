@@ -188,12 +188,17 @@ The placeholder and plugin operations are performed by the services in
       - :func:`cms.core.services.plugins.clear_placeholder`
       - ``placeholder``, ``language``
 
+The services run the checks registered for their operation, with the
+arguments in the third column, before they announce or change anything. Their
+own permission and parent checks still run inline, ahead of the registered
+checks, and are not yet registered as core checks themselves.
+
 .. TODO: ``add_plugin`` and ``change_plugin`` do not exist yet (the admin
-   performs these operations), the plugin services check permissions through
-   their backend and do not run operation checks yet, and
-   ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD`` have no
-   constants yet. The arguments of ``add_plugin`` and ``change_plugin`` follow
-   the proposal in #8868.
+   performs these operations), the inline checks are not registered core checks
+   yet, and ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD``
+   have no constants yet, so the clipboard copies run no registered checks. The
+   arguments of ``add_plugin`` and ``change_plugin`` follow the proposal in
+   #8868.
 
 
 ****************
