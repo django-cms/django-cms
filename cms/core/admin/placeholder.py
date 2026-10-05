@@ -389,11 +389,12 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         placeholder = plugin_data['placeholder_id']
         plugin_type = plugin_data['plugin_type']
 
-        if not self.has_add_plugin_permission(request, placeholder, plugin_type):
-            message = _('You do not have permission to add a plugin')
-            return HttpResponseForbidden(message)
-
-        if not placeholder.check_source(request.user):
+        # Saving is checked by the add_plugin service. These checks only spare
+        # the user a form they could not save.
+        if request.method != "POST" and not (
+            self.has_add_plugin_permission(request, placeholder, plugin_type)
+            and placeholder.check_source(request.user)
+        ):
             message = _('You do not have permission to add a plugin')
             return HttpResponseForbidden(message)
 
@@ -435,23 +436,20 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             # Use the QueryDict as the POST data
             request.POST = query_dict
 
-        response = plugin_instance.add_view(request)
-        plugin = getattr(plugin_instance, 'saved_object', None)
+        self._hand_over_operation(request, plugin_instance)
+        try:
+            # Saving goes through the add_plugin service, which announces the
+            # operation (see CMSPluginBase.save_model).
+            return plugin_instance.add_view(request)
+        except ValidationError as error:
+            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
 
-        if plugin_instance._operation_token:
-            tree_order = plugin.placeholder.get_plugin_tree_order(
-                plugin.language,
-                plugin.parent_id,
-            )
-            self._send_post_placeholder_operation(
-                request,
-                operation=operations.ADD_PLUGIN,
-                token=plugin_instance._operation_token,
-                plugin=plugin,
-                placeholder=plugin.placeholder,
-                tree_order=tree_order,
-            )
-        return response
+    def _hand_over_operation(self, request, plugin_instance):
+        """Give the plugin admin what its ``save_model()`` passes to the services."""
+        if request.method == "POST":
+            plugin_instance._operation_context = self._get_operation_context(request)
+            plugin_instance._operation_permissions = self._get_permissions(request)
+            plugin_instance._operation_sender = self.__class__
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
@@ -566,30 +564,21 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         # CMSPluginBase subclass instance
         plugin_instance = obj.get_plugin_class_instance(admin=self.admin_site)
 
-        if not self.has_change_plugin_permission(request, obj):
+        # Saving is checked by the change_plugin service. These checks only spare
+        # the user a form they could not save.
+        if request.method != "POST" and not (
+            self.has_change_plugin_permission(request, obj)
+            and obj.placeholder.check_source(request.user)
+        ):
             return HttpResponseForbidden(_("You do not have permission to edit this plugin"))
 
-        if not obj.placeholder.check_source(request.user):
-            message = _("You do not have permission to edit this plugin")
-            return HttpResponseForbidden(message)
-
-        response = plugin_instance.change_view(request, str(plugin_id))
-
-        plugin = getattr(plugin_instance, 'saved_object', None)
-
-        if plugin:
-            plugin.placeholder.clear_cache(plugin.language)
-
-        if plugin_instance._operation_token:
-            self._send_post_placeholder_operation(
-                request,
-                operation=operations.CHANGE_PLUGIN,
-                token=plugin_instance._operation_token,
-                old_plugin=obj,
-                new_plugin=plugin,
-                placeholder=plugin.placeholder,
-            )
-        return response
+        self._hand_over_operation(request, plugin_instance)
+        try:
+            # Saving goes through the change_plugin service, which announces the
+            # operation and clears the placeholder cache.
+            return plugin_instance.change_view(request, str(plugin_id))
+        except ValidationError as error:
+            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin

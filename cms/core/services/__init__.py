@@ -15,7 +15,9 @@ backend for every caller.
 """
 
 from cms.core.services.plugins import (
+    add_plugin,
     add_plugins_from_placeholder,
+    change_plugin,
     clear_placeholder,
     copy_placeholder_to_clipboard,
     copy_plugin_to_clipboard,
@@ -27,7 +29,9 @@ from cms.core.services.plugins import (
 )
 
 __all__ = [
+    "add_plugin",
     "add_plugins_from_placeholder",
+    "change_plugin",
     "clear_placeholder",
     "copy_placeholder_to_clipboard",
     "copy_plugin_to_clipboard",

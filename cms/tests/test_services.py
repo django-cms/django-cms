@@ -303,7 +303,7 @@ class PluginParentGuardTest(CMSTestCase):
 
     def test_move_accepts_a_parent_in_the_target_placeholder(self):
         plugin = add_plugin(self.body, "TextPlugin", "en", body="moved")
-        parent = add_plugin(self.other, "MultiColumnPlugin", "en")
+        parent = add_plugin(self.other, "ColumnPlugin", "en")
 
         plugin_services.move_plugin(
             plugin, 1, target_placeholder=self.other, target_parent=parent, context=self.context

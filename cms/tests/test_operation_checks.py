@@ -23,9 +23,11 @@ from cms.signals import (
     PAGE_OPERATION_SIGNALS,
     PLACEHOLDER_OPERATION_SIGNALS,
     post_obj_operation,
+    post_placeholder_operation,
     pre_obj_operation,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
 
 SLUG_NOT_UNIQUE = "You cannot have two pages with the same slug"
 
@@ -323,6 +325,34 @@ class OperationFrameTest(RegistryIsolationMixin, CMSTestCase):
             with self.frame():
                 raise RuntimeError
         self.assertEqual([signal for signal, _ in self.sent], [pre_obj_operation])
+
+    def test_a_failing_post_receiver_undoes_the_operation(self):
+        def fail(**kwargs):
+            raise RuntimeError("receiver failed")
+
+        post_obj_operation.connect(fail)
+        self.addCleanup(post_obj_operation.disconnect, fail)
+        target = create_page("Target", "nav_playground.html", "en")
+
+        with self.assertRaisesMessage(RuntimeError, "receiver failed"):
+            page_services.move_page(self.page, target, "first-child", context=self.context)
+
+        self.page.refresh_from_db()
+        self.assertIsNone(self.page.parent_id)
+
+    def test_a_failing_receiver_undoes_a_plugin_operation(self):
+        def fail(**kwargs):
+            raise RuntimeError("receiver failed")
+
+        placeholder = self.page.get_placeholders("en").get(slot="body")
+        plugin = add_plugin(placeholder, "TextPlugin", "en", body="Text")
+        post_placeholder_operation.connect(fail)
+        self.addCleanup(post_placeholder_operation.disconnect, fail)
+
+        with self.assertRaisesMessage(RuntimeError, "receiver failed"):
+            plugin_services.delete_plugin(plugin.cmsplugin_ptr, context=self.context)
+
+        self.assertTrue(CMSPlugin.objects.filter(pk=plugin.pk).exists())
 
     def test_a_silenced_context_announces_nothing(self):
         self.context = OperationContext(user=self.get_superuser(), emit_signals=False)
@@ -646,6 +676,222 @@ class CorePluginChecksTest(RegistryIsolationMixin, CMSTestCase):
                     self.assertIn("not allowed in placeholder", response.content.decode())
 
         self.assertFalse(self.other.get_plugins("en").exists())
+
+
+class PluginDataServicesTest(RegistryIsolationMixin, CMSTestCase):
+    """``add_plugin`` and ``change_plugin``: data in, cleaned by the plugin's form."""
+
+    def setUp(self):
+        super().setUp()
+        self.context = OperationContext(user=self.get_superuser(), language="en")
+        page = create_page("Page", "nav_playground.html", "en")
+        placeholders = page.get_placeholders("en")
+        self.body = placeholders.get(slot="body")
+        self.other = placeholders.get(slot="right-column")
+        self.sent = []
+        for signal in PLACEHOLDER_OPERATION_SIGNALS:
+            signal.connect(self.receive)
+            self.addCleanup(signal.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        self.sent.append((signal, kwargs))
+
+    def add_link(self, **kwargs):
+        data = kwargs.pop("data", {"name": "  A link  ", "external_link": "https://www.django-cms.org"})
+        return plugin_services.add_plugin(self.body, "LinkPlugin", "en", data, context=self.context, **kwargs)
+
+    def test_add_cleans_the_data_through_the_plugin_form(self):
+        plugin = self.add_link()
+
+        plugin.refresh_from_db()
+        self.assertEqual(plugin.name, "A link")  # stripped by the form field
+        self.assertEqual((plugin.placeholder_id, plugin.language, plugin.plugin_type), (self.body.pk, "en", "LinkPlugin"))
+        (pre_signal, pre), (post_signal, post) = self.sent
+        self.assertEqual((pre_signal, post_signal), PLACEHOLDER_OPERATION_SIGNALS)
+        self.assertEqual(post["operation"], operations.ADD_PLUGIN)
+        self.assertEqual(pre["token"], post["token"])
+        self.assertEqual((post["plugin"], post["placeholder"]), (plugin, self.body))
+        self.assertEqual(post["tree_order"], [plugin.pk])
+
+    def test_invalid_data_is_refused_before_anything_happens(self):
+        with self.assertRaises(ValidationError) as raised:
+            self.add_link(data={"name": "A link", "external_link": "not a url"})
+
+        self.assertIn("external_link", raised.exception.message_dict)
+        self.assertEqual(self.sent, [])
+        self.assertFalse(self.body.get_plugins("en").exists())
+
+    def test_tree_fields_cannot_be_set_through_data(self):
+        plugin = self.add_link(
+            data={"name": "A link", "external_link": "https://www.django-cms.org", "placeholder": self.other.pk, "position": 99}
+        )
+
+        self.assertEqual((plugin.placeholder_id, plugin.position), (self.body.pk, 1))
+
+    def test_positions(self):
+        first = self.add_link()
+        child = self.add_link(target=first, position="last-child")
+        before = self.add_link(target=first, position="left")
+        top = self.add_link(position="first-child")
+
+        tree = [(p.pk, p.parent_id) for p in self.body.get_plugins("en").order_by("position")]
+        self.assertEqual(tree, [(top.pk, None), (before.pk, None), (first.pk, None), (child.pk, first.pk)])
+
+    def test_a_plugin_can_replace_the_data_cleaning(self):
+        LinkPlugin = plugin_pool.get_plugin("LinkPlugin")
+        original = LinkPlugin.clean_plugin_data.__func__
+
+        def clean_plugin_data(cls, obj, data, *, instance=None):
+            return original(cls, obj, {**data, "name": data["name"].upper()}, instance=instance)
+
+        with patch.object(LinkPlugin, "clean_plugin_data", classmethod(clean_plugin_data)):
+            plugin = self.add_link()
+
+        self.assertEqual(plugin.name, "A LINK")
+
+    def test_change_only_needs_the_fields_that_change(self):
+        plugin = self.add_link()
+        self.sent.clear()
+
+        changed = plugin_services.change_plugin(plugin.cmsplugin_ptr, {"name": "Renamed"}, context=self.context)
+
+        changed.refresh_from_db()
+        self.assertEqual((changed.name, changed.external_link), ("Renamed", "https://www.django-cms.org"))
+        (_, pre), (_, post) = self.sent
+        self.assertEqual(post["operation"], operations.CHANGE_PLUGIN)
+        self.assertEqual((pre["old_plugin"].name, post["new_plugin"].name), ("A link", "Renamed"))
+        with self.assertRaises(ValidationError):
+            plugin_services.change_plugin(changed, {"external_link": "not a url"}, context=self.context)
+
+    def test_add_and_change_run_their_checks(self):
+        staff = OperationContext(user=self.get_staff_user_with_no_permissions(), language="en")
+        plugin = self.add_link()
+
+        verdict = can(operations.ADD_PLUGIN, staff, placeholder=self.body, plugin_type="LinkPlugin", language="en")
+        self.assertEqual([r.name for r in verdict.reasons], ["cms.core.add_permission"])
+        with self.assertRaises(PermissionDenied):
+            plugin_services.change_plugin(plugin, {"name": "No"}, context=staff)
+        with patch.object(Placeholder, "check_source", return_value=False), self.assertRaises(OperationBlocked):
+            self.add_link()
+
+    def test_add_validates_the_destination(self):
+        foreign = plugin_services.add_plugin(
+            self.other, "LinkPlugin", "en", {"name": "B", "external_link": "https://b.org"}, context=self.context
+        )
+        cases = {
+            "unknown type": dict(plugin_type="NoSuchPlugin"),
+            "parent elsewhere": dict(target=foreign),
+        }
+        for label, kwargs in cases.items():
+            with self.subTest(label), self.assertRaises(ValidationError):
+                plugin_services.add_plugin(
+                    self.body,
+                    kwargs.pop("plugin_type", "LinkPlugin"),
+                    "en",
+                    {"name": "A", "external_link": "https://a.org"},
+                    context=self.context,
+                    **kwargs,
+                )
+        with self.only_in("right-column"), self.assertRaises(ValidationError):
+            self.add_link()
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF={"body": {"limits": {"LinkPlugin": 1}}}):
+            self.add_link()
+            with self.assertRaises(ValidationError):
+                self.add_link()
+
+    def only_in(self, slot):
+        return patch.object(plugin_pool.get_plugin("LinkPlugin"), "allowed_slots", [slot])
+
+    def test_a_system_context_adds_without_a_user(self):
+        plugin = plugin_services.add_plugin(
+            self.body,
+            "LinkPlugin",
+            "en",
+            {"name": "A link", "external_link": "https://www.django-cms.org"},
+            context=OperationContext.system("tests"),
+        )
+
+        self.assertTrue(CMSPlugin.objects.filter(pk=plugin.pk).exists())
+
+    def test_the_admin_saves_through_the_service(self):
+        uri = self.get_add_plugin_uri(placeholder=self.body, plugin_type="LinkPlugin", language="en")
+
+        with patch("django.contrib.admin.site._registry", {}), self.login_user_context(self.get_superuser()):
+            # save_model must not need the placeholder admin from the admin site.
+            response = self.client.post(uri, {"name": "A link", "external_link": "https://www.django-cms.org"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([kwargs["operation"] for _, kwargs in self.sent], [operations.ADD_PLUGIN] * 2)
+        self.assertEqual(self.body.get_plugins("en").count(), 1)
+
+
+class PluginTreeRulesTest(RegistryIsolationMixin, CMSTestCase):
+    """Which plugin may go where: parent and child classes, and the site's languages."""
+
+    def setUp(self):
+        super().setUp()
+        self.context = OperationContext(user=self.get_superuser(), language="en")
+        page = create_page("Page", "nav_playground.html", "en")
+        placeholders = page.get_placeholders("en")
+        self.body = placeholders.get(slot="body")
+        self.other = placeholders.get(slot="right-column")
+        self.columns = add_plugin(self.body, "MultiColumnPlugin", "en")
+
+    def add(self, plugin_type, **kwargs):
+        return plugin_services.add_plugin(
+            kwargs.pop("placeholder", self.body), plugin_type, kwargs.pop("language", "en"), context=self.context,
+            **kwargs,
+        )
+
+    def test_add_follows_the_parent_and_child_classes(self):
+        # MultiColumnPlugin only takes ColumnPlugin children; ColumnPlugin needs it as parent.
+        column = self.add("ColumnPlugin", target=self.columns)
+        with self.assertRaisesMessage(ValidationError, "not allowed inside MultiColumnPlugin"):
+            self.add("TextPlugin", data={"body": "Text"}, target=self.columns)
+        with self.assertRaisesMessage(ValidationError, "can only be added inside another plugin"):
+            self.add("ColumnPlugin")
+
+        verdict = can(operations.ADD_PLUGIN, self.context, placeholder=self.body, plugin_type="ColumnPlugin", language="en")
+        self.assertEqual([r.name for r in verdict.reasons], ["cms.core.parent_allowed"])
+        self.assertEqual(self.body.get_plugins("en").count(), 2)
+        self.assertEqual(column.parent_id, self.columns.pk)
+
+    def test_text_takes_its_inline_plugins(self):
+        # djangocms-text hides its children from the structure board (allow_children
+        # is off), but text-enabled plugins are still allowed inside it.
+        text = add_plugin(self.body, "TextPlugin", "en", body="Text")
+
+        link = self.add(
+            "LinkPlugin", data={"name": "A link", "external_link": "https://www.django-cms.org"}, target=text
+        )
+
+        self.assertEqual(link.parent_id, text.pk)
+
+    def test_move_and_paste_follow_the_parent_and_child_classes(self):
+        text = add_plugin(self.other, "TextPlugin", "en", body="Text")
+
+        with self.assertRaisesMessage(ValidationError, "not allowed inside MultiColumnPlugin"):
+            plugin_services.move_plugin(text, 2, self.body, target_parent=self.columns, context=self.context)
+        with self.assertRaisesMessage(ValidationError, "not allowed inside MultiColumnPlugin"):
+            plugin_services.paste_plugin(text, "en", self.body, 2, target_parent=self.columns, context=self.context)
+
+    def test_reordering_keeps_an_existing_tree_movable(self):
+        # A tree that breaks the rules (created before they were checked, or by
+        # code that does not check) can still be reordered under the same parent.
+        invalid = add_plugin(self.body, "TextPlugin", "en", body="Text", target=self.columns)
+        add_plugin(self.body, "TextPlugin", "en", body="Second", target=self.columns)
+
+        plugin_services.move_plugin(invalid, 3, target_parent=self.columns, context=self.context)
+
+        self.assertEqual(CMSPlugin.objects.get(pk=invalid.pk).parent_id, self.columns.pk)
+
+    def test_the_language_belongs_to_the_site(self):
+        with self.assertRaisesMessage(ValidationError, "supported language"):
+            self.add("LinkPlugin", data={"name": "A", "external_link": "https://a.org"}, language="xx")
+        with self.assertRaisesMessage(ValidationError, "supported language"):
+            plugin_services.add_plugins_from_placeholder(self.body, self.other, "en", "xx", context=self.context)
+
+        self.add("LinkPlugin", data={"name": "A", "external_link": "https://a.org"}, language="de")
 
 
 class MovePageChecksTest(CMSTestCase):

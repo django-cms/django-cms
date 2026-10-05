@@ -149,11 +149,11 @@ The placeholder and plugin operations are performed by the services in
       - Service
       - Arguments
     * - ``ADD_PLUGIN``
-      - ``add_plugin``
+      - :func:`cms.core.services.plugins.add_plugin`
       - ``placeholder``, ``plugin_type``, ``language``, ``data``,
         ``position``, ``target``
     * - ``CHANGE_PLUGIN``
-      - ``change_plugin``
+      - :func:`cms.core.services.plugins.change_plugin`
       - ``plugin``, ``data``
     * - ``MOVE_PLUGIN``
       - :func:`cms.core.services.plugins.move_plugin`
@@ -191,8 +191,9 @@ The placeholder and plugin operations are performed by the services in
 The services run the checks registered for their operation, with the
 arguments in the third column, before they announce or change anything.
 
-.. TODO: ``add_plugin`` and ``change_plugin`` do not exist yet (the admin
-   performs these operations). Their arguments follow the proposal in #8868.
+Adding and changing a plugin also validate ``data`` with the plugin's
+:meth:`~cms.core.plugin_base.CMSPluginBase.clean_plugin_data`, after the
+checks.
 
 
 ****************
@@ -282,7 +283,7 @@ Plugin services
 ***************
 
 .. automodule:: cms.core.services.plugins
-    :members: move_plugin, cut_plugin, paste_plugin, paste_placeholder,
+    :members: add_plugin, change_plugin, move_plugin, cut_plugin, paste_plugin, paste_placeholder,
         copy_plugin_to_clipboard, copy_placeholder_to_clipboard,
         add_plugins_from_placeholder, delete_plugin, clear_placeholder
 

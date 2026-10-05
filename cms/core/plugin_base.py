@@ -655,36 +655,77 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         return TemplateResponse(request, "admin/cms/page/plugin/confirm_form.html", context)
 
-    def save_model(self, request, obj, form, change):
-        """
-        Override original method, and add some attributes to obj
-        This has to be made, because if the object is newly created, it must know
-        where it lives.
-        """
-        from django.contrib.admin import site
+    #: Fields of a plugin that place it in the plugin tree. They are set by the
+    #: operation that adds or moves the plugin, never by its form.
+    tree_fields = ("placeholder", "parent", "position", "language", "plugin_type", "path", "depth")
 
-        pl = obj.placeholder
-        pl_admin = site._registry[obj.placeholder.__class__]
+    @classmethod
+    def clean_plugin_data(cls, obj, data, *, instance=None):
+        """Validate and clean ``data`` for a plugin of this type, without a request.
+
+        The plugin services call this for every caller that passes data instead
+        of a form, so that the validation and sanitising a plugin's form does
+        cannot be skipped. ``obj`` is the object the placeholder belongs to,
+        ``instance`` the plugin being changed, or ``None`` for a new one. For a
+        change, ``data`` only needs the fields that change.
+
+        Returns the bound, valid model form; ``form.save(commit=False)`` gives
+        the plugin. Raises ``ValidationError`` with the form's errors otherwise.
+
+        The default binds the plugin's :attr:`form` with the fields its admin
+        form would show. A plugin whose form needs the request -- for its fields,
+        its choices or its validation -- overrides this classmethod.
+        """
+        from django.contrib.admin.utils import flatten_fieldsets
+        from django.forms.models import model_to_dict, modelform_factory
+
+        fields = flatten_fieldsets(cls.fieldsets) if cls.fieldsets else cls.fields
+        excluded = {*cls.tree_fields, *(cls.readonly_fields or ())}
+        exclude = list(cls.exclude or getattr(cls.form._meta, "exclude", None) or ())
+        exclude += [name for name in excluded if name not in exclude]
+        if fields:
+            fields = [name for name in fields if name not in excluded]
+        form_class = modelform_factory(cls.model, form=cls.form, fields=fields or None, exclude=exclude)
+
+        if instance is not None:
+            data = {**model_to_dict(instance, fields=list(form_class.base_fields)), **data}
+        form = form_class(data=data, instance=instance)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        return form
+
+    def save_model(self, request, obj, form, change):
+        """Save the plugin through the plugin services.
+
+        The services run the operation checks, announce the operation and clear
+        the placeholder cache. The placeholder admin hands over its operation
+        context and permission backend before it calls the add or change view;
+        a plugin admin used on its own builds them from the request.
+        """
+        from cms.core.services import plugins as plugin_services
+        from cms.shared.operations import OperationContext
+
+        context = getattr(self, "_operation_context", None) or OperationContext.from_request(request)
         operation_kwargs = {
-            "request": request,
-            "placeholder": pl,
+            "form": form,
+            "context": context,
+            "permissions": getattr(self, "_operation_permissions", None),
+            "sender": getattr(self, "_operation_sender", None),
         }
         if change:
-            operation_kwargs["old_plugin"] = self.model.objects.get(pk=obj.pk)
-            operation_kwargs["new_plugin"] = obj
-            operation_kwargs["operation"] = operations.CHANGE_PLUGIN
+            self.saved_object = plugin_services.change_plugin(obj, **operation_kwargs)
         else:
-            parent_id = obj.parent.pk if obj.parent else None
-            tree_order = obj.placeholder.get_plugin_tree_order(obj.language, parent_id)
-            operation_kwargs["plugin"] = obj
-            operation_kwargs["operation"] = operations.ADD_PLUGIN
-            operation_kwargs["tree_order"] = tree_order
-        # Remember the operation token
-        self._operation_token = pl_admin._send_pre_placeholder_operation(**operation_kwargs)
-        # Saves the plugin
-        # remember the saved object
-        self.saved_object = pl.add_plugin(obj)
-        pl.clear_cache(obj.language)
+            self.saved_object = plugin_services.add_plugin(
+                obj.placeholder,
+                obj.plugin_type,
+                obj.language,
+                position=obj.position,
+                target=obj.parent,
+                **operation_kwargs,
+            )
+        # The services announce both sides of the operation; the placeholder
+        # admin no longer has a post signal to send.
+        self._operation_token = None
 
     def save_form(self, request, form, change):
         obj = super().save_form(request, form, change)

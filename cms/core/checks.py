@@ -11,14 +11,20 @@ The checks work for any placeholder owner and never import pages.
 
 from __future__ import annotations
 
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from cms import operations
-from cms.core.plugins import get_plugin_disallowed_in_slot
+from cms.core.plugin_pool import plugin_pool
+from cms.core.plugins import get_plugin_disallowed_in_slot, has_reached_plugin_limit
 from cms.core.services.permissions import get_permissions
+from cms.exceptions import PluginLimitReached
 from cms.shared.checks import PERMISSION, POLICY, VALIDATION, OperationBlocked, register_core_check
+from cms.utils import get_current_site
+from cms.utils.i18n import get_language_list
 
+ADD_DENIED = _("You do not have permission to add a plugin")
+CHANGE_DENIED = _("You do not have permission to edit this plugin")
 MOVE_DENIED = _("You have no permission to move this plugin")
 CUT_DENIED = _("You have no permission to cut this plugin")
 PASTE_PLUGIN_DENIED = _("You have no permission to paste this plugin")
@@ -53,6 +59,60 @@ def _require_allowed_in_slot(plugins, placeholder):
         )
 
 
+def _site_id(placeholder, context):
+    """The site whose languages content in ``placeholder`` may have.
+
+    The site of the page the placeholder belongs to; for other placeholders the
+    site of the request, or ``SITE_ID``. ``None`` if neither is known.
+    """
+    page = placeholder.page
+    if page is not None:
+        return page.site_id
+    try:
+        return get_current_site(context.request).pk
+    except ImproperlyConfigured:
+        return None
+
+
+def _require_site_language(context, placeholder, language):
+    site_id = _site_id(placeholder, context)
+    if site_id is not None and language not in get_language_list(site_id=site_id):
+        raise ValidationError(_("Language must be set to a supported language!"))
+
+
+def _require_allowed_under(plugin_type, parent, placeholder):
+    """Refuse ``plugin_type`` under ``parent`` -- or at the top level if ``parent`` is ``None``.
+
+    Asks the same plugin classes the editor asks for what it offers: the
+    parent's ``get_child_classes()``, which includes the children's
+    ``parent_classes``, and ``requires_parent_plugin()`` for the top level.
+    Unregistered plugin types are left to the other checks.
+    """
+    try:
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+    except KeyError:
+        return
+    obj, slot = placeholder.source, placeholder.slot
+    if parent is None:
+        if plugin_class.requires_parent_plugin(slot, obj):
+            raise ValidationError(
+                _("Plugin %(plugin_type)s can only be added inside another plugin."),
+                params={"plugin_type": plugin_type},
+            )
+        return
+    try:
+        parent_class = plugin_pool.get_plugin(parent.plugin_type)
+    except KeyError:
+        return
+    # ``allow_children`` is not consulted: djangocms-text turns it off to keep
+    # its inline plugins out of the structure board, yet they are its children.
+    if plugin_type not in parent_class.get_child_classes(slot, obj, parent):
+        raise ValidationError(
+            _("Plugin %(plugin_type)s is not allowed inside %(parent_type)s."),
+            params={"plugin_type": plugin_type, "parent_type": parent.plugin_type},
+        )
+
+
 def check_parent(parent, placeholder, language, plugin=None) -> None:
     """Refuse a parent the plugin cannot end up under.
 
@@ -67,6 +127,146 @@ def check_parent(parent, placeholder, language, plugin=None) -> None:
         raise ValidationError(_("The parent plugin must be in the target placeholder and language."))
     if plugin is not None and (parent.pk == plugin.pk or parent.pk in plugin._get_descendants_ids()):
         raise ValidationError(_("A plugin cannot be moved inside itself or one of its descendants."))
+
+
+# Add
+
+
+def check_add_permission(context, *, placeholder, plugin_type, permissions=None, **kwargs):
+    if not _permissions(permissions, context).can_add_plugin(placeholder, plugin_type):
+        raise PermissionDenied(ADD_DENIED)
+
+
+def check_placeholder_editable(context, *, placeholder, permissions=None, **kwargs):
+    _require_editable(_permissions(permissions, context), placeholder)
+
+
+def check_plugin_type(context, *, plugin_type, **kwargs):
+    try:
+        plugin_pool.get_plugin(plugin_type)
+    except KeyError:
+        raise ValidationError(_("Invalid plugin type '%(plugin_type)s'"), params={"plugin_type": plugin_type})
+
+
+def check_add_slot(context, *, placeholder, plugin_type, **kwargs):
+    disallowed = get_plugin_disallowed_in_slot([plugin_type], placeholder.slot)
+    if disallowed:
+        raise ValidationError(
+            _("Plugin %(plugin_type)s is not allowed in placeholder '%(slot)s'."),
+            params={"plugin_type": disallowed, "slot": placeholder.slot},
+        )
+
+
+def check_add_target(context, *, placeholder, language, position="last-child", target=None, **kwargs):
+    # ``target`` is the parent, or the sibling for "left" and "right": either
+    # way it must be in the placeholder and language the plugin is added to.
+    check_parent(target, placeholder, language)
+    if isinstance(position, int) and target is not None and position <= target.position:
+        raise ValidationError(
+            _("Plugin position must be greater than %(position)d"), params={"position": target.position}
+        )
+
+
+def check_plugin_limit(context, *, placeholder, plugin_type, language, instance=None, **kwargs):
+    if instance is not None and instance.pk:
+        # The plugin's row exists already (djangocms-text creates it before the
+        # form is saved), so it has been counted against the limit.
+        return
+    page = placeholder.page
+    template = page.get_template() if page else None
+    try:
+        has_reached_plugin_limit(placeholder, plugin_type, language, template=template)
+    except PluginLimitReached as error:
+        raise ValidationError(str(error))
+
+
+register_core_check(
+    operations.ADD_PLUGIN,
+    "cms.core.add_permission",
+    check_add_permission,
+    kind=PERMISSION,
+    requires=["placeholder", "plugin_type"],
+)
+register_core_check(
+    operations.ADD_PLUGIN,
+    "cms.core.target_editable",
+    check_placeholder_editable,
+    kind=POLICY,
+    requires=["placeholder"],
+)
+register_core_check(
+    operations.ADD_PLUGIN, "cms.core.plugin_type_valid", check_plugin_type, kind=VALIDATION, requires=["plugin_type"]
+)
+register_core_check(
+    operations.ADD_PLUGIN,
+    "cms.core.allowed_in_slot",
+    check_add_slot,
+    kind=VALIDATION,
+    requires=["placeholder", "plugin_type"],
+)
+register_core_check(
+    operations.ADD_PLUGIN,
+    "cms.core.parent_valid",
+    check_add_target,
+    kind=VALIDATION,
+    requires=["placeholder", "language"],
+)
+register_core_check(
+    operations.ADD_PLUGIN,
+    "cms.core.plugin_limit",
+    check_plugin_limit,
+    kind=VALIDATION,
+    requires=["placeholder", "plugin_type", "language"],
+)
+
+
+def check_add_language(context, *, placeholder, language, **kwargs):
+    _require_site_language(context, placeholder, language)
+
+
+def check_add_parent_allowed(context, *, placeholder, plugin_type, position="last-child", target=None, **kwargs):
+    parent = target.parent if target is not None and position in ("left", "right") else target
+    _require_allowed_under(plugin_type, parent, placeholder)
+
+
+register_core_check(
+    operations.ADD_PLUGIN,
+    "cms.core.language_valid",
+    check_add_language,
+    kind=VALIDATION,
+    requires=["placeholder", "language"],
+)
+register_core_check(
+    operations.ADD_PLUGIN,
+    "cms.core.parent_allowed",
+    check_add_parent_allowed,
+    kind=VALIDATION,
+    requires=["placeholder", "plugin_type"],
+)
+
+
+# Change
+
+
+def check_change_permission(context, *, plugin, permissions=None, **kwargs):
+    if not _permissions(permissions, context).can_change_plugin(plugin):
+        raise PermissionDenied(CHANGE_DENIED)
+
+
+def check_change_editable(context, *, plugin, permissions=None, **kwargs):
+    _require_editable(_permissions(permissions, context), plugin.placeholder)
+
+
+register_core_check(
+    operations.CHANGE_PLUGIN,
+    "cms.core.change_permission",
+    check_change_permission,
+    kind=PERMISSION,
+    requires=["plugin"],
+)
+register_core_check(
+    operations.CHANGE_PLUGIN, "cms.core.source_editable", check_change_editable, kind=POLICY, requires=["plugin"]
+)
 
 
 # Move
@@ -111,6 +311,24 @@ register_core_check(
 )
 register_core_check(
     operations.MOVE_PLUGIN, "cms.core.allowed_in_slot", check_move_slot, kind=VALIDATION, requires=["plugin"]
+)
+
+
+def check_move_parent_allowed(context, *, plugin, target_placeholder=None, target_parent=None, **kwargs):
+    placeholder = target_placeholder or plugin.placeholder
+    new_parent_id = target_parent.pk if target_parent is not None else None
+    if placeholder.pk == plugin.placeholder_id and new_parent_id == plugin.parent_id:
+        # Reordering among the same siblings: the plugin keeps its parent.
+        return
+    _require_allowed_under(plugin.plugin_type, target_parent, placeholder)
+
+
+register_core_check(
+    operations.MOVE_PLUGIN,
+    "cms.core.parent_allowed",
+    check_move_parent_allowed,
+    kind=VALIDATION,
+    requires=["plugin"],
 )
 
 
@@ -191,6 +409,30 @@ register_core_check(
 )
 
 
+def check_target_language(context, *, target_placeholder, target_language, **kwargs):
+    _require_site_language(context, target_placeholder, target_language)
+
+
+def check_paste_parent_allowed(context, *, plugin, target_placeholder, target_parent=None, **kwargs):
+    _require_allowed_under(plugin.plugin_type, target_parent, target_placeholder)
+
+
+register_core_check(
+    operations.PASTE_PLUGIN,
+    "cms.core.language_valid",
+    check_target_language,
+    kind=VALIDATION,
+    requires=["target_placeholder", "target_language"],
+)
+register_core_check(
+    operations.PASTE_PLUGIN,
+    "cms.core.parent_allowed",
+    check_paste_parent_allowed,
+    kind=VALIDATION,
+    requires=["plugin", "target_placeholder"],
+)
+
+
 # Paste a copied placeholder
 
 
@@ -234,6 +476,14 @@ register_core_check(
     check_paste_placeholder_slot,
     kind=VALIDATION,
     requires=["plugin", "target_placeholder"],
+)
+
+register_core_check(
+    operations.PASTE_PLACEHOLDER,
+    "cms.core.language_valid",
+    check_target_language,
+    kind=VALIDATION,
+    requires=["target_placeholder", "target_language"],
 )
 
 
@@ -338,6 +588,14 @@ register_core_check(
     check_copy_from_placeholder_slot,
     kind=VALIDATION,
     requires=["source_placeholder", "target_placeholder", "source_language"],
+)
+
+register_core_check(
+    operations.ADD_PLUGINS_FROM_PLACEHOLDER,
+    "cms.core.language_valid",
+    check_target_language,
+    kind=VALIDATION,
+    requires=["target_placeholder", "target_language"],
 )
 
 

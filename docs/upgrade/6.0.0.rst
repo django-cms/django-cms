@@ -138,8 +138,7 @@ objects to act on and an ``OperationContext`` instead of an ``HttpRequest``.
   ``toggle_in_navigation`` and ``rebuild_urls``.
 * ``cms.extensions``: saving and deleting page and translation extensions.
 
-.. TODO: ``add_plugin``, ``change_plugin`` and the ``cms.extensions`` services
-   are not implemented yet.
+.. TODO: the ``cms.extensions`` services are not implemented yet.
 
 Each part owns the operations on its own content: ``cms.core`` the placeholder
 and plugin operations, for any placeholder owner and without depending on
@@ -273,21 +272,21 @@ declared.
 Plugin data cleaning
 ====================
 
-``add_plugin()`` and ``change_plugin()`` take plugin data rather than a form,
-and clean it through a new ``CMSPluginBase`` hook before saving. By default the
+``add_plugin()`` and ``change_plugin()`` in ``cms.core.services`` take plugin
+data rather than a form, and clean it through the new classmethod
+``CMSPluginBase.clean_plugin_data(obj, data, *, instance=None)`` before saving. By default the
 hook binds the plugin's ``form`` (the plugin's own, or the generated
 ``ModelForm``) without a request, so sanitising cannot be skipped by calling the
 service directly. Plugins whose form needs the request override the hook. The
 admin passes the form it already validated, so data is not cleaned twice.
-
-.. TODO: name the hook once implemented.
 
 One frame for all services
 ==========================
 
 ``cms.shared.operations.operation()`` is the frame every service runs its work
 in: it runs the operation checks, sends the pre-operation signal, runs the
-service's own code and sends the post-operation signal. A failing check raises
+service's own code and sends the post-operation signal, all in one database
+transaction. A signal receiver that raises undoes the operation. A failing check raises
 before any signal is sent, and a failing operation sends no post-operation
 signal. ``cms.signals.PAGE_OPERATION_SIGNALS`` and
 ``cms.signals.PLACEHOLDER_OPERATION_SIGNALS`` name the signal pairs.
@@ -376,6 +375,30 @@ Placeholder and plugin operations
   ``PermissionDenied``, instead of ``PermissionDenied``.
 * A system context (``OperationContext.system()``) skips the plugin permission
   checks, as it does for pages, but not the editability checks.
+* Adding, moving and pasting a plugin check the plugin's ``parent_classes``, the
+  parent's ``child_classes`` and ``require_parent`` -- the rules the editor
+  already applied when offering plugins -- and raise ``ValidationError`` if
+  the plugin may not go under its parent, or not at the top level. The admin
+  answers with 400. Code that built such trees through the admin endpoints is
+  refused now; reordering a plugin under its current parent is not checked.
+  Inline plugins of djangocms-text remain allowed: its ``get_child_classes()``
+  lists them.
+* Adding, pasting and copying plugins check that the site offers the language.
+* Adding and changing a plugin in the admin go through the ``add_plugin`` and
+  ``change_plugin`` services. ``CMSPluginBase.save_model()`` calls them and no
+  longer looks up the placeholder admin in ``admin.site``; it still sets
+  ``saved_object``, so plugins that override it and call ``super()`` keep
+  working. ``_operation_token`` is always ``None``: the services send both the
+  pre- and the post-operation signal.
+* Changing a plugin saves it with ``save()`` instead of
+  ``Placeholder.add_plugin()``.
+* The add and change views of the placeholder admin check permissions and
+  editability before showing the form. Saving is checked by the services: a
+  refused save is answered with 403 by Django's ``PermissionDenied`` handling,
+  an invalid one with 400.
+* Operations run in a transaction, together with their signal receivers. A
+  receiver of the post-operation signal that raises now rolls the operation
+  back.
 
 .. TODO: not implemented yet; confirm each point as it lands.
 
@@ -385,10 +408,6 @@ Placeholder and plugin operations
   ``_paste_plugin()``, ...) should override the ``has_*_permission`` methods or
   register an operation check instead.
 * The admin answers ``OperationBlocked`` with 409 instead of 403.
-* ``CMSPluginBase.save_model()`` calls the ``change_plugin`` or ``add_plugin``
-  service and no longer looks up the placeholder admin in ``admin.site``.
-* Plugin data passed to the services is cleaned through the plugin's form for
-  every caller.
 * Writing into content that a policy check protects, for example published
   content, through :mod:`cms.api` or another system context is refused unless
   the context explicitly opts out of policy checks.

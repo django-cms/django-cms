@@ -135,6 +135,13 @@ no post-operation signal is sent. The frame yields the signal kwargs; a service
 that wants receivers to see the object as it is after the operation updates them
 inside the ``with`` block.
 
+The frame runs in a database transaction, or a savepoint if the caller already
+holds one. The checks see the state the work changes, and the operation commits
+or rolls back together with whatever signal receivers write about it, such as a
+log entry or a version's modified date. A receiver that raises undoes the
+operation. Cache invalidation is not rolled back; clearing a cache too often is
+harmless.
+
 The checks
 ==========
 
@@ -412,26 +419,48 @@ The plugin services run the same three kinds of check:
   respected, the parent is in the target placeholder and language, a plugin is
   not moved into itself, and the language belongs to the site.
 
-.. TODO: not yet core checks: the plugin limit (the admin still checks it, with
-   the template from ``get_placeholder_template()``), ``parent_classes`` and
-   ``child_classes``, and the site language; they follow with ``add_plugin``.
+Whether a plugin may go under a parent is decided by the same plugin class
+methods the editor asks for what it offers: the parent's
+``get_child_classes()``, which includes the children's ``parent_classes`` and the
+placeholder configuration, and ``requires_parent_plugin()`` for the top level.
+A move is only checked if the plugin gets a new parent or placeholder, so a
+tree created before these rules were checked can still be reordered. The
+language is checked against the languages of the site the placeholder's page
+belongs to, or the current site for other placeholders.
+
+.. TODO: not yet core checks: the plugin limit for moves and pastes (the admin
+   still checks it, with the template from ``get_placeholder_template()``).
    Register the field-level ``PlaceholderRelationField`` checks as policy
    checks, keeping the field hook for compatibility.
 
 Plugin data
 ===========
 
-Adding or changing a plugin takes the plugin's data, not a form. Before saving,
-the service hands the data to a hook on ``CMSPluginBase`` that cleans it. By
-default the hook binds the plugin's ``form``, the plugin's own or the
-``ModelForm`` django CMS generates, so the model's validation applies at least.
-It needs no request.
+Adding or changing a plugin takes the plugin's data, not a form:
+
+.. code-block:: python
+
+    from cms.core.services import add_plugin, change_plugin
+
+    link = add_plugin(placeholder, "LinkPlugin", "en",
+                      {"name": "django CMS", "external_link": "https://www.django-cms.org"},
+                      context=context)
+    change_plugin(link, {"name": "The django CMS project"}, context=context)
+
+Before saving, the service hands the data to
+``CMSPluginBase.clean_plugin_data(obj, data, *, instance=None)``, a classmethod
+that cleans it. By default it binds the plugin's ``form``, the plugin's own or
+the ``ModelForm`` django CMS generates, with the fields the plugin's admin form
+shows, so the form's and the model's validation apply. It needs no request. For a
+change, ``data`` only needs the fields that change. The fields that place a
+plugin in the tree (placeholder, parent, position, language, plugin type) are
+never taken from the data; the operation sets them.
 
 The service calls the hook for every caller, so sanitising, for example the
 HTML sanitising a text plugin does in its form field, cannot be skipped by
 calling the service directly. A plugin whose form depends on the request
-overrides the hook. The admin passes the form it has already validated, so that
-the data is not cleaned twice.
+overrides the classmethod. The admin passes the form it has already validated as
+``form=``, so that the data is not cleaned twice.
 
 ``CMSPluginBase.save_model()`` calls the service as well; it no longer looks up
 the placeholder admin to announce the operation.
@@ -635,6 +664,35 @@ and ``plugins``, if a service passes it, the plugins it copies.
 
     * - Operation
       - Checks, in order
+    * - ``ADD_PLUGIN``
+      - ``cms.core.add_permission``: the user may add this plugin type to the
+        placeholder.
+
+        ``cms.core.target_editable`` (policy): the placeholder's content may be
+        edited.
+
+        ``cms.core.plugin_type_valid``: the plugin type is registered.
+
+        ``cms.core.allowed_in_slot``: the plugin type is allowed in the slot.
+
+        ``cms.core.parent_valid``: the target (parent or sibling) is in the
+        placeholder and language.
+
+        ``cms.core.plugin_limit``: the placeholder has not reached its limit for
+        the plugin type, or overall.
+
+        ``cms.core.language_valid``: the site offers the language.
+
+        ``cms.core.parent_allowed``: the plugin type may go under the parent, or
+        at the top level.
+    * - ``CHANGE_PLUGIN``
+      - ``cms.core.change_permission``: the user may change the plugin.
+
+        ``cms.core.source_editable`` (policy): its placeholder's content may be
+        edited.
+
+        The data is validated by the plugin's ``clean_plugin_data()`` after the
+        checks.
     * - ``MOVE_PLUGIN``
       - ``cms.core.move_permission``: the user may move the plugin out of its
         placeholder and into the target placeholder.
@@ -648,6 +706,9 @@ and ``plugins``, if a service passes it, the plugins it copies.
         ``cms.core.allowed_in_slot``: the plugin and its descendants are allowed
         in the target slot (not checked within a placeholder or into the
         clipboard).
+
+        ``cms.core.parent_allowed``: the plugin may go under its new parent, or
+        at the top level (only checked if the parent or placeholder changes).
     * - ``CUT_PLUGIN``
       - ``cms.core.cut_permission``: the user may move the plugin.
 
@@ -664,9 +725,15 @@ and ``plugins``, if a service passes it, the plugins it copies.
         language.
 
         ``cms.core.allowed_in_slot``: the plugins are allowed in the target slot.
+
+        ``cms.core.language_valid``: the site offers the target language.
+
+        ``cms.core.parent_allowed``: the plugin may go under the parent, or at
+        the top level.
     * - ``PASTE_PLACEHOLDER``
-      - ``cms.core.paste_permission``, ``cms.core.target_editable`` and
-        ``cms.core.allowed_in_slot``, for the plugins of the copied placeholder.
+      - ``cms.core.paste_permission``, ``cms.core.target_editable``,
+        ``cms.core.allowed_in_slot`` for the plugins of the copied placeholder,
+        and ``cms.core.language_valid``.
     * - ``COPY_PLUGIN_TO_CLIPBOARD``,
 
         ``COPY_PLACEHOLDER_TO_CLIPBOARD``
@@ -675,8 +742,8 @@ and ``plugins``, if a service passes it, the plugins it copies.
 
         ``cms.core.target_editable`` (policy): the clipboard may be edited.
     * - ``ADD_PLUGINS_FROM_PLACEHOLDER``
-      - ``cms.core.copy_permission``, ``cms.core.target_editable`` and
-        ``cms.core.allowed_in_slot``.
+      - ``cms.core.copy_permission``, ``cms.core.target_editable``,
+        ``cms.core.allowed_in_slot`` and ``cms.core.language_valid``.
     * - ``DELETE_PLUGIN``
       - ``cms.core.delete_permission`` and ``cms.core.source_editable``.
     * - ``CLEAR_PLACEHOLDER``
@@ -686,9 +753,7 @@ and ``plugins``, if a service passes it, the plugins it copies.
 
    * the page checks above are all permission or validation checks so far;
      those about an object's state become policy checks;
-   * the ``add_plugin`` and ``change_plugin`` services with the plugin data
-     hook, and the plugin limit, ``parent_classes``/``child_classes`` and site
-     language as core checks;
+   * the plugin limit for moves and pastes as a core check;
    * the services and checks for ``cms.extensions``.
 
 The version conditions of ``djangocms-versioning`` and

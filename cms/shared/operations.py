@@ -21,6 +21,8 @@ from dataclasses import dataclass
 from typing import Any
 from urllib.parse import parse_qsl, urlparse
 
+from django.db import transaction
+
 __all__ = ["OperationContext", "operation"]
 
 CMS_PATH_MISSING = (
@@ -144,6 +146,11 @@ def operation(
 ) -> Iterator[dict]:
     """The frame every service runs its work in.
 
+    The checks, both signals and the body run in one database transaction (a
+    savepoint if the caller already holds one): the operation, and whatever
+    signal receivers write about it, commit or roll back together. A receiver of
+    the post signal that raises undoes the operation.
+
     ``name`` and ``signal_operation`` must be declared in the operation registry
     (:mod:`cms.operations`); an undeclared one raises ``LookupError``.
 
@@ -170,26 +177,27 @@ def operation(
     if signal_operation is not None:
         get_operation(signal_operation)
 
-    if checks is not None:
-        from cms.shared.checks import run_checks
+    with transaction.atomic():
+        if checks is not None:
+            from cms.shared.checks import run_checks
 
-        run_checks(name, context, **checks)
+            run_checks(name, context, **checks)
 
-    token = str(uuid.uuid4())
-    signal_kwargs = {
-        "operation": signal_operation or name,
-        "request": context.request,
-        "user": context.user,
-        "language": context.language,
-        "origin": context.origin,
-        "token": token,
-        **signal_kwargs,
-    }
-    pre, post = signals or (None, None)
-    emit = pre is not None and context.emit_signals
+        token = str(uuid.uuid4())
+        signal_kwargs = {
+            "operation": signal_operation or name,
+            "request": context.request,
+            "user": context.user,
+            "language": context.language,
+            "origin": context.origin,
+            "token": token,
+            **signal_kwargs,
+        }
+        pre, post = signals or (None, None)
+        emit = pre is not None and context.emit_signals
 
-    if emit:
-        pre.send(sender=sender, **signal_kwargs)
-    yield signal_kwargs
-    if emit:
-        post.send(sender=sender, **signal_kwargs)
+        if emit:
+            pre.send(sender=sender, **signal_kwargs)
+        yield signal_kwargs
+        if emit:
+            post.send(sender=sender, **signal_kwargs)
