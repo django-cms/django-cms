@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _lazy
 
 from cms import operations
 from cms.extensions import checks as extension_checks  # noqa: F401  -- registers the extension checks
-from cms.extensions.models import BaseExtension, PageContentExtension
+from cms.extensions.models import PageContentExtension, PageExtension
 from cms.models import Page
 from cms.operations import Operation, register_operation
 from cms.shared.operations import OperationContext, operation
@@ -29,7 +29,9 @@ def _signal_kwargs(extension):
     return kwargs
 
 
-def save_extension(extension: BaseExtension, *, context: OperationContext, permissions=None) -> BaseExtension:
+def save_extension(
+    extension: PageExtension | PageContentExtension, *, context: OperationContext, permissions=None
+) -> PageExtension | PageContentExtension:
     """Save a new or changed extension. ``extension.extended_object`` must be set.
 
     :raises ~django.core.exceptions.PermissionDenied: if the acting user may not change what it extends.
@@ -47,7 +49,9 @@ def save_extension(extension: BaseExtension, *, context: OperationContext, permi
     return extension
 
 
-def delete_extension(extension: BaseExtension, *, context: OperationContext, permissions=None) -> None:
+def delete_extension(
+    extension: PageExtension | PageContentExtension, *, context: OperationContext, permissions=None
+) -> None:
     """Delete an extension.
 
     :raises ~django.core.exceptions.PermissionDenied: if the acting user may not change what it extends.

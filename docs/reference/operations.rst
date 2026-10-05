@@ -25,6 +25,8 @@ Operation context
 Operations
 **********
 
+.. py:module:: cms.operations
+
 Operations are declared in the operation registry ``cms.operations``. Each
 declaration has an operationId (the constant, for example
 ``operations.MOVE_PAGE == "move_page"``), a one-line summary, a plain-text
