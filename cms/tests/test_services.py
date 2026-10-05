@@ -46,17 +46,6 @@ class OperationContextTest(CMSTestCase):
 
         self.assertEqual(OperationContext.from_request(request).language, "de")
 
-    def test_placeholder_request_without_cms_path_stays_silent(self):
-        """The long-standing shim: no cms_path means no operation signals."""
-        request = self.get_request("/en/admin/cms/placeholder/")
-        request.user = self.get_superuser()
-
-        with self.assertWarns(UserWarning):
-            context = OperationContext.from_placeholder_request(request)
-
-        self.assertFalse(context.emit_signals)
-        self.assertIsNone(context.origin)
-
     def test_plain_request_without_cms_path_still_emits(self):
         """Only the placeholder endpoints use cms_path; page endpoints do not."""
         request = self.get_request("/en/admin/cms/page/1/set-home/")

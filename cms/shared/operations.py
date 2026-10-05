@@ -14,7 +14,6 @@ for programmatic callers, and receivers must cope with that.
 from __future__ import annotations
 
 import uuid
-import warnings
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -25,12 +24,6 @@ from django.db import transaction
 
 __all__ = ["OperationContext", "operation"]
 
-CMS_PATH_MISSING = (
-    'All custom placeholder admin endpoints require a "cms_path" GET query '
-    "which points to the path where the request originates from."
-    "This backwards compatible shim will be removed on 3.5 "
-    "and an HttpBadRequest response will be returned instead."
-)
 
 
 @dataclass(frozen=True)
@@ -45,9 +38,7 @@ class OperationContext:
     origin: str | None = None
     #: The originating request, for the signals' legacy ``request`` kwarg only.
     request: Any = None
-    #: Whether to emit the pre/post operation signals at all. The admin sets
-    #: this to ``False`` when a request arrives without ``cms_path``, which is a
-    #: backwards-compatible shim rather than a deliberate silence.
+    #: Whether to emit the pre/post operation signals at all.
     emit_signals: bool = True
     #: Set for code acting on the system's own behalf rather than a user's, see
     #: :meth:`system`. Names the caller, e.g. ``"cms.api"``.
@@ -85,31 +76,16 @@ class OperationContext:
 
     @classmethod
     def from_request(cls, request, language: str | None = None) -> OperationContext:
-        """Build a context from any admin request.
+        """Build a context from an admin request.
 
-        Picks up ``cms_path`` when the endpoint uses it, but does not require it:
-        only the placeholder endpoints have that convention (see
-        :meth:`from_placeholder_request`).
+        The frontend editor's endpoints carry a ``cms_path`` GET query naming the
+        page the user was actually looking at, which is not the endpoint being
+        called; the context's ``origin`` and ``language`` come from it. Without
+        it, the context has no origin, but the operation is still announced.
         """
         cms_path = request.GET.get("cms_path") if hasattr(request, "GET") else None
         if not cms_path:
             return cls(user=request.user, language=language, request=request)
-        return cls._from_cms_path(request, cms_path, language)
-
-    @classmethod
-    def from_placeholder_request(cls, request, language: str | None = None) -> OperationContext:
-        """Build a context from a placeholder admin request.
-
-        These endpoints are called from the frontend editor and carry a
-        ``cms_path`` GET query naming the page the user was actually looking at,
-        which is not the same as the endpoint being called. A request without it
-        still yields a usable context, but one that stays silent -- the
-        long-standing shim in the placeholder admin, preserved here.
-        """
-        cms_path = request.GET.get("cms_path") if hasattr(request, "GET") else None
-        if not cms_path:
-            warnings.warn(CMS_PATH_MISSING, UserWarning, stacklevel=2)
-            return cls(user=request.user, language=language, request=request, emit_signals=False)
         return cls._from_cms_path(request, cms_path, language)
 
     @classmethod

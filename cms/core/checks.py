@@ -167,17 +167,26 @@ def check_add_target(context, *, placeholder, language, position="last-child", t
         )
 
 
-def check_plugin_limit(context, *, placeholder, plugin_type, language, instance=None, **kwargs):
-    if instance is not None and instance.pk:
-        # The plugin's row exists already (djangocms-text creates it before the
-        # form is saved), so it has been counted against the limit.
-        return
+def _require_below_limit(placeholder, plugin_type, language):
+    """Refuse one more plugin of ``plugin_type`` in ``placeholder``, by the limits configured for its slot.
+
+    The limits may depend on the template of the placeholder's page
+    (``CMS_PLACEHOLDER_CONF``); other placeholders use the slot's limits.
+    """
     page = placeholder.page
     template = page.get_template() if page else None
     try:
         has_reached_plugin_limit(placeholder, plugin_type, language, template=template)
     except PluginLimitReached as error:
         raise ValidationError(str(error))
+
+
+def check_plugin_limit(context, *, placeholder, plugin_type, language, instance=None, **kwargs):
+    if instance is not None and instance.pk:
+        # The plugin's row exists already (djangocms-text creates it before the
+        # form is saved), so it has been counted against the limit.
+        return
+    _require_below_limit(placeholder, plugin_type, language)
 
 
 register_core_check(
@@ -332,6 +341,21 @@ register_core_check(
 )
 
 
+def check_move_limit(context, *, plugin, target_placeholder=None, **kwargs):
+    # Only a plugin entering another placeholder counts against its limits.
+    if target_placeholder is not None and target_placeholder.pk != plugin.placeholder_id:
+        _require_below_limit(target_placeholder, plugin.plugin_type, plugin.language)
+
+
+register_core_check(
+    operations.MOVE_PLUGIN,
+    "cms.core.plugin_limit",
+    check_move_limit,
+    kind=VALIDATION,
+    requires=["plugin"],
+)
+
+
 # Cut
 
 
@@ -430,6 +454,19 @@ register_core_check(
     check_paste_parent_allowed,
     kind=VALIDATION,
     requires=["plugin", "target_placeholder"],
+)
+
+
+def check_paste_limit(context, *, plugin, target_placeholder, target_language, **kwargs):
+    _require_below_limit(target_placeholder, plugin.plugin_type, target_language)
+
+
+register_core_check(
+    operations.PASTE_PLUGIN,
+    "cms.core.plugin_limit",
+    check_paste_limit,
+    kind=VALIDATION,
+    requires=["plugin", "target_placeholder", "target_language"],
 )
 
 

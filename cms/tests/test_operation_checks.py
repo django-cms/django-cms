@@ -9,6 +9,7 @@ from django.utils.translation import override as force_language
 from cms import operations
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_config import CMSCoreExtensions
+from cms.core import checks as core_checks
 from cms.core.plugin_pool import plugin_pool
 from cms.core.services import plugins as plugin_services
 from cms.models import CMSPlugin, Page, PageContent, Placeholder, UserSettings
@@ -28,6 +29,8 @@ from cms.signals import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
+from cms.utils.compat.warnings import RemovedInDjangoCMS70Warning
+from cms.utils.urlutils import admin_reverse
 
 SLUG_NOT_UNIQUE = "You cannot have two pages with the same slug"
 
@@ -892,6 +895,90 @@ class PluginTreeRulesTest(RegistryIsolationMixin, CMSTestCase):
             plugin_services.add_plugins_from_placeholder(self.body, self.other, "en", "xx", context=self.context)
 
         self.add("LinkPlugin", data={"name": "A", "external_link": "https://a.org"}, language="de")
+
+
+class PlaceholderAdminAdapterTest(RegistryIsolationMixin, CMSTestCase):
+    """The placeholder admin translates the services' refusals into HTTP answers."""
+
+    def setUp(self):
+        super().setUp()
+        self.superuser = self.get_superuser()
+        page = create_page("Page", "nav_playground.html", "en")
+        placeholders = page.get_placeholders("en")
+        self.body = placeholders.get(slot="body")
+        self.other = placeholders.get(slot="right-column")
+        self.plugin = add_plugin(self.body, "TextPlugin", "en", body="Text").cmsplugin_ptr
+        self.sent = []
+        for signal in PLACEHOLDER_OPERATION_SIGNALS:
+            signal.connect(self.receive)
+            self.addCleanup(signal.disconnect, self.receive)
+
+    def receive(self, signal, **kwargs):
+        self.sent.append(kwargs)
+
+    def move(self, user=None, uri=None, **data):
+        with self.login_user_context(user or self.superuser):
+            return self.client.post(
+                uri or self.get_move_plugin_uri(self.plugin),
+                {"plugin_id": self.plugin.pk, "target_language": "en", "target_position": 1, **data},
+            )
+
+    def test_refusals_are_answered_by_kind(self):
+        with patch.object(Placeholder, "check_source", return_value=False):
+            blocked = self.move(placeholder_id=self.other.pk)
+        refused = self.move(user=self.get_staff_user_with_no_permissions(), placeholder_id=self.other.pk)
+        with patch.object(plugin_pool.get_plugin("TextPlugin"), "allowed_slots", ["body"]):
+            invalid = self.move(placeholder_id=self.other.pk)
+
+        self.assertEqual((blocked.status_code, blocked.content.decode()), (409, str(core_checks.NOT_EDITABLE)))
+        self.assertEqual((refused.status_code, refused.content.decode()), (403, str(core_checks.MOVE_DENIED)))
+        self.assertEqual(invalid.status_code, 400)
+        self.assertEqual(self.sent, [])
+        self.assertEqual(CMSPlugin.objects.get(pk=self.plugin.pk).placeholder_id, self.body.pk)
+
+    def test_the_services_decide_moves_into_the_plugin_tree(self):
+        child = add_plugin(self.body, "TextPlugin", "en", body="Child", target=self.plugin)
+
+        response = self.move(plugin_parent=child.pk)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("cannot be moved inside itself", response.content.decode())
+
+    def test_the_plugin_limit_applies_to_moves_and_pastes(self):
+        add_plugin(self.other, "TextPlugin", "en", body="Already there")
+
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF={"right-column": {"limits": {"TextPlugin": 1}}}):
+            moved = self.move(placeholder_id=self.other.pk)
+            pasted = self.move(placeholder_id=self.other.pk, move_a_copy="true")
+
+        self.assertEqual((moved.status_code, pasted.status_code), (400, 400))
+        self.assertEqual(self.other.get_plugins("en").count(), 1)
+
+    def test_an_endpoint_without_cms_path_announces_the_operation(self):
+        response = self.move(uri=admin_reverse("cms_placeholder_move_plugin"), placeholder_id=self.other.pk)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([kwargs["operation"] for kwargs in self.sent], [operations.MOVE_PLUGIN] * 2)
+        self.assertIsNone(self.sent[0]["origin"])
+
+    def test_deleting_and_editing_are_decided_by_the_services(self):
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            deleted = self.client.post(self.get_delete_plugin_uri(self.plugin), {"post": "yes"})
+        with patch.object(Placeholder, "check_source", return_value=False), self.login_user_context(self.superuser):
+            edited = self.client.post(self.get_change_plugin_uri(self.plugin), {"body": "Changed"})
+
+        self.assertEqual(deleted.status_code, 403)
+        self.assertEqual(edited.status_code, 409)
+        self.assertTrue(CMSPlugin.objects.filter(pk=self.plugin.pk).exists())
+
+    def test_overriding_a_private_helper_is_deprecated(self):
+        from cms.core.admin.placeholder import PlaceholderAdmin
+
+        with self.assertWarns(RemovedInDjangoCMS70Warning):
+            type("CustomPlaceholderAdmin", (PlaceholderAdmin,), {"_move_plugin": lambda self, *args, **kwargs: None})
+        with self.assertWarns(RemovedInDjangoCMS70Warning):
+            type("TemplatePlaceholderAdmin", (PlaceholderAdmin,), {"get_placeholder_template": lambda *args: None})
 
 
 class MovePageChecksTest(CMSTestCase):

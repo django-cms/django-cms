@@ -1,4 +1,6 @@
 import json
+import warnings
+from functools import wraps
 
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
@@ -36,17 +38,15 @@ from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
 from cms.core.plugin_base import CMSPluginBase
 from cms.core.plugin_pool import plugin_pool
-from cms.core.plugins import (
-    downcast_plugins,
-    has_reached_plugin_limit,
-)
+from cms.core.plugins import downcast_plugins
 from cms.core.services import plugins as plugin_services
 from cms.core.services.permissions import AdminPluginPermissions
-from cms.exceptions import PluginLimitReached
 from cms.pages.admin.forms import PluginAddValidationForm
+from cms.shared.checks import OperationBlocked
 from cms.shared.operations import OperationContext
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
+from cms.utils.compat.warnings import RemovedInDjangoCMS70Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 
@@ -67,6 +67,48 @@ def get_int(int_str, default=_no_default):
             return int(int_str)
         except ValueError:
             return default
+
+
+def operation_endpoint(view):
+    """Answer the refusals of the plugin services as the frontend editor expects.
+
+    ``PermissionDenied`` becomes 403, ``OperationBlocked`` (the content may not
+    be changed right now, whoever asks) 409 and ``ValidationError`` 400, each
+    with the plain-text message the editor shows. The services decide; the
+    endpoints only translate.
+    """
+
+    @wraps(view)
+    def wrapper(self, request, *args, **kwargs):
+        try:
+            return view(self, request, *args, **kwargs)
+        except OperationBlocked as error:
+            return HttpResponse(conditional_escape(str(error)), status=409)
+        except PermissionDenied as error:
+            return HttpResponseForbidden(conditional_escape(str(error)))
+        except ValidationError as error:
+            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
+
+    return wrapper
+
+
+#: Private helpers of :class:`PlaceholderAdmin` that subclasses overrode to
+#: change how an operation is performed or permitted. Operations are services
+#: now, decided by operation checks and the ``has_*_permission`` hooks.
+_DEPRECATED_HOOKS = (
+    "_copy_plugin_to_clipboard",
+    "_copy_placeholder_to_clipboard",
+    "_add_plugins_from_placeholder",
+    "_paste_plugin",
+    "_paste_placeholder",
+    "_move_plugin",
+    "_cut_plugin",
+    "_send_pre_placeholder_operation",
+    "_send_post_placeholder_operation",
+    "_get_operation_language",
+    "_get_operation_origin",
+    "get_placeholder_template",
+)
 
 
 def _instance_overrides_method(base, instance, method_name):
@@ -191,6 +233,18 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
     """Placeholder admin manages placeholders and their plugins, as well as the preview, edit, and
     structure endpoints."""
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        overridden = [name for name in _DEPRECATED_HOOKS if name in cls.__dict__]
+        if overridden:
+            warnings.warn(
+                f"{cls.__qualname__} overrides {', '.join(overridden)}. Plugin operations are services in "
+                "cms.core.services now: override the has_*_permission methods or register an operation "
+                "check (cms_checks) instead. These methods will be removed in django CMS 7.",
+                RemovedInDjangoCMS70Warning,
+                stacklevel=2,
+            )
+
     def has_add_permission(self, request):
         # Placeholders are created by the system
         return False
@@ -266,22 +320,45 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         """The request-free context the services take.
 
         Parsing the ``cms_path`` GET query is an HTTP concern, so it happens
-        here rather than in the service layer.
+        here rather than in the service layer. A request without it is still
+        announced to the operation signals, without an origin.
         """
-        return OperationContext.from_placeholder_request(request)
+        return OperationContext.from_request(request)
 
     def _get_operation_language(self, request):
-        return OperationContext.from_placeholder_request(request).language
+        warnings.warn(
+            "_get_operation_language() is deprecated; use _get_operation_context(request).language.",
+            RemovedInDjangoCMS70Warning,
+            stacklevel=2,
+        )
+        return self._get_operation_context(request).language
 
     def _get_operation_origin(self, request):
-        return OperationContext.from_placeholder_request(request).origin
+        warnings.warn(
+            "_get_operation_origin() is deprecated; use _get_operation_context(request).origin.",
+            RemovedInDjangoCMS70Warning,
+            stacklevel=2,
+        )
+        return self._get_operation_context(request).origin
 
     def _send_pre_placeholder_operation(self, request, operation, **kwargs):
+        warnings.warn(
+            "_send_pre_placeholder_operation() is deprecated: the services in cms.core.services announce "
+            "their operations.",
+            RemovedInDjangoCMS70Warning,
+            stacklevel=2,
+        )
         return plugin_services._start(
             operation, self._get_operation_context(request), self.__class__, **kwargs
         )
 
     def _send_post_placeholder_operation(self, request, operation, token, **kwargs):
+        warnings.warn(
+            "_send_post_placeholder_operation() is deprecated: the services in cms.core.services announce "
+            "their operations.",
+            RemovedInDjangoCMS70Warning,
+            stacklevel=2,
+        )
         plugin_services._finish(
             operation, self._get_operation_context(request), token, self.__class__, **kwargs
         )
@@ -359,10 +436,14 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         return placeholder.has_clear_permission(request.user, languages)
 
     def get_placeholder_template(self, request, placeholder):
-        pass
+        """Deprecated: plugin limits use the template of the placeholder's page.
 
+        Overriding this has no effect any more.
+        """
+        return None
+
+    @operation_endpoint
     @xframe_options_sameorigin
-    @transaction.atomic
     def add_plugin(self, request):
         """
         Shows the add plugin form and saves it on POST.
@@ -437,12 +518,10 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             request.POST = query_dict
 
         self._hand_over_operation(request, plugin_instance)
-        try:
-            # Saving goes through the add_plugin service, which announces the
-            # operation (see CMSPluginBase.save_model).
-            return plugin_instance.add_view(request)
-        except ValidationError as error:
-            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
+        # Saving goes through the add_plugin service, which announces the
+        # operation (see CMSPluginBase.save_model). Django's add view runs in a
+        # transaction of its own.
+        return plugin_instance.add_view(request)
 
     def _hand_over_operation(self, request, plugin_instance):
         """Give the plugin admin what its ``save_model()`` passes to the services."""
@@ -451,9 +530,9 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             plugin_instance._operation_permissions = self._get_permissions(request)
             plugin_instance._operation_sender = self.__class__
 
+    @operation_endpoint
     @method_decorator(require_POST)
     @xframe_options_sameorigin
-    @transaction.atomic
     def copy_plugins(self, request):
         """
         POST request should have the following data:
@@ -478,29 +557,25 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         copy_to_clipboard = clipboard is not None and target_placeholder.pk == clipboard.pk
         source_plugin_id = request.POST.get('source_plugin_id', None)
 
-        try:
-            if copy_to_clipboard and source_plugin_id:
-                new_plugin = self._copy_plugin_to_clipboard(
-                    request,
-                    target_placeholder,
-                )
-                new_plugins = [new_plugin]
-            elif copy_to_clipboard:
-                new_plugin = self._copy_placeholder_to_clipboard(
-                    request,
-                    source_placeholder,
-                    target_placeholder,
-                )
-                new_plugins = [new_plugin]
-            else:
-                # The service checks that every plugin is allowed in the target slot.
-                new_plugins = self._add_plugins_from_placeholder(
-                    request,
-                    source_placeholder,
-                    target_placeholder,
-                )
-        except ValidationError as error:
-            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
+        if copy_to_clipboard and source_plugin_id:
+            new_plugin = self._copy_plugin_to_clipboard(
+                request,
+                target_placeholder,
+            )
+            new_plugins = [new_plugin]
+        elif copy_to_clipboard:
+            new_plugin = self._copy_placeholder_to_clipboard(
+                request,
+                source_placeholder,
+                target_placeholder,
+            )
+            new_plugins = [new_plugin]
+        else:
+            new_plugins = self._add_plugins_from_placeholder(
+                request,
+                source_placeholder,
+                target_placeholder,
+            )
         data = get_plugin_tree(request, new_plugins)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -551,8 +626,8 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             sender=self.__class__,
         )
 
+    @operation_endpoint
     @xframe_options_sameorigin
-    @transaction.atomic
     def edit_plugin(self, request, plugin_id):
         try:
             plugin_id = int(plugin_id)
@@ -573,16 +648,14 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             return HttpResponseForbidden(_("You do not have permission to edit this plugin"))
 
         self._hand_over_operation(request, plugin_instance)
-        try:
-            # Saving goes through the change_plugin service, which announces the
-            # operation and clears the placeholder cache.
-            return plugin_instance.change_view(request, str(plugin_id))
-        except ValidationError as error:
-            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
+        # Saving goes through the change_plugin service, which announces the
+        # operation and clears the placeholder cache. Django's change view runs
+        # in a transaction of its own.
+        return plugin_instance.change_view(request, str(plugin_id))
 
+    @operation_endpoint
     @method_decorator(require_POST)
     @xframe_options_sameorigin
-    @transaction.atomic
     def move_plugin(self, request):
         """
         Performs a move or a "paste" operation (when «move_a_copy» is set)
@@ -628,16 +701,9 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         move_to_clipboard = clipboard is not None and placeholder == clipboard
         source_placeholder = plugin.placeholder
 
-        if placeholder and placeholder != source_placeholder:
-            # Whether the plugins are allowed in the target slot is an operation
-            # check of the services; the limit depends on this admin's template.
-            try:
-                template = self.get_placeholder_template(request, placeholder)
-                has_reached_plugin_limit(placeholder, plugin.plugin_type,
-                                         target_language, template=template)
-            except PluginLimitReached as er:
-                return HttpResponseBadRequest(er)
-
+        # Resolving the client-supplied ids is this endpoint's job; whether the
+        # move, paste or cut may happen -- slot, limit, parent, cycles -- is
+        # decided by the operation checks of the services.
         if parent_id and plugin.parent_id != parent_id:
             target_pl = placeholder or plugin.placeholder
 
@@ -671,67 +737,46 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         else:
             target_parent = None
 
-        # Reparenting an existing plugin under itself or one of its own
-        # descendants would create a cycle in the plugin tree. The recursive
-        # descendant/ancestor queries would then loop indefinitely, stalling
-        # request handling (denial of service). Reject such moves.
-        # (Copies and cut-to-clipboard create new plugins, so they are safe.)
-        if (
-            target_parent
-            and not move_a_copy
-            and not move_to_clipboard
-            and (
-                target_parent.pk == plugin.pk
-                or target_parent.pk in plugin._get_descendants_ids()
-            )
-        ):
-            return HttpResponseBadRequest(
-                "A plugin cannot be moved inside itself or one of its descendants."
-            )
-
         old_parent = None
         fetch_tree = True
 
-        try:
-            if move_a_copy and plugin.plugin_type == "PlaceholderPlugin":
-                fetch_tree = False
-                new_plugin = None
-                new_plugins = self._paste_placeholder(
-                    request,
-                    plugin=plugin,
-                    target_language=target_language,
-                    target_placeholder=placeholder,
-                    target_position=target_position,
-                )
-            elif move_a_copy:
-                new_plugin = self._paste_plugin(
-                    request,
-                    plugin=plugin,
-                    target_parent=target_parent,
-                    target_language=target_language,
-                    target_placeholder=placeholder,
-                    target_position=target_position,
-                )
-            elif move_to_clipboard:
-                old_parent = plugin.parent  # Previous parent needs content update, too
-                new_plugin = self._cut_plugin(
-                    request,
-                    plugin=plugin,
-                    target_language=target_language,
-                    target_placeholder=placeholder,
-                )
-                new_plugins = [plugin]
-            else:
-                old_parent = plugin.parent  # Previous parent needs content update, too
-                new_plugin = self._move_plugin(
-                    request,
-                    plugin=plugin,
-                    target_parent=target_parent,
-                    target_position=target_position,
-                    target_placeholder=placeholder,
-                )
-        except ValidationError as error:
-            return HttpResponseBadRequest(conditional_escape(" ".join(error.messages)))
+        if move_a_copy and plugin.plugin_type == "PlaceholderPlugin":
+            fetch_tree = False
+            new_plugin = None
+            new_plugins = self._paste_placeholder(
+                request,
+                plugin=plugin,
+                target_language=target_language,
+                target_placeholder=placeholder,
+                target_position=target_position,
+            )
+        elif move_a_copy:
+            new_plugin = self._paste_plugin(
+                request,
+                plugin=plugin,
+                target_parent=target_parent,
+                target_language=target_language,
+                target_placeholder=placeholder,
+                target_position=target_position,
+            )
+        elif move_to_clipboard:
+            old_parent = plugin.parent  # Previous parent needs content update, too
+            new_plugin = self._cut_plugin(
+                request,
+                plugin=plugin,
+                target_language=target_language,
+                target_placeholder=placeholder,
+            )
+            new_plugins = [plugin]
+        else:
+            old_parent = plugin.parent  # Previous parent needs content update, too
+            new_plugin = self._move_plugin(
+                request,
+                plugin=plugin,
+                target_parent=target_parent,
+                target_position=target_position,
+                target_placeholder=placeholder,
+            )
 
         if new_plugin and fetch_tree:
             root = (new_plugin.parent or new_plugin)
@@ -796,14 +841,14 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             sender=self.__class__,
         )
 
+    @operation_endpoint
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):
         plugin = self._get_plugin_from_id(plugin_id)
 
-        # Checked here as well as in the service: the admin answers a refusal
-        # with a 403 carrying this message, which the frontend editor reads,
-        # rather than with Django's PermissionDenied page.
-        if not self.has_delete_plugin_permission(request, plugin):
+        # Deleting is checked by the delete_plugin service. This check only
+        # spares the user a confirmation page for a deletion they may not do.
+        if not request.POST and not self.has_delete_plugin_permission(request, plugin):
             message = _("You do not have permission to delete this plugin")
             return HttpResponseForbidden(message)
 
@@ -862,6 +907,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             request, "admin/cms/page/plugin/delete_confirmation.html", context
         )
 
+    @operation_endpoint
     @xframe_options_sameorigin
     def clear_placeholder(self, request, placeholder_id):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
@@ -879,7 +925,8 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             # this state-changing operation off CSRF-exempt GET requests.
             if request.method != "POST":
                 return HttpResponseNotAllowed(["POST"])
-            placeholder.clear(language)
+            with transaction.atomic():
+                placeholder.clear(language)
             return TemplateResponse(request, "admin/cms/page/plugin/confirm_form.html", {
                 "data_bridge": {
                     "action": "clear_placeholder",
@@ -888,11 +935,9 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 }
             })
 
-        # The permission check is repeated here only because the editor expects
-        # a 403 carrying this message rather than Django's PermissionDenied
-        # page. The source check is left to the service, which raises the same
-        # PermissionDenied this used to.
-        if not self.has_clear_placeholder_permission(request, placeholder, language):
+        # Clearing is checked by the clear_placeholder service. This check only
+        # spares the user a confirmation page for a clearing they may not do.
+        if not request.POST and not self.has_clear_placeholder_permission(request, placeholder, language):
             message = _("You do not have permission to clear this placeholder")
             return HttpResponseForbidden(message)
 

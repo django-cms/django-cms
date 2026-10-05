@@ -400,7 +400,8 @@ A REST API or an assistant that edits plugins therefore depends on
 packages such as djangocms-rest are *callers* of these services, not providers.
 The admin is an HTTP adapter: it turns a request into an ``OperationContext``,
 calls the service, and turns ``PermissionDenied`` into 403, ``OperationBlocked``
-into 409 and ``ValidationError`` into 400.
+into 409 and ``ValidationError`` into 400, each answered with the plain-text
+message the frontend editor shows.
 
 
 ******************************
@@ -428,9 +429,10 @@ tree created before these rules were checked can still be reordered. The
 language is checked against the languages of the site the placeholder's page
 belongs to, or the current site for other placeholders.
 
-.. TODO: not yet core checks: the plugin limit for moves and pastes (the admin
-   still checks it, with the template from ``get_placeholder_template()``).
-   Register the field-level ``PlaceholderRelationField`` checks as policy
+Plugin limits (``CMS_PLACEHOLDER_CONF``) are looked up with the template of
+the placeholder's page, for adding, moving and pasting alike.
+
+.. TODO: register the field-level ``PlaceholderRelationField`` checks as policy
    checks, keeping the field hook for compatibility.
 
 Plugin data
@@ -709,6 +711,9 @@ and ``plugins``, if a service passes it, the plugins it copies.
 
         ``cms.core.parent_allowed``: the plugin may go under its new parent, or
         at the top level (only checked if the parent or placeholder changes).
+
+        ``cms.core.plugin_limit``: the target placeholder has room for the plugin
+        (only checked when it enters another placeholder).
     * - ``CUT_PLUGIN``
       - ``cms.core.cut_permission``: the user may move the plugin.
 
@@ -730,6 +735,9 @@ and ``plugins``, if a service passes it, the plugins it copies.
 
         ``cms.core.parent_allowed``: the plugin may go under the parent, or at
         the top level.
+
+        ``cms.core.plugin_limit``: the target placeholder has room for the
+        plugin.
     * - ``PASTE_PLACEHOLDER``
       - ``cms.core.paste_permission``, ``cms.core.target_editable``,
         ``cms.core.allowed_in_slot`` for the plugins of the copied placeholder,
@@ -753,7 +761,6 @@ and ``plugins``, if a service passes it, the plugins it copies.
 
    * the page checks above are all permission or validation checks so far;
      those about an object's state become policy checks;
-   * the plugin limit for moves and pastes as a core check;
    * the services and checks for ``cms.extensions``.
 
 The version conditions of ``djangocms-versioning`` and

@@ -400,14 +400,34 @@ Placeholder and plugin operations
   receiver of the post-operation signal that raises now rolls the operation
   back.
 
+* The placeholder admin performs adding, changing, moving, copying, pasting,
+  deleting and clearing through the services in ``cms.core.services`` and only
+  translates their answers: ``PermissionDenied`` into 403, ``OperationBlocked``
+  into **409** (previously 403) and ``ValidationError`` into 400, each with a
+  plain-text message. Overriding the private helpers of these views
+  (``_move_plugin()``, ``_paste_plugin()``, ``_send_pre_placeholder_operation()``,
+  ...) issues a ``RemovedInDjangoCMS70Warning``; override the
+  ``has_*_permission`` methods or register an operation check instead.
+* The move endpoint no longer checks plugin limits, slots or cycles itself; the
+  services do. Plugin limits are looked up with the template of the
+  placeholder's page. ``PlaceholderAdmin.get_placeholder_template()``, which the
+  move endpoint used for this and which returned ``None`` unless overridden, is
+  deprecated and no longer consulted. Pasting a plugin now counts against the
+  limits of its target placeholder also when it is pasted into the placeholder
+  it was copied from.
+* The delete and clear endpoints check permissions themselves only before
+  showing their confirmation page; the deletion is checked by the services.
+* The placeholder endpoints no longer wrap their views in
+  ``transaction.atomic``: every service runs in a transaction of its own, and
+  Django's add and change views open one, too.
+* Placeholder admin endpoints no longer need a ``cms_path`` GET query to send
+  the placeholder operation signals; ``origin`` is a field of the
+  ``OperationContext``. A request without ``cms_path`` used to send no signals
+  and raise a ``UserWarning``; its operation is now announced with an empty
+  ``origin``.
+
 .. TODO: not implemented yet; confirm each point as it lands.
 
-* The placeholder admin performs adding, changing, moving, copying, pasting,
-  deleting and clearing through the services in ``cms.core.services``. Admin
-  subclasses overriding the private helpers of these views (``_move_plugin()``,
-  ``_paste_plugin()``, ...) should override the ``has_*_permission`` methods or
-  register an operation check instead.
-* The admin answers ``OperationBlocked`` with 409 instead of 403.
 * Writing into content that a policy check protects, for example published
   content, through :mod:`cms.api` or another system context is refused unless
   the context explicitly opts out of policy checks.
@@ -504,13 +524,13 @@ Miscellaneous
 Features deprecated in 6.0.0
 ============================
 
-* Placeholder admin endpoints no longer need a ``cms_path`` GET query to send
-  the placeholder operation signals; ``origin`` is a field of the
-  ``OperationContext``. A request without ``cms_path`` still works and its
-  operation is announced with an empty ``origin``.
-
-  .. TODO: not implemented yet; today such a request sends no signals
-     (``emit_signals=False``).
+* The private ``PlaceholderAdmin`` helpers ``_copy_plugin_to_clipboard()``,
+  ``_copy_placeholder_to_clipboard()``, ``_add_plugins_from_placeholder()``,
+  ``_paste_plugin()``, ``_paste_placeholder()``, ``_move_plugin()``,
+  ``_cut_plugin()``, ``_send_pre_placeholder_operation()``,
+  ``_send_post_placeholder_operation()``, ``_get_operation_language()`` and
+  ``_get_operation_origin()``, and ``get_placeholder_template()``. Overriding
+  any of them in a subclass issues a ``RemovedInDjangoCMS70Warning``.
 
 * The ``page`` argument of the plugin API is renamed to ``obj``, because
   placeholders no longer need to belong to a page. The second positional

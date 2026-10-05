@@ -16,7 +16,7 @@ Operation context
 *****************
 
 .. autoclass:: cms.shared.operations.OperationContext
-    :members: from_request, from_placeholder_request, system, is_system
+    :members: from_request, system, is_system
 
 .. autofunction:: cms.shared.operations.operation
 
