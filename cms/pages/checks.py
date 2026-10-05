@@ -553,8 +553,12 @@ class LanguageCopyPlan:
         source = self.source_page_content
         target_page_content = source.page.get_content_obj(self.target_language, fallback=False)
         source_placeholders = list(source.get_placeholders())
+        # Without content in the target language there is nothing to copy into;
+        # cms.pages.target_language reports that. Permission checks run first and
+        # see an empty plan.
         target_placeholders = {
-            placeholder.slot: placeholder for placeholder in target_page_content.get_placeholders()
+            placeholder.slot: placeholder
+            for placeholder in (target_page_content.get_placeholders() if target_page_content else ())
         }
         source_plugins = downcast_plugins(
             CMSPlugin.objects.filter(

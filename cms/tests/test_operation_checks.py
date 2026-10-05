@@ -2,7 +2,8 @@ from unittest.mock import patch
 
 from django.contrib import admin
 from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
+from django.utils.functional import Promise
 from django.utils.translation import override as force_language
 
 from cms import operations
@@ -14,7 +15,7 @@ from cms.pages.admin.forms import MovePageForm
 from cms.pages.admin.page import PageAdmin, PageContentAdmin
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions, PagePermissions
 from cms.shared import checks
-from cms.shared.checks import can
+from cms.shared.checks import OperationBlocked, can
 from cms.shared.operations import OperationContext, operation
 from cms.signals import PAGE_OPERATION_SIGNALS, post_obj_operation, pre_obj_operation
 from cms.test_utils.testcases import CMSTestCase
@@ -23,15 +24,18 @@ SLUG_NOT_UNIQUE = "You cannot have two pages with the same slug"
 
 
 class RegistryIsolationMixin:
-    """Keeps checks registered by a test out of the other tests."""
+    """Keeps checks and operations registered by a test out of the other tests."""
 
     def setUp(self):
         super().setUp()
         saved = {operation: dict(entries) for operation, entries in checks._extensions.items()}
+        saved_operations = dict(operations._registry)
 
         def restore():
             checks._extensions.clear()
             checks._extensions.update(saved)
+            operations._registry.clear()
+            operations._registry.update(saved_operations)
 
         self.addCleanup(restore)
 
@@ -86,8 +90,84 @@ class CheckRegistryTest(RegistryIsolationMixin, CMSTestCase):
 
         CMSCoreExtensions().configure_app(Config)
 
-        entry = checks.get_checks(operations.MOVE_PAGE)[-1]
-        self.assertEqual((entry.name, entry.kind), ("tests.kind", checks.PERMISSION))
+        entry = next(entry for entry in checks.get_checks(operations.MOVE_PAGE) if entry.name == "tests.kind")
+        self.assertEqual(entry.kind, checks.PERMISSION)
+
+    def test_checks_run_by_kind(self):
+        def check(context, **kwargs):
+            pass
+
+        checks.register_check(operations.MOVE_PAGE, "tests.validation", check)
+        checks.register_check(operations.MOVE_PAGE, "tests.policy", check, kind=checks.POLICY)
+        checks.register_check(operations.MOVE_PAGE, "tests.permission", check, kind=checks.PERMISSION)
+
+        entries = checks.get_checks(operations.MOVE_PAGE)
+        kinds = [entry.kind for entry in entries]
+        self.assertEqual(kinds, sorted(kinds, key=checks.KINDS.index))
+        names = [entry.name for entry in entries]
+        # Within a kind, the core checks come first.
+        self.assertLess(names.index("cms.pages.move_target_permission"), names.index("tests.permission"))
+        self.assertLess(names.index("tests.permission"), names.index("tests.policy"))
+        self.assertLess(names.index("tests.policy"), names.index("cms.pages.url_unique"))
+        self.assertLess(names.index("cms.pages.url_unique"), names.index("tests.validation"))
+
+    def test_a_policy_check_blocks_the_operation(self):
+        def published(context, **kwargs):
+            raise OperationBlocked("Published content is read-only")
+
+        checks.register_check(operations.MOVE_PAGE, "tests.published", published, kind=checks.POLICY)
+
+        with self.assertRaisesMessage(OperationBlocked, "Published content is read-only"):
+            page_services.move_page(self.page, self.page, "right", context=self.context)
+        # Code handling PermissionDenied keeps refusing a blocked operation.
+        self.assertTrue(issubclass(OperationBlocked, PermissionDenied))
+
+    def test_dry_run_reports_policy_and_validation_separately(self):
+        def published(context, **kwargs):
+            raise OperationBlocked("Published")
+
+        def invalid(context, **kwargs):
+            raise ValidationError("Invalid")
+
+        checks.register_check(operations.MOVE_PAGE, "tests.invalid", invalid)
+        checks.register_check(operations.MOVE_PAGE, "tests.published", published, kind=checks.POLICY)
+
+        verdict = can(operations.MOVE_PAGE, self.context, page=self.page, target_page=self.page, position="right")
+
+        self.assertFalse(verdict)
+        self.assertEqual(
+            [(r.name, r.kind) for r in verdict.reasons],
+            [("tests.published", checks.POLICY), ("tests.invalid", checks.VALIDATION)],
+        )
+
+    def test_a_system_context_runs_policy_checks_unless_it_opts_out(self):
+        def published(context, **kwargs):
+            raise OperationBlocked("Published")
+
+        checks.register_check(operations.MOVE_PAGE, "tests.published", published, kind=checks.POLICY)
+        target = {"page": self.page, "target_page": self.page, "position": "right"}
+
+        with self.assertRaises(OperationBlocked):
+            checks.run_checks(operations.MOVE_PAGE, OperationContext.system("tests"), **target)
+        migration = OperationContext.system("tests.migration", policy=False)
+        checks.run_checks(operations.MOVE_PAGE, migration, **target)
+        self.assertTrue(can(operations.MOVE_PAGE, migration, **target))
+
+    def test_only_a_system_context_skips_policy_checks(self):
+        with self.assertRaises(ValueError):
+            OperationContext(user=self.get_superuser(), policy=False)
+
+    def test_cms_config_registers_a_policy_check(self):
+        def check(context, **kwargs):
+            pass
+
+        class Config:
+            cms_checks = {operations.MOVE_PAGE: [("tests.policy", check, (), "policy")]}
+
+        CMSCoreExtensions().configure_app(Config)
+
+        entry = next(entry for entry in checks.get_checks(operations.MOVE_PAGE) if entry.name == "tests.policy")
+        self.assertEqual(entry.kind, checks.POLICY)
 
     def test_app_checks_default_to_validation(self):
         checks.register_check(operations.MOVE_PAGE, "tests.default", lambda context, **kwargs: None)
@@ -242,6 +322,81 @@ class OperationFrameTest(RegistryIsolationMixin, CMSTestCase):
         with self.frame():
             pass
         self.assertEqual(self.sent, [])
+
+
+class OperationRegistryTest(RegistryIsolationMixin, CMSTestCase):
+    def test_core_operations_are_declared(self):
+        for operation_id in (
+            operations.ADD_PLUGIN,
+            operations.CHANGE_PLUGIN,
+            operations.MOVE_PLUGIN,
+            operations.CLEAR_PLACEHOLDER,
+            operations.ADD_PAGE,
+            operations.MOVE_PAGE,
+            operations.CHANGE_USER_PERMISSIONS,
+        ):
+            with self.subTest(operation=operation_id):
+                declaration = operations.get_operation(operation_id)
+                self.assertEqual(declaration.id, operation_id)
+
+    def test_every_declaration_has_a_summary_and_a_description(self):
+        for declaration in operations.get_operations():
+            with self.subTest(operation=declaration.id):
+                self.assertTrue(str(declaration.summary))
+                self.assertTrue(declaration.description)
+
+    def test_the_summary_is_translatable(self):
+        # Translated when shown, not when declared at import time.
+        for declaration in operations.get_operations():
+            with self.subTest(operation=declaration.id):
+                self.assertIsInstance(declaration.summary, Promise)
+
+    def test_every_operation_a_service_runs_is_declared(self):
+        for operation_id in checks._core:
+            with self.subTest(operation=operation_id):
+                operations.get_operation(operation_id)
+
+    def test_an_undeclared_operation_is_unknown(self):
+        with self.assertRaises(LookupError):
+            operations.get_operation("tests.unknown")
+        with self.assertRaises(LookupError):
+            with operation("tests.unknown", OperationContext(user=None)):
+                self.fail("The body must not run")
+
+    def test_an_operation_is_declared_once(self):
+        with self.assertRaises(ValueError):
+            operations.register_operation(operations.Operation(operations.MOVE_PAGE, summary="Again"))
+
+    def test_the_description_defaults_to_the_service_docstring(self):
+        def publish(article, *, context):
+            """Publish an article."""
+
+        declaration = operations.register_operation(
+            operations.Operation("tests.publish", summary="Publish", service=publish)
+        )
+
+        self.assertEqual(declaration.description, "Publish an article.")
+        self.assertEqual(operations.get_operation("tests.publish"), declaration)
+
+    def test_cms_config_declares_operations(self):
+        class Config:
+            cms_operations = [operations.Operation("tests.publish", summary="Publish", description="Publish.")]
+
+        CMSCoreExtensions().configure_app(Config)
+
+        self.assertEqual(operations.get_operation("tests.publish").summary, "Publish")
+        self.assertEqual(list(operations.get_operations())[-1].id, "tests.publish")
+
+    def test_cms_config_refuses_bad_declarations(self):
+        class NotAnOperation:
+            cms_operations = [("tests.publish", "Publish")]
+
+        class Duplicate:
+            cms_operations = [operations.Operation(operations.MOVE_PAGE, summary="Move")]
+
+        for config in (NotAnOperation, Duplicate):
+            with self.subTest(config=config.__name__), self.assertRaises(ImproperlyConfigured):
+                CMSCoreExtensions().configure_app(config)
 
 
 class MovePageChecksTest(CMSTestCase):

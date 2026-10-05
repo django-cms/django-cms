@@ -1,3 +1,86 @@
+"""The operation registry.
+
+Every operation that changes content is declared here once, as an
+:class:`Operation`: a stable ``id`` -- the constants below are these ids, and the
+names the operation signals carry -- a one-line ``summary`` for people, a
+plain-English ``description`` for programs and developers, and the ``service``
+performing it. Checks, signals, log entries and dry runs refer to an operation by
+its id; log entries, API schemas and tool definitions read the summary and
+description from here instead of writing their own.
+
+The summary is shown to editors, so it is translatable: declare it with
+``gettext_lazy``. The description is read by API schemas and assistant tool
+definitions, which rely on stable wording, so it is plain English and not
+translated; it defaults to the service's docstring.
+
+Core parts declare their operations next to their services. Apps declare theirs
+in their ``cms_config``::
+
+    class MyAppConfig(CMSAppConfig):
+        cms_operations = [
+            Operation("myapp.publish", summary=_("Publish an article"), service=publish),
+        ]
+"""
+
+from __future__ import annotations
+
+import inspect
+from collections.abc import Callable, Iterator
+from dataclasses import dataclass, replace
+from typing import Any
+
+__all__ = ["Operation", "get_operation", "get_operations", "register_operation"]
+
+
+@dataclass(frozen=True)
+class Operation:
+    """The declaration of an operation."""
+
+    #: Stable and unique, e.g. ``"move_plugin"``. Used as the OpenAPI ``operationId``.
+    id: str
+    #: One line, shown to people. Translatable (``gettext_lazy``).
+    summary: Any
+    #: Plain English: what changes, what is required, what may refuse it. Not
+    #: translated. Defaults to the service's docstring.
+    description: str = ""
+    #: The service performing the operation, if it has one.
+    service: Callable | None = None
+
+
+_registry: dict[str, Operation] = {}
+
+
+def register_operation(declaration: Operation) -> Operation:
+    """Declare an operation. Its id must not be declared yet.
+
+    Returns the declaration as registered, with the description taken from the
+    service's docstring if none was given.
+    """
+    if not declaration.id:
+        raise ValueError("An operation needs an id.")
+    if not declaration.summary:
+        raise ValueError(f"Operation {declaration.id!r} needs a summary.")
+    if declaration.id in _registry:
+        raise ValueError(f"Operation {declaration.id!r} is already declared.")
+    if not declaration.description and declaration.service is not None:
+        declaration = replace(declaration, description=inspect.getdoc(declaration.service) or "")
+    _registry[declaration.id] = declaration
+    return declaration
+
+
+def get_operation(operation_id: str) -> Operation:
+    """The declaration of ``operation_id``. Raises ``LookupError`` if there is none."""
+    try:
+        return _registry[operation_id]
+    except KeyError:
+        raise LookupError(f"Operation {operation_id!r} is not declared.") from None
+
+
+def get_operations() -> Iterator[Operation]:
+    """Every declared operation, in the order they were declared."""
+    return iter(list(_registry.values()))
+
+
 # Placeholder operations
 ADD_PLUGIN = 'add_plugin'
 CHANGE_PLUGIN = 'change_plugin'

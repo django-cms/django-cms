@@ -22,12 +22,13 @@ from __future__ import annotations
 import uuid
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy as _lazy
 
 from cms import operations
 from cms.core.plugins import copy_plugins_to_placeholder
 from cms.core.services.permissions import get_permissions
 from cms.models import CMSPlugin, PlaceholderReference
+from cms.operations import Operation, register_operation
 from cms.shared.operations import OperationContext
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 
@@ -581,3 +582,93 @@ def clear_placeholder(
         plugins=plugins,
         placeholder=placeholder,
     )
+
+
+# -- operation registry -------------------------------------------------------
+# Summaries are shown to editors and translated; descriptions are read by API
+# schemas and assistant tool definitions and stay plain English.
+
+for _declaration in (
+    Operation(
+        operations.ADD_PLUGIN,
+        summary=_lazy("Add a plugin"),
+        description=(
+            "Add a plugin to a placeholder, at the top level or as a child of another plugin. "
+            "Requires permission to add this plugin type. Refused if the object owning the "
+            "placeholder may not be edited, or if the plugin is not allowed there."
+        ),
+    ),
+    Operation(
+        operations.CHANGE_PLUGIN,
+        summary=_lazy("Change a plugin"),
+        description=(
+            "Change the data of a plugin. Requires permission to change the plugin. Refused if the "
+            "object owning the placeholder may not be edited, or if the data is not valid for the "
+            "plugin."
+        ),
+    ),
+    Operation(
+        operations.MOVE_PLUGIN,
+        summary=_lazy("Move a plugin within or between placeholders"),
+        description=(
+            "Move a plugin with its children to another position, parent or placeholder. Requires "
+            "permission to move the plugin to the target placeholder. Refused if the parent is not "
+            "in the target placeholder and language, or if the plugin would end up inside itself."
+        ),
+        service=move_plugin,
+    ),
+    Operation(
+        operations.CUT_PLUGIN,
+        summary=_lazy("Cut a plugin to the clipboard"),
+        description=(
+            "Move a plugin with its children from its placeholder to the acting user's clipboard. "
+            "Requires permission to delete the plugin from its placeholder."
+        ),
+        service=cut_plugin,
+    ),
+    Operation(
+        operations.PASTE_PLUGIN,
+        summary=_lazy("Paste a plugin"),
+        description=(
+            "Copy a plugin with its children from the clipboard or another placeholder into a "
+            "placeholder. Requires permission to read the source and to add the plugins to the "
+            "target. Refused if the parent is not in the target placeholder and language."
+        ),
+        service=paste_plugin,
+    ),
+    Operation(
+        operations.PASTE_PLACEHOLDER,
+        summary=_lazy("Paste a copied placeholder"),
+        description=(
+            "Copy all plugins of a placeholder held on the clipboard into a placeholder. Requires "
+            "permission to read the source and to add the plugins to the target."
+        ),
+        service=paste_placeholder,
+    ),
+    Operation(
+        operations.ADD_PLUGINS_FROM_PLACEHOLDER,
+        summary=_lazy("Copy plugins from another placeholder"),
+        description=(
+            "Copy all plugins of one placeholder and language into another placeholder and "
+            "language. Requires permission to read the source and to add the plugins to the target."
+        ),
+        service=add_plugins_from_placeholder,
+    ),
+    Operation(
+        operations.DELETE_PLUGIN,
+        summary=_lazy("Delete a plugin"),
+        description="Delete a plugin with its children. Requires permission to delete the plugin.",
+        service=delete_plugin,
+    ),
+    Operation(
+        operations.CLEAR_PLACEHOLDER,
+        summary=_lazy("Clear a placeholder"),
+        description=(
+            "Delete all plugins of a placeholder, in one language or in all of them. Requires "
+            "permission to clear the placeholder."
+        ),
+        service=clear_placeholder,
+    ),
+):
+    register_operation(_declaration)
+del _declaration

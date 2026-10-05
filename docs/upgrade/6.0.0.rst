@@ -48,6 +48,10 @@ or an assistant.
   every caller, and anything can ask it as a dry run without changing content.
   See :ref:`operation_checks`.
 
+* **An operation registry.** Every content operation is declared once, with a
+  stable id, a summary and a description that log entries, REST APIs and
+  assistant tool definitions share.
+
 ***********************
 How to upgrade to 6.0.0
 ***********************
@@ -120,8 +124,8 @@ Services
 Content operations are available as **services**: plain functions that take the
 objects to act on and an ``OperationContext`` instead of an ``HttpRequest``.
 
-* ``cms.core.services``: ``move_plugin``, ``cut_plugin``, ``paste_plugin``,
-  ``paste_placeholder``, ``copy_plugin_to_clipboard``,
+* ``cms.core.services``: ``add_plugin``, ``change_plugin``, ``move_plugin``,
+  ``cut_plugin``, ``paste_plugin``, ``paste_placeholder``, ``copy_plugin_to_clipboard``,
   ``copy_placeholder_to_clipboard``, ``add_plugins_from_placeholder``,
   ``delete_plugin`` and ``clear_placeholder``.
 * ``cms.pages.services``: ``add_page``, ``add_translation``,
@@ -132,6 +136,16 @@ objects to act on and an ``OperationContext`` instead of an ``HttpRequest``.
   ``copy_page_tree``, ``copy_page_from_source``, ``delete_page``,
   ``delete_translation``, ``change_template``, ``copy_language``,
   ``toggle_in_navigation`` and ``rebuild_urls``.
+* ``cms.extensions``: saving and deleting page and translation extensions.
+
+.. TODO: ``add_plugin``, ``change_plugin`` and the ``cms.extensions`` services
+   are not implemented yet.
+
+Each part owns the operations on its own content: ``cms.core`` the placeholder
+and plugin operations, for any placeholder owner and without depending on
+pages; ``cms.pages`` the page operations; ``cms.permissions`` granting and
+revoking permissions. A REST API or an assistant editing plugins depends on
+``cms.core`` only.
 
 .. code-block:: python
 
@@ -207,24 +221,68 @@ Packages add their own checks, or replace a core check by name, in their
             operations.MOVE_PAGE: [("myapp.page_unlocked", page_is_unlocked, ["page"])],
         }
 
-Checks raise Django's own ``PermissionDenied`` or ``ValidationError``.
-Permission checks run first, so a refusal never tells a user about content they
-may not see.
+Every check is one of three kinds, run in this order:
 
-Every check is either a *permission* check (may this user do it?) or a
-*validation* check (would the result be valid?). Code acting on the system's
-own behalf -- :mod:`cms.api`, management commands -- passes
-``OperationContext.system("reason")``: it skips the permission checks but runs
-every validation check. A package's checks are validation checks unless its
-``cms_checks`` entry says ``"permission"``.
+* a **permission** check (may this user do it?) raises ``PermissionDenied``;
+  the admin answers 403;
+* a **policy** check (does the object's state allow it right now, whoever
+  acts? for example, published content is read-only) raises
+  ``cms.shared.checks.OperationBlocked``, a subclass of ``PermissionDenied``;
+  the admin answers 409;
+* a **validation** check (would the result be valid?) raises
+  ``ValidationError``; the admin answers 400.
+
+Permission checks run first, so a refusal never tells a user about content they
+may not see. Code acting on the system's own behalf -- :mod:`cms.api`,
+management commands -- passes ``OperationContext.system("reason")``: it skips
+the permission checks, runs the policy checks unless it explicitly opts out,
+and always runs every validation check. A package's checks are validation
+checks unless its ``cms_checks`` entry says ``"permission"`` or ``"policy"``.
 
 In 6.0, all page operations run through operation checks: moving, copying,
 deleting, setting the home page, deleting a translation, changing the template,
 copying a language and toggling the navigation status. ``cms.operations`` has
 new names for the operations that had none: ``SET_HOME``, ``COPY_PAGE``,
 ``CHANGE_PAGE_TEMPLATE``, ``COPY_PAGE_LANGUAGE`` and
-``TOGGLE_PAGE_IN_NAVIGATION``. The plugin operations follow. See
+``TOGGLE_PAGE_IN_NAVIGATION``. The placeholder and plugin operations run
+through operation checks, too, and ``cms.operations`` adds
+``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD``. See
 :ref:`operation_checks` for the concepts and the list of checks.
+
+.. TODO: plugin operation checks and the new constants are not implemented yet.
+
+Operation registry
+==================
+
+``cms.operations`` is the operation registry. Each operation is declared once
+with an operationId (``"move_plugin"``; the existing constants are these ids), a
+one-line summary, a plain-text description and its service. Checks, signals,
+log entries and dry runs refer to the id; REST schemas (for example the
+``operationId``, ``summary`` and ``description`` drf-spectacular emits), tool
+definitions for assistants, log entry messages and the documentation read the
+summary and description from the registry. Packages declare their own
+operations in their ``cms_config``.
+
+The summary is translatable (``gettext_lazy``) because it is shown to editors in
+log entries and the admin. The description is plain English and not translated,
+because API schemas and tool definitions rely on stable wording; it defaults to
+the service's docstring. Docstrings themselves are never translated.
+
+Apps declare theirs with ``cms_operations`` in their ``cms_config``, a list of
+``cms.operations.Operation``. ``operation()`` refuses an operation that is not
+declared.
+
+Plugin data cleaning
+====================
+
+``add_plugin()`` and ``change_plugin()`` take plugin data rather than a form,
+and clean it through a new ``CMSPluginBase`` hook before saving. By default the
+hook binds the plugin's ``form`` (the plugin's own, or the generated
+``ModelForm``) without a request, so sanitising cannot be skipped by calling the
+service directly. Plugins whose form needs the request override the hook. The
+admin passes the form it already validated, so data is not cleaned twice.
+
+.. TODO: name the hook once implemented.
 
 One frame for all services
 ==========================
@@ -303,6 +361,28 @@ Moving pages
 * Permissions are checked before the URLs. A user who may not move a page gets
   a 403 even if the move would also cause a URL conflict, where they previously
   got a 400 describing the conflict.
+
+Placeholder and plugin operations
+=================================
+
+.. TODO: not implemented yet; confirm each point as it lands.
+
+* The placeholder admin performs adding, changing, moving, copying, pasting,
+  deleting and clearing through the services in ``cms.core.services``. Admin
+  subclasses overriding the private helpers of these views (``_move_plugin()``,
+  ``_paste_plugin()``, ...) should override the ``has_*_permission`` methods or
+  register an operation check instead.
+* An operation refused because the object owning the placeholder is not
+  editable (``check_source()``, for example published content under
+  djangocms-versioning) raises ``OperationBlocked`` and the admin answers 409
+  instead of 403.
+* ``CMSPluginBase.save_model()`` calls the ``change_plugin`` or ``add_plugin``
+  service and no longer looks up the placeholder admin in ``admin.site``.
+* Plugin data passed to the services is cleaned through the plugin's form for
+  every caller.
+* Writing into content that a policy check protects, for example published
+  content, through :mod:`cms.api` or another system context is refused unless
+  the context explicitly opts out of policy checks.
 
 Toolbar pool keys
 =================
@@ -395,6 +475,14 @@ Miscellaneous
 
 Features deprecated in 6.0.0
 ============================
+
+* Placeholder admin endpoints no longer need a ``cms_path`` GET query to send
+  the placeholder operation signals; ``origin`` is a field of the
+  ``OperationContext``. A request without ``cms_path`` still works and its
+  operation is announced with an empty ``origin``.
+
+  .. TODO: not implemented yet; today such a request sends no signals
+     (``emit_signals=False``).
 
 * The ``page`` argument of the plugin API is renamed to ``obj``, because
   placeholders no longer need to belong to a page. The second positional

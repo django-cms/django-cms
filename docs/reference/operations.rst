@@ -25,9 +25,57 @@ Operation context
 Operations
 **********
 
-Operations are named by the constants in ``cms.operations``. The table lists the
-service performing each operation and the arguments its checks receive; every
-check also receives ``permissions``.
+Operations are declared in the operation registry ``cms.operations``. Each
+declaration has an operationId (the constant, for example
+``operations.MOVE_PAGE == "move_page"``), a one-line summary, a plain-text
+description and the service performing it.
+
+``summary``
+    Shown to people, in log entries and the admin. Translatable: declare it
+    with ``gettext_lazy``.
+``description``
+    Read by API schemas, tool definitions and the documentation. Plain English,
+    not translated. Defaults to the service's docstring
+    (``inspect.getdoc()``) if not declared.
+
+.. autoclass:: cms.operations.Operation
+    :members: id, summary, description, service
+
+.. autofunction:: cms.operations.register_operation
+
+.. autofunction:: cms.operations.get_operation
+
+.. autofunction:: cms.operations.get_operations
+
+``operation()`` raises ``LookupError`` for an operation that is not declared.
+
+Declaring operations from an app
+================================
+
+.. code-block:: python
+
+    from django.utils.translation import gettext_lazy as _
+
+    from cms.app_base import CMSAppConfig
+    from cms.operations import Operation
+
+    class MyAppConfig(CMSAppConfig):
+        cms_operations = [
+            Operation(
+                "myapp.publish_article",
+                summary=_("Publish an article"),
+                description="Make the article's draft its public version. "
+                            "Requires permission to publish articles.",
+                service=publish_article,
+            ),
+        ]
+
+``cms_operations`` is a list of :class:`~cms.operations.Operation`. Prefix the
+ids with the app's label, so that they cannot collide with the ids of django CMS
+or other apps; declaring an id twice raises ``ImproperlyConfigured``.
+
+The table lists the service performing each operation and the arguments its
+checks receive; every check also receives ``permissions``.
 
 .. list-table::
     :header-rows: 1
@@ -90,11 +138,62 @@ check also receives ``permissions``.
       - :func:`cms.pages.services.toggle_in_navigation`
       - ``page_content``
 
-The plugin services in ``cms.core.services`` (``MOVE_PLUGIN``,
-``CUT_PLUGIN``, ``PASTE_PLUGIN``, ``PASTE_PLACEHOLDER``,
-``ADD_PLUGINS_FROM_PLACEHOLDER``, ``DELETE_PLUGIN``, ``CLEAR_PLACEHOLDER``)
-check permissions through their backend and do not run operation checks yet.
-``ADD_PLUGIN`` and ``CHANGE_PLUGIN`` are performed by the admin only.
+The placeholder and plugin operations are performed by the services in
+``cms.core.services``:
+
+.. list-table::
+    :header-rows: 1
+    :widths: 32 28 40
+
+    * - Operation
+      - Service
+      - Arguments
+    * - ``ADD_PLUGIN``
+      - ``add_plugin``
+      - ``placeholder``, ``plugin_type``, ``language``, ``data``,
+        ``position``, ``target``
+    * - ``CHANGE_PLUGIN``
+      - ``change_plugin``
+      - ``plugin``, ``data``
+    * - ``MOVE_PLUGIN``
+      - :func:`cms.core.services.plugins.move_plugin`
+      - ``plugin``, ``target_position``, ``target_placeholder``,
+        ``target_parent``
+    * - ``CUT_PLUGIN``
+      - :func:`cms.core.services.plugins.cut_plugin`
+      - ``plugin``, ``target_language``, ``target_placeholder``
+    * - ``PASTE_PLUGIN``
+      - :func:`cms.core.services.plugins.paste_plugin`
+      - ``plugin``, ``target_language``, ``target_placeholder``,
+        ``target_position``, ``target_parent``
+    * - ``PASTE_PLACEHOLDER``
+      - :func:`cms.core.services.plugins.paste_placeholder`
+      - ``plugin``, ``target_language``, ``target_placeholder``,
+        ``target_position``
+    * - ``COPY_PLUGIN_TO_CLIPBOARD``
+      - :func:`cms.core.services.plugins.copy_plugin_to_clipboard`
+      - ``source_plugin``, ``target_placeholder``, ``target_language``
+    * - ``COPY_PLACEHOLDER_TO_CLIPBOARD``
+      - :func:`cms.core.services.plugins.copy_placeholder_to_clipboard`
+      - ``source_placeholder``, ``target_placeholder``, ``source_language``,
+        ``target_language``
+    * - ``ADD_PLUGINS_FROM_PLACEHOLDER``
+      - :func:`cms.core.services.plugins.add_plugins_from_placeholder`
+      - ``source_placeholder``, ``target_placeholder``, ``source_language``,
+        ``target_language``
+    * - ``DELETE_PLUGIN``
+      - :func:`cms.core.services.plugins.delete_plugin`
+      - ``plugin``
+    * - ``CLEAR_PLACEHOLDER``
+      - :func:`cms.core.services.plugins.clear_placeholder`
+      - ``placeholder``, ``language``
+
+.. TODO: ``add_plugin`` and ``change_plugin`` do not exist yet (the admin
+   performs these operations), the plugin services check permissions through
+   their backend and do not run operation checks yet, and
+   ``COPY_PLUGIN_TO_CLIPBOARD`` and ``COPY_PLACEHOLDER_TO_CLIPBOARD`` have no
+   constants yet. The arguments of ``add_plugin`` and ``change_plugin`` follow
+   the proposal in #8868.
 
 
 ****************
@@ -115,6 +214,10 @@ Operation checks
 
 .. autodata:: cms.shared.checks.VALIDATION
 
+.. autodata:: cms.shared.checks.POLICY
+
+.. autoexception:: cms.shared.checks.OperationBlocked
+
 .. autoclass:: cms.shared.checks.Verdict
     :members: complete
 
@@ -134,10 +237,11 @@ Registering checks from an app
 
 ``cms_checks`` maps an operation name to a list of ``(name, check)``,
 ``(name, check, requires)`` or ``(name, check, requires, kind)`` tuples.
-``kind`` is ``"validation"`` (the default) or ``"permission"``; a system
-context skips permission checks. A check is a callable
-``check(context, **target)`` raising ``PermissionDenied`` or
-``ValidationError``. Registering a check under the name of an existing one
+``kind`` is ``"validation"`` (the default), ``"policy"`` or
+``"permission"``; a system context skips permission checks. Checks run
+permission first, then policy, then validation. A check is a callable
+``check(context, **target)`` raising ``PermissionDenied`` (permission),
+``OperationBlocked`` (policy) or ``ValidationError`` (validation). Registering a check under the name of an existing one
 replaces it.
 
 Core checks

@@ -4,16 +4,17 @@ Every service runs the checks registered for its operation before it changes
 anything, and :func:`can` runs the same checks without changing anything -- a
 dry run for the admin UI, an API or an assistant asking "can I ...?".
 
-A check is a callable ``check(context, **target)`` that raises Django's own
-``PermissionDenied`` or ``ValidationError`` and returns nothing when the
-operation may proceed. ``context`` is the :class:`~cms.shared.operations.OperationContext`,
+A check is a callable ``check(context, **target)`` that raises
+``PermissionDenied``, :class:`OperationBlocked` or ``ValidationError`` and returns
+nothing when the operation may proceed. ``context`` is the :class:`~cms.shared.operations.OperationContext`,
 ``target`` the service's arguments (``page=``, ``target_page=``, ...). Checks
 should accept ``**kwargs`` so that a service can pass more later.
 
 Checks are registered per operation (the names in :mod:`cms.operations`) under a
-unique name. Core checks come first, in the order the core registers them; checks
-from apps follow in ``INSTALLED_APPS`` order. An app replaces a core check by
-registering one under the same name, in place::
+unique name. They run by kind -- permission, then policy, then validation -- and
+within a kind core checks come first, in the order the core registers them;
+checks from apps follow in ``INSTALLED_APPS`` order. An app replaces a core check
+by registering one under the same name, in place::
 
     class MyCMSConfig(CMSAppConfig):
         cms_checks = {
@@ -21,14 +22,16 @@ registering one under the same name, in place::
         }
 
 **Permission checks run first.** A real run stops at the first failure. A dry run
-collects every validation failure, but stops at a permission failure so that the
-reasons never tell a user more about content they may not touch.
+collects every policy and validation failure, but stops at a permission failure
+so that the reasons never tell a user more about content they may not touch.
 
 Every check has a *kind*: :data:`PERMISSION` checks ask whether the acting user
-may do this, :data:`VALIDATION` checks whether the result would be valid at all.
-Code acting on the system's own behalf -- :mod:`cms.api`, management commands --
-runs with ``OperationContext.system()``, which skips the permission checks but
-never the validation checks.
+may do this, :data:`POLICY` checks whether the object's state allows it right
+now, whoever acts, and :data:`VALIDATION` checks whether the result would be
+valid at all. Code acting on the system's own behalf -- :mod:`cms.api`,
+management commands -- runs with ``OperationContext.system()``, which skips the
+permission checks, runs the policy checks unless it opts out, and never skips
+the validation checks.
 
 These are unrelated to Django's system check framework (``manage.py check``).
 """
@@ -42,7 +45,9 @@ from django.core.exceptions import PermissionDenied, ValidationError
 
 __all__ = [
     "PERMISSION",
+    "POLICY",
     "VALIDATION",
+    "OperationBlocked",
     "Reason",
     "Verdict",
     "can",
@@ -51,12 +56,25 @@ __all__ = [
     "run_checks",
 ]
 
-#: Check kinds. A *permission* check asks whether the acting user may perform the
-#: operation; a system context (``OperationContext.system()``) skips it. A
-#: *validation* check asks whether the result would be valid at all, and always runs.
+#: Check kinds, in the order they run. A *permission* check asks whether the
+#: acting user may perform the operation; a system context
+#: (``OperationContext.system()``) skips it. A *policy* check asks whether the
+#: object's state allows the operation right now, whoever acts -- published
+#: content is read-only, a draft is locked by another user; a system context runs
+#: it unless created with ``policy=False``. A *validation* check asks whether the
+#: result would be valid at all, and always runs.
 PERMISSION = "permission"
+POLICY = "policy"
 VALIDATION = "validation"
-KINDS = (PERMISSION, VALIDATION)
+KINDS = (PERMISSION, POLICY, VALIDATION)
+
+
+class OperationBlocked(PermissionDenied):
+    """The object's state does not allow the operation right now, whoever acts.
+
+    Raised by policy checks. A subclass of ``PermissionDenied`` so that code
+    handling that keeps refusing; the admin answers it with 409 instead of 403.
+    """
 
 
 @dataclass(frozen=True)
@@ -100,21 +118,32 @@ def register_check(
     incomplete, instead of guessing.
 
     ``kind`` is :data:`PERMISSION` for a check about the acting user, which a
-    system context skips, or :data:`VALIDATION` (the default) for a check that
-    must hold whoever acts.
+    system context skips, :data:`POLICY` for a check about the object's state,
+    or :data:`VALIDATION` (the default) for a check that the result must pass
+    whoever acts.
     """
     _register(_extensions, operation, name, check, requires, kind)
 
 
 def _applies(entry, context) -> bool:
-    return not (entry.kind == PERMISSION and getattr(context, "is_system", False))
+    if entry.kind == PERMISSION:
+        return not getattr(context, "is_system", False)
+    if entry.kind == POLICY:
+        return getattr(context, "policy", True)
+    return True
 
 
 def get_checks(operation: str) -> list[_Entry]:
-    """The checks for ``operation``, in the order they run."""
+    """The checks for ``operation``, in the order they run.
+
+    By kind -- permission, policy, validation -- and within a kind core checks
+    first, then the apps' checks. An app check replacing a core check by name
+    takes its place.
+    """
     extensions = dict(_extensions.get(operation, {}))
     entries = [extensions.pop(name, entry) for name, entry in _core.get(operation, {}).items()]
-    return entries + list(extensions.values())
+    entries += extensions.values()
+    return sorted(entries, key=lambda entry: KINDS.index(entry.kind))
 
 
 def run_checks(operation: str, context, **target) -> None:
@@ -130,10 +159,15 @@ def run_checks(operation: str, context, **target) -> None:
 
 @dataclass(frozen=True)
 class Reason:
-    """Why a check failed: the check's ``name``, its ``kind`` and the user-facing ``message``."""
+    """Why a check failed: the check's ``name``, its ``kind`` and the user-facing ``message``.
+
+    ``kind`` follows the exception the check raised: ``"permission"`` for
+    ``PermissionDenied``, ``"policy"`` for :class:`OperationBlocked`,
+    ``"validation"`` for ``ValidationError``.
+    """
 
     name: str
-    kind: str  # "permission" or "validation"
+    kind: str  # "permission", "policy" or "validation"
     message: str
 
 
@@ -170,9 +204,11 @@ def can(operation: str, context, **target) -> Verdict:
             continue
         try:
             entry.check(context, **target)
+        except OperationBlocked as error:
+            reasons.append(Reason(entry.name, POLICY, str(error)))
         except PermissionDenied as error:
-            reasons.append(Reason(entry.name, "permission", str(error)))
+            reasons.append(Reason(entry.name, PERMISSION, str(error)))
             break
         except ValidationError as error:
-            reasons.extend(Reason(entry.name, "validation", str(message)) for message in error.messages)
+            reasons.extend(Reason(entry.name, VALIDATION, str(message)) for message in error.messages)
     return Verdict(allowed=not reasons, reasons=reasons, skipped=skipped)

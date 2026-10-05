@@ -49,10 +49,47 @@ How it is used
 Operations
 ==========
 
-Operations are named by the constants in ``cms.operations``, the same names the
-``pre_obj_operation`` and ``post_obj_operation`` signals carry, for example
-``operations.MOVE_PAGE``. Each service states which operation it performs, and
-runs that operation's checks before it sends the pre-operation signal:
+Every operation that changes content is declared once, in the **operation
+registry** ``cms.operations``. A declaration names:
+
+* an **operationId**, stable and unique, for example ``move_plugin``. The
+  constants in ``cms.operations`` (``operations.MOVE_PLUGIN``) are these ids,
+  and they are the names the ``pre_*_operation`` and ``post_*_operation``
+  signals carry;
+* a **summary**, one line: "Move a plugin within or between placeholders";
+* a **description**, plain text: what changes, what is required, and what may
+  refuse it;
+* the **service** performing it.
+
+Checks, signals, log entries and dry runs refer to an operation by its id.
+Everything that describes an operation to a person or a program reads the
+summary and description from the registry instead of writing its own: the
+admin's log entries, a REST API's schema (an OpenAPI ``operationId``,
+``summary`` and ``description``), tool definitions for an assistant, and this
+documentation. Packages declare their own operations the same way, in their
+:doc:`cms_config </how_to/20-cms-config>`.
+
+Summaries and descriptions are declared in the registry, not taken from the
+service's docstring, because they serve different readers:
+
+* The **summary** is shown to people: in log entries and in the admin. It is
+  translatable, declared with ``gettext_lazy``, and translated when it is shown.
+* The **description** is read by programs and developers: API schemas, tool
+  definitions for assistants and this documentation. It is plain English and not
+  translated, so that its wording stays stable for the programs that rely on
+  it. If a declaration has no description, the registry falls back to the
+  service's docstring (``inspect.getdoc()``).
+* **Docstrings** stay developer documentation, with markup, parameter names and
+  the exceptions raised. They are never translated, and are never used for text
+  shown to editors.
+
+Docstrings cannot be translated anyway. Wrapping one in ``_()`` turns it into an
+ordinary expression and leaves ``__doc__`` empty, ``makemessages`` does not
+extract docstrings, and a translation keyed on a whole docstring would be lost
+with every edit to it.
+
+Each service states which operation it performs, and runs that operation's
+checks before it sends the pre-operation signal:
 
 .. code-block:: python
 
@@ -104,20 +141,16 @@ The checks
 A check is a plain function. It receives the
 :class:`~cms.shared.operations.OperationContext` (the acting user, the language,
 where the operation came from) and the arguments of the service as keywords. It
-raises Django's own exceptions if the operation must not happen, and returns
-nothing otherwise:
-
-* ``PermissionDenied``: the user may not do this. The admin answers with 403.
-* ``ValidationError``: nobody may do this right now, because the result would
-  be invalid, for example two pages with the same URL. The admin answers with 400.
+raises an exception if the operation must not happen, and returns nothing
+otherwise.
 
 .. code-block:: python
 
-    from django.core.exceptions import ValidationError
+    from cms.shared.checks import OperationBlocked
 
     def page_is_unlocked(context, *, page, **kwargs):
         if is_locked(page, context.user):
-            raise ValidationError(_("This page is locked for editing."))
+            raise OperationBlocked(_("This page is locked for editing."))
 
 Checks accept ``**kwargs``, so that a service can pass more arguments in a later
 release without breaking them.
@@ -125,12 +158,46 @@ release without breaking them.
 Every check has a unique name, such as ``"cms.pages.url_unique"``. The name
 identifies the check in a dry run's result and makes it replaceable.
 
-Every check also has a *kind*:
+Three kinds of check
+====================
 
-* A **permission** check asks whether the acting user may do this, for example
-  ``cms.pages.move_permission``.
-* A **validation** check asks whether the result would be valid at all, whoever
-  acts, for example ``cms.pages.url_unique``.
+Every check has one of three *kinds*. The kind says what the check asks, which
+exception it raises, and who it applies to:
+
+.. list-table::
+    :header-rows: 1
+    :widths: 14 40 22 12
+
+    * - Kind
+      - Asks
+      - Raises
+      - Admin answers
+    * - **permission**
+      - May *this user* do it? For example ``cms.pages.move_permission``.
+      - ``PermissionDenied``
+      - 403
+    * - **policy**
+      - Does the object's state allow it right now, whoever acts? For example:
+        published content is read-only, a draft is locked by another user,
+        content is under moderation.
+      - ``OperationBlocked``
+      - 409
+    * - **validation**
+      - Would the result be valid? For example ``cms.pages.url_unique``: no two
+        pages with the same URL.
+      - ``ValidationError``
+      - 400
+
+``OperationBlocked`` lives in ``cms.shared.checks``. It is a subclass of
+``PermissionDenied``, so code that already handles ``PermissionDenied`` keeps
+refusing blocked operations; code that wants to tell the two apart catches
+``OperationBlocked`` first.
+
+The distinction between permission and policy matters to whoever is refused. A
+permission failure means "ask someone with more rights"; a policy failure means
+"nobody may do this to the object as it is now: create a draft, wait for the
+lock, or finish moderation first". Versioning, locking and moderation packages
+register policy checks.
 
 Acting on the system's behalf
 =============================
@@ -143,11 +210,18 @@ context*:
 
     context = OperationContext.system("myapp.import_pages", user=author)
 
-A system context skips the permission checks, because nobody asks whether the
-system may do something. It **still runs every validation check**: pages
-created through :mod:`cms.api` get unique URLs just like pages created in the
-admin. ``reason`` names the caller; ``user``, if given, is recorded as the
-author.
+``reason`` names the caller; ``user``, if given, is recorded as the author.
+A system context
+
+* **skips the permission checks**, because nobody asks whether the system may do
+  something;
+* **runs the policy checks**: by default, :mod:`cms.api` writing into published
+  content is refused just as an editor's change would be. A caller that has to
+  write regardless, such as a data migration, opts out explicitly when it
+  creates the context: ``OperationContext.system("myapp.migration",
+  policy=False)``. Only a system context can opt out;
+* **always runs every validation check**: pages created through :mod:`cms.api`
+  get unique URLs just like pages created in the admin.
 
 Forms never use a system context. A form processes input a user sent, so its
 ``save()`` passes the acting user's context, and the service checks that user's
@@ -156,13 +230,16 @@ permissions, even though the form has already validated its fields.
 Order
 =====
 
-The core checks run first, in the order django CMS registers them, **starting
-with the permission checks**. Checks registered by packages follow, in
+Checks run by kind: **permission checks first, then policy checks, then
+validation checks**. Within a kind, the core checks run first, in the order
+django CMS registers them, followed by checks registered by packages, in
 ``INSTALLED_APPS`` order.
 
 The order matters for what a user learns. A user who may not move a page should
 hear "you may not", not "a page with this URL already exists at the target",
-which would tell them about pages they may not see.
+which would tell them about pages they may not see. Policy comes before
+validation because there is no point in reporting an invalid result for an
+object that may not be changed at all.
 
 
 *********
@@ -186,10 +263,13 @@ nothing:
             print(reason.name, reason.kind, reason.message)
 
 The result, a ``Verdict``, is truthy if the operation may proceed. It lists a
-``Reason`` (check name, ``"permission"`` or ``"validation"``, message) for each
-failure. A real run stops at the first failure. A dry run collects all
-validation failures, so that a user can see everything that stands in the way at
-once, but it still stops at the first permission failure.
+``Reason`` (check name, kind, message) for each failure. A real run stops at the
+first failure. A dry run collects all policy and validation failures, so that a
+user can see everything that stands in the way at once, and reports them
+separately by their kind: "published content is read-only" asks for a different
+next step than "a page with this URL already exists". It still stops at the
+first permission failure, so a dry run never reveals anything about content the
+user may not touch.
 
 This is what the admin UI needs to grey out an action and say why, and what an
 API or an assistant needs to answer "can I move this page there?".
@@ -221,9 +301,9 @@ Adding and replacing checks
 A package registers checks in its :doc:`cms_config </how_to/20-cms-config>`,
 under ``cms_checks``. It maps an operation to a list of ``(name, check)``,
 ``(name, check, requires)`` or ``(name, check, requires, kind)`` tuples.
-``kind`` is ``"validation"`` unless the tuple says ``"permission"``, so a
-system context runs a package's checks unless the package marks them as
-permission checks:
+``kind`` is ``"validation"`` unless the tuple says ``"permission"`` or
+``"policy"``, so a system context runs a package's checks unless the package
+marks them as permission checks:
 
 .. code-block:: python
 
@@ -233,7 +313,7 @@ permission checks:
     class MyAppConfig(CMSAppConfig):
         cms_checks = {
             operations.MOVE_PAGE: [
-                ("myapp.page_unlocked", page_is_unlocked, ["page"]),
+                ("myapp.page_unlocked", page_is_unlocked, ["page"], "policy"),
             ],
         }
 
@@ -273,6 +353,85 @@ posts. So in the admin, adding a page needs both: the admin's
 ``has_add_permission`` and the backend's ``can_add_page``/``can_add_subpage``
 for the parent the page actually gets. An admin subclass can refuse adds this
 way, but not allow an add the backend refuses.
+
+The plugin permission backend (``cms.core.services.permissions``) works the same
+way for plugins and placeholders. It asks the object owning the placeholder
+(``has_placeholder_change_permission()``) and the placeholder's own
+``has_*_plugin_permission()`` methods; the admin adapter routes these through
+the placeholder admin's ``has_*_permission`` hooks.
+
+
+****************************
+Who owns which operations
+****************************
+
+Each part of django CMS owns the operations on its own content, with its own
+services, checks and permission backend, so that each can be replaced on its
+own::
+
+    cms.shared  ←  cms.core (placeholders, plugins)  ←  cms.pages, other placeholder owners
+                                                     ←  cms.permissions
+
+* **cms.core** owns the placeholder and plugin operations. They work for any
+  placeholder owner: a page content, an alias, or any model with a
+  ``PlaceholderRelationField``. Core never imports pages. It asks the owning
+  object for permission (``has_placeholder_change_permission()``) and for
+  policy (``check_source()``, where versioning plugs in).
+* **cms.pages** owns adding, changing, moving, copying and deleting pages, the
+  home page, the template, copying a language and the navigation status.
+  Operations that touch plugins, such as copying a language or a page, call the
+  core services for that part.
+* **cms.permissions** owns granting and revoking page permissions, global
+  permissions, user and group permissions, and page users and groups. These
+  change *who may act*, not content.
+* **cms.extensions** owns saving and deleting page and translation extensions.
+
+A REST API or an assistant that edits plugins therefore depends on
+``cms.core`` only, not on ``cms.pages``.
+
+``cms.api``, management commands, wizards, toolbar endpoints, the admin and
+packages such as djangocms-rest are *callers* of these services, not providers.
+The admin is an HTTP adapter: it turns a request into an ``OperationContext``,
+calls the service, and turns ``PermissionDenied`` into 403, ``OperationBlocked``
+into 409 and ``ValidationError`` into 400.
+
+
+******************************
+Placeholder and plugin checks
+******************************
+
+The plugin services run the same three kinds of check:
+
+* **permission**: the user may add, change, delete, move, clear or copy, and may
+  read the placeholder a paste comes from;
+* **policy**: the object owning the placeholder is editable (``check_source()``,
+  and with it the checks that packages such as djangocms-versioning register on
+  ``PlaceholderRelationField``);
+* **validation**: the plugin and its children are allowed in the slot, the
+  plugin limit is not exceeded, ``parent_classes`` and ``child_classes`` are
+  respected, the parent is in the target placeholder and language, a plugin is
+  not moved into itself, and the language belongs to the site.
+
+.. TODO: register the field-level ``PlaceholderRelationField`` checks as policy
+   checks, keeping the field hook for compatibility.
+
+Plugin data
+===========
+
+Adding or changing a plugin takes the plugin's data, not a form. Before saving,
+the service hands the data to a hook on ``CMSPluginBase`` that cleans it. By
+default the hook binds the plugin's ``form``, the plugin's own or the
+``ModelForm`` django CMS generates, so the model's validation applies at least.
+It needs no request.
+
+The service calls the hook for every caller, so sanitising, for example the
+HTML sanitising a text plugin does in its form field, cannot be skipped by
+calling the service directly. A plugin whose form depends on the request
+overrides the hook. The admin passes the form it has already validated, so that
+the data is not cleaned twice.
+
+``CMSPluginBase.save_model()`` calls the service as well; it no longer looks up
+the placeholder admin to announce the operation.
 
 
 ********************
@@ -462,7 +621,21 @@ Code that customised move validation by overriding ``MovePageForm.clean()``
 should register a check instead, see
 :ref:`upgrade-6.0-backward-incompatible`.
 
-The plugin and placeholder operations follow. The plan is to move
-``PlaceholderRelationField.default_checks`` and the version conditions of
-``djangocms-versioning`` onto the same registry, so that one mechanism answers
-"may this happen?" for every operation.
+.. TODO: the following is not implemented yet and must be updated as it lands:
+
+   * the page checks above are all permission or validation checks so far;
+     those about an object's state become policy checks;
+   * operation checks for the placeholder and plugin operations
+     (``ADD_PLUGIN``, ``CHANGE_PLUGIN``, ``MOVE_PLUGIN``, ``CUT_PLUGIN``,
+     ``PASTE_PLUGIN``, ``PASTE_PLACEHOLDER``, ``COPY_PLUGIN_TO_CLIPBOARD``,
+     ``COPY_PLACEHOLDER_TO_CLIPBOARD``, ``ADD_PLUGINS_FROM_PLACEHOLDER``,
+     ``DELETE_PLUGIN``, ``CLEAR_PLACEHOLDER``), which currently check through
+     their permission backend only, and the ``add_plugin`` and
+     ``change_plugin`` services with the plugin data hook;
+   * the services and checks for ``cms.extensions``.
+
+The placeholder and plugin operations follow the same structure, see
+*Placeholder and plugin checks* above. The version conditions of
+``djangocms-versioning`` and ``PlaceholderRelationField`` checks become policy
+checks on the same registry, so that one mechanism answers "may this happen?"
+for every operation.

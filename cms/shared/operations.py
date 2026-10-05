@@ -50,23 +50,36 @@ class OperationContext:
     #: Set for code acting on the system's own behalf rather than a user's, see
     #: :meth:`system`. Names the caller, e.g. ``"cms.api"``.
     system_reason: str | None = None
+    #: Whether the *policy* checks run. Only a system context may turn them off,
+    #: see :meth:`system`.
+    policy: bool = True
+
+    def __post_init__(self):
+        if not self.policy and not self.is_system:
+            raise ValueError("Only a system context can skip the policy checks.")
 
     @property
     def is_system(self) -> bool:
         return self.system_reason is not None
 
     @classmethod
-    def system(cls, reason: str, *, user=None, language: str | None = None) -> OperationContext:
+    def system(
+        cls, reason: str, *, user=None, language: str | None = None, policy: bool = True
+    ) -> OperationContext:
         """A context for code acting on the system's own behalf.
 
         Services skip their *permission* checks for it -- nobody asks whether
         :mod:`cms.api` or a management command may do something -- but still run
-        every *validation* check. ``reason`` names the caller; ``user``, if given,
-        is recorded as the author (``created_by`` and log entries).
+        the *policy* checks, so that writing into published content is refused,
+        and every *validation* check. ``reason`` names the caller; ``user``, if
+        given, is recorded as the author (``created_by`` and log entries).
+
+        ``policy=False`` skips the policy checks as well, for code that has to
+        write regardless of the object's state, such as a data migration.
         """
         if not reason:
             raise ValueError("A system context needs a reason naming its caller.")
-        return cls(user=user, language=language, system_reason=reason)
+        return cls(user=user, language=language, system_reason=reason, policy=policy)
 
     @classmethod
     def from_request(cls, request, language: str | None = None) -> OperationContext:
@@ -131,6 +144,9 @@ def operation(
 ) -> Iterator[dict]:
     """The frame every service runs its work in.
 
+    ``name`` and ``signal_operation`` must be declared in the operation registry
+    (:mod:`cms.operations`); an undeclared one raises ``LookupError``.
+
     Runs the checks registered for the operation ``name`` against ``checks`` (the
     service's arguments, see :mod:`cms.shared.checks`), sends the pre signal of
     the ``signals`` pair, runs the body of the ``with`` block, and sends the post
@@ -148,6 +164,12 @@ def operation(
                        sender=Page, obj=page) as signal_kwargs:
             page.move_page(target_page, position)
     """
+    from cms.operations import get_operation
+
+    get_operation(name)
+    if signal_operation is not None:
+        get_operation(signal_operation)
+
     if checks is not None:
         from cms.shared.checks import run_checks
 

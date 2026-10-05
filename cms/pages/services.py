@@ -27,6 +27,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _lazy
 
 from cms import api, operations
 from cms.core.plugins import copy_plugins_to_placeholder
@@ -41,6 +42,7 @@ from cms.models import (
     PageUserGroup,
     Placeholder,
 )
+from cms.operations import Operation, register_operation
 from cms.pages.checks import LanguageCopyPlan
 from cms.pages.utils import get_clean_username
 from cms.permissions.cache import clear_permission_cache
@@ -720,3 +722,168 @@ def rebuild_urls(page: Page, language: str | None = None, *, context: OperationC
     """
     for code in [language] if language else list(page.get_languages()):
         page.update_urls_from_content(code)
+
+
+# -- operation registry -------------------------------------------------------
+# Summaries are shown to editors and translated; descriptions are read by API
+# schemas and assistant tool definitions and stay plain English.
+
+for _declaration in (
+    Operation(
+        operations.ADD_PAGE,
+        summary=_lazy("Add a page"),
+        description=(
+            "Create a page with its first translation, at the root of a site or below a parent page, "
+            "optionally as a copy of a source page or page type. Requires permission to add a page "
+            "there and, for a source, to copy it."
+        ),
+        service=add_page,
+    ),
+    Operation(
+        operations.ADD_PAGE_TRANSLATION,
+        summary=_lazy("Add a page translation"),
+        description=(
+            "Add the content of a page in another language. Requires permission to change the page."
+        ),
+        service=add_translation,
+    ),
+    Operation(
+        operations.CHANGE_PAGE_TRANSLATION,
+        summary=_lazy("Change a page translation"),
+        description=(
+            "Change the title, slug, menu and meta fields of one translation of a page. Requires "
+            "permission to change this translation's content."
+        ),
+        service=change_page_content,
+    ),
+    Operation(
+        operations.CHANGE_PAGE_ADVANCED_SETTINGS,
+        summary=_lazy("Change a page's advanced settings"),
+        description=(
+            "Change the settings shared by all translations of a page, such as its reverse id, "
+            "apphook and redirects. Requires permission to change the page's advanced settings."
+        ),
+        service=change_advanced_settings,
+    ),
+    Operation(
+        operations.CHANGE_PAGE_PERMISSIONS,
+        summary=_lazy("Change a page's permissions"),
+        description=(
+            "Save and delete the permission grants of a page. Requires permission to change the "
+            "page's permissions; editing rights can only be granted to users and groups the acting "
+            "user manages, and only with flags the acting user holds."
+        ),
+        service=save_page_permissions,
+    ),
+    Operation(
+        operations.CHANGE_USER_PERMISSIONS,
+        summary=_lazy("Change a user's or group's permissions"),
+        description=(
+            "Set the django CMS model permissions of a user or group. Requires that the acting user "
+            "manages that user or group and holds every permission set or cleared."
+        ),
+        service=set_user_permissions,
+    ),
+    Operation(
+        operations.CHANGE_GLOBAL_PAGE_PERMISSION,
+        summary=_lazy("Change a global page permission"),
+        description=(
+            "Save a page permission that applies to every page of its sites. The acting user must "
+            "hold every flag of the grant on its sites."
+        ),
+        service=save_global_page_permission,
+    ),
+    Operation(
+        operations.DELETE_GLOBAL_PAGE_PERMISSION,
+        summary=_lazy("Delete a global page permission"),
+        description=(
+            "Delete a page permission that applies to every page of its sites. The acting user must "
+            "be able to have granted it."
+        ),
+        service=delete_global_page_permission,
+    ),
+    Operation(
+        operations.MOVE_PAGE,
+        summary=_lazy("Move a page"),
+        description=(
+            "Move a page with its descendants to another position in the page tree. Requires "
+            "permission to move the page and to add pages below the new parent. Refused if the "
+            "home page would end up below another page, or if a slug or URL would collide."
+        ),
+        service=move_page,
+    ),
+    Operation(
+        operations.COPY_PAGE,
+        summary=_lazy("Copy a page"),
+        description=(
+            "Copy a page with its descendants, translations and plugins to another position, "
+            "possibly on another site. Requires permission to view the page and to add pages at "
+            "the target. Refused if the page has none of the target site's languages."
+        ),
+        service=copy_page_tree,
+    ),
+    Operation(
+        operations.COPY_PAGE_FROM_SOURCE,
+        summary=_lazy("Create a page from a source"),
+        description=(
+            "Create a page as a copy of a source page or page type. Requires permission to change "
+            "the source, or to view a page type of the target site, and to add a page at the target."
+        ),
+        service=copy_page_from_source,
+    ),
+    Operation(
+        operations.SET_HOME,
+        summary=_lazy("Set the home page"),
+        description=(
+            "Make a root page the home page of its site. Requires permission to change the page "
+            "and the current home page. Refused for a page that is not a root page or already the "
+            "home page."
+        ),
+        service=set_home,
+    ),
+    Operation(
+        operations.DELETE_PAGE,
+        summary=_lazy("Delete a page"),
+        description="Delete a page with its descendants. Requires permission to delete the page.",
+        service=delete_page,
+    ),
+    Operation(
+        operations.DELETE_PAGE_TRANSLATION,
+        summary=_lazy("Delete a page translation"),
+        description=(
+            "Delete one translation of a page with its plugins. Requires permission to delete the "
+            "translation. Refused for the page's only translation."
+        ),
+        service=delete_translation,
+    ),
+    Operation(
+        operations.CHANGE_PAGE_TEMPLATE,
+        summary=_lazy("Change a page's template"),
+        description=(
+            "Change the template of one translation of a page. Requires permission to change the "
+            "translation. Refused for a template the project does not offer."
+        ),
+        service=change_template,
+    ),
+    Operation(
+        operations.COPY_PAGE_LANGUAGE,
+        summary=_lazy("Copy plugins to another language"),
+        description=(
+            "Copy the plugins of one translation of a page into another translation. Requires "
+            "permission to change the target translation and to add the plugins to every target "
+            "placeholder. Refused if the page has no content in the target language."
+        ),
+        service=copy_language,
+    ),
+    Operation(
+        operations.TOGGLE_PAGE_IN_NAVIGATION,
+        summary=_lazy("Show or hide a page in the navigation"),
+        description=(
+            "Toggle whether one translation of a page appears in menus. Requires permission to "
+            "change the translation."
+        ),
+        service=toggle_in_navigation,
+    ),
+):
+    register_operation(_declaration)
+del _declaration

@@ -6,10 +6,13 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_base import CMSAppConfig, CMSAppExtension
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
+from cms.core.services import plugins as plugin_services  # noqa: F401  -- declares the plugin operations
 from cms.models import PageContent
+from cms.operations import Operation, register_operation
 from cms.pages import (
     checks as page_checks,  # noqa: F401  -- registers the page operation checks
     editing,  # noqa: F401  -- registers the page editing hooks
+    services as page_services,  # noqa: F401  -- declares the page operations
 )
 from cms.pages.rendering import render_pagecontent
 from cms.permissions import checks as permission_checks  # noqa: F401  -- registers the grant checks
@@ -87,7 +90,7 @@ class CMSCoreExtensions(CMSAppExtension):
 
         ``cms_checks`` maps an operation name to ``(name, check)``,
         ``(name, check, requires)`` or ``(name, check, requires, kind)`` tuples.
-        ``kind`` defaults to ``"validation"``: a check that holds whoever acts.
+        ``kind`` is ``"permission"``, ``"policy"`` or ``"validation"`` (the default).
         """
         if not isinstance(cms_config.cms_checks, Mapping):
             raise ImproperlyConfigured("cms_checks must be a mapping of operation names to checks")
@@ -102,6 +105,21 @@ class CMSCoreExtensions(CMSAppExtension):
                 except ValueError as error:
                     raise ImproperlyConfigured(str(error)) from error
 
+    def configure_operations(self, cms_config):
+        """Declares the operations of an app, see :mod:`cms.operations`.
+
+        ``cms_operations`` is a list of :class:`~cms.operations.Operation`.
+        """
+        if not isinstance(cms_config.cms_operations, Iterable):
+            raise ImproperlyConfigured("cms_operations must be a list of Operation declarations")
+        for declaration in cms_config.cms_operations:
+            if not isinstance(declaration, Operation):
+                raise ImproperlyConfigured(f"{declaration!r} in cms_operations is not an Operation")
+            try:
+                register_operation(declaration)
+            except ValueError as error:
+                raise ImproperlyConfigured(str(error)) from error
+
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here
         # just move on.
@@ -111,5 +129,7 @@ class CMSCoreExtensions(CMSAppExtension):
             self.configure_toolbar_enabled_models(cms_config)
         if hasattr(cms_config, 'cms_toolbar_mixin'):
             self.configure_toolbar_mixin(cms_config)
+        if hasattr(cms_config, 'cms_operations'):
+            self.configure_operations(cms_config)
         if hasattr(cms_config, 'cms_checks'):
             self.configure_checks(cms_config)
