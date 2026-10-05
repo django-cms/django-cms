@@ -550,7 +550,9 @@ class Page(MP_Node):
         from cms.pages.utils import get_available_slug
 
         assert parent_page is None or isinstance(parent_page, Page), f"{parent_page} is not an instance of Page."
-        assert isinstance(user, get_user_model()), f"{user} is not an instance of User."
+        # ``user`` is the author of the copy. Code acting on the system's own
+        # behalf (OperationContext.system()) may have none.
+        assert user is None or isinstance(user, get_user_model()), f"{user} is not an instance of User."
 
         if parent_page:
             new_page = parent_page.add_child(site=site, login_required=self.login_required)

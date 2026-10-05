@@ -724,6 +724,18 @@ class PageOperationChecksTest(CMSTestCase):
         (kwargs,) = self.sent
         self.assertEqual((kwargs["operation"], kwargs["obj"], kwargs["new_page"]), (operations.COPY_PAGE, page, new_page))
 
+    def test_a_system_context_without_a_user_can_copy(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        system = OperationContext.system("tests")
+
+        tree_copy = page_services.copy_page_tree(page, None, "last-child", target_site=self.site, context=system)
+        source_copy = page_services.copy_page_from_source(
+            page, target_site=self.site, parent_page=None, language="en", context=system
+        )
+
+        self.assertEqual(Page.objects.filter(pk__in=[tree_copy.pk, source_copy.pk]).count(), 2)
+        self.assertEqual(tree_copy.get_content_obj("en").title, "Page")
+
     def test_the_last_translation_cannot_be_deleted(self):
         page = create_page("Page", "nav_playground.html", "en")
 
