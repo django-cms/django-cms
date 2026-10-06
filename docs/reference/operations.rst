@@ -252,6 +252,18 @@ permission first, then policy, then validation. A check is a callable
 ``OperationBlocked`` (policy) or ``ValidationError`` (validation). Registering a check under the name of an existing one
 replaces it.
 
+Editability checks
+==================
+
+.. autofunction:: cms.core.checks.register_editability_check
+
+.. autofunction:: cms.core.checks.register_editable_operation
+
+.. autofunction:: cms.core.checks.is_editable
+
+Apps register editability checks in their ``cms_config`` as
+``cms_editability_checks``, a list of ``(name, check)`` tuples.
+
 Core checks
 ===========
 

@@ -447,8 +447,47 @@ belongs to, or the current site for other placeholders.
 Plugin limits (``CMS_PLACEHOLDER_CONF``) are looked up with the template of
 the placeholder's page, for adding, moving and pasting alike.
 
-.. TODO: register the field-level ``PlaceholderRelationField`` checks as policy
-   checks, keeping the field hook for compatibility.
+Editability checks
+==================
+
+Some packages decide whether an object's content may be changed right now,
+whoever acts: a versioning package only lets drafts be changed, a locking
+package only the user holding the lock. Such a rule applies to every operation
+that changes the object's content -- adding, moving or deleting plugins in its
+placeholders, changing a page translation's template or navigation status,
+deleting the translation, copying plugins into it, saving a page content
+extension.
+
+Instead of registering a check for each of these operations, a package registers
+one **editability check**:
+
+.. code-block:: python
+
+    from cms.shared.checks import OperationBlocked
+
+    def draft_only(context, obj):
+        if is_versioned(obj) and not is_draft(obj):
+            raise OperationBlocked(_("Only drafts can be changed."))
+
+    class MyAppConfig(CMSAppConfig):
+        cms_editability_checks = [("myapp.draft_only", draft_only)]
+
+``obj`` is the object whose content changes: the page content, an alias
+content, any object placeholders belong to. The check must accept objects it
+does not manage. django CMS registers it as a policy check, under its name, for
+every operation that changes content, so a refusal reaches the caller as
+``OperationBlocked`` with the check's message, and a dry run reports it by name.
+Parts and packages add operations with
+:func:`cms.core.checks.register_editable_operation`.
+
+``Placeholder.check_source(user)``, which the frontend editor uses to decide
+whether a placeholder is shown as editable, asks the editability checks, too.
+
+The older hook still works: checks added to
+``PlaceholderRelationField.default_checks`` or passed to the field as
+``checks=`` answer ``True`` or ``False`` for a placeholder and still guard the
+plugin operations, through the core policy check ``cms.core.source_editable``.
+They give no reason, and they do not guard the page translation operations.
 
 Plugin data
 ===========

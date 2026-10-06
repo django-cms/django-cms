@@ -124,6 +124,18 @@ class CMSCoreExtensions(CMSAppExtension):
             except ValueError as error:
                 raise ImproperlyConfigured(str(error)) from error
 
+    def configure_editability_checks(self, cms_config):
+        """Registers an app's editability checks, see :func:`cms.core.checks.register_editability_check`.
+
+        ``cms_editability_checks`` is a list of ``(name, check)`` tuples.
+        """
+        from cms.core.checks import register_editability_check
+
+        for name, check in cms_config.cms_editability_checks:
+            if not callable(check):
+                raise ImproperlyConfigured(f"Editability check {name!r} is not callable")
+            register_editability_check(name, check)
+
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here
         # just move on.
@@ -137,3 +149,5 @@ class CMSCoreExtensions(CMSAppExtension):
             self.configure_operations(cms_config)
         if hasattr(cms_config, 'cms_checks'):
             self.configure_checks(cms_config)
+        if hasattr(cms_config, 'cms_editability_checks'):
+            self.configure_editability_checks(cms_config)

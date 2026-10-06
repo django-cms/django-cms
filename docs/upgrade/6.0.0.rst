@@ -514,6 +514,22 @@ not only to the ones they know, now see these operations, too.
 djangocms-versioning, for example, updates the modified date of the page's
 content.
 
+Editability checks
+==================
+
+* Packages that decide whether content may be changed right now -- versioning,
+  locking, moderation -- can register an **editability check** once
+  (``cms_editability_checks`` in ``cms_config``, or
+  ``cms.core.checks.register_editability_check()``). It guards every operation
+  that changes an object's content, plugins and page translations alike, and
+  refuses with ``OperationBlocked`` and its own message. See
+  :ref:`operation_checks`.
+* ``Placeholder.check_source(user)`` also asks the editability checks. It takes
+  a new keyword-only argument ``editability``; ``editability=False`` asks the
+  ``PlaceholderRelationField`` checks only.
+* ``PlaceholderRelationField.default_checks`` and the field's ``checks``
+  argument keep working as before.
+
 Callers outside the admin
 =========================
 

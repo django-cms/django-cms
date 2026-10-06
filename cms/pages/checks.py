@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from cms import operations
+from cms.core.checks import register_editable_operation
 from cms.core.plugins import downcast_plugins
 from cms.forms.validators import validate_path, validate_url_uniqueness
 from cms.models import CMSPlugin, Page, PagePermission
@@ -569,4 +570,27 @@ register_core_check(
     check_navigation_permission,
     kind=PERMISSION,
     requires=["page_content"],
+)
+
+
+# Editability: the page operations that change one translation's content run
+# the editability checks for that translation (cms.core.checks).
+
+
+def _target_content(page_content, target_language, **kwargs):
+    target = page_content.page.get_content_obj(target_language, fallback=False)
+    return [target] if target else []
+
+
+for _operation in (
+    operations.CHANGE_PAGE_TRANSLATION,
+    operations.DELETE_PAGE_TRANSLATION,
+    operations.CHANGE_PAGE_TEMPLATE,
+    operations.TOGGLE_PAGE_IN_NAVIGATION,
+):
+    register_editable_operation(
+        _operation, lambda page_content, **kwargs: [page_content], requires=["page_content"]
+    )
+register_editable_operation(
+    operations.COPY_PAGE_LANGUAGE, _target_content, requires=["page_content", "target_language"]
 )

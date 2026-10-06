@@ -1150,6 +1150,124 @@ class OperationCallersTest(CMSTestCase):
         self.assertEqual((entry.object_id, entry.change_message), (str(page.pk), "Set the home page"))
 
 
+class EditabilityChecksTest(RegistryIsolationMixin, CMSTestCase):
+    """One editability check guards every operation that changes an object's content."""
+
+    def setUp(self):
+        super().setUp()
+        saved = dict(core_checks._editability_checks)
+
+        def restore():
+            core_checks._editability_checks.clear()
+            core_checks._editability_checks.update(saved)
+
+        self.addCleanup(restore)
+        self.context = OperationContext(user=self.get_superuser(), language="en")
+        self.page = create_page("Page", "nav_playground.html", "en")
+        self.content = self.page.get_content_obj("en")
+        self.body = self.page.get_placeholders("en").get(slot="body")
+        self.plugin = add_plugin(self.body, "TextPlugin", "en", body="Text").cmsplugin_ptr
+        self.blocked = set()
+
+    def published_is_read_only(self, context, obj):
+        if obj in self.blocked:
+            raise OperationBlocked("Published content is read-only.")
+
+    def register(self):
+        core_checks.register_editability_check("tests.draft_only", self.published_is_read_only)
+
+    def test_it_blocks_the_plugin_operations_on_the_object(self):
+        self.register()
+        self.blocked.add(self.content)
+
+        verdict = can(operations.DELETE_PLUGIN, self.context, plugin=self.plugin)
+        with self.assertRaisesMessage(OperationBlocked, "Published content is read-only."):
+            plugin_services.delete_plugin(self.plugin, context=self.context)
+
+        self.assertEqual(
+            [(r.name, r.kind, r.message) for r in verdict.reasons],
+            [("tests.draft_only", checks.POLICY, "Published content is read-only.")],
+        )
+        self.assertTrue(CMSPlugin.objects.filter(pk=self.plugin.pk).exists())
+        # The editor's "is this editable?" asks the same checks.
+        self.assertFalse(self.body.check_source(self.context.user))
+        self.assertTrue(self.body.check_source(self.context.user, editability=False))
+
+    def test_it_blocks_changing_the_page_translation(self):
+        self.register()
+        self.blocked.add(self.content)
+
+        for operation_id, target in (
+            (operations.CHANGE_PAGE_TEMPLATE, {"page_content": self.content, "template": "nav_playground.html"}),
+            (operations.TOGGLE_PAGE_IN_NAVIGATION, {"page_content": self.content}),
+            (operations.DELETE_PAGE_TRANSLATION, {"page_content": self.content}),
+        ):
+            with self.subTest(operation=operation_id):
+                self.assertEqual(
+                    [r.name for r in can(operation_id, self.context, **target).reasons if r.kind == checks.POLICY],
+                    ["tests.draft_only"],
+                )
+        with self.assertRaises(OperationBlocked):
+            page_services.toggle_in_navigation(self.content, context=self.context)
+
+    def test_copying_a_language_asks_about_the_target(self):
+        self.register()
+        german = create_page_content("de", "Seite", self.page)
+        self.blocked.add(german)
+
+        with self.assertRaises(OperationBlocked):
+            page_services.copy_language(self.content, "de", context=self.context)
+        self.blocked = {self.content}
+        page_services.copy_language(self.content, "de", context=self.context)
+
+    def test_it_blocks_page_content_extensions_only(self):
+        from cms.extensions import services as extension_services
+        from cms.test_utils.project.extensionapp.models import MyPageContentExtension, MyPageExtension
+
+        self.register()
+        self.blocked.add(self.content)
+
+        with self.assertRaises(OperationBlocked):
+            extension_services.save_extension(MyPageContentExtension(extended_object=self.content), context=self.context)
+        extension_services.save_extension(MyPageExtension(extended_object=self.page), context=self.context)
+
+    def test_a_system_context_is_blocked_unless_it_opts_out(self):
+        self.register()
+        self.blocked.add(self.content)
+
+        with self.assertRaises(OperationBlocked):
+            plugin_services.delete_plugin(self.plugin, context=OperationContext.system("tests"))
+        plugin_services.delete_plugin(self.plugin, context=OperationContext.system("tests.migration", policy=False))
+
+    def test_operations_registered_later_get_the_checks(self):
+        self.register()
+        core_checks.register_editable_operation(operations.SET_HOME, lambda page, **kwargs: [page], requires=["page"])
+        self.addCleanup(core_checks._editable_operations.pop, operations.SET_HOME)
+        self.blocked.add(self.page)
+
+        self.assertIn("tests.draft_only", [entry.name for entry in checks.get_checks(operations.SET_HOME)])
+        self.assertFalse(can(operations.SET_HOME, self.context, page=self.page))
+
+    def test_cms_config_registers_editability_checks(self):
+        class Config:
+            cms_editability_checks = [("tests.config", self.published_is_read_only)]
+
+        CMSCoreExtensions().configure_app(Config)
+        self.blocked.add(self.content)
+
+        self.assertFalse(can(operations.CLEAR_PLACEHOLDER, self.context, placeholder=self.body, language="en"))
+
+    def test_the_field_hook_still_applies(self):
+        from cms.models.fields import PlaceholderRelationField
+
+        def draft_only(placeholder, user):
+            return placeholder.source != self.content
+
+        with patch.object(PlaceholderRelationField, "default_checks", [draft_only]):
+            with self.assertRaises(OperationBlocked):
+                plugin_services.delete_plugin(self.plugin, context=self.context)
+
+
 class MovePageChecksTest(CMSTestCase):
     """The ``MOVE_PAGE`` core checks, reached the way the page tree reaches them."""
 

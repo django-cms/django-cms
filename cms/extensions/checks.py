@@ -12,6 +12,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from cms import operations
+from cms.core.checks import register_editable_operation
 from cms.extensions.models import PageContentExtension
 from cms.pages.permissions import get_page_permissions
 from cms.shared.checks import PERMISSION, VALIDATION, register_core_check
@@ -55,3 +56,15 @@ register_core_check(
     kind=VALIDATION,
     requires=["extension"],
 )
+
+
+# A page content extension is part of its translation's content: changing it
+# runs the editability checks for the translation (cms.core.checks).
+
+
+def _extended_content(extension, **kwargs):
+    return [extension.extended_object] if isinstance(extension, PageContentExtension) else []
+
+
+for _operation in (operations.SAVE_EXTENSION, operations.DELETE_EXTENSION):
+    register_editable_operation(_operation, _extended_content, requires=["extension"])

@@ -82,7 +82,8 @@ class PluginPermissions:
         Separate from the permission checks: a versioning package uses this to
         lock published or checked-out content without changing who may edit.
         """
-        return placeholder.check_source(self.user)
+        # The editability checks run as policy checks of their own.
+        return placeholder.check_source(self.user, editability=False)
 
     # -- copying and pasting ----------------------------------------------
 

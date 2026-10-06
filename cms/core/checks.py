@@ -7,6 +7,19 @@ resolved, or ``None`` for a dry run, which falls back to the default one.
 service has already loaded; a dry run leaves it out and the check loads it.
 
 The checks work for any placeholder owner and never import pages.
+
+**Editability checks** answer one question for every operation that changes an
+object's content: may this object be changed right now, whoever acts? A
+versioning package, for example, only lets drafts be changed. Such a check is
+registered once, with :func:`register_editability_check` or
+``cms_editability_checks`` in a ``cms_config``, and becomes a policy check of
+every operation that changes content: the plugin operations, for the objects
+their placeholders belong to, and the operations other parts register with
+:func:`register_editable_operation`, such as changing a page translation.
+
+The older hook, ``PlaceholderRelationField.default_checks`` and the field's
+``checks``, still applies to the plugin operations through
+``cms.core.source_editable``.
 """
 
 from __future__ import annotations
@@ -19,7 +32,7 @@ from cms.core.plugin_pool import plugin_pool
 from cms.core.plugins import get_plugin_disallowed_in_slot, has_reached_plugin_limit
 from cms.core.services.permissions import get_permissions
 from cms.exceptions import PluginLimitReached
-from cms.shared.checks import PERMISSION, POLICY, VALIDATION, OperationBlocked, register_core_check
+from cms.shared.checks import PERMISSION, POLICY, VALIDATION, OperationBlocked, register_check, register_core_check
 from cms.utils import get_current_site
 from cms.utils.i18n import get_language_list
 
@@ -34,6 +47,100 @@ COPY_PLACEHOLDER_DENIED = _("You do not have permission to copy this placeholder
 DELETE_DENIED = _("You do not have permission to delete this plugin")
 CLEAR_DENIED = _("You do not have permission to clear this placeholder")
 NOT_EDITABLE = _("The content this placeholder belongs to cannot be edited right now.")
+
+
+# Editability
+
+#: operation -> callable returning the objects whose content the operation changes.
+_editable_operations: dict = {}
+#: name -> editability check.
+_editability_checks: dict = {}
+
+
+def _editability_wrapper(name, check, sources):
+    def run(context, **target):
+        for obj in sources(**target):
+            if obj is not None:
+                check(context, obj)
+
+    run.__name__ = run.__qualname__ = f"editability:{name}"
+    return run
+
+
+def register_editable_operation(operation: str, sources, *, requires=()) -> None:
+    """Declare that ``operation`` changes the content of the objects ``sources(**target)`` returns.
+
+    Every editability check, registered before or after, then also runs for
+    ``operation`` as a policy check. ``requires`` names the arguments
+    ``sources`` cannot do without.
+    """
+    _editable_operations[operation] = (sources, tuple(requires))
+    for name, check in _editability_checks.items():
+        register_check(operation, name, _editability_wrapper(name, check, sources), requires=requires, kind=POLICY)
+
+
+def register_editability_check(name: str, check) -> None:
+    """Add a policy check asking whether an object's content may be changed right now.
+
+    ``check(context, obj)`` raises :class:`~cms.shared.checks.OperationBlocked`
+    with a message for the user if ``obj`` -- a page content, an alias content,
+    any object placeholders belong to -- may not be changed, whoever acts. It
+    returns nothing otherwise, and must accept objects it does not manage.
+
+    The check is registered under ``name`` for every operation that changes
+    content (:func:`register_editable_operation`), so a dry run reports it by
+    that name. Registering a check under an existing name replaces it.
+    """
+    _editability_checks[name] = check
+    for operation, (sources, requires) in _editable_operations.items():
+        register_check(operation, name, _editability_wrapper(name, check, sources), requires=requires, kind=POLICY)
+
+
+def is_editable(obj, user) -> bool:
+    """Whether every editability check lets ``user`` change ``obj``'s content right now."""
+    from cms.shared.operations import OperationContext
+
+    context = OperationContext(user=user)
+    try:
+        for check in _editability_checks.values():
+            check(context, obj)
+    except OperationBlocked:
+        return False
+    return True
+
+
+def _sources(*placeholders):
+    return [placeholder.source for placeholder in placeholders if placeholder is not None]
+
+
+register_editable_operation(
+    operations.ADD_PLUGIN, lambda placeholder, **kwargs: _sources(placeholder), requires=["placeholder"]
+)
+register_editable_operation(
+    operations.CHANGE_PLUGIN, lambda plugin, **kwargs: _sources(plugin.placeholder), requires=["plugin"]
+)
+register_editable_operation(
+    operations.MOVE_PLUGIN,
+    lambda plugin, target_placeholder=None, **kwargs: _sources(plugin.placeholder, target_placeholder),
+    requires=["plugin"],
+)
+register_editable_operation(
+    operations.CUT_PLUGIN, lambda plugin, **kwargs: _sources(plugin.placeholder), requires=["plugin"]
+)
+for _operation in (
+    operations.PASTE_PLUGIN,
+    operations.PASTE_PLACEHOLDER,
+    operations.ADD_PLUGINS_FROM_PLACEHOLDER,
+):
+    register_editable_operation(
+        _operation, lambda target_placeholder, **kwargs: _sources(target_placeholder), requires=["target_placeholder"]
+    )
+register_editable_operation(
+    operations.DELETE_PLUGIN, lambda plugin, **kwargs: _sources(plugin.placeholder), requires=["plugin"]
+)
+register_editable_operation(
+    operations.CLEAR_PLACEHOLDER, lambda placeholder, **kwargs: _sources(placeholder), requires=["placeholder"]
+)
 
 
 def _permissions(permissions, context):

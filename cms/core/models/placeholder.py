@@ -205,11 +205,25 @@ class Placeholder(models.Model):
             return
         return next(f for f in self.source._meta.get_fields() if f.related_model == Placeholder)
 
-    def check_source(self, user):
+    def check_source(self, user, *, editability=True):
+        """Whether ``user`` may change content in this placeholder, as far as its source allows.
+
+        Asks the checks of the source's ``PlaceholderRelationField`` and the
+        editability checks (:func:`cms.core.checks.register_editability_check`),
+        for example whether the source is a draft. ``editability=False`` asks the
+        field checks only: the plugin operations run the editability checks
+        themselves, as named policy checks.
+        """
         remote_field = self._get_source_remote_field()
         if remote_field is None:
             return True
-        return remote_field.run_checks(self, user)
+        if not remote_field.run_checks(self, user):
+            return False
+        if editability:
+            from cms.core.checks import is_editable
+
+            return is_editable(self.source, user)
+        return True
 
     def _get_attached_model(self):
         if self.source:
