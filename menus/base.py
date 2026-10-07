@@ -152,11 +152,13 @@ class NavigationNode:
         """
         Returns a list of all children beneath the current menu item.
         """
-        # Extend one list; sum() would copy the accumulated list for every child.
+        # Reverse the stack to preserve preorder without copying each subtree.
         descendants = []
-        for node in self.children:
+        pending = list(reversed(self.children))
+        while pending:
+            node = pending.pop()
             descendants.append(node)
-            descendants.extend(node.get_descendants())
+            pending.extend(reversed(node.children))
         return descendants
 
     def get_ancestors(self) -> list['NavigationNode']:

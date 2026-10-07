@@ -383,6 +383,10 @@ class NavExtender(Modifier):
                                 extnode.parent_namespace = node.namespace
                                 extnode.parent = node
                                 node.children.append(extnode)
+                    # Attached roots cannot be claimed again. Hidden home and
+                    # falsy parent ids leave roots eligible for later extenders.
+                    if node.id and (node != home or node.visible):
+                        roots_by_namespace.pop(ext, None)
         removed = []
 
         # find all not assigned nodes
@@ -501,39 +505,60 @@ class SoftRootCutter(Modifier):
                 nodes = self.find_ancestors_and_remove_children(selected, nodes)
         return nodes
 
-    def find_and_remove_children(self, node, nodes):
+    def find_and_remove_children(self, node, nodes, removed=None):
+        if removed is None:
+            removed = set()
+            self.find_and_remove_children(node, nodes, removed)
+            if removed:
+                nodes[:] = [n for n in nodes if id(n) not in removed]
+            return nodes
+
         for child in node.children:
             if child.attr.get("soft_root", False):
-                self.remove_children(child, nodes)
+                self.remove_children(child, nodes, removed)
         return nodes
 
-    def remove_children(self, node, nodes):
-        # Filter nodes once; nodes.remove() per descendant is quadratic
+    def remove_children(self, node, nodes, removed=None):
+        if not node.children:
+            return
+
+        # Defer list filtering when called as part of a larger pruning pass.
         descendants = node.get_descendants()
         removed_ids = {id(descendant) for descendant in descendants}
-        nodes[:] = [n for n in nodes if id(n) not in removed_ids]
+        if removed is None:
+            nodes[:] = [n for n in nodes if id(n) not in removed_ids]
+        else:
+            removed.update(removed_ids)
         for descendant in descendants:
             descendant.children = []
         node.children = []
 
-    def find_ancestors_and_remove_children(self, node, nodes):
+    def find_ancestors_and_remove_children(self, node, nodes, removed=None):
         """
         Check ancestors of node for soft roots
         """
+        if removed is None:
+            # Share removals across all ancestors and sibling soft roots.
+            removed = set()
+            nodes = self.find_ancestors_and_remove_children(node, nodes, removed)
+            if removed:
+                nodes[:] = [n for n in nodes if id(n) not in removed]
+            return nodes
+
         if node.parent:
             if node.parent.attr.get("soft_root", False):
                 nodes = node.parent.get_descendants()
                 node.parent.parent = None
                 nodes = [node.parent] + nodes
             else:
-                nodes = self.find_ancestors_and_remove_children(node.parent, nodes)
+                nodes = self.find_ancestors_and_remove_children(node.parent, nodes, removed)
         else:
             for newnode in nodes:
                 if newnode != node and not newnode.parent:
-                    self.find_and_remove_children(newnode, nodes)
+                    self.find_and_remove_children(newnode, nodes, removed)
         for child in node.children:
             if child != node:
-                self.find_and_remove_children(child, nodes)
+                self.find_and_remove_children(child, nodes, removed)
         return nodes
 
 

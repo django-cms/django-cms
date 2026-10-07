@@ -2,15 +2,16 @@
 Regression tests for loops whose cost grew quadratically with the number of
 menu nodes, plugins or page permissions (#8912).
 
-Each test measures the work done for ``n`` and ``4 * n`` items. Linear work
-grows by about 4x, quadratic work by about 16x, so a ratio below
-``MAX_GROWTH`` means the code scales linearly.
+Scaling tests compare work for ``n`` and ``4 * n`` items. Linear work grows
+by about 4x, quadratic work by about 16x. ``MAX_GROWTH`` guards against the
+targeted quadratic operations; it does not prove linear complexity.
 
 Work is measured by counting comparisons or hash lookups where possible. Code
 whose cost is list copying cannot be counted that way and is timed instead.
 """
 
 import gc
+import sys
 import time
 from types import SimpleNamespace
 from unittest import mock
@@ -72,13 +73,27 @@ class CountingName(str):
 
 
 class CountingNode(NavigationNode):
-    """A navigation node that counts how often it is compared to another node."""
+    """Count node comparisons and parent-id reads, including attached roots."""
+
+    def __getattribute__(self, name):
+        if name == "parent_id":
+            Work.count += 1
+        return super().__getattribute__(name)
 
     def __eq__(self, other):
         Work.count += 1
         return self is other
 
     __hash__ = NavigationNode.__hash__
+
+
+class CountingList(list):
+    """Count visits even when a scan removes no nodes."""
+
+    def __iter__(self):
+        for item in super().__iter__():
+            Work.count += 1
+            yield item
 
 
 class ScalingAssertions:
@@ -152,11 +167,49 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
         """Nodes listed before their parent, as menus not ordered by tree path may return them."""
 
         def run(size):
-            nodes = [NavigationNode(str(i), "/", CountingId(i), CountingId(i - 1) if i else None) for i in range(size)]
+            nodes = [
+                NavigationNode(str(i), "/", CountingId(i), CountingId(i - 1) if i > 1 else None)
+                for i in range(1, size + 1)
+            ]
             final_nodes = _build_nodes_inner_for_one_menu(nodes[::-1], "Menu")
-            self.assertEqual(len(final_nodes), size)
+            self.assertEqual(final_nodes, nodes)
+            for parent, child in zip(nodes, nodes[1:], strict=False):
+                self.assertIs(child.parent, parent)
+                self.assertEqual(parent.children, [child])
 
         self.assertLinearCount(run, 100)
+
+    def test_build_mixed_order(self):
+        root = NavigationNode("root", "/", 1)
+        early = NavigationNode("early", "/", 2, 1)
+        late = NavigationNode("late", "/", 3, 1)
+        grandchild = NavigationNode("grandchild", "/", 4, 2)
+
+        nodes = _build_nodes_inner_for_one_menu([grandchild, early, root, late], "Menu")
+
+        self.assertEqual(nodes, [root, late, early, grandchild])
+        self.assertEqual(root.children, [late, early])
+        self.assertEqual(early.children, [grandchild])
+        self.assertIs(grandchild.parent, early)
+
+    def test_deep_descendants(self):
+        root = NavigationNode("root", "/", 0)
+        parent = root
+        spine = []
+        siblings = []
+        # Exceed Python's recursion limit without changing the runner's settings.
+        for index in range(1, sys.getrecursionlimit() + 1):
+            child = NavigationNode("child", "/", index)
+            sibling = NavigationNode("sibling", "/", -index)
+            parent.children = [child, sibling]
+            child.parent = sibling.parent = parent
+            spine.append(child)
+            siblings.append(sibling)
+            parent = child
+
+        self.assertEqual(root.get_descendants(), [*spine, *reversed(siblings)])
+        self.assertEqual(root.children, [spine[0], siblings[0]])
+        self.assertIs(spine[-1].parent, spine[-2])
 
     def test_get_descendants(self):
         def setup(size):
@@ -239,6 +292,78 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
             self.assertEqual(nodes, [*others, root])
 
         self.assertLinearCount(run, 200)
+
+    def test_many_extender_roots(self):
+        renderer = SimpleNamespace(menus={})
+        request = SimpleNamespace(path_info="/")
+
+        def run(size):
+            pages = [
+                CountingNode(str(i), "/", i, attr={"navigation_extenders": ["Extender"]}) for i in range(1, size + 1)
+            ]
+            roots = [CountingNode(str(i), "/", -i) for i in range(1, size + 1)]
+            for root in roots:
+                root.namespace = "Extender"
+            nodes = [*pages, *roots]
+
+            result = NavExtender(renderer).modify(request, nodes, None, None, False, False)
+
+            self.assertIs(result, nodes)
+            self.assertEqual(result, [*pages, *roots])
+            self.assertEqual(pages[0].children, roots)
+            self.assertTrue(all(root.parent is pages[0] for root in roots))
+            self.assertTrue(all(not page.children for page in pages[1:]))
+
+        self.assertLinearCount(run, 200)
+
+    def test_hidden_home_extenders(self):
+        home = NavigationNode("home", "/", 1, attr={"is_home": True, "navigation_extenders": ["Ext"]}, visible=False)
+        page = NavigationNode("page", "/page/", 2, attr={"navigation_extenders": ["Ext"]})
+        roots = [NavigationNode(str(i), "/", i) for i in (3, 4)]
+        for root in roots:
+            root.namespace = "Ext"
+        extender = NavExtender(SimpleNamespace(menus={}))
+        request = SimpleNamespace(path_info="/")
+
+        extender.modify(request, [home, *roots], None, None, False, False)
+        self.assertEqual(home.children, [])
+        self.assertTrue(all(root.parent is None for root in roots))
+
+        extender.modify(request, [home, page, *roots], None, None, False, False)
+        self.assertEqual(page.children, roots)
+        self.assertTrue(all(root.parent is page for root in roots))
+
+    def test_many_soft_roots(self):
+        for depth in (0, 2):
+            with self.subTest(depth=depth):
+
+                def run(size, depth=depth):
+                    root, branches = make_flat_tree(NavigationNode, 1)
+                    root.selected = True
+                    branch = branches[0]
+                    soft_roots = [NavigationNode(str(i), "/", i, attr={"soft_root": True}) for i in range(2, size + 2)]
+                    branch.children = soft_roots
+                    descendants = []
+                    for soft_root in soft_roots:
+                        soft_root.parent = branch
+                        parent = soft_root
+                        for level in range(depth):
+                            child = NavigationNode(str(level), "/", (soft_root.id, level))
+                            child.parent = parent
+                            parent.children = [child]
+                            descendants.append(child)
+                            parent = child
+                    kept = [root, branch, *soft_roots]
+                    nodes = CountingList([*kept, *descendants])
+
+                    result = SoftRootCutter(None).modify(None, nodes, None, None, False, False)
+
+                    self.assertIs(result, nodes)
+                    self.assertEqual(result, kept)
+                    self.assertEqual(branch.children, soft_roots)
+                    self.assertTrue(all(not node.children for node in [*soft_roots, *descendants]))
+
+                self.assertLinearCount(run, 200)
 
 
 class PluginScalingTests(ScalingAssertions, CMSTestCase):
