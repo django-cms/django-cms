@@ -55,24 +55,28 @@ def get_visible_page_contents(request, page_contents: Iterable[PageContent], sit
     # by restrictions on itself or its ancestors, whose paths are prefixes of its path.
     # The paths come from the loaded pages, so perm.page is never queried.
     page_paths = {page_content.page.pk: page_content.page.path for page_content in page_contents}
-    restrictions_by_path = defaultdict(list)
-    for perm in restrictions:
-        restrictions_by_path[page_paths[perm.page_id]].append(perm)
-
     user_id = request.user.pk
     user_groups = SimpleLazyObject(lambda: frozenset(request.user.groups.values_list("pk", flat=True)))
     is_auth_user = request.user.is_authenticated
+
+    # Resolve each grant scope once, regardless of how many descendants use it.
+    restrictions_by_path = defaultdict(dict)
+    for perm in restrictions:
+        perm_path = page_paths[perm.page_id]
+        scope = PermissionTuple((perm.grant_on, perm_path))
+        grants = restrictions_by_path[perm_path]
+        grants[scope] = grants.get(scope, False) or (
+            is_auth_user and (perm.user_id == user_id or perm.group_id in user_groups)
+        )
 
     def user_can_see_page(page: Page) -> bool:
         restricted = False
         for end in range(Page.steplen, len(page.path) + 1, Page.steplen):
             perm_path = page.path[:end]
-            for perm in restrictions_by_path.get(perm_path, ()):
-                if not PermissionTuple((perm.grant_on, perm_path)).contains(page.path):
+            for scope, granted in restrictions_by_path.get(perm_path, {}).items():
+                if not scope.contains(page.path):
                     continue
-                if not is_auth_user:
-                    return False
-                if perm.user_id == user_id or perm.group_id in user_groups:
+                if granted:
                     return True
                 restricted = True
 
@@ -363,13 +367,12 @@ class NavExtender(Modifier):
             if not node.parent_id:
                 roots_by_namespace[node.namespace].append(node)
         # Find nodes with NavExtenders
-        exts = []
+        exts = set()
         for node in nodes:
             extenders = node.attr.get("navigation_extenders", None)
             if extenders:
                 for ext in extenders:
-                    if ext not in exts:
-                        exts.append(ext)
+                    exts.add(ext)
                     # Link the nodes; a node may have been linked by an earlier extender
                     for extnode in roots_by_namespace.get(ext, ()):
                         if not extnode.parent_id:
@@ -387,14 +390,12 @@ class NavExtender(Modifier):
                     # falsy parent ids leave roots eligible for later extenders.
                     if node.id and (node != home or node.visible):
                         roots_by_namespace.pop(ext, None)
-        removed = []
-
-        # find all not assigned nodes
-        for menu in self.renderer.menus.items():
-            if hasattr(menu[1], "cms_enabled") and menu[1].cms_enabled and menu[0] not in exts:
-                for node in nodes:
-                    if node.namespace == menu[0]:
-                        removed.append(node)
+        # Resolve unassigned namespaces once rather than scanning nodes per menu.
+        unassigned = {
+            name
+            for name, menu in self.renderer.menus.items()
+            if getattr(menu, "cms_enabled", False) and name not in exts
+        }
         if breadcrumb:
             # if breadcrumb and home not in navigation add node
             if breadcrumb and home and not home.visible:
@@ -404,8 +405,7 @@ class NavExtender(Modifier):
                 else:
                     home.selected = False
         # remove all nodes that are nav_extenders and not assigned, in one pass
-        removed_ids = {id(node) for node in removed}
-        nodes[:] = [node for node in nodes if id(node) not in removed_ids]
+        nodes[:] = [node for node in nodes if node.namespace not in unassigned]
         return nodes
 
 

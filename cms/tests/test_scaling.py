@@ -22,7 +22,7 @@ from django.test.utils import CaptureQueriesContext
 
 from cms.api import create_page
 from cms.cms_menus import NavExtender, SoftRootCutter, get_visible_page_contents
-from cms.models import ACCESS_PAGE, CMSPlugin, PagePermission
+from cms.models import ACCESS_CHILDREN, ACCESS_PAGE, ACCESS_PAGE_AND_DESCENDANTS, CMSPlugin, PagePermission
 from cms.models.permissionmodels import PermissionTuple
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.plugins import downcast_plugins, get_bound_plugins
@@ -228,6 +228,31 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
 
         self.assertLinearTime(setup, 2000)
 
+    def test_cut_levels_deep_tree(self):
+        roots = []
+        expected = []
+        target = sys.getrecursionlimit() + 1
+        # Two deep branches must keep their leaf groups in input order.
+        for branch in range(2):
+            root = NavigationNode("root", "/", branch)
+            root.level = 0
+            parent = root
+            for level in range(1, target):
+                child = NavigationNode("child", "/", (branch, level))
+                child.level = level
+                parent.children = [child]
+                parent = child
+            leaves = [NavigationNode("leaf", "/", (branch, target, i)) for i in range(3)]
+            for leaf in leaves:
+                leaf.level = target
+            parent.children = leaves
+            roots.append(root)
+            expected.extend(leaves)
+
+        self.assertEqual(menu_utils.cut_levels(roots, target), expected)
+        self.assertIs(menu_utils.cut_levels(expected, target), expected)
+        self.assertEqual(menu_utils.cut_levels(roots, target + 1), [])
+
     def test_auth_visibility(self):
         request = SimpleNamespace(user=SimpleNamespace(is_authenticated=False))
 
@@ -316,6 +341,56 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
 
         self.assertLinearCount(run, 200)
 
+    def test_distinct_extenders(self):
+        def run(size):
+            pages = []
+            roots = []
+            for index in range(size):
+                name = CountingName(f"Ext{index}")
+                page = NavigationNode("page", "/", index + 1, attr={"navigation_extenders": [name]})
+                root = NavigationNode("ext", "/", -index - 1)
+                root.namespace = name
+                pages.append(page)
+                roots.append(root)
+            nodes = [*pages, *roots]
+
+            result = NavExtender(SimpleNamespace(menus={})).modify(None, nodes, None, None, False, False)
+
+            self.assertEqual(result, [*pages, *roots])
+            for page, root in zip(pages, roots, strict=True):
+                self.assertEqual(page.children, [root])
+                self.assertIs(root.parent, page)
+
+        self.assertLinearCount(run, 200)
+
+    def test_unassigned_namespaces(self):
+        def run(size):
+            menus = {}
+            roots = []
+            kept = []
+            for index in range(size):
+                name = CountingName(f"Ext{index}")
+                root = NavigationNode("ext", "/", index)
+                root.namespace = name
+                roots.append(root)
+                menus[name] = SimpleNamespace(cms_enabled=True)
+                page = NavigationNode("page", "/", -index - 1)
+                page.namespace = "CMSMenu"
+                kept.append(page)
+            # A menu without cms_enabled remains in the output.
+            standalone = NavigationNode("standalone", "/", "standalone")
+            standalone.namespace = "Standalone"
+            menus["Standalone"] = SimpleNamespace()
+            kept.append(standalone)
+            nodes = [*roots, *kept]
+
+            result = NavExtender(SimpleNamespace(menus=menus)).modify(None, nodes, None, None, False, False)
+
+            self.assertIs(result, nodes)
+            self.assertEqual(result, kept)
+
+        self.assertLinearCount(run, 200)
+
     def test_hidden_home_extenders(self):
         home = NavigationNode("home", "/", 1, attr={"is_home": True, "navigation_extenders": ["Ext"]}, visible=False)
         page = NavigationNode("page", "/page/", 2, attr={"navigation_extenders": ["Ext"]})
@@ -389,7 +464,7 @@ class PluginScalingTests(ScalingAssertions, CMSTestCase):
         self.assertLinearCount(run, 200)
 
 
-class ViewRestrictionScalingTests(CMSTestCase):
+class ViewRestrictionScalingTests(ScalingAssertions, CMSTestCase):
     template = "nav_playground.html"
 
     def setUp(self):
@@ -435,3 +510,47 @@ class ViewRestrictionScalingTests(CMSTestCase):
             PagePermission.objects.create(page=page, user=self.user, can_view=True, grant_on=ACCESS_PAGE)
 
         self.assertEqual(self._count_queries(page_contents), query_count)
+
+    def test_shared_ancestor_scales(self):
+        root = self.pages[0]
+        other = self._create_user("other", is_staff=False)
+        original_contains = PermissionTuple.contains
+
+        def counted_contains(permission, path):
+            Work.count += 1
+            return original_contains(permission, path)
+
+        def run(size):
+            pages = [root] + [
+                create_page(f"child-{size}-{index}", self.template, "en", parent=root) for index in range(size)
+            ]
+            PagePermission.objects.filter(page=root).delete()
+            PagePermission.objects.bulk_create(
+                [
+                    PagePermission(page=root, user=other, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+                    for _ in range(size)
+                ]
+            )
+            contents = [page.get_content_obj() for page in pages]
+
+            self.assertEqual(get_visible_page_contents(self._get_request(), contents, self.site), [])
+
+        with mock.patch.object(PermissionTuple, "contains", counted_contains):
+            self.assertLinearCount(run, 25)
+
+    def test_grants_keep_their_scope(self):
+        root = self.pages[0]
+        child = create_page("child", self.template, "en", parent=root)
+        grandchild = create_page("grandchild", self.template, "en", parent=child)
+        contents = [page.get_content_obj() for page in (root, child, grandchild)]
+        other = self._create_user("other", is_staff=False)
+        PagePermission.objects.create(page=root, user=self.user, can_view=True, grant_on=ACCESS_CHILDREN)
+        PagePermission.objects.create(page=root, user=other, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+
+        self.assertEqual(get_visible_page_contents(self._get_request(), contents, self.site), [contents[1]])
+
+        # A matching grant must survive later nonmatching grants of the same scope.
+        PagePermission.objects.create(page=root, user=self.user, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        PagePermission.objects.create(page=root, user=other, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+
+        self.assertEqual(get_visible_page_contents(self._get_request(), contents, self.site), contents)
