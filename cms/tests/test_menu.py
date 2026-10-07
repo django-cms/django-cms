@@ -38,6 +38,7 @@ from cms.utils.i18n import get_default_language_for_site
 from menus.base import NavigationNode
 from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
 from menus.models import CacheKey
+from menus.templatetags.menu_tags import cut_after
 from menus.utils import cut_levels, find_selected, mark_descendants
 
 
@@ -1026,6 +1027,30 @@ class MenuTests(BaseMenuTest):
     def test_utils_cut_levels(self):
         tree_nodes, flat_nodes = self._get_nodes()
         self.assertEqual(cut_levels(tree_nodes, 1), [flat_nodes[1]])
+
+    def test_cut_after_removes_consecutive_invisible_children(self):
+        parent = NavigationNode("parent", "/parent/", 1)
+        hidden1 = NavigationNode("hidden1", "/hidden1/", 2, 1, visible=False)
+        hidden2 = NavigationNode("hidden2", "/hidden2/", 3, 1, visible=False)
+        shown = NavigationNode("shown", "/shown/", 4, 1)
+        parent.children = [hidden1, hidden2, shown]
+
+        cut_after(parent, 1)
+
+        self.assertEqual(parent.children, [shown])
+
+    def test_cut_after_cuts_child_following_invisible_child(self):
+        parent = NavigationNode("parent", "/parent/", 1)
+        hidden = NavigationNode("hidden", "/hidden/", 2, 1, visible=False)
+        shown = NavigationNode("shown", "/shown/", 3, 1)
+        grandchild = NavigationNode("grandchild", "/grandchild/", 4, 3)
+        parent.children = [hidden, shown]
+        shown.children = [grandchild]
+
+        cut_after(parent, 1)
+
+        self.assertEqual(parent.children, [shown])
+        self.assertEqual(shown.children, [])
 
     def test_empty_menu(self):
         context = self.get_context()

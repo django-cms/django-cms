@@ -381,12 +381,12 @@ def get_bound_plugins(plugins):
             pass
     """
     plugin_types_map = defaultdict(list)
-    plugin_ids = []
+    plugin_ids = set()  # A set: it is checked for every plugin
     plugin_lookup = {}
 
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
-        plugin_ids.append(plugin.pk)
+        plugin_ids.add(plugin.pk)
         plugin_model = get_plugin_model(plugin.plugin_type)
         base_model = plugin_model._meta.concrete_model  # Collect all base models
         if base_model is CMSPlugin:
@@ -437,7 +437,7 @@ def downcast_plugins(
     """
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
-    plugin_ids = []
+    plugin_ids = set()  # A set: it is checked for every plugin
 
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
@@ -449,7 +449,7 @@ def downcast_plugins(
             # Plugin not available
             logger.error(f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info())
             continue
-        plugin_ids.append(plugin.pk)
+        plugin_ids.add(plugin.pk)
         if base_model is CMSPlugin:
             plugin.__class__ = plugin_model  # In case it is a proxy model
             plugin_lookup[plugin.pk] = plugin  # otherwise, no downcast needed

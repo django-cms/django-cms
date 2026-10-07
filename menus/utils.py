@@ -43,7 +43,11 @@ def cut_levels(nodes, level):
     if nodes:
         if nodes[0].level == level:
             return nodes
-    return sum((cut_levels(node.children, level) for node in nodes), [])
+    # Extend one list; sum() would copy the accumulated list for every node.
+    result = []
+    for node in nodes:
+        result.extend(cut_levels(node.children, level))
+    return result
 
 
 def find_selected(nodes):

@@ -16,6 +16,7 @@ from cms.utils.i18n import (
     get_language_object,
     get_public_languages,
 )
+from menus.base import detach_from_parents
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -36,11 +37,10 @@ def cut_after(node, levels, removed=None):
     if levels <= 0:
         node.children = []
     else:
+        # Filter before recursing: removing while iterating skipped the next child.
+        node.children[:] = [child for child in node.children if child.visible]
         for child in node.children:
-            if child.visible:
-                cut_after(child, levels - 1)
-            else:
-                node.children.remove(child)
+            cut_after(child, levels - 1)
 
 
 def remove(node, removed):
@@ -55,6 +55,7 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     cutting nodes away from menus
     """
     final = []
+    invisible = []
     selected = None
     for node in nodes:
         if getattr(node, "level", None) == from_level and node.visible:
@@ -70,15 +71,17 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
                             final.append(node)
                         break
                     parent = parent.parent
-        elif not node.visible and node.parent and node in node.parent.children:
-            # Cut out invisible child nodes
-            node.parent.children.remove(node)
+        elif not node.visible:
+            # Cut out invisible child nodes after the loop
+            invisible.append(node)
         if getattr(node, "level", None) == to_level:
             # Cut at to_level
             node.children = []
         if node.selected:
             # Mark selected node
             selected = node
+
+    detach_from_parents(invisible)
 
     def cut_inactive(final_nodes):
         """Recursively cut inactive nodes from the tree."""

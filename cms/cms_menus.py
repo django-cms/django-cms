@@ -7,6 +7,7 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, PagePermission, PageUrl
+from cms.models.permissionmodels import PermissionTuple
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
@@ -50,20 +51,25 @@ def get_visible_page_contents(request, page_contents: Iterable[PageContent], sit
         page_id__in={page_content.page.pk for page_content in page_contents},
         can_view=True,
     )
-    restriction_map = {perm.page_id: perm for perm in restrictions}
+    # Index restrictions by the path of their page. A page can only be restricted
+    # by restrictions on itself or its ancestors, whose paths are prefixes of its path.
+    # The paths come from the loaded pages, so perm.page is never queried.
+    page_paths = {page_content.page.pk: page_content.page.path for page_content in page_contents}
+    restrictions_by_path = defaultdict(list)
+    for perm in restrictions:
+        restrictions_by_path[page_paths[perm.page_id]].append(perm)
 
     user_id = request.user.pk
     user_groups = SimpleLazyObject(lambda: frozenset(request.user.groups.values_list("pk", flat=True)))
     is_auth_user = request.user.is_authenticated
 
     def user_can_see_page(page: Page) -> bool:
-        if page.pk in restriction_map:
-            # set internal fk cache to our page with loaded ancestors and descendants
-            PagePermission.page.field.set_cached_value(restriction_map[page.pk], page)
-
         restricted = False
-        for perm in restrictions:
-            if perm.get_page_permission_tuple().contains(page.path):
+        for end in range(Page.steplen, len(page.path) + 1, Page.steplen):
+            perm_path = page.path[:end]
+            for perm in restrictions_by_path.get(perm_path, ()):
+                if not PermissionTuple((perm.grant_on, perm_path)).contains(page.path):
+                    continue
                 if not is_auth_user:
                     return False
                 if perm.user_id == user_id or perm.group_id in user_groups:
@@ -351,6 +357,11 @@ class NavExtender(Modifier):
         # rearrange the parent relations
         # Find home
         home = next((n for n in nodes if n.attr.get("is_home", False)), None)
+        # Index the nodes without parent by namespace, so linking does not scan all nodes per extender
+        roots_by_namespace = defaultdict(list)
+        for node in nodes:
+            if not node.parent_id:
+                roots_by_namespace[node.namespace].append(node)
         # Find nodes with NavExtenders
         exts = []
         for node in nodes:
@@ -359,9 +370,9 @@ class NavExtender(Modifier):
                 for ext in extenders:
                     if ext not in exts:
                         exts.append(ext)
-                    # Link the nodes
-                    for extnode in nodes:
-                        if extnode.namespace == ext and not extnode.parent_id:
+                    # Link the nodes; a node may have been linked by an earlier extender
+                    for extnode in roots_by_namespace.get(ext, ()):
+                        if not extnode.parent_id:
                             # if home has nav extenders but home is not visible
                             if node == home and not node.visible:
                                 # extnode.parent_id = None
@@ -388,9 +399,9 @@ class NavExtender(Modifier):
                     home.selected = True
                 else:
                     home.selected = False
-        # remove all nodes that are nav_extenders and not assigned
-        for node in removed:
-            nodes.remove(node)
+        # remove all nodes that are nav_extenders and not assigned, in one pass
+        removed_ids = {id(node) for node in removed}
+        nodes[:] = [node for node in nodes if id(node) not in removed_ids]
         return nodes
 
 
@@ -497,9 +508,12 @@ class SoftRootCutter(Modifier):
         return nodes
 
     def remove_children(self, node, nodes):
-        for child in node.children:
-            nodes.remove(child)
-            self.remove_children(child, nodes)
+        # Filter nodes once; nodes.remove() per descendant is quadratic
+        descendants = node.get_descendants()
+        removed_ids = {id(descendant) for descendant in descendants}
+        nodes[:] = [n for n in nodes if id(n) not in removed_ids]
+        for descendant in descendants:
+            descendant.children = []
         node.children = []
 
     def find_ancestors_and_remove_children(self, node, nodes):
