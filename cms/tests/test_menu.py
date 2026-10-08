@@ -6,12 +6,13 @@ from django.core.cache import caches
 from django.db import connection
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
+from django.test import SimpleTestCase
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils.translation import activate, override as force_language
 
 from cms.api import create_page, create_page_content
 from cms.apphook_pool import apphook_pool
-from cms.cms_menus import CMSMenu, get_visible_page_contents
+from cms.cms_menus import CMSMenu, SoftRootCutter, get_visible_page_contents
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, PageContent
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (
@@ -1308,6 +1309,47 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(2, len(nodes))
         self.assertEqual(expected_normal_attr, nodes[0].attr)
         self.assertEqual(expected_redirect_attr, nodes[1].attr)
+
+
+class SoftRootCutterTests(SimpleTestCase):
+    def test_prune_soft_root_children(self):
+        root = NavigationNode("root", "/", 1)
+        soft_root = NavigationNode("soft root", "/soft/", 2, 1, attr={"soft_root": True})
+        child = NavigationNode("child", "/soft/child/", 3, 2)
+        grandchild = NavigationNode("grandchild", "/soft/child/grandchild/", 4, 3)
+        sibling = NavigationNode("sibling", "/sibling/", 5, 1)
+        sibling_child = NavigationNode("sibling child", "/sibling/child/", 6, 5)
+        nodes = _build_nodes_inner_for_one_menu(
+            [root, soft_root, child, grandchild, sibling, sibling_child], "test"
+        )
+
+        # Direct callers must apply collected removals to the original list.
+        result = SoftRootCutter(None).find_and_remove_children(root, nodes)
+
+        self.assertIs(result, nodes)
+        self.assertEqual(nodes, [root, soft_root, sibling, sibling_child])
+        self.assertEqual(root.children, [soft_root, sibling])
+        self.assertEqual(soft_root.children, [])
+        self.assertEqual(child.children, [])
+        self.assertEqual(grandchild.children, [])
+        self.assertEqual(sibling.children, [sibling_child])
+        self.assertIs(sibling_child.parent, sibling)
+
+    def test_prune_without_removals(self):
+        for attributes in ({}, {"soft_root": True}):
+            with self.subTest(attributes=attributes):
+                root = NavigationNode("root", "/", 1)
+                child = NavigationNode("child", "/child/", 2, 1, attr=attributes)
+                nodes = _build_nodes_inner_for_one_menu([root, child], "test")
+
+                # Ordinary children and soft-root leaves stay in place.
+                result = SoftRootCutter(None).find_and_remove_children(root, nodes)
+
+                self.assertIs(result, nodes)
+                self.assertEqual(nodes, [root, child])
+                self.assertEqual(root.children, [child])
+                self.assertEqual(child.children, [])
+                self.assertIs(child.parent, root)
 
 
 @override_settings(CMS_PERMISSION=False)
