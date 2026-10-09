@@ -57,6 +57,7 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     final = []
     invisible = []
     selected = None
+    ancestor_levels = {}
     for node in nodes:
         if getattr(node, "level", None) == from_level and node.visible:
             if node.level <= extra_inactive or node.selected or node.ancestor or node.descendant:
@@ -65,12 +66,16 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             else:
                 # Find level of nearest active ancestor
                 parent = node.parent
-                while parent:
-                    if parent.ancestor:
-                        if parent.level + extra_inactive + 1 >= from_level:
-                            final.append(node)
-                        break
+                path = []
+                while parent and not parent.ancestor and id(parent) not in ancestor_levels:
+                    path.append(parent)
                     parent = parent.parent
+                level = parent.level if parent and parent.ancestor else ancestor_levels.get(id(parent))
+                # Siblings and cousins share the result for their parent chain.
+                for ancestor in path:
+                    ancestor_levels[id(ancestor)] = level
+                if level is not None and level + extra_inactive + 1 >= from_level:
+                    final.append(node)
         elif not node.visible:
             # Cut out invisible child nodes after the loop
             invisible.append(node)
@@ -102,9 +107,15 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
 
 def flatten(nodes):
     flat = []
-    for node in nodes:
+    # Preserve preorder without copying each subtree into every ancestor list.
+    pending = [iter(nodes)]
+    while pending:
+        node = next(pending[-1], None)
+        if node is None:
+            pending.pop()
+            continue
         flat.append(node)
-        flat.extend(flatten(node.children))
+        pending.append(iter(node.children))
     return flat
 
 

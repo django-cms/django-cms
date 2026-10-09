@@ -11,6 +11,7 @@ elements, independently of machine speed.
 """
 
 import sys
+from itertools import starmap
 from types import SimpleNamespace
 from unittest import mock
 
@@ -20,14 +21,24 @@ from django.test.utils import CaptureQueriesContext
 
 from cms.api import create_page
 from cms.cms_menus import NavExtender, SoftRootCutter, get_visible_page_contents
-from cms.models import ACCESS_CHILDREN, ACCESS_PAGE, ACCESS_PAGE_AND_DESCENDANTS, CMSPlugin, PagePermission
+from cms.models import (
+    ACCESS_CHILDREN,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    CMSPlugin,
+    PagePermission,
+    Placeholder,
+)
 from cms.models.permissionmodels import PermissionTuple
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import override_placeholder_conf
+from cms.utils import plugins as plugin_utils
 from cms.utils.plugins import downcast_plugins, get_bound_plugins
 from menus import utils as menu_utils
 from menus.base import NavigationNode
 from menus.menu_pool import _build_nodes_inner_for_one_menu
 from menus.modifiers import AuthVisibility
+from menus.templatetags import menu_tags
 from menus.templatetags.menu_tags import cut_levels
 
 # Growth factor between the small and the large input.
@@ -105,9 +116,17 @@ class CountingList(list):
 
 
 class CountingTreeNode(NavigationNode):
+    def __getattribute__(self, name):
+        if name == "parent":
+            Work.count += 1
+        return super().__getattribute__(name)
+
     def get_descendants(self):
         # Keep recursive results instrumented so repeated subtree copies count.
         return CountingList(super().get_descendants())
+
+    def get_ancestors(self):
+        return CountingList(super().get_ancestors())
 
 
 class ScalingAssertions:
@@ -147,7 +166,75 @@ def make_flat_tree(node_class, size, **attr):
     return root, children
 
 
+def make_deep_tree(node_class, size):
+    """Return a chain with counted child visits, ordered from root to leaf."""
+    root = node_class("root", "/", 0)
+    root.level = 0
+    nodes = [root]
+    for index in range(1, size + 1):
+        child = node_class(str(index), "/", index)
+        child.level = index
+        child.parent = nodes[-1]
+        nodes[-1].children = CountingList([child])
+        nodes.append(child)
+    return nodes
+
+
 class MenuScalingTests(ScalingAssertions, CMSTestCase):
+    def test_get_ancestors(self):
+        def run(size):
+            nodes = make_deep_tree(CountingTreeNode, size)
+            self.assertEqual(nodes[-1].get_ancestors(), nodes[-2::-1])
+
+        self.assertLinearCount(run, 50)
+
+    def test_flatten_deep_tree(self):
+        original_flatten = menu_tags.flatten
+
+        def counted_flatten(nodes):
+            # Count elements copied from each recursive result by list.extend.
+            return CountingList(original_flatten(nodes))
+
+        def run(size):
+            nodes = make_deep_tree(NavigationNode, size)
+            siblings = []
+            for parent in nodes[:-1]:
+                sibling = NavigationNode("sibling", "/", -parent.id - 1)
+                parent.children.append(sibling)
+                siblings.append(sibling)
+            self.assertEqual(menu_tags.flatten([nodes[0]]), [*nodes, *reversed(siblings)])
+
+        with mock.patch.object(menu_tags, "flatten", counted_flatten):
+            self.assertLinearCount(run, 50)
+
+    def test_deep_ancestor_chain(self):
+        nodes = make_deep_tree(NavigationNode, sys.getrecursionlimit() + 1)
+        self.assertEqual(nodes[-1].get_ancestors(), nodes[-2::-1])
+
+    def test_flatten_recursion_limit(self):
+        nodes = make_deep_tree(NavigationNode, sys.getrecursionlimit() + 1)
+        self.assertEqual(menu_tags.flatten([nodes[0]]), nodes)
+
+    def test_shared_inactive_parents(self):
+        for active_level in (None, 0, 1):
+            with self.subTest(active_level=active_level):
+
+                def run(size, active_level=active_level):
+                    nodes = make_deep_tree(CountingTreeNode, size)
+                    if active_level is not None:
+                        nodes[active_level].ancestor = True
+                    leaves = [CountingTreeNode("leaf", "/", size + i + 1) for i in range(size)]
+                    nodes[-1].children = leaves
+                    for leaf in leaves:
+                        leaf.level = size + 1
+                        leaf.parent = nodes[-1]
+
+                    # Only level 1 is close enough to admit these inactive leaves.
+                    result = cut_levels([*nodes, *leaves], size + 1, size + 2, size - 1, 1000)
+                    self.assertEqual(result, leaves if active_level == 1 else [])
+
+                self.assertLinearCount(run, 50)
+
     def test_build_nodes_with_orphans(self):
         """Nodes whose parent is missing (for example an untranslated or restricted parent page)."""
 
@@ -442,6 +529,37 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
 
 
 class PluginScalingTests(ScalingAssertions, CMSTestCase):
+    def test_default_plugin_merge(self):
+        request = SimpleNamespace(user=self.get_superuser())
+        config = {
+            "scaling": {
+                "default_plugins": [
+                    {
+                        "plugin_type": "EmptyPlugin",
+                        "values": {},
+                        "children": [{"plugin_type": "EmptyPlugin", "values": {}}],
+                    }
+                ]
+            }
+        }
+
+        def counted_batches(function, args):
+            # Instrument completed batches; plugin creation still uses the database.
+            for batch in starmap(function, args):
+                yield CountingList(batch)
+
+        def run(size):
+            placeholders = [Placeholder.objects.create(slot="scaling") for _ in range(size)]
+            plugins = plugin_utils.create_default_plugins(request, placeholders, None, "en")
+            self.assertEqual(len(plugins), 2 * size)
+            self.assertEqual([plugin.placeholder_id for plugin in plugins[::2]], [ph.pk for ph in placeholders])
+            for parent, child in zip(plugins[::2], plugins[1::2], strict=True):
+                self.assertIsNone(parent.parent_id)
+                self.assertEqual(child.parent_id, parent.pk)
+
+        with override_placeholder_conf(config), mock.patch.object(plugin_utils, "starmap", counted_batches):
+            self.assertLinearCount(run, 10)
+
     def _make_plugin_chain(self, size):
         """Unsaved plugins without a custom model, each nested in the previous one."""
         return [

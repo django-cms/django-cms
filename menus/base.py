@@ -165,10 +165,13 @@ class NavigationNode:
         """
         Returns a list of all parent items, excluding the current menu item.
         """
-        if getattr(self, 'parent', None):
-            return [self.parent] + self.parent.get_ancestors()
-        else:
-            return []
+        # Collect nearest parents first without repeatedly copying the chain.
+        ancestors = []
+        parent = getattr(self, "parent", None)
+        while parent:
+            ancestors.append(parent)
+            parent = getattr(parent, "parent", None)
+        return ancestors
 
     def is_selected(self, request) -> bool:
         """

@@ -3,7 +3,7 @@ import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable, Sequence
 from copy import deepcopy
-from itertools import starmap
+from itertools import chain, starmap
 from operator import itemgetter
 
 from django.db import models, transaction
@@ -149,7 +149,8 @@ def create_default_plugins(request, placeholders, template, lang):
         for ph, default_plugin_confs in filter(itemgetter(1), unfiltered_confs)
         if ph.has_change_permission(request.user)
     )
-    return sum(starmap(_create_default_plugins, mutable_confs), [])
+    # Collect each batch once instead of copying all earlier placeholders' plugins.
+    return list(chain.from_iterable(starmap(_create_default_plugins, mutable_confs)))
 
 
 def get_plugins_as_layered_tree(plugins):
