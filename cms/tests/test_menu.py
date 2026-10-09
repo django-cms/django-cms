@@ -6,12 +6,13 @@ from django.core.cache import caches
 from django.db import connection
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
+from django.test import SimpleTestCase
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils.translation import activate, override as force_language
 
 from cms.api import create_page, create_page_content
 from cms.apphook_pool import apphook_pool
-from cms.cms_menus import CMSMenu, get_visible_page_contents
+from cms.cms_menus import CMSMenu, SoftRootCutter, get_visible_page_contents
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, PageContent
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (
@@ -38,6 +39,7 @@ from cms.utils.i18n import get_default_language_for_site
 from menus.base import NavigationNode
 from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
 from menus.models import CacheKey
+from menus.templatetags.menu_tags import cut_after
 from menus.utils import cut_levels, find_selected, mark_descendants
 
 
@@ -1027,6 +1029,30 @@ class MenuTests(BaseMenuTest):
         tree_nodes, flat_nodes = self._get_nodes()
         self.assertEqual(cut_levels(tree_nodes, 1), [flat_nodes[1]])
 
+    def test_cut_after_removes_consecutive_invisible_children(self):
+        parent = NavigationNode("parent", "/parent/", 1)
+        hidden1 = NavigationNode("hidden1", "/hidden1/", 2, 1, visible=False)
+        hidden2 = NavigationNode("hidden2", "/hidden2/", 3, 1, visible=False)
+        shown = NavigationNode("shown", "/shown/", 4, 1)
+        parent.children = [hidden1, hidden2, shown]
+
+        cut_after(parent, 1)
+
+        self.assertEqual(parent.children, [shown])
+
+    def test_cut_after_cuts_child_following_invisible_child(self):
+        parent = NavigationNode("parent", "/parent/", 1)
+        hidden = NavigationNode("hidden", "/hidden/", 2, 1, visible=False)
+        shown = NavigationNode("shown", "/shown/", 3, 1)
+        grandchild = NavigationNode("grandchild", "/grandchild/", 4, 3)
+        parent.children = [hidden, shown]
+        shown.children = [grandchild]
+
+        cut_after(parent, 1)
+
+        self.assertEqual(parent.children, [shown])
+        self.assertEqual(shown.children, [])
+
     def test_empty_menu(self):
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1283,6 +1309,47 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(2, len(nodes))
         self.assertEqual(expected_normal_attr, nodes[0].attr)
         self.assertEqual(expected_redirect_attr, nodes[1].attr)
+
+
+class SoftRootCutterTests(SimpleTestCase):
+    def test_prune_soft_root_children(self):
+        root = NavigationNode("root", "/", 1)
+        soft_root = NavigationNode("soft root", "/soft/", 2, 1, attr={"soft_root": True})
+        child = NavigationNode("child", "/soft/child/", 3, 2)
+        grandchild = NavigationNode("grandchild", "/soft/child/grandchild/", 4, 3)
+        sibling = NavigationNode("sibling", "/sibling/", 5, 1)
+        sibling_child = NavigationNode("sibling child", "/sibling/child/", 6, 5)
+        nodes = _build_nodes_inner_for_one_menu(
+            [root, soft_root, child, grandchild, sibling, sibling_child], "test"
+        )
+
+        # Direct callers must apply collected removals to the original list.
+        result = SoftRootCutter(None).find_and_remove_children(root, nodes)
+
+        self.assertIs(result, nodes)
+        self.assertEqual(nodes, [root, soft_root, sibling, sibling_child])
+        self.assertEqual(root.children, [soft_root, sibling])
+        self.assertEqual(soft_root.children, [])
+        self.assertEqual(child.children, [])
+        self.assertEqual(grandchild.children, [])
+        self.assertEqual(sibling.children, [sibling_child])
+        self.assertIs(sibling_child.parent, sibling)
+
+    def test_prune_without_removals(self):
+        for attributes in ({}, {"soft_root": True}):
+            with self.subTest(attributes=attributes):
+                root = NavigationNode("root", "/", 1)
+                child = NavigationNode("child", "/child/", 2, 1, attr=attributes)
+                nodes = _build_nodes_inner_for_one_menu([root, child], "test")
+
+                # Ordinary children and soft-root leaves stay in place.
+                result = SoftRootCutter(None).find_and_remove_children(root, nodes)
+
+                self.assertIs(result, nodes)
+                self.assertEqual(nodes, [root, child])
+                self.assertEqual(root.children, [child])
+                self.assertEqual(child.children, [])
+                self.assertIs(child.parent, root)
 
 
 @override_settings(CMS_PERMISSION=False)
