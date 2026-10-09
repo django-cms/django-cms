@@ -6,13 +6,11 @@ Scaling tests compare work for ``n`` and ``4 * n`` items. Linear work grows
 by about 4x, quadratic work by about 16x. ``MAX_GROWTH`` guards against the
 targeted quadratic operations; it does not prove linear complexity.
 
-Work is measured by counting comparisons or hash lookups where possible. Code
-whose cost is list copying cannot be counted that way and is timed instead.
+Work is measured by counting comparisons, hash lookups, list visits and copied
+elements, independently of machine speed.
 """
 
-import gc
 import sys
-import time
 from types import SimpleNamespace
 from unittest import mock
 
@@ -38,12 +36,9 @@ SCALE = 4
 # Linear code grows by about SCALE, quadratic code by about SCALE ** 2.
 MAX_GROWTH = 2 * SCALE
 
-# Timed runs take the fastest of this many repeats to reduce noise.
-TIMING_REPEATS = 7
-
 
 class Work:
-    """Counts comparisons and hash lookups made by the code under test."""
+    """Counts operations made by the code under test."""
 
     count = 0
 
@@ -88,12 +83,31 @@ class CountingNode(NavigationNode):
 
 
 class CountingList(list):
-    """Count visits even when a scan removes no nodes."""
+    """Count visits and every element copied by list concatenation."""
 
     def __iter__(self):
         for item in super().__iter__():
             Work.count += 1
             yield item
+
+    def __reversed__(self):
+        for item in super().__reversed__():
+            Work.count += 1
+            yield item
+
+    def __add__(self, other):
+        Work.count += len(self) + len(other)
+        return CountingList(super().__add__(other))
+
+    def __radd__(self, other):
+        Work.count += len(other) + len(self)
+        return CountingList(list.__add__(other, self))
+
+
+class CountingTreeNode(NavigationNode):
+    def get_descendants(self):
+        # Keep recursive results instrumented so repeated subtree copies count.
+        return CountingList(super().get_descendants())
 
 
 class ScalingAssertions:
@@ -108,24 +122,6 @@ class ScalingAssertions:
         large = Work.count
 
         self.assertLess(large, MAX_GROWTH * max(small, 1), f"work grew from {small} to {large}")
-
-    def assertLinearTime(self, setup, n):
-        """``setup(size)`` returns a callable that performs the work."""
-        small = self._fastest(setup(n))
-        large = self._fastest(setup(SCALE * n))
-        self.assertLess(large, MAX_GROWTH * small, f"time grew from {small:.6f}s to {large:.6f}s")
-
-    def _fastest(self, work):
-        gc.disable()
-        try:
-            timings = []
-            for _ in range(TIMING_REPEATS):
-                start = time.perf_counter()
-                work()
-                timings.append(time.perf_counter() - start)
-            return min(timings)
-        finally:
-            gc.enable()
 
 
 def make_flat_tree(node_class, size, **attr):
@@ -212,21 +208,25 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
         self.assertIs(spine[-1].parent, spine[-2])
 
     def test_get_descendants(self):
-        def setup(size):
-            root, children = make_flat_tree(NavigationNode, size)
-            return root.get_descendants
+        def run(size):
+            root, children = make_flat_tree(CountingTreeNode, size)
+            root.children = CountingList(children)
+            self.assertEqual(root.get_descendants(), children)
 
-        self.assertLinearTime(setup, 2000)
+        self.assertLinearCount(run, 200)
 
     def test_utils_cut_levels(self):
-        def setup(size):
+        def run(size):
             roots = []
+            expected = []
             for index in range(size):
                 root, children = make_flat_tree(NavigationNode, 1)
+                root.children = CountingList(children)
                 roots.append(root)
-            return lambda: menu_utils.cut_levels(roots, 1)
+                expected.extend(children)
+            self.assertEqual(menu_utils.cut_levels(roots, 1), expected)
 
-        self.assertLinearTime(setup, 2000)
+        self.assertLinearCount(run, 200)
 
     def test_cut_levels_deep_tree(self):
         roots = []
