@@ -1,14 +1,17 @@
+import warnings
 from importlib import import_module
 from unittest.mock import patch
 
 from django.conf import settings
 from django.template.context import Context
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.views import details
 
 
@@ -643,6 +646,29 @@ class TestGetLanguageFromRequest(CMSTestCase):
     def test_get_language_from_request_does_not_return_empty_string_from_get(self):
         request = self.get_request('/en/?language=', language='en')
         self.assertEqual(get_language_from_request(request), 'en')
+
+    def test_get_language_from_request_post_matching_other_sources_does_not_warn(self):
+        # Forms may post a language field: no warning if the language is also available otherwise
+        request = RequestFactory().post('/fr/?language=fr', {'language': 'fr'})
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', RemovedInDjangoCMS60Warning)
+            self.assertEqual(get_language_from_request(request), 'fr')
+
+    def test_get_language_from_request_post_matching_active_language_does_not_warn(self):
+        request = RequestFactory().post('/fr/', {'language': 'fr'})
+        with translation.override('fr'), warnings.catch_warnings():
+            warnings.simplefilter('error', RemovedInDjangoCMS60Warning)
+            self.assertEqual(get_language_from_request(request), 'fr')
+
+    def test_get_language_from_request_post_only_source_is_deprecated(self):
+        request = RequestFactory().post('/en/', {'language': 'fr'})
+        with translation.override('en'), self.assertWarns(RemovedInDjangoCMS60Warning):
+            self.assertEqual(get_language_from_request(request), 'fr')
+
+    def test_get_language_from_request_post_takes_precedence_over_get(self):
+        request = RequestFactory().post('/en/?language=en', {'language': 'fr'})
+        with self.assertWarns(RemovedInDjangoCMS60Warning):
+            self.assertEqual(get_language_from_request(request), 'fr')
 
 
 @override_settings(
