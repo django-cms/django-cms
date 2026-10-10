@@ -464,6 +464,12 @@ class DuplicateSitePermissionsTests(CMSTestCase):
         )
         site_settings.enable()
         self.addCleanup(site_settings.disable)
+        # With ``SITE_ID=None`` the site is resolved from ``Host`` through the
+        # process-wide ``SITE_CACHE``. Backends that do not reuse primary keys
+        # across tests (PostgreSQL, MySQL) would otherwise serve a stale
+        # ``allowed.example`` site from an earlier test.
+        Site.objects.clear_cache()
+        self.addCleanup(Site.objects.clear_cache)
 
     def duplicate(self, selected_site, site_in, host, query_parent=None, body_parent=None, source=None):
         # Keep the URL object and the default source on the editor's own site, so
