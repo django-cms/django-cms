@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any
 
 from django.utils.encoding import smart_str
@@ -153,16 +154,26 @@ class NavigationNode:
         """
         Returns a list of all children beneath the current menu item.
         """
-        return sum(([node] + node.get_descendants() for node in self.children), [])
+        # Reverse the stack to preserve preorder without copying each subtree.
+        descendants = []
+        pending = list(reversed(self.children))
+        while pending:
+            node = pending.pop()
+            descendants.append(node)
+            pending.extend(reversed(node.children))
+        return descendants
 
     def get_ancestors(self) -> list[NavigationNode]:
         """
         Returns a list of all parent items, excluding the current menu item.
         """
-        if getattr(self, 'parent', None):
-            return [self.parent] + self.parent.get_ancestors()
-        else:
-            return []
+        # Collect nearest parents first without repeatedly copying the chain.
+        ancestors = []
+        parent = getattr(self, "parent", None)
+        while parent:
+            ancestors.append(parent)
+            parent = getattr(parent, "parent", None)
+        return ancestors
 
     def is_selected(self, request) -> bool:
         """
@@ -183,3 +194,22 @@ class NavigationNode:
         Indicates whether the node is a leaf node.
         """
         return not self.children
+
+
+def detach_from_parents(nodes: Iterable[NavigationNode]) -> None:
+    """
+    Remove each node from its parent's ``children`` list.
+
+    Each parent's list is filtered once. Calling ``list.remove`` per node
+    would be quadratic in the number of siblings.
+    """
+    removed = set()
+    parents = {}
+
+    for node in nodes:
+        removed.add(id(node))
+        if node.parent:
+            parents[id(node.parent)] = node.parent
+
+    for parent in parents.values():
+        parent.children[:] = [child for child in parent.children if id(child) not in removed]

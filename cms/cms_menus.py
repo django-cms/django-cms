@@ -9,6 +9,7 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, PagePermission, PageUrl
+from cms.models.permissionmodels import PermissionTuple
 from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
@@ -86,23 +87,32 @@ def get_visible_page_contents(request, page_contents: Iterable[PageContent], sit
         page_id__in={page_content.page.pk for page_content in page_contents},
         can_view=True,
     )
-    restriction_map = {perm.page_id: perm for perm in restrictions}
-
+    # Index restrictions by the path of their page. A page can only be restricted
+    # by restrictions on itself or its ancestors, whose paths are prefixes of its path.
+    # The paths come from the loaded pages, so perm.page is never queried.
+    page_paths = {page_content.page.pk: page_content.page.path for page_content in page_contents}
     user_id = request.user.pk
     user_groups = SimpleLazyObject(lambda: frozenset(request.user.groups.values_list("pk", flat=True)))
     is_auth_user = request.user.is_authenticated
 
-    def user_can_see_page(page: Page) -> bool:
-        if page.pk in restriction_map:
-            # set internal fk cache to our page with loaded ancestors and descendants
-            PagePermission.page.field.set_cached_value(restriction_map[page.pk], page)
+    # Resolve each grant scope once, regardless of how many descendants use it.
+    restrictions_by_path = defaultdict(dict)
+    for perm in restrictions:
+        perm_path = page_paths[perm.page_id]
+        scope = PermissionTuple((perm.grant_on, perm_path))
+        grants = restrictions_by_path[perm_path]
+        grants[scope] = grants.get(scope, False) or (
+            is_auth_user and (perm.user_id == user_id or perm.group_id in user_groups)
+        )
 
+    def user_can_see_page(page: Page) -> bool:
         restricted = False
-        for perm in restrictions:
-            if perm.get_page_permission_tuple().contains(page.path):
-                if not is_auth_user:
-                    return False
-                if perm.user_id == user_id or perm.group_id in user_groups:
+        for end in range(Page.steplen, len(page.path) + 1, Page.steplen):
+            perm_path = page.path[:end]
+            for scope, granted in restrictions_by_path.get(perm_path, {}).items():
+                if not scope.contains(page.path):
+                    continue
+                if granted:
                     return True
                 restricted = True
 
@@ -398,17 +408,21 @@ class NavExtender(Modifier):
         # rearrange the parent relations
         # Find home
         home = next((n for n in nodes if n.attr.get("is_home", False)), None)
+        # Index the nodes without parent by namespace, so linking does not scan all nodes per extender
+        roots_by_namespace = defaultdict(list)
+        for node in nodes:
+            if not node.parent_id:
+                roots_by_namespace[node.namespace].append(node)
         # Find nodes with NavExtenders
-        exts = []
+        exts = set()
         for node in nodes:
             extenders = node.attr.get("navigation_extenders", None)
             if extenders:
                 for ext in extenders:
-                    if ext not in exts:
-                        exts.append(ext)
-                    # Link the nodes
-                    for extnode in nodes:
-                        if extnode.namespace == ext and not extnode.parent_id:
+                    exts.add(ext)
+                    # Link the nodes; a node may have been linked by an earlier extender
+                    for extnode in roots_by_namespace.get(ext, ()):
+                        if not extnode.parent_id:
                             # if home has nav extenders but home is not visible
                             if node == home and not node.visible:
                                 # extnode.parent_id = None
@@ -419,14 +433,16 @@ class NavExtender(Modifier):
                                 extnode.parent_namespace = node.namespace
                                 extnode.parent = node
                                 node.children.append(extnode)
-        removed = []
-
-        # find all not assigned nodes
-        for menu in self.renderer.menus.items():
-            if hasattr(menu[1], "cms_enabled") and menu[1].cms_enabled and menu[0] not in exts:
-                for node in nodes:
-                    if node.namespace == menu[0]:
-                        removed.append(node)
+                    # Attached roots cannot be claimed again. Hidden home and
+                    # falsy parent ids leave roots eligible for later extenders.
+                    if node.id and (node != home or node.visible):
+                        roots_by_namespace.pop(ext, None)
+        # Resolve unassigned namespaces once rather than scanning nodes per menu.
+        unassigned = {
+            name
+            for name, menu in self.renderer.menus.items()
+            if getattr(menu, "cms_enabled", False) and name not in exts
+        }
         if breadcrumb:
             # if breadcrumb and home not in navigation add node
             if breadcrumb and home and not home.visible:
@@ -435,9 +451,8 @@ class NavExtender(Modifier):
                     home.selected = True
                 else:
                     home.selected = False
-        # remove all nodes that are nav_extenders and not assigned
-        for node in removed:
-            nodes.remove(node)
+        # remove all nodes that are nav_extenders and not assigned, in one pass
+        nodes[:] = [node for node in nodes if node.namespace not in unassigned]
         return nodes
 
 
@@ -537,36 +552,60 @@ class SoftRootCutter(Modifier):
                 nodes = self.find_ancestors_and_remove_children(selected, nodes)
         return nodes
 
-    def find_and_remove_children(self, node, nodes):
+    def find_and_remove_children(self, node, nodes, removed=None):
+        if removed is None:
+            removed = set()
+            self.find_and_remove_children(node, nodes, removed)
+            if removed:
+                nodes[:] = [n for n in nodes if id(n) not in removed]
+            return nodes
+
         for child in node.children:
             if child.attr.get("soft_root", False):
-                self.remove_children(child, nodes)
+                self.remove_children(child, nodes, removed)
         return nodes
 
-    def remove_children(self, node, nodes):
-        for child in node.children:
-            nodes.remove(child)
-            self.remove_children(child, nodes)
+    def remove_children(self, node, nodes, removed=None):
+        if not node.children:
+            return
+
+        # Defer list filtering when called as part of a larger pruning pass.
+        descendants = node.get_descendants()
+        removed_ids = {id(descendant) for descendant in descendants}
+        if removed is None:
+            nodes[:] = [n for n in nodes if id(n) not in removed_ids]
+        else:
+            removed.update(removed_ids)
+        for descendant in descendants:
+            descendant.children = []
         node.children = []
 
-    def find_ancestors_and_remove_children(self, node, nodes):
+    def find_ancestors_and_remove_children(self, node, nodes, removed=None):
         """
         Check ancestors of node for soft roots
         """
+        if removed is None:
+            # Share removals across all ancestors and sibling soft roots.
+            removed = set()
+            nodes = self.find_ancestors_and_remove_children(node, nodes, removed)
+            if removed:
+                nodes[:] = [n for n in nodes if id(n) not in removed]
+            return nodes
+
         if node.parent:
             if node.parent.attr.get("soft_root", False):
                 nodes = node.parent.get_descendants()
                 node.parent.parent = None
                 nodes = [node.parent] + nodes
             else:
-                nodes = self.find_ancestors_and_remove_children(node.parent, nodes)
+                nodes = self.find_ancestors_and_remove_children(node.parent, nodes, removed)
         else:
             for newnode in nodes:
                 if newnode != node and not newnode.parent:
-                    self.find_and_remove_children(newnode, nodes)
+                    self.find_and_remove_children(newnode, nodes, removed)
         for child in node.children:
             if child != node:
-                self.find_and_remove_children(child, nodes)
+                self.find_and_remove_children(child, nodes, removed)
         return nodes
 
 

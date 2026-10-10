@@ -40,10 +40,21 @@ def cut_levels(nodes, level):
     """
     For cutting the nav_extender levels if you have a from_level in the navigation.
     """
-    if nodes:
-        if nodes[0].level == level:
-            return nodes
-    return sum((cut_levels(node.children, level) for node in nodes), [])
+    if nodes and nodes[0].level == level:
+        return nodes
+
+    # Visit sibling groups in order and copy matching nodes only once.
+    result = []
+    pending = [nodes]
+    while pending:
+        siblings = pending.pop()
+        if not siblings:
+            continue
+        if siblings[0].level == level:
+            result.extend(siblings)
+            continue
+        pending.extend(node.children for node in reversed(siblings))
+    return result
 
 
 def find_selected(nodes):

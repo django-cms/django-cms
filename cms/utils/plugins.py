@@ -6,12 +6,11 @@ from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
 from functools import cache
-from itertools import starmap
+from itertools import chain, starmap
 from operator import itemgetter
 
 from django.db import models, transaction
 from django.http import HttpRequest
-from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
 from cms.constants import PLUGIN_ITERATOR_CHUNK_SIZE
@@ -154,7 +153,8 @@ def create_default_plugins(request, placeholders, template, lang):
         for ph, default_plugin_confs in filter(itemgetter(1), unfiltered_confs)
         if ph.has_change_permission(request.user)
     )
-    return sum(starmap(_create_default_plugins, mutable_confs), [])
+    # Collect each batch once instead of copying all earlier placeholders' plugins.
+    return list(chain.from_iterable(starmap(_create_default_plugins, mutable_confs)))
 
 
 def get_plugins_as_layered_tree(plugins):
@@ -374,12 +374,12 @@ def get_bound_plugins(plugins):
             pass
     """
     plugin_types_map = defaultdict(list)
-    plugin_ids = []
+    plugin_ids = set()  # A set: it is checked for every plugin
     plugin_lookup = {}
 
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
-        plugin_ids.append(plugin.pk)
+        plugin_ids.add(plugin.pk)
         plugin_model = get_plugin_model(plugin.plugin_type)
         base_model = plugin_model._meta.concrete_model  # Collect all base models
         if base_model is CMSPlugin:
@@ -430,7 +430,7 @@ def downcast_plugins(
     """
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
-    plugin_ids = []
+    plugin_ids = set()  # A set: it is checked for every plugin
 
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
@@ -442,7 +442,7 @@ def downcast_plugins(
             # Plugin not available
             logger.error(f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info())
             continue
-        plugin_ids.append(plugin.pk)
+        plugin_ids.add(plugin.pk)
         if base_model is CMSPlugin:
             plugin.__class__ = plugin_model  # In case it is a proxy model
             plugin_lookup[plugin.pk] = plugin  # otherwise, no downcast needed
