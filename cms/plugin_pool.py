@@ -41,7 +41,10 @@ class PluginPool:
 
     @property
     def global_template_restrictions(self) -> bool:
-        return any(".htm" in (key or "") for key in self.global_restrictions_cache)
+        """``True`` if ``CMS_PLACEHOLDER_CONF`` contains template-specific keys"""
+        from cms.utils import placeholder
+
+        return placeholder._template_in_conf
 
     def _clear_cached(self) -> None:
         self.root_plugin_cache = {}
@@ -348,9 +351,10 @@ class PluginPool:
         plugin restrictions only depend on template and placeholder slot as described by the
         CMS_PLACEHOLDER_CONF setting.
 
-        If it can, it retrieves the appropriate restrictions cache based on the template and slot
-        of the plugin instance's placeholder. If not, it returns the (local) request cache which will
-        be recalculated for each request.
+        If it can, it retrieves the restrictions cache for the object class, slot and (if
+        ``CMS_PLACEHOLDER_CONF`` contains template-specific keys) template of the plugin instance's
+        placeholder. If not, it returns the (local) request cache which will be recalculated for
+        each request.
 
         Args:
             request_cache (dict): The current request cache (only filled is non globally cacheable).
@@ -370,13 +374,9 @@ class PluginPool:
         else:
             template = ""
 
-        if template and f"{object_class}:{template} {slot}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{object_class}:{template} {slot}"]
-        if template and f"{object_class}:{template}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{object_class}:{template}"]
-        if slot and f"{object_class}:{slot}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{object_class}:{slot}"]
-        return self.global_restrictions_cache[object_class]
+        # Restrictions are resolved per setting from different CMS_PLACEHOLDER_CONF keys (see
+        # get_placeholder_conf). Hence, each slot (and template) needs its own cache.
+        return self.global_restrictions_cache[f"{object_class}:{template} {slot}"]
 
     restriction_methods = (
         "get_require_parent",

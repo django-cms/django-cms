@@ -44,7 +44,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import override_placeholder_conf
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
+from cms.utils.plugins import copy_plugins_to_placeholder, get_plugin_restrictions, get_plugins
 from cms.utils.urlutils import admin_reverse
 
 
@@ -330,6 +330,52 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEqual(["TextPlugin"], ColumnPlugin.get_child_classes("body", page_content))
+
+    @staticmethod
+    def _add_column(placeholder):
+        multi_column = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
+        return api.add_plugin(placeholder, "ColumnPlugin", "en", target=multi_column)
+
+    def test_slot_child_classes_do_not_leak_into_other_slots(self):
+        """Globally cached restrictions of one slot do not apply to other slots (#8914)"""
+        page_content = api.create_page("page", "col_two.html", "en").get_admin_content("en")
+        sidebar = page_content.get_placeholders().get(slot="col_sidebar")
+        left = page_content.get_placeholders().get(slot="col_left")
+        CMS_PLACEHOLDER_CONF = {"col_sidebar": {"child_classes": {"ColumnPlugin": ["TextPlugin"]}}}
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            sidebar_column = self._add_column(sidebar)
+            left_column = self._add_column(left)
+
+            sidebar_children, _ = get_plugin_restrictions(sidebar_column, page_content, {})
+            left_children, _ = get_plugin_restrictions(left_column, page_content, {})
+            self.assertEqual(["TextPlugin"], sidebar_children)
+            self.assertIn("LinkPlugin", left_children)
+
+    def test_slot_child_classes_do_not_leak_into_other_templates(self):
+        """Globally cached restrictions of a template-specific slot do not apply to other templates (#8914)"""
+        restricted = api.create_page("restricted", "col_two.html", "en").get_admin_content("en")
+        other = api.create_page("other", "col_three.html", "en").get_admin_content("en")
+        CMS_PLACEHOLDER_CONF = {"col_two.html col_left": {"child_classes": {"ColumnPlugin": ["TextPlugin"]}}}
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            restricted_column = self._add_column(restricted.get_placeholders().get(slot="col_left"))
+            other_column = self._add_column(other.get_placeholders().get(slot="col_left"))
+
+            restricted_children, _ = get_plugin_restrictions(restricted_column, restricted, {})
+            other_children, _ = get_plugin_restrictions(other_column, other, {})
+            self.assertEqual(["TextPlugin"], restricted_children)
+            self.assertIn("LinkPlugin", other_children)
+
+    def test_cached_slot_child_classes_are_not_duplicated(self):
+        """Child classes from a placeholder override are not repeated when read from the cache"""
+        page_content = api.create_page("page", "col_two.html", "en").get_admin_content("en")
+        sidebar = page_content.get_placeholders().get(slot="col_sidebar")
+        CMS_PLACEHOLDER_CONF = {"col_sidebar": {"child_classes": {"ColumnPlugin": ["TextPlugin"]}}}
+        with override_placeholder_conf(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            first = self._add_column(sidebar)
+            second = self._add_column(sidebar)
+
+            self.assertEqual(["TextPlugin"], get_plugin_restrictions(first, page_content, {})[0])
+            self.assertEqual(["TextPlugin"], get_plugin_restrictions(second, page_content, {})[0])
 
     def test_excluded_plugin(self):
         """

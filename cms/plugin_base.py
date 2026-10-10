@@ -847,6 +847,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Get all child plugin candidates - for the same source (and template) as the overrides
         source = instance.placeholder.source if page is None and instance is not None else page
         installed_plugins = cls.get_child_plugin_candidates(slot, source)
+        if only_uncached:
+            # Cached child classes are already known to the caller
+            installed_plugins = [plugin for plugin in installed_plugins if not plugin.cache_parent_classes]
 
         if child_classes == "auto":
             from cms.utils.placeholder import get_placeholder_conf
@@ -866,9 +869,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             # ``None`` (handled below) means there is no restriction.
             # Override skips check if current class is valid parent of child classes
             return [plugin.__name__ for plugin in installed_plugins if plugin.__name__ in child_classes]
-
-        if only_uncached:
-            installed_plugins = [plugin for plugin in installed_plugins if not plugin.cache_parent_classes]
 
         child_classes = []
         plugin_type = cls.__name__
