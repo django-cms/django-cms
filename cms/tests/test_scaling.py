@@ -256,7 +256,7 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
             ]
             final_nodes = _build_nodes_inner_for_one_menu(nodes[::-1], "Menu")
             self.assertEqual(final_nodes, nodes)
-            for parent, child in zip(nodes, nodes[1:], strict=False):
+            for parent, child in zip(nodes, nodes[1:]):
                 self.assertIs(child.parent, parent)
                 self.assertEqual(parent.children, [child])
 
@@ -444,7 +444,7 @@ class MenuScalingTests(ScalingAssertions, CMSTestCase):
             result = NavExtender(SimpleNamespace(menus={})).modify(None, nodes, None, None, False, False)
 
             self.assertEqual(result, [*pages, *roots])
-            for page, root in zip(pages, roots, strict=True):
+            for page, root in zip(pages, roots):
                 self.assertEqual(page.children, [root])
                 self.assertIs(root.parent, page)
 
@@ -553,7 +553,7 @@ class PluginScalingTests(ScalingAssertions, CMSTestCase):
             plugins = plugin_utils.create_default_plugins(request, placeholders, None, "en")
             self.assertEqual(len(plugins), 2 * size)
             self.assertEqual([plugin.placeholder_id for plugin in plugins[::2]], [ph.pk for ph in placeholders])
-            for parent, child in zip(plugins[::2], plugins[1::2], strict=True):
+            for parent, child in zip(plugins[::2], plugins[1::2]):
                 self.assertIsNone(parent.parent_id)
                 self.assertEqual(child.parent_id, parent.pk)
 
