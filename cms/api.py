@@ -116,7 +116,7 @@ def _validate_path_uniqueness(page, path, language):
         return
     from cms.forms.validators import validate_url_uniqueness
 
-    validate_url_uniqueness(page.site, path, language, exclude_page=page.parent)
+    validate_url_uniqueness(page.site, path, language, exclude_page=page)
 
 
 def _verify_plugin_type(plugin_type):
