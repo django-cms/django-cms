@@ -287,6 +287,7 @@ class AddPageForm(BasePageContentForm):
         "in_navigation": get_cms_setting("DEFAULT_IN_NAVIGATION"),
     }
     source_permission_denied = _("You do not have permission to use this page type.")
+    source_requires_change_permission = False
 
     class Meta:
         model = PageContent
@@ -360,13 +361,30 @@ class AddPageForm(BasePageContentForm):
             data["path"] = path
         return data
 
+    def user_can_use_source(self, source):
+        """Whether ``self._user`` may copy ``source`` into a new page.
+
+        The visible ``source`` select offers the page types of the current site,
+        which anyone allowed to add a page may build on unless view restrictions
+        apply. Forms whose ``source`` is a hidden, client-controlled field set
+        ``source_requires_change_permission``: ``Page.copy()`` reads the source's
+        *admin* content (with versioning: its latest draft), so they require what
+        the admin requires to show it -- change permission on the source, resolved
+        against the source's own site. This keeps cross-site copies possible for
+        users authorized on both sites while rejecting sources they could not open
+        in the admin.
+        """
+        if self.source_requires_change_permission:
+            return user_can_change_page(self._user, source, site=source.site)
+        return user_can_view_page(self._user, source)
+
     def clean_source(self):
         source = self.cleaned_data.get("source")
         # ``source`` is a hidden field whose value is fully controlled by the
         # client on POST and ``has_add_permission`` only checks that the user may
         # create *a* page, not that they may read ``source`` -- whose placeholders,
         # plugins and extensions ``save()`` copies into the new page.
-        if source and not user_can_view_page(self._user, source):
+        if source and not self.user_can_use_source(source):
             raise ValidationError(self.source_permission_denied)
         return source
 
@@ -521,6 +539,7 @@ class AddPageTypeForm(AddPageForm):
     content_defaults = {
         "in_navigation": False,
     }
+    source_requires_change_permission = True
 
     def get_or_create_root(self):
         """
@@ -585,6 +604,7 @@ class DuplicatePageForm(AddPageForm):
         widget=forms.HiddenInput(),
     )
     source_permission_denied = _("You do not have permission to copy this page.")
+    source_requires_change_permission = True
 
 
 class ChangePageForm(BasePageContentForm):
