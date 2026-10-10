@@ -336,6 +336,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         multi_column = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
         return api.add_plugin(placeholder, "ColumnPlugin", "en", target=multi_column)
 
+    def assertCachedGlobally(self, plugin, page_content, child_classes):
+        """The plugin's child classes are stored in the global (not the request) restrictions cache"""
+        cache = plugin_pool.get_restrictions_cache({}, plugin, page_content)
+        self.assertIs(cache, plugin_pool.get_restrictions_cache({}, plugin, page_content))
+        self.assertEqual(child_classes, cache.get("plugin_children", {}).get(plugin.plugin_type))
+
     def test_slot_child_classes_do_not_leak_into_other_slots(self):
         """Globally cached restrictions of one slot do not apply to other slots (#8914)"""
         page_content = api.create_page("page", "col_two.html", "en").get_admin_content("en")
@@ -350,6 +356,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             left_children, _ = get_plugin_restrictions(left_column, page_content, {})
             self.assertEqual(["TextPlugin"], sidebar_children)
             self.assertIn("LinkPlugin", left_children)
+            self.assertCachedGlobally(sidebar_column, page_content, sidebar_children)
+            self.assertCachedGlobally(left_column, page_content, left_children)
 
     def test_slot_child_classes_do_not_leak_into_other_templates(self):
         """Globally cached restrictions of a template-specific slot do not apply to other templates (#8914)"""
@@ -364,6 +372,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             other_children, _ = get_plugin_restrictions(other_column, other, {})
             self.assertEqual(["TextPlugin"], restricted_children)
             self.assertIn("LinkPlugin", other_children)
+            self.assertCachedGlobally(restricted_column, restricted, restricted_children)
+            self.assertCachedGlobally(other_column, other, other_children)
 
     def test_cached_slot_child_classes_are_not_duplicated(self):
         """Child classes from a placeholder override are not repeated when read from the cache"""
@@ -376,6 +386,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
             self.assertEqual(["TextPlugin"], get_plugin_restrictions(first, page_content, {})[0])
             self.assertEqual(["TextPlugin"], get_plugin_restrictions(second, page_content, {})[0])
+            self.assertCachedGlobally(first, page_content, ["TextPlugin"])
 
     def test_excluded_plugin(self):
         """

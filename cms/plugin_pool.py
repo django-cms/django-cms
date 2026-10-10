@@ -31,7 +31,7 @@ class PluginPool:
     plugins: dict[str, type[CMSPluginBase]]
     root_plugin_cache: dict[str, list[type[CMSPluginBase]]]
     discovered: bool
-    global_restrictions_cache: defaultdict[str, dict]
+    global_restrictions_cache: defaultdict[tuple[str, str, str], dict]
 
     def __init__(self):
         self.plugins = {}
@@ -343,7 +343,7 @@ class PluginPool:
 
     def get_restrictions_cache(
         self, request_cache: dict, instance: CMSPluginBase, obj: models.Model | None
-    ) -> defaultdict[str, dict]:
+    ) -> dict:
         """
         Retrieve the restrictions cache for a given plugin instance.
 
@@ -376,7 +376,7 @@ class PluginPool:
 
         # Restrictions are resolved per setting from different CMS_PLACEHOLDER_CONF keys (see
         # get_placeholder_conf). Hence, each slot (and template) needs its own cache.
-        return self.global_restrictions_cache[f"{object_class}:{template} {slot}"]
+        return self.global_restrictions_cache[(object_class, template, slot)]
 
     restriction_methods = (
         "get_require_parent",
