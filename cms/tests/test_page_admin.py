@@ -366,6 +366,22 @@ class PageTest(PageTestBase):
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_markup)
 
+    def test_change_child_slug_to_sibling_slug(self):
+        """Changing a child page's slug to a sibling's slug is rejected (#8902)"""
+        parent = create_page("parent", "nav_playground.html", "en")
+        create_page("a", "nav_playground.html", "en", parent=parent, slug="a")
+        page_b = create_page("b", "nav_playground.html", "en", parent=parent, slug="b")
+        superuser = self.get_superuser()
+        page_data = self.get_new_page_data()
+        page_data.update({"title": "b", "slug": "a", "template": page_b.get_template("en")})
+
+        with self.login_user_context(superuser):
+            response = self.client.post(self.get_page_change_uri("en", page_b), page_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "has the same url 'parent/a'")
+        self.assertEqual(PageUrl.objects.get(page=page_b, language="en").path, "parent/b")
+
     def test_edit_page(self):
         """
         Test that a page can edited via the admin

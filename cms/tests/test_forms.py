@@ -286,6 +286,123 @@ class FormsTestCase(CMSTestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("You can&#x27;t move the home page inside another page", str(form.errors["target"]))
 
+    def test_move_page_form_without_urls(self):
+        target = create_page("Target", "nav_playground.html", "en")
+        page = create_page("Unpublished", "nav_playground.html", "en")
+        # A never-published page can have content but no public URL yet.
+        page.urls.all().delete()
+
+        for destination in ("", target.pk):
+            with self.subTest(target=destination):
+                form = forms.MovePageForm(
+                    data={"target": destination, "position": 0}, page=page, site=self.site
+                )
+                self.assertTrue(form.is_valid(), form.errors)
+                form.move_page()
+                page.refresh_from_db()
+                self.assertEqual(page.parent_id, destination or None)
+                self.assertFalse(page.urls.exists())
+
+    def test_move_page_form_checks_all_url_languages(self):
+        source = create_page("Source", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind")
+        create_page("Kind", "nav_playground.html", "de", parent=target, slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 0}, page=page, site=self.site
+            )
+            self.assertFalse(form.is_valid())
+            self.assertIn("You cannot have two pages with the same slug", str(form.errors["__all__"]))
+
+    def test_move_page_form_keeps_overwritten_urls(self):
+        source = create_page("Source", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind", overwrite_url="custom")
+        # Would collide with the synthesized path "ziel/kind", but the
+        # overwritten German URL stays at "custom" after the move.
+        create_page("Kind", "nav_playground.html", "de", parent=target, slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 0}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertEqual(page.get_path("de"), "custom")
+
+    def test_move_page_form_keeps_overwritten_urls_next_to_sibling(self):
+        source = create_page("Source", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind", overwrite_url="custom")
+        create_page("Other", "nav_playground.html", "en", parent=target)
+        # A sibling with the same German slug does not collide with the
+        # overwritten German URL, whatever the insert position.
+        create_page("Kind", "nav_playground.html", "de", parent=target, slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 1}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertEqual(page.get_path("de"), "custom")
+
+    def test_move_page_form_reorders_home_page(self):
+        home = create_page("Home", "nav_playground.html", "en")
+        create_page_content("de", "Start", home, slug="start")
+        home.set_as_homepage()
+        other = create_page("Other", "nav_playground.html", "en")
+        # Matches the German slug of the home page, whose URLs never change
+        # when it is reordered among the root pages.
+        create_page_content("de", "Andere", other, slug="andere", overwrite_url="start")
+
+        with force_language("en"):
+            form = forms.MovePageForm(data={"target": "", "position": 1}, page=home, site=self.site)
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        home.refresh_from_db()
+        self.assertTrue(home.is_home)
+        self.assertEqual(home.get_path("de"), "")
+
+    def test_move_page_form_below_unreachable_parent(self):
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        # The German translation of the target has no public path.
+        target.urls.filter(language="de").update(path=None)
+        source = create_page("Source", "nav_playground.html", "en")
+        create_page_content("de", "Quelle", source, slug="quelle")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind")
+        # Would collide if the page were checked as a root page, but below an
+        # unreachable parent its German URL stays unreachable.
+        create_page("Kind", "nav_playground.html", "de", slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 0}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertIsNone(page.get_path("de"))
+
     def test_move_page_form_positions(self):
         """Test different position options in MovePageForm"""
         parent = create_page("Parent", "nav_playground.html", "en")

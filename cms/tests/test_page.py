@@ -268,6 +268,28 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get(child.get_absolute_url("en"))
         self.assertEqual(response.status_code, 200)
 
+    def test_validate_url_uniqueness_child_page_sibling_conflict(self):
+        """A child page's natural path is checked for conflicts with its siblings (#8902)"""
+        site = _get_current_site()
+        parent = create_page("Parent", "nav_playground.html", "en", slug="parent")
+        create_page("A", "nav_playground.html", "en", parent=parent, slug="a")
+        page_b = create_page("B", "nav_playground.html", "en", parent=parent, slug="b")
+
+        # B may keep its own path
+        self.assertTrue(validate_url_uniqueness(site, path="parent/b", language="en", exclude_page=page_b))
+        # but not take A's path
+        with self.assertRaises(ValidationError):
+            validate_url_uniqueness(site, path="parent/a", language="en", exclude_page=page_b)
+
+    def test_validate_url_uniqueness_parent_child_same_slug(self):
+        """A child with the same slug as its parent has a different path and is valid"""
+        site = _get_current_site()
+        parent = create_page("parent", "nav_playground.html", "en", slug="foo")
+        child = create_page("child", "nav_playground.html", "en", parent=parent, slug="foo")
+
+        self.assertTrue(validate_url_uniqueness(site, path="foo/foo", language="en", exclude_page=child))
+        self.assertTrue(validate_url_uniqueness(site, path="foo", language="en", exclude_page=parent))
+
     def test_validate_url_uniqueness_escapes_html_in_error_message(self):
         """
         validate_url_uniqueness raises a ValidationError whose message is

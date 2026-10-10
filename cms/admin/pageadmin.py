@@ -1329,7 +1329,8 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             object_id__in=page_contents.values("pk"),
         )
         saved_plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
-        page_url = obj.page.urls.get(language=obj.language)
+        # A translation that has never been published may have no PageUrl
+        page_urls = obj.page.urls.filter(language=obj.language)
 
         operation_token = send_pre_page_operation(
             request=request,
@@ -1348,7 +1349,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if obj.language in obj.page.page_content_cache:
             del obj.page.page_content_cache[obj.language]
 
-        page_url.delete()
+        page_urls.delete()
         page_contents.delete()
         saved_plugins.delete()
 
