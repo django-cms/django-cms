@@ -59,6 +59,7 @@ admin-style = ["djangocms-simple-admin-style"]
 
 [project.scripts]
 djangocms = "cms.management.djangocms:execute_from_command_line"
+cmsupgrade = "cms.compat.upgrade:main"
 
 [tool.setuptools]
 # Explicit allow-list: the empty find {} defaults to namespace-package discovery,

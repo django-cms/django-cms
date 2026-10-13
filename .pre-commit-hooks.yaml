@@ -1,0 +1,6 @@
+- id: cmsupgrade
+  name: cmsupgrade
+  description: Rewrite imports of names that moved in django CMS 6 to their new locations.
+  entry: cmsupgrade
+  language: python
+  types: [python]

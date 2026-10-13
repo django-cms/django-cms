@@ -146,6 +146,62 @@ bundled with django CMS is used as an offline fallback.
     <https://github.com/django-cms/cms-template>`_ to support them.
 
 
+.. _cmsupgrade-command:
+
+``cmsupgrade``
+==============
+
+The ``cmsupgrade`` command rewrites imports of names that moved in django CMS 6
+(see :ref:`upgrade-6.0-moved-modules`) to their new locations, in the spirit of
+``pyupgrade`` or ``django-upgrade``. It is available as a standalone executable
+once django CMS is installed and can also be invoked as
+``python -m cms.compat.upgrade``::
+
+    cmsupgrade <path> [<path> ...]
+
+Directories are searched recursively for ``*.py`` files; version control,
+virtual environment, ``node_modules`` and build directories are skipped. Files
+are rewritten in place::
+
+    # before
+    from cms.plugin_base import CMSPluginBase
+    from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+
+    # after
+    from cms.core.plugin_base import CMSPluginBase
+    from cms.shared.editing_urls import get_object_edit_url
+    from cms.toolbar.utils import get_toolbar_from_request
+
+Imports are split where their names moved to different modules, aliases are
+kept, and modules that moved wholesale are followed in ``from cms import
+plugin_pool`` and ``import cms.plugin_pool`` alike. Dotted paths in string
+literals, such as ``mock.patch("cms.plugin_pool.plugin_pool")`` targets, are
+updated too. Star imports from a moved module are reported but not changed.
+
+The table of moves is read from the installed django CMS, so no Django settings
+are needed. The command exits with status 1 if it changed (or would change) a
+file, which makes it usable in CI and as a `pre-commit <https://pre-commit.com>`_
+hook::
+
+    - repo: https://github.com/django-cms/django-cms
+      rev: <a 6.x release>
+      hooks:
+        - id: cmsupgrade
+
+It accepts the following options:
+
+* ``--diff``: print a diff instead of rewriting files.
+* ``--check``: only list the files that would be rewritten.
+* ``--no-strings``: leave string literals alone.
+* ``--list``: print every moved name with its new path and exit.
+
+.. note::
+
+    The new import paths do not exist in django CMS 5.x. Only run
+    ``cmsupgrade`` on code that no longer needs to support it. Rewritten
+    imports may be out of order, so run ``isort`` or ``ruff`` afterwards.
+
+
 **********************
 Informational commands
 **********************

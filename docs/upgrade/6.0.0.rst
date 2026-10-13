@@ -66,7 +66,8 @@ Upgrade django CMS::
 Modules have moved (see :ref:`upgrade-6.0-moved-modules`), but the old import
 paths keep working without warnings in 6.0. You do not need to change imports
 to upgrade; switch to the new paths when your package no longer needs to support
-django CMS 5.x.
+django CMS 5.x. The :ref:`cmsupgrade <cmsupgrade-command>` command does this for
+you.
 
 Then apply migrations, collect static files, and run the django CMS checks::
 
@@ -605,6 +606,11 @@ Moved modules
 These modules moved. Their old paths remain importable and return the same
 objects, so ``isinstance()`` checks and signal ``sender`` comparisons keep
 working.
+
+The :ref:`cmsupgrade <cmsupgrade-command>` command rewrites imports from the
+old paths to the new ones::
+
+    cmsupgrade path/to/your/project
 
 =========================================  ============================================
 Old path                                   New path
