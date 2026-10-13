@@ -10,12 +10,13 @@ from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, Resolver404, resolve
 from django.utils.functional import cached_property
-from django.utils.translation import override as force_language
+from django.utils.translation import get_language, override as force_language
 
 from cms import __version__
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models import Placeholder, UserSettings
+from cms.models.pluginmodel import get_plugin_action_urls
 from cms.templates import TemplatesCache
 from cms.toolbar.items import ButtonList, Menu, ToolbarAPIMixin
 from cms.toolbar.utils import (
@@ -133,6 +134,21 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def sideframe_enabled(self):
         return get_cms_setting('SIDEFRAME_ENABLED')
+
+    @cached_property
+    def _plugin_action_urls(self):
+        return {}
+
+    def get_plugin_action_urls(self):
+        """
+        Returns the admin urls for plugin actions (see :func:`cms.models.pluginmodel.get_plugin_action_urls`).
+        They are reversed once per request and active language, since the language can change while
+        rendering (e.g., to the toolbar language).
+        """
+        language = get_language()
+        if language not in self._plugin_action_urls:
+            self._plugin_action_urls[language] = get_plugin_action_urls()
+        return self._plugin_action_urls[language]
 
 
 class CMSToolbarBase(BaseToolbar):
