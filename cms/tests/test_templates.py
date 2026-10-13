@@ -1,8 +1,11 @@
 import os.path
+from importlib.machinery import ModuleSpec
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, loader
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
@@ -18,6 +21,25 @@ SITE_PATH = {
     1: os.path.join(settings.PROJECT_PATH, "project", "templates", PATH_PREFIX),
     2: os.path.join(settings.PROJECT_PATH, "project", "templates", "%s_2" % PATH_PREFIX),
 }
+
+
+class LoadFromFileTests(SimpleTestCase):
+    def test_empty_path_returns_none(self):
+        for module_path in (None, ""):
+            with self.subTest(module_path=module_path):
+                self.assertIsNone(_load_from_file(module_path))
+
+    def test_unsupported_file_type_raises_import_error(self):
+        module_path = os.path.join(GOOD_PATH, "base.html")
+        with self.assertRaisesMessage(ImportError, f"Cannot load template config: {module_path}"):
+            _load_from_file(module_path)
+
+    def test_spec_without_loader_raises_import_error(self):
+        module_path = os.path.join(GOOD_PATH, "__init__.py")
+        spec = ModuleSpec("mod", loader=None)
+        with patch("importlib.util.spec_from_file_location", return_value=spec):
+            with self.assertRaisesMessage(ImportError, f"Cannot load template config: {module_path}"):
+                _load_from_file(module_path)
 
 
 class TemplatesConfig(CMSTestCase):
