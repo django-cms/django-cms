@@ -23,7 +23,7 @@ jobs:
         django-version: [
           '5.2', '6.0', '6.1'
         ]
-        python-version: ['3.13']
+        python-version: ['3.13', '3.15']
         requirements-file: ['requirements_base.txt']
         os: [
           ubuntu-latest,
