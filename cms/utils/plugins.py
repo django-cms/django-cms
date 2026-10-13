@@ -359,6 +359,96 @@ def copy_plugins_to_placeholder(
     return list(plugins_by_id.values())
 
 
+def _get_ghost_plugin_ids(plugins, plugin_ids, plugin_lookup):
+    """
+    Returns the ids of all plugins that could not be downcast ("ghosts") together
+    with all their descendants. Plugins whose parent is not among ``plugins`` are
+    not affected.
+    """
+    ghost_ids = plugin_ids - plugin_lookup.keys()
+    if not ghost_ids:
+        return ghost_ids
+
+    children_by_parent = defaultdict(list)
+    for plugin in plugins:
+        if plugin.parent_id:
+            children_by_parent[plugin.parent_id].append(plugin.pk)
+
+    pending = list(ghost_ids)
+    while pending:
+        for child_id in children_by_parent.pop(pending.pop(), ()):
+            if child_id not in ghost_ids:
+                ghost_ids.add(child_id)
+                pending.append(child_id)
+    return ghost_ids
+
+
+def _downcast_plugins(plugins, placeholders=None, select_placeholder=False, request=None, ignore_missing=True):
+    """
+    Downcasts ``plugins`` with one query per concrete plugin model and yields them in the
+    original order. Plugins that cannot be downcast are skipped together with all their
+    descendants.
+    """
+    plugins = list(plugins)  # Iterated twice
+    plugin_types_map = defaultdict(list)
+    plugin_lookup = {}
+    plugin_ids = set()  # A set: it is checked for every plugin
+
+    # make a map of plugin types, needed later for downcasting
+    for plugin in plugins:
+        # Keep track of the plugin ids we've received
+        plugin_ids.add(plugin.pk)
+        try:
+            plugin_model = get_plugin_model(plugin.plugin_type)
+        except KeyError:
+            if not ignore_missing:
+                raise
+            # Plugin not available
+            logger.error(f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info())
+            continue
+        base_model = plugin_model._meta.concrete_model  # Collect all base models
+        if base_model is CMSPlugin:
+            plugin.__class__ = plugin_model  # In case it is a proxy model
+            plugin_lookup[plugin.pk] = plugin  # otherwise, no downcast needed
+        else:
+            plugin_types_map[base_model].append(plugin.pk)
+
+    placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders or []}
+
+    for base_model, pks in plugin_types_map.items():
+        # get all the plugins of type cls.model
+        plugin_qs = base_model.objects.filter(pk__in=pks)
+
+        if select_placeholder:
+            plugin_qs = plugin_qs.select_related("placeholder")
+
+        # put them in a map, so we can replace the base CMSPlugins with their
+        # downcasted versions
+        for instance in plugin_qs.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
+            instance.__class__ = get_plugin_model(instance.plugin_type)  # Cast to original model (including proxies)
+            plugin_lookup[instance.pk] = instance
+
+    # A plugin needs a non-ghost parent, grandparent, etc. Ghosts are plugins that are
+    # not installed or whose concrete model instance is missing.
+    ghost_ids = _get_ghost_plugin_ids(plugins, plugin_ids, plugin_lookup)
+
+    for plugin in plugins:
+        if plugin.pk in ghost_ids:
+            continue
+        instance = plugin_lookup[plugin.pk]
+        if instance.parent_id in plugin_lookup:
+            instance._state.fields_cache["parent"] = plugin_lookup[instance.parent_id]
+        placeholder = placeholders_by_id.get(instance.placeholder_id)
+        if placeholder:
+            instance.placeholder = placeholder
+            cls = get_plugin_class(instance.plugin_type)
+            if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
+                placeholder.cache_placeholder = False
+
+        plugin._inst = instance  # Populate bound plugin cache for plugin
+        yield instance
+
+
 def get_bound_plugins(plugins):
     """
     Get the bound plugins by downcasting the plugins to their respective classes. Raises a KeyError if the plugin type
@@ -366,7 +456,8 @@ def get_bound_plugins(plugins):
 
     Creates a map of plugin types and their corresponding plugin IDs for later use in downcasting.
     Then, retrieves the plugin instances from the plugin model using the mapped plugin IDs.
-    Finally, iterates over the plugins and yields the downcasted versions if they have a valid parent.
+    Finally, iterates over the plugins and yields the downcasted versions unless they or one of their
+    ancestors could not be downcast.
     Does not affect caching.
 
     :param plugins:  List of ``CMSPlugin`` instances.
@@ -381,38 +472,7 @@ def get_bound_plugins(plugins):
             # Do something with the bound_plugin
             pass
     """
-    plugin_types_map = defaultdict(list)
-    plugin_ids = set()  # A set: it is checked for every plugin
-    plugin_lookup = {}
-
-    # make a map of plugin types, needed later for downcasting
-    for plugin in plugins:
-        plugin_ids.add(plugin.pk)
-        plugin_model = get_plugin_model(plugin.plugin_type)
-        base_model = plugin_model._meta.concrete_model  # Collect all base models
-        if base_model is CMSPlugin:
-            plugin.__class__ = plugin_model  # In case it's a proxy model
-            plugin_lookup[plugin.pk] = plugin  # Otherwise, no downcast needed
-        else:
-            plugin_types_map[base_model].append(plugin.pk)
-
-    for base_model, pks in plugin_types_map.items():
-        plugin_queryset = base_model.objects.filter(pk__in=pks)
-        # put them in a map, so we can replace the base CMSPlugins with their
-        # downcasted versions
-        for instance in plugin_queryset.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
-            model = get_plugin_model(instance.plugin_type)  # Get original class
-            instance.__class__ = model  # Cast to correct model (including proxies)
-            plugin_lookup[instance.pk] = instance
-
-    for plugin in plugins:
-        parent_not_available = not plugin.parent_id or plugin.parent_id not in plugin_ids
-        # The plugin either has no parent or needs to have a non-ghost parent
-        valid_parent = parent_not_available or plugin.parent_id in plugin_lookup
-
-        if valid_parent and plugin.pk in plugin_lookup:
-            plugin._inst = plugin_lookup[plugin.pk]  # Populate bound plugin cache for plugin
-            yield plugin_lookup[plugin.pk]
+    return _downcast_plugins(plugins, ignore_missing=False)
 
 
 def downcast_plugins(
@@ -423,7 +483,7 @@ def downcast_plugins(
 ) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins
-    that are not available.
+    that are not available together with their descendants.
 
     :param plugins: List of plugins to downcast.
     :type plugins: List[CMSPlugin]
@@ -436,62 +496,7 @@ def downcast_plugins(
     :return: Generator that yields the downcasted plugins.
     :rtype: Generator[CMSPlugin, None, None]
     """
-    plugin_types_map = defaultdict(list)
-    plugin_lookup = {}
-    plugin_ids = set()  # A set: it is checked for every plugin
-
-    # make a map of plugin types, needed later for downcasting
-    for plugin in plugins:
-        # Keep track of the plugin ids we've received
-        try:
-            plugin_model = get_plugin_model(plugin.plugin_type)
-            base_model = plugin_model._meta.concrete_model  # Collect all base models
-        except KeyError:
-            # Plugin not available
-            logger.error(f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info())
-            continue
-        plugin_ids.add(plugin.pk)
-        if base_model is CMSPlugin:
-            plugin.__class__ = plugin_model  # In case it is a proxy model
-            plugin_lookup[plugin.pk] = plugin  # otherwise, no downcast needed
-        else:
-            plugin_types_map[base_model].append(plugin.pk)
-
-    placeholders = placeholders or []
-    placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
-
-    for plugin_model, pks in plugin_types_map.items():
-        # get all the plugins of type cls.model
-        plugin_qs = plugin_model.objects.filter(pk__in=pks)
-
-        if select_placeholder:
-            plugin_qs = plugin_qs.select_related("placeholder")
-
-        # put them in a map, so we can replace the base CMSPlugins with their
-        # downcasted versions
-        for instance in plugin_qs.iterator(chunk_size=PLUGIN_ITERATOR_CHUNK_SIZE):
-            cls = get_plugin_class(instance.plugin_type)  # Plugin class
-            instance.__class__ = cls.model  # Cast to original model (including proxies)
-            plugin_lookup[instance.pk] = instance
-
-    for plugin in plugins:
-        parent_not_available = not plugin.parent_id or plugin.parent_id not in plugin_ids
-        # The plugin either has no parent or needs to have a non-ghost parent
-        valid_parent = parent_not_available or plugin.parent_id in plugin_lookup
-
-        if valid_parent and plugin.pk in plugin_lookup:
-            instance = plugin_lookup[plugin.pk]
-            if instance.parent_id in plugin_lookup:
-                instance._state.fields_cache["parent"] = plugin_lookup[instance.parent_id]
-            placeholder = placeholders_by_id.get(instance.placeholder_id)
-            if placeholder:
-                instance.placeholder = placeholder
-                cls = get_plugin_class(instance.plugin_type)
-                if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
-                    placeholder.cache_placeholder = False
-
-            plugin._inst = instance  # Populate bound plugin cache for plugin
-            yield instance
+    return _downcast_plugins(plugins, placeholders, select_placeholder, request)
 
 
 def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):

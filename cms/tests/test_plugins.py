@@ -1515,6 +1515,76 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertIsInstance(bound_plugins[0], DirectProxyCMSPluginModel)
         self.assertEqual(bound_plugins[0].pk, plugin.pk)
 
+    def _create_text_plugin_chain(self, placeholder, n):
+        """Creates n nested text plugins and returns their CMSPlugin base instances."""
+        parent = None
+        for i in range(n):
+            parent = api.add_plugin(placeholder, "TextPlugin", "en", target=parent, body=f"text {i}")
+        return list(CMSPlugin.objects.filter(placeholder=placeholder).order_by("position"))
+
+    def test_downcast_plugins_skips_descendants_of_ghost_plugins(self):
+        from cms.utils.plugins import downcast_plugins, get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        plugins = self._create_text_plugin_chain(placeholder, 4)
+        # The second plugin becomes a ghost: its concrete model instance is missing
+        Text.objects.filter(pk=plugins[1].pk)._raw_delete(Text.objects.db)
+
+        for downcast in (downcast_plugins, get_bound_plugins):
+            with self.subTest(downcast=downcast.__name__):
+                downcasted = list(downcast(plugins))
+                self.assertEqual([plugin.pk for plugin in downcasted], [plugins[0].pk])
+                self.assertIsInstance(downcasted[0], Text)
+
+    def test_downcast_plugins_skips_descendants_of_uninstalled_plugins(self):
+        from cms.utils.plugins import downcast_plugins
+
+        placeholder = self.get_placeholder()
+        plugins = self._create_text_plugin_chain(placeholder, 4)
+        sibling = api.add_plugin(placeholder, "TextPlugin", "en", body="sibling")
+        CMSPlugin.objects.filter(pk=plugins[1].pk).update(plugin_type="UninstalledPlugin")
+        plugins = list(CMSPlugin.objects.filter(placeholder=placeholder).order_by("position"))
+
+        with self.assertLogs("cms.utils.plugins", level="ERROR"):
+            downcasted = list(downcast_plugins(plugins))
+        self.assertEqual([plugin.pk for plugin in downcasted], [plugins[0].pk, sibling.pk])
+
+    def test_get_bound_plugins_raises_for_uninstalled_plugins(self):
+        from cms.utils.plugins import get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        plugins = self._create_text_plugin_chain(placeholder, 2)
+        CMSPlugin.objects.filter(pk=plugins[1].pk).update(plugin_type="UninstalledPlugin")
+        plugins = list(CMSPlugin.objects.filter(placeholder=placeholder).order_by("position"))
+
+        with self.assertRaises(KeyError):
+            list(get_bound_plugins(plugins))
+
+    def test_copy_plugins_does_not_promote_descendants_of_ghost_plugins(self):
+        source = self.get_placeholder()
+        target = Placeholder.objects.create(slot="target")
+        plugins = self._create_text_plugin_chain(source, 4)
+        Text.objects.filter(pk=plugins[1].pk)._raw_delete(Text.objects.db)
+
+        copied = copy_plugins_to_placeholder(plugins, target)
+
+        self.assertEqual(len(copied), 1)
+        self.assertEqual(
+            list(target.get_plugins().values_list("parent_id", flat=True)),
+            [None],
+        )
+
+    def test_downcast_plugins_accepts_generators(self):
+        from cms.utils.plugins import downcast_plugins, get_bound_plugins
+
+        placeholder = self.get_placeholder()
+        plugins = self._create_text_plugin_chain(placeholder, 3)
+
+        for downcast in (downcast_plugins, get_bound_plugins):
+            with self.subTest(downcast=downcast.__name__):
+                downcasted = list(downcast(plugin for plugin in plugins))
+                self.assertEqual([plugin.pk for plugin in downcasted], [plugin.pk for plugin in plugins])
+
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):
