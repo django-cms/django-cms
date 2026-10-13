@@ -11,9 +11,10 @@ from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet
 from cms.utils.i18n import get_fallback_languages
+from cms.utils.mptree import get_manager_base
 
 
-class PageManager(models.Manager):
+class PageManager(get_manager_base()):
 
     def get_queryset(self):
         """Change standard model queryset to our own.

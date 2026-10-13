@@ -15,7 +15,8 @@ The whole module only runs under the mptree backend::
 
 Under treebeard it is skipped: those code paths belong to treebeard, are covered
 by the rest of the suite, and holding treebeard to this module's expectations
-means asserting on upstream behaviour we cannot fix.
+means asserting on upstream behaviour we cannot fix. The one exception is
+``TreebeardManagerContractTests``, which only runs under treebeard.
 """
 import os
 import time
@@ -82,10 +83,24 @@ class TreeFieldParityTests(SimpleTestCase):
 
         mro_modules = {base.__module__ for base in PageQuerySet.__mro__}
         self.assertNotIn("treebeard.mp_tree", mro_modules)
-        # The manager is backend-agnostic (never treebeard) in either mode.
-        from cms.models import Page
+        # Same for the manager: in mptree mode it is a plain Django manager.
+        mro_modules = {base.__module__ for base in type(Page.objects).__mro__}
+        self.assertNotIn("treebeard.mp_tree", mro_modules)
 
-        self.assertNotIn("treebeard", type(Page.objects).__module__)
+
+@skipIf(get_tree_backend() != "treebeard", "treebeard backend only")
+class TreebeardManagerContractTests(SimpleTestCase):
+    """treebeard >= 6 implements the node API (``add_child``, ``move``,
+    ``get_descendants`` ...) on the manager and enforces that the default manager
+    of an ``MP_Node`` model subclasses ``MP_NodeManager`` with system check
+    ``treebeard.E001``. A plain manager passes 5.x with a warning and fails at
+    runtime on 6.x and 7.x."""
+
+    def test_page_manager_is_a_treebeard_manager(self):
+        from treebeard.mp_tree import MP_NodeManager
+
+        self.assertIsInstance(Page.objects, MP_NodeManager)
+        self.assertNotIn("treebeard.E001", {error.id for error in Page.check()})
 
 
 @mptree_only

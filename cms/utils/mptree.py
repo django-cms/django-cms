@@ -757,6 +757,20 @@ def get_tree_base() -> type:
     return MP_Node
 
 
+def get_manager_base() -> type:
+    """Base manager class for ``Page``: treebeard's ``MP_NodeManager`` or a plain manager.
+
+    treebeard >= 6 raises system check ``treebeard.E001`` unless the default
+    manager of an ``MP_Node`` subclasses ``MP_NodeManager``.
+    """
+    if get_tree_backend() == "mptree":
+        return models.Manager
+
+    from treebeard.mp_tree import MP_NodeManager
+
+    return MP_NodeManager
+
+
 def get_queryset_base() -> type:
     """
     Base class for ``PageQuerySet``. Treebeard mode keeps ``MP_NodeQuerySet``
