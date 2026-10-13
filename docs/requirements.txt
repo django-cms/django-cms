@@ -184,7 +184,7 @@ types-docutils==0.22.3.20251115
     # via docstrfmt
 typing-extensions==4.15.0
     # via beautifulsoup4
-urllib3==2.7.0
+urllib3==2.8.0
     # via requests
 uvicorn==0.48.0
     # via sphinx-autobuild
