@@ -46,6 +46,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
+from cms.utils.urlutils import admin_reverse
 
 TEST_MANAGERS = ["Jenkins <tests@django-cms.org>"] if MAILERS_SUPPORTED else [("Jenkins", "tests@django-cms.org")]
 
@@ -737,6 +738,67 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
             output = self.render_template_obj(template, {"category": category}, request)
         expected = "foo"
         self.assertEqual(expected, output)
+
+    def test_render_model_does_not_reverse_plugin_action_urls(self):
+        """Generic objects only use their edit url: the plugin action urls are neither reversed nor rendered."""
+        import json
+        import re
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        category = Category.objects.create(name="foo", depth=1)
+        page = create_page("Test", "col_two.html", "en")
+        template = "{% load cms_tags sekizai_tags %}{% render_model category 'name' %}{% render_block 'js' %}"
+        request = RequestFactory().get(get_object_edit_url(self.get_pagecontent_obj(page)))
+        request.user = self._create_user("admin", True, True)
+        request.current_page = page
+        request.session = SessionBase()
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+
+        with patch("cms.templatetags.cms_tags.admin_reverse", wraps=admin_reverse) as reverse_mock:
+            output = self.render_template_obj(template, {"category": category}, request)
+
+        reverse_mock.assert_not_called()
+        self.assertNotIn("/admin/cms/placeholder/", output)
+        script = re.search(r'<script id="cms-plugin-sampleapp-category-name-\d+"[^>]*>(.*?)</script>', output, re.S)
+        urls = json.loads(script.group(1))["urls"]
+        # Not HTML-escaped: the frontend reads the JSON with JSON.parse(script.textContent)
+        self.assertEqual(
+            urls["edit_plugin"],
+            admin_reverse("sampleapp_category_change", args=(category.pk,)) + "?language=en&_popup=1",
+        )
+        self.assertEqual(
+            [urls[key] for key in ("add_plugin", "move_plugin", "delete_plugin", "copy_plugin")],
+            ["", "", "", ""],
+        )
+
+    def test_render_model_urls_cannot_break_out_of_script(self):
+        """Urls are JSON-escaped, not HTML-escaped: they must still not end the script element."""
+        import json
+        import re
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        category = Category.objects.create(name="foo", depth=1)
+        category.evil_url = '/edit/?a=1&b="</script><script>alert(1)</script>'
+        page = create_page("Test", "col_two.html", "en")
+        template = (
+            "{% load cms_tags sekizai_tags %}{% render_model category 'name' '' '' '' '' 'evil_url' %}"
+            "{% render_block 'js' %}"
+        )
+        request = RequestFactory().get(get_object_edit_url(self.get_pagecontent_obj(page)))
+        request.user = self._create_user("admin", True, True)
+        request.current_page = page
+        request.session = SessionBase()
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+
+        output = self.render_template_obj(template, {"category": category}, request)
+
+        self.assertNotIn("<script>alert(1)", output)
+        script = re.search(r'<script id="cms-plugin-sampleapp-category-[^"]*"[^>]*>(.*?)</script>', output, re.S)
+        self.assertEqual(json.loads(script.group(1))["urls"]["edit_plugin"], category.evil_url + "?language=en")
 
     def test_render_model_add(self):
         from django.core.cache import cache
