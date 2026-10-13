@@ -23,6 +23,7 @@ import time
 from collections import defaultdict
 from unittest import skipIf
 
+from django.core.checks import run_checks
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from treebeard.mp_tree import MP_Node
 
@@ -100,7 +101,7 @@ class TreebeardManagerContractTests(SimpleTestCase):
         from treebeard.mp_tree import MP_NodeManager
 
         self.assertIsInstance(Page.objects, MP_NodeManager)
-        self.assertNotIn("treebeard.E001", {error.id for error in Page.check()})
+        self.assertNotIn("treebeard.E001", {error.id for error in run_checks()})
 
 
 @mptree_only
