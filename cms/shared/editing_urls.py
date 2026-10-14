@@ -14,6 +14,7 @@ from __future__ import annotations
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.http import QueryDict
 from django.urls import NoReverseMatch
@@ -155,6 +156,27 @@ def get_object_live_url(obj: models.Model, language: str | None = None, site: Si
         absolute_url = f"//{obj_site.domain}{absolute_url}"
 
     return absolute_url
+
+
+def select_grouper(queryset: models.QuerySet) -> models.QuerySet:
+    """Join the grouper registered for the queryset's model, if there is one.
+
+    Content models name their grouper in ``cms_toolbar_enabled_models`` (pages:
+    ``"page"``). The toolbar and the editor read it for nearly every object they
+    load, so fetching it along saves a query per request -- for any registered
+    model, not only page content. Only a forward foreign key or one-to-one field
+    can be joined; any other grouper leaves the queryset as it is.
+    """
+    field_name = apps.get_app_config("cms").cms_extension.model_groupers.get(queryset.model)
+    if not field_name:
+        return queryset
+    try:
+        field = queryset.model._meta.get_field(field_name)
+    except FieldDoesNotExist:
+        return queryset
+    if (field.many_to_one or field.one_to_one) and field.concrete:
+        return queryset.select_related(field_name)
+    return queryset
 
 
 def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> models.Model | None:

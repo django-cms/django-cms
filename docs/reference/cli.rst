@@ -174,9 +174,13 @@ are rewritten in place::
 
 Imports are split where their names moved to different modules, aliases are
 kept, and modules that moved wholesale are followed in ``from cms import
-plugin_pool`` and ``import cms.plugin_pool`` alike. Dotted paths in string
-literals, such as ``mock.patch("cms.plugin_pool.plugin_pool")`` targets, are
-updated too. Star imports from a moved module are reported but not changed.
+plugin_pool`` and ``import cms.plugin_pool`` alike. References such as
+``cms.models.managers.PageManager`` after an ``import`` of the module are
+rewritten one by one, which covers migrations as well, and so are names that did
+not follow their module (``cms.admin.forms.RequestToolbarForm`` moved to core,
+the rest of the module to pages). Dotted paths in string literals, such as
+``mock.patch("cms.plugin_pool.plugin_pool")`` targets, are updated too. Star
+imports from a moved module are reported but not changed.
 
 The table of moves is read from the installed django CMS, so no Django settings
 are needed. The command exits with status 1 if it changed (or would change) a

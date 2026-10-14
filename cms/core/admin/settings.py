@@ -17,12 +17,10 @@ from django.utils.html import conditional_escape
 from django.utils.translation import override
 from django.views.decorators.csrf import csrf_protect
 
-from cms.core.permissions import user_can_view_placeholder_source
-from cms.models import UserSettings
-from cms.pages.admin.forms import RequestToolbarForm
-from cms.pages.models.content import PageContent
-from cms.pages.utils import get_page_from_request
-from cms.permissions.page_permissions import user_can_view_page
+from cms.core.admin.forms import RequestToolbarForm
+from cms.core.editing.views import _may_view
+from cms.core.models.settings import UserSettings
+from cms.shared.resolvers import resolve as resolve_hook
 from cms.utils.urlutils import admin_reverse
 
 
@@ -83,10 +81,9 @@ class SettingsAdmin(admin.ModelAdmin):
         cms_path = form_data.get('cms_path') or request.path_info
         origin_url = urlparse(cms_path)
         attached_obj = form_data.get('attached_obj')
-        if isinstance(attached_obj, PageContent):
-            current_page = attached_obj.page
-        else:
-            current_page = get_page_from_request(request, use_path=origin_url.path, clean_path=True)
+        # Pages answers which page the toolbar belongs to: the attached object's
+        # own page, or the page served at the origin path.
+        current_page = resolve_hook("toolbar_current_page", request=request, obj=attached_obj, path=origin_url.path)
 
         # The object id/type come straight from the client, so enforce an
         # object-level view check before rendering a toolbar for it. Without
@@ -94,13 +91,10 @@ class SettingsAdmin(admin.ModelAdmin):
         # pages on other sites or of view-restricted pages they cannot access.
         # Deny with the same generic response as an unknown object so this does
         # not become an existence oracle.
-        if isinstance(attached_obj, PageContent):
-            if not user_can_view_page(request.user, current_page):
+        if attached_obj is not None:
+            if not _may_view(request.user, attached_obj):
                 return HttpResponseBadRequest('Invalid parameters')
-        elif attached_obj is not None:
-            if not user_can_view_placeholder_source(request.user, attached_obj):
-                return HttpResponseBadRequest('Invalid parameters')
-        elif current_page is not None and not user_can_view_page(request.user, current_page):
+        elif current_page is not None and not resolve_hook("editing_can_view", user=request.user, obj=current_page):
             return HttpResponseBadRequest('Invalid parameters')
 
         data = QueryDict(query_string=origin_url.query, mutable=True)

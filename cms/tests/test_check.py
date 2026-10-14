@@ -120,6 +120,16 @@ class CheckTests(CheckAssertMixin, TestCase):
         with self.settings(MIDDLEWARE=MIDDLEWARE):
             self.assertCheck(False, warnings=0, errors=2)
 
+    def test_middleware_under_its_new_path(self):
+        """``cmsupgrade`` rewrites MIDDLEWARE to the new paths; the check accepts them."""
+        middleware = [
+            "cms.toolbar.middleware.ToolbarMiddleware" if path == "cms.middleware.toolbar.ToolbarMiddleware" else path
+            for path in settings.MIDDLEWARE
+        ]
+        self.assertIn("cms.toolbar.middleware.ToolbarMiddleware", middleware)
+        with self.settings(MIDDLEWARE=middleware):
+            self.assertCheck(True, warnings=0, errors=0)
+
     def test_copy_relations_fk_check(self):
         """
         this is ugly, feel free to come up with a better test

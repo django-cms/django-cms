@@ -21,7 +21,7 @@ from django.urls import NoReverseMatch
 
 from cms.core.permissions import user_can_view_placeholder_source
 from cms.core.placeholders import get_declared_placeholders_for_obj, get_placeholder_conf
-from cms.shared.editing_urls import get_object_preview_url
+from cms.shared.editing_urls import get_object_preview_url, select_grouper
 from cms.shared.resolvers import resolve
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -52,7 +52,10 @@ def _load_object(content_type: ContentType, object_id, request):
     obj = resolve("editing_object", content_type=content_type, object_id=object_id, request=request)
     if obj is not None:
         return obj
-    return content_type.get_object_for_this_type(pk=object_id)
+    # As ``ContentType.get_object_for_this_type``, with the registered grouper
+    # joined: the toolbar and the edit URLs read it for every object.
+    queryset = content_type.model_class()._base_manager.using(content_type._state.db)
+    return select_grouper(queryset).get(pk=object_id)
 
 
 def _may_view(user, obj) -> bool:

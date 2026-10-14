@@ -20,9 +20,9 @@ from sekizai.context import SekizaiContext
 from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.core.models.plugin import get_plugin_action_urls
 from cms.models import CMSPlugin, Placeholder
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.urlutils import admin_reverse
 
 __all__ = [
     "create_child_plugin_references",
@@ -35,7 +35,12 @@ __all__ = [
 ]
 
 
-def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[str] | None = None) -> str:
+def get_placeholder_toolbar_js(
+    placeholder: Placeholder,
+    allowed_plugins: list[str] | None = None,
+    action_urls: dict[str, str] | None = None,
+) -> str:
+    action_urls = action_urls or get_plugin_action_urls()
     label = placeholder.get_label() or ''
     help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -48,15 +53,19 @@ def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[s
         'plugin_restriction': allowed_plugins or [],
         'addPluginHelpTitle': force_str(help_text),
         'urls': {
-            'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
-            'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
+            'add_plugin': action_urls["add"],
+            'copy_plugin': action_urls["copy"],
         }
     }
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None) -> dict[str, Any]:
-    data = plugin.get_plugin_info(children=children)
+def get_plugin_toolbar_info(
+    plugin: CMSPlugin,
+    children: list[str] | None = None,
+    action_urls: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    data = plugin.get_plugin_info(children=children, action_urls=action_urls)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}
@@ -69,8 +78,12 @@ def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None
     return data
 
 
-def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None) -> str:
-    data = get_plugin_toolbar_info(plugin, children=children)
+def get_plugin_toolbar_js(
+    plugin: CMSPlugin,
+    children: list[str] | None = None,
+    action_urls: dict[str, str] | None = None,
+) -> str:
+    data = get_plugin_toolbar_info(plugin, children=children, action_urls=action_urls)
     return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
 
 
@@ -140,6 +153,7 @@ def get_plugin_tree(
         plugin_info = get_plugin_info(
             plugin,
             children=child_classes,
+            action_urls=action_urls,
         )
 
         tree_data.append(plugin_info)
@@ -148,6 +162,7 @@ def get_plugin_tree(
             collect_plugin_data(plugin_instance)
 
     with force_language(toolbar.toolbar_language):
+        action_urls = toolbar.get_plugin_action_urls()
         for root_plugin in root_plugins:
             collect_plugin_data(root_plugin)
             context = {

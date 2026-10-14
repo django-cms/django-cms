@@ -1,17 +1,18 @@
 """How pages take part in the frontend editor.
 
 The editor (:mod:`cms.core.editing.views`) is generic; these hooks are how the
-pages container gets the four things it needs that a plain editable model does
-not: a prefetched query, its own view permission, apphook hand-off, and page
-resolution from a URL. Registered with :mod:`cms.shared.resolvers` so that core
+pages container gets the things it needs that a plain editable model does not:
+a prefetched query, its own view permission, apphook hand-off, page resolution
+from a URL, and the page a toolbar requested by the toolbar endpoint belongs to. Registered with :mod:`cms.shared.resolvers` so that core
 never imports pages.
 
 Imported from ``cms.cms_config`` so the registrations run at app startup.
 """
 
-from cms.models import PageContent
+from cms.models import Page, PageContent
 from cms.pages.apphook_pool import apphook_pool
 from cms.pages.appresolver import applications_page_check
+from cms.pages.utils import get_page_from_request
 from cms.permissions.page_permissions import user_can_view_page
 from cms.shared.resolvers import provide
 
@@ -39,8 +40,11 @@ def _editing_can_view(user, obj):
     """Page content follows page view permission, not placeholder-source rules.
 
     Without this a staff user who may not view a restricted page could still
-    read its plugin structure through the editor endpoints.
+    read its plugin structure through the editor endpoints. A page itself is
+    asked about by the toolbar endpoint when no object is attached.
     """
+    if isinstance(obj, Page):
+        return user_can_view_page(user, obj)
     if not isinstance(obj, PageContent):
         return None
     return user_can_view_page(user, obj.page)
@@ -98,7 +102,19 @@ def _editing_page_for_url(url, request):
         request.path_info = original_path_info
 
 
+def _toolbar_current_page(request, obj, path):
+    """The page a toolbar requested through the toolbar endpoint belongs to.
+
+    The attached object's own page if it is page content, otherwise the page
+    served at ``path`` (the page the toolbar is shown on).
+    """
+    if isinstance(obj, PageContent):
+        return obj.page
+    return get_page_from_request(request, use_path=path, clean_path=True)
+
+
 provide("editing_object", _editing_object)
 provide("editing_can_view", _editing_can_view)
 provide("editing_alternate_response", _editing_alternate_response)
 provide("editing_page_for_url", _editing_page_for_url)
+provide("toolbar_current_page", _toolbar_current_page)

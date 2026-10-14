@@ -20,12 +20,19 @@ What gets rewritten:
 * ``from cms import plugin_pool`` and ``import cms.plugin_pool as pool`` follow a
   module that moved wholesale. A plain ``import cms.plugin_pool`` is rewritten
   together with every ``cms.plugin_pool`` reference in the file.
+* ``import cms.toolbar.utils`` (with or without ``as``) and ``from cms.toolbar
+  import utils`` of a module that moved in part: each reference to a moved name
+  is rewritten to its new path and the new module imported. This is the form
+  migrations use, so migrations are covered too. The same applies to names that
+  did not follow their module's move (``cms.admin.forms`` moved to pages, but
+  ``RequestToolbarForm`` to core). A module whose names went to different
+  places and that is used as an object (``handler(forms)``) is reported and
+  left alone.
 * String literals holding a dotted path to a moved name, typically
   ``mock.patch("cms.plugin_pool.plugin_pool")`` targets. Disable with
   ``--no-strings``.
 
-Star imports from a moved module, and plain ``import`` of a module that only
-moved in part, are reported but left alone.
+Star imports from a moved module are reported but left alone.
 
 The move table is read statically from the installed django CMS source, so no
 Django settings are needed. Only use the result in code that no longer needs to
@@ -43,6 +50,8 @@ import tokenize
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from cms.compat._scopes import Scope, Scopes
 
 __all__ = ["MoveTable", "load_move_table", "main", "rewrite_source"]
 
@@ -88,6 +97,17 @@ class MoveTable:
                 break
             path = new
         return None if path == start else path
+
+    def has_exceptions(self, module: str) -> bool:
+        """Whether some of ``module``'s names did not move to its ``fallback``."""
+        target = self.module_target(module)
+        prefix = f"{module}."
+        for old_path in self.names:
+            if old_path.startswith(prefix) and "." not in old_path[len(prefix) :]:
+                new_path = self.lookup(module, old_path[len(prefix) :])
+                if new_path is None or new_path.rpartition(".")[0] != target:
+                    return True
+        return False
 
     def module_target(self, module: str) -> str | None:
         """New path of a module that moved wholesale, or ``None``."""
@@ -280,74 +300,395 @@ _FROM_MODULE = re.compile(r"from\s+((?:\w+\s*\.\s*)*\w+)")
 _SIMPLE_STRING = re.compile(r"""\A([rRuU]?)('''|\"\"\"|'|")(.*)\2\Z""", re.DOTALL)
 
 
-def _rewrite_import_from(node, table, offsets, edits, warnings):
+@dataclass
+class _Binding:
+    """A local name bound to a moved module by an import statement."""
+
+    #: The module as imported, e.g. ``cms.admin.forms``.
+    module: str
+    #: How the code refers to it: ``cms.admin.forms``, an ``as`` name, or ``forms``.
+    ref: str
+    #: The module the binding now points at -- the shim's ``fallback`` -- or
+    #: ``None`` if the module did not move wholesale and the import stays.
+    target: str | None
+    #: ``import a.b`` without ``as``: references spell out the dotted path.
+    plain: bool
+    #: Modules that must be imported because references now name them.
+    extra: list[str] = field(default_factory=list)
+    #: The binding is still referenced and its import must stay.
+    still_used: bool = False
+    #: The scope the import binds in.
+    scope: Scope | None = None
+    #: Line of the first import making the binding, for warnings.
+    lineno: int = 0
+    #: The scopes the binding's import statements are in; imports it needs are
+    #: added next to them.
+    statement_scopes: list[Scope] = field(default_factory=list)
+    #: The name is bound in other ways too (a parameter, an assignment, another
+    #: module): which references mean the module cannot be told, so none move.
+    ambiguous: bool = False
+
+    @property
+    def dropped(self) -> bool:
+        """Every reference was rewritten to another module; the import can go."""
+        return not self.still_used and bool(self.extra)
+
+
+@dataclass
+class _Alias:
+    """One name of an import statement, after rewriting."""
+
+    #: The module imported from (``from`` imports) or imported (plain imports).
+    module: str
+    #: The imported name; ``None`` for plain imports.
+    name: str | None
+    local: str | None
+    binding: _Binding | None = None
+
+    # A binding follows its target, which is only settled once the references
+    # have been analysed; until then the alias keeps the original path.
+    @property
+    def final_module(self) -> str:
+        if self.binding and self.binding.target:
+            return self.binding.target if self.name is None else self.binding.target.rpartition(".")[0]
+        return self.module
+
+    @property
+    def final_name(self) -> str | None:
+        if self.binding and self.binding.target and self.name is not None:
+            return self.binding.target.rpartition(".")[2]
+        return self.name
+
+    @property
+    def kept(self) -> bool:
+        return not (self.binding and self.binding.dropped)
+
+
+def _plan_import_from(node, table, shims, warnings, get_binding) -> list[_Alias] | None:
     if node.level or not node.module:
-        return
+        return None
     module = node.module
-    shims = table.shim_modules()
     if any(alias.name == "*" for alias in node.names):
         if module in shims:
             warnings.append((node.lineno, f"star import from moved module {module}; update it manually"))
-        return
-
-    # (new module, imported name, local name) per alias, in order.
-    targets = []
+        return None
+    plan = []
     for alias in node.names:
         local = alias.asname or alias.name
         new_path = table.lookup(module, alias.name)
-        if new_path is None:
-            new_path = table.module_target(f"{module}.{alias.name}")
-        if new_path is None:
-            targets.append((module, alias.name, local))
-        else:
+        if new_path is not None:
             new_module, _, new_name = new_path.rpartition(".")
-            targets.append((new_module, new_name, local))
-    if all(new_module == module for new_module, _, _ in targets):
+            plan.append(_Alias(new_module, new_name, local))
+            continue
+        imported_module = f"{module}.{alias.name}"
+        if imported_module in shims:
+            # ``from cms.admin import forms``: the name is a moved module.
+            binding = get_binding(node, imported_module, local, plain=False)
+            plan.append(_Alias(module, alias.name, local, binding))
+            continue
+        plan.append(_Alias(module, alias.name, local))
+    return plan
+
+
+def _plan_import(node, shims, get_binding) -> list[_Alias] | None:
+    plan = []
+    relevant = False
+    for alias in node.names:
+        if alias.name not in shims:
+            plan.append(_Alias(alias.name, None, alias.asname))
+            continue
+        relevant = True
+        binding = get_binding(node, alias.name, alias.asname or alias.name, plain=alias.asname is None)
+        plan.append(_Alias(alias.name, None, alias.asname, binding))
+    return plan if relevant else None
+
+
+def _bound_module(statement, local: str) -> str | None:
+    """The module ``statement`` binds to the name ``local``, if it binds a module to it."""
+    for alias in statement.names:
+        if isinstance(statement, ast.Import):
+            if alias.asname == local:
+                return alias.name
+        elif (alias.asname or alias.name) == local and statement.module and not statement.level:
+            return f"{statement.module}.{alias.name}"
+    return None
+
+
+def _binds_root(statement, root: str) -> bool:
+    """Whether ``statement`` is a plain ``import root.x`` (binding ``root`` to the package)."""
+    return isinstance(statement, ast.Import) and any(
+        alias.asname is None and alias.name.partition(".")[0] == root for alias in statement.names
+    )
+
+
+def _check_ambiguity(binding: _Binding) -> None:
+    hows = binding.scope.bindings.get(binding.ref.partition(".")[0] if binding.plain else binding.ref, [])
+    if binding.plain:
+        root = binding.ref.partition(".")[0]
+        clear = all(how is not None and _binds_root(how, root) for how in hows)
+    else:
+        clear = all(how is not None and _bound_module(how, binding.ref) == binding.module for how in hows)
+    binding.ambiguous = binding.scope.star or not clear
+
+
+def _bindings_of(bindings_by_key, scope: Scope, name: str):
+    """The bindings in ``scope`` a reference spelled with ``name`` may read."""
+    for (scope_id, ref), binding in bindings_by_key.items():
+        if scope_id == id(scope) and (ref == name or (binding.plain and ref.partition(".")[0] == name)):
+            yield binding
+
+
+def _find_references(tree, scopes, bindings_by_key) -> dict[int, list[tuple[ast.AST, Scope]]]:
+    """The nodes that read each binding: ``id(binding)`` -> module expression nodes and their scopes.
+
+    For ``import cms.toolbar.utils`` that is each ``cms.toolbar.utils`` attribute
+    whose ``cms`` resolves to the import's scope; for an ``as`` or ``from`` import
+    each ``utils`` name that does.
+    """
+    parent_attribute = {id(node.value): node for node in ast.walk(tree) if isinstance(node, ast.Attribute)}
+    references: dict[int, list[tuple[ast.AST, Scope]]] = {}
+    for name, scope in scopes.loads:
+        if scope.reads_uncertain(name.id):
+            # Which binding this reads depends on statement order: none of the
+            # candidates can be rewritten safely.
+            for candidate_scope in scope.read_candidates(name.id):
+                for binding in _bindings_of(bindings_by_key, candidate_scope, name.id):
+                    binding.ambiguous = True
+            continue
+        resolved = scope.resolve(name.id)
+        if resolved is None:
+            continue
+        binding = bindings_by_key.get((id(resolved), name.id))
+        value = name if binding is not None and not binding.plain else None
+        if value is None:
+            # ``cms.toolbar.utils``: the longest imported module the chain spells.
+            binding = None
+            node, dotted = name, name.id
+            while id(node) in parent_attribute:
+                node = parent_attribute[id(node)]
+                dotted = f"{dotted}.{node.attr}"
+                candidate = bindings_by_key.get((id(resolved), dotted))
+                if candidate is not None and candidate.plain:
+                    binding, value = candidate, node
+        if binding is not None:
+            references.setdefault(id(binding), []).append((value, scope))
+    return references
+
+
+def _rewrite_references(tree, scopes, table, offsets, edits, warnings, bindings_by_key):
+    """Follow each moved-module binding into the references made through it.
+
+    The binding itself points at the module's ``fallback`` if it has one. A name
+    that moved somewhere else -- an exception to the fallback, like
+    ``RequestToolbarForm`` in ``cms.admin.forms`` -- is rewritten to its full new
+    path, and that module is imported next to the binding.
+    """
+    if not bindings_by_key:
+        return
+    parent_attribute = {id(node.value): node for node in ast.walk(tree) if isinstance(node, ast.Attribute)}
+    references = _find_references(tree, scopes, bindings_by_key)
+    # ``nonlocal utils`` needs ``utils`` bound in the enclosing function: the
+    # import stays even if no reference is left.
+    declared_nonlocal = {
+        (id(target), name)
+        for scope, name in scopes.nonlocal_declarations
+        if (target := scope.outer_binding(name)) is not None
+    }
+
+    def leave_alone(binding, lineno, reason):
+        # The import stays as it is: it keeps working through the shim.
+        binding.target = None
+        binding.still_used = True
+        warnings.append((lineno, f"{reason}; update its uses of {binding.module} manually"))
+
+    for binding in bindings_by_key.values():
+        if binding.ambiguous:
+            leave_alone(binding, binding.lineno, f"{binding.ref} may also refer to something else")
+            continue
+        values = references.get(id(binding), [])
+        bare = [value for value, _ in values if id(value) not in parent_attribute]
+        if bare and binding.target and table.has_exceptions(binding.module):
+            # The module object itself is passed around, so the names that moved
+            # elsewhere may be read from it anywhere. The fallback lacks them.
+            leave_alone(
+                binding,
+                bare[0].lineno,
+                f"{binding.ref} is used as a module, and not all names of {binding.module} moved to the same place",
+            )
+            continue
+        planned = []
+        extra = []
+        # Scopes the references rewritten to a full new path are read in.
+        reading_scopes = []
+        for value, reading_scope in values:
+            node = parent_attribute.get(id(value))
+            if node is None:
+                # The module itself is used, not one of its names.
+                binding.still_used = True
+                if binding.target and binding.plain:
+                    planned.append((*offsets.span(value), binding.target))
+                continue
+            new_path = table.lookup(binding.module, node.attr)
+            if new_path is None:
+                binding.still_used = True
+                continue
+            new_module, _, new_name = new_path.rpartition(".")
+            if binding.target and new_module == binding.target and new_name == node.attr:
+                binding.still_used = True
+                if binding.plain:
+                    planned.append((*offsets.span(value), binding.target))
+                continue
+            planned.append((*offsets.span(node), new_path))
+            reading_scopes.append(reading_scope)
+            if new_module not in extra:
+                extra.append(new_module)
+        problem = _check_new_imports(scopes, binding, extra, reading_scopes)
+        if problem:
+            leave_alone(binding, binding.lineno, problem)
+            continue
+        binding.extra = extra
+        if (id(binding.scope), binding.ref.partition(".")[0] if binding.plain else binding.ref) in declared_nonlocal:
+            binding.still_used = True
+        edits.extend(planned)
+
+
+#: Stands for an import ``cmsupgrade`` is about to add, while checking it.
+_ADDED = object()
+
+
+def _check_new_imports(scopes: Scopes, binding: _Binding, modules: list[str], reading_scopes: list[Scope]):
+    """Why the imports for ``modules`` cannot be added next to ``binding``, or ``None``.
+
+    Each import binds the package name (``cms``) in the scopes of the binding's
+    import statements, and every rewritten reference must then read that package.
+    """
+    for root in dict.fromkeys(module.partition(".")[0] for module in modules):
+        added = list(dict.fromkeys(scope.binding_scope(root) for scope in binding.statement_scopes))
+        for scope in added:
+            if not _can_import_here(scopes, scope, root):
+                return f"importing the new location would rebind {root!r} next to {binding.ref}"
+        for reading_scope in reading_scopes:
+            if not _reads_package(reading_scope, root, added):
+                return f"{root!r} means something else where {binding.ref} is used"
+    return None
+
+
+def _reads_package(reading_scope: Scope, root: str, added: list[Scope]) -> bool:
+    """Whether ``root`` read in ``reading_scope`` is the package, once ``added`` import it."""
+    if reading_scope.reads_uncertain(root):
+        return False
+    newly_bound = [scope for scope in added if root not in scope.bindings]
+    for scope in newly_bound:
+        scope.bindings[root] = [_ADDED]
+    try:
+        resolved = reading_scope.resolve(root)
+        if resolved is None or resolved.star:
+            return False
+        hows = resolved.bindings.get(root, [])
+        return bool(hows) and all(how is _ADDED or (how is not None and _binds_root(how, root)) for how in hows)
+    finally:
+        for scope in newly_bound:
+            del scope.bindings[root]
+
+
+def _can_import_here(scopes: Scopes, scope: Scope, root: str) -> bool:
+    """Whether an ``import root.x`` can be added to ``scope`` without changing what code reads.
+
+    That is harmless where ``root`` is only bound by such imports already.
+    Anything else bound to it would be replaced, and in a function the name would
+    become local, so a read of the outer ``root`` before the new import would fail.
+    """
+    hows = scope.bindings.get(root)
+    if hows is not None:
+        return all(how is not None and _binds_root(how, root) for how in hows) and not scope.star
+    if scope.kind == "module":
+        return not scope.star
+    for name, reading_scope in scopes.loads:
+        if name.id != root or not _is_within(reading_scope, scope):
+            continue
+        resolved = reading_scope.resolve(root)
+        if resolved is None or not _is_within(resolved, scope):
+            return False
+    return True
+
+
+def _is_within(scope: Scope, ancestor: Scope) -> bool:
+    while scope is not None:
+        if scope is ancestor:
+            return True
+        scope = scope.parent
+    return False
+
+
+def _statement_layout(node, offsets):
+    start, end = offsets.span(node)
+    prefix = offsets.line_prefix(start)
+    indent = prefix if not prefix.strip() else ""
+    separator = f"\n{indent}" if not prefix.strip() else "; "
+    return start, end, indent, separator
+
+
+def _extra_imports(plan) -> list[str]:
+    extra = []
+    for alias in plan:
+        if alias.binding:
+            extra += [module for module in alias.binding.extra if module not in extra]
+    return extra
+
+
+def _emit_import_from(node, plan, offsets, edits, warnings):
+    kept = [alias for alias in plan if alias.kept]
+    extra = _extra_imports(plan)
+    unchanged = len(kept) == len(plan) and all(
+        alias.final_module == node.module and alias.final_name == original.name
+        for alias, original in zip(plan, node.names, strict=True)
+    )
+    if unchanged and not extra:
         return
 
-    start, end = offsets.span(node)
+    start, end, indent, separator = _statement_layout(node, offsets)
     statement = offsets.source[start:end]
-    new_modules = {new_module for new_module, _, _ in targets}
-    names_kept = all(alias.name == name for alias, (_, name, _) in zip(node.names, targets, strict=True))
+    new_modules = {alias.final_module for alias in kept}
+    names_kept = len(kept) == len(plan) and all(
+        alias.final_name == original.name for alias, original in zip(plan, node.names, strict=True)
+    )
     match = _FROM_MODULE.match(statement)
     if len(new_modules) == 1 and names_kept and match:
         # Only the module changed: swap it and keep the rest, comments included.
         edits.append((start + match.start(1), start + match.end(1), new_modules.pop()))
+        if extra:
+            edits.append((end, end, separator + separator.join(f"import {module}" for module in extra)))
         return
 
     multiline = "\n" in statement and "(" in statement
     comments, dropped = _alias_comments(node, statement) if multiline else ({}, 0)
     if dropped:
-        warnings.append((node.lineno, f"comments inside the import from {module} were dropped"))
+        warnings.append((node.lineno, f"comments inside the import from {node.module} were dropped"))
     groups: dict[str, list[tuple[str, str]]] = {}
-    for index, (new_module, name, local) in enumerate(targets):
-        groups.setdefault(new_module, []).append((_format_alias(name, local), comments.get(index, "")))
-    prefix = offsets.line_prefix(start)
-    indent = prefix if not prefix.strip() else ""
-    separator = f"\n{indent}" if not prefix.strip() else "; "
-    replacement = separator.join(
-        _format_from(new_module, aliases, multiline, indent) for new_module, aliases in groups.items()
+    for index, alias in enumerate(plan):
+        if alias.kept:
+            groups.setdefault(alias.final_module, []).append(
+                (_format_alias(alias.final_name, alias.local), comments.get(index, ""))
+            )
+    lines = [_format_from(module, aliases, multiline, indent) for module, aliases in groups.items()]
+    lines += [f"import {module}" for module in extra]
+    edits.append((start, end, separator.join(lines)))
+
+
+def _emit_import(node, plan, offsets, edits):
+    kept = [alias for alias in plan if alias.kept]
+    extra = _extra_imports(plan)
+    unchanged = len(kept) == len(plan) and all(
+        alias.final_module == original.name for alias, original in zip(plan, node.names, strict=True)
     )
-    edits.append((start, end, replacement))
-
-
-def _rewrite_import(node, table, offsets, edits, warnings, plain_imports):
-    aliases = []
-    changed = False
-    for alias in node.names:
-        target = table.module_target(alias.name)
-        if target is None:
-            if alias.name in table.shim_modules():
-                warnings.append((node.lineno, f"{alias.name} moved in part; update references to its names manually"))
-            aliases.append(_format_alias(alias.name, alias.asname))
-            continue
-        changed = True
-        if alias.asname is None:
-            plain_imports[alias.name] = target
-        aliases.append(_format_alias(target, alias.asname))
-    if changed:
-        start, end = offsets.span(node)
-        edits.append((start, end, f"import {', '.join(aliases)}"))
+    if unchanged and not extra:
+        return
+    start, end, _, separator = _statement_layout(node, offsets)
+    lines = []
+    if kept:
+        lines.append(f"import {', '.join(_format_alias(alias.final_module, alias.local) for alias in kept)}")
+    lines += [f"import {module}" for module in extra]
+    edits.append((start, end, separator.join(lines)))
 
 
 def _rewrite_string(node, table, shims, offsets, edits):
@@ -377,7 +718,6 @@ def rewrite_source(source: str, table: MoveTable, *, strings: bool = True, filen
     offsets = _Offsets(source)
     edits: list[tuple[int, int, str]] = []
     warnings: list[tuple[int, str]] = []
-    plain_imports: dict[str, str] = {}
     shims = table.shim_modules()
 
     in_fstring = set()
@@ -385,20 +725,53 @@ def rewrite_source(source: str, table: MoveTable, *, strings: bool = True, filen
         if isinstance(node, ast.JoinedStr):
             in_fstring.update(id(sub) for sub in ast.walk(node))
 
+    scopes = Scopes(tree)
+    # One binding per scope and name: the same module imported twice in a scope
+    # is one binding, so each reference is rewritten exactly once.
+    bindings_by_key: dict[tuple[int, str], _Binding] = {}
+
+    def get_binding(statement, module, ref, plain):
+        statement_scope = scopes.scope_of[id(statement)]
+        # ``global forms`` in a function makes its import bind at module level.
+        scope = statement_scope.binding_scope(ref.partition(".")[0] if plain else ref)
+        key = (id(scope), ref)
+        binding = bindings_by_key.get(key)
+        if binding is None:
+            binding = bindings_by_key[key] = _Binding(
+                module, ref, table.module_target(module), plain, scope=scope, lineno=statement.lineno
+            )
+        if statement_scope not in binding.statement_scopes:
+            binding.statement_scopes.append(statement_scope)
+        return binding
+
+    # Plan every import first: how a statement is rewritten depends on how the
+    # modules it binds are used, which only the references can tell.
+    statements = []
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom):
-            _rewrite_import_from(node, table, offsets, edits, warnings)
+            plan = _plan_import_from(node, table, shims, warnings, get_binding)
         elif isinstance(node, ast.Import):
-            _rewrite_import(node, table, offsets, edits, warnings, plain_imports)
-        elif strings and isinstance(node, ast.Constant) and isinstance(node.value, str) and id(node) not in in_fstring:
-            _rewrite_string(node, table, shims, offsets, edits)
+            plan = _plan_import(node, shims, get_binding)
+        else:
+            if (
+                strings
+                and isinstance(node, ast.Constant)
+                and isinstance(node.value, str)
+                and id(node) not in in_fstring
+            ):
+                _rewrite_string(node, table, shims, offsets, edits)
+            continue
+        if plan:
+            statements.append((node, plan))
 
-    if plain_imports:
-        # ``import cms.plugin_pool`` was rewritten, so its references must follow.
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Attribute) and _dotted(node) in plain_imports:
-                start, end = offsets.span(node)
-                edits.append((start, end, plain_imports[_dotted(node)]))
+    for binding in bindings_by_key.values():
+        _check_ambiguity(binding)
+    _rewrite_references(tree, scopes, table, offsets, edits, warnings, bindings_by_key)
+    for node, plan in statements:
+        if isinstance(node, ast.ImportFrom):
+            _emit_import_from(node, plan, offsets, edits, warnings)
+        else:
+            _emit_import(node, plan, offsets, edits)
 
     for start, end, text in sorted(edits, reverse=True):
         source = source[:start] + text + source[end:]

@@ -159,6 +159,7 @@ class BaseRenderer:
         placeholder_toolbar_js = get_placeholder_toolbar_js(
             placeholder=placeholder,
             allowed_plugins=allowed_plugins,
+            action_urls=self.toolbar.get_plugin_action_urls(),
         )
         return placeholder_toolbar_js
 
@@ -175,6 +176,7 @@ class BaseRenderer:
         content = get_plugin_toolbar_js(
             plugin,
             children=child_classes,
+            action_urls=self.toolbar.get_plugin_action_urls(),
         )
         return content
 

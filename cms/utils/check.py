@@ -4,6 +4,7 @@ from itertools import chain
 
 from django.conf import settings
 from django.utils.decorators import method_decorator
+from django.utils.module_loading import import_string
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
 
@@ -239,6 +240,13 @@ def check_site_id(output):
             section.success("SITE_ID is set to %r" % site_id)
 
 
+def _import_or_path(path):
+    try:
+        return import_string(path)
+    except ImportError:
+        return path
+
+
 @define_check
 def check_middlewares(output):
     with output.section("Middlewares") as section:
@@ -254,10 +262,13 @@ def check_middlewares(output):
             "cms.middleware.toolbar.ToolbarMiddleware",
             "cms.middleware.language.LanguageCookieMiddleware",
         )
-        middlewares = getattr(settings, "MIDDLEWARE", [])
+        # Compare what the paths import, not the paths: a middleware that moved is
+        # the same class under its old and its new path (``cms.compat``), and
+        # ``cmsupgrade`` rewrites settings to the new one.
+        middlewares = {_import_or_path(middleware) for middleware in getattr(settings, "MIDDLEWARE", [])}
 
         for middleware in required_middlewares:
-            if middleware not in middlewares:
+            if _import_or_path(middleware) not in middlewares:
                 section.error("%s middleware must be in MIDDLEWARE" % middleware)
             else:
                 section.success("%s middleware found" % middleware)

@@ -46,6 +46,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting, get_site_id
+from cms.utils.urlutils import admin_reverse
 
 TEST_MANAGERS = ["Jenkins <tests@django-cms.org>"] if MAILERS_SUPPORTED else [("Jenkins", "tests@django-cms.org")]
 
@@ -738,6 +739,67 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         expected = "foo"
         self.assertEqual(expected, output)
 
+    def test_render_model_does_not_reverse_plugin_action_urls(self):
+        """Generic objects only use their edit url: the plugin action urls are neither reversed nor rendered."""
+        import json
+        import re
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        category = Category.objects.create(name="foo", depth=1)
+        page = create_page("Test", "col_two.html", "en")
+        template = "{% load cms_tags sekizai_tags %}{% render_model category 'name' %}{% render_block 'js' %}"
+        request = RequestFactory().get(get_object_edit_url(self.get_pagecontent_obj(page)))
+        request.user = self._create_user("admin", True, True)
+        request.current_page = page
+        request.session = SessionBase()
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+
+        with patch("cms.shared.templatetags.admin_reverse", wraps=admin_reverse) as reverse_mock:
+            output = self.render_template_obj(template, {"category": category}, request)
+
+        reverse_mock.assert_not_called()
+        self.assertNotIn("/admin/cms/placeholder/", output)
+        script = re.search(r'<script id="cms-plugin-sampleapp-category-name-\d+"[^>]*>(.*?)</script>', output, re.S)
+        urls = json.loads(script.group(1))["urls"]
+        # Not HTML-escaped: the frontend reads the JSON with JSON.parse(script.textContent)
+        self.assertEqual(
+            urls["edit_plugin"],
+            admin_reverse("sampleapp_category_change", args=(category.pk,)) + "?language=en&_popup=1",
+        )
+        self.assertEqual(
+            [urls[key] for key in ("add_plugin", "move_plugin", "delete_plugin", "copy_plugin")],
+            ["", "", "", ""],
+        )
+
+    def test_render_model_urls_cannot_break_out_of_script(self):
+        """Urls are JSON-escaped, not HTML-escaped: they must still not end the script element."""
+        import json
+        import re
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        category = Category.objects.create(name="foo", depth=1)
+        category.evil_url = '/edit/?a=1&b="</script><script>alert(1)</script>'
+        page = create_page("Test", "col_two.html", "en")
+        template = (
+            "{% load cms_tags sekizai_tags %}{% render_model category 'name' '' '' '' '' 'evil_url' %}"
+            "{% render_block 'js' %}"
+        )
+        request = RequestFactory().get(get_object_edit_url(self.get_pagecontent_obj(page)))
+        request.user = self._create_user("admin", True, True)
+        request.current_page = page
+        request.session = SessionBase()
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+
+        output = self.render_template_obj(template, {"category": category}, request)
+
+        self.assertNotIn("<script>alert(1)", output)
+        script = re.search(r'<script id="cms-plugin-sampleapp-category-[^"]*"[^>]*>(.*?)</script>', output, re.S)
+        self.assertEqual(json.loads(script.group(1))["urls"]["edit_plugin"], category.evil_url + "?language=en")
+
     def test_render_model_add(self):
         from django.core.cache import cache
 
@@ -882,11 +944,11 @@ class AdminBreadcrumbMarkupTests(CMSTestCase):
     DJANGO_6_1 = (6, 1, 0, "final", 0)
 
     def test_django_version_gte_tag(self):
-        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+        with patch("cms.shared.admin_templatetags.django.VERSION", self.DJANGO_5_2):
             self.assertFalse(django_version_gte(6, 1))
             self.assertTrue(django_version_gte(5, 2))
             self.assertTrue(django_version_gte(4, 2))
-        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+        with patch("cms.shared.admin_templatetags.django.VERSION", self.DJANGO_6_1):
             self.assertTrue(django_version_gte(6, 1))
             self.assertTrue(django_version_gte(6))
             self.assertFalse(django_version_gte(7))
@@ -900,13 +962,13 @@ class AdminBreadcrumbMarkupTests(CMSTestCase):
     # -- page tree changelist: admin/cms/page/tree/base.html --
 
     def test_pagetree_breadcrumbs_legacy_div_below_6_1(self):
-        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+        with patch("cms.shared.admin_templatetags.django.VERSION", self.DJANGO_5_2):
             html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
         self.assertIn('<div class="breadcrumbs cms-pagetree-breadcrumbs">', html)
         self.assertNotIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
 
     def test_pagetree_breadcrumbs_ol_on_6_1(self):
-        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+        with patch("cms.shared.admin_templatetags.django.VERSION", self.DJANGO_6_1):
             html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
         self.assertIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
         self.assertIn('<li aria-current="page">Pages</li>', html)
@@ -916,14 +978,14 @@ class AdminBreadcrumbMarkupTests(CMSTestCase):
 
     def test_page_change_form_breadcrumbs_legacy_div_below_6_1(self):
         page = create_page("Home", "nav_playground.html", "en")
-        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+        with patch("cms.shared.admin_templatetags.django.VERSION", self.DJANGO_5_2):
             html = self._get_admin_html(self.get_page_change_uri("en", page))
         self.assertIn('<div class="breadcrumbs">', html)
         self.assertNotIn('<ol class="breadcrumbs">', html)
 
     def test_page_change_form_breadcrumbs_ol_on_6_1(self):
         page = create_page("Home", "nav_playground.html", "en")
-        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+        with patch("cms.shared.admin_templatetags.django.VERSION", self.DJANGO_6_1):
             html = self._get_admin_html(self.get_page_change_uri("en", page))
         self.assertIn('<ol class="breadcrumbs">', html)
         self.assertIn('aria-current="page"', html)
@@ -1013,3 +1075,43 @@ class AdminObjectToolsPlacementTests(CMSTestCase):
             html.index('id="content-main"'),
         )
 
+
+
+class RenderModelOptionsTests(CMSTestCase):
+    """``{% render_model %}`` asks the model, not a hard-coded ``Page`` branch."""
+
+    def test_model_without_options_is_unchanged(self):
+        from cms.core.editing.templatetags import _language_args, _render_model_options
+
+        obj = object()
+        self.assertEqual(_render_model_options(obj, "name", "a,b", "admin:x"), ("name", "a,b", "admin:x"))
+        self.assertFalse(_language_args(obj))
+
+    def test_model_options_are_used(self):
+        from cms.core.editing.templatetags import _language_args, _render_model_options
+
+        class Model:
+            render_model_language_args = True
+
+            def get_render_model_options(self, attribute, edit_fields):
+                return f"get_{attribute}", edit_fields or "name", "admin:own_view"
+
+        self.assertEqual(
+            _render_model_options(Model(), "name", None, "admin:given"), ("get_name", "name", "admin:own_view")
+        )
+        self.assertTrue(_language_args(Model()))
+
+    def test_page_titles(self):
+        page = create_page("render-model-page", "nav_playground.html", "en")
+        self.assertEqual(
+            page.get_render_model_options("titles", None),
+            ("get_title", "title,page_title,menu_title", "admin:cms_page_edit_title_fields"),
+        )
+        self.assertEqual(
+            page.get_render_model_options(None, "titles"),
+            (None, "title,page_title,menu_title", "admin:cms_page_edit_title_fields"),
+        )
+        self.assertEqual(
+            page.get_render_model_options("menu_title", "title"),
+            ("get_menu_title", "title", "admin:cms_page_edit_title_fields"),
+        )

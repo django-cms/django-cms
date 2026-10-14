@@ -1094,6 +1094,30 @@ class Page(MP_Node):
     def soft_root(self):
         return self.get_page_content_obj_attribute("soft_root")
 
+    #: ``{% render_model %}`` passes the language, not the request, to the
+    #: page's admin URLs and to callable attributes such as ``get_title``.
+    render_model_language_args = True
+
+    #: Title attributes ``{% render_model %}`` maps to a getter and the fields edited by default.
+    _render_model_titles = {
+        "title": ("get_title", "title"),
+        "page_title": ("get_page_title", "page_title"),
+        "menu_title": ("get_menu_title", "menu_title"),
+        "titles": ("get_title", "title,page_title,menu_title"),
+    }
+
+    def get_render_model_options(self, attribute, edit_fields):
+        """How ``{% render_model %}`` edits a page: the titles, in the page's title view.
+
+        See :func:`cms.core.editing.templatetags._render_model_options`.
+        """
+        if attribute in self._render_model_titles:
+            attribute, default_fields = self._render_model_titles[attribute]
+            edit_fields = edit_fields or default_fields
+        if edit_fields == "titles":
+            edit_fields = self._render_model_titles["titles"][1]
+        return attribute, edit_fields, "admin:cms_page_edit_title_fields"
+
     def get_template(self, language=None, fallback=True, force_reload=False):
         content = self.get_content_obj(language, fallback, force_reload)
         if content:

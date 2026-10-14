@@ -674,6 +674,15 @@ Notes:
   ``cms.toolbar.templatetags`` and ``cms.shared.templatetags``;
   ``{% load cms_tags %}`` and importing the classes from
   ``cms.templatetags.cms_tags`` work as before.
+* Likewise the ``cms_admin`` template tags moved to
+  ``cms.pages.admin.templatetags``, ``cms.core.admin.templatetags`` and
+  ``cms.shared.admin_templatetags``; ``{% load cms_admin %}`` and importing them
+  from ``cms.templatetags.cms_admin`` work as before.
+* ``PluginAddValidationForm`` and ``RequestToolbarForm`` moved to
+  ``cms.core.admin.forms``; ``cms.admin.forms`` still provides them.
+* ``{% render_model %}`` no longer special-cases pages. A model can adjust how it
+  is edited with ``get_render_model_options()`` and ``render_model_language_args``
+  (see :ttag:`render_model`).
 
 For contributors
 ================

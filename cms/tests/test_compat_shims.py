@@ -5,6 +5,7 @@ import warnings
 from django.test import TestCase
 
 import cms
+from cms import compat
 from cms.compat import moved, registry, resolve
 from cms.utils.compat.warnings import RemovedInDjangoCMS70Warning
 
@@ -89,6 +90,17 @@ class MovedRegistryTest(TestCase):
 
 
 class MovedHelperTest(TestCase):
+    def setUp(self):
+        # The fake shims below must not outlive the test: the registry is global,
+        # and every test reading ``registry()`` afterwards would try to import them.
+        snapshot = dict(compat._registry)
+
+        def restore():
+            compat._registry.clear()
+            compat._registry.update(snapshot)
+
+        self.addCleanup(restore)
+
     def test_returns_getattr_dir_and_all(self):
         __getattr__, __dir__, __all__ = moved(
             "cms.tests.test_compat_shims._fake_a",

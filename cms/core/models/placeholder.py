@@ -73,11 +73,12 @@ class Placeholder(models.Model):
 
     def get_label(self):
         from cms.core.placeholders import get_placeholder_conf
-        from cms.models import PageContent
 
         template = None
-        if isinstance(self.source, PageContent):
-            # Make the database access lazy, so that it only happens if needed.
+        if hasattr(self.source, "get_template"):
+            # Any source with a template, as for the plugin configuration
+            # (``CMSPluginBase._get_template_for_conf``). Lazy, so that the
+            # database access only happens if needed.
             template = lazy(self.source.get_template, str)()
         name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)

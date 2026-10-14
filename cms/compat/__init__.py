@@ -11,10 +11,14 @@ A shim module looks like this::
     # cms/models/pagemodel.py
     from cms.compat import moved
 
-    __getattr__, __dir__, __all__ = moved(__name__, {
-        "Page": "cms.pages.models.page.Page",
-        "PageUrl": "cms.pages.models.page.PageUrl",
-    }, since="6.0")
+    __getattr__, __dir__, __all__ = moved(
+        __name__,
+        {
+            "Page": "cms.pages.models.page.Page",
+            "PageUrl": "cms.pages.models.page.PageUrl",
+        },
+        since="6.0",
+    )
 
 ``__all__`` matters: :pep:`562` module ``__getattr__`` is not consulted by
 ``from ... import *``, and several CMS modules are star-imported (notably into

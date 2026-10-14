@@ -33,7 +33,7 @@ from django.utils.translation import (
 from cms.core.placeholders import validate_placeholder_name
 from cms.core.plugin_pool import plugin_pool
 from cms.exceptions import PlaceholderNotFound
-from cms.models import CMSPlugin, Page, Placeholder as PlaceholderModel
+from cms.models import CMSPlugin, Placeholder as PlaceholderModel
 from cms.shared.templatetags import MultiValueArgumentBeforeKeywordArgument
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_language_from_request
@@ -188,6 +188,30 @@ class RenderPluginBlock(InclusionTag):
         return context
 
 
+def _render_model_options(instance, attribute, edit_fields, view_url):
+    """Let the edited model adjust what ``{% render_model %}`` edits, and how.
+
+    A model may define ``get_render_model_options(attribute, edit_fields)``
+    returning ``(attribute, edit_fields, view_url)``, e.g. to map a template
+    attribute to a getter or to route editing through its own admin view. Pages
+    use this for their titles; the editor itself stays generic.
+    """
+    get_options = getattr(instance, "get_render_model_options", None)
+    if get_options is None:
+        return attribute, edit_fields, view_url
+    attribute, edit_fields, model_view_url = get_options(attribute, edit_fields)
+    return attribute, edit_fields, model_view_url or view_url
+
+
+def _language_args(instance) -> bool:
+    """Whether the model's admin URLs and callable attributes take the language.
+
+    Set ``render_model_language_args = True`` on the model to receive the
+    language instead of the request.
+    """
+    return getattr(instance, "render_model_language_args", False)
+
+
 class CMSEditableObject(InclusionTag):
     """
     Templatetag that links a content extracted from a generic django model
@@ -291,7 +315,7 @@ class CMSEditableObject(InclusionTag):
                 elif not edit_fields:
                     if not view_url:
                         view_url = f"admin:{opts.app_label}_{opts.model_name}_change"
-                    if isinstance(instance, Page):
+                    if _language_args(instance):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
                         url_base = reverse(view_url, args=(instance.pk,))
@@ -339,7 +363,7 @@ class CMSEditableObject(InclusionTag):
         # This allows the requested item to be a method, a property or an
         # attribute
         if callable(extra_context["content"]):
-            if isinstance(instance, Page):
+            if _language_args(instance):
                 extra_context["content"] = extra_context["content"](language)
             else:
                 extra_context["content"] = extra_context["content"](context["request"])
@@ -357,25 +381,7 @@ class CMSEditableObject(InclusionTag):
         if not attribute:
             return context
         attribute = attribute.strip()
-        # ugly-ish
-        if isinstance(instance, Page):
-            if attribute == "title":
-                attribute = "get_title"
-                if not edit_fields:
-                    edit_fields = "title"
-            elif attribute == "page_title":
-                attribute = "get_page_title"
-                if not edit_fields:
-                    edit_fields = "page_title"
-            elif attribute == "menu_title":
-                attribute = "get_menu_title"
-                if not edit_fields:
-                    edit_fields = "menu_title"
-            elif attribute == "titles":
-                attribute = "get_title"
-                if not edit_fields:
-                    edit_fields = "title,page_title,menu_title"
-            view_url = "admin:cms_page_edit_title_fields"
+        attribute, edit_fields, view_url = _render_model_options(instance, attribute, edit_fields, view_url)
         extra_context = copy(context)
         extra_context["attribute_name"] = attribute
         extra_context = self._get_empty_context(extra_context, instance, edit_fields, language, view_url, view_method)
@@ -400,11 +406,8 @@ class CMSEditableObject(InclusionTag):
         if not instance and editmode:
             return context
         extra_context = copy(context)
-        # ugly-ish
-        if instance and isinstance(instance, Page):
-            if edit_fields == "titles":
-                edit_fields = "title,page_title,menu_title"
-            view_url = "admin:cms_page_edit_title_fields"
+        if instance:
+            _, edit_fields, view_url = _render_model_options(instance, None, edit_fields, view_url)
         if edit_fields == "changelist":
             view_url = f"admin:{instance._meta.app_label}_{instance._meta.model_name}_changelist"
         querystring = OrderedDict((("language", language),))

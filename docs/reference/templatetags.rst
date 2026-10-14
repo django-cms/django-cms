@@ -496,6 +496,17 @@ This will render to:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
+A model can adjust how ``render_model`` edits it, the way pages do for their
+titles:
+
+* ``get_render_model_options(attribute, edit_fields)``: return
+  ``(attribute, edit_fields, view_url)``, for example to map a template
+  attribute to a getter or to send editing to the model's own admin view.
+  ``attribute`` is ``None`` for the tags that do not render an attribute, such as
+  ``render_model_icon``; a returned ``view_url`` of ``None`` keeps the one given.
+* ``render_model_language_args = True``: the model's admin URLs and callable
+  attributes take the language instead of the request.
+
 .. note::
 
     By default this template tag escapes the content of the rendered
