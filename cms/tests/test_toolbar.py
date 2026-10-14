@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 from unittest.mock import patch
 
 import iptools
@@ -41,7 +41,7 @@ from cms.cms_toolbars import (
     PageToolbar,
 )
 from cms.core.editing import structure
-from cms.core.editing.structure import get_plugin_tree
+from cms.core.editing.structure import get_plugin_toolbar_info, get_plugin_tree
 from cms.models import CMSPlugin, PageContent, PagePermission, Placeholder, UserSettings
 from cms.shared import editing_urls
 from cms.shared.editing_urls import (
@@ -330,21 +330,41 @@ class PluginActionUrlsTest(CMSTestCase):
         self.assertTrue(urls["edit_url"].startswith("/sub/"))
         self.assertTrue(urls["move_url"].startswith("/sub/"))
 
-    def test_toolbar_reverses_action_urls_once_per_language(self):
+    def test_toolbar_reverses_action_urls_once_in_toolbar_language(self):
         toolbar = EmptyToolbar(RequestFactory().get("/"))
-        plugins = [CMSPlugin(pk=pk) for pk in (1, 2, 3)]
+        toolbar.toolbar_language = "fr"
+        plugins = [CMSPlugin(pk=pk, plugin_type="LinkPlugin") for pk in (1, 2, 3)]
 
         with patch("cms.core.models.plugin.admin_reverse", wraps=admin_reverse) as reverse_mock:
-            with override("en"):
-                en_urls = [plugin.get_action_urls(action_urls=toolbar.get_plugin_action_urls()) for plugin in plugins]
-                self.assertEqual(reverse_mock.call_count, 5)
-            with override("de"):
-                de_urls = [plugin.get_action_urls(action_urls=toolbar.get_plugin_action_urls()) for plugin in plugins]
-                self.assertEqual(reverse_mock.call_count, 10)
+            urls = []
+            for language in ("en", "de"):  # e.g., the page language while rendering content
+                with override(language):
+                    for plugin in plugins:
+                        info = get_plugin_toolbar_info(plugin, action_urls=toolbar.get_plugin_action_urls())
+                        urls.append(info["urls"])
+            self.assertEqual(reverse_mock.call_count, 5)
 
-        self.assertEqual(en_urls[1]["edit_plugin"], admin_reverse("cms_placeholder_edit_plugin", args=(2,)))
-        self.assertTrue(en_urls[1]["edit_plugin"].startswith("/en/"))
-        self.assertTrue(de_urls[1]["edit_plugin"].startswith("/de/"))
+        with override("fr"):
+            self.assertEqual(urls[1]["edit_plugin"], admin_reverse("cms_placeholder_edit_plugin", args=(2,)))
+        for plugin_urls in urls:
+            self.assertTrue(plugin_urls["edit_plugin"].startswith("/fr/admin/"))
+
+    def test_plugin_info_overrides_with_legacy_signatures(self):
+        # Overrides in third-party plugin models do not accept any additional arguments
+        def get_plugin_info(self, children=None):
+            return CMSPlugin.get_plugin_info(self, children=children)
+
+        def get_action_urls(self, js_compat=True):
+            return CMSPlugin.get_action_urls(self, js_compat=js_compat)
+
+        toolbar = EmptyToolbar(RequestFactory().get("/"))
+        plugin = CMSPlugin(pk=42, plugin_type="LinkPlugin")
+        plugin.get_plugin_info = MethodType(get_plugin_info, plugin)
+        plugin.get_action_urls = MethodType(get_action_urls, plugin)
+
+        info = get_plugin_toolbar_info(plugin, action_urls=toolbar.get_plugin_action_urls())
+
+        self.assertEqual(info["urls"]["edit_plugin"], admin_reverse("cms_placeholder_edit_plugin", args=(42,)))
 
     def test_plugin_tree_uses_toolbar_language(self):
         page = create_page("home", "nav_playground.html", "en")

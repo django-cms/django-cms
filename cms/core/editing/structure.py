@@ -65,7 +65,11 @@ def get_plugin_toolbar_info(
     children: list[str] | None = None,
     action_urls: dict[str, str] | None = None,
 ) -> dict[str, Any]:
-    data = plugin.get_plugin_info(children=children, action_urls=action_urls)
+    if action_urls:
+        # Passed as an attribute to keep get_plugin_info/get_action_urls overrides with the
+        # original signatures working
+        plugin._action_urls = action_urls
+    data = plugin.get_plugin_info(children=children)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}

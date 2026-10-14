@@ -268,7 +268,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             self._inst = self
         return self._inst
 
-    def get_plugin_info(self, children=None, action_urls=None):
+    def get_plugin_info(self, children=None):
         plugin_class = self.plugin_class
 
         info = {
@@ -283,7 +283,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             'plugin_restriction': children or [],
             'is_slot': plugin_class.is_slot,
             'disable_child_plugins': plugin_class.disable_child_plugins,
-            'urls': self.get_action_urls(action_urls=action_urls),
+            'urls': self.get_action_urls(),
         }
         return info
 
@@ -439,18 +439,20 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         """
         pass
 
-    def get_action_urls(self, js_compat=True, action_urls=None):
+    def get_action_urls(self, js_compat=True):
         """
         .. versionadded:: 4.0
 
-        :param action_urls: The result of :func:`get_plugin_action_urls`, if already available for the
-            current request. Avoids reversing the admin urls for every plugin.
+        If the toolbar already reversed the admin urls for the current request (see
+        :meth:`cms.toolbar.toolbar.BaseToolbar.get_plugin_action_urls`), they are available as
+        ``self._action_urls`` and are not reversed again for every plugin.
+
         :return: dict of action urls for edit, add, delete, copy, and move plugin.
 
         This method replaces the set of legacy methods ``get_add_url``, ``get_edit_url``,
         ``get_move_url``, ``get_delete_url``, ``get_copy_url``.
         """
-        action_urls = action_urls or get_plugin_action_urls()
+        action_urls = getattr(self, "_action_urls", None) or get_plugin_action_urls()
         edit_url = re.sub(r"/0/", f"/{self.pk}/", action_urls["edit"])
         delete_url = re.sub(r"/0/", f"/{self.pk}/", action_urls["delete"])
 
