@@ -79,6 +79,17 @@ Then apply migrations, collect static files, and run the django CMS checks::
 What's new in 6.0.0
 *******************
 
+Permission performance
+======================
+
+Bulk page reads now index change-permission grants by page path and check only
+each page's ancestor paths, instead of scanning every grant for every restricted
+page. This removes quadratic grant matching as page and grant counts grow.
+
+Saving page permission grants now validates distinct user and group recipients
+in batches, using at most two recipient-fetch queries instead of one per grant.
+The existing permission and grant-scope rules are preserved.
+
 A modular code base
 ===================
 

@@ -637,5 +637,17 @@ def _change_permission_predicate(user, site):
     perm_tuples = get_change_perm_tuples(user, site)
     if perm_tuples == GRANT_ALL_PERMISSIONS:
         return lambda page: True
-    perm_tuples = [PermissionTuple(perm) for perm in perm_tuples]
-    return lambda page: any(perm.contains(page.path) for perm in perm_tuples)
+    scopes_by_path = defaultdict(set)
+    for grant_on, path in perm_tuples:
+        scopes_by_path[path].add(grant_on)
+
+    def can_change(page):
+        path = page.path
+        for end in range(Page.steplen, len(path) + 1, Page.steplen):
+            ancestor = path[:end]
+            for grant_on in scopes_by_path.get(ancestor, ()):
+                if PermissionTuple((grant_on, ancestor)).contains(path):
+                    return True
+        return False
+
+    return can_change

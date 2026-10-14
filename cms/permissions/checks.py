@@ -219,13 +219,18 @@ def check_grant_recipients(context, *, page, save=(), **kwargs):
         return
     from cms.permissions.utils import get_subordinate_groups, get_subordinate_users
 
-    users = get_subordinate_users(user, page.site)
-    groups = get_subordinate_groups(user, page.site)
-    for grant in grants:
-        if (grant.user_id and not users.filter(pk=grant.user_id).exists()) or (
-            grant.group_id and not groups.filter(pk=grant.group_id).exists()
-        ):
-            raise PermissionDenied(_("You may not grant page permissions to this user or group."))
+    user_ids = {grant.user_id for grant in grants if grant.user_id is not None}
+    group_ids = {grant.group_id for grant in grants if grant.group_id is not None}
+    allowed_users = (
+        set(get_subordinate_users(user, page.site).filter(pk__in=user_ids).values_list("pk", flat=True))
+        if user_ids else set()
+    )
+    allowed_groups = (
+        set(get_subordinate_groups(user, page.site).filter(pk__in=group_ids).values_list("pk", flat=True))
+        if group_ids else set()
+    )
+    if user_ids - allowed_users or group_ids - allowed_groups:
+        raise PermissionDenied(_("You may not grant page permissions to this user or group."))
 
 
 register_core_check(
