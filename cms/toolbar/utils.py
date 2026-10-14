@@ -60,7 +60,11 @@ def get_plugin_toolbar_info(
     action_urls: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     # ``parents`` is deprecated (see CMSPlugin.get_plugin_info); forwarded for backwards compatibility.
-    data = plugin.get_plugin_info(children=children, parents=parents, action_urls=action_urls)
+    if action_urls:
+        # Passed as an attribute to keep get_plugin_info/get_action_urls overrides with the
+        # original signatures working
+        plugin._action_urls = action_urls
+    data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}
