@@ -1,6 +1,6 @@
 """The permission checks the page services perform, as one replaceable object.
 
-The counterpart of :mod:`cms.core.services.permissions`, and the same three
+The counterpart of :mod:`cms.core.permissions`, and the same three
 rules: every predicate is the ``cms.utils.page_permissions`` call the page
 admin's ``has_*_permission`` hooks already delegate to, so a stock installation
 decides exactly as before; ``permissions=`` replaces the backend for one call;

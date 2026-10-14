@@ -10,6 +10,7 @@ passes ``OperationContext.system()`` and skips those checks.
 
 from __future__ import annotations
 
+from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -17,7 +18,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _lazy
 
 from cms import operations
-from cms.operations import Operation, register_operation
+from cms.operations import Argument, Operation, register_operation
 from cms.permissions.checks import CMS_PERMISSION_ACTIONS, cms_permission_models
 from cms.permissions.models import PageUser, PageUserGroup
 from cms.shared.operations import OperationContext, operation
@@ -140,6 +141,24 @@ for _declaration in (
             "user manages, and only with flags the acting user holds."
         ),
         service=save_page_permissions,
+        arguments=(
+            Argument("page", model="cms.Page", description="The page the grants belong to."),
+            Argument(
+                "save",
+                model="cms.PagePermission",
+                instance=True,
+                many=True,
+                required=False,
+                description="New or changed grants of the page.",
+            ),
+            Argument(
+                "delete",
+                model="cms.PagePermission",
+                many=True,
+                required=False,
+                description="Grants of the page to delete.",
+            ),
+        ),
     ),
     Operation(
         operations.CHANGE_USER_PERMISSIONS,
@@ -149,6 +168,14 @@ for _declaration in (
             "manages that user or group and holds every permission set or cleared."
         ),
         service=set_user_permissions,
+        arguments=(
+            Argument(
+                "data",
+                type=dict,
+                description="can_<action>_<name> fields mapped to true or false; missing fields stay as they are.",
+            ),
+            Argument("obj", model=(settings.AUTH_USER_MODEL, "auth.Group"), description="The user or group."),
+        ),
     ),
     Operation(
         operations.CHANGE_GLOBAL_PAGE_PERMISSION,
@@ -158,6 +185,10 @@ for _declaration in (
             "hold every flag of the grant on its sites."
         ),
         service=save_global_page_permission,
+        arguments=(
+            Argument("grant", model="cms.GlobalPagePermission", instance=True, description="The new or changed grant."),
+            Argument("sites", model="sites.Site", many=True, description="The sites the grant applies to."),
+        ),
     ),
     Operation(
         operations.DELETE_GLOBAL_PAGE_PERMISSION,
@@ -167,6 +198,9 @@ for _declaration in (
             "be able to have granted it."
         ),
         service=delete_global_page_permission,
+        arguments=(
+            Argument("grant", model="cms.GlobalPagePermission", description="The grant to delete."),
+        ),
     ),
 ):
     register_operation(_declaration)

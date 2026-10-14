@@ -11,7 +11,7 @@ Every service runs in the :func:`~cms.shared.operations.operation` frame:
 4. emit the post-operation signal with the same token,
 5. return the changed object.
 
-The permission checks ask a backend (:mod:`cms.core.services.permissions`), so a
+The permission checks ask a backend (:mod:`cms.core.permissions`), so a
 caller reaching an operation from outside the admin is checked the same way. Pass
 ``permissions=`` to supply a different backend for one call -- the placeholder
 admin does this, handing over an adapter that routes each predicate back through
@@ -28,11 +28,11 @@ from django.utils.translation import gettext_lazy as _lazy
 
 from cms import operations
 from cms.core import checks as core_checks  # noqa: F401  -- registers the plugin operation checks
+from cms.core.permissions import get_permissions
 from cms.core.plugin_pool import plugin_pool
 from cms.core.plugins import copy_plugins_to_placeholder
-from cms.core.services.permissions import get_permissions
 from cms.models import CMSPlugin, PlaceholderReference
-from cms.operations import Operation, register_operation
+from cms.operations import Argument, Operation, register_operation
 from cms.shared.checks import run_checks
 from cms.shared.operations import OperationContext, operation
 from cms.signals import PLACEHOLDER_OPERATION_SIGNALS, post_placeholder_operation, pre_placeholder_operation
@@ -656,6 +656,35 @@ for _declaration in (
             "placeholder may not be edited, or if the plugin is not allowed there."
         ),
         service=add_plugin,
+        arguments=(
+            Argument("placeholder", model="cms.Placeholder", description="The placeholder to add the plugin to."),
+            Argument("plugin_type", type=str, description="The plugin's class name, e.g. \"TextPlugin\"."),
+            Argument("language", type=str, description="The language of the plugin."),
+            Argument(
+                "data",
+                type=dict,
+                required=False,
+                null=True,
+                description="The plugin's field values, validated as by the plugin's form.",
+            ),
+            Argument(
+                "position",
+                type=(str, int),
+                required=False,
+                description=(
+                    "\"first-child\" or \"last-child\" (the default) of target, or of the placeholder without "
+                    "a target; \"left\" or \"right\" of target as a sibling; or a tree position with target as "
+                    "the parent."
+                ),
+            ),
+            Argument(
+                "target",
+                model="cms.CMSPlugin",
+                required=False,
+                null=True,
+                description="The plugin the position is relative to.",
+            ),
+        ),
     ),
     Operation(
         operations.CHANGE_PLUGIN,
@@ -666,6 +695,16 @@ for _declaration in (
             "plugin."
         ),
         service=change_plugin,
+        arguments=(
+            Argument("plugin", model="cms.CMSPlugin", description="The plugin."),
+            Argument(
+                "data",
+                type=dict,
+                required=False,
+                null=True,
+                description="The field values that change, validated as by the plugin's form.",
+            ),
+        ),
     ),
     Operation(
         operations.MOVE_PLUGIN,
@@ -676,6 +715,24 @@ for _declaration in (
             "in the target placeholder and language, or if the plugin would end up inside itself."
         ),
         service=move_plugin,
+        arguments=(
+            Argument("plugin", model="cms.CMSPlugin", description="The plugin."),
+            Argument("target_position", type=int, description="The plugin's new position in the placeholder's tree."),
+            Argument(
+                "target_placeholder",
+                model="cms.Placeholder",
+                required=False,
+                null=True,
+                description="The placeholder to move to; the plugin's own if not given.",
+            ),
+            Argument(
+                "target_parent",
+                model="cms.CMSPlugin",
+                required=False,
+                null=True,
+                description="The new parent plugin; none for the top level.",
+            ),
+        ),
     ),
     Operation(
         operations.CUT_PLUGIN,
@@ -685,6 +742,11 @@ for _declaration in (
             "Requires permission to delete the plugin from its placeholder."
         ),
         service=cut_plugin,
+        arguments=(
+            Argument("plugin", model="cms.CMSPlugin", description="The plugin."),
+            Argument("target_language", type=str, description="The language of the clipboard."),
+            Argument("target_placeholder", model="cms.Placeholder", description="The acting user's clipboard."),
+        ),
     ),
     Operation(
         operations.PASTE_PLUGIN,
@@ -695,6 +757,19 @@ for _declaration in (
             "target. Refused if the parent is not in the target placeholder and language."
         ),
         service=paste_plugin,
+        arguments=(
+            Argument("plugin", model="cms.CMSPlugin", description="The plugin to copy, with its descendants."),
+            Argument("target_language", type=str, description="The language to paste into."),
+            Argument("target_placeholder", model="cms.Placeholder", description="The placeholder to paste into."),
+            Argument("target_position", type=int, description="The position of the copy in the placeholder's tree."),
+            Argument(
+                "target_parent",
+                model="cms.CMSPlugin",
+                required=False,
+                null=True,
+                description="The parent plugin of the copy; none for the top level.",
+            ),
+        ),
     ),
     Operation(
         operations.PASTE_PLACEHOLDER,
@@ -704,6 +779,12 @@ for _declaration in (
             "permission to read the source and to add the plugins to the target."
         ),
         service=paste_placeholder,
+        arguments=(
+            Argument("plugin", model="cms.CMSPlugin", description="The placeholder reference plugin on the clipboard."),
+            Argument("target_language", type=str, description="The language to paste into."),
+            Argument("target_placeholder", model="cms.Placeholder", description="The placeholder to paste into."),
+            Argument("target_position", type=int, description="The position of the first copy in the placeholder's tree."),
+        ),
     ),
     Operation(
         operations.ADD_PLUGINS_FROM_PLACEHOLDER,
@@ -713,12 +794,21 @@ for _declaration in (
             "language. Requires permission to read the source and to add the plugins to the target."
         ),
         service=add_plugins_from_placeholder,
+        arguments=(
+            Argument("source_placeholder", model="cms.Placeholder", description="The placeholder to copy from."),
+            Argument("target_placeholder", model="cms.Placeholder", description="The placeholder to copy into."),
+            Argument("source_language", type=str, description="The language to copy from."),
+            Argument("target_language", type=str, description="The language to copy into."),
+        ),
     ),
     Operation(
         operations.DELETE_PLUGIN,
         summary=_lazy("Delete a plugin"),
         description="Delete a plugin with its children. Requires permission to delete the plugin.",
         service=delete_plugin,
+        arguments=(
+            Argument("plugin", model="cms.CMSPlugin", description="The plugin."),
+        ),
     ),
     Operation(
         operations.CLEAR_PLACEHOLDER,
@@ -728,6 +818,10 @@ for _declaration in (
             "permission to clear the placeholder."
         ),
         service=clear_placeholder,
+        arguments=(
+            Argument("placeholder", model="cms.Placeholder", description="The placeholder to clear."),
+            Argument("language", type=str, null=True, description="The language to clear; all languages if null."),
+        ),
     ),
     Operation(
         operations.COPY_PLUGIN_TO_CLIPBOARD,
@@ -737,6 +831,11 @@ for _declaration in (
             "permission to read the plugin's placeholder and to copy the plugins."
         ),
         service=copy_plugin_to_clipboard,
+        arguments=(
+            Argument("source_plugin", model="cms.CMSPlugin", description="The plugin to copy, with its descendants."),
+            Argument("target_placeholder", model="cms.Placeholder", description="The acting user's clipboard."),
+            Argument("target_language", type=str, description="The language of the clipboard."),
+        ),
     ),
     Operation(
         operations.COPY_PLACEHOLDER_TO_CLIPBOARD,
@@ -746,6 +845,12 @@ for _declaration in (
             "language. Requires permission to read the placeholder and to copy the plugins."
         ),
         service=copy_placeholder_to_clipboard,
+        arguments=(
+            Argument("source_placeholder", model="cms.Placeholder", description="The placeholder to copy."),
+            Argument("target_placeholder", model="cms.Placeholder", description="The acting user's clipboard."),
+            Argument("source_language", type=str, description="The language to copy."),
+            Argument("target_language", type=str, description="The language of the clipboard."),
+        ),
     ),
 ):
     register_operation(_declaration)

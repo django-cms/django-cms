@@ -49,6 +49,7 @@ Creating new functionality
     Create admin for grouper models <16-grouper-admin>
     Extend Page & Page Content models <18-extending_page_contents>
     Test your extensions <19-testing>
+    Change content through services <26-service-layer>
 
 Sharing functionality
 ---------------------

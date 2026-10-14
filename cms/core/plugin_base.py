@@ -702,7 +702,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         context and permission backend before it calls the add or change view;
         a plugin admin used on its own builds them from the request.
         """
-        from cms.core.services import plugins as plugin_services
+        from cms.core import services as plugin_services
         from cms.shared.operations import OperationContext
 
         context = getattr(self, "_operation_context", None) or OperationContext.from_request(request)

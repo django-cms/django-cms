@@ -317,6 +317,18 @@ def check_plugin_instances(output):
 
 
 @define_check
+def check_operation_arguments(output):
+    from cms.shared.checks import argument_problems
+
+    with output.section("Operation arguments") as section:
+        problems = argument_problems()
+        for problem in problems:
+            section.error(problem)
+        if not problems:
+            section.success("Every operation check requires only declared arguments")
+
+
+@define_check
 def check_copy_relations(output):
     from cms.core.models.plugin import CMSPlugin
     from cms.core.plugin_pool import plugin_pool

@@ -6,7 +6,7 @@ Operations and services
 
 The functions and objects that change content outside the admin, check whether
 a change is allowed, and announce it. See :ref:`operation_checks` for the
-concepts.
+concepts and :ref:`service_layer_how_to` for how to use them.
 
 .. versionadded:: 6.0
 
@@ -30,7 +30,7 @@ Operations
 Operations are declared in the operation registry ``cms.operations``. Each
 declaration has an operationId (the constant, for example
 ``operations.MOVE_PAGE == "move_page"``), a one-line summary, a plain-text
-description and the service performing it.
+description, the service performing it and the arguments a caller supplies.
 
 ``summary``
     Shown to people, in log entries and the admin. Translatable: declare it
@@ -39,9 +39,36 @@ description and the service performing it.
     Read by API schemas, tool definitions and the documentation. Plain English,
     not translated. Defaults to the service's docstring
     (``inspect.getdoc()``) if not declared.
+``arguments``
+    What a caller outside Python -- a REST endpoint, an MCP tool -- supplies,
+    as :class:`Argument` declarations. :meth:`Operation.json_schema` turns them
+    into the JSON Schema both use for a request body or an ``inputSchema``.
+    ``None`` if not declared; adapters leave such operations out.
 
 .. autoclass:: cms.operations.Operation
-    :members: id, summary, description, service
+    :members: id, summary, description, service, arguments, json_schema
+
+.. autoclass:: cms.operations.Argument
+    :members: json_schema, models
+
+Arguments are checked against the service when the operation is declared:
+
+* every argument is a keyword argument of the service -- adapters call the
+  service, and :func:`~cms.shared.checks.can`, with keywords;
+* every parameter the service requires is declared, and an argument the
+  service requires is not declared optional;
+* ``context``, ``permissions`` and ``sender`` are never arguments.
+
+A service parameter with a default that is not declared stays available to
+Python callers only (for example the ``form`` the admin passes to
+``add_plugin``).
+
+A model argument names a stored object by primary key; the adapter resolves
+it, scoped to what the acting user may see, before it calls the service. Its
+schema is ``{"type": ["integer", "string"], "x-cms-model": "cms.page"}``. With
+``instance=True`` the caller builds the object instead -- a new grant, or a
+page with changed advanced settings -- and the schema is an object marked
+``"x-cms-instance": true``.
 
 .. autofunction:: cms.operations.register_operation
 
@@ -59,7 +86,7 @@ Declaring operations from an app
     from django.utils.translation import gettext_lazy as _
 
     from cms.app_base import CMSAppConfig
-    from cms.operations import Operation
+    from cms.operations import Argument, Operation
 
     class MyAppConfig(CMSAppConfig):
         cms_operations = [
@@ -69,6 +96,9 @@ Declaring operations from an app
                 description="Make the article's draft its public version. "
                             "Requires permission to publish articles.",
                 service=publish_article,
+                arguments=[
+                    Argument("article", model="myapp.Article", description="The article to publish."),
+                ],
             ),
         ]
 
@@ -141,7 +171,7 @@ checks receive; every check also receives ``permissions``.
       - ``page_content``, ``template``
     * - ``COPY_PAGE_LANGUAGE``
       - :func:`cms.pages.services.copy_language`
-      - ``page_content``, ``target_language``
+      - ``source_page_content``, ``target_language``
     * - ``TOGGLE_PAGE_IN_NAVIGATION``
       - :func:`cms.pages.services.toggle_in_navigation`
       - ``page_content``
@@ -157,43 +187,43 @@ The placeholder and plugin operations are performed by the services in
       - Service
       - Arguments
     * - ``ADD_PLUGIN``
-      - :func:`cms.core.services.plugins.add_plugin`
+      - :func:`cms.core.services.add_plugin`
       - ``placeholder``, ``plugin_type``, ``language``, ``data``,
         ``position``, ``target``
     * - ``CHANGE_PLUGIN``
-      - :func:`cms.core.services.plugins.change_plugin`
+      - :func:`cms.core.services.change_plugin`
       - ``plugin``, ``data``
     * - ``MOVE_PLUGIN``
-      - :func:`cms.core.services.plugins.move_plugin`
+      - :func:`cms.core.services.move_plugin`
       - ``plugin``, ``target_position``, ``target_placeholder``,
         ``target_parent``
     * - ``CUT_PLUGIN``
-      - :func:`cms.core.services.plugins.cut_plugin`
+      - :func:`cms.core.services.cut_plugin`
       - ``plugin``, ``target_language``, ``target_placeholder``
     * - ``PASTE_PLUGIN``
-      - :func:`cms.core.services.plugins.paste_plugin`
+      - :func:`cms.core.services.paste_plugin`
       - ``plugin``, ``target_language``, ``target_placeholder``,
         ``target_position``, ``target_parent``
     * - ``PASTE_PLACEHOLDER``
-      - :func:`cms.core.services.plugins.paste_placeholder`
+      - :func:`cms.core.services.paste_placeholder`
       - ``plugin``, ``target_language``, ``target_placeholder``,
         ``target_position``
     * - ``COPY_PLUGIN_TO_CLIPBOARD``
-      - :func:`cms.core.services.plugins.copy_plugin_to_clipboard`
+      - :func:`cms.core.services.copy_plugin_to_clipboard`
       - ``source_plugin``, ``target_placeholder``, ``target_language``
     * - ``COPY_PLACEHOLDER_TO_CLIPBOARD``
-      - :func:`cms.core.services.plugins.copy_placeholder_to_clipboard`
+      - :func:`cms.core.services.copy_placeholder_to_clipboard`
       - ``source_placeholder``, ``target_placeholder``, ``source_language``,
         ``target_language``
     * - ``ADD_PLUGINS_FROM_PLACEHOLDER``
-      - :func:`cms.core.services.plugins.add_plugins_from_placeholder`
+      - :func:`cms.core.services.add_plugins_from_placeholder`
       - ``source_placeholder``, ``target_placeholder``, ``source_language``,
         ``target_language``
     * - ``DELETE_PLUGIN``
-      - :func:`cms.core.services.plugins.delete_plugin`
+      - :func:`cms.core.services.delete_plugin`
       - ``plugin``
     * - ``CLEAR_PLACEHOLDER``
-      - :func:`cms.core.services.plugins.clear_placeholder`
+      - :func:`cms.core.services.clear_placeholder`
       - ``placeholder``, ``language``
 
 The services run the checks registered for their operation, with the
@@ -251,6 +281,12 @@ permission first, then policy, then validation. A check is a callable
 ``check(context, **target)`` raising ``PermissionDenied`` (permission),
 ``OperationBlocked`` (policy) or ``ValidationError`` (validation). Registering a check under the name of an existing one
 replaces it.
+
+``requires`` may only name arguments the operation declares: a dry run with
+the declared arguments skips a check that requires any other name, and would
+approve what the service refuses. ``manage.py cms check`` reports such checks.
+
+.. autofunction:: cms.shared.checks.argument_problems
 
 Editability checks
 ==================
@@ -319,7 +355,7 @@ Extension services
 Plugin services
 ***************
 
-.. automodule:: cms.core.services.plugins
+.. automodule:: cms.core.services
     :members: add_plugin, change_plugin, move_plugin, cut_plugin, paste_plugin, paste_placeholder,
         copy_plugin_to_clipboard, copy_placeholder_to_clipboard,
         add_plugins_from_placeholder, delete_plugin, clear_placeholder
@@ -340,14 +376,14 @@ Permission backends
 
 .. autofunction:: cms.pages.permissions.get_page_permissions
 
-.. py:module:: cms.core.services.permissions
+.. py:module:: cms.core.permissions
 
-.. autoclass:: cms.core.services.permissions.PluginPermissions
+.. autoclass:: cms.core.permissions.PluginPermissions
     :members:
 
-.. autoclass:: cms.core.services.permissions.AdminPluginPermissions
+.. autoclass:: cms.core.permissions.AdminPluginPermissions
 
-.. autofunction:: cms.core.services.permissions.get_permissions
+.. autofunction:: cms.core.permissions.get_permissions
 
 
 *****************

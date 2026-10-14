@@ -7,8 +7,8 @@ from django.test import override_settings
 
 from cms import operations
 from cms.api import add_plugin, create_page
-from cms.core.services import plugins as plugin_services
-from cms.core.services.permissions import PluginPermissions, get_permissions
+from cms.core import services as plugin_services
+from cms.core.permissions import PluginPermissions, get_permissions
 from cms.models import GlobalPagePermission, Page, PageContent, PagePermission, PageType, Placeholder, UserSettings
 from cms.pages import services as page_services
 from cms.pages.permissions import PagePermissions, get_page_permissions

@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_base import CMSAppConfig, CMSAppExtension
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
-from cms.core.services import plugins as plugin_services  # noqa: F401  -- declares the plugin operations
+from cms.core import services as plugin_services  # noqa: F401  -- declares the plugin operations
 from cms.extensions import services as extension_services  # noqa: F401  -- declares the extension operations
 from cms.models import PageContent
 from cms.operations import Operation, register_operation

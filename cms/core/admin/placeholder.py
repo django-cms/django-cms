@@ -28,6 +28,7 @@ from django.views.decorators.http import require_POST
 
 from cms import operations
 from cms.constants import SLUG_REGEXP
+from cms.core import services as plugin_services
 from cms.core.admin.forms import PluginAddValidationForm
 from cms.core.editing.structure import create_child_plugin_references, get_plugin_content, get_plugin_tree
 from cms.core.editing.views import (
@@ -37,11 +38,10 @@ from cms.core.editing.views import (
 )
 from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
+from cms.core.permissions import AdminPluginPermissions
 from cms.core.plugin_base import CMSPluginBase
 from cms.core.plugin_pool import plugin_pool
 from cms.core.plugins import downcast_plugins
-from cms.core.services import plugins as plugin_services
-from cms.core.services.permissions import AdminPluginPermissions
 from cms.shared.checks import OperationBlocked
 from cms.shared.operations import OperationContext
 from cms.toolbar.utils import get_toolbar_from_request

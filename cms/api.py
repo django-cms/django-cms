@@ -517,7 +517,7 @@ def add_plugin(placeholder, plugin_type, language, position="last-child", target
     :param target: Parent plugin. Must be plugin instance
     :param data: Data for the plugin type instance
     :param context: An :class:`~cms.shared.operations.OperationContext`. If given,
-        the plugin is added by :func:`cms.core.services.plugins.add_plugin`: the
+        the plugin is added by :func:`cms.core.services.add_plugin`: the
         operation's checks run, ``data`` is cleaned by the plugin's form, and the
         operation is announced and runs in a transaction. Without it, nothing is
         checked, cleaned or announced, as in previous versions.
@@ -529,7 +529,7 @@ def add_plugin(placeholder, plugin_type, language, position="last-child", target
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
 
     if context is not None:
-        from cms.core.services import plugins as plugin_services
+        from cms.core import services as plugin_services
 
         return plugin_services.add_plugin(
             placeholder, plugin_type, language, data, position=position, target=target, context=context

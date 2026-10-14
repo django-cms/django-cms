@@ -507,27 +507,29 @@ class LanguageCopyPlan:
         return self._plan[1]
 
 
-def check_copy_language_permission(context, *, page_content, target_language=None, permissions=None, **kwargs):
+def check_copy_language_permission(
+    context, *, source_page_content, target_language=None, permissions=None, **kwargs
+):
     # The copy changes the target translation; the source is only read.
     permissions = _permissions(permissions, context)
-    page = page_content.page
+    page = source_page_content.page
     target = page.get_content_obj(target_language, fallback=False) if target_language else None
     if not (permissions.can_change_content(target) if target else permissions.can_change_page(page)):
         raise PermissionDenied(_("You do not have permission to copy this content"))
 
 
-def check_target_language(context, *, page_content, target_language, **kwargs):
-    page = page_content.page
+def check_target_language(context, *, source_page_content, target_language, **kwargs):
+    page = source_page_content.page
     if not target_language or target_language not in get_language_list(site_id=page.site_id):
         raise ValidationError(_("Language must be set to a supported language!"))
     if not page.get_content_obj(target_language, fallback=False):
         raise ValidationError(_("The page has no content in the target language."))
 
 
-def check_copy_language_plugin_permission(context, *, page_content, target_language, plan=None, **kwargs):
+def check_copy_language_plugin_permission(context, *, source_page_content, target_language, plan=None, **kwargs):
     # Checked for every placeholder before anything is copied, so that a
     # refusal never leaves a partial copy behind.
-    plan = plan or LanguageCopyPlan(page_content, target_language)
+    plan = plan or LanguageCopyPlan(source_page_content, target_language)
     for target, plugins in plan.copies:
         if not target.has_add_plugins_permission(context.user, plugins):
             raise PermissionDenied(_("You do not have permission to copy these plugins."))
@@ -538,21 +540,21 @@ register_core_check(
     "cms.pages.copy_language_permission",
     check_copy_language_permission,
     kind=PERMISSION,
-    requires=["page_content"],
+    requires=["source_page_content"],
 )
 register_core_check(
     operations.COPY_PAGE_LANGUAGE,
     "cms.pages.target_language",
     check_target_language,
     kind=VALIDATION,
-    requires=["page_content", "target_language"],
+    requires=["source_page_content", "target_language"],
 )
 register_core_check(
     operations.COPY_PAGE_LANGUAGE,
     "cms.pages.copy_language_plugin_permission",
     check_copy_language_plugin_permission,
     kind=PERMISSION,
-    requires=["page_content", "target_language"],
+    requires=["source_page_content", "target_language"],
 )
 
 
@@ -577,8 +579,8 @@ register_core_check(
 # the editability checks for that translation (cms.core.checks).
 
 
-def _target_content(page_content, target_language, **kwargs):
-    target = page_content.page.get_content_obj(target_language, fallback=False)
+def _target_content(source_page_content, target_language, **kwargs):
+    target = source_page_content.page.get_content_obj(target_language, fallback=False)
     return [target] if target else []
 
 
@@ -592,5 +594,5 @@ for _operation in (
         _operation, lambda page_content, **kwargs: [page_content], requires=["page_content"]
     )
 register_editable_operation(
-    operations.COPY_PAGE_LANGUAGE, _target_content, requires=["page_content", "target_language"]
+    operations.COPY_PAGE_LANGUAGE, _target_content, requires=["source_page_content", "target_language"]
 )

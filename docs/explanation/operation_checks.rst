@@ -376,7 +376,7 @@ posts. So in the admin, adding a page needs both: the admin's
 for the parent the page actually gets. An admin subclass can refuse adds this
 way, but not allow an add the backend refuses.
 
-The plugin permission backend (``cms.core.services.permissions``) works the same
+The plugin permission backend (``cms.core.permissions``) works the same
 way for plugins and placeholders. It asks the object owning the placeholder
 (``has_placeholder_change_permission()``) and the placeholder's own
 ``has_*_plugin_permission()`` methods; the admin adapter routes these through
@@ -688,7 +688,7 @@ column are what a check receives and what a dry run passes to ``can()``.
     * - ``COPY_PAGE_LANGUAGE``
 
         ``copy_language``
-      - ``page_content``, ``target_language``
+      - ``source_page_content``, ``target_language``
       - ``cms.pages.copy_language_permission``: the user may change the page.
 
         ``cms.pages.target_language``: the site offers the language and the

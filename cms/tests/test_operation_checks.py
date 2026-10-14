@@ -9,9 +9,8 @@ from django.utils.translation import override as force_language
 from cms import operations
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_config import CMSCoreExtensions
-from cms.core import checks as core_checks
+from cms.core import checks as core_checks, services as plugin_services
 from cms.core.plugin_pool import plugin_pool
-from cms.core.services import plugins as plugin_services
 from cms.models import CMSPlugin, Page, PageContent, Placeholder, UserSettings
 from cms.pages import services as page_services
 from cms.pages.admin.forms import MovePageForm
@@ -437,6 +436,161 @@ class OperationRegistryTest(RegistryIsolationMixin, CMSTestCase):
         for config in (NotAnOperation, Duplicate):
             with self.subTest(config=config.__name__), self.assertRaises(ImproperlyConfigured):
                 CMSCoreExtensions().configure_app(config)
+
+
+class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
+    """Declared arguments: what REST endpoints and MCP tools let callers supply (RFC 9j, 9k)."""
+
+    def test_every_core_operation_declares_its_arguments(self):
+        for declaration in operations.get_operations():
+            with self.subTest(operation=declaration.id):
+                self.assertIsNotNone(declaration.arguments)
+
+    def test_checks_require_only_declared_arguments(self):
+        # A dry run with the declared arguments must run every check: a check
+        # requiring another name would be skipped, and approve what the
+        # service refuses.
+        self.assertEqual(checks.argument_problems(), [])
+
+    def test_a_check_requiring_an_undeclared_argument_is_reported(self):
+        checks.register_check(operations.MOVE_PAGE, "tests.needs_parent", lambda context, **kwargs: None, requires=["parent"])
+
+        self.assertEqual(
+            checks.argument_problems(),
+            [
+                "Check 'tests.needs_parent' of operation 'move_page' requires 'parent', "
+                "which the operation does not declare."
+            ],
+        )
+
+    def test_dry_run_with_the_declared_arguments_skips_no_check(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        context = OperationContext(user=self.get_superuser())
+
+        verdict = can(operations.MOVE_PAGE, context, page=page, target_page=target, position="first-child")
+
+        self.assertEqual(verdict.skipped, [])
+        self.assertTrue(verdict)
+
+    def test_copy_language_checks_take_the_service_argument(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        create_page_content("de", "Seite", page)
+        context = OperationContext(user=self.get_superuser())
+
+        verdict = can(
+            operations.COPY_PAGE_LANGUAGE,
+            context,
+            source_page_content=page.get_content_obj("en"),
+            target_language="de",
+        )
+
+        self.assertEqual(verdict.skipped, [])
+
+    def test_model_labels_resolve(self):
+        from django.apps import apps
+
+        for declaration in operations.get_operations():
+            for argument in declaration.arguments:
+                for label in argument.models:
+                    with self.subTest(operation=declaration.id, argument=argument.name):
+                        self.assertEqual(apps.get_model(label)._meta.label_lower, label)
+
+    def test_json_schema(self):
+        schema = operations.get_operation(operations.MOVE_PLUGIN).json_schema()
+
+        self.assertEqual(schema["required"], ["plugin", "target_position"])
+        self.assertFalse(schema["additionalProperties"])
+        self.assertEqual(
+            schema["properties"]["plugin"],
+            {"type": ["integer", "string"], "x-cms-model": "cms.cmsplugin", "description": "The plugin."},
+        )
+        self.assertEqual(schema["properties"]["target_parent"]["anyOf"][1], {"type": "null"})
+
+    def test_json_schema_of_arguments(self):
+        Argument = operations.Argument
+        for argument, schema in (
+            (Argument("title", type=str), {"type": "string"}),
+            (Argument("position", type=(str, int)), {"type": ["string", "integer"]}),
+            (Argument("mode", type=str, choices=["a", "b"]), {"type": "string", "enum": ["a", "b"]}),
+            (Argument("parent", model="cms.Page", null=True), {
+                "anyOf": [{"type": ["integer", "string"], "x-cms-model": "cms.page"}, {"type": "null"}]
+            }),
+            (Argument("sites", model="sites.Site", many=True), {
+                "type": "array", "items": {"type": ["integer", "string"], "x-cms-model": "sites.site"}
+            }),
+            (Argument("grant", model="cms.GlobalPagePermission", instance=True), {
+                "type": "object", "x-cms-model": "cms.globalpagepermission", "x-cms-instance": True
+            }),
+            (Argument("owner", model=("auth.User", "auth.Group")), {
+                "type": ["integer", "string"], "x-cms-model": ["auth.user", "auth.group"]
+            }),
+        ):
+            with self.subTest(argument=argument.name):
+                self.assertEqual(argument.json_schema(), schema)
+
+    def test_an_operation_without_arguments_has_no_schema(self):
+        self.assertIsNone(operations.Operation("tests.publish", summary="Publish").json_schema())
+
+    def test_bad_arguments_are_refused(self):
+        Argument = operations.Argument
+        for kwargs in (
+            {"name": "page"},
+            {"name": "page", "type": str, "model": "cms.Page"},
+            {"name": "page", "type": set},
+            {"name": "page", "type": str, "instance": True},
+            {"name": "not a name", "type": str},
+        ):
+            with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
+                Argument(**kwargs)
+
+    def test_arguments_must_fit_the_service(self):
+        Argument = operations.Argument
+
+        def publish(article, note=None, *, context, permissions=None):
+            """Publish an article."""
+
+        for arguments in (
+            (Argument("note", type=str, required=False),),  # article is not declared
+            (Argument("article", model="cms.Page"), Argument("draft", type=bool)),  # no such keyword
+            (Argument("article", model="cms.Page", required=False),),  # the service requires it
+            (Argument("article", model="cms.Page"), Argument("context", type=dict)),  # reserved
+            (Argument("article", model="cms.Page"), Argument("article", model="cms.Page")),
+        ):
+            with self.subTest(arguments=[argument.name for argument in arguments]), self.assertRaises(ValueError):
+                operations.register_operation(
+                    operations.Operation("tests.publish", summary="Publish", service=publish, arguments=arguments)
+                )
+
+        declaration = operations.register_operation(
+            operations.Operation(
+                "tests.publish",
+                summary="Publish",
+                service=publish,
+                arguments=[Argument("article", model="cms.Page"), Argument("note", type=str, required=False)],
+            )
+        )
+        self.assertEqual([argument.name for argument in declaration.arguments], ["article", "note"])
+
+    def test_a_service_taking_any_keyword_accepts_any_argument(self):
+        def publish(*, context, **kwargs):
+            """Publish."""
+
+        operations.register_operation(
+            operations.Operation(
+                "tests.publish", summary="Publish", service=publish, arguments=[operations.Argument("article", type=int)]
+            )
+        )
+
+    def test_cms_config_refuses_arguments_that_do_not_fit(self):
+        def publish(article, *, context):
+            """Publish."""
+
+        class Config:
+            cms_operations = [operations.Operation("tests.publish", summary="Publish", service=publish, arguments=[])]
+
+        with self.assertRaises(ImproperlyConfigured):
+            CMSCoreExtensions().configure_app(Config)
 
 
 class PluginServiceChecksTest(RegistryIsolationMixin, CMSTestCase):
@@ -1720,7 +1874,7 @@ class ContentPermissionTest(CMSTestCase):
             can(
                 operations.COPY_PAGE_LANGUAGE,
                 self.context,
-                page_content=english,
+                source_page_content=english,
                 target_language="de",
                 permissions=permissions,
             )
@@ -1729,7 +1883,7 @@ class ContentPermissionTest(CMSTestCase):
             can(
                 operations.COPY_PAGE_LANGUAGE,
                 self.context,
-                page_content=self.german,
+                source_page_content=self.german,
                 target_language="en",
                 permissions=permissions,
             )

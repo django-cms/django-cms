@@ -130,6 +130,15 @@ class CheckTests(CheckAssertMixin, TestCase):
         with self.settings(MIDDLEWARE=middleware):
             self.assertCheck(True, warnings=0, errors=0)
 
+    def test_check_requiring_an_undeclared_argument(self):
+        from cms import operations
+        from cms.shared import checks
+
+        checks.register_check(operations.MOVE_PAGE, "tests.needs_parent", lambda context, **kwargs: None, requires=["parent"])
+        self.addCleanup(checks._extensions[operations.MOVE_PAGE].pop, "tests.needs_parent")
+
+        self.assertCheck(False, warnings=0, errors=1)
+
     def test_copy_relations_fk_check(self):
         """
         this is ugly, feel free to come up with a better test

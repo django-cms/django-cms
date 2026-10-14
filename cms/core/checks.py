@@ -1,7 +1,7 @@
 """The core checks placeholder and plugin operations run, registered with :mod:`cms.shared.checks`.
 
 Each check takes the service's arguments as keywords. ``permissions`` is the
-plugin permission backend (:mod:`cms.core.services.permissions`) the service
+plugin permission backend (:mod:`cms.core.permissions`) the service
 resolved, or ``None`` for a dry run, which falls back to the default one.
 ``plugins``, if given, is the list of plugins the operation copies, which the
 service has already loaded; a dry run leaves it out and the check loads it.
@@ -28,9 +28,9 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied, Valid
 from django.utils.translation import gettext_lazy as _
 
 from cms import operations
+from cms.core.permissions import get_permissions
 from cms.core.plugin_pool import plugin_pool
 from cms.core.plugins import get_plugin_disallowed_in_slot, has_reached_plugin_limit
-from cms.core.services.permissions import get_permissions
 from cms.exceptions import PluginLimitReached
 from cms.shared.checks import PERMISSION, POLICY, VALIDATION, OperationBlocked, register_check, register_core_check
 from cms.utils import get_current_site

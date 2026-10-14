@@ -15,7 +15,7 @@ from cms import operations
 from cms.extensions import checks as extension_checks  # noqa: F401  -- registers the extension checks
 from cms.extensions.models import PageContentExtension, PageExtension
 from cms.models import Page
-from cms.operations import Operation, register_operation
+from cms.operations import Argument, Operation, register_operation
 from cms.shared.operations import OperationContext, operation
 from cms.signals import PAGE_OPERATION_SIGNALS
 
@@ -81,6 +81,16 @@ for _declaration in (
             "same kind on the same object."
         ),
         service=save_extension,
+        arguments=(
+            Argument(
+                "extension",
+                type=object,
+                description=(
+                    "A new or changed page or page content extension, of an extension model the project registers, "
+                    "with extended_object set."
+                ),
+            ),
+        ),
     ),
     Operation(
         operations.DELETE_EXTENSION,
@@ -90,6 +100,13 @@ for _declaration in (
             "change the page or the translation."
         ),
         service=delete_extension,
+        arguments=(
+            Argument(
+                "extension",
+                type=object,
+                description="A stored page or page content extension, of an extension model the project registers.",
+            ),
+        ),
     ),
 ):
     register_operation(_declaration)

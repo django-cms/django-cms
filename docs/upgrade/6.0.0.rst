@@ -49,8 +49,8 @@ or an assistant.
   See :ref:`operation_checks`.
 
 * **An operation registry.** Every content operation is declared once, with a
-  stable id, a summary and a description that log entries, REST APIs and
-  assistant tool definitions share.
+  stable id, a summary, a description and its arguments, which log entries,
+  REST APIs and assistant tool definitions share.
 
 ***********************
 How to upgrade to 6.0.0
@@ -176,7 +176,7 @@ Permission backends
 
 Every service checks permissions itself, through a **permission backend**:
 
-* ``cms.core.services.permissions.PluginPermissions`` for plugins and
+* ``cms.core.permissions.PluginPermissions`` for plugins and
   placeholders,
 * ``cms.pages.permissions.PagePermissions`` for pages.
 
@@ -276,6 +276,15 @@ the service's docstring. Docstrings themselves are never translated.
 Apps declare theirs with ``cms_operations`` in their ``cms_config``, a list of
 ``cms.operations.Operation``. ``operation()`` refuses an operation that is not
 declared.
+
+Each declaration also lists the ``arguments`` a caller outside Python supplies,
+as ``cms.operations.Argument`` -- a value of a type, or a model object named by
+primary key -- and ``Operation.json_schema()`` turns them into the JSON Schema
+of a REST request body or an MCP tool's ``inputSchema``. Declared arguments are
+checked against the service's signature, and checks registered with
+``cms_checks`` may only require declared arguments; ``manage.py cms check``
+reports any that do not. An operation without ``arguments`` keeps working, but
+API and tool adapters leave it out.
 
 Plugin data cleaning
 ====================

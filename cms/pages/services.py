@@ -36,7 +36,7 @@ from cms.models import (
     PageContent,
     Placeholder,
 )
-from cms.operations import Operation, register_operation
+from cms.operations import Argument, Operation, register_operation
 from cms.pages.checks import LanguageCopyPlan
 from cms.pages.utils import get_clean_username
 from cms.permissions.cache import clear_permission_cache
@@ -562,7 +562,7 @@ def copy_language(
         operations.COPY_PAGE_LANGUAGE,
         context,
         checks={
-            "page_content": source_page_content,
+            "source_page_content": source_page_content,
             "target_language": target_language,
             "plan": plan,
             "permissions": permissions,
@@ -626,6 +626,28 @@ for _declaration in (
             "there and, for a source, to copy it."
         ),
         service=add_page,
+        arguments=(
+            Argument("site", model="sites.Site", description="The site to add the page to."),
+            Argument(
+                "parent_page",
+                model="cms.Page",
+                null=True,
+                description="The page to add the page below; null for the root of the site.",
+            ),
+            Argument(
+                "source",
+                model="cms.Page",
+                null=True,
+                description="A page or page type to copy the new page from; null for an empty page.",
+            ),
+            Argument("language", type=str, description="The language of the first translation."),
+            Argument(
+                "content_data",
+                type=dict,
+                description="The first translation's fields: title, slug, menu and meta fields, template.",
+            ),
+            Argument("is_page_type", type=bool, required=False, description="Create a page type instead of a page."),
+        ),
     ),
     Operation(
         operations.ADD_PAGE_TRANSLATION,
@@ -634,6 +656,15 @@ for _declaration in (
             "Add the content of a page in another language. Requires permission to change the page."
         ),
         service=add_translation,
+        arguments=(
+            Argument("page", model="cms.Page", description="The page."),
+            Argument("language", type=str, description="The language of the new translation."),
+            Argument(
+                "content_data",
+                type=dict,
+                description="The translation's fields: title, slug, menu and meta fields, template.",
+            ),
+        ),
     ),
     Operation(
         operations.CHANGE_PAGE_TRANSLATION,
@@ -643,6 +674,10 @@ for _declaration in (
             "permission to change this translation's content."
         ),
         service=change_page_content,
+        arguments=(
+            Argument("page_content", model="cms.PageContent", description="The page translation."),
+            Argument("data", type=dict, description="The fields that change."),
+        ),
     ),
     Operation(
         operations.CHANGE_PAGE_ADVANCED_SETTINGS,
@@ -652,6 +687,14 @@ for _declaration in (
             "apphook and redirects. Requires permission to change the page's advanced settings."
         ),
         service=change_advanced_settings,
+        arguments=(
+            Argument(
+                "page",
+                model="cms.Page",
+                instance=True,
+                description="The stored page with its advanced settings changed; other changed fields are not saved.",
+            ),
+        ),
     ),
     Operation(
         operations.MOVE_PAGE,
@@ -662,6 +705,16 @@ for _declaration in (
             "home page would end up below another page, or if a slug or URL would collide."
         ),
         service=move_page,
+        arguments=(
+            Argument("page", model="cms.Page", description="The page to move, with its descendants."),
+            Argument("target_page", model="cms.Page", description="The page the position is relative to."),
+            Argument(
+                "position",
+                type=str,
+                choices=("left", "right", "first-child", "last-child"),
+                description="Where the page goes relative to target_page: as its sibling, or as its first or last child.",
+            ),
+        ),
     ),
     Operation(
         operations.COPY_PAGE,
@@ -672,6 +725,28 @@ for _declaration in (
             "the target. Refused if the page has none of the target site's languages."
         ),
         service=copy_page_tree,
+        arguments=(
+            Argument("page", model="cms.Page", description="The page to copy, with its descendants."),
+            Argument(
+                "target_page",
+                model="cms.Page",
+                null=True,
+                description="The page the position is relative to; null for the root of the target site.",
+            ),
+            Argument(
+                "position",
+                type=str,
+                choices=("left", "right", "first-child", "last-child"),
+                description="Where the page goes relative to target_page: as its sibling, or as its first or last child.",
+            ),
+            Argument("target_site", model="sites.Site", description="The site to copy to."),
+            Argument(
+                "copy_permissions",
+                type=bool,
+                required=False,
+                description="Copy the page permission grants as well.",
+            ),
+        ),
     ),
     Operation(
         operations.COPY_PAGE_FROM_SOURCE,
@@ -681,6 +756,18 @@ for _declaration in (
             "the source, or to view a page type of the target site, and to add a page at the target."
         ),
         service=copy_page_from_source,
+        arguments=(
+            Argument("source", model="cms.Page", description="The page or page type to create the page from."),
+            Argument("target_site", model="sites.Site", description="The site to create the page on."),
+            Argument(
+                "parent_page",
+                model="cms.Page",
+                null=True,
+                description="The page to create the page below; null for the root of the site.",
+            ),
+            Argument("language", type=str, description="The language the caller creates the translation in."),
+            Argument("create_page_type", type=bool, required=False, description="Create a page type instead of a page."),
+        ),
     ),
     Operation(
         operations.SET_HOME,
@@ -691,12 +778,18 @@ for _declaration in (
             "home page."
         ),
         service=set_home,
+        arguments=(
+            Argument("page", model="cms.Page", description="The page."),
+        ),
     ),
     Operation(
         operations.DELETE_PAGE,
         summary=_lazy("Delete a page"),
         description="Delete a page with its descendants. Requires permission to delete the page.",
         service=delete_page,
+        arguments=(
+            Argument("page", model="cms.Page", description="The page to delete, with its descendants."),
+        ),
     ),
     Operation(
         operations.DELETE_PAGE_TRANSLATION,
@@ -706,6 +799,9 @@ for _declaration in (
             "translation. Refused for the page's only translation."
         ),
         service=delete_translation,
+        arguments=(
+            Argument("page_content", model="cms.PageContent", description="The page translation."),
+        ),
     ),
     Operation(
         operations.CHANGE_PAGE_TEMPLATE,
@@ -715,6 +811,10 @@ for _declaration in (
             "translation. Refused for a template the project does not offer."
         ),
         service=change_template,
+        arguments=(
+            Argument("page_content", model="cms.PageContent", description="The page translation."),
+            Argument("template", type=str, description="The template's path, one of the project's CMS_TEMPLATES."),
+        ),
     ),
     Operation(
         operations.COPY_PAGE_LANGUAGE,
@@ -725,6 +825,10 @@ for _declaration in (
             "placeholder. Refused if the page has no content in the target language."
         ),
         service=copy_language,
+        arguments=(
+            Argument("source_page_content", model="cms.PageContent", description="The translation to copy the plugins of."),
+            Argument("target_language", type=str, description="The language of the translation to copy the plugins into."),
+        ),
     ),
     Operation(
         operations.TOGGLE_PAGE_IN_NAVIGATION,
@@ -734,6 +838,9 @@ for _declaration in (
             "change the translation."
         ),
         service=toggle_in_navigation,
+        arguments=(
+            Argument("page_content", model="cms.PageContent", description="The page translation."),
+        ),
     ),
 ):
     register_operation(_declaration)

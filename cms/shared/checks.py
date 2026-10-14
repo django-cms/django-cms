@@ -43,11 +43,14 @@ from dataclasses import dataclass, field
 
 from django.core.exceptions import PermissionDenied, ValidationError
 
+from cms.operations import get_operations
+
 __all__ = [
     "PERMISSION",
     "POLICY",
     "VALIDATION",
     "OperationBlocked",
+    "argument_problems",
     "Reason",
     "Verdict",
     "can",
@@ -144,6 +147,30 @@ def get_checks(operation: str) -> list[_Entry]:
     entries = [extensions.pop(name, entry) for name, entry in _core.get(operation, {}).items()]
     entries += extensions.values()
     return sorted(entries, key=lambda entry: KINDS.index(entry.kind))
+
+
+def argument_problems() -> list[str]:
+    """Checks that require an argument their operation does not declare.
+
+    An adapter -- REST, MCP -- calls :func:`can` with the operation's declared
+    arguments. A check requiring any other name is skipped in that dry run
+    (:attr:`Verdict.skipped`), so the dry run approves what the service may
+    refuse. Operations without declared arguments are not checked. ``manage.py
+    cms check`` reports these.
+    """
+    problems = []
+    for declaration in get_operations():
+        if declaration.arguments is None:
+            continue
+        declared = {argument.name for argument in declaration.arguments}
+        for entry in get_checks(declaration.id):
+            problems.extend(
+                f"Check {entry.name!r} of operation {declaration.id!r} requires {name!r}, "
+                f"which the operation does not declare."
+                for name in entry.requires
+                if name not in declared
+            )
+    return problems
 
 
 def run_checks(operation: str, context, **target) -> None:
