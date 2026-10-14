@@ -664,7 +664,8 @@ class QueryRegistryTest(RegistryIsolationMixin, CMSTestCase):
             [query.id for query in operations.get_queries()],
             [
                 "get_object_placeholders", "get_placeholder", "get_plugin", "get_plugin_tree",
-                "get_page", "get_page_by_path", "get_page_content", "get_page_contents", "get_page_tree",
+                "get_page", "get_page_by_path", "get_page_content", "get_page_content_by_path", "get_page_contents",
+                "get_page_tree",
                 "search_pages",
             ],
         )

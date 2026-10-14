@@ -313,6 +313,7 @@ affected.
 ``cms.pages.queries`` reads pages the same way: ``get_page``,
 ``get_page_by_path`` (site and path, as the page view resolves it),
 ``get_page_content`` (with the site's fallback languages),
+``get_page_content_by_path`` (both in one: what the page view shows at a path),
 ``get_page_contents`` and ``get_page_tree`` (every readable page of a site,
 one content per page, in tree order, page types left out) and
 ``search_pages`` (``Page.objects.search`` matching). In published mode they

@@ -41,6 +41,7 @@ __all__ = [
     "get_page",
     "get_page_by_path",
     "get_page_content",
+    "get_page_content_by_path",
     "get_page_contents",
     "get_page_tree",
     "search_pages",
@@ -111,15 +112,27 @@ def get_page_by_path(
 
     :raises Page.DoesNotExist: if there is none, or the user may not read it.
     """
+    page = _page_at(site, path, language)
+    if page is None:
+        raise _hidden(Page)
+    return _readable_page(page, context, admin)
+
+
+def _page_at(site: Site, path: str, language: str | None) -> Page | None:
+    """The page at ``path``, its URLs with that path cached on it; ``None`` if there is none.
+
+    Two pages may share a path in different languages: the one with the path in
+    ``language`` wins, then the one whose URL was created first.
+    """
     page_urls = list(
-        PageUrl.objects.get_for_site(site).filter(path=path.strip("/")).select_related("page").order_by("pk")
+        PageUrl.objects.get_for_site(site).filter(path=path.strip("/")).select_related("page__site").order_by("pk")
     )
     if not page_urls:
-        raise _hidden(Page)
+        return None
     chosen = next((url for url in page_urls if url.language == language), page_urls[0])
     page = chosen.page
     page.urls_cache = {url.language: url for url in page_urls if url.page_id == page.pk}
-    return _readable_page(page, context, admin)
+    return page
 
 
 def get_page_content(
@@ -136,8 +149,37 @@ def get_page_content(
 
     :raises PageContent.DoesNotExist: if there is none, or the user may not read it.
     """
-    languages = _languages(page.site_id, language, fallback)
-    candidates = _contents(admin).filter(page_id=page.pk, language__in=languages).select_related("page__site")
+    return _readable_content(page.pk, page.site_id, language, context, admin, fallback)
+
+
+def get_page_content_by_path(
+    site: Site, path: str, language: str, context, *, admin: bool = False, fallback: bool = True
+) -> PageContent:
+    """The content in ``language`` of the page of ``site`` at ``path``: what the page view shows there.
+
+    :func:`get_page_by_path` and :func:`get_page_content` in one, with one
+    content query and one visibility check: the page at ``path`` -- in
+    ``language`` if two pages share it -- and its content in ``language`` or,
+    with ``fallback``, its first fallback language. ``content.page`` carries the
+    page's URLs with ``path`` (``urls_cache``).
+
+    :raises PageContent.DoesNotExist: if there is no such page or content, or the user may not read it.
+    """
+    page = _page_at(site, path, language)
+    if page is None:
+        raise _hidden(PageContent)
+    content = _readable_content(page.pk, site.pk, language, context, admin, fallback)
+    content.page = page
+    return content
+
+
+def _readable_content(page_id, site_id, language, context, admin: bool, fallback: bool) -> PageContent:
+    """The best content of a page by language and fallback, if the user may read it; read once, checked once.
+
+    Read through the mode's manager, never from the page's content caches.
+    """
+    languages = _languages(site_id, language, fallback)
+    candidates = _contents(admin).filter(page_id=page_id, language__in=languages).select_related("page__site")
     contents = _one_per_page(candidates, languages)
     if not contents or not _visible(_user(context), contents, contents[0].page.site, admin):
         raise _hidden(PageContent)
@@ -298,6 +340,25 @@ for _declaration in (
             _FALLBACK,
         ),
         returns=Result(model="cms.PageContent", description="The content."),
+        modes=_BOTH,
+    ),
+    Query(
+        "get_page_content_by_path",
+        summary=_lazy("A page's content by its path"),
+        description=(
+            'The content of the page of a site at a URL path -- "about/team", or "" for the home page -- in a '
+            "language, or in the site's first fallback language that has content: what the page view shows "
+            "there. If two pages share the path in different languages, the one with it in this language wins. "
+            "Not found if there is no such page or content, or the user may not view the page."
+        ),
+        service=get_page_content_by_path,
+        arguments=(
+            _SITE,
+            Argument("path", type=str, description="The page's path, without the language prefix."),
+            _LANGUAGE,
+            _FALLBACK,
+        ),
+        returns=Result(model="cms.PageContent", description="The content; content.page is set, with its URLs."),
         modes=_BOTH,
     ),
     Query(

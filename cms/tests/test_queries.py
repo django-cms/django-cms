@@ -459,7 +459,8 @@ class PageReadsTest(CMSTestCase):
         from cms import operations as operation_registry
         from cms.shared.lookups import get_lookup
 
-        for query_id in ("get_page", "get_page_by_path", "get_page_content", "get_page_contents",
+        for query_id in ("get_page", "get_page_by_path", "get_page_content", "get_page_content_by_path",
+                         "get_page_contents",
                          "get_page_tree", "search_pages"):
             query = operation_registry.get_query(query_id)
             with self.subTest(query=query_id):
@@ -570,3 +571,61 @@ class PageReadsTest(CMSTestCase):
         self.assertEqual((german, english), (b, a))
         self.assertEqual(german.get_path("en"), "bee")
         self.assertEqual(english.get_path("de"), "a-de")
+
+    # -- path to content ---------------------------------------------------------------
+
+    def test_content_by_path(self):
+        home = page_queries.get_page_content_by_path(self.site, "", "de", self.anonymous)
+        team = page_queries.get_page_content_by_path(self.site, "/about/team/", "de", self.anonymous)
+
+        self.assertEqual((home.page, home.language, home.title), (self.home, "de", "Startseite"))
+        self.assertEqual((team.page, team.language), (self.team, "en"))  # fallback
+        self.assertIn("en", team.page.urls_cache)
+        with self.assertRaises(PageContent.DoesNotExist):
+            page_queries.get_page_content_by_path(self.site, "about/team", "de", self.anonymous, fallback=False)
+        with self.assertRaises(PageContent.DoesNotExist):
+            page_queries.get_page_content_by_path(self.site, "nowhere", "en", self.anonymous)
+
+    def test_content_by_path_applies_visibility(self):
+        self.restrict(self.about)
+        for path in ("about", "about/team", "members"):
+            with self.subTest(path=path):
+                with self.assertRaises(PageContent.DoesNotExist):
+                    page_queries.get_page_content_by_path(self.site, path, "en", self.anonymous)
+                self.assertTrue(page_queries.get_page_content_by_path(self.site, path, "en", self.member))
+        with self.assertRaises(PageContent.DoesNotExist):
+            page_queries.get_page_content_by_path(self.site, "about", "en", self.member, admin=True)  # not staff
+
+    def test_content_by_path_reads_through_the_mode(self):
+        draft = self.about.get_content_obj("en")
+        public = PageContent.admin_manager.exclude(pk=draft.pk)
+        with patch.object(PageContent.objects, "get_queryset", return_value=public):
+            with self.assertRaises(PageContent.DoesNotExist):
+                page_queries.get_page_content_by_path(self.site, "about", "en", self.editor)
+            self.assertEqual(
+                page_queries.get_page_content_by_path(self.site, "about", "en", self.editor, admin=True), draft
+            )
+
+    def test_content_by_path_with_a_shared_path(self):
+        a = create_page("A", "nav_playground.html", "en", slug="shared")
+        create_page_content("de", "A de", a, slug="a-de")
+        b = create_page("B", "nav_playground.html", "en", slug="bee")
+        create_page_content("de", "B de", b, slug="shared")
+
+        german = page_queries.get_page_content_by_path(self.site, "shared", "de", self.anonymous)
+        english = page_queries.get_page_content_by_path(self.site, "shared", "en", self.anonymous)
+
+        self.assertEqual((german.page, german.title), (b, "B de"))
+        self.assertEqual((english.page, english.title), (a, "A"))
+        self.assertEqual(german.page.get_path("en"), "bee")
+        self.assertEqual(english.page.get_path("de"), "a-de")
+
+    def test_content_by_path_reads_less_than_two_calls(self):
+        page_queries.get_page_content_by_path(self.site, "about/team", "de", self.member)  # warm caches
+        with CaptureQueriesContext(connection) as combined:
+            page_queries.get_page_content_by_path(self.site, "about/team", "de", self.member)
+        with CaptureQueriesContext(connection) as chained:
+            page = page_queries.get_page_by_path(self.site, "about/team", self.member, language="de")
+            page_queries.get_page_content(page, "de", self.member)
+
+        self.assertLess(len(combined.captured_queries), len(chained.captured_queries))

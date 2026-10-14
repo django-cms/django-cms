@@ -428,8 +428,8 @@ Page reads
 ==========
 
 .. automodule:: cms.pages.queries
-    :members: get_page, get_page_by_path, get_page_content, get_page_contents, get_page_tree, search_pages,
-        PageNode
+    :members: get_page, get_page_by_path, get_page_content, get_page_content_by_path, get_page_contents,
+        get_page_tree, search_pages, PageNode
 
 The lists filter view permissions for all pages at once with
 :func:`cms.permissions.page_permissions.filter_viewable_page_contents`, the
@@ -473,8 +473,8 @@ so ``admin`` -- like ``context`` -- is never a declared argument.
 
 django CMS declares ``get_object_placeholders``, ``get_placeholder``,
 ``get_plugin``, ``get_plugin_tree``, ``get_page``, ``get_page_by_path``,
-``get_page_content``, ``get_page_contents``, ``get_page_tree`` and
-``search_pages``.
+``get_page_content``, ``get_page_content_by_path``, ``get_page_contents``,
+``get_page_tree`` and ``search_pages``.
 
 Scoped lookups
 ==============
