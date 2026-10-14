@@ -1,7 +1,11 @@
+from collections import defaultdict
+from collections.abc import Iterable
 from functools import wraps
 
+from django.utils.functional import SimpleLazyObject
+
 from cms.constants import GRANT_ALL_PERMISSIONS
-from cms.models import Page, PermissionTuple
+from cms.models import Page, PagePermission, PermissionTuple
 from cms.permissions.cache import get_permission_cache, set_permission_cache
 from cms.permissions.utils import (
     cached_func,
@@ -541,3 +545,97 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     return page_perms == GRANT_ALL_PERMISSIONS or any(
         PermissionTuple(perm).contains(page_path) for perm in page_perms
     )
+
+
+def filter_viewable_page_contents(user, page_contents: Iterable, site) -> list:
+    """The page contents among ``page_contents`` whose page ``user`` may view.
+
+    A many-pages-at-once version of :func:`user_can_view_page`: one query for the
+    view restrictions of all pages, however many there are. ``page_contents`` must
+    have their pages loaded (``select_related("page")``), with ``path``.
+
+    A page is restricted by view grants on itself and on its ancestors, so the
+    grants of every ancestor are read too, whether or not it is among
+    ``page_contents``. As in :func:`user_can_view_page`, a user who may change a
+    restricted page may view it; their change permissions are read once.
+    """
+    public_for = get_cms_setting("PUBLIC_FOR")
+    can_see_unrestricted = public_for == "all" or (public_for == "staff" and user.is_staff)
+
+    if not user.is_authenticated and not can_see_unrestricted:
+        # User is not authenticated and can't see unrestricted pages,
+        # no need to check for page restrictions because if there's some,
+        # user is anon and if there is not any, user can't see unrestricted.
+        return []
+
+    page_contents = list(page_contents)
+    if user_can_view_all_pages(user, site):
+        return page_contents
+
+    if not get_cms_setting("PERMISSION"):
+        # If there's no restrictions, let the user see all pages
+        # only if he can see unrestricted, otherwise return no pages.
+        return page_contents if can_see_unrestricted else []
+
+    # A page can only be restricted by grants on itself or its ancestors, whose
+    # paths are the prefixes of its path: read the grants of all of them at once.
+    paths = {
+        page_content.page.path[:end]
+        for page_content in page_contents
+        for end in range(Page.steplen, len(page_content.page.path) + 1, Page.steplen)
+    }
+    restrictions = PagePermission.objects.filter(page__path__in=paths, can_view=True).values(
+        "grant_on", "user_id", "group_id", "page__path"
+    )
+    user_id = user.pk
+    user_groups = SimpleLazyObject(lambda: frozenset(user.groups.values_list("pk", flat=True)))
+    is_auth_user = user.is_authenticated
+
+    # Resolve each grant scope once, regardless of how many descendants use it.
+    restrictions_by_path = defaultdict(dict)
+    for perm in restrictions:
+        perm_path = perm["page__path"]
+        scope = PermissionTuple((perm["grant_on"], perm_path))
+        grants = restrictions_by_path[perm_path]
+        grants[scope] = grants.get(scope, False) or (
+            is_auth_user and (perm["user_id"] == user_id or perm["group_id"] in user_groups)
+        )
+
+    can_change = None
+
+    def user_can_see_page(page: Page) -> bool:
+        nonlocal can_change
+        restricted = False
+        for end in range(Page.steplen, len(page.path) + 1, Page.steplen):
+            perm_path = page.path[:end]
+            for scope, granted in restrictions_by_path.get(perm_path, {}).items():
+                if not scope.contains(page.path):
+                    continue
+                if granted:
+                    return True
+                restricted = True
+
+        if restricted:
+            # Restricted, and no grant lets the user view it: they still may if
+            # they may change it, as user_can_view_page() decides.
+            if can_change is None:
+                can_change = _change_permission_predicate(user, site)
+            return can_change(page)
+        # Page has no view restrictions, fallback to the project's
+        # CMS_PUBLIC_FOR setting.
+        return can_see_unrestricted
+
+    return list(page_content for page_content in page_contents if user_can_see_page(page_content.page))
+
+
+def _change_permission_predicate(user, site):
+    """:func:`user_can_change_page` for many pages of ``site``: the permissions read once, then paths matched."""
+    if not user.is_authenticated or not user.has_perms(_django_permissions_by_action["change_page"]):
+        return lambda page: False
+    if user.is_superuser or not get_cms_setting("PERMISSION"):
+        return lambda page: True
+    perm_tuples = get_change_perm_tuples(user, site)
+    if perm_tuples == GRANT_ALL_PERMISSIONS:
+        return lambda page: True
+    perm_tuples = [PermissionTuple(perm) for perm in perm_tuples]
+    return lambda page: any(perm.contains(page.path) for perm in perm_tuples)

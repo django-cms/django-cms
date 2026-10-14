@@ -82,6 +82,7 @@ source_modules =
     cms.core.rendering
     cms.core.placeholders
     cms.core.plugins
+    cms.core.queries
 forbidden_modules =
     cms.pages.admin.page
     cms.appresolver

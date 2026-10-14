@@ -207,6 +207,10 @@ class PageContent(models.Model):
         return self.page.has_change_permission(user)
 
     def has_placeholder_view_permission(self, user):
+        # ``login_required`` is not a view permission: the page view enforces it
+        # (cms.views.details), so readers of the content must too.
+        if self.page.login_required and not user.is_authenticated:
+            return False
         return self.page.has_view_permission(user)
 
     def has_publish_permission(self, user):

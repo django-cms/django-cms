@@ -96,13 +96,16 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         .filter(path=path)
         .select_related("page", "page__site")
     )
-    page_urls = list(page_urls)  # force queryset evaluation to save 1 query
-    try:
-        page = page_urls[0].page
-        if page_urls[0].language == get_language_from_request(request):
-            page.urls_cache = {url.language: url for url in page_urls}
-    except IndexError:
-        page = None
+    page_urls = list(page_urls.order_by("pk"))  # force queryset evaluation to save 1 query
+    if not page_urls:
+        return None
+    # Paths are per language: another page may have the same path in another
+    # language. The URL in the request's language wins.
+    language = get_language_from_request(request)
+    chosen = next((url for url in page_urls if url.language == language), page_urls[0])
+    page = chosen.page
+    if chosen.language == language:
+        page.urls_cache = {url.language: url for url in page_urls if url.page_id == page.pk}
     return page
 
 

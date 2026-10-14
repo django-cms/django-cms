@@ -25,6 +25,7 @@ The older hook, ``PlaceholderRelationField.default_checks`` and the field's
 from __future__ import annotations
 
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
+from django.db import router, transaction
 from django.utils.translation import gettext_lazy as _
 
 from cms import operations
@@ -784,3 +785,67 @@ register_core_check(
     kind=POLICY,
     requires=["placeholder"],
 )
+
+
+# Stale content: a write based on a read that is no longer current is refused.
+# The caller passes the token it read (``cms.core.queries.get_plugin_tree``) as
+# ``expected_token``; without one the check does nothing.
+
+STALE_CONTENT = _("The content has changed since it was read. Reload it and try again.")
+
+
+def _content_unchanged(target):
+    """A check comparing ``expected_token`` with the placeholder ``target(**kwargs)`` names."""
+
+    def check(context, *, expected_token=None, **kwargs):
+        if expected_token is None:
+            return
+        from cms.core.models.placeholder import Placeholder
+        from cms.core.queries import placeholder_token
+
+        placeholder, language = target(**kwargs)
+        using = router.db_for_write(Placeholder)
+        locking = transaction.get_connection(using).in_atomic_block
+        if locking:
+            # Serialize writes on the placeholder: the row lock is held until the
+            # operation's transaction ends, so a second write with the same token
+            # waits, then reads the first one's changes -- with a locking read, so
+            # also under REPEATABLE READ -- and is refused. A dry run outside a
+            # transaction (can()) compares without locking.
+            list(Placeholder.objects.using(using).select_for_update().filter(pk=placeholder.pk).values_list("pk"))
+        if placeholder_token(placeholder, language, for_update=locking) != expected_token:
+            raise OperationBlocked(STALE_CONTENT)
+
+    return check
+
+
+for _operation, _target, _requires in (
+    (operations.ADD_PLUGIN, lambda placeholder, language, **kwargs: (placeholder, language), ["placeholder", "language"]),
+    (operations.CHANGE_PLUGIN, lambda plugin, **kwargs: (plugin.placeholder, plugin.language), ["plugin"]),
+    (operations.MOVE_PLUGIN, lambda plugin, **kwargs: (plugin.placeholder, plugin.language), ["plugin"]),
+    (operations.CUT_PLUGIN, lambda plugin, **kwargs: (plugin.placeholder, plugin.language), ["plugin"]),
+    (operations.DELETE_PLUGIN, lambda plugin, **kwargs: (plugin.placeholder, plugin.language), ["plugin"]),
+    (
+        operations.CLEAR_PLACEHOLDER,
+        lambda placeholder, language=None, **kwargs: (placeholder, language),
+        ["placeholder"],
+    ),
+    (
+        operations.PASTE_PLUGIN,
+        lambda target_placeholder, target_language, **kwargs: (target_placeholder, target_language),
+        ["target_placeholder", "target_language"],
+    ),
+    (
+        operations.PASTE_PLACEHOLDER,
+        lambda target_placeholder, target_language, **kwargs: (target_placeholder, target_language),
+        ["target_placeholder", "target_language"],
+    ),
+    (
+        operations.ADD_PLUGINS_FROM_PLACEHOLDER,
+        lambda target_placeholder, target_language, **kwargs: (target_placeholder, target_language),
+        ["target_placeholder", "target_language"],
+    ),
+):
+    register_core_check(
+        _operation, "cms.core.content_unchanged", _content_unchanged(_target), kind=POLICY, requires=_requires
+    )

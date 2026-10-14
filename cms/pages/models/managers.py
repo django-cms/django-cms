@@ -28,41 +28,55 @@ class PageManager(models.Manager):
         return self.get_queryset().get_home(site)
 
     def search(self, q, language=None, current_site_only=True, site=None):
-        """Simple search function
+        """Pages whose public content matches ``q``.
 
-        Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
+        A page matches if the title of its public content, or a ``search_fields``
+        field of one of the plugins in it, contains ``q``, case-insensitively; in
+        ``language`` if given. Only public content is searched
+        (``PageContent.objects``; with djangocms-versioning, the published
+        version), so a page never matches by text only a draft contains.
         """
-        from cms.core.plugin_pool import plugin_pool
+        from cms.pages.models.content import PageContent
 
         qs = self.get_queryset()
 
         if site or current_site_only:
             qs = qs.on_site(site)
 
-        qt = Q(pagecontent_set__title__icontains=q)
+        matching = search_page_contents(PageContent.objects.all(), q, language)
+        return qs.filter(pk__in=matching.values("page_id")).distinct()
 
-        # find 'searchable' plugins and build query
-        qp = Q()
-        plugins = plugin_pool.registered_plugins
-        for plugin in plugins:
-            cmsplugin = plugin.model
-            if not (
-                hasattr(cmsplugin, 'search_fields') and hasattr(cmsplugin, 'cmsplugin_ptr')
-            ):
-                continue
-            field = cmsplugin.cmsplugin_ptr.field
-            related_query_name = field.related_query_name()
-            if related_query_name and not related_query_name.startswith('+'):
-                for field in cmsplugin.search_fields:
-                    qp |= Q(**{
-                        f'pagecontent_set__placeholders__cmsplugin__{related_query_name}__{field}__icontains': q})
-        if language:
-            qt &= Q(pagecontent_set__language=language)
-            qp &= Q(pagecontent_set__placeholders__cmsplugin__language=language)
 
-        qs = qs.filter(qt | qp)
+def search_page_contents(page_contents, q, language=None):
+    """The contents among ``page_contents`` matching ``q``, as :meth:`PageManager.search` matches.
 
-        return qs.distinct()
+    Their title, or a ``search_fields`` field of one of their plugins, contains
+    ``q``, case-insensitively; with ``language``, plugins in that language and
+    contents in it. ``page_contents`` decides which content is searched: the
+    public content, or the editor's (``PageContent.admin_manager``).
+    """
+    from cms.core.plugin_pool import plugin_pool
+
+    qt = Q(title__icontains=q)
+
+    # find 'searchable' plugins and build query
+    qp = Q()
+    for plugin in plugin_pool.registered_plugins:
+        cmsplugin = plugin.model
+        if not (
+            hasattr(cmsplugin, 'search_fields') and hasattr(cmsplugin, 'cmsplugin_ptr')
+        ):
+            continue
+        field = cmsplugin.cmsplugin_ptr.field
+        related_query_name = field.related_query_name()
+        if related_query_name and not related_query_name.startswith('+'):
+            for field in cmsplugin.search_fields:
+                qp |= Q(**{f'placeholders__cmsplugin__{related_query_name}__{field}__icontains': q})
+    if language:
+        qt &= Q(language=language)
+        qp &= Q(placeholders__cmsplugin__language=language)
+
+    return page_contents.filter(qt | qp).distinct()
 
 
 class WithUserMixin:

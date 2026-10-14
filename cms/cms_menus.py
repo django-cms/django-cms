@@ -8,7 +8,7 @@ from cms import constants
 from cms.models import Page, PageContent, PagePermission, PageUrl
 from cms.pages.apphook_pool import apphook_pool
 from cms.permissions.models import PermissionTuple
-from cms.permissions.page_permissions import user_can_view_all_pages
+from cms.permissions.page_permissions import filter_viewable_page_contents
 from cms.shared.editing_urls import get_object_edit_url, get_object_preview_url
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
@@ -27,65 +27,8 @@ VISIBLE_FOR_ANONYMOUS = constants.VISIBILITY_ALL, constants.VISIBILITY_ANONYMOUS
 
 
 def get_visible_page_contents(request, page_contents: Iterable[PageContent], site) -> Iterable[PageContent]:
-    """
-    This code is a many-pages-at-once version of cms.utils.page_permissions.user_can_view_page.
-    `pages` contains all published pages.
-    """
-    public_for = get_cms_setting("PUBLIC_FOR")
-    can_see_unrestricted = public_for == "all" or (public_for == "staff" and request.user.is_staff)
-
-    if not request.user.is_authenticated and not can_see_unrestricted:
-        # User is not authenticated and can't see unrestricted pages,
-        # no need to check for page restrictions because if there's some,
-        # user is anon and if there is not any, user can't see unrestricted.
-        return []
-
-    if user_can_view_all_pages(request.user, site):
-        return page_contents
-
-    if not get_cms_setting("PERMISSION"):
-        # If there's no restrictions, let the user see all pages
-        # only if he can see unrestricted, otherwise return no pages.
-        return page_contents if can_see_unrestricted else []
-
-    restrictions = PagePermission.objects.filter(
-        page_id__in={page_content.page.pk for page_content in page_contents},
-        can_view=True,
-    )
-    # Index restrictions by the path of their page. A page can only be restricted
-    # by restrictions on itself or its ancestors, whose paths are prefixes of its path.
-    # The paths come from the loaded pages, so perm.page is never queried.
-    page_paths = {page_content.page.pk: page_content.page.path for page_content in page_contents}
-    user_id = request.user.pk
-    user_groups = SimpleLazyObject(lambda: frozenset(request.user.groups.values_list("pk", flat=True)))
-    is_auth_user = request.user.is_authenticated
-
-    # Resolve each grant scope once, regardless of how many descendants use it.
-    restrictions_by_path = defaultdict(dict)
-    for perm in restrictions:
-        perm_path = page_paths[perm.page_id]
-        scope = PermissionTuple((perm.grant_on, perm_path))
-        grants = restrictions_by_path[perm_path]
-        grants[scope] = grants.get(scope, False) or (
-            is_auth_user and (perm.user_id == user_id or perm.group_id in user_groups)
-        )
-
-    def user_can_see_page(page: Page) -> bool:
-        restricted = False
-        for end in range(Page.steplen, len(page.path) + 1, Page.steplen):
-            perm_path = page.path[:end]
-            for scope, granted in restrictions_by_path.get(perm_path, {}).items():
-                if not scope.contains(page.path):
-                    continue
-                if granted:
-                    return True
-                restricted = True
-
-        # Page has no view restrictions, fallback to the project's
-        # CMS_PUBLIC_FOR setting.
-        return can_see_unrestricted and not restricted
-
-    return list(page_content for page_content in page_contents if user_can_see_page(page_content.page))
+    """The page contents ``request.user`` may view, see :func:`~cms.permissions.page_permissions.filter_viewable_page_contents`."""
+    return filter_viewable_page_contents(request.user, page_contents, site)
 
 
 class CMSNavigationNode(NavigationNode):

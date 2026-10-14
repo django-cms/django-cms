@@ -286,6 +286,67 @@ checked against the service's signature, and checks registered with
 reports any that do not. An operation without ``arguments`` keeps working, but
 API and tool adapters leave it out.
 
+``returns`` declares what the service returns, as ``cms.operations.Result``;
+``Operation.output_schema()`` describes it for a REST response or an MCP tool's
+``outputSchema``. Reads are declared the same way, as ``cms.operations.Query``
+(``register_query``, ``get_queries``; ``cms_queries`` in an app's
+``cms_config``), with the modes they support.
+
+Read services and content tokens
+================================
+
+``cms.core.queries`` reads placeholders and plugins for an adapter without a
+request: ``get_source``, ``get_placeholders``, ``get_placeholder``,
+``get_plugin`` and ``get_plugin_tree``. By default they read what the site shows
+(the ``objects`` manager) for whoever may view it; ``admin=True`` reads drafts
+(``admin_manager``) for active staff users. ``cms.shared.lookups``
+maps model labels to these scoped lookups (``cms.placeholder``,
+``cms.cmsplugin``, ``cms.pagecontent``), so that REST and MCP adapters resolve
+primary keys without querying models themselves.
+
+``get_plugin_tree()`` returns a content token. The plugin operations that change
+a placeholder take it back as ``expected_token`` and refuse with
+``OperationBlocked`` if the content changed since (check
+``cms.core.content_unchanged``). Existing callers pass no token and are not
+affected.
+
+``cms.pages.queries`` reads pages the same way: ``get_page``,
+``get_page_by_path`` (site and path, as the page view resolves it),
+``get_page_content`` (with the site's fallback languages),
+``get_page_contents`` and ``get_page_tree`` (every readable page of a site,
+one content per page, in tree order, page types left out) and
+``search_pages`` (``Page.objects.search`` matching). In published mode they
+apply view restrictions, ``CMS_PUBLIC_FOR`` and ``login_required``; lists check
+view permissions for all pages in a fixed number of queries.
+
+``Page.objects.search()`` now searches public content only
+(``PageContent.objects``; with djangocms-versioning, the published version):
+a page no longer matches by text that only one of its drafts contains. The
+matching itself is unchanged and available for any page contents as
+``cms.pages.models.managers.search_page_contents(page_contents, q, language)``;
+``search_pages(..., admin=True)`` uses it to search the editor's content.
+
+Paths are per language, so two pages can share one in different languages
+(page A is ``shared`` in English, page B ``shared`` in German).
+``get_page_from_request()`` now prefers the page whose URL with that path is in
+the request's language, where it used to take either, and caches only that
+page's own URLs on it: before, page A's cache could hold page B's German URL,
+and ``page.get_path("de")`` returned B's path. ``get_page_by_path()`` takes an
+optional ``language`` for the same choice.
+
+The menu's bulk view-permission filter is now
+``cms.permissions.page_permissions.filter_viewable_page_contents(user,
+page_contents, site)``; ``cms.cms_menus.get_visible_page_contents(request, ...)``
+calls it. It now also reads the view restrictions of ancestors that are not
+among the pages passed in: before, a restricted page without content in the
+menu's languages did not hide its descendants. It also applies the rule of
+``user_can_view_page()`` that a user who may change a restricted page may view
+it, so such pages now appear in that user's menu too.
+
+``PageContent.has_placeholder_view_permission()`` now refuses anonymous users
+for a page with ``login_required``, as the page view always has. Code relying on
+it no longer has to check ``login_required`` itself.
+
 Plugin data cleaning
 ====================
 

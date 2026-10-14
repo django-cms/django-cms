@@ -6,13 +6,17 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_base import CMSAppConfig, CMSAppExtension
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
-from cms.core import services as plugin_services  # noqa: F401  -- declares the plugin operations
+from cms.core import (
+    queries as core_queries,  # noqa: F401  -- registers the placeholder and plugin lookups
+    services as plugin_services,  # noqa: F401  -- declares the plugin operations
+)
 from cms.extensions import services as extension_services  # noqa: F401  -- declares the extension operations
 from cms.models import PageContent
-from cms.operations import Operation, register_operation
+from cms.operations import Operation, Query, register_operation, register_query
 from cms.pages import (
     checks as page_checks,  # noqa: F401  -- registers the page operation checks
     editing,  # noqa: F401  -- registers the page editing hooks
+    queries as page_queries,  # noqa: F401  -- registers the page content lookup
     services as page_services,  # noqa: F401  -- declares the page operations
 )
 from cms.pages.rendering import render_pagecontent
@@ -136,6 +140,21 @@ class CMSCoreExtensions(CMSAppExtension):
                 raise ImproperlyConfigured(f"Editability check {name!r} is not callable")
             register_editability_check(name, check)
 
+    def configure_queries(self, cms_config):
+        """Declares the reads of an app, see :mod:`cms.operations`.
+
+        ``cms_queries`` is a list of :class:`~cms.operations.Query`.
+        """
+        if not isinstance(cms_config.cms_queries, Iterable):
+            raise ImproperlyConfigured("cms_queries must be a list of Query declarations")
+        for declaration in cms_config.cms_queries:
+            if not isinstance(declaration, Query):
+                raise ImproperlyConfigured(f"{declaration!r} in cms_queries is not a Query")
+            try:
+                register_query(declaration)
+            except ValueError as error:
+                raise ImproperlyConfigured(str(error)) from error
+
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here
         # just move on.
@@ -147,6 +166,8 @@ class CMSCoreExtensions(CMSAppExtension):
             self.configure_toolbar_mixin(cms_config)
         if hasattr(cms_config, 'cms_operations'):
             self.configure_operations(cms_config)
+        if hasattr(cms_config, 'cms_queries'):
+            self.configure_queries(cms_config)
         if hasattr(cms_config, 'cms_checks'):
             self.configure_checks(cms_config)
         if hasattr(cms_config, 'cms_editability_checks'):

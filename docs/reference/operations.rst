@@ -44,9 +44,17 @@ description, the service performing it and the arguments a caller supplies.
     as :class:`Argument` declarations. :meth:`Operation.json_schema` turns them
     into the JSON Schema both use for a request body or an ``inputSchema``.
     ``None`` if not declared; adapters leave such operations out.
+``returns``
+    What the service returns, as a :class:`Result`.
+    :meth:`Operation.output_schema` describes it as JSON Schema, for a REST
+    response or an MCP ``outputSchema``. A model object is marked with its
+    label as ``x-cms-model``: serializing it is the adapter's job.
 
 .. autoclass:: cms.operations.Operation
-    :members: id, summary, description, service, arguments, json_schema
+    :members: id, summary, description, service, arguments, returns, json_schema, output_schema
+
+.. autoclass:: cms.operations.Result
+    :members: json_schema, models, is_empty
 
 .. autoclass:: cms.operations.Argument
     :members: json_schema, models
@@ -102,7 +110,8 @@ Declaring operations from an app
             ),
         ]
 
-``cms_operations`` is a list of :class:`~cms.operations.Operation`. Prefix the
+``cms_operations`` is a list of :class:`~cms.operations.Operation`; reads go
+into ``cms_queries``, a list of :class:`~cms.operations.Query`. Prefix the
 ids with the app's label, so that they cannot collide with the ids of django CMS
 or other apps; declaring an id twice raises ``ImproperlyConfigured``.
 
@@ -384,6 +393,97 @@ Permission backends
 .. autoclass:: cms.core.permissions.AdminPluginPermissions
 
 .. autofunction:: cms.core.permissions.get_permissions
+
+
+*************
+Read services
+*************
+
+Read services give an adapter -- a REST endpoint, an MCP resource -- the content a
+user is about to change, decided by the same rules as the services. They take an
+:class:`~cms.shared.operations.OperationContext` and return model objects.
+
+Every read takes an ``admin`` flag:
+
+``admin=False`` (default)
+    What the site shows: the source model's ``objects`` manager -- with
+    djangocms-versioning, the published version -- for whoever the source's
+    ``has_placeholder_view_permission`` lets view it, anonymous visitors
+    included. A model without that hook never has its placeholders read this
+    way; ``PageContent`` defines it (page view permission and
+    ``login_required``).
+``admin=True``
+    What an editor sees: the ``admin_manager``, drafts included, for active
+    staff users who may view the source. Use it to resolve the arguments of a
+    write.
+
+Content a user may not read raises its model's ``DoesNotExist``, exactly as
+content that does not exist.
+
+.. automodule:: cms.core.queries
+    :members: get_source, get_placeholders, get_placeholder, get_plugin, get_plugin_tree, placeholder_token,
+        PlaceholderContent
+
+Page reads
+==========
+
+.. automodule:: cms.pages.queries
+    :members: get_page, get_page_by_path, get_page_content, get_page_contents, get_page_tree, search_pages,
+        PageNode
+
+The lists filter view permissions for all pages at once with
+:func:`cms.permissions.page_permissions.filter_viewable_page_contents`, the
+function the menu uses.
+
+Content tokens
+==============
+
+:func:`~cms.core.queries.get_plugin_tree` returns a token for the placeholder's
+content in that language. The plugin operations that change a placeholder --
+``add_plugin``, ``change_plugin``, ``move_plugin``, ``cut_plugin``,
+``delete_plugin``, ``clear_placeholder``, ``paste_plugin``,
+``paste_placeholder`` and ``add_plugins_from_placeholder`` -- take it back as
+``expected_token``. The policy check ``cms.core.content_unchanged`` refuses the
+operation with :class:`~cms.shared.checks.OperationBlocked` if the content has
+changed since, and :func:`~cms.shared.checks.can` reports it. Without
+``expected_token`` the check does nothing.
+
+The token covers the placeholder the operation changes: the plugin's own
+placeholder for ``move_plugin``, not the target.
+
+Declared reads
+==============
+
+Reads are declared like operations, as a :class:`~cms.operations.Query`, so
+that a REST interface can offer them in its OpenAPI schema and an MCP server as
+resource templates. Ids are unique across operations and queries.
+
+.. autoclass:: cms.operations.Query
+    :members: id, summary, description, service, arguments, returns, modes, json_schema, output_schema
+
+.. autofunction:: cms.operations.register_query
+
+.. autofunction:: cms.operations.get_query
+
+.. autofunction:: cms.operations.get_queries
+
+``modes`` lists ``"published"``, ``"editing"`` or both. A read offering
+``"editing"`` takes ``admin``; the adapter sets it from the mode it reads in,
+so ``admin`` -- like ``context`` -- is never a declared argument.
+
+django CMS declares ``get_object_placeholders``, ``get_placeholder``,
+``get_plugin``, ``get_plugin_tree``, ``get_page``, ``get_page_by_path``,
+``get_page_content``, ``get_page_contents``, ``get_page_tree`` and
+``search_pages``.
+
+Scoped lookups
+==============
+
+.. automodule:: cms.shared.lookups
+    :members: register_lookup, get_lookup, lookup, lookup_many
+
+django CMS registers lookups for ``cms.placeholder``, ``cms.cmsplugin``,
+``cms.page``, ``cms.pagecontent`` and ``sites.site``.
 
 
 *****************

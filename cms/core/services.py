@@ -32,7 +32,7 @@ from cms.core.permissions import get_permissions
 from cms.core.plugin_pool import plugin_pool
 from cms.core.plugins import copy_plugins_to_placeholder
 from cms.models import CMSPlugin, PlaceholderReference
-from cms.operations import Argument, Operation, register_operation
+from cms.operations import Argument, Operation, Result, register_operation
 from cms.shared.checks import run_checks
 from cms.shared.operations import OperationContext, operation
 from cms.signals import PLACEHOLDER_OPERATION_SIGNALS, post_placeholder_operation, pre_placeholder_operation
@@ -126,6 +126,7 @@ def add_plugin(
     position="last-child",
     target=None,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     form=None,
     sender=None,
@@ -157,6 +158,7 @@ def add_plugin(
             position=position,
             target=target,
             permissions=_guard(permissions, context),
+            expected_token=expected_token,
             instance=form.instance if form is not None else None,
         )
         save_m2m = form is None
@@ -196,6 +198,7 @@ def change_plugin(
     data: dict | None = None,
     *,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     form=None,
     sender=None,
@@ -217,6 +220,7 @@ def change_plugin(
             plugin=plugin,
             data=data,
             permissions=_guard(permissions, context),
+            expected_token=expected_token,
         )
         plugin_class = plugin_pool.get_plugin(plugin.plugin_type)
         old_plugin = plugin_class.model.objects.get(pk=plugin.pk)
@@ -249,6 +253,7 @@ def move_plugin(
     target_parent=None,
     *,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     sender=None,
 ) -> CMSPlugin:
@@ -265,6 +270,7 @@ def move_plugin(
         operations.MOVE_PLUGIN,
         context,
         checks={
+            "expected_token": expected_token,
             "plugin": plugin,
             "target_position": target_position,
             "target_placeholder": target_placeholder,
@@ -304,6 +310,7 @@ def cut_plugin(
     target_placeholder,
     *,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     sender=None,
 ) -> CMSPlugin:
@@ -316,6 +323,7 @@ def cut_plugin(
         operations.CUT_PLUGIN,
         context,
         checks={
+            "expected_token": expected_token,
             "plugin": plugin,
             "target_language": target_language,
             "target_placeholder": target_placeholder,
@@ -366,6 +374,7 @@ def paste_plugin(
     target_parent=None,
     *,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     sender=None,
 ) -> CMSPlugin:
@@ -380,6 +389,7 @@ def paste_plugin(
         operations.PASTE_PLUGIN,
         context,
         checks={
+            "expected_token": expected_token,
             "plugin": plugin,
             "target_language": target_language,
             "target_placeholder": target_placeholder,
@@ -420,6 +430,7 @@ def paste_placeholder(
     target_position: int,
     *,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     sender=None,
 ) -> list[CMSPlugin]:
@@ -434,6 +445,7 @@ def paste_placeholder(
         operations.PASTE_PLACEHOLDER,
         context,
         checks={
+            "expected_token": expected_token,
             "plugin": plugin,
             "target_language": target_language,
             "target_placeholder": target_placeholder,
@@ -553,6 +565,7 @@ def add_plugins_from_placeholder(
     target_language: str,
     *,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     sender=None,
 ) -> list[CMSPlugin]:
@@ -567,6 +580,7 @@ def add_plugins_from_placeholder(
         operations.ADD_PLUGINS_FROM_PLACEHOLDER,
         context,
         checks={
+            "expected_token": expected_token,
             "source_placeholder": source_placeholder,
             "target_placeholder": target_placeholder,
             "source_language": source_language,
@@ -597,7 +611,7 @@ def add_plugins_from_placeholder(
 
 
 def delete_plugin(
-    plugin: CMSPlugin, *, context: OperationContext, permissions=None, sender=None
+    plugin: CMSPlugin, *, context: OperationContext, expected_token: str | None = None, permissions=None, sender=None
 ) -> list[int]:
     """Delete a plugin and return the placeholder's resulting plugin tree order."""
     placeholder = plugin.placeholder
@@ -605,7 +619,7 @@ def delete_plugin(
     with operation(
         operations.DELETE_PLUGIN,
         context,
-        checks={"plugin": plugin, "permissions": _guard(permissions, context)},
+        checks={"expected_token": expected_token, "plugin": plugin, "permissions": _guard(permissions, context)},
         signals=PLACEHOLDER_OPERATION_SIGNALS,
         sender=sender,
         plugin=plugin,
@@ -624,6 +638,7 @@ def clear_placeholder(
     language: str | None,
     *,
     context: OperationContext,
+    expected_token: str | None = None,
     permissions=None,
     site_id: int | None = None,
     sender=None,
@@ -632,7 +647,7 @@ def clear_placeholder(
     with operation(
         operations.CLEAR_PLACEHOLDER,
         context,
-        checks={"placeholder": placeholder, "language": language, "permissions": _guard(permissions, context)},
+        checks={"expected_token": expected_token, "placeholder": placeholder, "language": language, "permissions": _guard(permissions, context)},
         signals=PLACEHOLDER_OPERATION_SIGNALS,
         sender=sender,
         plugins=placeholder.get_plugins_list(language),
@@ -684,7 +699,17 @@ for _declaration in (
                 null=True,
                 description="The plugin the position is relative to.",
             ),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the placeholder in this language as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(model="cms.CMSPlugin", description="The new plugin, as its own plugin model."),
     ),
     Operation(
         operations.CHANGE_PLUGIN,
@@ -704,7 +729,17 @@ for _declaration in (
                 null=True,
                 description="The field values that change, validated as by the plugin's form.",
             ),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the plugin's placeholder in its language as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(model="cms.CMSPlugin", description="The changed plugin."),
     ),
     Operation(
         operations.MOVE_PLUGIN,
@@ -732,7 +767,17 @@ for _declaration in (
                 null=True,
                 description="The new parent plugin; none for the top level.",
             ),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the plugin's placeholder in its language (not the target placeholder) as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(model="cms.CMSPlugin", description="The moved plugin."),
     ),
     Operation(
         operations.CUT_PLUGIN,
@@ -746,7 +791,17 @@ for _declaration in (
             Argument("plugin", model="cms.CMSPlugin", description="The plugin."),
             Argument("target_language", type=str, description="The language of the clipboard."),
             Argument("target_placeholder", model="cms.Placeholder", description="The acting user's clipboard."),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the plugin's placeholder in its language as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(model="cms.CMSPlugin", description="The plugin, now in the clipboard."),
     ),
     Operation(
         operations.PASTE_PLUGIN,
@@ -769,7 +824,17 @@ for _declaration in (
                 null=True,
                 description="The parent plugin of the copy; none for the top level.",
             ),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the target placeholder in the target language as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(model="cms.CMSPlugin", description="The copy of the plugin."),
     ),
     Operation(
         operations.PASTE_PLACEHOLDER,
@@ -784,7 +849,17 @@ for _declaration in (
             Argument("target_language", type=str, description="The language to paste into."),
             Argument("target_placeholder", model="cms.Placeholder", description="The placeholder to paste into."),
             Argument("target_position", type=int, description="The position of the first copy in the placeholder's tree."),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the target placeholder in the target language as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(model="cms.CMSPlugin", many=True, description="The copies of the plugins."),
     ),
     Operation(
         operations.ADD_PLUGINS_FROM_PLACEHOLDER,
@@ -799,7 +874,17 @@ for _declaration in (
             Argument("target_placeholder", model="cms.Placeholder", description="The placeholder to copy into."),
             Argument("source_language", type=str, description="The language to copy from."),
             Argument("target_language", type=str, description="The language to copy into."),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the target placeholder in the target language as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(model="cms.CMSPlugin", many=True, description="The copies of the plugins."),
     ),
     Operation(
         operations.DELETE_PLUGIN,
@@ -808,7 +893,17 @@ for _declaration in (
         service=delete_plugin,
         arguments=(
             Argument("plugin", model="cms.CMSPlugin", description="The plugin."),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the plugin's placeholder in its language as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(type=int, many=True, description="The ids of the placeholder's remaining plugins, in tree order."),
     ),
     Operation(
         operations.CLEAR_PLACEHOLDER,
@@ -821,7 +916,17 @@ for _declaration in (
         arguments=(
             Argument("placeholder", model="cms.Placeholder", description="The placeholder to clear."),
             Argument("language", type=str, null=True, description="The language to clear; all languages if null."),
+            Argument(
+                "expected_token",
+                type=str,
+                required=False,
+                description=(
+                    "The token of the placeholder in this language, or in all languages if none is given as last read. If given, the operation is refused when the content has changed "
+                    "since."
+                ),
+            ),
         ),
+        returns=Result(),
     ),
     Operation(
         operations.COPY_PLUGIN_TO_CLIPBOARD,
@@ -836,6 +941,7 @@ for _declaration in (
             Argument("target_placeholder", model="cms.Placeholder", description="The acting user's clipboard."),
             Argument("target_language", type=str, description="The language of the clipboard."),
         ),
+        returns=Result(model="cms.CMSPlugin", description="The copy in the clipboard."),
     ),
     Operation(
         operations.COPY_PLACEHOLDER_TO_CLIPBOARD,
@@ -851,6 +957,7 @@ for _declaration in (
             Argument("source_language", type=str, description="The language to copy."),
             Argument("target_language", type=str, description="The language of the clipboard."),
         ),
+        returns=Result(model="cms.PlaceholderReference", description="The reference plugin holding the copies."),
     ),
 ):
     register_operation(_declaration)

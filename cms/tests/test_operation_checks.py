@@ -41,12 +41,15 @@ class RegistryIsolationMixin:
         super().setUp()
         saved = {operation: dict(entries) for operation, entries in checks._extensions.items()}
         saved_operations = dict(operations._registry)
+        saved_queries = dict(operations._queries)
 
         def restore():
             checks._extensions.clear()
             checks._extensions.update(saved)
             operations._registry.clear()
             operations._registry.update(saved_operations)
+            operations._queries.clear()
+            operations._queries.update(saved_queries)
 
         self.addCleanup(restore)
 
@@ -591,6 +594,161 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
 
         with self.assertRaises(ImproperlyConfigured):
             CMSCoreExtensions().configure_app(Config)
+
+
+class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
+    """Declared results: what REST responses and MCP tools describe (RFC 9l)."""
+
+    def test_every_operation_declares_its_result(self):
+        import inspect
+
+        from django.apps import apps
+
+        for declaration in operations.get_operations():
+            with self.subTest(operation=declaration.id):
+                returns = declaration.returns
+                self.assertIsNotNone(returns)
+                annotation = str(inspect.signature(declaration.service).return_annotation)
+                # The declaration agrees with the service's annotation.
+                self.assertEqual(returns.is_empty, annotation == "None")
+                self.assertEqual(returns.many, annotation.startswith("list["))
+                for label in returns.models:
+                    model = apps.get_model(label)
+                    if len(returns.models) == 1:
+                        self.assertIn(model.__name__, annotation)
+
+    def test_output_schema(self):
+        self.assertEqual(
+            operations.get_operation(operations.MOVE_PLUGIN).output_schema(),
+            {"type": "object", "x-cms-model": "cms.cmsplugin", "description": "The moved plugin."},
+        )
+        self.assertEqual(operations.get_operation(operations.DELETE_PAGE).output_schema(), {"type": "null"})
+        self.assertEqual(
+            operations.get_operation(operations.COPY_PAGE_LANGUAGE).output_schema()["items"], {"type": "string"}
+        )
+        self.assertIsNone(operations.Operation("tests.publish", summary="Publish").output_schema())
+
+    def test_json_schema_of_results(self):
+        Result = operations.Result
+        for result, schema in (
+            (Result(), {"type": "null"}),
+            (Result(type=bool), {"type": "boolean"}),
+            (Result(model="cms.Page", null=True), {"anyOf": [{"type": "object", "x-cms-model": "cms.page"}, {"type": "null"}]}),
+            (Result(type=int, many=True), {"type": "array", "items": {"type": "integer"}}),
+            (Result(fields={"token": Result(type=str)}), {
+                "type": "object", "properties": {"token": {"type": "string"}}, "required": ["token"]
+            }),
+        ):
+            with self.subTest(result=result):
+                self.assertEqual(result.json_schema(), schema)
+
+    def test_bad_results_are_refused(self):
+        Result = operations.Result
+        for kwargs in (
+            {"type": str, "model": "cms.Page"},
+            {"type": set},
+            {"fields": {"token": str}},
+            {"type": str, "fields": {"token": Result(type=str)}},
+        ):
+            with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
+                Result(**kwargs)
+
+
+class QueryRegistryTest(RegistryIsolationMixin, CMSTestCase):
+    """Declared reads: what REST GET endpoints and MCP resources describe."""
+
+    def test_core_reads_are_declared(self):
+        from django.apps import apps
+
+        self.assertEqual(
+            [query.id for query in operations.get_queries()],
+            [
+                "get_object_placeholders", "get_placeholder", "get_plugin", "get_plugin_tree",
+                "get_page", "get_page_by_path", "get_page_content", "get_page_contents", "get_page_tree",
+                "search_pages",
+            ],
+        )
+        for query in operations.get_queries():
+            with self.subTest(query=query.id):
+                self.assertTrue(str(query.summary))
+                self.assertTrue(query.description)
+                self.assertIsNotNone(query.arguments)
+                self.assertIsNotNone(query.returns)
+                self.assertEqual(query.modes, ("published", "editing"))
+                for label in (*query.returns.models, *(m for a in query.arguments for m in a.models)):
+                    apps.get_model(label)
+
+    def test_model_arguments_of_reads_have_lookups(self):
+        from cms.shared.lookups import get_lookup
+
+        for query in operations.get_queries():
+            for argument in query.arguments:
+                for label in argument.models:
+                    with self.subTest(query=query.id, argument=argument.name):
+                        get_lookup(label)
+
+    def test_a_query_runs_with_its_declared_arguments(self):
+        page = create_page("Page", "nav_playground.html", "en")
+        content = page.get_content_obj("en")
+        query = operations.get_query("get_object_placeholders")
+        context = OperationContext(user=self.get_superuser())
+
+        for editing in (False, True):
+            placeholders = query.service(label="cms.pagecontent", pk=content.pk, context=context, admin=editing)
+            self.assertEqual(set(placeholders), set(content.get_placeholders()))
+
+    def test_admin_is_a_mode_not_an_argument(self):
+        def read(pk, *, context, admin=False):
+            """Read."""
+
+        with self.assertRaises(ValueError):
+            operations.register_query(
+                operations.Query(
+                    "tests.read", summary="Read", service=read,
+                    arguments=[operations.Argument("pk", type=int), operations.Argument("admin", type=bool)],
+                )
+            )
+
+    def test_editing_reads_need_an_admin_flag(self):
+        def read(pk, *, context):
+            """Read."""
+
+        with self.assertRaises(ValueError):
+            operations.register_query(
+                operations.Query("tests.read", summary="Read", service=read, modes=("published", "editing"))
+            )
+        with self.assertRaises(ValueError):
+            operations.register_query(operations.Query("tests.read", summary="Read", service=read, modes=("draft",)))
+        operations.register_query(operations.Query("tests.read", summary="Read", service=read))
+
+    def test_ids_are_unique_across_operations_and_queries(self):
+        with self.assertRaises(ValueError):
+            operations.register_query(operations.Query(operations.MOVE_PAGE, summary="Read"))
+        with self.assertRaises(ValueError):
+            operations.register_operation(operations.Operation("get_plugin", summary="Write"))
+
+    def test_the_description_defaults_to_the_docstring(self):
+        def read(pk, *, context):
+            """Read a thing."""
+
+        declaration = operations.register_query(operations.Query("tests.read", summary="Read", service=read))
+        self.assertEqual(declaration.description, "Read a thing.")
+        self.assertEqual(operations.get_query("tests.read"), declaration)
+        with self.assertRaises(LookupError):
+            operations.get_query("tests.unknown")
+
+    def test_cms_config_declares_queries(self):
+        class Config:
+            cms_queries = [operations.Query("tests.read", summary="Read", description="Read.")]
+
+        CMSCoreExtensions().configure_app(Config)
+        self.assertEqual(operations.get_query("tests.read").description, "Read.")
+
+        class NotAQuery:
+            cms_queries = [operations.Operation("tests.write", summary="Write")]
+
+        with self.assertRaises(ImproperlyConfigured):
+            CMSCoreExtensions().configure_app(NotAQuery)
 
 
 class PluginServiceChecksTest(RegistryIsolationMixin, CMSTestCase):

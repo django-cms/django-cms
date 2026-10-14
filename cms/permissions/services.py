@@ -15,12 +15,13 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from django.db.models import Model
 from django.utils.translation import gettext_lazy as _lazy
 
 from cms import operations
-from cms.operations import Argument, Operation, register_operation
+from cms.operations import Argument, Operation, Result, register_operation
 from cms.permissions.checks import CMS_PERMISSION_ACTIONS, cms_permission_models
-from cms.permissions.models import PageUser, PageUserGroup
+from cms.permissions.models import GlobalPagePermission, PageUser, PageUserGroup
 from cms.shared.operations import OperationContext, operation
 
 __all__ = [
@@ -42,7 +43,7 @@ def permission_accessor(obj):
 
 
 @transaction.atomic
-def set_user_permissions(data, obj, *, context: OperationContext):
+def set_user_permissions(data, obj, *, context: OperationContext) -> Model:
     """Apply the CMS model permission fields in ``data`` to a user or group.
 
     ``data`` maps ``can_<action>_<name>`` fields to booleans; a field that is
@@ -72,7 +73,7 @@ def set_user_permissions(data, obj, *, context: OperationContext):
 
 
 @transaction.atomic
-def save_page_permissions(page, *, save=(), delete=(), context: OperationContext, permissions=None):
+def save_page_permissions(page, *, save=(), delete=(), context: OperationContext, permissions=None) -> None:
     """Save and delete the page permission grants of one page.
 
     :raises ~django.core.exceptions.PermissionDenied: if the acting user may not
@@ -93,7 +94,7 @@ def save_page_permissions(page, *, save=(), delete=(), context: OperationContext
 
 
 @transaction.atomic
-def save_global_page_permission(grant, *, sites, context: OperationContext):
+def save_global_page_permission(grant, *, sites, context: OperationContext) -> GlobalPagePermission:
     """Save a site-wide page grant for ``sites``.
 
     The ``CHANGE_GLOBAL_PAGE_PERMISSION`` checks compare both
@@ -111,7 +112,7 @@ def save_global_page_permission(grant, *, sites, context: OperationContext):
 
 
 @transaction.atomic
-def delete_global_page_permission(grant, *, context: OperationContext):
+def delete_global_page_permission(grant, *, context: OperationContext) -> None:
     """Delete a site-wide grant if the acting user could have granted it.
 
     :raises ~django.core.exceptions.PermissionDenied: if the acting user may not.
@@ -159,6 +160,7 @@ for _declaration in (
                 description="Grants of the page to delete.",
             ),
         ),
+        returns=Result(),
     ),
     Operation(
         operations.CHANGE_USER_PERMISSIONS,
@@ -176,6 +178,7 @@ for _declaration in (
             ),
             Argument("obj", model=(settings.AUTH_USER_MODEL, "auth.Group"), description="The user or group."),
         ),
+        returns=Result(model=(settings.AUTH_USER_MODEL, "auth.Group"), description="The user or group."),
     ),
     Operation(
         operations.CHANGE_GLOBAL_PAGE_PERMISSION,
@@ -189,6 +192,7 @@ for _declaration in (
             Argument("grant", model="cms.GlobalPagePermission", instance=True, description="The new or changed grant."),
             Argument("sites", model="sites.Site", many=True, description="The sites the grant applies to."),
         ),
+        returns=Result(model="cms.GlobalPagePermission", description="The saved grant."),
     ),
     Operation(
         operations.DELETE_GLOBAL_PAGE_PERMISSION,
@@ -201,6 +205,7 @@ for _declaration in (
         arguments=(
             Argument("grant", model="cms.GlobalPagePermission", description="The grant to delete."),
         ),
+        returns=Result(),
     ),
 ):
     register_operation(_declaration)

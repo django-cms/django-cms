@@ -184,6 +184,52 @@ A check that needs an argument you did not pass is skipped and listed in
 ``verdict.complete`` before you rely on it.
 
 
+*********************
+Read before you write
+*********************
+
+An adapter receives primary keys and shows users content before they change it.
+Read both through the read services, which apply the same rules as the
+services -- not through the models:
+
+.. code-block:: python
+
+    from cms.core import queries
+    from cms.shared.lookups import lookup
+
+    # Objects by primary key, only if the acting user may see them. The label is
+    # the one an operation's arguments declare (``argument.models``).
+    content = lookup("cms.pagecontent", content_id, context, admin=True)
+    placeholder = queries.get_placeholders(content, context, admin=True).get(slot="content")
+
+    # The plugins in tree order, and a token for what was read.
+    tree = queries.get_plugin_tree(placeholder, "en", context, admin=True)
+    for plugin in tree.plugins:
+        print(plugin.pk, plugin.plugin_type, plugin.parent_id, plugin.position)
+
+``admin=True`` reads as an editor: drafts included (the model's
+``admin_manager``), for active staff users. Writes act on that content, so
+resolve their arguments this way. Without it, the reads return what the site
+shows (``objects``; with djangocms-versioning, the published version) to whoever
+may view it, anonymous visitors included -- what a public API serves.
+
+Content that does not exist and content the user may not see both raise
+``DoesNotExist``, so that a lookup never confirms that hidden content exists.
+
+Pass the token back when you write. If someone changed the placeholder in the
+meantime, the write is refused with ``OperationBlocked``; read again and decide
+again:
+
+.. code-block:: python
+
+    plugin_services.move_plugin(
+        lookup("cms.cmsplugin", plugin_id, context, admin=True),
+        target_position=1,
+        expected_token=tree.token,
+        context=context,
+    )
+
+
 ************************
 Group several operations
 ************************
@@ -242,6 +288,15 @@ operation, including those that installed apps declare:
 * ``json_schema()`` describes the arguments as JSON Schema, ready for a request
   body or an MCP ``inputSchema``. A model argument is the object's primary key,
   marked with its model's label as ``x-cms-model``.
+* ``output_schema()`` describes the result, from ``op.returns``. A model object
+  in it is marked ``x-cms-model``; your serializer for that model fills in its
+  fields.
+
+Reads are declared the same way, as queries: ``get_queries()`` and
+``get_query()`` return them with ``arguments``, ``returns`` and the ``modes``
+they support -- ``"published"`` and ``"editing"``. Call a query's service with
+``admin=True`` for the editing mode; ``admin`` is never one of the declared
+arguments.
 
 To call an operation with decoded JSON, turn primary keys into objects -- only
 objects the acting user may see -- and call the service with keywords:
@@ -255,7 +310,7 @@ objects the acting user may see -- and call the service with keywords:
                 continue
             value = payload[argument.name]
             if argument.models and not argument.instance and value is not None:
-                value = get_visible_object(argument.models, value, context.user)  # your lookup
+                value = lookup(argument.models[0], value, context, admin=True)  # cms.shared.lookups
             kwargs[argument.name] = value
         return op.service(**kwargs, context=context)
 

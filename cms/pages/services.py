@@ -36,7 +36,7 @@ from cms.models import (
     PageContent,
     Placeholder,
 )
-from cms.operations import Argument, Operation, register_operation
+from cms.operations import Argument, Operation, Result, register_operation
 from cms.pages.checks import LanguageCopyPlan
 from cms.pages.utils import get_clean_username
 from cms.permissions.cache import clear_permission_cache
@@ -648,6 +648,7 @@ for _declaration in (
             ),
             Argument("is_page_type", type=bool, required=False, description="Create a page type instead of a page."),
         ),
+        returns=Result(model="cms.PageContent", description="The new page's first translation."),
     ),
     Operation(
         operations.ADD_PAGE_TRANSLATION,
@@ -665,6 +666,7 @@ for _declaration in (
                 description="The translation's fields: title, slug, menu and meta fields, template.",
             ),
         ),
+        returns=Result(model="cms.PageContent", description="The new translation."),
     ),
     Operation(
         operations.CHANGE_PAGE_TRANSLATION,
@@ -678,6 +680,7 @@ for _declaration in (
             Argument("page_content", model="cms.PageContent", description="The page translation."),
             Argument("data", type=dict, description="The fields that change."),
         ),
+        returns=Result(model="cms.PageContent", description="The changed translation."),
     ),
     Operation(
         operations.CHANGE_PAGE_ADVANCED_SETTINGS,
@@ -695,6 +698,7 @@ for _declaration in (
                 description="The stored page with its advanced settings changed; other changed fields are not saved.",
             ),
         ),
+        returns=Result(model="cms.Page", description="The page."),
     ),
     Operation(
         operations.MOVE_PAGE,
@@ -715,6 +719,7 @@ for _declaration in (
                 description="Where the page goes relative to target_page: as its sibling, or as its first or last child.",
             ),
         ),
+        returns=Result(model="cms.Page", description="The moved page."),
     ),
     Operation(
         operations.COPY_PAGE,
@@ -747,6 +752,7 @@ for _declaration in (
                 description="Copy the page permission grants as well.",
             ),
         ),
+        returns=Result(model="cms.Page", description="The copy of the page."),
     ),
     Operation(
         operations.COPY_PAGE_FROM_SOURCE,
@@ -768,6 +774,7 @@ for _declaration in (
             Argument("language", type=str, description="The language the caller creates the translation in."),
             Argument("create_page_type", type=bool, required=False, description="Create a page type instead of a page."),
         ),
+        returns=Result(model="cms.Page", description="The new page, without translations yet."),
     ),
     Operation(
         operations.SET_HOME,
@@ -781,6 +788,7 @@ for _declaration in (
         arguments=(
             Argument("page", model="cms.Page", description="The page."),
         ),
+        returns=Result(model="cms.Page", description="The new home page."),
     ),
     Operation(
         operations.DELETE_PAGE,
@@ -790,6 +798,7 @@ for _declaration in (
         arguments=(
             Argument("page", model="cms.Page", description="The page to delete, with its descendants."),
         ),
+        returns=Result(),
     ),
     Operation(
         operations.DELETE_PAGE_TRANSLATION,
@@ -802,6 +811,7 @@ for _declaration in (
         arguments=(
             Argument("page_content", model="cms.PageContent", description="The page translation."),
         ),
+        returns=Result(),
     ),
     Operation(
         operations.CHANGE_PAGE_TEMPLATE,
@@ -815,6 +825,7 @@ for _declaration in (
             Argument("page_content", model="cms.PageContent", description="The page translation."),
             Argument("template", type=str, description="The template's path, one of the project's CMS_TEMPLATES."),
         ),
+        returns=Result(model="cms.PageContent", description="The translation."),
     ),
     Operation(
         operations.COPY_PAGE_LANGUAGE,
@@ -829,6 +840,7 @@ for _declaration in (
             Argument("source_page_content", model="cms.PageContent", description="The translation to copy the plugins of."),
             Argument("target_language", type=str, description="The language of the translation to copy the plugins into."),
         ),
+        returns=Result(type=str, many=True, description="The slots without a placeholder in the target language, skipped."),
     ),
     Operation(
         operations.TOGGLE_PAGE_IN_NAVIGATION,
@@ -841,6 +853,7 @@ for _declaration in (
         arguments=(
             Argument("page_content", model="cms.PageContent", description="The page translation."),
         ),
+        returns=Result(type=bool, description="Whether the translation is now in the navigation."),
     ),
 ):
     register_operation(_declaration)
