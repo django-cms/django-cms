@@ -1,6 +1,11 @@
 name: Docs
 
-on: pull_request
+on:
+  pull_request:
+  push:
+    branches:
+      # django CMS 6 is developed on develop-6, which replaces main without a pull request.
+      - develop-6
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

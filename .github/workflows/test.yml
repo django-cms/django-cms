@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+      # django CMS 6 is developed on develop-6, which replaces main without a pull request.
+      - develop-6
   schedule:
     # Run nightly at 2 AM UTC
     - cron: '0 2 * * *'
