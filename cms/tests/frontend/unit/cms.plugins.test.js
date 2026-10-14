@@ -2535,5 +2535,34 @@ describe('CMS.Plugin', function() {
             expect(CMS._plugins.length).toEqual(pluginsCount);
             expect(CMS._instances.length).toEqual(instancesCount);
         });
+
+        it('keeps fields of different models with the same pk apart', function() {
+            $('head').append(
+                '<script id="cms-plugin-app-other-field-1" type="application/json" data-cms-general>' +
+                    '{"type":"generic","plugin_id":"1"}</script>'
+            );
+
+            Plugin._refreshPlugins();
+            const generic = CMS._instances.filter(instance => instance.options.type === 'generic');
+
+            expect(generic.length).toEqual(2);
+            expect(generic.map(instance => instance.container)).toEqual([
+                'cms-plugin-app-model-field-1',
+                'cms-plugin-app-other-field-1'
+            ]);
+
+            Plugin.prototype._setupUI.calls.reset();
+            Plugin._refreshPlugins();
+
+            expect(CMS._instances.length).toEqual(2);
+            expect(Plugin.prototype._setupUI.calls.allArgs()).toEqual([
+                ['cms-plugin-app-model-field-1'],
+                ['cms-plugin-app-other-field-1']
+            ]);
+            expect(Plugin.prototype._setupUI.calls.all()[0].object).toBe(generic[0]);
+            expect(Plugin.prototype._setupUI.calls.all()[1].object).toBe(generic[1]);
+
+            $('#cms-plugin-app-other-field-1').remove();
+        });
     });
 });

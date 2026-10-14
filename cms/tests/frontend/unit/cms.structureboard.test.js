@@ -68,6 +68,7 @@ const originalPlugin = (await vi.importActual('../../../static/cms/js/modules/cm
 class FakePlugin {
     constructor(container, opts) {
         this.options = opts;
+        this.container = container;
         const el = $('<div></div>');
 
         el.data('cms', []);
