@@ -455,37 +455,56 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         """
         .. versionadd: 4.0
 
+        If the toolbar already reversed the admin urls for the current request (see
+        :meth:`cms.toolbar.toolbar.BaseToolbar.get_plugin_action_urls`), they are available as
+        ``self._action_urls`` and are not reversed again for every plugin.
+
         :return: dict of action urls for edit, add, delete, copy, and move plugin.
 
         This method replaces the set of legacy methods `get_add_url`, ``get_edit_url`, `get_move_url`,
         `get_delete_url`, `get_copy_url`.
         """
-        if not hasattr(CMSPlugin, '_edit_url'):
-            CMSPlugin._edit_url = admin_reverse('cms_placeholder_edit_plugin', args=(0,))
-            CMSPlugin._add_url = admin_reverse('cms_placeholder_add_plugin')
-            CMSPlugin._delete_url = admin_reverse('cms_placeholder_delete_plugin', args=(0,))
-            CMSPlugin._move_url = admin_reverse('cms_placeholder_move_plugin')
-            CMSPlugin._copy_url = admin_reverse('cms_placeholder_copy_plugins')
+        action_urls = getattr(self, "_action_urls", None) or get_plugin_action_urls()
+        edit_url = re.sub(r"/0/", f"/{self.pk}/", action_urls["edit"])
+        delete_url = re.sub(r"/0/", f"/{self.pk}/", action_urls["delete"])
 
         if js_compat:
             # TODO: Remove this condition
             # once the javascript files have been refactored
             # to use the new naming schema (ending in _url).
             return {
-                'edit_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._edit_url),
-                'add_plugin': CMSPlugin._add_url,
-                'delete_plugin': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._delete_url),
-                'move_plugin': CMSPlugin._move_url,
-                'copy_plugin': CMSPlugin._copy_url,
+                'edit_plugin': edit_url,
+                'add_plugin': action_urls["add"],
+                'delete_plugin': delete_url,
+                'move_plugin': action_urls["move"],
+                'copy_plugin': action_urls["copy"],
             }
         else:
             return {
-                'edit_url': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._edit_url),
-                'add_url': CMSPlugin._add_url,
-                'delete_url': re.sub(r"/0/", f"/{self.pk}/", CMSPlugin._delete_url),
-                'move_url': CMSPlugin._move_url,
-                'copy_url': CMSPlugin._copy_url,
+                'edit_url': edit_url,
+                'add_url': action_urls["add"],
+                'delete_url': delete_url,
+                'move_url': action_urls["move"],
+                'copy_url': action_urls["copy"],
             }
+
+
+def get_plugin_action_urls():
+    """
+    Returns the admin urls for the plugin actions edit, add, delete, move, and copy. The edit and
+    delete urls contain ``0`` in place of the plugin id.
+
+    The urls depend on the active language, the script prefix, and the urlconf of the current request.
+    Do not cache them beyond a request: use :meth:`cms.toolbar.toolbar.BaseToolbar.get_plugin_action_urls`
+    instead.
+    """
+    return {
+        "edit": admin_reverse("cms_placeholder_edit_plugin", args=(0,)),
+        "add": admin_reverse("cms_placeholder_add_plugin"),
+        "delete": admin_reverse("cms_placeholder_delete_plugin", args=(0,)),
+        "move": admin_reverse("cms_placeholder_move_plugin"),
+        "copy": admin_reverse("cms_placeholder_copy_plugins"),
+    }
 
 
 def get_plugin_media_path(instance, filename):
