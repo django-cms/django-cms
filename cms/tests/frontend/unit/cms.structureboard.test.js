@@ -2728,6 +2728,89 @@ describe('CMS.StructureBoard', function() {
             expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'js');
             expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
         });
+
+        describe('with external sekizai scripts', () => {
+            let src;
+            let loads;
+
+            const content = (pluginId, js) => ({
+                pluginIds: [pluginId],
+                html: `<div class="cms-plugin cms-plugin-${pluginId}"></div>`,
+                placeholder_id: 1,
+                position: pluginId,
+                js: js
+            });
+            const waitForRefresh = () => new Promise(resolve => {
+                StructureBoard._triggerRefreshEvents.and.callFake(resolve);
+            });
+            const settle = () => new Promise(resolve => setTimeout(resolve, 50));
+
+            beforeEach(() => {
+                // A unique script per test, so that it is neither cached nor already present
+                const marker = `__cmsScriptLoads${Date.now()}${Math.random().toString().slice(2)}`;
+
+                src = `data:text/javascript,window.${marker}=(window.${marker}||0)+1`;
+                loads = () => window[marker];
+                spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
+                spyOn(CMS.API.StructureBoard, '_contentChanged');
+                spyOn(StructureBoard, '_triggerRefreshEvents');
+            });
+
+            afterEach(() => {
+                document.querySelectorAll(`script[src="${src}"]`).forEach(script => script.remove());
+            });
+
+            it('triggers refresh events once, after a script shared by two content items has loaded', async () => {
+                const data = {
+                    content: [
+                        content(1, `<script src="${src}"></script>`),
+                        content(2, `<script src="${src}"></script>`)
+                    ]
+                };
+                const refresh = waitForRefresh();
+
+                expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(false);
+                expect(StructureBoard._triggerRefreshEvents).not.toHaveBeenCalled();
+                expect(document.querySelectorAll(`script[src="${src}"]`).length).toBe(1);
+
+                await refresh;
+                expect(loads()).toBe(1);
+                await settle();
+                expect(StructureBoard._triggerRefreshEvents).toHaveBeenCalledTimes(1);
+            });
+
+            it('waits for a script loaded by an earlier content item', async () => {
+                const data = {
+                    content: [content(1, `<script src="${src}"></script>`), content(2, '<script>void 0;</script>')]
+                };
+                const refresh = waitForRefresh();
+
+                CMS.API.StructureBoard._updateContentFromDataBridge(data);
+                expect(StructureBoard._triggerRefreshEvents).not.toHaveBeenCalled();
+
+                await refresh;
+                expect(loads()).toBe(1);
+                await settle();
+                expect(StructureBoard._triggerRefreshEvents).toHaveBeenCalledTimes(1);
+            });
+
+            it('waits for a script still loading from a previous update', async () => {
+                const refresh = waitForRefresh();
+
+                CMS.API.StructureBoard._updateContentFromDataBridge({
+                    content: [content(1, `<script src="${src}"></script>`)]
+                });
+                CMS.API.StructureBoard._updateContentFromDataBridge({
+                    content: [content(2, `<script src="${src}"></script>`)]
+                });
+                expect(StructureBoard._triggerRefreshEvents).not.toHaveBeenCalled();
+
+                await refresh;
+                expect(loads()).toBe(1);
+                await settle();
+                expect(StructureBoard._triggerRefreshEvents).toHaveBeenCalledTimes(1);
+            });
+        });
     });
 
     describe('_preloadOppositeMode', () => {
