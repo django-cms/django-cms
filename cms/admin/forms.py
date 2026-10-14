@@ -752,11 +752,8 @@ class ChangePageForm(BasePageContentForm):
             # This content is what visitors see (nothing like a versioning
             # package hides it), so the page URL follows the change right away.
             # Otherwise the URL is only updated once this content is published.
+            # Apphook URLs are reloaded there if the page URL changed.
             page.update_urls_from_content(self._language)
-
-            if page.application_urls and "slug" in self.changed_data:
-                # Connects the apphook restart handler to the request finished signal
-                set_restart_trigger()
         page.clear_cache(menu=True)
         send_post_page_operation(
             request=self._request,
