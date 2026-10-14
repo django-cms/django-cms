@@ -2253,7 +2253,7 @@ Plugin.staticPlaceholderDuplicatesMap = {};
 Plugin._initializeTree = function _initializeTree() {
     const plugins = {};
 
-    document.body.querySelectorAll(
+    document.querySelectorAll(
         'script[data-cms-plugin], ' +
         'script[data-cms-placeholder], ' +
         'script[data-cms-general]'
@@ -2295,7 +2295,7 @@ Plugin._refreshPlugins = function refreshPlugins() {
     Plugin.staticPlaceholderDuplicatesMap = {};
 
     // Re-read front-end editable fields ("general" plugins) from DOM
-    document.body.querySelectorAll('script[data-cms-general]').forEach(script => {
+    document.querySelectorAll('script[data-cms-general]').forEach(script => {
         CMS._plugins.push([script.id, JSON.parse(script.textContent)]);
     });
     // Remove duplicates

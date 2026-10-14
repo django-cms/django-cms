@@ -1168,7 +1168,7 @@ class StructureBoard {
             location = document.head;
         } else if (block === 'js') {
             selector = 'script';
-            current = document.body.querySelectorAll(selector);
+            current = document.querySelectorAll(selector);
             location = document.body;
         } else {
             return;

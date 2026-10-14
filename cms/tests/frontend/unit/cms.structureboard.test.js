@@ -2811,4 +2811,51 @@ describe('CMS.StructureBoard', function() {
             $('#fixture_container').empty();
         });
     });
+
+    describe('_updateSekizai', () => {
+        let board;
+
+        beforeEach(() => {
+            board = new StructureBoard();
+        });
+
+        afterEach(() => {
+            $('script[data-test-sekizai]').remove();
+        });
+
+        it('does nothing if the block is empty', () => {
+            expect(board._updateSekizai({ js: '' }, 'js')).not.toBeDefined();
+            expect(board._updateSekizai({}, 'js')).not.toBeDefined();
+            expect(board._updateSekizai({ js: '<script data-test-sekizai></script>' }, 'unknown')).not.toBeDefined();
+            expect($('script[data-test-sekizai]').length).toBe(0);
+        });
+
+        it('appends inline scripts that are not yet in the document to the body', () => {
+            const js = '<script data-test-sekizai id="cms-plugin-app-model-field-1" type="application/json" ' +
+                'data-cms-general>{"type":"generic"}</script>';
+
+            expect(board._updateSekizai({ js }, 'js')).toBe(false);
+            expect($('body > script[data-test-sekizai]').length).toBe(1);
+            expect($('#cms-plugin-app-model-field-1').text()).toBe('{"type":"generic"}');
+        });
+
+        it('does not add scripts again that are already in the body', () => {
+            const js = '<script data-test-sekizai id="cms-plugin-app-model-field-1" type="application/json" ' +
+                'data-cms-general>{"type":"generic"}</script>';
+
+            $('body').append(js);
+            board._updateSekizai({ js }, 'js');
+            expect($('script[data-test-sekizai]').length).toBe(1);
+        });
+
+        it('does not add scripts again that are already in the head', () => {
+            const js = '<script data-test-sekizai id="cms-plugin-app-model-field-1" type="application/json" ' +
+                'data-cms-general>{"type":"generic"}</script>';
+
+            $('head').append(js);
+            board._updateSekizai({ js }, 'js');
+            expect($('script[data-test-sekizai]').length).toBe(1);
+            expect($('head > script[data-test-sekizai]').length).toBe(1);
+        });
+    });
 });
