@@ -91,8 +91,8 @@ names are "main", "sidebar", "footer", etc.
 
 Finally, you need to add ``{% render_block "css" %}`` in the ``<head>`` section
 of your CMS templates and ``{% render_block "js" %}`` right before the closing
-``</body>`` tag of your CMS templates. This will render the CSS and JavaScript
-at the appropriate places in your CMS templates.
+``</body>`` tag or in the ``<head>`` of your CMS templates. This will render the CSS
+and JavaScript at the appropriate places in your CMS templates.
 
 django CMS uses `django-sekizai <https://github.com/django-cms/django-sekizai>`_
 to manage CSS and JavaScript. To use the sekizai tags, you need to load the
@@ -248,9 +248,9 @@ CMS page (or apphook page), or the first template in :setting:`CMS_TEMPLATES` wh
 URL is not managed by the CMS.
 
 **Use it as the base for any app template that should blend into CMS pages** — write
-``{% extends CMS_TEMPLATE|default:"my_default_template.html" %}`` instead of hardcoding 
-a base-template path. The app template will then pick up the toolbar, sekizai blocks, 
-and any layout the current page template provides, even if editors later switch the 
+``{% extends CMS_TEMPLATE|default:"my_default_template.html" %}`` instead of hardcoding
+a base-template path. The app template will then pick up the toolbar, sekizai blocks,
+and any layout the current page template provides, even if editors later switch the
 page to a different template.
 
 Without ``CMS_TEMPLATE``, an app template with a hardcoded
@@ -304,14 +304,14 @@ Default behavior (without versioning)
 -------------------------------------
 
 In django CMS (version 4 and above), when creating page content translations, all content is immediately
-published. When creating a translation of an existing page, the template from the original page content is 
-copied to the new translation. This behavior can be seen in the `create_translation` method. The template 
+published. When creating a translation of an existing page, the template from the original page content is
+copied to the new translation. This behavior can be seen in the `create_translation` method. The template
 is explicitly copied from the original page content to ensure consistent layout across languages.
 
 Note for django CMS versions prior to 4.2:
 
-In older versions of django CMS (prior to 4.2), when creating page content translations, the template is not 
-automatically copied from the original page content. Instead, the default site template (or the template 
+In older versions of django CMS (prior to 4.2), when creating page content translations, the template is not
+automatically copied from the original page content. Instead, the default site template (or the template
 from the last published version) is applied, and manual adjustments may be necessary to ensure consistency.
 
 Behavior with djangocms-versioning
