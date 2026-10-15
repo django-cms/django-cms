@@ -8,6 +8,7 @@ from django.test.utils import override_settings
 from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import add_plugin, assign_user_to_page, create_page
 from cms.cache.permissions import (
+    PERMISSION_KEYS,
     clear_user_permission_cache,
     get_permission_cache,
     set_permission_cache,
@@ -28,6 +29,7 @@ from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
+    user_can_change_page,
     user_can_change_page_advanced_settings,
     user_can_delete_page,
     user_can_move_page,
@@ -84,6 +86,21 @@ class PermissionCacheTests(CMSTestCase):
                                                               "change_page")
         self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
+
+    @override_settings(CMS_LANGUAGES={"default": {"fallbacks": ["en"], "public": True}})
+    def test_uncached_cross_site_permission_preserves_destination_cache(self):
+        source_site = Site.objects.create(domain="source.example", name="Source")
+        source = create_page("source", "nav_playground.html", "en", site=source_site)
+        assign_user_to_page(self.home_page, self.user_normal, can_add=True, can_change=True)
+        assign_user_to_page(source, self.user_normal, can_change=True)
+        self.assertTrue(user_can_change_page(self.user_normal, self.home_page, site=self.home_page.site))
+        destination_cache = {key: get_permission_cache(self.user_normal, key) for key in PERMISSION_KEYS}
+
+        self.assertTrue(user_can_change_page(self.user_normal, source, site=source_site, use_cache=False))
+        self.assertEqual(
+            {key: get_permission_cache(self.user_normal, key) for key in PERMISSION_KEYS},
+            destination_cache,
+        )
 
     def test_cached_permission_precedence(self):
         # refs - https://github.com/divio/django-cms/issues/6335

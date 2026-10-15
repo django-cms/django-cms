@@ -509,6 +509,33 @@ class DuplicateSitePermissionsTests(CMSTestCase):
         self.assertEqual(copy.site_id, self.allowed_site.pk)
         self.assertContains(self.client.get(copy.get_absolute_url(), HTTP_HOST="allowed.example"), marker)
 
+    def test_authorized_cross_site_source_with_page_permissions_is_allowed(self):
+        # The endpoint caches destination permissions before the form checks
+        # the source. Neither site should need a global change grant.
+        GlobalPagePermission.objects.filter(user=self.actor).delete()
+        self.add_page_permission(
+            self.actor, self.allowed, can_add=True, can_change=True, grant_on=ACCESS_PAGE,
+        )
+        self.add_page_permission(self.actor, self.forbidden, can_change=True, grant_on=ACCESS_PAGE)
+        marker = "CROSS-SITE-PAGE-PERMISSION-CONTENT"
+        add_plugin(self.forbidden.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body=marker)
+        response = self.duplicate(
+            self.allowed_site, None, "allowed.example", self.allowed, self.allowed,
+            source=self.forbidden,
+        )
+        self.assertEqual(response.status_code, 302)
+        self.allowed.refresh_from_db()
+        copy = self.allowed.get_child_pages().get()
+        self.assertEqual(copy.site_id, self.allowed_site.pk)
+        self.assertContains(self.client.get(copy.get_absolute_url(), HTTP_HOST="allowed.example"), marker)
+
+    def test_unauthorized_cross_site_source_with_page_permissions_is_rejected(self):
+        GlobalPagePermission.objects.filter(user=self.actor).delete()
+        self.add_page_permission(
+            self.actor, self.allowed, can_add=True, can_change=True, grant_on=ACCESS_PAGE,
+        )
+        self.assert_source_rejected(self.forbidden)
+
     def test_same_site_source_requires_change_permission(self):
         # An unreachable source must not become public through duplication, on
         # the same site too. This models a null URL path, not a djangocms-versioning

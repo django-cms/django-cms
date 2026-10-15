@@ -365,7 +365,10 @@ class AddPageForm(BasePageContentForm):
         in the admin.
         """
         if self.source_requires_change_permission:
-            return user_can_change_page(self._user, source, site=source.site)
+            # The shared permission cache is keyed by user/action, not site.
+            # Read source permissions without reusing or replacing the
+            # destination's cached permissions.
+            return user_can_change_page(self._user, source, site=source.site, use_cache=False)
         return user_can_view_page(self._user, source, site=source.site)
 
     def clean_source(self):
