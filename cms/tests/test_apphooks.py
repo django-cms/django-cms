@@ -1,8 +1,10 @@
 import sys
 import types
 import uuid
+from copy import deepcopy
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -676,6 +678,43 @@ class ApphooksTestCase(BaseApphooksTestCase):
         self.assertRedirects(
             response, "/en/blog/settings/?page=2", status_code=302, fetch_redirect_response=False
         )
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_fallback_redirect_applies_page_permissions(self):
+        # Fallback routes are subject to the same access checks as the app's patterns:
+        # anonymous users are sent to the login page instead of the fallback URL
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME, login_required=True)
+        self.reload_urls()
+
+        response = self.client.get("/de/blog/settings/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(settings.LOGIN_URL, response["Location"])
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get("/de/blog/settings/")
+
+        self.assertRedirects(response, "/en/blog/settings/", status_code=302, fetch_redirect_response=False)
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_fallback_redirect_hides_non_public_languages(self):
+        # Like pages, languages which are not public are only available to staff
+        languages = deepcopy(settings.CMS_LANGUAGES)
+        for language in languages[1]:
+            if language["code"] == "de":
+                language["public"] = False
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+
+        with self.settings(CMS_LANGUAGES=languages):
+            self.reload_urls()
+            response = self.client.get("/de/blog/settings/")
+            self.assertEqual(response.status_code, 404)
+
+            with self.login_user_context(self.get_superuser()):
+                response = self.client.get("/de/blog/settings/")
+            self.assertRedirects(response, "/en/blog/settings/", status_code=302, fetch_redirect_response=False)
 
     @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
     def test_apphook_page_root_is_not_redirected_by_fallback_patterns(self):

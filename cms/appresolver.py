@@ -199,16 +199,23 @@ def get_patterns_for_page_url(page_url):
     return url_patterns
 
 
-def _fallback_redirect(page_id, language):
-    """Return a view redirecting to the same app sub-URL in the page's fallback ``language``.
+def _fallback_redirect(page_id, language, fallback):
+    """Return a view redirecting app sub-URLs requested in ``language`` to the same
+    sub-URL in the page's ``fallback`` language.
 
+    As for pages, languages which are not public are only available to staff users.
     The target URL is computed per request: reversing while the URLconf is being
     built would recurse into building it.
     """
 
     def fallback_redirect(request, rest):
+        from cms.page_rendering import _handle_no_page
+
         page = get_object_or_404(Page, pk=page_id)
-        url = page.get_absolute_url(language, fallback=False) + rest
+        is_staff = hasattr(request, "user") and request.user.is_staff
+        if language not in get_public_languages(site_id=page.site_id) and not is_staff:
+            return _handle_no_page(request)
+        url = page.get_absolute_url(fallback, fallback=False) + rest
         if request.META.get("QUERY_STRING"):
             url += "?" + request.META["QUERY_STRING"]
         return HttpResponseRedirect(url)
@@ -254,9 +261,10 @@ def _get_fallback_patterns(page, paths, site_id):
         if shadows_pages:
             # Pages published in this language below the path take precedence
             continue
-        fallback_patterns[language] = [
-            re_path(rf"^{re.escape(path)}/(?P<rest>.+)$", _fallback_redirect(page.pk, fallback)),
-        ]
+        pattern = re_path(rf"^{re.escape(path)}/(?P<rest>.+)$", _fallback_redirect(page.pk, language, fallback))
+        # Lets applications_page_check() find the page, e.g., for permission checks
+        pattern.page_id = page.pk
+        fallback_patterns[language] = [pattern]
     return fallback_patterns
 
 
@@ -356,6 +364,9 @@ def _get_app_patterns(site: Site | None) -> list[URLPattern]:
             resolver.url_patterns_dict[lang] = current_patterns
         paths = {lang: path for lang, (*_, path) in languages.items()}
         for lang, fallback_patterns in _get_fallback_patterns(page, paths, page.site_id).items():
+            # Apply the same access checks as for the app's own patterns
+            if app.permissions:
+                _set_permissions(fallback_patterns, app.exclude_permissions)
             if site is None:
                 _set_site_filter(fallback_patterns, page.site_id)
             resolver.url_patterns_dict[lang] = fallback_patterns
