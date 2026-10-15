@@ -277,6 +277,7 @@ class AddPageForm(BasePageContentForm):
         "in_navigation": get_cms_setting("DEFAULT_IN_NAVIGATION"),
     }
     source_permission_denied = _("You do not have permission to use this page type.")
+    source_requires_change_permission = False
 
     class Meta:
         model = PageContent
@@ -350,13 +351,33 @@ class AddPageForm(BasePageContentForm):
             data["path"] = path
         return data
 
+    def user_can_use_source(self, source):
+        """Whether ``self._user`` may copy ``source`` into a new page.
+
+        The visible ``source`` select offers the page types of the current site,
+        which anyone allowed to add a page may build on unless view restrictions
+        apply. Forms whose ``source`` is a hidden, client-controlled field set
+        ``source_requires_change_permission``: ``Page.copy()`` reads the source's
+        *admin* content (with versioning: its latest draft), so they require what
+        the admin requires to show it -- change permission on the source, resolved
+        against the source's own site. This keeps cross-site copies possible for
+        users authorized on both sites while rejecting sources they could not open
+        in the admin.
+        """
+        if self.source_requires_change_permission:
+            # The shared permission cache is keyed by user/action, not site.
+            # Read source permissions without reusing or replacing the
+            # destination's cached permissions.
+            return user_can_change_page(self._user, source, site=source.site, use_cache=False)
+        return user_can_view_page(self._user, source, site=source.site)
+
     def clean_source(self):
         source = self.cleaned_data.get("source")
         # ``source`` is a hidden field whose value is fully controlled by the
         # client on POST and ``has_add_permission`` only checks that the user may
         # create *a* page, not that they may read ``source`` -- whose placeholders,
         # plugins and extensions ``save()`` copies into the new page.
-        if source and not user_can_view_page(self._user, source, site=source.site):
+        if source and not self.user_can_use_source(source):
             raise ValidationError(self.source_permission_denied)
         return source
 
@@ -511,6 +532,7 @@ class AddPageTypeForm(AddPageForm):
     content_defaults = {
         "in_navigation": False,
     }
+    source_requires_change_permission = True
 
     def get_or_create_root(self):
         """
@@ -570,28 +592,13 @@ class AddPageTypeForm(AddPageForm):
 
 class DuplicatePageForm(AddPageForm):
     source_permission_denied = _("You do not have permission to copy this page.")
+    source_requires_change_permission = True
 
     source = forms.ModelChoiceField(
         queryset=Page.objects.all(),
         required=True,
         widget=forms.HiddenInput(),
     )
-
-    def clean_source(self):
-        source = self.cleaned_data.get("source")
-        # ``source`` is a hidden field whose value is fully controlled by the
-        # client on POST and whose queryset spans every page on every site.
-        # ``has_add_permission`` only checks that the user may create *a* page,
-        # not that they may read ``source``. Without an explicit object-level
-        # check, a staff user with only "add page" rights could duplicate (and
-        # thereby read the plugin content of) any page -- bypassing per-page
-        # view restrictions and multi-site isolation (CWE-639 / CWE-862).
-        # ``copy(..., permissions=False)`` even strips the source's view
-        # restrictions, leaving the copy fully readable. Require that the user
-        # is actually allowed to view the page they are copying.
-        if source and not user_can_view_page(self._user, source, site=source.site):
-            raise ValidationError(self.source_permission_denied)
-        return source
 
     def from_source(self, source, parent=None):
         new_page = super().from_source(source, parent=parent)
