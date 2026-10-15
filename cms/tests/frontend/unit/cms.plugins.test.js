@@ -2439,10 +2439,10 @@ describe('CMS.Plugin', function() {
         it('reads data scripts from the whole document, including <head>', function() {
             const instances = Plugin._initializeTree();
 
-            expect(CMS._plugins).toContainEqual(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
-            expect(CMS._plugins).toContainEqual(['cms-plugin-2', { type: 'plugin', plugin_id: '2' }]);
-            expect(constructed).toContainEqual(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
-            expect(constructed).toContainEqual(['cms-plugin-2', { type: 'plugin', plugin_id: '2' }]);
+            expect(CMS._plugins).toContain(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
+            expect(CMS._plugins).toContain(['cms-plugin-2', { type: 'plugin', plugin_id: '2' }]);
+            expect(constructed).toContain(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
+            expect(constructed).toContain(['cms-plugin-2', { type: 'plugin', plugin_id: '2' }]);
             expect(instances).toBe(CMS._instances);
             expect(instances.length).toEqual(constructed.length);
         });
@@ -2475,7 +2475,7 @@ describe('CMS.Plugin', function() {
         it('picks up front-end editable fields whose data script is in <head>', function() {
             Plugin._refreshPlugins();
 
-            expect(CMS._plugins).toContainEqual(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
+            expect(CMS._plugins).toContain(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
             const generic = CMS._instances.filter(instance => instance.options.type === 'generic');
 
             expect(generic.length).toEqual(1);
