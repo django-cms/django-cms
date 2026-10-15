@@ -61,6 +61,7 @@ class Plugin {
 
         // create an unique for this component to use it internally
         this.uid = uid();
+        this.container = container;
 
         // this property will be filled later
         this.modal = null;
@@ -2253,7 +2254,7 @@ Plugin.staticPlaceholderDuplicatesMap = {};
 Plugin._initializeTree = function _initializeTree() {
     const plugins = {};
 
-    document.body.querySelectorAll(
+    document.querySelectorAll(
         'script[data-cms-plugin], ' +
         'script[data-cms-placeholder], ' +
         'script[data-cms-general]'
@@ -2295,7 +2296,7 @@ Plugin._refreshPlugins = function refreshPlugins() {
     Plugin.staticPlaceholderDuplicatesMap = {};
 
     // Re-read front-end editable fields ("general" plugins) from DOM
-    document.body.querySelectorAll('script[data-cms-general]').forEach(script => {
+    document.querySelectorAll('script[data-cms-general]').forEach(script => {
         CMS._plugins.push([script.id, JSON.parse(script.textContent)]);
     });
     // Remove duplicates
@@ -2319,21 +2320,19 @@ Plugin._refreshPlugins = function refreshPlugins() {
         }
     });
 
-    CMS._plugins.forEach(([type, opts]) => {
+    CMS._plugins.forEach(([container, opts]) => {
         if (opts.type !== 'placeholder' && opts.type !== 'plugin') {
-            const instance = CMS._instances.find(
-                i => i.options.type === opts.type && Number(i.options.plugin_id) === Number(opts.plugin_id)
-            );
+            const instance = CMS._instances.find(i => i.container === container);
 
             if (instance) {
                 // update
-                instance._setupUI(type);
+                instance._setupUI(container);
                 instance._ensureData();
                 instance.ui.container.data('cms').push(instance.options);
                 instance._setGeneric();
             } else {
                 // create
-                CMS._instances.push(new Plugin(type, opts));
+                CMS._instances.push(new Plugin(container, opts));
             }
         }
     });
