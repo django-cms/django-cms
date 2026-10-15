@@ -494,6 +494,8 @@ class DuplicateSitePermissionsTests(CMSTestCase):
             source=self.forbidden,
         )
         self.assertEqual(response.status_code, 302)
+        # ``get_children()`` short-circuits on the stale in-memory ``numchild``.
+        self.allowed.refresh_from_db()
         copy = self.allowed.get_child_pages().get()
         self.assertEqual(copy.site_id, self.allowed_site.pk)
         self.assertContains(self.client.get(copy.get_absolute_url(), HTTP_HOST="allowed.example"), marker)
@@ -531,6 +533,8 @@ class DuplicateSitePermissionsTests(CMSTestCase):
             source=self.allowed,
         )
         self.assertEqual(response.status_code, 302)
+        # ``get_children()`` short-circuits on the stale in-memory ``numchild``.
+        self.allowed.refresh_from_db()
         copy = self.allowed.get_child_pages().get()
         self.assertEqual(copy.site_id, self.allowed_site.pk)
         self.assertContains(self.client.get(copy.get_absolute_url(), HTTP_HOST="allowed.example"), marker)
