@@ -16,7 +16,7 @@ from django.template import Context, Template
 from django.template.response import TemplateResponse
 from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch, clear_url_caches, include, path, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, clear_url_caches, include, path, resolve, reverse
 from django.utils.timezone import now
 from django.utils.translation import activate, override as force_language
 from django.views.generic import TemplateView
@@ -662,6 +662,66 @@ class ApphooksTestCase(BaseApphooksTestCase):
             # the remaining apphook still resolves, i.e. the pathless page was skipped
             # rather than the whole pattern list being abandoned
             self.assertEqual(urlpatterns[0].reverse('sample-root'), 'live-app/')
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_sub_url_redirects_to_fallback_language(self):
+        # The apphook page has no German URL: app sub-URLs in German redirect to
+        # the same sub-URL in the fallback language (de falls back to en)
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        self.reload_urls()
+
+        response = self.client.get("/de/blog/settings/?page=2")
+
+        self.assertRedirects(
+            response, "/en/blog/settings/?page=2", status_code=302, fetch_redirect_response=False
+        )
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_page_root_is_not_redirected_by_fallback_patterns(self):
+        # The page root stays with cms.views.details and redirect_on_fallback
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        self.reload_urls()
+
+        with force_language("de"):
+            resolver = get_app_patterns()[0]
+            with self.assertRaises(Resolver404):
+                resolver.resolve("blog/")
+            self.assertEqual(resolver.resolve("blog/settings/").kwargs, {"rest": "settings/"})
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_sub_url_served_once_language_is_published(self):
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        blog = create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        create_page_content("de", "Blog", blog, slug="blog")
+        self.reload_urls()
+
+        response = self.client.get("/de/blog/settings/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "sample settings page")
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_fallback_does_not_shadow_pages_in_language(self):
+        # Another page published in German at the apphook page's path takes precedence
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        other = create_page("other", "nav_playground.html", "en", parent=home)
+        create_page_content("de", "Blog", other, slug="blog")
+        self.reload_urls()
+
+        with force_language("de"):
+            self.assertEqual(get_app_patterns()[0].url_patterns, [])
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_on_home_page_has_no_fallback_redirect(self):
+        # A catch-all below the home page would capture every URL of the language
+        self.create_homepage("home", "nav_playground.html", "en", apphook=APP_NAME)
+        self.reload_urls()
+
+        with force_language("de"):
+            self.assertEqual(get_app_patterns()[0].url_patterns, [])
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
     def test_apphook_urlpattern_order(self):
