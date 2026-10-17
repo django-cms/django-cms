@@ -82,6 +82,9 @@ for the mechanics).
 
   - An apphook does not serve any public traffic until the page is **published**.
   - This also implies that parent pages on the path need to be published.
+  - Publishing is per language: the application serves a language only once the page is
+    published in it. In other languages, its URLs redirect to a fallback language (see
+    :ref:`apphooks_language_fallback`).
 
 Implications and trade-offs
 ---------------------------
