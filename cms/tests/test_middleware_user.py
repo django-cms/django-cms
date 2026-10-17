@@ -9,7 +9,7 @@ from django.urls import path
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import SimpleLazyObject
 
-from cms.permissions.utils import (
+from cms.shared.users import (
     _current_user,
     current_user,
     get_current_user,

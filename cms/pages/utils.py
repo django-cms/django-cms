@@ -1,9 +1,8 @@
 import re
 
 from django.urls import NoReverseMatch, reverse
-from django.utils.encoding import force_str
 
-from cms.constants import PAGE_USERNAME_MAX_LENGTH
+from cms.shared.users import get_clean_username  # noqa: F401  -- re-exported for compatibility
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_cms_setting
 
@@ -35,19 +34,6 @@ def get_page_template_from_request(request):
     if request.current_page:
         return request.current_page.get_template()
     return get_cms_setting('TEMPLATES')[0][0]
-
-
-def get_clean_username(user):
-    try:
-        username = force_str(user)
-    except AttributeError:
-        # AnonymousUser may not have USERNAME_FIELD
-        username = "anonymous"
-    else:
-        # limit changed_by and created_by to avoid problems with Custom User Model
-        if len(username) > PAGE_USERNAME_MAX_LENGTH:
-            username = f'{username[:PAGE_USERNAME_MAX_LENGTH - 15]}... (id={user.pk})'
-    return username
 
 
 def get_page_from_request(request, use_path=None, clean_path=None):
