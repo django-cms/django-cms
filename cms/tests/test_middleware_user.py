@@ -57,6 +57,14 @@ class CurrentUserContextTests(SimpleTestCase):
             self.assertIs(get_current_user(), user)
         self.assertIsNone(get_current_user())
 
+    def test_context_manager_restores_on_exception(self):
+        outer, inner = AnonymousUser(), AnonymousUser()
+        with current_user(outer):
+            with self.assertRaises(RuntimeError), current_user(inner):
+                raise RuntimeError
+            self.assertIs(get_current_user(), outer)
+        self.assertIsNone(get_current_user())
+
     def test_lazy_user_survives_context_comparison(self):
         """The stored value must be comparable without waking the lazy user.
 

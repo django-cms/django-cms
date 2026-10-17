@@ -102,7 +102,8 @@ def current_user(user):
     """
     Changes the current user just within a context.
     """
-    old_user = get_current_user()
-    set_current_user(user)
-    yield
-    set_current_user(old_user)
+    token = set_current_user(user)
+    try:
+        yield
+    finally:
+        reset_current_user(token)
