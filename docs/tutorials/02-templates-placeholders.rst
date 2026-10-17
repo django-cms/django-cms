@@ -96,7 +96,7 @@ A few things to notice:
   the same page need the same asset, sekizai collects them so each
   block is rendered exactly once, in the right place in the document.
   Every django CMS template needs the ``"css"`` block in ``<head>``
-  and the ``"js"`` block just before ``</body>``.
+  and the ``"js"`` block, preferably just before ``</body>``.
 
 For everything ``{% placeholder %}`` accepts, see
 :doc:`/reference/placeholders`. For the conceptual story, see

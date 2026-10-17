@@ -2449,4 +2449,120 @@ describe('CMS.Plugin', function() {
             expect($('.cms-plugin-overlay')).toBeInDOM();
         });
     });
+
+    describe('CMS.Plugin._initializeTree()', function() {
+        var OriginalPlugin;
+        var constructed;
+
+        beforeEach(function() {
+            OriginalPlugin = CMS.Plugin;
+            constructed = [];
+            CMS.Plugin = function FakePlugin(container, options) {
+                constructed.push([container, options]);
+            };
+            $('head').append(
+                '<script id="cms-plugin-app-model-field-1" type="application/json" data-cms-general>' +
+                    '{"type":"generic","plugin_id":"1"}</script>'
+            );
+            $('body').append(
+                '<script id="cms-plugin-2" type="application/json" data-cms-plugin>' +
+                    '{"type":"plugin","plugin_id":"2"}</script>'
+            );
+        });
+
+        afterEach(function() {
+            CMS.Plugin = OriginalPlugin;
+            $('#cms-plugin-app-model-field-1').remove();
+            $('#cms-plugin-2').remove();
+            CMS._plugins = [];
+            CMS._instances = [];
+        });
+
+        it('reads data scripts from the whole document, including <head>', function() {
+            const instances = Plugin._initializeTree();
+
+            expect(CMS._plugins).toContainEqual(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
+            expect(CMS._plugins).toContainEqual(['cms-plugin-2', { type: 'plugin', plugin_id: '2' }]);
+            expect(constructed).toContainEqual(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
+            expect(constructed).toContainEqual(['cms-plugin-2', { type: 'plugin', plugin_id: '2' }]);
+            expect(instances).toBe(CMS._instances);
+            expect(instances.length).toEqual(constructed.length);
+        });
+    });
+
+    describe('CMS.Plugin._refreshPlugins()', function() {
+        beforeEach(function() {
+            CMS._plugins = [];
+            CMS._instances = [];
+            spyOn(Plugin.prototype, '_setupUI').and.callFake(function() {
+                const el = $('<div></div>');
+
+                el.data('cms', []);
+                this.ui = { container: el };
+            });
+            spyOn(Plugin.prototype, '_ensureData');
+            spyOn(Plugin.prototype, '_setGeneric');
+            $('head').append(
+                '<script id="cms-plugin-app-model-field-1" type="application/json" data-cms-general>' +
+                    '{"type":"generic","plugin_id":"1"}</script>'
+            );
+        });
+
+        afterEach(function() {
+            $('#cms-plugin-app-model-field-1').remove();
+            CMS._plugins = [];
+            CMS._instances = [];
+        });
+
+        it('picks up front-end editable fields whose data script is in <head>', function() {
+            Plugin._refreshPlugins();
+
+            expect(CMS._plugins).toContainEqual(['cms-plugin-app-model-field-1', { type: 'generic', plugin_id: '1' }]);
+            const generic = CMS._instances.filter(instance => instance.options.type === 'generic');
+
+            expect(generic.length).toEqual(1);
+            expect(generic[0].options.plugin_id).toEqual('1');
+            expect(Plugin.prototype._setGeneric).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not duplicate plugins that are already registered', function() {
+            Plugin._refreshPlugins();
+            const pluginsCount = CMS._plugins.length;
+            const instancesCount = CMS._instances.length;
+
+            Plugin._refreshPlugins();
+
+            expect(CMS._plugins.length).toEqual(pluginsCount);
+            expect(CMS._instances.length).toEqual(instancesCount);
+        });
+
+        it('keeps fields of different models with the same pk apart', function() {
+            $('head').append(
+                '<script id="cms-plugin-app-other-field-1" type="application/json" data-cms-general>' +
+                    '{"type":"generic","plugin_id":"1"}</script>'
+            );
+
+            Plugin._refreshPlugins();
+            const generic = CMS._instances.filter(instance => instance.options.type === 'generic');
+
+            expect(generic.length).toEqual(2);
+            expect(generic.map(instance => instance.container)).toEqual([
+                'cms-plugin-app-model-field-1',
+                'cms-plugin-app-other-field-1'
+            ]);
+
+            Plugin.prototype._setupUI.calls.reset();
+            Plugin._refreshPlugins();
+
+            expect(CMS._instances.length).toEqual(2);
+            expect(Plugin.prototype._setupUI.calls.allArgs()).toEqual([
+                ['cms-plugin-app-model-field-1'],
+                ['cms-plugin-app-other-field-1']
+            ]);
+            expect(Plugin.prototype._setupUI.calls.all()[0].object).toBe(generic[0]);
+            expect(Plugin.prototype._setupUI.calls.all()[1].object).toBe(generic[1]);
+
+            $('#cms-plugin-app-other-field-1').remove();
+        });
+    });
 });
