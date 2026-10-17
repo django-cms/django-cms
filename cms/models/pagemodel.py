@@ -1020,6 +1020,16 @@ class Page(MP_Node):
         self.urls_cache = {}
         self._update_url_path_recursive(language)
 
+        if (
+            self.application_urls
+            or self.get_descendants().exclude(application_urls__isnull=True).exclude(application_urls="").exists()
+        ):
+            # Apphook patterns are built from the PageUrl table: reload them
+            # once the URL of this page (or a descendant) has changed
+            from cms.signals.apphook import set_restart_trigger
+
+            set_restart_trigger()
+
     def get_fallbacks(self, language):
         return i18n.get_fallback_languages(language, site_id=self.site_id)
 

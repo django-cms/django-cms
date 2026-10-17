@@ -17,7 +17,7 @@ from unittest.mock import patch
 from django.test import override_settings
 
 from cms.api import create_page, create_page_content
-from cms.models import Page, UrlconfRevision
+from cms.models import Page, PageContent, UrlconfRevision
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks
@@ -224,3 +224,95 @@ class ApphookReloadLanguageVariantTests(CMSTestCase):
 
             # Verify that set_restart_trigger was NOT called for updates
             mock_set_restart_trigger.assert_not_called()
+
+
+class ApphookReloadOnUrlUpdateTests(CMSTestCase):
+    """
+    With a versioning package, a page's ``PageUrl`` is only created or changed
+    when ``Page.update_urls_from_content`` runs upon publishing (#8931). The
+    apphook patterns are built from ``PageUrl`` and must be reloaded then.
+    """
+
+    def _create_apphook_page(self):
+        return create_page(
+            title="Test Page",
+            template="nav_playground.html",
+            language="en",
+            apphook="SampleApp",
+            apphook_namespace="test_app",
+        )
+
+    def _create_draft_content(self, page, language, slug):
+        # Simulate a versioned draft: content without a PageUrl
+        content = create_page_content(language=language, title="Draft", page=page, slug=slug)
+        page.urls.filter(language=language).delete()
+        return content
+
+    @patch('cms.signals.apphook.set_restart_trigger')
+    def test_publishing_new_language_triggers_url_reload(self, mock_set_restart_trigger):
+        with apphooks(SampleApp):
+            page = self._create_apphook_page()
+            self._create_draft_content(page, "de", "test-seite")
+            mock_set_restart_trigger.reset_mock()
+
+            page.update_urls_from_content("de")
+
+            self.assertEqual(page.urls.get(language="de").path, "test-seite")
+            mock_set_restart_trigger.assert_called_once()
+
+    @patch('cms.signals.apphook.set_restart_trigger')
+    def test_changed_slug_triggers_url_reload(self, mock_set_restart_trigger):
+        with apphooks(SampleApp):
+            page = self._create_apphook_page()
+            page.get_content_obj("en", fallback=False).update(slug="renamed")
+            mock_set_restart_trigger.reset_mock()
+
+            page.update_urls_from_content("en")
+
+            mock_set_restart_trigger.assert_called_once()
+
+    @patch('cms.signals.apphook.set_restart_trigger')
+    def test_unpublishing_triggers_url_reload(self, mock_set_restart_trigger):
+        with apphooks(SampleApp):
+            page = self._create_apphook_page()
+            PageContent.objects.filter(page=page, language="en").delete()
+            mock_set_restart_trigger.reset_mock()
+
+            page.update_urls_from_content("en")
+
+            self.assertIsNone(page.urls.get(language="en").path)
+            mock_set_restart_trigger.assert_called_once()
+
+    @patch('cms.signals.apphook.set_restart_trigger')
+    def test_changed_parent_slug_triggers_url_reload_for_apphook_child(self, mock_set_restart_trigger):
+        with apphooks(SampleApp):
+            parent = create_page("Parent", "nav_playground.html", "en", slug="parent")
+            create_page(
+                "Child", "nav_playground.html", "en", parent=parent, apphook="SampleApp", apphook_namespace="test_app"
+            )
+            parent.get_content_obj("en", fallback=False).update(slug="renamed")
+            mock_set_restart_trigger.reset_mock()
+
+            parent.update_urls_from_content("en")
+
+            mock_set_restart_trigger.assert_called_once()
+
+    @patch('cms.signals.apphook.set_restart_trigger')
+    def test_unchanged_url_no_reload(self, mock_set_restart_trigger):
+        with apphooks(SampleApp):
+            page = self._create_apphook_page()
+            mock_set_restart_trigger.reset_mock()
+
+            page.update_urls_from_content("en")
+
+            mock_set_restart_trigger.assert_not_called()
+
+    @patch('cms.signals.apphook.set_restart_trigger')
+    def test_changed_url_without_apphook_no_reload(self, mock_set_restart_trigger):
+        page = create_page("Page", "nav_playground.html", "en", slug="page")
+        page.get_content_obj("en", fallback=False).update(slug="renamed")
+        mock_set_restart_trigger.reset_mock()
+
+        page.update_urls_from_content("en")
+
+        mock_set_restart_trigger.assert_not_called()
