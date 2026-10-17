@@ -906,6 +906,15 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if obj is None:
             raise self._get_404_exception(object_id)
 
+        # ``add_view`` only checks that the user may add a page on the destination
+        # site. The source is read through the admin, so require what the admin
+        # requires to show it: CMS change permission on ``obj.page``, resolved
+        # against the page's own site. ``has_view_permission`` (overridden below,
+        # not Django's model-level check) is used rather than
+        # ``has_change_permission`` because djangocms-versioning does not touch it.
+        if not self.has_view_permission(request, obj):
+            raise PermissionDenied
+
         if request.method == "GET":
             # source is a field in the form
             # because its value is in the url,
