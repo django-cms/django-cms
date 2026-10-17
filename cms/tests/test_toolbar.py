@@ -1,6 +1,7 @@
 import datetime
+import json
 import re
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 from unittest.mock import patch
 
 import iptools
@@ -15,7 +16,7 @@ from django.template.defaultfilters import date as date_filter, truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.urls import reverse
+from django.urls import get_script_prefix, reverse, set_script_prefix
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
@@ -39,7 +40,7 @@ from cms.cms_toolbars import (
     PageToolbar,
     get_user_model,
 )
-from cms.models import PagePermission, Placeholder, UserSettings
+from cms.models import CMSPlugin, PagePermission, Placeholder, UserSettings
 from cms.test_utils.project.placeholderapp.models import CharPksExample, Example1
 from cms.test_utils.project.placeholderapp.views import ClassDetail, detail_view
 from cms.test_utils.testcases import URL_CMS_USERSETTINGS, CMSTestCase
@@ -61,6 +62,7 @@ from cms.toolbar.utils import (
     get_object_live_url,
     get_object_preview_url,
     get_object_structure_url,
+    get_plugin_toolbar_info,
     get_plugin_tree,
     get_toolbar_from_request,
 )
@@ -295,6 +297,91 @@ class MissingToolbarTest(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(placeholder.get_plugins("en").count(), 1)
+
+
+class PluginActionUrlsTest(CMSTestCase):
+    """
+    Plugin action urls depend on the active language and the script prefix. They
+    must not be cached beyond a request (they used to be cached for the process).
+    """
+
+    def test_action_urls_follow_active_language(self):
+        plugin = CMSPlugin(pk=42)
+
+        for language in ("de", "fr"):
+            with self.subTest(language=language), override(language):
+                urls = plugin.get_action_urls()
+                self.assertEqual(urls["edit_plugin"], admin_reverse("cms_placeholder_edit_plugin", args=(42,)))
+                self.assertEqual(urls["delete_plugin"], admin_reverse("cms_placeholder_delete_plugin", args=(42,)))
+                self.assertEqual(urls["add_plugin"], admin_reverse("cms_placeholder_add_plugin"))
+                self.assertTrue(urls["edit_plugin"].startswith(f"/{language}/admin/"))
+
+    def test_action_urls_follow_script_prefix(self):
+        plugin = CMSPlugin(pk=42)
+        plugin.get_action_urls()  # Would have cached the urls without prefix
+
+        old_prefix = get_script_prefix()
+        set_script_prefix("/sub/")
+        try:
+            urls = plugin.get_action_urls(js_compat=False)
+        finally:
+            set_script_prefix(old_prefix)
+
+        self.assertTrue(urls["edit_url"].startswith("/sub/"))
+        self.assertTrue(urls["move_url"].startswith("/sub/"))
+
+    def test_toolbar_reverses_action_urls_once_in_toolbar_language(self):
+        toolbar = EmptyToolbar(RequestFactory().get("/"))
+        toolbar.toolbar_language = "fr"
+        plugins = [CMSPlugin(pk=pk, plugin_type="LinkPlugin") for pk in (1, 2, 3)]
+
+        with patch("cms.models.pluginmodel.admin_reverse", wraps=admin_reverse) as reverse_mock:
+            urls = []
+            for language in ("en", "de"):  # e.g., the page language while rendering content
+                with override(language):
+                    for plugin in plugins:
+                        info = get_plugin_toolbar_info(plugin, action_urls=toolbar.get_plugin_action_urls())
+                        urls.append(info["urls"])
+            self.assertEqual(reverse_mock.call_count, 5)
+
+        with override("fr"):
+            self.assertEqual(urls[1]["edit_plugin"], admin_reverse("cms_placeholder_edit_plugin", args=(2,)))
+        for plugin_urls in urls:
+            self.assertTrue(plugin_urls["edit_plugin"].startswith("/fr/admin/"))
+
+    def test_plugin_info_overrides_with_legacy_signatures(self):
+        # Overrides in third-party plugin models do not accept any additional arguments
+        def get_plugin_info(self, children=None, parents=None):
+            return CMSPlugin.get_plugin_info(self, children=children, parents=parents)
+
+        def get_action_urls(self, js_compat=True):
+            return CMSPlugin.get_action_urls(self, js_compat=js_compat)
+
+        toolbar = EmptyToolbar(RequestFactory().get("/"))
+        plugin = CMSPlugin(pk=42, plugin_type="LinkPlugin")
+        plugin.get_plugin_info = MethodType(get_plugin_info, plugin)
+        plugin.get_action_urls = MethodType(get_action_urls, plugin)
+
+        info = get_plugin_toolbar_info(plugin, action_urls=toolbar.get_plugin_action_urls())
+
+        self.assertEqual(info["urls"]["edit_plugin"], admin_reverse("cms_placeholder_edit_plugin", args=(42,)))
+
+    def test_plugin_tree_uses_toolbar_language(self):
+        page = create_page("home", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en")[0]
+        plugin = add_plugin(placeholder, "LinkPlugin", "en", name="link", external_link="http://example.com")
+        request = RequestFactory().get("/")
+        request.user = self.get_superuser()
+        request.toolbar = EmptyToolbar(request)
+        request.toolbar.toolbar_language = "fr"
+
+        with override("de"):
+            tree = get_plugin_tree(request, [plugin])
+
+        self.assertEqual(
+            tree["plugins"][0]["urls"]["edit_plugin"],
+            f"/fr/admin/cms/placeholder/edit-plugin/{plugin.pk}/",
+        )
 
 
 @override_settings(CMS_PERMISSION=False)
@@ -1396,7 +1483,19 @@ class ToolbarModeTests(ToolbarTestBase):
 
 @override_settings(ROOT_URLCONF="cms.test_utils.project.placeholderapp_urls")
 class EditModelTemplateTagTest(ToolbarTestBase):
-    edit_fields_rx = "(\\?|&amp;|\\\\u0026)edit_fields=%s"
+    edit_fields_rx = "(\\?|&)edit_fields=%s"
+
+    def get_edit_plugin_urls(self, response):
+        """Returns the edit urls of all front-end editable objects, read as the frontend does."""
+        scripts = re.findall(r"<script [^>]*data-cms-general>(.*?)</script>", response.content.decode("utf8"), re.S)
+        return [json.loads(script)["urls"]["edit_plugin"] for script in scripts]
+
+    def assertEditPluginUrl(self, response, url, prefix=False):
+        urls = self.get_edit_plugin_urls(response)
+        if prefix:
+            self.assertTrue(any(edit_url.startswith(url) for edit_url in urls), f"{url} not a prefix of {urls}")
+        else:
+            self.assertIn(url, urls)
 
     def tearDown(self):
         Example1.objects.all().delete()
@@ -2008,11 +2107,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-changelist-{} cms-render-model '
             'cms-render-model-block"></template>'.format("placeholderapp", "example1", ex1.pk),
         )
-        self.assertContains(
+        self.assertEditPluginUrl(
             response,
-            '"edit_plugin": "{}?language={}&amp;edit_fields=changelist"'.format(
-                admin_reverse("placeholderapp_example1_changelist"), "en"
-            ),
+            "{}?language={}&edit_fields=changelist".format(admin_reverse("placeholderapp_example1_changelist"), "en"),
         )
 
     def test_changeform_url_is_marked_as_popup(self):
@@ -2035,11 +2132,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 """
         request = self.get_page_request(page, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(
+        self.assertEditPluginUrl(
             response,
-            '"edit_plugin": "{}?language=en&amp;_popup=1"'.format(
-                admin_reverse("placeholderapp_example1_change", args=(ex1.pk,))
-            ),
+            "{}?language=en&_popup=1".format(admin_reverse("placeholderapp_example1_change", args=(ex1.pk,))),
         )
 
     def test_add_form_url_is_marked_as_popup(self):
@@ -2057,10 +2152,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 """
         request = self.get_page_request(page, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(
-            response,
-            '"edit_plugin": "{}?_popup=1"'.format(admin_reverse("placeholderapp_example1_add")),
-        )
+        self.assertEditPluginUrl(response, "{}?_popup=1".format(admin_reverse("placeholderapp_example1_add")))
 
     def test_edit_field_url_is_not_marked_as_popup(self):
         """``edit_field`` is a cms view rendering its own chrome-less template: it
@@ -2079,9 +2171,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 """
         request = self.get_page_request(page, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(
+        self.assertEditPluginUrl(
             response,
-            '"edit_plugin": "{}?language=en&amp;edit_fields=char_1"'.format(
+            "{}?language=en&edit_fields=char_1".format(
                 admin_reverse("placeholderapp_example1_edit_field", args=(ex1.pk, "en"))
             ),
         )
@@ -2167,7 +2259,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 """
         request = self.get_page_request(page, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '"edit_plugin": "/admin/placeholderapp/example1/edit-field/%s/en/' % ex1.pk)
+        self.assertEditPluginUrl(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk, prefix=True)
 
     def test_edit_field_respects_content_admin_mixin(self):
         user = self.get_staff()
@@ -2197,7 +2289,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 """
         request = self.get_page_request(page, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '"edit_plugin": "/admin/placeholderapp/example1/edit-field/%s/en/' % ex1.pk)
+        self.assertEditPluginUrl(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk, prefix=True)
 
     def test_method_attribute(self):
         user = self.get_staff()
@@ -2271,8 +2363,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             "</h1>".format("placeholderapp", "example1", "callable_item", ex1.pk),
         )
-        self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
-        self.assertTrue(re.search(self.edit_fields_rx % "char_2", response.content.decode("utf8")))
+        self.assertEditPluginUrl(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk, prefix=True)
+        edit_plugin_urls = " ".join(self.get_edit_plugin_urls(response))
+        self.assertTrue(re.search(self.edit_fields_rx % "char_2", edit_plugin_urls))
 
     def test_admin_url_multiple_fields(self):
         user = self.get_staff()
@@ -2297,9 +2390,10 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             "</h1>".format("placeholderapp", "example1", "callable_item", ex1.pk),
         )
-        self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
-        self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode("utf8")))
-        self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode("utf8")))
+        self.assertEditPluginUrl(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk, prefix=True)
+        edit_plugin_urls = " ".join(self.get_edit_plugin_urls(response))
+        self.assertTrue(re.search(self.edit_fields_rx % "char_1", edit_plugin_urls))
+        self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", edit_plugin_urls))
 
     def test_instance_method(self):
         user = self.get_staff()

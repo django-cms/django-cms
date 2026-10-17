@@ -1168,7 +1168,7 @@ class StructureBoard {
             location = document.head;
         } else if (block === 'js') {
             selector = 'script';
-            current = document.body.querySelectorAll(selector);
+            current = document.querySelectorAll(selector);
             location = document.body;
         } else {
             return;
@@ -1179,9 +1179,9 @@ class StructureBoard {
 
         template.innerHTML = data[block];
 
-        // Collect deferred scripts to ensure firing
-        this.scriptReferenceCount = 0;
-
+        // scriptReferenceCount is not reset here: it still counts scripts inserted earlier (by another
+        // content item or a previous update) that are loading. A matching script found below may be one
+        // of them, so the refresh events must wait for it as well.
         for (const element of template.content.querySelectorAll(selector)) {
             if (StructureBoard._elementPresent(current, element)) {
                 element.remove();

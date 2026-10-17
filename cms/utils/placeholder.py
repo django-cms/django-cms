@@ -95,8 +95,12 @@ _placeholder_settings, _template_in_conf = _get_placeholder_settings()
 
 def _clear_placeholder_conf_cache():
     # Needed by the override_placeholder_conf context manager for tests
+    from cms.plugin_pool import plugin_pool
+
     global _placeholder_settings, _template_in_conf
     _placeholder_settings, _template_in_conf = _get_placeholder_settings()
+    # Globally cached plugin restrictions depend on the placeholder configuration
+    plugin_pool.global_restrictions_cache.clear()
 
 
 def get_placeholder_conf(setting: str, placeholder: str, template: str | None = None, default=None):

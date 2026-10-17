@@ -25,12 +25,19 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from importlib.machinery import SourceFileLoader
+    from importlib.util import module_from_spec, spec_from_file_location
 
-    imported = None
-    if module_path:
-        imported = SourceFileLoader("mod", module_path).load_module()
-    return imported
+    if not module_path:
+        return None
+
+    spec = spec_from_file_location("mod", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load template config: {module_path}")
+
+    # Python 3.15 removed the legacy load_module() API.
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def default(name):

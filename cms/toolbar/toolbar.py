@@ -16,6 +16,7 @@ from cms import __version__
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models import Placeholder, UserSettings
+from cms.models.pluginmodel import get_plugin_action_urls
 from cms.templates import TemplatesCache
 from cms.toolbar.items import ButtonList, Menu, ToolbarAPIMixin
 from cms.toolbar.utils import (
@@ -133,6 +134,18 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def sideframe_enabled(self):
         return get_cms_setting('SIDEFRAME_ENABLED')
+
+    @cached_property
+    def _plugin_action_urls(self):
+        with force_language(self.toolbar_language):
+            return get_plugin_action_urls()
+
+    def get_plugin_action_urls(self):
+        """
+        Returns the admin urls for plugin actions (see :func:`cms.models.pluginmodel.get_plugin_action_urls`).
+        They are reversed once per request in the toolbar language, since they lead to the admin.
+        """
+        return self._plugin_action_urls
 
 
 class CMSToolbarBase(BaseToolbar):
