@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
 
+from cms.compat import moved
 from cms.constants import ROOT_USER_LEVEL
 from cms.core.permissions import (  # noqa: F401  -- re-exported for compatibility
     has_plugin_permission,
@@ -13,16 +14,21 @@ from cms.core.permissions import (  # noqa: F401  -- re-exported for compatibili
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
 from cms.shared.permissions import get_model_permission_codename
-from cms.shared.users import (  # noqa: F401  -- re-exported for compatibility
-    current_user,
-    get_clean_username,
-    get_current_user,
-    get_current_user_name,
-    reset_current_user,
-    set_current_user,
-)
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
+
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {
+        "current_user": "cms.shared.users.current_user",
+        "get_clean_username": "cms.shared.users.get_clean_username",
+        "get_current_user": "cms.shared.users.get_current_user",
+        "get_current_user_name": "cms.shared.users.get_current_user_name",
+        "reset_current_user": "cms.shared.users.reset_current_user",
+        "set_current_user": "cms.shared.users.set_current_user",
+    },
+    since="6.0",
+)
 
 
 def _has_global_permission(user, site, action):
@@ -400,5 +406,10 @@ def get_subordinate_groups(user, site):
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )
     )
+
+
+# Keep the module's existing exports alongside the relocated helpers.
+__all__.extend(name for name in globals() if not name.startswith("_") and name != "moved")
+__all__.sort()
 
 

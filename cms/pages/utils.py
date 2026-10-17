@@ -2,9 +2,15 @@ import re
 
 from django.urls import NoReverseMatch, reverse
 
-from cms.shared.users import get_clean_username  # noqa: F401  -- re-exported for compatibility
+from cms.compat import moved
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_cms_setting
+
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {"get_clean_username": "cms.shared.users.get_clean_username"},
+    since="6.0",
+)
 
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
@@ -118,3 +124,8 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
         path = f'{base}/{slug}' if base else slug
         return get_available_slug(site, path, language, suffix, modified=True)
     return slug
+
+
+# Keep the module's existing exports alongside the relocated helpers.
+__all__.extend(name for name in globals() if not name.startswith("_") and name != "moved")
+__all__.sort()
