@@ -74,9 +74,10 @@ def _get_page_permission_tuples_for_action(user, site, action, check_global=True
         return cached
 
     page_actions = get_page_actions(user, site)
-    # Set cache for all actions calculated
-    for act, page_paths in page_actions.items():
-        set_permission_cache(user, act, list(page_paths))
+    # Uncached cross-site checks must not replace another site's permissions.
+    if use_cache:
+        for act, page_paths in page_actions.items():
+            set_permission_cache(user, act, list(page_paths))
     return page_actions[action]
 
 
@@ -151,12 +152,13 @@ def user_can_add_subpage(user, target, site=None):
 
 @cached_func
 @auth_permission_required('change_page')
-def user_can_change_page(user, page, site=None):
+def user_can_change_page(user, page, site=None, use_cache=True):
     can_change = has_generic_permission(
         page=page,
         user=user,
         action='change_page',
         site=site,
+        use_cache=use_cache,
     )
     return can_change
 
