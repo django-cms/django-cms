@@ -31,7 +31,7 @@ from cms.permissions.models import (
     PagePermission,
     PageUser,
 )
-from cms.permissions.utils import set_current_user
+from cms.shared.users import set_current_user
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting

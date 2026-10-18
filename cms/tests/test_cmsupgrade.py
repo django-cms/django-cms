@@ -487,6 +487,40 @@ class ScopeTest(SimpleTestCase):
 
 
 class MoveTableTest(SimpleTestCase):
+    def test_user_helpers_rewrite_to_shared(self):
+        table = load_move_table()
+        paths = {
+            "cms.permissions.utils": (
+                "current_user",
+                "get_clean_username",
+                "get_current_user",
+                "get_current_user_name",
+                "reset_current_user",
+                "set_current_user",
+            ),
+            "cms.pages.utils": ("get_clean_username",),
+        }
+        for module, names in paths.items():
+            for name in names:
+                with self.subTest(module=module, name=name):
+                    source = f"from {module} import {name}\n"
+                    self.assertEqual(
+                        rewrite_source(source, table).source,
+                        f"from cms.shared.users import {name}\n",
+                    )
+                    self.assertIs(resolve(f"{module}.{name}"), resolve(f"cms.shared.users.{name}"))
+
+    def test_partial_user_shims_preserve_star_imports(self):
+        for module, existing_name, moved_name in (
+            ("cms.permissions.utils", "get_subordinate_groups", "current_user"),
+            ("cms.pages.utils", "get_available_slug", "get_clean_username"),
+        ):
+            with self.subTest(module=module):
+                namespace = {}
+                exec(f"from {module} import *", namespace)  # noqa: S102
+                for name in (existing_name, moved_name):
+                    self.assertIs(namespace[name], resolve(f"{module}.{name}"))
+
     def test_static_table_matches_registry(self):
         """Reading ``moved()`` declarations statically finds every runtime entry."""
         table = load_move_table()

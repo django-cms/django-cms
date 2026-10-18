@@ -38,9 +38,9 @@ from cms.models import (
 )
 from cms.operations import Argument, Operation, Result, register_operation
 from cms.pages.checks import LanguageCopyPlan
-from cms.pages.utils import get_clean_username
 from cms.permissions.cache import clear_permission_cache
 from cms.shared.operations import OperationContext, operation
+from cms.shared.users import get_clean_username
 from cms.signals import PAGE_OPERATION_SIGNALS
 from cms.signals.apphook import set_restart_trigger
 
