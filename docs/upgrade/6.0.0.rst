@@ -411,6 +411,10 @@ Bug fixes
   English) showed "This page has no preview!" instead of the apphook. The
   editor now resolves and renders the apphook in the translation's language.
 
+* The ``current_user()`` context manager restores the previous user when its
+  block raises. Previously a caught exception left the temporary user in place,
+  so later page saves were attributed to it.
+
 * Deleting a translation that was never published, and so has no URL, no longer
   raises ``PageUrl.DoesNotExist``.
 * Copying plugins to a language the page has no content in is refused with an
@@ -751,6 +755,11 @@ Notes:
   ``get_model_permission_codename`` to ``cms.shared.permissions``, and
   ``get_permission_codename`` is Django's
   ``django.contrib.auth.get_permission_codename``.
+* The acting-user helpers ``set_current_user``, ``reset_current_user``,
+  ``get_current_user``, ``get_current_user_name`` and ``current_user`` moved
+  from ``cms.utils.permissions`` to ``cms.shared.users``, together with
+  ``get_clean_username`` from ``cms.utils.page``. They are not permission
+  policy, and pages needs them whether or not page permissions are enabled.
 * The template tag classes of ``cms_tags`` moved to
   ``cms.core.editing.templatetags``, ``cms.pages.templatetags``,
   ``cms.toolbar.templatetags`` and ``cms.shared.templatetags``;
