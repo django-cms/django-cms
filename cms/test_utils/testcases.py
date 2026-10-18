@@ -470,7 +470,7 @@ class BaseCMSTestCase:
             if warning.message == message and warning.category is category:
                 break
             else:
-                if warning.category not in (DeprecationWarning, ):
+                if not issubclass(warning.category, DeprecationWarning):
                     self.fail(f"Unexpected warning {warning.message} ({warning.category})")
         else:
             self.fail(f"Warning {message} not given.")
