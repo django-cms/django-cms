@@ -2,7 +2,7 @@
 django CMS
 ##########
 
-|PyPiVersion| |PyVersion| |DjVersion| |License| |Coverage|
+|PyPiVersion| |PyVersion| |DjVersion| |License| |Coverage| |Build|
 
 Lean, open-source enterprise content management powered by Django.
 Backed by the non-profit django CMS Association (`Sponsor us <https://www.django-cms.org/en/memberships/>`_).
@@ -139,3 +139,6 @@ See `LICENSE <LICENSE>`_ for credits to third-party contributions.
     :alt: License
 .. |Coverage| image:: https://codecov.io/gh/django-cms/django-cms/graph/badge.svg?token=Jyx7Ilpibf
  :target: https://codecov.io/gh/django-cms/django-cms
+.. |Build|  image:: https://github.com/jyoti-bhogal/django-cms/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/jyoti-bhogal/django-cms/actions/workflows/test.yml
+   :alt: Build Status 
