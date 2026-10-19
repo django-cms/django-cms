@@ -15,7 +15,7 @@ For the conceptual model ("mount points" and what it means for request routing),
 :ref:`about_apphooks`.
 
 The :ref:`Tutorials <tutorials>` section contains a basic guide to :ref:`getting started
-with apphooks <apphooks_introduction>`. This document assumes more familiarity with the
+with apphooks <tutorial_apphook>`. This document assumes more familiarity with the
 CMS generally.
 
 The basics of apphook creation
@@ -115,6 +115,8 @@ Whenever you:
 - add or remove an apphook
 - change the slug of a page containing an apphook or the slug of a page which has a
   descendant with an apphook
+- publish or unpublish a language of a page containing an apphook (or of a page which has
+  a descendant with an apphook)
 
 the URL caches must be reloaded.
 
