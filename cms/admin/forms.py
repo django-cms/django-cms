@@ -1263,7 +1263,6 @@ class PagePermissionInlineAdminForm(BasePagePermissionInlineAdminForm):
         site_id = getattr(self._page, "site_id", None)
         site = Site.objects._get_site_by_id(site_id) if site_id else None
         sub_users = get_subordinate_users(user, site)
-        self.fields["user"].queryset = sub_users
 
         limit_choices = True
         use_raw_id = False
@@ -1308,6 +1307,8 @@ class PagePermissionInlineAdminForm(BasePagePermissionInlineAdminForm):
             self.fields["user"].widget = UserSelectAdminWidget()
             self.fields["user"].widget.user = user  # assign current user
 
+        # Set this after replacing the widget so its choices are populated too.
+        self.fields["user"].queryset = sub_users
         self.fields["group"].queryset = get_subordinate_groups(user, site)
 
     class Meta:

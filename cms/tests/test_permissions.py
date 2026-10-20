@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
-from django.db import OperationalError, ProgrammingError
+from django.db import OperationalError, ProgrammingError, connection
 from django.test.utils import override_settings
 
 from cms.admin.forms import BasePermissionAdminForm
@@ -1097,10 +1097,13 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
 
     def _bulk_users(self):
         user_model = type(self.manager)
-        return user_model.objects.bulk_create([
-            user_model(**{user_model.USERNAME_FIELD: f'raw-id-user-{index}@example.com'}, is_staff=True)
-            for index in range(500)
+        usernames = [f'raw-id-user-{index}@example.com' for index in range(500)]
+        user_model.objects.bulk_create([
+            user_model(**{user_model.USERNAME_FIELD: username}, is_staff=True)
+            for username in usernames
         ])
+        # MySQL does not populate generated primary keys on bulk-created users.
+        return user_model.objects.filter(**{f'{user_model.USERNAME_FIELD}__in': usernames})
 
     @override_settings(CMS_RAW_ID_USERS=1)
     def test_large_subordinate_set_uses_restricted_select(self):
@@ -1113,9 +1116,12 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
         flags = dict.fromkeys(PagePermission.get_all_permissions(), False)
         flags['can_change'] = True
         child = create_page('Subordinates', 'nav_playground.html', 'en', parent=self.page)
+        # Exercise MySQL's lack of bulk-insert IDs on every test backend.
+        with patch.object(type(connection.features), 'can_return_rows_from_bulk_insert', False):
+            users = self._bulk_users()
         PagePermission.objects.bulk_create([
             PagePermission(page=child, user=user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, **flags)
-            for user in self._bulk_users()
+            for user in users
         ])
         outsider = self._create_user('outsider', is_staff=True)
         before = list(PagePermission.objects.order_by('pk').values())
