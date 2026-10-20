@@ -227,7 +227,7 @@ def validate_apphook(page, apphook, namespace, config):
     if app is None:
         raise ValidationError({"application_urls": _("Invalid application.")})
     field = "application_namespace"
-    if app.app_config and config:
+    if app.app_config and config not in (None, ""):
         from django.forms import IntegerField
 
         try:
@@ -268,7 +268,7 @@ def prepare_advanced_settings(page, data):
             app = apphook_pool.get_apphook(apphook)
             if app is not None:
                 namespace = namespace or app.app_name
-                if app.app_config and data.get("application_configs"):
+                if app.app_config and data.get("application_configs") not in (None, ""):
                     from django.forms import IntegerField
 
                     try:

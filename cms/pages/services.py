@@ -22,7 +22,6 @@ from __future__ import annotations
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _lazy
@@ -38,6 +37,7 @@ from cms.models import (
 )
 from cms.operations import Argument, Operation, Result, register_operation
 from cms.pages.checks import LanguageCopyPlan
+from cms.pages.transactions import page_write
 from cms.pages.validation import ADVANCED_SETTINGS_FIELDS
 from cms.permissions.cache import clear_permission_cache
 from cms.shared.operations import OperationContext, operation
@@ -116,7 +116,7 @@ def resolve_add_parent(site, parent_page, *, is_page_type=False):
     return parent_page
 
 
-@transaction.atomic
+@page_write("site", "parent_page", "source")
 def add_page(
     *, site, parent_page, source, language, content_data, context,
     is_page_type=False, allow_view_only_page_type=False, permissions=None,
@@ -176,7 +176,7 @@ def add_page(
     return translation
 
 
-@transaction.atomic
+@page_write("page")
 def add_translation(page, *, language, content_data, context, permissions=None) -> PageContent:
     """Add one translation to an existing page.
 
@@ -220,7 +220,7 @@ def get_or_create_page_type_root(site, *, language):
     return root
 
 
-@transaction.atomic
+@page_write("page_content")
 def change_page_content(page_content, *, data, context, permissions=None) -> PageContent:
     """Update a page translation and its public URL when applicable.
 
@@ -257,7 +257,7 @@ def change_page_content(page_content, *, data, context, permissions=None) -> Pag
     return page_content
 
 
-@transaction.atomic
+@page_write("page", refresh=False)
 def change_advanced_settings(page, *, data=None, context, permissions=None) -> Page:
     """Save the advanced settings changed on ``page`` and invalidate dependent caches.
 
@@ -286,7 +286,7 @@ def change_advanced_settings(page, *, data=None, context, permissions=None) -> P
         if changes:
             for field, value in changes.items():
                 setattr(saved_page, field, value)
-            saved_page.save()
+            saved_page.save(update_fields={*changes, "changed_by", "changed_date"})
             saved_page.clear_cache(menu=True)
             clear_permission_cache()
             if {"application_urls", "application_namespace"} & changes.keys():
@@ -294,6 +294,7 @@ def change_advanced_settings(page, *, data=None, context, permissions=None) -> P
     return saved_page
 
 
+@page_write("page", "target_page")
 def move_page(
     page: Page,
     target_page: Page,
@@ -326,6 +327,7 @@ def move_page(
     return page
 
 
+@page_write("page")
 def set_home(page: Page, *, context: OperationContext, permissions=None) -> Page:
     """Make ``page`` the home page of its site.
 
@@ -358,6 +360,7 @@ def set_home(page: Page, *, context: OperationContext, permissions=None) -> Page
     return page
 
 
+@page_write("page", "target_page", "target_site")
 def copy_page_tree(
     page: Page,
     target_page: Page | None,
@@ -400,6 +403,7 @@ def copy_page_tree(
     return new_page
 
 
+@page_write("source", "parent_page", "target_site")
 def copy_page_from_source(
     source: Page,
     *,
@@ -451,6 +455,7 @@ def _copy_from_source(source, *, target_site, parent_page, language, create_page
     return new_page
 
 
+@page_write("page")
 def delete_page(page: Page, *, context: OperationContext, permissions=None) -> None:
     """Delete a page, its descendants, and all of their content.
 
@@ -487,6 +492,7 @@ def delete_page(page: Page, *, context: OperationContext, permissions=None) -> N
         set_restart_trigger()
 
 
+@page_write("page_content")
 def delete_translation(
     page_content: PageContent, *, context: OperationContext, permissions=None
 ) -> None:
@@ -521,6 +527,7 @@ def delete_translation(
         saved_plugins.delete()
 
 
+@page_write("page_content")
 def change_template(
     page_content: PageContent, template: str, *, context: OperationContext, permissions=None
 ) -> PageContent:
@@ -542,6 +549,7 @@ def change_template(
     return page_content
 
 
+@page_write("source_page_content")
 def copy_language(
     source_page_content: PageContent,
     target_language: str,
@@ -584,6 +592,7 @@ def copy_language(
     return plan.missing_slots
 
 
+@page_write("page_content")
 def toggle_in_navigation(
     page_content: PageContent, *, context: OperationContext, permissions=None
 ) -> bool:
@@ -601,6 +610,7 @@ def toggle_in_navigation(
     return page_content.in_navigation
 
 
+@page_write("page")
 def rebuild_urls(page: Page, language: str | None = None, *, context: OperationContext) -> None:
     """Recompute a page's URLs from its content, for one language or all of them.
 

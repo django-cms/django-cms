@@ -58,6 +58,7 @@ from cms.core.plugins import copy_plugins_to_placeholder, downcast_plugins
 from cms.models import PageContent
 from cms.pages.apphook_pool import apphook_pool
 from cms.pages.models.page import Page
+from cms.pages.transactions import page_url_errors, page_write
 from cms.pages.utils import get_available_slug
 from cms.permissions.models import (
     ACCESS_PAGE_AND_DESCENDANTS,
@@ -143,7 +144,7 @@ def _verify_plugin_type(plugin_type):
 # ===============================================================================
 
 
-@transaction.atomic
+@page_write("site", "parent", translate_errors=False)
 def create_page(
     title,
     template,
@@ -343,7 +344,7 @@ def _create_page_as_operation(call, context):
         "position": call["position"],
         "prepared": prepared,
     }
-    with operation(
+    with page_url_errors(call), operation(
         operations.ADD_PAGE,
         context,
         checks=check_args,
@@ -377,7 +378,7 @@ def _create_page_content_as_operation(call, context):
         "page": call["page"], "permissions": None, "language": call["language"],
         "content_data": content_data, "prepared": prepared, "inherit_template": False,
     }
-    with operation(
+    with page_url_errors(call), operation(
         operations.ADD_PAGE_TRANSLATION,
         context,
         checks=check_args,
@@ -390,7 +391,7 @@ def _create_page_content_as_operation(call, context):
         return _create_page_content(**call)
 
 
-@transaction.atomic
+@page_write("page", "parent", translate_errors=False)
 def create_page_content(
     language,
     title,

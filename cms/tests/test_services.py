@@ -1,8 +1,10 @@
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import IntegrityError
 from django.test import override_settings
 
 from cms import operations
@@ -192,6 +194,43 @@ class PageDataValidationTest(CMSTestCase):
                     operations.CHANGE_PAGE_ADVANCED_SETTINGS, page_services.change_advanced_settings,
                     {"page": self.page, "data": data}, field,
                 )
+
+    def test_config_zero_is_validated_like_string_zero(self):
+        from cms.pages.apphook_pool import apphook_pool
+        from cms.test_utils.project.sampleapp.models import SampleAppConfig
+
+        app = SimpleNamespace(
+            app_config=SampleAppConfig, app_name="fallback",
+            get_configs=SampleAppConfig.objects.all,
+        )
+        with patch.object(apphook_pool, "discover_apps"), patch.object(apphook_pool, "get_apphook", return_value=app):
+            for config in (0, "0"):
+                with self.subTest(config=config):
+                    self.assert_refused(
+                        operations.CHANGE_PAGE_ADVANCED_SETTINGS, page_services.change_advanced_settings,
+                        {"page": self.page, "data": {"application_urls": "ConfiguredApp", "application_configs": config}},
+                        "application_configs",
+                    )
+            for config in (None, ""):
+                with self.subTest(config=config):
+                    page = page_services.change_advanced_settings(
+                        self.page, data={"application_urls": "ConfiguredApp", "application_configs": config},
+                        context=self.context,
+                    )
+                    self.assertEqual(page.application_namespace, "fallback")
+
+    def test_advanced_settings_only_save_changed_fields_and_audit_fields(self):
+        original_save = Page.save
+
+        def save_after_unrelated_update(page, **kwargs):
+            Page.objects.filter(pk=page.pk).update(login_required=True)
+            return original_save(page, **kwargs)
+
+        with patch.object(Page, "save", save_after_unrelated_update):
+            page_services.change_advanced_settings(self.page, data={"reverse_id": "changed"}, context=self.context)
+        self.page.refresh_from_db()
+        self.assertTrue(self.page.login_required)
+        self.assertEqual(self.page.reverse_id, "changed")
 
     def test_advanced_settings_instance_compatibility_also_validates(self):
         create_page("Other", "nav_playground.html", "en", reverse_id="taken")
@@ -579,6 +618,37 @@ class PageDataValidationTest(CMSTestCase):
         self.assertTrue(verdict.complete)
         changed = page_services.change_advanced_settings(**kwargs, context=self.context)
         self.assertEqual(changed.reverse_id, "shared")
+
+    def test_database_url_conflict_rolls_back_and_becomes_field_error(self):
+        # Replacing validation cannot remove the database's routing constraint.
+        self.replace_data_checks()
+        for values, field in (({"slug": "parent"}, "slug"), ({"overwrite_url": "parent"}, "overwrite_url")):
+            with self.subTest(field=field):
+                before = self.counts()
+                with self.assertRaises(ValidationError) as caught:
+                    page_services.add_page(**self.creation_kwargs(**values), context=self.context)
+                self.assertIn(field, caught.exception.message_dict)
+                self.assertEqual(self.counts(), before)
+
+    def test_unrelated_integrity_error_is_not_translated(self):
+        error = IntegrityError("An unrelated constraint failed")
+        before = self.counts()
+        with patch("cms.api._create_page_content", side_effect=error):
+            with self.assertRaises(IntegrityError) as caught:
+                page_services.add_page(**self.creation_kwargs(), context=self.context)
+        self.assertIs(caught.exception, error)
+        self.assertEqual(self.counts(), before)
+
+    def test_descendant_url_collision_rolls_back_content_and_urls(self):
+        child = create_page("Child", "nav_playground.html", "en", parent=self.page)
+        create_page("Override", "nav_playground.html", "en", overwrite_url="renamed/child")
+        with self.assertRaises(ValidationError) as caught:
+            page_services.change_page_content(self.content, data={"slug": "renamed"}, context=self.context)
+        self.assertIn("slug", caught.exception.message_dict)
+        self.content.refresh_from_db()
+        self.assertEqual(self.content.slug, "parent")
+        self.assertEqual(PageUrl.objects.get(page=self.page, language="en").path, "parent")
+        self.assertEqual(PageUrl.objects.get(page=child, language="en").path, "parent/child")
 
     def test_shape_errors_also_appear_in_preflight_with_replaced_checks(self):
         self.replace_data_checks()

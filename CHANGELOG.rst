@@ -11,6 +11,10 @@ Features:
 
 Bug Fixes:
 ----------
+* Validate numeric apphook configuration ID ``0`` consistently with string IDs.
+* Serialize page service and creation API writes per site, refresh page inputs
+  after locking, preserve unrelated advanced-settings edits, and report URL
+  constraint conflicts as validation errors after rollback.
 * Reject sibling URL conflicts in ``validate_url_uniqueness()`` even when the
   candidate path matches the page's expected parent path. Excluding the edited
   page no longer skips checks against other pages.

@@ -180,6 +180,26 @@ namespace; without a selection, an empty namespace defaults to the apphook's
 ``app_name``. Existing Python callers may still pass a modified page and omit
 ``data``; new adapters should use the dictionary form declared in the registry.
 
+Page services and the creation APIs serialize writes to each affected site
+before preparing inputs or running checks. They reload page inputs after taking
+the lock, so a waiting creation uses the parent's latest path and a waiting
+identifier claim sees the preceding write. Moves, homepage changes and URL
+rebuilds use the same lock. Advanced-settings saves write only changed fields
+and audit fields. Pass explicit ``data`` for concurrent editors: the legacy
+modified-instance form cannot distinguish an intended edit from a stale value.
+
+On databases with row locks, writes to the same site wait until the surrounding
+transaction commits; cross-site operations lock sites in primary-key order.
+SQLite uses its database write lock instead. Keep transactions short. Code
+that writes through raw model saves or querysets must coordinate with these
+operations itself; validation replacements still own the rules, including
+identifier uniqueness. ``can()`` remains a read-only snapshot and does not
+reserve identifiers or URLs.
+
+Known URL uniqueness failures during a service or context-aware API write are
+rolled back and reported as field-keyed ``ValidationError`` exceptions.
+Unrelated database errors retain their original exception type.
+
 
 ****************
 Handle a refusal
