@@ -15,6 +15,7 @@ from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionI
 from cms.api import add_plugin, assign_user_to_page, create_page
 from cms.models import Page, PageContent
 from cms.pages.admin.forms import BasePermissionAdminForm
+from cms.permissions import services as permission_services
 from cms.permissions.cache import (
     clear_user_permission_cache,
     get_cache_key,
@@ -41,6 +42,7 @@ from cms.permissions.page_permissions import (
     user_can_publish_page,
 )
 from cms.permissions.utils import get_grantable_page_permissions
+from cms.shared.operations import OperationContext
 from cms.shared.users import current_user
 from cms.test_utils.testcases import CMSTestCase
 
@@ -1035,6 +1037,37 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, 'throughout the selected scope')
                 self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    def test_page_only_manager_cannot_grant_descendants(self):
+        # The manager's rights, including permission management, apply to this page only.
+        self.manager_grant.delete()
+        self._manager_page_grant(ACCESS_PAGE, can_change_permissions=True, can_publish=True)
+        self.manager = self.reload(self.manager)
+        row = self._grant()  # Also makes the recipient subordinate to the page manager.
+        row.grant_on = ACCESS_PAGE
+        row.save()
+        context = OperationContext(user=self.manager)
+        for flags in ({'can_publish': 'on'}, {}):
+            with self.subTest(flags=flags):
+                before = list(PagePermission.objects.order_by('pk').values())
+                response = self._post(**flags)
+                self.assertContains(response, 'throughout the selected scope')
+                response = self._post(row, grant_on=ACCESS_PAGE_AND_DESCENDANTS, **flags)
+                self.assertContains(response, 'throughout the selected scope')
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+                grant = PagePermission.objects.get(pk=row.pk)
+                grant.grant_on = ACCESS_PAGE_AND_DESCENDANTS
+                grant.can_publish = bool(flags)
+                with self.assertRaises(PermissionDenied):
+                    permission_services.save_page_permissions(self.page, save=[grant], context=context)
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+        response = self._post(row, can_publish='on')
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertTrue(row.can_publish)
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
 
     @override_settings(CMS_RAW_ID_USERS=1)
     def test_raw_id_recipient_must_be_subordinate(self):
