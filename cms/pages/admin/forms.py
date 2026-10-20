@@ -45,7 +45,6 @@ from cms.permissions.page_permissions import (  # the add checks stay importable
 )
 from cms.permissions.utils import (
     get_grantable_global_permissions,
-    get_grantable_page_permissions,
     get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
@@ -1029,12 +1028,13 @@ class BasePagePermissionInlineAdminForm(BasePermissionAdminForm):
         grant_on = cleaned_data.get('grant_on')
         if user is None or page is None or grant_on is None:
             return cleaned_data
-        grantable = get_grantable_page_permissions(user, page, grant_on)
+        # The same rule as the service's ``cms.permissions.grantable_page_permissions``
+        # check, reported here as a field error instead of a refused save.
         held = {
             flag for flag in PagePermission.get_all_permissions()
             if (cleaned_data.get(flag) if flag in self.fields else getattr(self.instance, flag))
         }
-        if 'can_change_permissions' not in grantable or not held <= grantable:
+        if not permission_checks.page_grant_allowed(user, page, grant_on, held):
             self.add_error('grant_on', forms.ValidationError(
                 _("You cannot grant or manage these permissions throughout the selected scope."),
                 code='permission_scope_not_allowed',

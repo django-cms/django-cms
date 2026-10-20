@@ -421,6 +421,11 @@ any editing rights stored on the same grant are checked as well.
 Recipient user IDs are validated against the manager's subordinate users,
 including when the admin uses a raw-ID widget.
 
+The same rules apply outside the admin: the page permission service, used by
+the admin, :mod:`cms.api` and other callers acting on behalf of a user, refuses
+grants the acting user may not hand out, and changes to or deletions of grants
+they could not have handed out.
+
 
 Delegating global page permissions
 ==================================

@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.sites.models import Site
 from django.db import OperationalError, ProgrammingError
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import NoPermissionsException
@@ -16,8 +15,12 @@ from cms.pages.admin.forms import (
     PagePermissionInlineAdminForm,
     ViewRestrictionInlineAdminForm,
 )
-from cms.permissions import page_permissions, services as permission_services, utils as permissions
-from cms.permissions.models import ACCESS_CHOICES
+from cms.permissions import (
+    checks as permission_checks,
+    page_permissions,
+    services as permission_services,
+    utils as permissions,
+)
 from cms.shared.operations import OperationContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
@@ -124,15 +127,7 @@ class PagePermissionInlineAdmin(TabularInline):
             if field in self.model.get_all_permissions()
         })
         if obj is not None:
-            allowed = Q(pk__in=[])
-            for scope, _label in ACCESS_CHOICES:
-                grantable = permissions.get_grantable_page_permissions(request.user, obj, scope)
-                if 'can_change_permissions' in grantable:
-                    allowed |= Q(grant_on=scope, **{
-                        field: False for field in self.model.get_all_permissions()
-                        if field not in grantable
-                    })
-            qs = qs.filter(allowed)
+            qs = permission_checks.manageable_page_grants(qs, request.user, obj)
         formset_cls._queryset = qs
         return formset_cls
 
