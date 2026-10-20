@@ -1,6 +1,7 @@
 import warnings
 from unittest.mock import patch
 
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.models import Site
@@ -9,6 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import OperationalError, ProgrammingError
 from django.test.utils import override_settings
 
+from cms.admin.forms import BasePermissionAdminForm
 from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import add_plugin, assign_user_to_page, create_page
 from cms.cache.permissions import (
@@ -39,6 +41,7 @@ from cms.utils.page_permissions import (
     user_can_move_page,
     user_can_publish_page,
 )
+from cms.utils.permissions import current_user
 
 
 @override_settings(
@@ -706,3 +709,231 @@ class GlobalPagePermissionEscalationTests(CMSTestCase):
         self.assertTrue(new_grant.can_publish)
         self.assertTrue(new_grant.can_change_advanced_settings)
         self.assertTrue(new_grant.can_move_page)
+
+
+@override_settings(CMS_PERMISSION=True)
+class PagePermissionInlineAuthorizationTests(CMSTestCase):
+    restricted_flags = (
+        'can_add', 'can_delete', 'can_publish',
+        'can_change_advanced_settings', 'can_move_page',
+    )
+
+    def setUp(self):
+        self.page = create_page('Permission test', 'nav_playground.html', 'en')
+        self.manager = self._create_user('manager', is_staff=True)
+        self.manager.user_permissions.add(*Permission.objects.filter(codename__in=[
+            'change_page', 'add_page', 'delete_page', 'publish_page',
+            'change_page_advanced_settings', 'move_page',
+            'add_pagepermission', 'change_pagepermission', 'delete_pagepermission',
+        ]))
+        flags = dict.fromkeys(GlobalPagePermission.get_all_permissions(), False)
+        flags.update(can_change=True, can_change_permissions=True)
+        self.manager_grant = GlobalPagePermission.objects.create(user=self.manager, **flags)
+        self.manager_grant.sites.add(Site.objects.get_current())
+        self.target = self._create_user('target', is_staff=True)
+        self.group = Group.objects.create(name='target group')
+        self.url = f'/en/admin/cms/page/{self.page.pk}/advanced-settings/?language=en'
+
+    def _grant(self, **flags):
+        defaults = dict.fromkeys(PagePermission.get_all_permissions(), False)
+        defaults.update({'can_change': True, **flags})
+        return PagePermission.objects.create(
+            page=self.page, user=self.target, grant_on=ACCESS_PAGE_AND_DESCENDANTS, **defaults,
+        )
+
+    def _post(self, row=None, actor=None, **changes):
+        """Submit rendered fields, injecting a hidden row when testing forged IDs."""
+        with self.login_user_context(actor or self.manager):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 200)
+            data = {'_save': 'Save'}
+
+            def add_form(form):
+                for bound in form:
+                    value = bound.value()
+                    if isinstance(bound.field, forms.BooleanField):
+                        if value:
+                            data[bound.html_name] = 'on'
+                    elif value is not None:
+                        data[bound.html_name] = value
+
+            add_form(response.context_data['adminform'].form)
+            for inline in response.context_data['inline_admin_formsets']:
+                formset = inline.formset
+                add_form(formset.management_form)
+                for form in formset.forms:
+                    add_form(form)
+                is_view_restriction = bool(row and row.can_view)
+                if inline.opts.show_with_view_permissions != is_view_restriction:
+                    continue
+                form = next((form for form in formset.forms if row and form.instance.pk == row.pk), None)
+                if form is not None:
+                    prefix = form.prefix
+                else:
+                    index = formset.total_form_count()
+                    prefix = f'{formset.prefix}-{index}'
+                    data[f'{formset.prefix}-TOTAL_FORMS'] = index + 1
+                    if row:
+                        data[f'{formset.prefix}-INITIAL_FORMS'] = index + 1
+                    with current_user(actor or self.manager):
+                        fields = formset.empty_form.fields
+                    for field in fields:
+                        if row and hasattr(row, field):
+                            value = getattr(row, field)
+                            if isinstance(value, bool):
+                                value = 'on' if value else ''
+                            elif hasattr(value, 'pk'):
+                                value = value.pk
+                            data[f'{prefix}-{field}'] = '' if value is None else value
+                    data[f'{prefix}-user'] = row.user_id if row else self.target.pk
+                    data[f'{prefix}-page'] = self.page.pk
+                    data[f'{prefix}-grant_on'] = row.grant_on if row else ACCESS_PAGE_AND_DESCENDANTS
+                    data[f'{prefix}-can_change'] = 'on'
+                for field, value in changes.items():
+                    data[f'{prefix}-{field}'] = value
+            return self.client.post(self.url, data)
+
+    def test_ungrantable_rows_are_not_editable(self):
+        rows = [self._grant(**{flag: True}) for flag in self.restricted_flags]
+        allowed = self._grant()
+        with self.login_user_context(self.manager):
+            response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        visible_ids = {
+            form.instance.pk
+            for inline in response.context_data['inline_admin_formsets']
+            for form in inline.formset.forms
+        }
+        self.assertIn(allowed.pk, visible_ids)
+        for row in rows:
+            self.assertNotIn(row.pk, visible_ids)
+
+    def test_forged_edits_cannot_change_protected_rows(self):
+        for flag in self.restricted_flags:
+            row = self._grant(**{flag: True})
+            original = PagePermission.objects.filter(pk=row.pk).values().get()
+            for changes in (
+                {'grant_on': ACCESS_PAGE},
+                {'user': self.manager.pk},
+                {'user': '', 'group': self.group.pk},
+                {'can_change': ''},
+                {'DELETE': 'on'},
+            ):
+                with self.subTest(flag=flag, changes=changes):
+                    response = self._post(row, **changes)
+                    self.assertEqual(response.status_code, 302)
+                    self.assertEqual(PagePermission.objects.filter(pk=row.pk).values().get(), original)
+        self.assertFalse(user_can_publish_page.without_cache(self.reload(self.manager), self.page))
+
+    def test_saving_editable_row_preserves_protected_row(self):
+        protected = self._grant(can_publish=True)
+        editable = self._grant()
+        response = self._post(editable, grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        protected.refresh_from_db()
+        editable.refresh_from_db()
+        self.assertTrue(protected.can_publish)
+        self.assertEqual(protected.grant_on, ACCESS_PAGE_AND_DESCENDANTS)
+        self.assertEqual(editable.grant_on, ACCESS_PAGE)
+
+    def test_new_rows_ignore_forged_flags_and_permissive_defaults(self):
+        response = self._post(**dict.fromkeys(self.restricted_flags, 'on'))
+        self.assertEqual(response.status_code, 302)
+        row = PagePermission.objects.get(user=self.target)
+        for flag in self.restricted_flags:
+            self.assertFalse(getattr(row, flag), flag)
+        self.assertTrue(row.can_change)
+
+    def test_existing_rows_ignore_forged_flags(self):
+        row = self._grant()
+        response = self._post(row, grant_on=ACCESS_PAGE, **dict.fromkeys(self.restricted_flags, 'on'))
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+        for flag in self.restricted_flags:
+            self.assertFalse(getattr(row, flag), flag)
+
+    def test_authorized_manager_can_grant_revoke_and_delete(self):
+        self.manager_grant.can_publish = True
+        self.manager_grant.save()
+        self.manager = self.reload(self.manager)
+        response = self._post(can_publish='on')
+        self.assertEqual(response.status_code, 302)
+        row = PagePermission.objects.get(user=self.target)
+        self.assertTrue(row.can_publish)
+        response = self._post(row, can_publish='')
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertFalse(row.can_publish)
+        response = self._post(row, DELETE='on')
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(PagePermission.objects.filter(pk=row.pk).exists())
+
+    def test_superuser_can_manage_protected_row(self):
+        row = self._grant(can_publish=True)
+        response = self._post(row, actor=self.get_superuser(), can_publish='', grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertFalse(row.can_publish)
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+
+    def test_view_restrictions_remain_editable(self):
+        row = self._grant(can_change=False, can_view=True)
+        response = self._post(row, grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertTrue(row.can_view)
+        self.assertFalse(row.can_change)
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+        for flag in self.restricted_flags:
+            self.assertFalse(getattr(row, flag), flag)
+
+    def test_view_restriction_cannot_transfer_hidden_editing_rights(self):
+        row = self._grant(can_view=True, can_publish=True)
+        for changes in ({'user': self.manager.pk}, {'grant_on': ACCESS_PAGE}, {'DELETE': 'on'}):
+            with self.subTest(changes=changes):
+                response = self._post(row, **changes)
+                self.assertEqual(response.status_code, 302)
+                row.refresh_from_db()
+                self.assertEqual(row.user_id, self.target.pk)
+                self.assertEqual(row.grant_on, ACCESS_PAGE_AND_DESCENDANTS)
+                self.assertTrue(row.can_publish)
+                self.assertTrue(row.can_view)
+
+    def test_authorized_view_restriction_edit_preserves_hidden_flags(self):
+        self.manager_grant.can_publish = True
+        self.manager_grant.save()
+        self.manager = self.reload(self.manager)
+        row = self._grant(can_view=True, can_publish=True)
+        response = self._post(row, grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertTrue(row.can_publish)
+        self.assertTrue(row.can_change)
+        self.assertTrue(row.can_view)
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+
+    def test_excluded_flags_are_preserved_on_existing_instances(self):
+        row = self._grant(can_publish=True)
+        form_class = forms.modelform_factory(
+            PagePermission, form=BasePermissionAdminForm,
+            fields=['user', 'can_change', 'grant_on'],
+        )
+        form = form_class(instance=row, data={
+            'user': self.target.pk, 'can_change': 'on', 'grant_on': ACCESS_PAGE,
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        row.refresh_from_db()
+        self.assertTrue(row.can_publish)
+
+    def test_formsets_keep_their_own_page(self):
+        other = create_page('Other', 'nav_playground.html', 'en')
+        inline = PagePermissionInlineAdmin(Page, admin.site)
+        request = self.get_request(self.url)
+        request.user = self.manager
+        with current_user(self.manager):
+            first = inline.get_formset(request, self.page)
+            second = inline.get_formset(request, other)
+        self.assertEqual(first.form._page, self.page)
+        self.assertEqual(second.form._page, other)
