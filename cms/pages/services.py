@@ -24,7 +24,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import QuerySet
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _lazy
+from django.utils.translation import get_language, gettext_lazy as _lazy
 
 from cms import api, operations
 from cms.core.plugins import copy_plugins_to_placeholder
@@ -463,6 +463,9 @@ def delete_page(page: Page, *, context: OperationContext, permissions=None) -> N
     placeholders hang off page contents by generic relation, which the database
     cannot cascade through.
     """
+    # Post signal receivers (e.g. the log entry) describe the page by its title
+    # after its content is gone. Load the title while it still exists.
+    page.get_admin_content(get_language(), fallback=True)
     with operation(
         operations.DELETE_PAGE,
         context,
