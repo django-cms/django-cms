@@ -79,6 +79,17 @@ Then apply migrations, collect static files, and run the django CMS checks::
 What's new in 6.0.0
 *******************
 
+Permission performance
+======================
+
+Bulk page reads now index change-permission grants by page path and check only
+each page's ancestor paths, instead of scanning every grant for every restricted
+page. This removes quadratic grant matching as page and grant counts grow.
+
+Saving page permission grants now validates distinct user and group recipients
+in batches, using at most two recipient-fetch queries instead of one per grant.
+The existing permission and grant-scope rules are preserved.
+
 A modular code base
 ===================
 
@@ -399,6 +410,10 @@ Bug fixes
   language than the translation's own (for example from an admin running in
   English) showed "This page has no preview!" instead of the apphook. The
   editor now resolves and renders the apphook in the translation's language.
+
+* The ``current_user()`` context manager restores the previous user when its
+  block raises. Previously a caught exception left the temporary user in place,
+  so later page saves were attributed to it.
 
 * Deleting a translation that was never published, and so has no URL, no longer
   raises ``PageUrl.DoesNotExist``.
@@ -740,6 +755,11 @@ Notes:
   ``get_model_permission_codename`` to ``cms.shared.permissions``, and
   ``get_permission_codename`` is Django's
   ``django.contrib.auth.get_permission_codename``.
+* The acting-user helpers ``set_current_user``, ``reset_current_user``,
+  ``get_current_user``, ``get_current_user_name`` and ``current_user`` moved
+  from ``cms.utils.permissions`` to ``cms.shared.users``, together with
+  ``get_clean_username`` from ``cms.utils.page``. They are not permission
+  policy, and pages needs them whether or not page permissions are enabled.
 * The template tag classes of ``cms_tags`` moved to
   ``cms.core.editing.templatetags``, ``cms.pages.templatetags``,
   ``cms.toolbar.templatetags`` and ``cms.shared.templatetags``;

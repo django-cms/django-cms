@@ -240,6 +240,60 @@ forbidden_modules =
     cms.toolbar
 
 # ---------------------------------------------------------------------------
+# Container: pages -> permissions  (RFC 5.0, 6.2)
+# Pages and permissions are siblings. Permissions may import pages (the
+# PagePermission -> Page FK is irreducible); pages reaches permissions only
+# through the `page_permissions` contract, so the container can be dropped or
+# replaced.
+#
+# The acting-user helpers moved to cms.shared.users, which retired the
+# imports from Page.save(), cms.api and the page admin forms that had nothing
+# to do with permission policy.
+#
+# Blind spot: `from cms.models import PagePermission` goes through the facade.
+# ---------------------------------------------------------------------------
+[importlinter:contract:pages-not-permissions]
+name = pages reaches permissions only through the page_permissions contract
+type = forbidden
+allow_indirect_imports = True
+source_modules =
+    cms.pages
+forbidden_modules =
+    cms.permissions
+ignore_imports =
+    # The default page backend forwards to the grant-based policy. Retired
+    # when the default becomes Django model permissions and cms.permissions
+    # registers itself as the `page_permissions` contract.
+    cms.pages.permissions -> cms.permissions.page_permissions
+    # Predicates called directly instead of through get_page_permissions().
+    # Retired by routing them through the backend.
+    cms.pages.editing -> cms.permissions.page_permissions
+    cms.pages.models.page -> cms.permissions.page_permissions
+    cms.pages.queries -> cms.permissions.page_permissions
+    cms.pages.rendering -> cms.permissions.page_permissions
+    cms.pages.toolbar -> cms.permissions.page_permissions
+    # Cache invalidation on tree changes. Retired by a signal the permissions
+    # container listens to (cf. `menu_invalidation`).
+    cms.pages.models.page -> cms.permissions.cache
+    cms.pages.models.page -> cms.permissions.models
+    cms.pages.models.page -> cms.permissions.utils
+    cms.pages.services -> cms.permissions.cache
+    # The page admin hosts the grant inlines and the user/group forms.
+    # Retired when cms.permissions contributes its inlines and forms to the
+    # page admin by registration.
+    cms.pages.admin.forms -> cms.permissions.checks
+    cms.pages.admin.forms -> cms.permissions.models
+    cms.pages.admin.forms -> cms.permissions.page_permissions
+    cms.pages.admin.forms -> cms.permissions.services
+    cms.pages.admin.forms -> cms.permissions.utils
+    cms.pages.admin.page -> cms.permissions.admin
+    cms.pages.admin.page -> cms.permissions.cache
+    cms.pages.admin.page -> cms.permissions.models
+    cms.pages.admin.page -> cms.permissions.page_permissions
+    cms.pages.admin.page -> cms.permissions.services
+    cms.pages.admin.page -> cms.permissions.utils
+
+# ---------------------------------------------------------------------------
 # Layer: model  (RFC 5.1)
 # Models must not import upwards. This contract is already KEPT -- it exists
 # to stop it regressing.

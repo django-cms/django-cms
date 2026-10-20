@@ -9,6 +9,13 @@ Backed by the non-profit django CMS Association (`Sponsor us <https://www.django
 
 This repository contains the core package published as ``django-cms`` on PyPI.
 
+django CMS 6 development branch
+===============================
+
+This branch contains ongoing development for django CMS 6. APIs and behavior
+may change as work progresses. For the changes planned for this version, see
+the `django CMS 6 upgrade guide <docs/upgrade/6.0.0.rst>`_.
+
 Start here
 ==========
 

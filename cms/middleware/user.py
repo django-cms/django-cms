@@ -10,7 +10,7 @@ class CurrentUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        from cms.permissions.utils import reset_current_user, set_current_user
+        from cms.shared.users import reset_current_user, set_current_user
 
         token = set_current_user(getattr(request, 'user', None))
         try:

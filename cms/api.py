@@ -58,14 +58,14 @@ from cms.core.plugins import copy_plugins_to_placeholder, downcast_plugins
 from cms.models import PageContent
 from cms.pages.apphook_pool import apphook_pool
 from cms.pages.models.page import Page
-from cms.pages.utils import get_available_slug, get_clean_username
+from cms.pages.utils import get_available_slug
 from cms.permissions.models import (
     ACCESS_PAGE_AND_DESCENDANTS,
     GlobalPagePermission,
     PagePermission,
     PageUser,
 )
-from cms.permissions.utils import get_current_user, reset_current_user, set_current_user
+from cms.shared.users import get_clean_username, get_current_user, reset_current_user, set_current_user
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from menus.menu_pool import menu_pool

@@ -9,7 +9,7 @@ from django.urls import path
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import SimpleLazyObject
 
-from cms.permissions.utils import (
+from cms.shared.users import (
     _current_user,
     current_user,
     get_current_user,
@@ -55,6 +55,14 @@ class CurrentUserContextTests(SimpleTestCase):
         user = AnonymousUser()
         with current_user(user):
             self.assertIs(get_current_user(), user)
+        self.assertIsNone(get_current_user())
+
+    def test_context_manager_restores_on_exception(self):
+        outer, inner = AnonymousUser(), AnonymousUser()
+        with current_user(outer):
+            with self.assertRaises(RuntimeError), current_user(inner):
+                raise RuntimeError
+            self.assertIs(get_current_user(), outer)
         self.assertIsNone(get_current_user())
 
     def test_lazy_user_survives_context_comparison(self):

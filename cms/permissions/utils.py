@@ -1,94 +1,34 @@
 from collections import defaultdict
-from contextlib import contextmanager
-from contextvars import ContextVar
 from functools import lru_cache, wraps
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
 
-from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
+from cms.compat import moved
+from cms.constants import ROOT_USER_LEVEL
 from cms.core.permissions import (  # noqa: F401  -- re-exported for compatibility
     has_plugin_permission,
     user_can_view_placeholder_source,
 )
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
-from cms.pages.utils import get_clean_username
 from cms.shared.permissions import get_model_permission_codename
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 
-
-class _CurrentUserRef:
-    """Identity-comparable holder for the value of :data:`_current_user`.
-
-    ``request.user`` is a ``SimpleLazyObject``, and asgiref compares context
-    variables when it restores a context after handing control back to the
-    event loop (``asgiref.sync._restore_context``). Comparing a lazy user
-    evaluates it, which runs the auth backend's database query on the event
-    loop thread and raises ``SynchronousOnlyOperation`` -- in some asgiref
-    versions before the result future is completed, hanging the request.
-
-    Storing the user behind this wrapper keeps the context variable cheap to
-    compare (default identity equality) so the user is only evaluated where
-    django CMS actually reads it, in synchronous code.
-    """
-
-    __slots__ = ('user',)
-
-    def __init__(self, user):
-        self.user = user
-
-
-# context variable support for async-safe user tracking
-_current_user: ContextVar = ContextVar('current_user', default=None)
-
-
-def set_current_user(user):
-    """
-    Assigns current user from request to context variable, used by
-    CurrentUserMiddleware.
-
-    Returns the ``contextvars.Token`` for the change, so callers can restore
-    the previous value with :func:`reset_current_user`.
-    """
-    return _current_user.set(_CurrentUserRef(user) if user is not None else None)
-
-
-def reset_current_user(token):
-    """
-    Restores the current user context variable to the value it held before the
-    ``set_current_user`` call that produced ``token``.
-    """
-    _current_user.reset(token)
-
-
-def get_current_user():
-    """
-    Returns current user, or None
-    """
-    ref = _current_user.get()
-    return ref.user if ref is not None else None
-
-
-def get_current_user_name():
-    current_user = get_current_user()
-
-    if not current_user:
-        return SCRIPT_USERNAME
-    return get_clean_username(current_user)
-
-
-@contextmanager
-def current_user(user):
-    """
-    Changes the current user just within a context.
-    """
-    old_user = get_current_user()
-    set_current_user(user)
-    yield
-    set_current_user(old_user)
+__getattr__, __dir__, __all__ = moved(
+    __name__,
+    {
+        "current_user": "cms.shared.users.current_user",
+        "get_clean_username": "cms.shared.users.get_clean_username",
+        "get_current_user": "cms.shared.users.get_current_user",
+        "get_current_user_name": "cms.shared.users.get_current_user_name",
+        "reset_current_user": "cms.shared.users.reset_current_user",
+        "set_current_user": "cms.shared.users.set_current_user",
+    },
+    since="6.0",
+)
 
 
 def _has_global_permission(user, site, action):
@@ -466,5 +406,10 @@ def get_subordinate_groups(user, site):
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )
     )
+
+
+# Keep the module's existing exports alongside the relocated helpers.
+__all__.extend(name for name in globals() if not name.startswith("_") and name != "moved")
+__all__.sort()
 
 
