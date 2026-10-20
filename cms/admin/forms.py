@@ -1,3 +1,5 @@
+from copy import copy
+
 from django import forms
 from django.apps import apps
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -61,6 +63,7 @@ from cms.utils.page_permissions import (
 from cms.utils.permissions import (
     get_current_user,
     get_grantable_global_permissions,
+    get_grantable_page_permissions,
     get_model_permission_codename,
     get_subordinate_groups,
     get_subordinate_users,
@@ -1198,14 +1201,45 @@ class ChangeListForm(forms.Form):
 class BasePermissionAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Excluded flags must not inherit permissive model defaults on new
+        # grants. Existing grants must retain them: excluding a field is not
+        # authorization to revoke it.
+        if not self.instance._state.adding:
+            return
         permission_fields = self._meta.model.get_all_permissions()
 
         for field in permission_fields:
-            if field not in self.base_fields:
+            if field not in self.fields:
                 setattr(self.instance, field, False)
 
 
-class PagePermissionInlineAdminForm(BasePermissionAdminForm):
+class BasePagePermissionInlineAdminForm(BasePermissionAdminForm):
+    _page = None
+    _current_user = None
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # The inline binds both values per request. Standalone forms have no
+        # admin actor, and must not inherit one left in the current-user context.
+        user = self._current_user
+        page = self._page
+        grant_on = cleaned_data.get('grant_on')
+        if user is None or page is None or grant_on is None:
+            return cleaned_data
+        grantable = get_grantable_page_permissions(user, page, grant_on)
+        held = {
+            flag for flag in PagePermission.get_all_permissions()
+            if (cleaned_data.get(flag) if flag in self.fields else getattr(self.instance, flag))
+        }
+        if 'can_change_permissions' not in grantable or not held <= grantable:
+            self.add_error('grant_on', forms.ValidationError(
+                _("You cannot grant or manage these permissions throughout the selected scope."),
+                code='permission_scope_not_allowed',
+            ))
+        return cleaned_data
+
+
+class PagePermissionInlineAdminForm(BasePagePermissionInlineAdminForm):
     """
     Page permission inline admin form used in inline admin. Required, because
     user and group queryset must be changed. User can see only users on the same
@@ -1224,7 +1258,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        user = get_current_user()  # current user from threadlocals
+        user = self._current_user or get_current_user()
 
         site_id = getattr(self._page, "site_id", None)
         site = Site.objects._get_site_by_id(site_id) if site_id else None
@@ -1263,14 +1297,18 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
                 # We can't set a queryset on a raw id lookup, but we can use
                 # the fact that it respects the limit_choices_to parameter.
                 if limit_choices:
+                    # The relation belongs to the model field and is otherwise
+                    # shared by other forms and requests (including view restrictions).
+                    self.fields["user"].widget.rel = copy(self.fields["user"].widget.rel)
                     self.fields["user"].widget.rel.limit_choices_to = dict(
                         id__in=list(sub_users.values_list("pk", flat=True))
                     )
         else:
             self.fields["user"].widget = UserSelectAdminWidget()
-            self.fields["user"].queryset = sub_users
             self.fields["user"].widget.user = user  # assign current user
 
+        # Set this after replacing the widget so its choices are populated too.
+        self.fields["user"].queryset = sub_users
         self.fields["group"].queryset = get_subordinate_groups(user, site)
 
     class Meta:
@@ -1289,7 +1327,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
         model = PagePermission
 
 
-class ViewRestrictionInlineAdminForm(BasePermissionAdminForm):
+class ViewRestrictionInlineAdminForm(BasePagePermissionInlineAdminForm):
     page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
         label=_("user"),
@@ -1346,27 +1384,6 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
             "sites",
         ]
         model = GlobalPagePermission
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if not self.instance.pk:
-            return
-
-        # ``GlobalPagePermissionAdmin.get_form`` excludes the flags the manager
-        # may not grant, and ``BasePermissionAdminForm`` then blanks every
-        # excluded flag on the instance. That is right for a new row -- several
-        # ``can_*`` flags default to ``True`` on the model -- but on an existing
-        # one it would silently *revoke* rights the manager is equally
-        # unauthorized to touch, so restore the stored values here.
-        stored = (
-            self._meta.model._base_manager.filter(pk=self.instance.pk)
-            .values(*self._meta.model.get_all_permissions())
-            .first()
-        )
-        for field, value in (stored or {}).items():
-            if field not in self.fields:
-                setattr(self.instance, field, value)
 
     def clean(self):
         cleaned_data = super().clean()
