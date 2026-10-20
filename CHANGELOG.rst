@@ -11,6 +11,9 @@ Features:
 
 Bug Fixes:
 ----------
+* Reject sibling URL conflicts in ``validate_url_uniqueness()`` even when the
+  candidate path matches the page's expected parent path. Excluding the edited
+  page no longer skips checks against other pages.
 * Some inline editing modals did not contain _popup=1 query param for Django (#8816) (8d2f94b02) -- Fabian Braun
 * Object tools moved with Django 6.1 (#8819) (8df73e592) -- Fabian Braun
 * Release scripts silently produced an empty changelog (#8813) (a3e2b34cf) -- Fabian Braun
