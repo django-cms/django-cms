@@ -142,6 +142,31 @@ These three behaviours cover most real cases. Be deliberate about
 which one each language gets; "serve English under the German URL"
 is rarely what a German-speaking visitor wants.
 
+.. _apphooks_language_fallback:
+
+Apphooks
+--------
+
+The page an apphook is attached to follows the rules above. The URLs
+*below* it are served by the application only in languages in which
+the page is published. In any other language, they redirect (302) to
+the same URL in the first fallback language in which the page is
+published: with ``fallbacks = ["de"]``, ``/fi/blog/category/news/``
+redirects to ``/de/blog/category/news/``. The query string is kept.
+
+This happens regardless of ``redirect_on_fallback``, as the
+application cannot be served under another language's URL. Two
+exceptions apply:
+
+* If pages are published in the requested language at or below the
+  apphook page's path, those pages take precedence and nothing is
+  redirected.
+* Apphooks on the home page are not redirected, since their URLs
+  would cover the whole language.
+
+Once the page is published in the requested language, the
+application serves that language directly.
+
 
 **************
 URL strategies

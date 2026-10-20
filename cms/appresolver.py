@@ -1,17 +1,20 @@
+import re
 from collections import OrderedDict
 from importlib import import_module
 
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.db import OperationalError, ProgrammingError
-from django.urls import NoReverseMatch, Resolver404, URLResolver, reverse
+from django.db import OperationalError, ProgrammingError, models
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.urls import NoReverseMatch, Resolver404, URLResolver, re_path, reverse
 from django.urls.resolvers import RegexPattern, URLPattern
 from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
-from cms.utils.i18n import get_language_list
+from cms.utils.i18n import get_fallback_languages, get_language_list, get_public_languages
 
 APP_RESOLVERS = []
 
@@ -196,6 +199,75 @@ def get_patterns_for_page_url(page_url):
     return url_patterns
 
 
+def _fallback_redirect(page_id, language, fallback):
+    """Return a view redirecting app sub-URLs requested in ``language`` to the same
+    sub-URL in the page's ``fallback`` language.
+
+    As for pages, languages which are not public are only available to staff users.
+    The target URL is computed per request: reversing while the URLconf is being
+    built would recurse into building it.
+    """
+
+    def fallback_redirect(request, rest):
+        from cms.page_rendering import _handle_no_page
+
+        page = get_object_or_404(Page, pk=page_id)
+        is_staff = hasattr(request, "user") and request.user.is_staff
+        if language not in get_public_languages(site_id=page.site_id) and not is_staff:
+            return _handle_no_page(request)
+        url = page.get_absolute_url(fallback, fallback=False) + rest
+        if request.META.get("QUERY_STRING"):
+            url += "?" + request.META["QUERY_STRING"]
+        return HttpResponseRedirect(url)
+
+    return fallback_redirect
+
+
+def _get_fallback_patterns(page, paths, site_id):
+    """Return redirect patterns for languages in which the apphook page has no public URL.
+
+    Requests to app sub-URLs in such a language (e.g., ``/fi/blog/category/news/``)
+    would otherwise 404, since app patterns exist only for languages with a public URL.
+    They are redirected to the same sub-URL in the first fallback language that has one
+    (``/de/blog/category/news/``). The page root itself is left to ``cms.views.details``,
+    which renders or redirects according to ``redirect_on_fallback``.
+    """
+    from cms.models.pagemodel import PageUrl
+
+    public_languages = get_public_languages(site_id=site_id)
+    fallback_patterns = {}
+    for language in get_language_list(site_id=site_id):
+        if language in paths:
+            continue
+        fallback = next(
+            (
+                lang
+                for lang in get_fallback_languages(language, site_id=site_id)
+                if lang in paths and lang in public_languages
+            ),
+            None,
+        )
+        if fallback is None:
+            continue
+        path = paths[fallback]
+        if not path:
+            # An apphook on the home page would catch every URL of the language
+            continue
+        shadows_pages = (
+            PageUrl.objects.filter(site_id=site_id, language=language)
+            .filter(models.Q(path=path) | models.Q(path__startswith=f"{path}/"))
+            .exists()
+        )
+        if shadows_pages:
+            # Pages published in this language below the path take precedence
+            continue
+        pattern = re_path(rf"^{re.escape(path)}/(?P<rest>.+)$", _fallback_redirect(page.pk, language, fallback))
+        # Lets applications_page_check() find the page, e.g., for permission checks
+        pattern.page_id = page.pk
+        fallback_patterns[language] = [pattern]
+    return fallback_patterns
+
+
 def get_app_patterns():
     try:
         try:
@@ -273,13 +345,13 @@ def _get_app_patterns(site: Site | None) -> list[URLPattern]:
         app_ns = app.app_name, page_url.page.application_namespace
         with override(page_url.language):
             hooked_applications[page_url.page][page_url.language] = (
-                app_ns, get_patterns_for_page_url(page_url), app)
+                app_ns, get_patterns_for_page_url(page_url), app, page_url.path)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs
     app_patterns = []
     for page, languages in hooked_applications.items():
         resolver = None
-        for lang, ((app_ns, inst_ns), current_patterns, app) in languages.items():
+        for lang, ((app_ns, inst_ns), current_patterns, app, _path) in languages.items():
             if not resolver:
                 regex_pattern = RegexPattern(r'')
                 resolver = AppRegexURLResolver(
@@ -290,6 +362,14 @@ def _get_app_patterns(site: Site | None) -> list[URLPattern]:
             if site is None:
                 _set_site_filter(current_patterns, page.site_id)
             resolver.url_patterns_dict[lang] = current_patterns
+        paths = {lang: path for lang, (*_, path) in languages.items()}
+        for lang, fallback_patterns in _get_fallback_patterns(page, paths, page.site_id).items():
+            # Apply the same access checks as for the app's own patterns
+            if app.permissions:
+                _set_permissions(fallback_patterns, app.exclude_permissions)
+            if site is None:
+                _set_site_filter(fallback_patterns, page.site_id)
+            resolver.url_patterns_dict[lang] = fallback_patterns
         app_patterns.append(resolver)
         APP_RESOLVERS.append(resolver)
     return app_patterns
