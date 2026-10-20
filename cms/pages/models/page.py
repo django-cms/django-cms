@@ -18,9 +18,9 @@ from django.utils.translation import get_language, gettext_lazy as _, override a
 from cms import constants
 from cms.pages.models.managers import PageManager, PageUrlManager
 from cms.pages.mptree import get_tree_base
-from cms.pages.utils import get_clean_username
 from cms.shared.resolvers import provide
 from cms.shared.signals import page_caches_invalidated
+from cms.shared.users import get_clean_username, get_current_user_name
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
@@ -708,8 +708,6 @@ class Page(MP_Node):
             self.application_namespace = None
 
         created = not bool(self.pk)
-        from cms.permissions.utils import get_current_user_name
-
         self.changed_by = get_current_user_name()
         if created:
             self.created_by = self.changed_by

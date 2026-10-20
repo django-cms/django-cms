@@ -42,7 +42,6 @@ from cms.permissions.page_permissions import (  # the add checks stay importable
     user_can_change_page,
 )
 from cms.permissions.utils import (
-    get_current_user,
     get_grantable_global_permissions,
     get_model_permission_codename,
     get_subordinate_groups,
@@ -51,6 +50,7 @@ from cms.permissions.utils import (
 )
 from cms.shared.checks import can
 from cms.shared.operations import OperationContext
+from cms.shared.users import get_current_user
 from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request

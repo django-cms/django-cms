@@ -39,7 +39,7 @@ from cms.permissions.page_permissions import (
     user_can_move_page,
     user_can_publish_page,
 )
-from cms.permissions.utils import current_user
+from cms.shared.users import current_user
 from cms.test_utils.testcases import CMSTestCase
 
 
@@ -901,3 +901,75 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
             second = inline.get_formset(request, other)
         self.assertEqual(first.form._page, self.page)
         self.assertEqual(second.form._page, other)
+
+
+class BatchedPermissionChecksTests(CMSTestCase):
+    def test_indexed_change_grants_preserve_scope_boundaries(self):
+        from types import SimpleNamespace
+
+        from cms.permissions.page_permissions import _change_permission_predicate
+
+        user = self._create_user('indexed-editor', is_staff=True, permissions=['change_page'])
+        site = Site.objects.get_current()
+        ancestor = '0001'
+        paths = [ancestor, '00010001', '000100010001', '0002', '00020001']
+        scopes = [ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_DESCENDANTS,
+                  ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS]
+        for scope in scopes:
+            grants = [(scope, ancestor), (scope, ancestor)]
+            with self.subTest(scope=scope), patch(
+                'cms.permissions.page_permissions.get_change_perm_tuples', return_value=grants
+            ):
+                predicate = _change_permission_predicate(user, site)
+                for path in paths:
+                    self.assertEqual(predicate(SimpleNamespace(path=path)), PermissionTuple(grants[0]).contains(path))
+        with patch('cms.permissions.page_permissions.get_change_perm_tuples', return_value=[]):
+            self.assertFalse(_change_permission_predicate(user, site)(SimpleNamespace(path=ancestor)))
+
+    def test_recipient_queries_do_not_grow_with_grant_count(self):
+        from django.contrib.auth import get_user_model
+
+        from cms.permissions.checks import check_grant_recipients
+        from cms.shared.operations import OperationContext
+
+        page = create_page('Recipients', 'nav_playground.html', 'en')
+        actor = self._create_user('batch-editor', is_staff=True)
+        users = [self._create_user(f'recipient-{i}', is_staff=True) for i in range(5)]
+        groups = [Group.objects.create(name=f'recipient-group-{i}') for i in range(5)]
+        grants = [PagePermission(user=user, can_change=True) for user in users]
+        grants += [PagePermission(group=group, can_change=True) for group in groups]
+        # Isolate the recipient fetches from the queries that establish subordination.
+        with patch('cms.permissions.utils.get_subordinate_users', return_value=get_user_model().objects.all()), patch(
+            'cms.permissions.utils.get_subordinate_groups', return_value=Group.objects.all()
+        ):
+            for batch in ([grants[0], grants[5]], grants * 3):
+                with self.assertNumQueries(2):
+                    check_grant_recipients(OperationContext(user=actor), page=page, save=batch)
+            with self.assertNumQueries(0):
+                check_grant_recipients(OperationContext(user=actor), page=page, save=[])
+                check_grant_recipients(OperationContext(user=actor), page=page,
+                                       save=[PagePermission(user=actor, **{
+                                           flag: flag == 'can_view' for flag in PagePermission.get_all_permissions()
+                                       })])
+
+    def test_disallowed_recipients_are_rejected(self):
+        from django.contrib.auth import get_user_model
+
+        from cms.permissions.checks import check_grant_recipients
+        from cms.shared.operations import OperationContext
+
+        page = create_page('Recipients', 'nav_playground.html', 'en')
+        actor = self._create_user('batch-editor', is_staff=True)
+        allowed = self._create_user('allowed', is_staff=True)
+        forbidden = self._create_user('forbidden', is_staff=True)
+        allowed_group = Group.objects.create(name='allowed')
+        forbidden_group = Group.objects.create(name='forbidden')
+        valid = [PagePermission(user=allowed, can_change=True), PagePermission(group=allowed_group, can_change=True)]
+        with patch('cms.permissions.utils.get_subordinate_users',
+                   return_value=get_user_model().objects.filter(pk=allowed.pk)), patch(
+            'cms.permissions.utils.get_subordinate_groups', return_value=Group.objects.filter(pk=allowed_group.pk)
+        ):
+            for grant in (PagePermission(user=forbidden, can_change=True),
+                          PagePermission(group=forbidden_group, can_change=True)):
+                with self.subTest(grant=grant), self.assertRaises(PermissionDenied):
+                    check_grant_recipients(OperationContext(user=actor), page=page, save=[*valid, grant])

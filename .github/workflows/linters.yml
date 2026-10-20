@@ -36,7 +36,10 @@ jobs:
       with:
         python-version: '3.12'
 
-    - run: python -Im pip install --user import-linter
+    # setup-python's interpreter has no user site-packages (and -I disables them
+    # anyway): install into it directly. lint-imports puts the checkout on the
+    # path itself, so cms needs no installing.
+    - run: python -m pip install import-linter
 
     # Contracts and their grandfathered exceptions live in .importlinter.
     # A new boundary violation fails here; so does an exception that no

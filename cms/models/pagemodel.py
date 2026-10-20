@@ -28,7 +28,7 @@ __getattr__, __dir__, __all__ = moved(
         "force_language": "cms.pages.models.page.force_language",
         "force_str": "cms.pages.models.page.force_str",
         "getLogger": "cms.pages.models.page.getLogger",
-        "get_clean_username": "cms.pages.models.page.get_clean_username",
+        "get_clean_username": "cms.shared.users.get_clean_username",
         "get_cms_setting": "cms.pages.models.page.get_cms_setting",
         "get_current_language": "cms.pages.models.page.get_current_language",
         "get_language": "cms.pages.models.page.get_language",
