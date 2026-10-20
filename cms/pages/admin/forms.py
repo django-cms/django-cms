@@ -1001,10 +1001,15 @@ class ChangeListForm(forms.Form):
 class BasePermissionAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Excluded flags must not inherit permissive model defaults on new
+        # grants. Existing grants must retain them: excluding a field is not
+        # authorization to revoke it.
+        if not self.instance._state.adding:
+            return
         permission_fields = self._meta.model.get_all_permissions()
 
         for field in permission_fields:
-            if field not in self.base_fields:
+            if field not in self.fields:
                 setattr(self.instance, field, False)
 
 
@@ -1149,27 +1154,6 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
             "sites",
         ]
         model = GlobalPagePermission
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if not self.instance.pk:
-            return
-
-        # ``GlobalPagePermissionAdmin.get_form`` excludes the flags the manager
-        # may not grant, and ``BasePermissionAdminForm`` then blanks every
-        # excluded flag on the instance. That is right for a new row -- several
-        # ``can_*`` flags default to ``True`` on the model -- but on an existing
-        # one it would silently *revoke* rights the manager is equally
-        # unauthorized to touch, so restore the stored values here.
-        stored = (
-            self._meta.model._base_manager.filter(pk=self.instance.pk)
-            .values(*self._meta.model.get_all_permissions())
-            .first()
-        )
-        for field, value in (stored or {}).items():
-            if field not in self.fields:
-                setattr(self.instance, field, value)
 
     def clean(self):
         cleaned_data = super().clean()

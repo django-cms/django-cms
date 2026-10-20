@@ -395,6 +395,20 @@ page-user manager is to off-load routine account administration from
 the superuser. Hand the role only to people you would trust with the
 accounts it covers.
 
+Delegating per-page permissions
+===============================
+
+With ``CMS_PERMISSION=True``, a manager with ``can_change_permissions``
+can manage subordinate permission grants through a page's advanced settings.
+The inline offers only the permission flags the manager can grant on that page.
+Existing grants containing flags they cannot grant are omitted from the editable
+inlines, including view restrictions that also carry such editing rights.
+Those grants cannot be changed or deleted by submitting their IDs manually.
+This also prevents transferring protected rights to another user or group, or
+changing their scope through ``grant_on``. A manager authorized to grant all
+the row's rights, or a superuser, must make those changes.
+
+
 Delegating global page permissions
 ==================================
 
