@@ -3,11 +3,12 @@ from unittest.mock import patch
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
-from django.db import OperationalError, ProgrammingError
+from django.db import OperationalError, ProgrammingError, connection
 from django.test.utils import override_settings
 
 from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
@@ -39,6 +40,7 @@ from cms.permissions.page_permissions import (
     user_can_move_page,
     user_can_publish_page,
 )
+from cms.permissions.utils import get_grantable_page_permissions
 from cms.shared.users import current_user
 from cms.test_utils.testcases import CMSTestCase
 
@@ -784,9 +786,11 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
                 {'DELETE': 'on'},
             ):
                 with self.subTest(flag=flag, changes=changes):
+                    before = list(PagePermission.objects.order_by('pk').values())
                     response = self._post(row, **changes)
                     self.assertEqual(response.status_code, 302)
                     self.assertEqual(PagePermission.objects.filter(pk=row.pk).values().get(), original)
+                    self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
         self.assertFalse(user_can_publish_page.without_cache(self.reload(self.manager), self.page))
 
     def test_saving_editable_row_preserves_protected_row(self):
@@ -856,8 +860,10 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
         row = self._grant(can_view=True, can_publish=True)
         for changes in ({'user': self.manager.pk}, {'grant_on': ACCESS_PAGE}, {'DELETE': 'on'}):
             with self.subTest(changes=changes):
+                before = list(PagePermission.objects.order_by('pk').values())
                 response = self._post(row, **changes)
                 self.assertEqual(response.status_code, 302)
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
                 row.refresh_from_db()
                 self.assertEqual(row.user_id, self.target.pk)
                 self.assertEqual(row.grant_on, ACCESS_PAGE_AND_DESCENDANTS)
@@ -901,6 +907,219 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
             second = inline.get_formset(request, other)
         self.assertEqual(first.form._page, self.page)
         self.assertEqual(second.form._page, other)
+
+    def _manager_page_grant(self, scope, **flags):
+        defaults = dict.fromkeys(PagePermission.get_all_permissions(), False)
+        defaults.update(can_change=True, **flags)
+        return PagePermission.objects.create(
+            page=self.page, user=self.manager, grant_on=scope, **defaults,
+        )
+
+    def test_grantable_scope_matrix_includes_future_pages(self):
+        scopes = (
+            ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
+            ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS,
+        )
+        covered = {
+            ACCESS_PAGE: {ACCESS_PAGE},
+            ACCESS_CHILDREN: {ACCESS_CHILDREN},
+            ACCESS_PAGE_AND_CHILDREN: {ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN},
+            ACCESS_DESCENDANTS: {ACCESS_CHILDREN, ACCESS_DESCENDANTS},
+            ACCESS_PAGE_AND_DESCENDANTS: set(scopes),
+        }
+        # The page has no children: authorization must still cover future ones.
+        for held_scope in scopes:
+            grant = self._manager_page_grant(held_scope, can_publish=True)
+            self.manager = self.reload(self.manager)
+            for requested_scope in scopes:
+                with self.subTest(held=held_scope, requested=requested_scope):
+                    grantable = get_grantable_page_permissions(self.manager, self.page, requested_scope)
+                    self.assertEqual('can_publish' in grantable, requested_scope in covered[held_scope])
+            grant.delete()
+
+    def test_scope_coverage_combines_user_group_and_ancestor_grants(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        self.manager.groups.add(self.group)
+        group_grant = self._grant(can_publish=True)
+        group_grant.user = None
+        group_grant.group = self.group
+        group_grant.grant_on = ACCESS_DESCENDANTS
+        group_grant.save()
+        child = create_page('Child', 'nav_playground.html', 'en', parent=self.page)
+        for page in (self.page, child):
+            with self.subTest(page=page.pk):
+                self.assertIn('can_publish', get_grantable_page_permissions(
+                    self.manager, page, ACCESS_PAGE_AND_DESCENDANTS,
+                ))
+
+    def test_grants_on_existing_children_do_not_cover_future_siblings(self):
+        child = create_page('Child', 'nav_playground.html', 'en', parent=self.page)
+        grant = self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_publish=True)
+        grant.page = child
+        grant.save()
+        self.assertNotIn('can_publish', get_grantable_page_permissions(
+            self.manager, self.page, ACCESS_DESCENDANTS,
+        ))
+
+    def test_ancestor_children_grant_covers_only_child_itself(self):
+        self._manager_page_grant(ACCESS_CHILDREN, can_publish=True)
+        child = create_page('Child', 'nav_playground.html', 'en', parent=self.page)
+        self.assertIn('can_publish', get_grantable_page_permissions(self.manager, child, ACCESS_PAGE))
+        self.assertNotIn('can_publish', get_grantable_page_permissions(
+            self.manager, child, ACCESS_PAGE_AND_CHILDREN,
+        ))
+
+    def test_scope_requires_django_permission(self):
+        self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_publish=True)
+        self.manager.user_permissions.remove(Permission.objects.get(codename='publish_page'))
+        self.assertNotIn('can_publish', get_grantable_page_permissions(
+            self.reload(self.manager), self.page, ACCESS_PAGE_AND_DESCENDANTS,
+        ))
+
+    def test_new_grant_cannot_exceed_flag_scope(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(can_publish='on')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'throughout the selected scope')
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+        response = self._post(can_publish='on', grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(PagePermission.objects.get(user=self.target).can_publish)
+
+    def test_new_grant_requires_management_throughout_scope(self):
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.can_publish = True
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE, can_change_permissions=True)
+        self._grant()  # Make the recipient subordinate to the page manager.
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(can_publish='on')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'throughout the selected scope')
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    def test_existing_scope_protects_against_forged_changes(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        for view in (False, True):
+            row = self._grant(can_publish=True, can_view=view)
+            for changes in (
+                {'grant_on': ACCESS_PAGE}, {'user': self.manager.pk},
+                {'user': '', 'group': self.group.pk}, {'DELETE': 'on'},
+            ):
+                with self.subTest(view=view, changes=changes):
+                    before = list(PagePermission.objects.order_by('pk').values())
+                    response = self._post(row, **changes)
+                    self.assertIn(response.status_code, (200, 302))
+                    self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    def test_existing_scope_requires_management_authority(self):
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE, can_change_permissions=True)
+        row = self._grant()
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(row, DELETE='on')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    def test_scope_expansion_checks_visible_and_hidden_flags(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        for view in (False, True):
+            row = self._grant(can_publish=True, can_view=view)
+            row.grant_on = ACCESS_PAGE
+            row.save()
+            with self.subTest(view=view):
+                before = list(PagePermission.objects.order_by('pk').values())
+                response = self._post(row, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'throughout the selected scope')
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_raw_id_recipient_must_be_subordinate(self):
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_change_permissions=True)
+        row = self._grant()
+        outsider = self._create_user('outsider', is_staff=True)
+        before = list(PagePermission.objects.order_by('pk').values())
+        for existing in (None, row):
+            with self.subTest(existing=existing):
+                response = self._post(existing, user=outsider.pk)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'Select a valid choice')
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+                self._assert_recipient_widget(response, ForeignKeyRawIdWidget)
+        self.assertEqual(self._post(row, user=self.target.pk).status_code, 302)
+
+    def _assert_recipient_widget(self, response, widget_class):
+        inline = next(
+            inline for inline in response.context_data['inline_admin_formsets']
+            if not inline.opts.show_with_view_permissions
+        )
+        self.assertIsInstance(inline.formset.forms[0].fields['user'].widget, widget_class)
+
+    def _bulk_users(self):
+        user_model = type(self.manager)
+        usernames = [f'raw-id-user-{index}@example.com' for index in range(500)]
+        user_model.objects.bulk_create([
+            user_model(**{user_model.USERNAME_FIELD: username}, is_staff=True)
+            for username in usernames
+        ])
+        # MySQL does not populate generated primary keys on bulk-created users.
+        return user_model.objects.filter(**{f'{user_model.USERNAME_FIELD}__in': usernames})
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_large_subordinate_set_uses_restricted_select(self):
+        from cms.forms.widgets import UserSelectAdminWidget
+
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_change_permissions=True)
+        row = self._grant()
+        flags = dict.fromkeys(PagePermission.get_all_permissions(), False)
+        flags['can_change'] = True
+        child = create_page('Subordinates', 'nav_playground.html', 'en', parent=self.page)
+        # Exercise MySQL's lack of bulk-insert IDs on every test backend.
+        with patch.object(type(connection.features), 'can_return_rows_from_bulk_insert', False):
+            users = self._bulk_users()
+        PagePermission.objects.bulk_create([
+            PagePermission(page=child, user=user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, **flags)
+            for user in users
+        ])
+        outsider = self._create_user('outsider', is_staff=True)
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(row, user=outsider.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Select a valid choice')
+        self._assert_recipient_widget(response, UserSelectAdminWidget)
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+        self.assertEqual(self._post(row, user=self.target.pk).status_code, 302)
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_root_level_raw_id_recipient_excludes_superusers(self):
+        self._bulk_users()
+        row = self._grant()
+        superuser = self.get_superuser()
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(row, user=superuser.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Select a valid choice')
+        self._assert_recipient_widget(response, ForeignKeyRawIdWidget)
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+        self.assertEqual(self._post(row, user=self.target.pk).status_code, 302)
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_raw_id_lookup_does_not_mutate_shared_relation(self):
+        relation = PagePermission._meta.get_field('user').remote_field
+        original_limits = relation.limit_choices_to
+        self._grant()
+        with self.login_user_context(self.manager):
+            response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self._assert_recipient_widget(response, ForeignKeyRawIdWidget)
+        self.assertIs(relation.limit_choices_to, original_limits)
 
 
 class BatchedPermissionChecksTests(CMSTestCase):

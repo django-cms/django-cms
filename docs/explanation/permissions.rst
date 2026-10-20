@@ -408,6 +408,19 @@ This also prevents transferring protected rights to another user or group, or
 changing their scope through ``grant_on``. A manager authorized to grant all
 the row's rights, or a superuser, must make those changes.
 
+The manager must hold both permission-management authority and the editing
+rights being granted throughout the selected scope (page, children, or
+descendants). Rights on the parent alone do not authorize grants for its
+descendants. This applies to new grants and scope changes, and existing grants
+outside the manager's authority cannot be edited or deleted. Scope checks also
+cover future pages, even when the selected subtree is currently empty.
+User, group, and global grants can jointly provide the required authority.
+View restrictions require permission-management authority over their scope;
+any editing rights stored on the same grant are checked as well.
+
+Recipient user IDs are validated against the manager's subordinate users,
+including when the admin uses a raw-ID widget.
+
 
 Delegating global page permissions
 ==================================
