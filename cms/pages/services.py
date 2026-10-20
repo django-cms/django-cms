@@ -39,6 +39,7 @@ from cms.models import (
 from cms.operations import Argument, Operation, Result, register_operation
 from cms.pages.checks import LanguageCopyPlan
 from cms.pages.utils import get_clean_username
+from cms.pages.validation import ADVANCED_SETTINGS_FIELDS
 from cms.permissions.cache import clear_permission_cache
 from cms.shared.operations import OperationContext, operation
 from cms.signals import PAGE_OPERATION_SIGNALS
@@ -81,10 +82,7 @@ def main_language_template(page):
 
 def _create_translation(page, *, source, language, content_data, context):
     data = dict(content_data, page=page, language=language, created_by=context.user)
-    template = main_language_template(page)
-    if template:
-        data["template"] = template
-    translation = api.create_page_content(**data)
+    translation = api._create_page_content(**data)
     page.page_content_cache[translation.language] = translation
 
     if source:
@@ -123,7 +121,7 @@ def add_page(
     *, site, parent_page, source, language, content_data, context,
     is_page_type=False, allow_view_only_page_type=False, permissions=None,
 ) -> PageContent:
-    """Create a page and its first translation from validated content values.
+    """Validate content values and create a page and its first translation.
 
     Runs the ``ADD_PAGE`` checks -- for a page created from ``source``, including
     the permission to copy it -- and announces the operation to signal receivers as
@@ -131,18 +129,26 @@ def add_page(
 
     :raises ~django.core.exceptions.PermissionDenied: if the user may not add the
         page there, or not copy ``source``.
+    :raises ~django.core.exceptions.ValidationError: if a content value or path
+        is invalid; errors are keyed by input field.
     """
     parent_page = resolve_add_parent(site, parent_page, is_page_type=is_page_type)
+    prepared = {}
+    check_args = {
+        "site": site,
+        "parent_page": parent_page,
+        "source": source,
+        "allow_view_only_page_type": allow_view_only_page_type,
+        "permissions": permissions,
+        "language": language,
+        "content_data": content_data,
+        "is_page_type": is_page_type,
+        "prepared": prepared,
+    }
     with operation(
         operations.ADD_PAGE,
         context,
-        checks={
-            "site": site,
-            "parent_page": parent_page,
-            "source": source,
-            "allow_view_only_page_type": allow_view_only_page_type,
-            "permissions": permissions,
-        },
+        checks=check_args,
         signals=PAGE_OPERATION_SIGNALS,
         sender=Page,
         signal_operation=operations.ADD_PAGE_TRANSLATION,
@@ -162,7 +168,7 @@ def add_page(
             page.add_to_tree(position="last-child")
             page.save()
         translation = _create_translation(
-            page, source=source, language=language, content_data=content_data, context=context,
+            page, source=source, language=language, content_data=prepared["content_data"], context=context,
         )
         if not page.is_page_type and not Page.objects.on_site(site).exclude(pk=page.pk).exists():
             page.set_as_homepage(context.user)
@@ -176,17 +182,22 @@ def add_translation(page, *, language, content_data, context, permissions=None) 
 
     :raises ~django.core.exceptions.PermissionDenied: if the user may not change the page.
     """
+    prepared = {}
+    check_args = {
+        "page": page, "permissions": permissions, "language": language,
+        "content_data": content_data, "prepared": prepared,
+    }
     with operation(
         operations.ADD_PAGE_TRANSLATION,
         context,
-        checks={"page": page, "permissions": permissions},
+        checks=check_args,
         signals=PAGE_OPERATION_SIGNALS,
         sender=Page,
         obj=page,
         language=language,
     ):
         translation = _create_translation(
-            page, source=None, language=language, content_data=content_data, context=context,
+            page, source=None, language=language, content_data=prepared["content_data"], context=context,
         )
     return translation
 
@@ -202,7 +213,7 @@ def get_or_create_page_type_root(site, *, language):
     if not root:
         root = Page.add_root(site=site, is_page_type=True)
     if not root.has_translation(language):
-        api.create_page_content(
+        api._create_page_content(
             language=language, title=gettext("Page Types"), page=root,
             slug=PAGE_TYPES_ID, path=PAGE_TYPES_ID, in_navigation=False,
         )
@@ -216,31 +227,24 @@ def change_page_content(page_content, *, data, context, permissions=None) -> Pag
     ``data`` holds the fields to write. The apphook URL patterns are reloaded
     when the page's public path changed, whichever field changed it.
 
-    :raises ~django.core.exceptions.ValidationError: if ``data`` names a field
-        that cannot be changed this way.
+    :raises ~django.core.exceptions.ValidationError: if a supplied field, value
+        or prospective URL is invalid; errors are keyed by input field.
     """
-    editable = {
-        "title", "slug", "template", "page_title", "meta_description",
-        "overwrite_url", "redirect", "soft_root", "menu_title",
-        "limit_visibility_in_menu", "xframe_options",
-    }
-    if set(data) - editable:
-        raise ValidationError("Unknown page content field.")
     page = page_content.page
     language = page_content.language
+    prepared = {}
+    check_args = {"page_content": page_content, "data": data, "prepared": prepared, "permissions": permissions}
     with operation(
         operations.CHANGE_PAGE_TRANSLATION,
         context,
-        checks={"page_content": page_content, "permissions": permissions},
+        checks=check_args,
         signals=PAGE_OPERATION_SIGNALS,
         sender=Page,
         obj=page,
         language=language,
     ):
         old_path = page.urls.filter(language=language).values_list("path", flat=True).first()
-        values = dict(data)
-        if "overwrite_url" in values:
-            values["overwrite_url"] = (values["overwrite_url"] or "").strip("/") or None
+        values = prepared["data"]
         page_content.update(
             changed_by=get_clean_username(context.user), changed_date=timezone.now(), **values,
         )
@@ -253,35 +257,32 @@ def change_page_content(page_content, *, data, context, permissions=None) -> Pag
     return page_content
 
 
-ADVANCED_SETTINGS_FIELDS = (
-    "login_required",
-    "reverse_id",
-    "navigation_extenders",
-    "application_urls",
-    "application_namespace",
-)
-
-
 @transaction.atomic
-def change_advanced_settings(page, *, context, permissions=None) -> Page:
+def change_advanced_settings(page, *, data=None, context, permissions=None) -> Page:
     """Save the advanced settings changed on ``page`` and invalidate dependent caches.
 
-    ``page`` is an unsaved, modified copy of a stored page. The service compares it
-    with the stored page and writes the advanced settings that differ; changes to
-    any other field are not saved. The apphook URL patterns are reloaded when the
-    apphook or its namespace changed.
+    ``data`` holds the fields to change. For existing Python callers omitting
+    ``data``, ``page`` may be a modified copy of a stored page; only its advanced
+    settings are considered. Both paths run the same validation checks.
     """
     saved_page = Page.objects.get(pk=page.pk)
-    changes = {
-        field: getattr(page, field)
-        for field in ADVANCED_SETTINGS_FIELDS
-        if getattr(page, field) != getattr(saved_page, field)
-    }
+    if data is None:
+        data = {
+            field: getattr(page, field)
+            for field in ADVANCED_SETTINGS_FIELDS
+            if getattr(page, field) != getattr(saved_page, field)
+        }
+    prepared = {}
+    check_args = {"page": saved_page, "data": data, "prepared": prepared, "permissions": permissions}
     with operation(
         operations.CHANGE_PAGE_ADVANCED_SETTINGS,
         context,
-        checks={"page": saved_page, "permissions": permissions},
+        checks=check_args,
     ):
+        changes = {
+            field: value for field, value in prepared["data"].items()
+            if value != getattr(saved_page, field)
+        }
         if changes:
             for field, value in changes.items():
                 setattr(saved_page, field, value)
@@ -694,9 +695,9 @@ for _declaration in (
             Argument(
                 "page",
                 model="cms.Page",
-                instance=True,
-                description="The stored page with its advanced settings changed; other changed fields are not saved.",
+                description="The page whose advanced settings change.",
             ),
+            Argument("data", type=dict, description="The advanced settings to change, including application_configs."),
         ),
         returns=Result(model="cms.Page", description="The page."),
     ),

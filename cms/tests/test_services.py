@@ -9,7 +9,16 @@ from cms import operations
 from cms.api import add_plugin, create_page
 from cms.core import services as plugin_services
 from cms.core.permissions import PluginPermissions, get_permissions
-from cms.models import GlobalPagePermission, Page, PageContent, PagePermission, PageType, Placeholder, UserSettings
+from cms.models import (
+    GlobalPagePermission,
+    Page,
+    PageContent,
+    PagePermission,
+    PageType,
+    PageUrl,
+    Placeholder,
+    UserSettings,
+)
 from cms.pages import services as page_services
 from cms.pages.permissions import PagePermissions, get_page_permissions
 from cms.permissions import services as permission_services
@@ -56,6 +65,555 @@ class OperationContextTest(CMSTestCase):
 
         self.assertTrue(context.emit_signals)
         self.assertIsNone(context.origin)
+
+
+class PageDataValidationTest(CMSTestCase):
+    """Forms, services and preflight share page validation before any mutation."""
+
+    def setUp(self):
+        super().setUp()
+        self.user = self.get_superuser()
+        self.context = OperationContext(user=self.user, language="en")
+        self.page = create_page("Parent", "nav_playground.html", "en")
+        self.content = self.page.get_admin_content("en")
+        self.sent = []
+        pre_obj_operation.connect(self.receive)
+        self.addCleanup(pre_obj_operation.disconnect, self.receive)
+
+    def receive(self, **kwargs):
+        self.sent.append(kwargs)
+
+    def counts(self):
+        return tuple(model.objects.count() for model in (Page, PageContent, PageUrl, Placeholder))
+
+    def assert_refused(self, operation, service, kwargs, field):
+        before = self.counts()
+        verdict = can(operation, self.context, **kwargs)
+        self.assertFalse(verdict)
+        self.assertTrue(verdict.complete, verdict.skipped)
+        self.assertTrue(all(reason.kind == checks.VALIDATION for reason in verdict.reasons))
+        with self.assertRaises(ValidationError) as caught:
+            service(**kwargs, context=self.context)
+        self.assertIn(field, caught.exception.message_dict)
+        self.assertEqual([reason.message for reason in verdict.reasons], caught.exception.messages)
+        self.assertEqual(before, self.counts())
+        self.assertEqual(self.sent, [])
+
+    def creation_kwargs(self, **changes):
+        return {
+            "site": self.page.site, "parent_page": None, "source": None, "language": "en",
+            "content_data": {
+                "title": "New", "slug": "new", "template": "nav_playground.html", **changes,
+            },
+        }
+
+    def test_create_validates_field_values_before_signals(self):
+        for field, value in (
+            ("template", "missing.html"), ("title", "x" * 256),
+            ("meta_description", "x" * 321), ("slug", "bad/slug"),
+            ("redirect", "javascript:alert(1)/x"), ("limit_visibility_in_menu", 99),
+            ("xframe_options", 99), ("overwrite_url", "<script>"),
+        ):
+            with self.subTest(field=field):
+                self.assert_refused(
+                    operations.ADD_PAGE, page_services.add_page,
+                    self.creation_kwargs(**{field: value}), field,
+                )
+
+    def test_language_is_validated_for_pages_and_translations(self):
+        kwargs = self.creation_kwargs()
+        kwargs["language"] = "not-on-site"
+        self.assert_refused(operations.ADD_PAGE, page_services.add_page, kwargs, "language")
+        self.assert_refused(
+            operations.ADD_PAGE_TRANSLATION, page_services.add_translation,
+            {"page": self.page, "language": "not-on-site", "content_data": kwargs["content_data"]},
+            "language",
+        )
+
+    def test_duplicate_slug_and_overwrite_url_are_field_errors(self):
+        for values, field in (
+            ({"slug": self.content.slug}, "slug"),
+            ({"overwrite_url": self.page.get_path("en")}, "overwrite_url"),
+        ):
+            with self.subTest(field=field):
+                self.assert_refused(
+                    operations.ADD_PAGE, page_services.add_page, self.creation_kwargs(**values), field,
+                )
+
+    def test_change_validates_fields_and_leaves_content_unchanged(self):
+        other = create_page("Other", "nav_playground.html", "en")
+        original = self.content.title
+        for data, field in (
+            ({"title": "x" * 256}, "title"),
+            ({"template": "bad.html"}, "template"),
+            ({"limit_visibility_in_menu": 99}, "limit_visibility_in_menu"),
+            ({"xframe_options": 99}, "xframe_options"),
+            ({"slug": "other"}, "slug"),
+            ({"overwrite_url": other.get_path("en")}, "overwrite_url"),
+            ({"page": other}, "page"),
+        ):
+            with self.subTest(field=field):
+                self.assert_refused(
+                    operations.CHANGE_PAGE_TRANSLATION, page_services.change_page_content,
+                    {"page_content": self.content, "data": data}, field,
+                )
+                self.content.refresh_from_db()
+                self.assertEqual(self.content.title, original)
+
+    def test_sibling_slug_conflicts_on_change(self):
+        first = create_page("First", "nav_playground.html", "en", parent=self.page)
+        second = create_page("Second", "nav_playground.html", "en", parent=self.page)
+        self.assert_refused(
+            operations.CHANGE_PAGE_TRANSLATION, page_services.change_page_content,
+            {"page_content": second.get_admin_content("en"), "data": {"slug": first.get_slug("en")}},
+            "slug",
+        )
+
+    def test_template_must_be_loadable(self):
+        with self.settings(CMS_TEMPLATES=[("not-installed.html", "Missing")]):
+            self.assert_refused(
+                operations.ADD_PAGE, page_services.add_page,
+                self.creation_kwargs(template="not-installed.html"), "template",
+            )
+
+    def test_advanced_settings_validate_reverse_id_and_namespace(self):
+        create_page(
+            "Other", "nav_playground.html", "en",
+            reverse_id="taken", apphook="SampleApp", apphook_namespace="taken",
+        )
+        for data, field in (
+            ({"reverse_id": "taken"}, "reverse_id"),
+            ({"application_urls": "SampleApp", "application_namespace": "taken"}, "application_namespace"),
+            ({"application_urls": "NoSuchApp"}, "application_urls"),
+            ({"site": self.page.site}, "site"),
+        ):
+            with self.subTest(field=field):
+                self.assert_refused(
+                    operations.CHANGE_PAGE_ADVANCED_SETTINGS, page_services.change_advanced_settings,
+                    {"page": self.page, "data": data}, field,
+                )
+
+    def test_advanced_settings_instance_compatibility_also_validates(self):
+        create_page("Other", "nav_playground.html", "en", reverse_id="taken")
+        self.page.reverse_id = "taken"
+        with self.assertRaises(ValidationError) as caught:
+            page_services.change_advanced_settings(self.page, context=self.context)
+        self.assertIn("reverse_id", caught.exception.message_dict)
+        self.page.refresh_from_db()
+        self.assertIsNone(self.page.reverse_id)
+
+    @override_settings(CMS_APPHOOKS=["cms.test_utils.project.sampleapp.cms_apps.SampleAppWithConfig"])
+    def test_apphook_configuration_is_validated_and_normalized(self):
+        from cms.test_utils.project.sampleapp.models import SampleAppConfig
+
+        config_binding = patch.object(SampleAppConfig, "cmsapp", None, create=True)
+        config_binding.start()
+        self.addCleanup(config_binding.stop)
+        self.apphook_clear()
+        self.addCleanup(self.apphook_clear)
+        config = SampleAppConfig.objects.create(namespace="configured")
+        kwargs = {
+            "page": self.page,
+            "data": {"application_urls": "SampleAppWithConfig", "application_configs": "not-an-id"},
+        }
+        self.assert_refused(
+            operations.CHANGE_PAGE_ADVANCED_SETTINGS, page_services.change_advanced_settings,
+            kwargs, "application_configs",
+        )
+        kwargs["data"]["application_configs"] = config.pk
+        self.assertTrue(can(operations.CHANGE_PAGE_ADVANCED_SETTINGS, self.context, **kwargs))
+        changed = page_services.change_advanced_settings(**kwargs, context=self.context)
+        self.assertEqual(changed.application_namespace, "configured")
+        self.assertNotIn("application_namespace", kwargs["data"])  # input is not mutated
+
+    def test_invalid_override_is_rejected_even_for_home_or_unreachable_page(self):
+        self.page.set_as_homepage(self.user)
+        self.content.page = self.page
+        self.assert_refused(
+            operations.CHANGE_PAGE_TRANSLATION, page_services.change_page_content,
+            {"page_content": self.content, "data": {"overwrite_url": "<bad>"}}, "overwrite_url",
+        )
+        child = create_page("Child", "nav_playground.html", "en", parent=self.page)
+        self.page.is_home = False
+        self.page.save()
+        self.page.urls.update(path=None)
+        child_content = child.get_admin_content("en")
+        self.assert_refused(
+            operations.CHANGE_PAGE_TRANSLATION, page_services.change_page_content,
+            {"page_content": child_content, "data": {"overwrite_url": "bad/<path>"}}, "overwrite_url",
+        )
+
+    def test_context_api_uses_field_errors_and_legacy_api_keeps_assertions(self):
+        from cms.api import create_page_content
+
+        with self.assertRaises(ValidationError) as caught:
+            create_page_content("de", "Other", self.page, template="bad.html", context=self.context)
+        self.assertIn("template", caught.exception.message_dict)
+        self.assertEqual(self.sent, [])
+        with self.assertRaises(AssertionError):
+            create_page_content("de", "Other", self.page, template="bad.html")
+
+    def test_context_page_api_validates_before_signals_or_rows(self):
+        create_page("Other", "nav_playground.html", "en", reverse_id="taken")
+        for values, field in (
+            ({"template": "bad.html"}, "template"),
+            ({"language": "not-on-site"}, "language"),
+            ({"reverse_id": "taken"}, "reverse_id"),
+            ({"apphook": "NoSuchApp"}, "application_urls"),
+            ({"position": "invalid"}, "position"),
+            ({"navigation_extenders": "NoSuchMenu"}, "navigation_extenders"),
+        ):
+            with self.subTest(field=field):
+                before = self.counts()
+                with self.assertRaises(ValidationError) as caught:
+                    create_page(**{
+                        "title": "New", "template": "nav_playground.html", "language": "en",
+                        "context": self.context, **values,
+                    })
+                self.assertIn(field, caught.exception.message_dict)
+                self.assertEqual(before, self.counts())
+                self.assertEqual(self.sent, [])
+
+    def test_context_page_api_checks_sibling_site_in_system_context(self):
+        other_site = Site.objects.create(domain="other.example", name="Other")
+        before = self.counts()
+        with self.assertRaises(ValidationError) as caught:
+            create_page(
+                "New", "nav_playground.html", "en", parent=self.page, position="right",
+                site=other_site, context=OperationContext.system("test.import"),
+            )
+        self.assertIn("parent_page", caught.exception.message_dict)
+        self.assertEqual(before, self.counts())
+        self.assertEqual(self.sent, [])
+
+    def test_translation_data_and_duplicate_language_are_checked(self):
+        for language, data, field in (
+            ("de", {"title": "Neu", "template": "bad.html"}, "template"),
+            ("de", {"title": "Neu", "limit_visibility_in_menu": 99}, "limit_visibility_in_menu"),
+            ("en", {"title": "Duplicate"}, "language"),
+        ):
+            with self.subTest(field=field):
+                self.assert_refused(
+                    operations.ADD_PAGE_TRANSLATION, page_services.add_translation,
+                    {"page": self.page, "language": language, "content_data": data}, field,
+                )
+
+    def test_headless_template_choices_and_inheritance(self):
+        from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+
+        with self.settings(CMS_TEMPLATES=[], CMS_PLACEHOLDERS=[("headless", ["body"], "Headless")]):
+            for template in ("headless", TEMPLATE_INHERITANCE_MAGIC):
+                kwargs = self.creation_kwargs(template=template, slug=f"new-{template}")
+                self.assertTrue(can(operations.ADD_PAGE, self.context, **kwargs))
+                content = page_services.add_page(**kwargs, context=self.context)
+                self.assertEqual(content.template, template)
+            self.sent.clear()
+            self.assert_refused(
+                operations.ADD_PAGE, page_services.add_page,
+                self.creation_kwargs(template="missing"), "template",
+            )
+
+    def test_template_change_and_content_edit_share_validation(self):
+        for service, operation, data in (
+            (page_services.change_template, operations.CHANGE_PAGE_TEMPLATE, {"template": "bad.html"}),
+            (page_services.change_page_content, operations.CHANGE_PAGE_TRANSLATION,
+             {"data": {"template": "bad.html"}}),
+        ):
+            self.assert_refused(operation, service, {"page_content": self.content, **data}, "template")
+
+    def test_prepared_values_do_not_modify_input_and_normalize_overwrite_url(self):
+        kwargs = self.creation_kwargs(overwrite_url="/custom/path/")
+        self.assertTrue(can(operations.ADD_PAGE, self.context, **kwargs))
+        self.assertEqual(kwargs["content_data"]["overwrite_url"], "/custom/path/")
+        content = page_services.add_page(**kwargs, context=self.context)
+        self.assertEqual(content.overwrite_url, "custom/path")
+        self.assertEqual(content.page.get_path("en"), "custom/path")
+        self.assertEqual(kwargs["content_data"]["overwrite_url"], "/custom/path/")
+
+    def test_page_type_preflight_uses_its_future_root_without_creating_it(self):
+        from cms.constants import PAGE_TYPES_ID
+
+        kwargs = self.creation_kwargs(slug=self.content.slug)
+        kwargs["is_page_type"] = True
+        before = self.counts()
+        verdict = can(operations.ADD_PAGE, self.context, **kwargs)
+        self.assertTrue(verdict, verdict.reasons)
+        self.assertTrue(verdict.complete)
+        self.assertEqual(before, self.counts())
+        content = page_services.add_page(**kwargs, context=self.context)
+        self.assertEqual(content.page.get_path("en"), f"{PAGE_TYPES_ID}/{self.content.slug}")
+        self.sent.clear()
+        # The same preflight must use the now-existing root as well.
+        self.assert_refused(operations.ADD_PAGE, page_services.add_page, kwargs, "slug")
+
+    def test_missing_data_is_reported_as_skipped(self):
+        for operation, kwargs in (
+            (operations.ADD_PAGE, {"site": self.page.site}),
+            (operations.ADD_PAGE_TRANSLATION, {"page": self.page}),
+            (operations.CHANGE_PAGE_TRANSLATION, {"page_content": self.content}),
+            (operations.CHANGE_PAGE_ADVANCED_SETTINGS, {"page": self.page}),
+        ):
+            with self.subTest(operation=operation):
+                verdict = can(operation, self.context, **kwargs)
+                self.assertTrue(verdict)
+                self.assertFalse(verdict.complete)
+                self.assertIn("cms.pages.content_data_valid", verdict.skipped)
+
+    def test_forms_report_the_same_field_errors(self):
+        from cms.pages.admin.forms import AddPageForm, AdvancedSettingsForm, ChangePageForm
+
+        request = self.get_request("/?language=en")
+        request.user = self.user
+        create_page("Other", "nav_playground.html", "en", reverse_id="taken")
+        cases = (
+            (AddPageForm, None, {"title": "New", "slug": "parent"}, "slug",
+             page_services.add_page, self.creation_kwargs(slug="parent")),
+            (ChangePageForm, self.content, {"title": "Parent", "slug": "parent", "overwrite_url": "<bad>"},
+             "overwrite_url", page_services.change_page_content,
+             {"page_content": self.content, "data": {"overwrite_url": "<bad>"}}),
+            (AdvancedSettingsForm, self.page, {"reverse_id": "taken"}, "reverse_id",
+             page_services.change_advanced_settings, {"page": self.page, "data": {"reverse_id": "taken"}}),
+        )
+        for base, instance, data, field, service, kwargs in cases:
+            with self.subTest(form=base.__name__):
+                form_class = type("BoundForm", (base,), {"_site": self.page.site, "_request": request})
+                form = form_class(data=data, instance=instance)
+                self.assertFalse(form.is_valid())
+                self.assertIn(field, form.errors)
+                with self.assertRaises(ValidationError) as caught:
+                    service(**kwargs, context=self.context)
+                self.assertEqual(list(form.errors[field]), caught.exception.message_dict[field])
+
+    def test_validation_does_not_depend_on_assertions(self):
+        # Can also be run manually with python -O; CI uses normal Python.
+        self.assert_refused(
+            operations.ADD_PAGE, page_services.add_page,
+            self.creation_kwargs(template="bad.html"), "template",
+        )
+
+    def test_extended_admin_forms_keep_extra_fields_and_save_core_fields(self):
+        from django import forms
+
+        from cms.pages.admin.forms import AdvancedSettingsForm, ChangePageForm
+
+        request = self.get_request("/?language=en")
+        request.user = self.user
+        for base, instance, data in (
+            (ChangePageForm, self.content, {"title": "Updated", "slug": "parent"}),
+            (AdvancedSettingsForm, self.page, {"reverse_id": "updated"}),
+        ):
+            with self.subTest(form=base.__name__):
+                form_class = type("ExtendedForm", (base,), {
+                    "_site": self.page.site, "_request": request, "seo_note": forms.CharField(),
+                })
+                form = form_class(data={**data, "seo_note": "Keep me"}, instance=instance)
+                self.assertTrue(form.is_valid(), form.errors)
+                form.save()
+                self.assertEqual(form.cleaned_data["seo_note"], "Keep me")
+                instance.refresh_from_db()
+                for field, value in data.items():
+                    self.assertEqual(getattr(instance, field), value)
+
+    def test_form_conflict_link_uses_the_requests_language(self):
+        from cms.pages.admin.forms import ChangePageForm
+
+        other = create_page("Other", "nav_playground.html", "en")
+        request = self.get_request("/?language=de")
+        request.user = self.user
+        form_class = type("BoundForm", (ChangePageForm,), {"_site": self.page.site, "_request": request})
+        form = form_class(data={"title": "Changed", "slug": other.get_slug("en")}, instance=self.content)
+        self.assertFalse(form.is_valid())
+        self.assertIn("?language=de", form.errors["slug"][0])
+
+    def replace_data_checks(self):
+        self.enterContext(patch.dict(checks._extensions, {}, clear=True))
+        for name in (
+            operations.ADD_PAGE, operations.ADD_PAGE_TRANSLATION,
+            operations.CHANGE_PAGE_TRANSLATION, operations.CHANGE_PAGE_ADVANCED_SETTINGS,
+        ):
+            checks.register_check(name, "cms.pages.content_data_valid", lambda context, **kwargs: None)
+
+    def test_replaced_data_checks_do_not_break_services_or_context_apis(self):
+        from cms.api import create_page_content
+
+        self.replace_data_checks()
+        content = page_services.add_page(**self.creation_kwargs(), context=self.context)
+        translated = page_services.add_translation(
+            self.page, language="de", content_data={"title": "Deutsch"}, context=self.context,
+        )
+        self.assertEqual(translated.template, self.content.template)
+        changed = page_services.change_page_content(content, data={"title": "Changed"}, context=self.context)
+        self.assertEqual(changed.title, "Changed")
+        page = page_services.change_advanced_settings(
+            self.page, data={"reverse_id": "changed"}, context=self.context,
+        )
+        self.assertEqual(page.reverse_id, "changed")
+        api_page = create_page("API", "nav_playground.html", "en", context=self.context)
+        api_content = create_page_content("de", "API Deutsch", api_page, context=self.context)
+        self.assertEqual(api_content.language, "de")
+
+    def test_replaced_data_checks_still_reject_unsupported_input_shapes(self):
+        from cms.api import create_page_content
+
+        self.replace_data_checks()
+        for call in (
+            lambda: page_services.add_page(**self.creation_kwargs(unknown=True), context=self.context),
+            lambda: page_services.add_translation(
+                self.page, language="de", content_data={"title": "New", "unknown": True}, context=self.context,
+            ),
+            lambda: page_services.change_page_content(
+                self.content, data={"unknown": True}, context=self.context,
+            ),
+            lambda: page_services.change_advanced_settings(
+                self.page, data={"unknown": True}, context=self.context,
+            ),
+            lambda: create_page(
+                "New", "nav_playground.html", "en", limit_visibility_in_menu="not-an-integer", context=self.context,
+            ),
+            lambda: create_page_content(
+                "de", "New", self.page, limit_visibility_in_menu="not-an-integer", context=self.context,
+            ),
+        ):
+            before = self.counts()
+            with self.assertRaises(ValidationError):
+                call()
+            self.assertEqual(self.counts(), before)
+            self.assertEqual(self.sent, [])
+
+    def test_page_data_is_prepared_once_with_or_without_replaced_check(self):
+        from cms.pages import validation
+
+        for replaced in (False, True):
+            with self.subTest(replaced=replaced):
+                if replaced:
+                    self.replace_data_checks()
+                with patch.object(
+                    validation, "prepare_content_change", wraps=validation.prepare_content_change,
+                ) as prepare:
+                    page_services.change_page_content(self.content, data={"title": "Changed"}, context=self.context)
+                self.assertEqual(prepare.call_count, 1)
+
+    def test_replacement_owns_description_limit_in_preflight_and_execution(self):
+        from cms.api import create_page_content
+
+        data = {"meta_description": "x" * 400, "overwrite_url": "/custom/path/"}
+        self.assert_refused(
+            operations.CHANGE_PAGE_TRANSLATION, page_services.change_page_content,
+            {"page_content": self.content, "data": data}, "meta_description",
+        )
+        self.assert_refused(
+            operations.ADD_PAGE, page_services.add_page,
+            self.creation_kwargs(meta_description="x" * 400), "meta_description",
+        )
+        self.assert_refused(
+            operations.ADD_PAGE_TRANSLATION, page_services.add_translation,
+            {"page": self.page, "language": "de", "content_data": {"title": "Deutsch", "meta_description": "x" * 400}},
+            "meta_description",
+        )
+        self.replace_data_checks()
+        observed = []
+
+        def allow_longer_description(context, *, prepared, **kwargs):
+            values = prepared.get("data", prepared.get("content_data"))
+            observed.append(dict(values))
+            if len(values.get("meta_description") or "") > 500:
+                raise ValidationError({"meta_description": "At most 500 characters."})
+
+        for operation in (
+            operations.ADD_PAGE, operations.ADD_PAGE_TRANSLATION, operations.CHANGE_PAGE_TRANSLATION,
+        ):
+            checks.register_check(operation, "cms.pages.content_data_valid", allow_longer_description)
+
+        verdict = can(
+            operations.CHANGE_PAGE_TRANSLATION, self.context, page_content=self.content, data=data,
+        )
+        self.assertTrue(verdict)
+        self.assertTrue(verdict.complete)
+        page_services.change_page_content(self.content, data=data, context=self.context)
+        self.content.refresh_from_db()
+        self.assertEqual(self.content.meta_description, data["meta_description"])
+        self.assertEqual(self.content.overwrite_url, "custom/path")
+        self.assertEqual(observed[-2], observed[-1])
+        self.assertEqual(data["overwrite_url"], "/custom/path/")  # no caller mutation
+
+        kwargs = self.creation_kwargs(meta_description="x" * 400)
+        verdict = can(operations.ADD_PAGE, self.context, **kwargs)
+        self.assertTrue(verdict)
+        self.assertTrue(verdict.complete)
+        created = page_services.add_page(**kwargs, context=self.context)
+        self.assertEqual(created.meta_description, "x" * 400)
+        self.assertEqual(observed[-2], observed[-1])
+        translated_kwargs = {"page": self.page, "language": "de", "content_data": {
+            "title": "Deutsch", "meta_description": "x" * 400,
+        }}
+        verdict = can(operations.ADD_PAGE_TRANSLATION, self.context, **translated_kwargs)
+        self.assertTrue(verdict)
+        self.assertTrue(verdict.complete)
+        translated = page_services.add_translation(**translated_kwargs, context=self.context)
+        self.assertEqual(translated.meta_description, "x" * 400)
+        self.assertEqual(translated.template, self.content.template)
+        self.assertEqual(observed[-2], observed[-1])
+
+        api_page = create_page("API", "nav_playground.html", "en", meta_description="x" * 400, context=self.context)
+        self.assertEqual(api_page.get_admin_content("en").meta_description, "x" * 400)
+        api_translation = create_page_content(
+            "de", "API Deutsch", api_page, meta_description="x" * 400, context=self.context,
+        )
+        self.assertEqual(api_translation.meta_description, "x" * 400)
+
+        self.sent.clear()
+        self.assert_refused(
+            operations.CHANGE_PAGE_TRANSLATION, page_services.change_page_content,
+            {"page_content": self.content, "data": {"meta_description": "x" * 501}}, "meta_description",
+        )
+
+    def test_replacement_can_relax_advanced_settings_uniqueness(self):
+        create_page("Other", "nav_playground.html", "en", reverse_id="shared")
+        kwargs = {"page": self.page, "data": {"reverse_id": "shared"}}
+        self.assert_refused(
+            operations.CHANGE_PAGE_ADVANCED_SETTINGS, page_services.change_advanced_settings, kwargs, "reverse_id",
+        )
+        self.replace_data_checks()
+        verdict = can(operations.CHANGE_PAGE_ADVANCED_SETTINGS, self.context, **kwargs)
+        self.assertTrue(verdict)
+        self.assertTrue(verdict.complete)
+        changed = page_services.change_advanced_settings(**kwargs, context=self.context)
+        self.assertEqual(changed.reverse_id, "shared")
+
+    def test_shape_errors_also_appear_in_preflight_with_replaced_checks(self):
+        self.replace_data_checks()
+        self.assert_refused(
+            operations.CHANGE_PAGE_TRANSLATION, page_services.change_page_content,
+            {"page_content": self.content, "data": {"unknown": "value"}}, "unknown",
+        )
+
+    def test_preparation_waits_for_permissions_in_preflight_and_execution(self):
+        from cms.pages import validation
+
+        context = OperationContext(user=self.get_staff_user_with_no_permissions())
+        with patch.object(validation, "prepare_content_change", wraps=validation.prepare_content_change) as prepare:
+            self.assertFalse(can(
+                operations.CHANGE_PAGE_TRANSLATION, context, page_content=self.content, data={"title": "Changed"},
+            ))
+            with self.assertRaises(PermissionDenied):
+                page_services.change_page_content(self.content, data={"title": "Changed"}, context=context)
+        prepare.assert_not_called()
+
+    def test_preflight_prepares_once_without_writing_or_mutating_input(self):
+        from cms.pages import validation
+
+        data = {"overwrite_url": "/prepared/path/"}
+        before = self.counts()
+        with patch.object(validation, "prepare_content_change", wraps=validation.prepare_content_change) as prepare:
+            verdict = can(
+                operations.CHANGE_PAGE_TRANSLATION, self.context, page_content=self.content, data=data,
+            )
+        self.assertTrue(verdict)
+        self.assertTrue(verdict.complete)
+        self.assertEqual(prepare.call_count, 1)
+        self.assertEqual(data, {"overwrite_url": "/prepared/path/"})
+        self.assertEqual(before, self.counts())
+        self.assertEqual(self.sent, [])
 
 
 class RequestFreeServiceTest(CMSTestCase):

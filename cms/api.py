@@ -215,9 +215,6 @@ def create_page(
         announced to the operation signals and runs in a transaction. Without it,
         nothing is checked or announced, as in previous versions.
     """
-    if context is not None:
-        call = {name: value for name, value in locals().items() if name not in ("context", "call")}
-        return _create_page_as_operation(call, context)
     if published is not None or publication_date is not None or publication_end_date is not None:
         warnings.warn(
             'This API function no longer accepts a "published", "publication_date", or '
@@ -225,6 +222,9 @@ def create_page(
             UserWarning,
             stacklevel=2,
         )
+    if context is not None:
+        call = {name: value for name, value in locals().items() if name not in ("context", "call")}
+        return _create_page_as_operation(call, context)
 
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
@@ -267,54 +267,42 @@ def create_page(
     else:
         application_urls = None
 
-    # ugly permissions hack: expose the creator through the current-user
-    # context variable for the duration of the creation, then restore the
-    # previous value. Capturing the token and resetting (instead of blindly
-    # setting None at the end) avoids clobbering a user set by
-    # CurrentUserMiddleware and prevents leaking the creator into the next
-    # operation on the same thread. See cms.utils.permissions.reset_current_user.
+    content_data = {
+        "title": title, "menu_title": menu_title, "page_title": page_title,
+        "slug": slug, "redirect": redirect, "meta_description": meta_description,
+        "overwrite_url": overwrite_url, "soft_root": soft_root,
+        "in_navigation": in_navigation, "template": template,
+        "limit_visibility_in_menu": limit_visibility_in_menu, "xframe_options": xframe_options,
+    }
+    return _create_page(
+        site=site, parent=parent, position=position, created_by=created_by,
+        page_data={
+            "reverse_id": reverse_id, "navigation_extenders": navigation_extenders,
+            "application_urls": application_urls, "application_namespace": apphook_namespace,
+            "login_required": login_required,
+        },
+        language=language, content_data=content_data,
+    )
+
+
+def _create_page(*, site, parent, position, created_by, page_data, language, content_data, validated=False):
+    """Persist a page; operation callers supply already prepared content."""
     if created_by and isinstance(created_by, get_user_model()):
         user_token = set_current_user(created_by)
         created_by = get_clean_username(created_by)
     else:
         user_token = set_current_user(None)
-
     try:
-        if reverse_id:
-            if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
-                raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
-
+        reverse_id = page_data.get("reverse_id")
+        if not validated and reverse_id and Page.objects.filter(reverse_id=reverse_id, site=site).exists():
+            raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
         page = Page(
-            parent=parent,
-            created_by=created_by,
-            changed_by=created_by,
-            reverse_id=reverse_id,
-            navigation_extenders=navigation_extenders,
-            application_urls=application_urls,
-            application_namespace=apphook_namespace,
-            login_required=login_required,
-            site=site,
+            parent=parent, site=site, created_by=created_by, changed_by=created_by, **page_data,
         )
         page.add_to_tree(position=position)
         page.save()
-
-        create_page_content(
-            language=language,
-            title=title,
-            menu_title=menu_title,
-            page_title=page_title,
-            slug=slug,
-            created_by=created_by,
-            redirect=redirect,
-            meta_description=meta_description,
-            page=page,
-            overwrite_url=overwrite_url,
-            soft_root=soft_root,
-            in_navigation=in_navigation,
-            template=template,
-            limit_visibility_in_menu=limit_visibility_in_menu,
-            xframe_options=xframe_options,
-        )
+        creator = _create_page_content if validated else create_page_content
+        creator(page=page, language=language, created_by=created_by, **content_data)
         return page
     finally:
         reset_current_user(user_token)
@@ -323,6 +311,7 @@ def create_page(
 def _create_page_as_operation(call, context):
     """Run :func:`create_page` as the ``ADD_PAGE`` operation."""
     from cms.pages.checks import get_new_parent
+    from cms.pages.validation import CREATE_CONTENT_FIELDS
     from cms.shared.operations import operation
     from cms.signals import PAGE_OPERATION_SIGNALS
 
@@ -330,22 +319,44 @@ def _create_page_as_operation(call, context):
     site = call["site"] or (parent.site if parent else Site.objects.get_current())
     if call["created_by"] == "python-api" and context.user is not None:
         call["created_by"] = context.user
+    apphook = call["apphook"]
+    if isinstance(apphook, CMSApp):
+        apphook = type(apphook).__name__
+    elif isinstance(apphook, type) and issubclass(apphook, CMSApp):
+        apphook = apphook.__name__
+    page_data = {
+        "reverse_id": call["reverse_id"], "navigation_extenders": call["navigation_extenders"],
+        "application_urls": apphook, "application_namespace": call["apphook_namespace"],
+        "login_required": call["login_required"],
+    }
+    prepared = {}
+    check_args = {
+        "site": site,
+        "parent_page": get_new_parent(parent, call["position"]) if parent else None,
+        "parent_anchor": parent,
+        "source": None,
+        "allow_view_only_page_type": False,
+        "permissions": None,
+        "language": call["language"],
+        "content_data": {key: value for key, value in call.items() if key in CREATE_CONTENT_FIELDS},
+        "page_data": page_data,
+        "position": call["position"],
+        "prepared": prepared,
+    }
     with operation(
         operations.ADD_PAGE,
         context,
-        checks={
-            "site": site,
-            "parent_page": get_new_parent(parent, call["position"]) if parent else None,
-            "source": None,
-            "allow_view_only_page_type": False,
-            "permissions": None,
-        },
+        checks=check_args,
         signals=PAGE_OPERATION_SIGNALS,
         sender=Page,
         signal_operation=operations.ADD_PAGE_TRANSLATION,
         language=call["language"],
     ) as signal_kwargs:
-        page = create_page(**call)
+        page = _create_page(
+            site=site, parent=parent, position=call["position"], created_by=call["created_by"],
+            page_data=prepared["page_data"], language=call["language"],
+            content_data=prepared["content_data"], validated=True,
+        )
         signal_kwargs["obj"] = page
     return page
 
@@ -357,16 +368,26 @@ def _create_page_content_as_operation(call, context):
 
     if call["created_by"] == "python-api" and context.user is not None:
         call["created_by"] = context.user
+    prepared = {}
+    content_data = {
+        key: value for key, value in call.items()
+        if key not in {"page", "language", "parent", "created_by"}
+    }
+    check_args = {
+        "page": call["page"], "permissions": None, "language": call["language"],
+        "content_data": content_data, "prepared": prepared, "inherit_template": False,
+    }
     with operation(
         operations.ADD_PAGE_TRANSLATION,
         context,
-        checks={"page": call["page"], "permissions": None},
+        checks=check_args,
         signals=PAGE_OPERATION_SIGNALS,
         sender=Page,
         obj=call["page"],
         language=call["language"],
     ):
-        return create_page_content(**call)
+        call.update(prepared["content_data"])
+        return _create_page_content(**call)
 
 
 @transaction.atomic
@@ -440,6 +461,23 @@ def create_page_content(
     if overwrite_url or path is None:
         path = page.get_url_data(slug, overwrite_url, language)["path"]
 
+    try:
+        _validate_path_uniqueness(page, path, language)
+    except ValidationError as error:
+        raise IntegrityError(error) from error
+    call = {name: value for name, value in locals().items() if name not in ("context", "call", "accepted_limitations")}
+    return _create_page_content(**call)
+
+
+def _create_page_content(
+    language, title, page, menu_title=None, slug=None, redirect=None,
+    meta_description=None, parent=None, overwrite_url=None, page_title=None,
+    path=None, created_by="python-api", soft_root=False, in_navigation=False,
+    template=TEMPLATE_INHERITANCE_MAGIC,
+    limit_visibility_in_menu=constants.VISIBILITY_ALL,
+    xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
+):
+    """Persist prepared content. Callers validate before announcing an operation."""
     # When called directly (not via create_page) with a user instance, expose
     # it through the current-user context variable so signal handlers and
     # PageContent.objects.with_user() attribute the creation correctly. Capture
@@ -453,11 +491,6 @@ def create_page_content(
         created_by = get_clean_username(created_by)
 
     try:
-        try:
-            _validate_path_uniqueness(page, path, language)
-        except ValidationError as e:
-            raise IntegrityError(e)
-
         # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
         user = get_current_user()
         page_content = PageContent.objects.with_user(user).create(

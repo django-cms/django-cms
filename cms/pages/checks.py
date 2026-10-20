@@ -17,8 +17,9 @@ from cms.core.checks import register_editable_operation
 from cms.core.plugins import downcast_plugins
 from cms.forms.validators import validate_path, validate_url_uniqueness
 from cms.models import CMSPlugin, Page, PagePermission
+from cms.pages import validation
 from cms.pages.permissions import get_page_permissions
-from cms.shared.checks import PERMISSION, VALIDATION, register_core_check
+from cms.shared.checks import PERMISSION, VALIDATION, register_core_check, register_core_preparation
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 
@@ -267,6 +268,103 @@ register_core_check(
 )
 
 
+def prepare_add_content_data(
+    context, *, site, language, content_data, parent_page=None, is_page_type=False,
+    prepared=None, page_data=None, **kwargs
+):
+    if prepared is None:
+        prepared = {}
+    if is_page_type:
+        from cms.pages.services import resolve_add_parent
+
+        parent_page = resolve_add_parent(site, parent_page, is_page_type=True)
+    parent_path = None
+    if is_page_type and parent_page is None:
+        from cms.constants import PAGE_TYPES_ID
+
+        parent_path = PAGE_TYPES_ID
+    prepared["parent_page"] = parent_page
+    prepared["content_data"] = validation.prepare_creation_data(
+        site, language, content_data, parent=parent_page, parent_path=parent_path,
+    )
+    prepared["page_data"] = (
+        validation.prepare_advanced_settings(Page(site=site), page_data) if page_data is not None else None
+    )
+    return {"prepared": prepared}
+
+
+def prepare_translation_data(
+    context, *, page, language, content_data, prepared=None, inherit_template=True, **kwargs
+):
+    if prepared is None:
+        prepared = {}
+    data = validation.prepare_creation_data(page.site, language, content_data, page=page)
+    if inherit_template:
+        from cms.pages.services import main_language_template
+
+        template = main_language_template(page)
+        if template:
+            data["template"] = template
+    prepared["content_data"] = data
+    return {"prepared": prepared}
+
+
+def prepare_changed_content_data(context, *, page_content, data, prepared=None, **kwargs):
+    if prepared is None:
+        prepared = {}
+    prepared["data"] = validation.prepare_content_change(page_content, data)
+    return {"prepared": prepared}
+
+
+def prepare_advanced_settings_data(context, *, page, data, prepared=None, **kwargs):
+    if prepared is None:
+        prepared = {}
+    prepared["data"] = validation.prepare_advanced_settings(page, data)
+    return {"prepared": prepared}
+
+
+def check_add_content_data(
+    context, *, site, language, content_data, prepared, page_data=None,
+    position="last-child", parent_anchor=None, **kwargs
+):
+    parent_page = prepared["parent_page"]
+    if any(page and page.site_id != site.pk for page in (parent_page, parent_anchor)):
+        raise ValidationError({"parent_page": _("Parent page must be on the same site.")})
+    if position not in ("last-child", "first-child", "left", "right"):
+        raise ValidationError({"position": _("Invalid page position.")})
+    validation.validate_creation_data(site, language, prepared["content_data"], parent=parent_page)
+    if page_data is not None:
+        validation.validate_advanced_settings(
+            Page(site=site), prepared["page_data"], application_configs=page_data.get("application_configs"),
+        )
+
+
+def check_translation_data(context, *, page, language, content_data, prepared, **kwargs):
+    # Validate both the submitted choice and the effective inherited template.
+    if "template" in content_data:
+        validation.validate_template(content_data["template"])
+    validation.validate_creation_data(page.site, language, prepared["content_data"], page=page)
+
+
+def check_changed_content_data(context, *, page_content, data, prepared, **kwargs):
+    validation.validate_content_change(page_content, prepared["data"])
+
+
+def check_advanced_settings_data(context, *, page, data, prepared, **kwargs):
+    validation.validate_advanced_settings(page, prepared["data"], application_configs=data.get("application_configs"))
+
+
+for _operation, _prepare, _check, _requires in (
+    (operations.ADD_PAGE, prepare_add_content_data, check_add_content_data, ("site", "language", "content_data")),
+    (operations.ADD_PAGE_TRANSLATION, prepare_translation_data, check_translation_data, ("page", "language", "content_data")),
+    (operations.CHANGE_PAGE_TRANSLATION, prepare_changed_content_data, check_changed_content_data, ("page_content", "data")),
+    (operations.CHANGE_PAGE_ADVANCED_SETTINGS, prepare_advanced_settings_data, check_advanced_settings_data, ("page", "data")),
+):
+    register_core_preparation(_operation, "cms.pages.content_data_prepared", _prepare, requires=_requires)
+    register_core_check(
+        _operation, "cms.pages.content_data_valid", _check, kind=VALIDATION, requires=_requires,
+    )
+del _operation, _prepare, _check, _requires
 
 
 # Copy page
@@ -428,11 +526,7 @@ def check_change_template_permission(context, *, page_content, permissions=None,
 
 
 def check_template_valid(context, *, template, **kwargs):
-    if get_cms_setting("TEMPLATES"):
-        if template not in dict(get_cms_setting("TEMPLATES")):
-            raise ValidationError(_("Template not valid"))
-    elif template not in (placeholder_set[0] for placeholder_set in get_cms_setting("PLACEHOLDERS")):
-        raise ValidationError(_("Placeholder selection not valid"))
+    validation.validate_template(template)
 
 
 register_core_check(
