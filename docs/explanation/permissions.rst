@@ -395,6 +395,38 @@ page-user manager is to off-load routine account administration from
 the superuser. Hand the role only to people you would trust with the
 accounts it covers.
 
+Delegating per-page permissions
+===============================
+
+With ``CMS_PERMISSION=True``, a manager with ``can_change_permissions``
+can manage subordinate permission grants through a page's advanced settings.
+The inline offers only the permission flags the manager can grant on that page.
+Existing grants containing flags they cannot grant are omitted from the editable
+inlines, including view restrictions that also carry such editing rights.
+Those grants cannot be changed or deleted by submitting their IDs manually.
+This also prevents transferring protected rights to another user or group, or
+changing their scope through ``grant_on``. A manager authorized to grant all
+the row's rights, or a superuser, must make those changes.
+
+The manager must hold both permission-management authority and the editing
+rights being granted throughout the selected scope (page, children, or
+descendants). Rights on the parent alone do not authorize grants for its
+descendants. This applies to new grants and scope changes, and existing grants
+outside the manager's authority cannot be edited or deleted. Scope checks also
+cover future pages, even when the selected subtree is currently empty.
+User, group, and global grants can jointly provide the required authority.
+View restrictions require permission-management authority over their scope;
+any editing rights stored on the same grant are checked as well.
+
+Recipient user IDs are validated against the manager's subordinate users,
+including when the admin uses a raw-ID widget.
+
+The same rules apply outside the admin: the page permission service, used by
+the admin, :mod:`cms.api` and other callers acting on behalf of a user, refuses
+grants the acting user may not hand out, and changes to or deletions of grants
+they could not have handed out.
+
+
 Delegating global page permissions
 ==================================
 

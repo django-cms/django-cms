@@ -24,6 +24,8 @@ from cms.models import (
 from cms.pages import services as page_services
 from cms.pages.permissions import PagePermissions, get_page_permissions
 from cms.permissions import services as permission_services
+from cms.permissions.models import ACCESS_PAGE, ACCESS_PAGE_AND_DESCENDANTS
+from cms.permissions.utils import get_grantable_global_permissions
 from cms.shared import checks
 from cms.shared.checks import can
 from cms.shared.operations import OperationContext
@@ -1046,6 +1048,105 @@ class PageGrantRecipientTest(CMSTestCase):
         verdict = self.verdict(can_view=True)
 
         self.assertNotIn("cms.permissions.grant_recipients", [reason.name for reason in verdict.reasons])
+
+
+@override_settings(CMS_PERMISSION=True)
+class PageGrantScopeServiceTest(CMSTestCase):
+    """The page permission service applies the admin's grant rules to every caller."""
+
+    def setUp(self):
+        super().setUp()
+        from django.contrib.auth.models import Permission
+
+        self.page = create_page("home", "nav_playground.html", "en")
+        manager = self._create_user("manager", is_staff=True)
+        manager.user_permissions.add(*Permission.objects.filter(codename__in=[
+            "change_page", "add_page", "delete_page", "publish_page",
+            "change_page_advanced_settings", "move_page",
+            "add_pagepermission", "change_pagepermission", "delete_pagepermission",
+        ]))
+        flags = dict.fromkeys(GlobalPagePermission.get_all_permissions(), False)
+        grant = GlobalPagePermission.objects.create(user=manager, **{**flags, "can_change": True,
+                                                                      "can_change_permissions": True})
+        grant.sites.add(Site.objects.get_current())
+        self.manager = manager
+        self.context = OperationContext(user=manager)
+        self.target = self._create_user("target", is_staff=True)
+
+    def _grant(self, save=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS, **flags):
+        grant = PagePermission(
+            page=self.page, user=self.target, grant_on=grant_on,
+            **{**dict.fromkeys(PagePermission.get_all_permissions(), False), "can_change": True, **flags},
+        )
+        if save:
+            grant.save()
+        return grant
+
+    def test_protected_grants_cannot_be_deleted_moved_or_rescoped(self):
+        protected = self._grant(can_publish=True)
+        original = PagePermission.objects.filter(pk=protected.pk).values().get()
+        for change in ({"grant_on": ACCESS_PAGE}, {"user": self.manager}, {"can_publish": False}):
+            with self.subTest(change=change):
+                grant = PagePermission.objects.get(pk=protected.pk)
+                for field, value in change.items():
+                    setattr(grant, field, value)
+                with self.assertRaises(PermissionDenied):
+                    permission_services.save_page_permissions(self.page, save=[grant], context=self.context)
+        with self.assertRaises(PermissionDenied):
+            permission_services.save_page_permissions(self.page, delete=[protected], context=self.context)
+        self.assertEqual(PagePermission.objects.filter(pk=protected.pk).values().get(), original)
+
+        verdict = can(operations.CHANGE_PAGE_PERMISSIONS, self.context, page=self.page, delete=[protected])
+        self.assertEqual(verdict.reasons[0].name, "cms.permissions.page_grants_manageable")
+
+    def test_manageable_grants_can_be_changed_and_deleted(self):
+        grant = self._grant()
+        grant.grant_on = ACCESS_PAGE
+        permission_services.save_page_permissions(self.page, save=[grant], context=self.context)
+        grant.refresh_from_db()
+        self.assertEqual(grant.grant_on, ACCESS_PAGE)
+        permission_services.save_page_permissions(self.page, delete=[grant], context=self.context)
+        self.assertFalse(PagePermission.objects.filter(pk=grant.pk).exists())
+
+    def test_flags_must_be_grantable_throughout_the_scope(self):
+        # Publishing rights on the page alone do not cover its descendants.
+        PagePermission.objects.create(
+            page=self.page, user=self.manager, grant_on=ACCESS_PAGE,
+            **{**dict.fromkeys(PagePermission.get_all_permissions(), False), "can_change": True, "can_publish": True},
+        )
+        wide = self._grant(save=False, can_publish=True)
+        with self.assertRaises(PermissionDenied):
+            permission_services.save_page_permissions(self.page, save=[wide], context=self.context)
+        self.assertFalse(PagePermission.objects.filter(user=self.target).exists())
+
+        narrow = self._grant(save=False, can_publish=True, grant_on=ACCESS_PAGE)
+        permission_services.save_page_permissions(self.page, save=[narrow], context=self.context)
+        self.assertTrue(PagePermission.objects.get(pk=narrow.pk).can_publish)
+
+    def test_superuser_manages_any_grant(self):
+        protected = self._grant(can_publish=True)
+        permission_services.save_page_permissions(
+            self.page, delete=[protected], context=OperationContext(user=self.get_superuser())
+        )
+        self.assertFalse(PagePermission.objects.filter(pk=protected.pk).exists())
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_django_permissions_apply_without_cms_permissions(self):
+        from django.contrib.auth.models import Permission
+
+        self.manager.user_permissions.remove(Permission.objects.get(codename="publish_page"))
+        self.context = OperationContext(user=self.reload(self.manager))
+        with self.assertRaises(PermissionDenied):
+            permission_services.save_page_permissions(
+                self.page, save=[self._grant(save=False, can_publish=True)], context=self.context
+            )
+        self.assertFalse(PagePermission.objects.filter(user=self.target).exists())
+
+        self.assertNotIn("can_publish", get_grantable_global_permissions(self.context.user, []))
+
+        grant = self._grant(save=False, can_move_page=True)
+        permission_services.save_page_permissions(self.page, save=[grant], context=self.context)
+        self.assertTrue(PagePermission.objects.get(pk=grant.pk).can_move_page)
 
 
 class AddPageServiceTest(CMSTestCase):

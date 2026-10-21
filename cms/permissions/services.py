@@ -77,7 +77,9 @@ def save_page_permissions(page, *, save=(), delete=(), context: OperationContext
     """Save and delete the page permission grants of one page.
 
     :raises ~django.core.exceptions.PermissionDenied: if the acting user may not
-        change the page's permissions, or not grant a flag set on a saved grant.
+        change the page's permissions, may not grant a saved grant's flags
+        throughout its scope, or could not have granted a changed or deleted
+        grant as stored.
     :raises ~django.core.exceptions.ValidationError: if a grant belongs to another page.
     """
     save, delete = list(save), list(delete)
@@ -139,7 +141,8 @@ for _declaration in (
         description=(
             "Save and delete the permission grants of a page. Requires permission to change the "
             "page's permissions; editing rights can only be granted to users and groups the acting "
-            "user manages, and only with flags the acting user holds."
+            "user manages, and only with flags the acting user may grant throughout the grant's scope. "
+            "Existing grants can only be changed or deleted by users who could have granted them."
         ),
         service=save_page_permissions,
         arguments=(

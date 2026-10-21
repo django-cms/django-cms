@@ -102,10 +102,13 @@ def get_grantable_global_permissions(user, site_ids=None):
     if not user or not user.is_authenticated:
         return set()
 
-    if user.is_superuser or not get_cms_setting('PERMISSION'):
+    if user.is_superuser:
         return all_flags
 
-    if site_ids is None:
+    if not get_cms_setting('PERMISSION'):
+        # Without CMS permissions, Django permissions alone decide.
+        held = all_flags
+    elif site_ids is None:
         held = _global_permission_flags(GlobalPagePermission.objects.with_user(user))
     elif not site_ids:
         held = _managed_global_permission_flags(
@@ -150,6 +153,82 @@ def _flags_with_django_permissions(user):
         if flag not in _global_permission_actions
         or user.has_perms(_django_permissions_by_action[_global_permission_actions[flag]])
     }
+
+
+def _permission_scope_is_covered(page, grant_on, permission_tuples):
+    """Check coverage of a scope, including pages that may be created later.
+
+    Only grants anchored at the page or its ancestors can cover every future
+    branch. Their scopes are depth intervals, whose union must cover the
+    requested interval. Separate page-only and descendants grants can therefore
+    jointly authorize a page-and-descendants grant.
+    """
+    from cms.permissions.models import (
+        ACCESS_CHILDREN,
+        ACCESS_DESCENDANTS,
+        ACCESS_PAGE,
+        ACCESS_PAGE_AND_CHILDREN,
+        ACCESS_PAGE_AND_DESCENDANTS,
+    )
+
+    offsets = {
+        ACCESS_PAGE: (0, 0),
+        ACCESS_CHILDREN: (1, 1),
+        ACCESS_PAGE_AND_CHILDREN: (0, 1),
+        ACCESS_DESCENDANTS: (1, float('inf')),
+        ACCESS_PAGE_AND_DESCENDANTS: (0, float('inf')),
+    }
+    if grant_on not in offsets:
+        return False
+    start, end = (page.depth + offset for offset in offsets[grant_on])
+    intervals = []
+    for scope, path in permission_tuples:
+        if scope in offsets and page.path.startswith(path):
+            depth = len(path) // page.steplen
+            intervals.append(tuple(depth + offset for offset in offsets[scope]))
+    for lower, upper in sorted(intervals):
+        if lower > start:
+            return False
+        if upper >= start:
+            if upper >= end:
+                return True
+            start = upper + 1
+    return False
+
+
+def get_grantable_page_permissions(user, page, grant_on):
+    """Return flags a manager may delegate throughout a page permission scope.
+
+    View restrictions require permission-management authority, rather than an
+    explicit can_view grant: managers can also restrict otherwise public pages.
+    Editing flags still require the corresponding CMS and Django permissions.
+    """
+    from cms.permissions.models import ACCESS_CHOICES
+
+    if not user or not user.is_authenticated or grant_on not in dict(ACCESS_CHOICES):
+        return set()
+    all_flags = set(PagePermission.get_all_permissions())
+    if user.is_superuser:
+        return all_flags
+
+    django_flags = _flags_with_django_permissions(user)
+    if not get_cms_setting('PERMISSION'):
+        # Without CMS permissions, Django permissions alone decide.
+        granted = all_flags & django_flags
+    else:
+        site = page.site
+        global_actions = get_global_actions_for_user(user, site)
+        page_actions = get_page_actions_for_user(user, site)
+        granted = {
+            flag for flag, action in _global_permission_actions.items()
+            if flag in django_flags and (
+                action in global_actions
+                or _permission_scope_is_covered(page, grant_on, page_actions.get(action, ()))
+            )
+        }
+    if 'can_change_permissions' not in granted:
+        return set()
+    return granted | {'can_view'}
 
 
 def user_can_add_global_permissions(user, site):

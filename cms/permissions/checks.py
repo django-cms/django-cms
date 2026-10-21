@@ -169,22 +169,61 @@ def check_grants_belong_to_page(context, *, page, save=(), delete=(), **kwargs):
         raise ValidationError(_("The permission belongs to another page."))
 
 
+def _held_page_flags(grant):
+    return {flag for flag in PagePermission.get_all_permissions() if getattr(grant, flag)}
+
+
+def page_grant_allowed(user, page, grant_on, flags) -> bool:
+    """May ``user`` manage a grant on ``page`` holding ``flags`` throughout ``grant_on``?
+
+    Managing needs permission-management authority over the whole scope, and every
+    flag held, also for pages created later. :func:`manageable_page_grants` is the
+    same rule as a queryset filter.
+    """
+    if user is None:
+        return False
+    from cms.permissions.utils import get_grantable_page_permissions
+
+    grantable = get_grantable_page_permissions(user, page, grant_on)
+    return "can_change_permissions" in grantable and set(flags) <= grantable
+
+
+def manageable_page_grants(queryset, user, page):
+    """Narrow ``queryset`` to the grants of ``page`` that ``user`` may manage."""
+    from django.db.models import Q
+
+    from cms.permissions.models import ACCESS_CHOICES
+    from cms.permissions.utils import get_grantable_page_permissions
+
+    allowed = Q(pk__in=[])
+    for scope, _label in ACCESS_CHOICES:
+        grantable = get_grantable_page_permissions(user, page, scope)
+        if "can_change_permissions" in grantable:
+            allowed |= Q(grant_on=scope, **{
+                flag: False for flag in PagePermission.get_all_permissions() if flag not in grantable
+            })
+    return queryset.filter(page=page).filter(allowed)
+
+
+def check_page_grants_manageable(context, *, page, save=(), delete=(), **kwargs):
+    """Changed and deleted grants, as stored, may only be managed by someone who could grant them.
+
+    Otherwise rights the acting user does not hold could be revoked, moved to
+    another user or group, or rescoped through ``grant_on``.
+    """
+    pks = {grant.pk for grant in (*save, *delete) if grant.pk}
+    if not pks:
+        return
+    for stored in PagePermission.objects.filter(pk__in=pks).select_related("page"):
+        if not page_grant_allowed(context.user, stored.page, stored.grant_on, _held_page_flags(stored)):
+            raise PermissionDenied(_("You may not change this page permission."))
+
+
 def check_grantable_page_permissions(context, *, page, save=(), **kwargs):
-    """Every flag set on a saved grant must be one the acting user holds on the page."""
-    held = {
-        "can_add": page.has_add_permission,
-        "can_change": page.has_change_permission,
-        "can_delete": page.has_delete_permission,
-        "can_publish": page.has_publish_permission,
-        "can_change_advanced_settings": page.has_advanced_settings_permission,
-        "can_change_permissions": page.has_change_permissions_permission,
-        "can_move_page": page.has_move_page_permission,
-        "can_view": page.has_view_permission,
-    }
+    """Every flag set on a saved grant must be one the acting user may grant throughout its scope."""
     for grant in save:
-        for flag, has_permission in held.items():
-            if getattr(grant, flag) and not has_permission(context.user):
-                raise PermissionDenied(_("You may not grant this page permission."))
+        if not page_grant_allowed(context.user, page, grant.grant_on, _held_page_flags(grant)):
+            raise PermissionDenied(_("You may not grant this page permission."))
 
 
 register_core_check(
@@ -192,6 +231,13 @@ register_core_check(
     "cms.permissions.grants_belong_to_page",
     check_grants_belong_to_page,
     kind=VALIDATION,
+    requires=["page"],
+)
+register_core_check(
+    operations.CHANGE_PAGE_PERMISSIONS,
+    "cms.permissions.page_grants_manageable",
+    check_page_grants_manageable,
+    kind=PERMISSION,
     requires=["page"],
 )
 register_core_check(
