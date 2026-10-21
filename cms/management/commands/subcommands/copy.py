@@ -1,15 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.core.management import CommandError
 from django.db import transaction
 
-from cms import operations
-from cms.api import copy_plugins_to_language
+from cms.api import copy_plugins_to_language, create_page_content
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import EmptyPageContent, Page, PageContent
+from cms.models import EmptyPageContent, Page
 from cms.pages.utils import get_available_slug
-from cms.shared.operations import OperationContext, operation
-from cms.signals import PAGE_OPERATION_SIGNALS
+from cms.pages.validation import CREATE_CONTENT_FIELDS
+from cms.shared.operations import OperationContext
 from cms.utils import get_language_list
 
 User = get_user_model()
@@ -54,6 +54,7 @@ class CopyLangCommand(SubcommandsCommand):
                             help="Username of user needed create new content objects")
         parser.add_argument("--userid", type=int, help="User id of user needed create new content objects")
 
+    @transaction.atomic
     def handle(self, *args, **options):
         verbose = options.get('verbosity') > 1
         only_empty = options.get('only_empty')
@@ -106,20 +107,20 @@ class CopyLangCommand(SubcommandsCommand):
                             else new_title["slug"]
                     # Adding the translation is announced like any other; the
                     # command acts on the system's behalf, for ``user``.
-                    with operation(
-                        operations.ADD_PAGE_TRANSLATION,
-                        OperationContext.system("cms.copy_lang", user=user, language=to_lang),
-                        checks={"page": page, "permissions": None},
-                        signals=PAGE_OPERATION_SIGNALS,
-                        sender=Page,
-                        obj=page,
-                    ):
-                        new_content = PageContent.objects.with_user(user).create(**new_title)
-
-                        if new_content.is_public():
-                            # The page URL is derived from public content only; drafts
-                            # created by a versioning package get theirs on publish.
-                            page.update_urls_from_content(to_lang)
+                    try:
+                        # The context-aware API validates and announces the
+                        # creation while preserving the source template.
+                        create_page_content(
+                            page=page,
+                            language=to_lang,
+                            **{key: value for key, value in new_title.items() if key in CREATE_CONTENT_FIELDS},
+                            context=OperationContext.system("cms.copy_lang", user=user, language=to_lang),
+                        )
+                    except ValidationError as error:
+                        raise CommandError(
+                            f"Cannot copy page {page.pk} from {from_lang} to {to_lang}: {error}. "
+                            "No changes from this command were saved."
+                        ) from error
 
                 if copy_content:
                     # copy plugins using API

@@ -37,6 +37,37 @@ if settings.AUTH_USER_MODEL == "customuserapp.User":
     TEST_INSTALLED_APPS.append("cms.test_utils.project.customuserapp")
 
 
+class CopyLanguageValidationTests(CMSTestCase):
+    def test_invalid_legacy_content_reports_page_and_rolls_back_entire_copy(self):
+        from cms.models import PageContent
+
+        user = self.get_superuser()
+        first = create_page("First", "nav_playground.html", "en")
+        legacy = create_page("Legacy", "nav_playground.html", "en", parent=first)
+        for invalid_data in ({"redirect": "javascript:alert(1)/x"}, {"meta_description": "x" * 321}):
+            with self.subTest(data=invalid_data):
+                PageContent.objects.filter(page=legacy).update(
+                    **{"redirect": None, "meta_description": None, **invalid_data},
+                )
+                with self.assertRaisesMessage(CommandError, f"Cannot copy page {legacy.pk} from en to de"):
+                    management.call_command(
+                        "cms", "copy", "lang", "--from-lang=en", "--to-lang=de",
+                        f"--userid={user.pk}", stdout=StringIO(),
+                    )
+                self.assertFalse(PageContent.objects.filter(language="de").exists())
+                self.assertFalse(PageUrl.objects.filter(language="de").exists())
+
+    def test_copy_preserves_source_translation_template(self):
+        user = self.get_superuser()
+        page = create_page("First", "nav_playground.html", "de")
+        create_page_content("en", "Source", page, template="col_two.html")
+        management.call_command(
+            "cms", "copy", "lang", "--from-lang=en", "--to-lang=fr",
+            f"--userid={user.pk}", stdout=StringIO(),
+        )
+        self.assertEqual(page.get_admin_content("fr").template, "col_two.html")
+
+
 class ManagementTestCase(CMSTestCase):
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_list_apphooks(self):

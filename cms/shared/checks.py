@@ -33,6 +33,10 @@ management commands -- runs with ``OperationContext.system()``, which skips the
 permission checks, runs the policy checks unless it opts out, and never skips
 the validation checks.
 
+Operations may define a separate input preparation step. Both real and dry
+runs execute it after permission/policy checks and before validation. This
+step converts input shapes and types; replaceable checks own business rules.
+
 These are unrelated to Django's system check framework (``manage.py check``).
 """
 
@@ -88,9 +92,46 @@ class _Entry:
     kind: str
 
 
+@dataclass(frozen=True)
+class _Preparation(_Entry):
+    """Input conversion, separate from replaceable business-rule checks."""
+
+
 # operation -> name -> entry. Dicts keep insertion order, which is check order.
 _core: dict[str, dict[str, _Entry]] = {}
 _extensions: dict[str, dict[str, _Entry]] = {}
+_preparations: dict[str, _Preparation] = {}
+
+
+def register_core_preparation(
+    operation: str, name: str, prepare: Callable, *, requires: Iterable[str],
+) -> None:
+    """Define core input preparation shared by preflight and writes.
+
+    This is an internal registration API for operation implementations. Apps
+    customize business rules through :func:`register_check` instead.
+
+    ``prepare(context, **target)`` returns additional arguments for the checks.
+    It may reject unsupported input shapes or unconvertible types, but business
+    rules belong in replaceable checks. It runs after permissions and policies,
+    before validation. ``register_check`` replaces checks, not this input step.
+    """
+    _preparations[operation] = _Preparation(name, prepare, tuple(requires), VALIDATION)
+
+
+def _execution_steps(operation):
+    entries = get_checks(operation)
+    preparation = _preparations.get(operation)
+    if preparation is not None:
+        index = next((i for i, entry in enumerate(entries) if entry.kind == VALIDATION), len(entries))
+        entries.insert(index, preparation)
+    return entries
+
+
+def _run_step(entry, context, target):
+    result = entry.check(context, **target)
+    if isinstance(entry, _Preparation):
+        target.update(result)
 
 
 def _register(registry, operation, name, check, requires, kind):
@@ -163,7 +204,7 @@ def argument_problems() -> list[str]:
         if declaration.arguments is None:
             continue
         declared = {argument.name for argument in declaration.arguments}
-        for entry in get_checks(declaration.id):
+        for entry in _execution_steps(declaration.id):
             problems.extend(
                 f"Check {entry.name!r} of operation {declaration.id!r} requires {name!r}, "
                 f"which the operation does not declare."
@@ -175,13 +216,13 @@ def argument_problems() -> list[str]:
 
 def run_checks(operation: str, context, **target) -> None:
     """Raise the first failure of ``operation``'s checks. Services call this."""
-    for entry in get_checks(operation):
+    for entry in _execution_steps(operation):
         if not _applies(entry, context):
             continue
         missing = [arg for arg in entry.requires if arg not in target]
         if missing:
             raise TypeError(f"Check {entry.name!r} needs {', '.join(missing)} to run.")
-        entry.check(context, **target)
+        _run_step(entry, context, target)
 
 
 @dataclass(frozen=True)
@@ -206,6 +247,7 @@ class Verdict:
     reasons: list[Reason] = field(default_factory=list)
     #: Names of checks skipped for want of a target argument. A verdict that
     #: skipped checks is not a promise: the real operation may still fail.
+    #: Includes the preparation step when its required input is missing.
     skipped: list[str] = field(default_factory=list)
 
     @property
@@ -223,14 +265,14 @@ def can(operation: str, context, **target) -> Verdict:
     """Dry-run ``operation``: run its checks, change nothing, report why not."""
     reasons = []
     skipped = []
-    for entry in get_checks(operation):
+    for entry in _execution_steps(operation):
         if not _applies(entry, context):
             continue
         if any(arg not in target for arg in entry.requires):
             skipped.append(entry.name)
             continue
         try:
-            entry.check(context, **target)
+            _run_step(entry, context, target)
         except OperationBlocked as error:
             reasons.append(Reason(entry.name, POLICY, str(error)))
         except PermissionDenied as error:
@@ -238,4 +280,7 @@ def can(operation: str, context, **target) -> Verdict:
             break
         except ValidationError as error:
             reasons.extend(Reason(entry.name, VALIDATION, str(message)) for message in error.messages)
+            if isinstance(entry, _Preparation):
+                # Later checks cannot inspect input that could not be prepared.
+                break
     return Verdict(allowed=not reasons, reasons=reasons, skipped=skipped)

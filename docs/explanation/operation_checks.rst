@@ -349,6 +349,26 @@ Registering in ``cms_config`` means several packages can contribute checks to
 the same operation without knowing about each other, and without changing
 attributes of another package's classes at import time.
 
+Page operations separate input preparation from these replaceable rules.
+The internal ``register_core_preparation()`` API defines the conversion step
+shared by ``can()`` and ``run_checks()``; apps customize the validation checks
+instead. Preparation runs after permissions/policies and before validation.
+It checks supported fields and storage types, normalizes paths and resolves
+defaults, but does not enforce lengths, choices, URL uniqueness or apphook
+namespace uniqueness. Failures and missing inputs are reported under
+``cms.pages.content_data_prepared``.
+
+Replacing ``cms.pages.content_data_valid`` replaces the page-data rules in
+both paths. The replacement can inspect ``prepared["data"]`` for edits or
+``prepared["content_data"]`` for creation. Core validation is not called again
+by the service. The service persists the prepared values after the registered
+checks succeed; database constraints still apply.
+
+These replacements do not reach the admin forms: forms still run their field
+validators and core ``validation.clean_*`` functions directly. An app that
+relaxes a rule for the admin must customize both the form fields and cleaning
+methods as needed.
+
 Permissions
 ===========
 
@@ -570,31 +590,47 @@ column are what a check receives and what a dry run passes to ``can()``.
     * - ``ADD_PAGE``
 
         ``add_page``
-      - ``site``, ``parent_page``, ``source``, ``allow_view_only_page_type``
+      - ``site``, ``parent_page``, ``source``, ``allow_view_only_page_type``,
+        ``language``, ``content_data``, ``is_page_type``
       - ``cms.pages.add_permission``: the user may add a page at the root or
         below the parent the page gets (for page types, the page-types root).
 
         ``cms.pages.add_source_permission``: for a page created from a source,
         the user may copy the source.
 
+        ``cms.pages.content_data_valid``: the site's language, template,
+        content fields and prospective URL are valid. No page-types root is
+        created during preflight.
+
         Announced to signal receivers as ``ADD_PAGE_TRANSLATION``.
     * - ``ADD_PAGE_TRANSLATION``
 
         ``add_translation``
-      - ``page``
+      - ``page``, ``language``, ``content_data``
       - ``cms.pages.add_translation_permission``: the user may change the page.
+
+        ``cms.pages.content_data_valid``: the language has no translation yet,
+        and its content, inherited template and URL are valid.
     * - ``CHANGE_PAGE_TRANSLATION``
 
         ``change_page_content``
-      - ``page_content``
+      - ``page_content``, ``data``
       - ``cms.pages.change_translation_permission``: the user may change this
         translation's content.
+
+        ``cms.pages.content_data_valid``: the supplied fields and prospective
+        URL are valid. A supplied template uses the same validator as
+        ``CHANGE_PAGE_TEMPLATE``.
     * - ``CHANGE_PAGE_ADVANCED_SETTINGS``
 
         ``change_advanced_settings``
-      - ``page``
+      - ``page``, ``data``
       - ``cms.pages.advanced_settings_permission``: the user may change the
         page's advanced settings.
+
+        ``cms.pages.content_data_valid``: the reverse ID is available on this
+        site, and the navigation extender, apphook, selected configuration and
+        resulting namespace are valid.
     * - ``CHANGE_PAGE_PERMISSIONS``
 
         ``save_page_permissions``
@@ -684,7 +720,8 @@ column are what a check receives and what a dry run passes to ``can()``.
       - ``page_content``, ``template``
       - ``cms.pages.change_template_permission``: the user may change the page.
 
-        ``cms.pages.template_valid``: the project offers the template.
+        ``cms.pages.template_valid``: the project offers and can load the
+        template, or it is a valid inheritance/headless placeholder selection.
     * - ``COPY_PAGE_LANGUAGE``
 
         ``copy_language``

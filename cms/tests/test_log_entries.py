@@ -178,6 +178,17 @@ class LogPageOperationsTests(CMSTestCase):
             # Check that the correct user created the log
             self.assertEqual(self._admin_user.pk, log_entry.user_id)
 
+    def test_log_for_delete_page_service_names_the_page(self):
+        """A freshly loaded page is logged by its title, not as an untitled page."""
+        from cms.pages import services as page_services
+        from cms.shared.operations import OperationContext
+
+        page = create_page("page_a", "nav_playground.html", "en")
+        page_services.delete_page(
+            Page.objects.get(pk=page.pk), context=OperationContext(user=self._admin_user, language="en"),
+        )
+        self.assertEqual("page_a", LogEntry.objects.get(action_flag=DELETION).object_repr)
+
     def test_log_for_change_translation(self):
         """
         When a pages translation is changed a log entry is created.

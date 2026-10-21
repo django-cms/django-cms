@@ -1530,11 +1530,13 @@ class PageTest(PageTestBase):
 
         with self.login_user_context(superuser):
             # change the apphook config to an invalid value
-            expected_error = '<ul class="errorlist"><li>Invalid application config value</li></ul>'
             page_data["application_configs"] = "2"
             response = self.client.post(endpoint, page_data)
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error)
+            self.assertEqual(
+                response.context["adminform"].form.errors["application_configs"],
+                ["Invalid application config value"],
+            )
             self.assertEqual(
                 cms_pages.filter(
                     application_urls="SampleAppWithConfig",

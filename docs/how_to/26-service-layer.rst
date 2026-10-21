@@ -93,7 +93,8 @@ They take model objects and return model objects:
     # Move a page below another one.
     page_services.move_page(page, target_page, "last-child", context=context)
 
-The functions in :mod:`cms.api` keep working as before and do not run checks.
+Without a context, the functions in :mod:`cms.api` keep their legacy input
+validation and do not run operation checks.
 To run one as its operation -- checks, signals, transaction -- pass a context:
 
 .. code-block:: python
@@ -101,6 +102,103 @@ To run one as its operation -- checks, signals, transaction -- pass a context:
     from cms.api import create_page
 
     page = create_page("About", "page.html", "en", context=context)
+
+Page creation and editing use the request-independent validators in
+``cms.pages.validation``, shared with the admin forms. They validate the site's
+language, templates (including headless placeholder sets), field values,
+redirects and URL conflicts before operation signals or writes. Invalid input
+raises ``ValidationError`` with a ``message_dict`` keyed by field. The
+context-aware page creation APIs use these checks too; their context-less
+counterparts retain legacy assertions and path ``IntegrityError`` exceptions.
+
+Both ``can()`` and execution prepare page input after permission/policy checks
+and before validation. Preparation copies supported fields, converts storage
+types, strips overwrite-URL slashes and resolves defaults, paths and templates.
+Unsupported fields or unconvertible input are reported by
+``cms.pages.content_data_prepared`` in preflight too.
+
+The separate ``cms.pages.content_data_valid`` check owns the business rules.
+An app replacing it can tighten or relax those rules; execution does not run
+the original validator afterward. The replacement receives the original
+arguments plus ``prepared["data"]`` for edits or ``prepared["content_data"]``
+for creation. Validate those normalized values without mutating them.
+
+For example, to allow longer descriptions on content edits while retaining
+the other default rules:
+
+.. code-block:: python
+
+    from django.core.exceptions import ValidationError
+    from django.core.validators import MaxLengthValidator
+
+    from cms import operations
+    from cms.pages import validation
+    from cms.shared.checks import register_check
+
+    def validate_content(context, *, page_content, prepared, **kwargs):
+        values = prepared["data"]
+        validation.validate_content_change(
+            page_content,
+            {name: value for name, value in values.items() if name != "meta_description"},
+        )
+        if values.get("meta_description"):
+            try:
+                MaxLengthValidator(500)(values["meta_description"])
+            except ValidationError as error:
+                raise ValidationError({"meta_description": error.messages}) from error
+
+    register_check(
+        operations.CHANGE_PAGE_TRANSLATION,
+        "cms.pages.content_data_valid",
+        validate_content,
+        requires=["page_content", "data"],
+    )
+
+Replacing ``cms.pages.content_data_valid`` affects service execution and
+``can()``. Admin forms still apply their field validators and the core
+``validation.clean_*`` rules directly. To relax validation in the admin too,
+customize the form's fields and cleaning methods. Adjust any API serializer
+limits separately.
+
+Admin form subclasses may add their own fields. Only core fields are passed
+to page-data validators and services; extra fields remain in ``cleaned_data``
+for the subclass to handle.
+
+Advanced settings accept a dictionary of changes:
+
+.. code-block:: python
+
+    page = page_services.change_advanced_settings(
+        page,
+        data={"reverse_id": "about", "login_required": False},
+        context=context,
+    )
+
+The service validates reverse IDs, apphooks, configuration selections and
+namespaces. A selected ``application_configs`` primary key supplies the
+namespace; without a selection, an empty namespace defaults to the apphook's
+``app_name``. Existing Python callers may still pass a modified page and omit
+``data``; new adapters should use the dictionary form declared in the registry.
+
+Page services and the creation APIs serialize writes to each affected site
+before preparing inputs or running checks. They reload page inputs after taking
+the lock, so a waiting creation uses the parent's latest path and a waiting
+identifier claim sees the preceding write. Moves, homepage changes and URL
+rebuilds use the same lock. Advanced-settings saves write only changed fields
+and audit fields. Pass explicit ``data`` for concurrent editors: the legacy
+modified-instance form cannot distinguish an intended edit from a stale value.
+
+On databases with row locks, writes to the same site wait until the surrounding
+transaction commits; cross-site operations lock sites in primary-key order.
+SQLite uses its database write lock instead. Keep transactions short. Code
+that writes through raw model saves or querysets must coordinate with these
+operations itself; validation replacements still own the rules, including
+identifier uniqueness. ``can()`` remains a read-only snapshot and does not
+reserve identifiers or URLs.
+
+Known URL uniqueness failures during a service or context-aware API write are
+rolled back and reported as field-keyed ``ValidationError`` exceptions.
+Unrelated database errors retain their original exception type.
 
 
 ****************
@@ -182,6 +280,26 @@ validation failure otherwise.
 A check that needs an argument you did not pass is skipped and listed in
 ``verdict.skipped``. A verdict with skipped checks is not a promise: check
 ``verdict.complete`` before you rely on it.
+
+Page-data checks require ``language`` and ``content_data`` for creation, or
+``data`` for content and advanced-settings edits. Pass those values to include
+input validation in preflight:
+
+.. code-block:: python
+
+    values = {"slug": "about", "redirect": "/en/contact/"}
+    verdict = can(
+        operations.CHANGE_PAGE_TRANSLATION,
+        context,
+        page_content=content,
+        data=values,
+    )
+    if verdict and verdict.complete:
+        page_services.change_page_content(content, data=values, context=context)
+
+Preflight does not reserve a URL or lock the proposed change. The service
+checks again when called. ``complete`` means that no registered check was
+skipped; plugin form cleaning still runs separately inside plugin services.
 
 
 *********************

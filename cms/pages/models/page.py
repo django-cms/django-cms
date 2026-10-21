@@ -18,6 +18,7 @@ from django.utils.translation import get_language, gettext_lazy as _, override a
 from cms import constants
 from cms.pages.models.managers import PageManager, PageUrlManager
 from cms.pages.mptree import get_tree_base
+from cms.pages.transactions import PageUrlConflict, page_write
 from cms.shared.resolvers import provide
 from cms.shared.signals import page_caches_invalidated
 from cms.shared.users import get_clean_username, get_current_user_name
@@ -212,6 +213,7 @@ class Page(MP_Node):
     def has_valid_url(self, language):
         return self.urls.filter(language=language, path__isnull=False).exists()
 
+    @page_write("self", translate_errors=False)
     def set_as_homepage(self, user=None):
         """
         Sets the given page as the homepage.
@@ -395,6 +397,7 @@ class Page(MP_Node):
         else:
             self.parent.add_sibling(pos=position, instance=self)
 
+    @page_write("self", "target_page", translate_errors=False)
     def move_page(self, target_page, position="first-child", user=None):
         """
         Called from admin interface when page is moved. Should be used on
@@ -874,7 +877,7 @@ class Page(MP_Node):
                     page_pks_being_updated = list(
                         page_urls_qs.filter(language=lang).values_list("page__pk", flat=True)
                     )
-                    raise IntegrityError(
+                    raise PageUrlConflict(
                         f"Cannot update URL path. A page URL with path='{new_path}' "
                         f"and language='{lang}' already exists for another page "
                         f"on the same site (not page(s): {page_pks_being_updated})."
@@ -883,6 +886,7 @@ class Page(MP_Node):
         # If no collision detected, proceed with the update
         return page_urls_qs.update(**data)
 
+    @page_write("self", translate_errors=False)
     def update_urls_from_content(self, language):
         """Derive this page's :class:`~cms.pages.models.page.PageUrl` for ``language``
         from the publicly visible :class:`~cms.pages.models.content.PageContent`
@@ -924,7 +928,7 @@ class Page(MP_Node):
                     and PageUrl.objects.filter(language=language, path=path, site=self.site_id).exists()
                 )
                 if collision:
-                    raise IntegrityError(
+                    raise PageUrlConflict(
                         f"Cannot create URL. A page URL with path='{path}' and "
                         f"language='{language}' already exists for another page on the same site."
                     )
