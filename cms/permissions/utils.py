@@ -102,10 +102,13 @@ def get_grantable_global_permissions(user, site_ids=None):
     if not user or not user.is_authenticated:
         return set()
 
-    if user.is_superuser or not get_cms_setting('PERMISSION'):
+    if user.is_superuser:
         return all_flags
 
-    if site_ids is None:
+    if not get_cms_setting('PERMISSION'):
+        # Without CMS permissions, Django permissions alone decide.
+        held = all_flags
+    elif site_ids is None:
         held = _global_permission_flags(GlobalPagePermission.objects.with_user(user))
     elif not site_ids:
         held = _managed_global_permission_flags(
@@ -205,20 +208,24 @@ def get_grantable_page_permissions(user, page, grant_on):
     if not user or not user.is_authenticated or grant_on not in dict(ACCESS_CHOICES):
         return set()
     all_flags = set(PagePermission.get_all_permissions())
-    if user.is_superuser or not get_cms_setting('PERMISSION'):
+    if user.is_superuser:
         return all_flags
 
-    site = page.site
-    global_actions = get_global_actions_for_user(user, site)
-    page_actions = get_page_actions_for_user(user, site)
     django_flags = _flags_with_django_permissions(user)
-    granted = {
-        flag for flag, action in _global_permission_actions.items()
-        if flag in django_flags and (
-            action in global_actions
-            or _permission_scope_is_covered(page, grant_on, page_actions.get(action, ()))
-        )
-    }
+    if not get_cms_setting('PERMISSION'):
+        # Without CMS permissions, Django permissions alone decide.
+        granted = all_flags & django_flags
+    else:
+        site = page.site
+        global_actions = get_global_actions_for_user(user, site)
+        page_actions = get_page_actions_for_user(user, site)
+        granted = {
+            flag for flag, action in _global_permission_actions.items()
+            if flag in django_flags and (
+                action in global_actions
+                or _permission_scope_is_covered(page, grant_on, page_actions.get(action, ()))
+            )
+        }
     if 'can_change_permissions' not in granted:
         return set()
     return granted | {'can_view'}

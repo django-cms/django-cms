@@ -14,6 +14,7 @@ from cms.pages import services as page_services
 from cms.pages.permissions import PagePermissions, get_page_permissions
 from cms.permissions import services as permission_services
 from cms.permissions.models import ACCESS_PAGE, ACCESS_PAGE_AND_DESCENDANTS
+from cms.permissions.utils import get_grantable_global_permissions
 from cms.shared import checks
 from cms.shared.checks import can
 from cms.shared.operations import OperationContext
@@ -500,6 +501,24 @@ class PageGrantScopeServiceTest(CMSTestCase):
             self.page, delete=[protected], context=OperationContext(user=self.get_superuser())
         )
         self.assertFalse(PagePermission.objects.filter(pk=protected.pk).exists())
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_django_permissions_apply_without_cms_permissions(self):
+        from django.contrib.auth.models import Permission
+
+        self.manager.user_permissions.remove(Permission.objects.get(codename="publish_page"))
+        self.context = OperationContext(user=self.reload(self.manager))
+        with self.assertRaises(PermissionDenied):
+            permission_services.save_page_permissions(
+                self.page, save=[self._grant(save=False, can_publish=True)], context=self.context
+            )
+        self.assertFalse(PagePermission.objects.filter(user=self.target).exists())
+
+        self.assertNotIn("can_publish", get_grantable_global_permissions(self.context.user, []))
+
+        grant = self._grant(save=False, can_move_page=True)
+        permission_services.save_page_permissions(self.page, save=[grant], context=self.context)
+        self.assertTrue(PagePermission.objects.get(pk=grant.pk).can_move_page)
 
 
 class AddPageServiceTest(CMSTestCase):
