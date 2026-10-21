@@ -312,6 +312,12 @@ By default the subcommand copy content from the current site
 placeholder has no content for the specified language; using the defined
 options you can change this.
 
+New translations preserve the source translation's template and run the
+page-data validators. If legacy content fails validation, the command reports
+the page ID, languages and validation errors. The entire command runs in one
+database transaction, so that failure also rolls back earlier copies. Correct
+the reported source data before retrying.
+
 You must provide two arguments:
 
 * ``--from-lang``: the language to copy the content from;

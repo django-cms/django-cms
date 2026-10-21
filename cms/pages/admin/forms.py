@@ -4,7 +4,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
@@ -12,7 +11,6 @@ from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.forms.fields import PageSmartLinkField
-from cms.forms.validators import validate_path, validate_url_uniqueness
 from cms.forms.widgets import (
     AppHookSelect,
     ApplicationConfigSelect,
@@ -28,7 +26,7 @@ from cms.models import (
     PageUserGroup,
 )
 from cms.operations import ADD_PAGE, COPY_PAGE_FROM_SOURCE
-from cms.pages import services as page_services
+from cms.pages import services as page_services, validation
 from cms.pages.apphook_pool import apphook_pool
 from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
 from cms.permissions import checks as permission_checks, services as permission_services
@@ -56,6 +54,11 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request
 from cms.utils.urlutils import static_with_version
 from menus.menu_pool import menu_pool
+
+
+def _add_validation_errors(form, error):
+    for field, errors in error.error_dict.items():
+        form.add_error(field if field in form.fields else None, errors)
 
 
 def get_permission_accessor(obj):
@@ -293,18 +296,21 @@ class AddPageForm(BasePageContentForm):
         parent_path = self.get_parent_path(parent_page)
         path = f"{parent_path}/{data['slug']}" if parent_path else data["slug"]
 
+        values = {
+            **self.content_defaults,
+            **{name: value for name, value in data.items() if name in validation.CONTENT_FIELDS},
+            "template": self.get_template(),
+            "path": path,
+        }
         try:
-            # Validate the url
-            validate_url_uniqueness(
-                self._site,
-                path=path,
-                language=self._language,
-                user_language=self._language,
+            values = validation.clean_creation_data(
+                self._site, self._language, values,
+                page=data.get("cms_page"), parent=parent_page,
             )
         except ValidationError as error:
-            self.add_error("slug", error)
+            _add_validation_errors(self, error)
         else:
-            data["path"] = path
+            data.update(values)
         return data
 
     def get_parent_path(self, parent_page):
@@ -585,53 +591,25 @@ class ChangePageForm(BasePageContentForm):
         return self.instance.language
 
     def clean_overwrite_url(self):
-        path = (self.cleaned_data.get("overwrite_url") or "").strip("/")
-        if path:
-            # Validate the characters here rather than in ``clean()``: that method returns early
-            # for the home page and for pages without a reachable path, but the value is persisted
-            # either way and becomes the live url as soon as the page stops being home.
-            validate_path(path)
-        return self.cleaned_data["overwrite_url"]
+        try:
+            values = validation.prepare_content_values({"overwrite_url": self.cleaned_data["overwrite_url"]})
+            validation.validate_content_values(values)
+        except ValidationError as error:
+            raise ValidationError(error.error_dict["overwrite_url"]) from error
+        return values["overwrite_url"]
 
     def clean(self):
         data = super().clean()
-
         if self._errors:
-            # Form already has errors, best to let those be
-            # addressed first.
             return data
-
-        page = self.instance.page
-
-        if page.is_home:
-            # the home page always lives at the root path
-            return data
-
-        slug = data["slug"]
-        path_override = self.cleaned_data.get("overwrite_url")
-
-        # the same derivation Page.update_urls_from_content applies on save
-        path = page.get_url_data(slug, path_override, self._language)["path"]
-
-        if path is None:
-            # the page has no reachable path (e.g. unpublished parent),
-            # so there is no URL to validate
-            return data
-
-        user_language = get_site_language_from_request(self._request, site_id=self._site.pk)
-
         try:
-            # Validate the url
-            validate_url_uniqueness(
-                self._site,
-                path=path,
-                language=self._language,
-                user_language=user_language,
-                exclude_page=page,
-            )
+            values = {name: value for name, value in data.items() if name in validation.CONTENT_FIELDS}
+            data.update(validation.clean_content_change(
+                self.instance, values,
+                user_language=get_site_language_from_request(self._request, site_id=self._site.pk),
+            ))
         except ValidationError as error:
-            field = "overwrite_url" if path_override else "slug"
-            self.add_error(field, error)
+            _add_validation_errors(self, error)
         return data
 
     def clean_xframe_options(self):
@@ -648,7 +626,7 @@ class ChangePageForm(BasePageContentForm):
         page_content = super().save(commit=False)
         return page_services.change_page_content(
             page_content,
-            data=self.cleaned_data,
+            data={name: value for name, value in self.cleaned_data.items() if name in validation.CONTENT_FIELDS},
             context=OperationContext.from_request(self._request, language=self._language),
             permissions=(
                 AdminPageContentPermissions(self._page_admin, self._request)
@@ -737,86 +715,18 @@ class AdvancedSettingsForm(forms.ModelForm):
         return get_site_language_from_request(self._request, site_id=self._site.pk)
 
     def clean(self):
-        cleaned_data = super().clean()
-
+        data = super().clean()
         if self._errors:
-            # Fail fast if there's errors in the form
-            return cleaned_data
-
-        if "reverse_id" in self.fields:
-            reverse_id = cleaned_data["reverse_id"]
-            if reverse_id:
-                lookup = Page.objects.on_site(self._site).filter(reverse_id=reverse_id)
-                if lookup.exclude(pk=self.instance.pk).exists():
-                    self._errors["reverse_id"] = self.error_class(
-                        [_("A page with this reverse URL id exists already.")]
-                    )
-        apphook = cleaned_data.get("application_urls", None)
-        # The field 'application_namespace' is a misnomer. It should be
-        # 'instance_namespace'.
-        instance_namespace = cleaned_data.get("application_namespace", None)
-        application_config = cleaned_data.get("application_configs", None)
-
-        if apphook:
-            apphooks_with_config = self.get_apphooks_with_config()
-
-            # application_config wins over application_namespace
-            if apphook in apphooks_with_config and application_config:
-                # the value of the application config namespace is saved in
-                # the 'usual' namespace field to be backward compatible
-                # with existing apphooks
-                try:
-                    appconfig_pk = forms.IntegerField(required=True).to_python(application_config)
-                except ValidationError:
-                    self._errors["application_configs"] = ErrorList([_("Invalid application config value")])
-                    return self.cleaned_data
-
-                try:
-                    config = apphooks_with_config[apphook].get_configs().get(pk=appconfig_pk)
-                except ObjectDoesNotExist:
-                    self._errors["application_configs"] = ErrorList([_("Invalid application config value")])
-                    return self.cleaned_data
-
-                if self._check_unique_namespace_instance(config.namespace):
-                    # Looks like there's already one with the default instance
-                    # namespace defined.
-                    self._errors["application_configs"] = ErrorList(
-                        [_("An application instance using this configuration already exists.")]
-                    )
-                else:
-                    self.cleaned_data["application_namespace"] = config.namespace
-            else:
-                if instance_namespace:
-                    if self._check_unique_namespace_instance(instance_namespace):
-                        self._errors["application_namespace"] = ErrorList(
-                            [_("An application instance with this name already exists.")]
-                        )
-                else:
-                    # The attribute on the apps 'app_name' is a misnomer, it should be
-                    # 'application_namespace'.
-                    application_namespace = apphook_pool.get_apphook(apphook).app_name
-                    if application_namespace and not instance_namespace:
-                        if self._check_unique_namespace_instance(application_namespace):
-                            # Looks like there's already one with the default instance
-                            # namespace defined.
-                            self._errors["application_namespace"] = ErrorList(
-                                [_("An application instance with this name already exists.")]
-                            )
-                        else:
-                            # OK, there are zero instances of THIS app that use the
-                            # default instance namespace, so, since the user didn't
-                            # provide one, we'll use the default. NOTE: The following
-                            # line is really setting the "instance namespace" of the
-                            # new app to the app's "application namespace", which is
-                            # the default instance namespace.
-                            self.cleaned_data["application_namespace"] = application_namespace
-
-        if instance_namespace and not apphook:
-            self.cleaned_data["application_namespace"] = None
-
-        if application_config and not apphook:
-            self.cleaned_data["application_configs"] = None
-        return self.cleaned_data
+            return data
+        try:
+            fields = {*validation.ADVANCED_SETTINGS_FIELDS, "application_configs"}
+            values = {name: value for name, value in data.items() if name in fields}
+            data.update(validation.clean_advanced_settings(self.instance, values))
+        except ValidationError as error:
+            _add_validation_errors(self, error)
+        if not data.get("application_urls"):
+            data["application_configs"] = None
+        return data
 
     def get_apphooks(self):
         for hook in apphook_pool.get_apphooks():

@@ -805,9 +805,11 @@ class AdminFormsTests(AdminTestsBase):
 
         with self.login_user_context(superuser):
             response = self.client.post(page2_endpoint, page2_data)
-            expected_error = '<ul class="errorlist">' "<li>A page with this reverse URL id exists already.</li></ul>"
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error.format(page2.pk), html=True)
+            self.assertEqual(
+                response.context["adminform"].form.errors["reverse_id"],
+                ["A page with this reverse URL id exists already."],
+            )
 
     @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_endpoint_fails_gracefully(self):
