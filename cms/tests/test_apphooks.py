@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
 from django.core.checks.urls import check_url_config
+from django.core.signals import request_finished
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.template import Context, Template
@@ -29,7 +30,8 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.middleware.page import get_page
-from cms.models import PageContent
+from cms.models import Page, PageContent
+from cms.signals.apphook import DISPATCH_UID
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
@@ -761,6 +763,30 @@ class ApphooksTestCase(BaseApphooksTestCase):
 
         with force_language("de"):
             self.assertEqual(get_app_patterns()[0].url_patterns, [])
+
+    @override_settings(
+        CMS_PERMISSION=False,
+        ROOT_URLCONF='cms.test_utils.project.urls',
+        MIDDLEWARE=['cms.middleware.utils.ApphookReloadMiddleware', *settings.MIDDLEWARE],
+    )
+    def test_apphook_urls_follow_moved_page(self):
+        # Moving a page changes the urls of its apphook: the reload middleware has
+        # to serve them at the new location without a server restart
+        parent_1 = create_page("parent-1", "nav_playground.html", "en")
+        parent_2 = create_page("parent-2", "nav_playground.html", "en")
+        page = create_page("blog", "nav_playground.html", "en", parent=parent_1, apphook=APP_NAME)
+        # Creating the page scheduled a reload for the end of the next request. Drop
+        # it: the app's url patterns are built by the request below.
+        request_finished.disconnect(dispatch_uid=DISPATCH_UID)
+        self.assertEqual(self.client.get("/en/parent-1/blog/extra_1/").status_code, 200)
+
+        with self.login_user_context(self.get_superuser()):
+            endpoint = self.get_admin_url(Page, "move_page", page.pk)
+            response = self.client.post(endpoint, {"id": page.pk, "position": 0, "target": parent_2.pk})
+        self.assertEqual(response.json()["status"], 200)
+
+        self.assertEqual(self.client.get("/en/parent-2/blog/extra_1/").status_code, 200)
+        self.assertEqual(self.client.get("/en/parent-1/blog/extra_1/").status_code, 404)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
     def test_apphook_urlpattern_order(self):

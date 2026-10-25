@@ -117,6 +117,8 @@ Whenever you:
   descendant with an apphook
 - publish or unpublish a language of a page containing an apphook (or of a page which has
   a descendant with an apphook)
+- move a page containing an apphook or a page which has a descendant with an apphook to
+  a different URL
 
 the URL caches must be reloaded.
 

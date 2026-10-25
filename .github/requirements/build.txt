@@ -24,8 +24,9 @@ check-wheel-contents==0.6.3 \
     --hash=sha256:5ae39c8c434b972f0740d04610759168590713175aab584b012b1b84f6771874
 
 # Build backend, matching [build-system] requires in pyproject.toml
-setuptools==84.0.0 \
-    --hash=sha256:51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670
+setuptools==84.1.0 \
+    --hash=sha256:23657205b63d4d31395ab917815247f694aafad28cd21316bf5fd45a51048ea0 \
+    --hash=sha256:5231689c6ac8156cd155cfb98c3fd6fb252c3e7e9bd3d78b64d3c55f132624c9
 setuptools-scm==10.2.1 \
     --hash=sha256:b7c82f4102d389ee57dc66ccdb4f9b4bca3c40ba83b43f1f63d68ccd72db2580
 
