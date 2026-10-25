@@ -467,12 +467,21 @@ class Page(MP_Node):
         _lock_tree_roots(self)
 
         languages = self.urls.values_list("language", flat=True)
+        old_paths = dict(self.urls.values_list("language", "path"))
 
         for language in languages:
             if not self.is_home:
                 self._update_url_path(language)
             self._update_url_path_recursive(language)
         self.clear_cache(menu=True)
+
+        new_paths = dict(self.urls.values_list("language", "path"))
+        if new_paths != old_paths and self.__class__.get_tree(self).has_apphooks():
+            # Apphook patterns are built from the PageUrl table: reload them if the
+            # URLs of this page, from which those of its descendants derive, changed
+            from cms.signals.apphook import set_restart_trigger
+
+            set_restart_trigger()
         return self
 
     def _clear_placeholders(self, language):

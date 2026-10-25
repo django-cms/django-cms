@@ -466,7 +466,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         clear_permission_cache()
 
-        if obj.application_urls:
+        if any(page.application_urls for page in cms_pages):
             set_restart_trigger()
 
     def get_copy_dialog(self, request, page_id):
