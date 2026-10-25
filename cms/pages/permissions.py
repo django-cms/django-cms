@@ -1,10 +1,16 @@
 """The permission checks the page services perform, as one replaceable object.
 
 The counterpart of :mod:`cms.core.permissions`, and the same three
-rules: every predicate is the ``cms.utils.page_permissions`` call the page
-admin's ``has_*_permission`` hooks already delegate to, so a stock installation
-decides exactly as before; ``permissions=`` replaces the backend for one call;
-and a ``page_permissions`` contract replaces it for every caller.
+rules: every predicate is the ``cms.utils.page_permissions`` call a stock
+installation always made, so it decides exactly as before; ``permissions=``
+replaces the backend for one call; and a ``page_permissions`` contract replaces
+it for every caller -- the admin included, since the page admins'
+``has_*_permission`` hooks ask the backend, too.
+
+The admin adapters route predicates through those hooks, so that admin classes
+overriding them keep deciding admin requests. Overrides calling ``super()`` can
+therefore only narrow what the backend allows. Predicates without a hook are
+answered by the backend.
 
 Predicates answer ``True``/``False``. Raising ``PermissionDenied`` with a message
 a user will read is the service's job, so the wording stays with the operation.
@@ -17,9 +23,17 @@ from cms.permissions import page_permissions
 __all__ = [
     "AdminPageContentPermissions",
     "AdminPagePermissions",
+    "BackendPagePermissions",
     "PagePermissions",
     "get_page_permissions",
 ]
+
+
+def _site_of(page):
+    """The page's site from Django's site cache: ``page.site`` queries once per page."""
+    from django.contrib.sites.models import Site
+
+    return Site.objects._get_site_by_id(page.site_id)
 
 
 class PagePermissions:
@@ -29,22 +43,22 @@ class PagePermissions:
         self.user = user
 
     def can_change_page(self, page) -> bool:
-        return page_permissions.user_can_change_page(self.user, page=page, site=page.site)
+        return page_permissions.user_can_change_page(self.user, page=page, site=_site_of(page))
 
     def can_change_advanced_settings(self, page) -> bool:
-        return page_permissions.user_can_change_page_advanced_settings(self.user, page=page, site=page.site)
+        return page_permissions.user_can_change_page_advanced_settings(self.user, page=page, site=_site_of(page))
 
     def can_change_page_permissions(self, page) -> bool:
-        return page_permissions.user_can_change_page_permissions(self.user, page=page, site=page.site)
+        return page_permissions.user_can_change_page_permissions(self.user, page=page, site=_site_of(page))
 
     def can_view_page(self, page) -> bool:
-        return page_permissions.user_can_view_page(self.user, page=page, site=page.site)
+        return page_permissions.user_can_view_page(self.user, page=page, site=_site_of(page))
 
     def can_delete_page(self, page) -> bool:
-        return page_permissions.user_can_delete_page(self.user, page=page, site=page.site)
+        return page_permissions.user_can_delete_page(self.user, page=page, site=_site_of(page))
 
     def can_move_page(self, page) -> bool:
-        return page_permissions.user_can_move_page(user=self.user, page=page, site=page.site)
+        return page_permissions.user_can_move_page(user=self.user, page=page, site=_site_of(page))
 
     def can_change_content(self, page_content) -> bool:
         """May the user change this translation of a page?
@@ -62,7 +76,7 @@ class PagePermissions:
 
     def can_delete_translation(self, page, language) -> bool:
         return page_permissions.user_can_delete_page_translation(
-            user=self.user, page=page, language=language, site=page.site
+            user=self.user, page=page, language=language, site=_site_of(page)
         )
 
     def can_move_descendants(self, page, site, parent_page) -> bool:
@@ -75,12 +89,35 @@ class PagePermissions:
         )
 
 
-class AdminPagePermissions(PagePermissions):
-    """Routes every predicate back through a page admin's overridable hooks.
+class BackendPagePermissions(PagePermissions):
+    """Answers every predicate with the active backend: the contract, or the default.
 
-    Only the predicates the admin actually exposes as hooks are redirected; the
-    rest fall through to the default policy, which is what the admin called
-    inline anyway.
+    The base of the admin adapters, which redirect some predicates through the
+    admin's hooks. Predicates they do not redirect must still honour a
+    ``page_permissions`` contract instead of falling back to the default policy.
+    """
+
+    def __init__(self, user):
+        super().__init__(user)
+        self.backend = get_page_permissions(user)
+
+
+def _delegate(name):
+    def predicate(self, *args, **kwargs):
+        return getattr(self.backend, name)(*args, **kwargs)
+
+    predicate.__name__ = predicate.__qualname__ = name
+    return predicate
+
+
+for _name in [name for name in vars(PagePermissions) if name.startswith("can_")]:
+    setattr(BackendPagePermissions, _name, _delegate(_name))
+
+
+class AdminPagePermissions(BackendPagePermissions):
+    """Routes the predicates a page admin exposes as hooks through those hooks.
+
+    The rest are answered by the active backend, which is what the hooks ask, too.
     """
 
     def __init__(self, model_admin, request):
@@ -103,8 +140,12 @@ class AdminPagePermissions(PagePermissions):
     def can_move_page(self, page) -> bool:
         return bool(self.model_admin.has_move_page_permission(self.request, obj=page))
 
+    def can_change_content(self, page_content) -> bool:
+        # The page admin's change hook may narrow content changes, too
+        return self.can_change_page(page_content.page) and self.backend.can_change_content(page_content)
 
-class AdminPageContentPermissions(PagePermissions):
+
+class AdminPageContentPermissions(BackendPagePermissions):
     """The same, for a ``PageContentAdmin`` whose hooks take content objects."""
 
     def __init__(self, model_admin, request):

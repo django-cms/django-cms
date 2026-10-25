@@ -17,11 +17,13 @@ from djangocms_text.models import Text
 from cms import api
 from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
+from cms.app_base import CMSAppConfig
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.core import checks as core_checks
 from cms.core.models.placeholder import Placeholder
 from cms.models import PageContent, PageUrl, UserSettings
 from cms.pages.models.page import Page
+from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions, PagePermissions
 from cms.permissions.models import GlobalPagePermission, PagePermission
 from cms.shared import checks as shared_checks
 from cms.shared.checks import OperationBlocked
@@ -685,6 +687,80 @@ class AdminTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, "Changed title")
+
+
+class ReadOnlyContentPermissions(PagePermissions):
+    """A ``page_permissions`` contract that lets no page content and no page be viewed or changed."""
+
+    def can_change_content(self, page_content):
+        return False
+
+    def can_view_page(self, page):
+        return False
+
+
+class PagePermissionContractAdminTests(AdminTestsBase):
+    """A ``page_permissions`` contract decides admin requests, too."""
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("testpage", "nav_playground.html", "en")
+        get_contract = CMSAppConfig.get_contract
+
+        def contract(name):
+            return ReadOnlyContentPermissions if name == "page_permissions" else get_contract(name)
+
+        patcher = patch.object(CMSAppConfig, "get_contract", side_effect=contract)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_admin_hooks_ask_the_contract(self):
+        request = self.get_request()
+        request.user = self.get_superuser()
+        page_content = self.page.get_admin_content("en")
+
+        self.assertFalse(site._registry[PageContent].has_change_permission(request, obj=page_content))
+        # Viewing and changing the page itself are still the default policy's
+        self.assertTrue(site._registry[PageContent].has_view_permission(request, obj=page_content))
+        self.assertTrue(site._registry[Page].has_change_permission(request, obj=self.page))
+
+    def test_admin_adapters_ask_the_contract_for_predicates_without_hook(self):
+        request = self.get_request()
+        request.user = self.get_superuser()
+
+        page_permissions = AdminPagePermissions(site._registry[Page], request)
+        content_permissions = AdminPageContentPermissions(site._registry[PageContent], request)
+
+        self.assertFalse(page_permissions.can_view_page(self.page))
+        self.assertFalse(content_permissions.can_view_page(self.page))
+        self.assertFalse(page_permissions.can_change_content(self.page.get_admin_content("en")))
+
+    def test_page_edit_field_endpoint_respects_the_contract(self):
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+        original_title = self.page.get_admin_content("en").title
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_copy_dialog_and_actions_menu_respect_the_contract(self):
+        with self.login_user_context(self.get_superuser()):
+            dialog = self.client.get(admin_reverse("cms_page_get_copy_dialog", args=(self.page.pk,)))
+            menu = self.client.get(admin_reverse("cms_page_actions_menu", args=(self.page.pk,)))
+
+        # The contract refuses viewing the page, so it may not be copied
+        self.assertEqual(dialog.status_code, 403)
+        self.assertFalse(menu.context["has_copy_page_permission"])
+
+    def test_admin_hook_overrides_still_narrow_the_contract(self):
+        request = self.get_request()
+        request.user = self.get_superuser()
+
+        with patch.object(site._registry[Page], "has_move_page_permission", return_value=False):
+            self.assertFalse(AdminPagePermissions(site._registry[Page], request).can_move_page(self.page))
 
 
 class NoDBAdminTests(CMSTestCase):

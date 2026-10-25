@@ -61,7 +61,7 @@ from cms.pages.admin.forms import (
     MovePageForm,
 )
 from cms.pages.models.page import AdminCacheDict
-from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions
+from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions, get_page_permissions
 from cms.permissions import page_permissions, services as permission_services, utils as permissions
 from cms.permissions.admin import PERMISSION_ADMIN_INLINES
 from cms.permissions.models import PermissionTuple
@@ -171,12 +171,12 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 user=request.user,
                 site=site,
             )
-        return page_permissions.user_can_change_page(request.user, page=obj, site=obj.site)
+        return get_page_permissions(request.user).can_change_page(obj)
 
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
             return False
-        return page_permissions.user_can_change_page_advanced_settings(request.user, page=obj, site=obj.site)
+        return get_page_permissions(request.user).can_change_advanced_settings(obj)
 
     def log_deletion(self, request, object, object_repr):
         # DJANGO_42
@@ -295,14 +295,21 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
 
         site = get_site_from_request(request)
         paste_enabled = request.GET.get("has_copy") or request.GET.get("has_cut")
+        permissions = AdminPagePermissions(self, request)
+        copy_verdict = can(
+            operations.COPY_PAGE,
+            OperationContext.from_request(request),
+            page=page,
+            permissions=permissions,
+        )
         context = {
             "page": page,
             "opts": self.opts,
             "site": site,
             "page_is_restricted": page.has_view_restrictions(site),
             "paste_enabled": paste_enabled,
-            "has_add_permission": page_permissions.user_can_add_subpage(request.user, target=page),
-            "has_copy_page_permission": page_permissions.user_can_view_page_draft(request.user, page, site=site),
+            "has_add_permission": permissions.can_add_subpage(page, page.site),
+            "has_copy_page_permission": bool(copy_verdict),
             "has_change_permission": self.has_change_permission(request, obj=page),
             "has_change_advanced_settings_permission": self.has_change_advanced_settings_permission(request, obj=page),
             "has_change_permissions_permission": self.has_change_permissions_permission(request, obj=page),
@@ -451,23 +458,27 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             data = request.POST
 
         target_id = data.get("target")
-
-        site = get_site_from_request(request)
-        user = request.user
-        can_view_page = page_permissions.user_can_view_page(user, page, page.site)
-
-        if not can_view_page:
-            raise PermissionDenied
+        target = None
 
         if target_id:
             try:
                 target = Page.objects.get(pk=target_id)
             except Page.DoesNotExist:
                 raise Http404
-            if not page_permissions.user_can_add_subpage(user, target, target.site):
-                raise PermissionDenied
-        elif not page_permissions.user_can_add_page(user, site):
-            raise PermissionDenied
+
+        # The dialog only asks whether to copy permissions: refuse it if the copy
+        # would be refused. Invalid input is reported by the copy itself.
+        verdict = can(
+            operations.COPY_PAGE,
+            OperationContext.from_request(request),
+            page=page,
+            target_page=target,
+            position="last-child",
+            target_site=get_site_from_request(request),
+            permissions=AdminPagePermissions(self, request),
+        )
+        if any(reason.kind == "permission" for reason in verdict.reasons):
+            raise PermissionDenied(str(verdict))
 
         context = {
             "dialog_id": "dialog-copy",
@@ -492,7 +503,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     def has_change_permissions_permission(self, request, obj=None):
         if not obj:
             return False
-        return page_permissions.user_can_change_page_permissions(request.user, page=obj, site=obj.site)
+        return get_page_permissions(request.user).can_change_page_permissions(obj)
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -500,12 +511,12 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         """
         if not obj:
             return False
-        return page_permissions.user_can_delete_page(request.user, page=obj, site=obj.site)
+        return get_page_permissions(request.user).can_delete_page(obj)
 
     def has_move_page_permission(self, request, obj=None):
         if not obj:
             return False
-        return page_permissions.user_can_move_page(user=request.user, page=obj, site=obj.site)
+        return get_page_permissions(request.user).can_move_page(obj)
 
     @require_POST
     @transaction.atomic
@@ -984,15 +995,8 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             parent_item = None
 
         if parent_item:
-            has_perm = page_permissions.user_can_add_subpage(
-                request.user,
-                target=parent_item,
-                site=parent_item.site,
-            )
-        else:
-            site = get_site_from_request(request)
-            has_perm = page_permissions.user_can_add_page(request.user, site=site)
-        return has_perm
+            return get_page_permissions(request.user).can_add_subpage(parent_item, parent_item.site)
+        return get_page_permissions(request.user).can_add_page(get_site_from_request(request))
 
     def has_add_permission(self, request):
         """
@@ -1007,7 +1011,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         """
 
         if obj:
-            return page_permissions.user_can_change_page(request.user, page=obj.page, site=obj.page.site)
+            return get_page_permissions(request.user).can_change_content(obj)
         return page_permissions.user_can_change_at_least_one_page(
             user=request.user,
             site=get_site_from_request(request),
@@ -1022,7 +1026,7 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         # as done, e.g., by djangocms-versioning
 
         if obj:
-            return page_permissions.user_can_change_page(request.user, page=obj.page, site=obj.page.site)
+            return get_page_permissions(request.user).can_change_page(obj.page)
         return page_permissions.user_can_change_at_least_one_page(
             user=request.user,
             site=get_site_from_request(request),
@@ -1035,24 +1039,18 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         """
         if not obj:
             return False
-        return page_permissions.user_can_delete_page(request.user, page=obj.page, site=obj.page.site)
+        return get_page_permissions(request.user).can_delete_page(obj.page)
 
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
             return False
-        return page_permissions.user_can_change_page_advanced_settings(request.user, page=obj.page, site=obj.page.site)
+        return get_page_permissions(request.user).can_change_advanced_settings(obj.page)
 
     def has_delete_translation_permission(self, request, language, obj=None):
         if not obj:
             return False
 
-        has_perm = page_permissions.user_can_delete_page_translation(
-            user=request.user,
-            page=obj,
-            language=language,
-            site=obj.site,
-        )
-        return has_perm
+        return get_page_permissions(request.user).can_delete_translation(obj, language)
 
     def get_sites_for_user(self, user):
         from django.contrib.sites.models import Site
@@ -1300,16 +1298,17 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         template = get_template(self.page_tree_row_template)
         is_popup = IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET
         languages = get_language_list(site.pk)
-        user_can_add = page_permissions.user_can_add_subpage
-        user_can_change = page_permissions.user_can_change_page
-        user_can_change_advanced = page_permissions.user_can_change_page_advanced_settings
-        user_can_change_permissions = page_permissions.user_can_change_page_permissions
+        # Page-level hooks live on the page admin of the site serving this request
+        page_admin = self.admin_site._registry.get(Page)
+        permissions = (
+            AdminPagePermissions(page_admin, request) if page_admin else get_page_permissions(request.user)
+        )
 
         def render_page_row(page):
             page.admin_content_cache = AdminCacheDict(
                 (trans.language, trans) for trans in page.filtered_translations
             )
-            has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
+            has_move_page_permission = permissions.can_move_page(page)
 
             if permissions_on and not has_move_page_permission:
                 # TODO: check if this is really needed
@@ -1334,11 +1333,10 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
                 "follow_descendants": follow_descendants,
                 "site_languages": languages,
                 "is_popup": is_popup,
-                "has_add_page_permission": user_can_add(request.user, target=page),
-                "has_change_permission": user_can_change(request.user, page, site),
+                "has_add_page_permission": permissions.can_add_subpage(page, site),
+                "has_change_permission": permissions.can_change_page(page),
                 "has_change_advanced_settings_permission": (
-                    user_can_change_advanced(request.user, page, site)
-                    or user_can_change_permissions(request.user, page, site)
+                    permissions.can_change_advanced_settings(page) or permissions.can_change_page_permissions(page)
                 ),
                 "has_move_page_permission": has_move_page_permission,
                 "can_change": page_content.is_editable(request),
