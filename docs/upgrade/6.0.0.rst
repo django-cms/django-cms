@@ -202,6 +202,13 @@ decide exactly as django CMS always has. A backend can be replaced
   contract from a ``CMSAppExtension``:
   ``contract = ("page_permissions", MyPagePermissions)``.
 
+A ``page_permissions`` contract decides admin requests, too: the page admins'
+``has_*_permission`` methods ask the active page permission backend, and the
+admin adapters ask it for every predicate without such a method. Overriding a
+``has_*_permission`` method and calling ``super()`` can therefore only narrow
+what the backend allows. New code should implement a contract rather than
+override admin methods.
+
 Operation checks
 ================
 

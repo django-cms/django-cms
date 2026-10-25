@@ -15,9 +15,9 @@ from cms.pages.admin.forms import (
     PagePermissionInlineAdminForm,
     ViewRestrictionInlineAdminForm,
 )
+from cms.pages.permissions import get_page_permissions
 from cms.permissions import (
     checks as permission_checks,
-    page_permissions,
     services as permission_services,
     utils as permissions,
 )
@@ -48,11 +48,7 @@ class PagePermissionInlineAdmin(TabularInline):
     def has_change_permission(self, request, obj=None):
         if not obj:
             return False
-        return page_permissions.user_can_change_page_permissions(
-            request.user,
-            page=obj,
-            site=obj.site,
-        )
+        return get_page_permissions(request.user).can_change_page_permissions(obj)
 
     def has_add_permission(self, request, obj=None):
         return self.has_change_permission(request, obj)

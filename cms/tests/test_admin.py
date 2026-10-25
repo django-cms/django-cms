@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib import admin
@@ -16,11 +17,16 @@ from djangocms_text.models import Text
 from cms import api
 from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
+from cms.app_base import CMSAppConfig
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.core import checks as core_checks
 from cms.core.models.placeholder import Placeholder
 from cms.models import PageContent, PageUrl, UserSettings
 from cms.pages.models.page import Page
+from cms.pages.permissions import AdminPageContentPermissions, AdminPagePermissions, PagePermissions
 from cms.permissions.models import GlobalPagePermission, PagePermission
+from cms.shared import checks as shared_checks
+from cms.shared.checks import OperationBlocked
 from cms.shared.editing_urls import get_object_edit_url
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
@@ -597,6 +603,164 @@ class AdminTests(AdminTestsBase):
             response,
             '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">',
         )
+
+    def test_page_edit_field_endpoint_respects_page_content_change_permission(self):
+        """The edit-field endpoint must not bypass the PageContent admin's change permission."""
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+        content_admin = site._registry[PageContent]
+        original_title = self.page.get_admin_content("en").title
+
+        with patch.object(content_admin, "has_change_permission", return_value=False) as has_change_permission:
+            with self.login_user_context(self.get_superuser()):
+                get_response = self.client.get(endpoint)
+                post_response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(get_response.status_code, 403)
+        self.assertEqual(post_response.status_code, 403)
+        has_change_permission.assert_called()
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+    def test_page_edit_field_endpoint_respects_editability_checks(self):
+        """Content that may not be changed right now, e.g., published content, is answered with 409."""
+        saved = dict(core_checks._editability_checks)
+        saved_extensions = {operation: dict(entries) for operation, entries in shared_checks._extensions.items()}
+
+        def restore():
+            core_checks._editability_checks.clear()
+            core_checks._editability_checks.update(saved)
+            shared_checks._extensions.clear()
+            shared_checks._extensions.update(saved_extensions)
+
+        self.addCleanup(restore)
+
+        def published_is_read_only(context, obj):
+            if isinstance(obj, PageContent):
+                raise OperationBlocked("Published content is read-only.")
+
+        core_checks.register_editability_check("tests.published_is_read_only", published_is_read_only)
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+        original_title = self.page.get_admin_content("en").title
+
+        with self.login_user_context(self.get_superuser()):
+            get_response = self.client.get(endpoint)
+            post_response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(get_response.status_code, 409)
+        self.assertContains(post_response, "Published content is read-only.", status_code=409)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+    def test_page_edit_field_endpoint_uses_content_admin_of_its_admin_site(self):
+        """On a separate admin site, the endpoint asks that site's PageContent admin."""
+        content_admin_class = type(site._registry[PageContent])
+
+        class ReadOnlyContentAdmin(content_admin_class):
+            def has_change_permission(self, request, obj=None):
+                return False
+
+        custom_site = admin.AdminSite(name="custom")
+        custom_site.register(Page, type(site._registry[Page]))
+        custom_site.register(PageContent, ReadOnlyContentAdmin)
+        page_admin = custom_site._registry[Page]
+        original_title = self.page.get_admin_content("en").title
+
+        request = self.get_request(post_data={"title": "Changed title"})
+        request.user = self.get_superuser()
+        response = page_admin.edit_title_fields(request, self.page.pk, "en")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+        # Without a PageContent admin on that site, the default page permissions apply
+        custom_site.unregister(PageContent)
+        request = self.get_request(path="/?edit_fields=title", post_data={"title": "Changed title"})
+        request.user = self.get_superuser()
+        response = page_admin.edit_title_fields(request, self.page.pk, "en")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, "Changed title")
+
+    def test_page_edit_field_endpoint_saves_with_page_content_change_permission(self):
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, "Changed title")
+
+
+class ReadOnlyContentPermissions(PagePermissions):
+    """A ``page_permissions`` contract that lets no page content and no page be viewed or changed."""
+
+    def can_change_content(self, page_content):
+        return False
+
+    def can_view_page(self, page):
+        return False
+
+
+class PagePermissionContractAdminTests(AdminTestsBase):
+    """A ``page_permissions`` contract decides admin requests, too."""
+
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("testpage", "nav_playground.html", "en")
+        get_contract = CMSAppConfig.get_contract
+
+        def contract(name):
+            return ReadOnlyContentPermissions if name == "page_permissions" else get_contract(name)
+
+        patcher = patch.object(CMSAppConfig, "get_contract", side_effect=contract)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_admin_hooks_ask_the_contract(self):
+        request = self.get_request()
+        request.user = self.get_superuser()
+        page_content = self.page.get_admin_content("en")
+
+        self.assertFalse(site._registry[PageContent].has_change_permission(request, obj=page_content))
+        # Viewing and changing the page itself are still the default policy's
+        self.assertTrue(site._registry[PageContent].has_view_permission(request, obj=page_content))
+        self.assertTrue(site._registry[Page].has_change_permission(request, obj=self.page))
+
+    def test_admin_adapters_ask_the_contract_for_predicates_without_hook(self):
+        request = self.get_request()
+        request.user = self.get_superuser()
+
+        page_permissions = AdminPagePermissions(site._registry[Page], request)
+        content_permissions = AdminPageContentPermissions(site._registry[PageContent], request)
+
+        self.assertFalse(page_permissions.can_view_page(self.page))
+        self.assertFalse(content_permissions.can_view_page(self.page))
+        self.assertFalse(page_permissions.can_change_content(self.page.get_admin_content("en")))
+
+    def test_page_edit_field_endpoint_respects_the_contract(self):
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+        original_title = self.page.get_admin_content("en").title
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+    @override_settings(CMS_PERMISSION=True)
+    def test_copy_dialog_and_actions_menu_respect_the_contract(self):
+        with self.login_user_context(self.get_superuser()):
+            dialog = self.client.get(admin_reverse("cms_page_get_copy_dialog", args=(self.page.pk,)))
+            menu = self.client.get(admin_reverse("cms_page_actions_menu", args=(self.page.pk,)))
+
+        # The contract refuses viewing the page, so it may not be copied
+        self.assertEqual(dialog.status_code, 403)
+        self.assertFalse(menu.context["has_copy_page_permission"])
+
+    def test_admin_hook_overrides_still_narrow_the_contract(self):
+        request = self.get_request()
+        request.user = self.get_superuser()
+
+        with patch.object(site._registry[Page], "has_move_page_permission", return_value=False):
+            self.assertFalse(AdminPagePermissions(site._registry[Page], request).can_move_page(self.page))
 
 
 class NoDBAdminTests(CMSTestCase):
