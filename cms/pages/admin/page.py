@@ -66,7 +66,7 @@ from cms.permissions import page_permissions, services as permission_services, u
 from cms.permissions.admin import PERMISSION_ADMIN_INLINES
 from cms.permissions.models import PermissionTuple
 from cms.permissions.utils import clear_permission_lru_caches
-from cms.shared.checks import can
+from cms.shared.checks import OperationBlocked, can
 from cms.shared.editing_urls import get_object_edit_url
 from cms.shared.operations import OperationContext
 from cms.utils import get_current_site
@@ -651,6 +651,24 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if not translation:
             raise Http404("No translation matches requested language.")
 
+        # Ask the content's change checks before showing the form, not only when
+        # it is posted. They include the PageContent admin's permission hook and
+        # editability checks, e.g., read-only published content.
+        context = OperationContext.from_request(request, language=language)
+        permissions = AdminPageContentPermissions(admin.site._registry[PageContent], request)
+        verdict = can(
+            operations.CHANGE_PAGE_TRANSLATION,
+            context,
+            page_content=translation,
+            permissions=permissions,
+        )
+        if not verdict:
+            if verdict.reasons[0].kind == "permission":
+                return HttpResponseForbidden(str(verdict))
+            if verdict.reasons[0].kind == "policy":
+                return HttpResponse(str(verdict), status=409)
+            return HttpResponseBadRequest(str(verdict))
+
         saved_successfully = False
         raw_fields = request.GET.get("edit_fields", "title")
         edit_fields = [field for field in raw_fields.split(",") if field in self.title_frontend_editable_fields]
@@ -673,12 +691,24 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if not cancel_clicked and request.method == "POST":
             form = PageTitleForm(instance=translation, data=request.POST)
             if form.is_valid():
-                page_services.change_page_content(
-                    form.save(commit=False),
-                    data=form.cleaned_data,
-                    context=OperationContext.from_request(request, language=language),
-                )
-                saved_successfully = True
+                try:
+                    page_services.change_page_content(
+                        form.save(commit=False),
+                        data=form.cleaned_data,
+                        context=context,
+                        permissions=permissions,
+                    )
+                except OperationBlocked as error:
+                    return HttpResponse(str(error), status=409)
+                except PermissionDenied as error:
+                    return HttpResponseForbidden(str(error) or _("You do not have permission to edit this page"))
+                except ValidationError as error:
+                    # Errors are keyed by input field; show those not on the form as form errors
+                    errors = error.message_dict if hasattr(error, "error_dict") else {None: error.messages}
+                    for field, field_errors in errors.items():
+                        form.add_error(field if field in form.fields else None, field_errors)
+                else:
+                    saved_successfully = True
         else:
             form = PageTitleForm(instance=translation)
         admin_form = AdminForm(
