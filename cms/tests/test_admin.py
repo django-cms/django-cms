@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib import admin
@@ -612,6 +613,32 @@ class AdminTests(AdminTestsBase):
             response,
             '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">',
         )
+
+    def test_page_edit_field_endpoint_respects_page_content_change_permission(self):
+        """The edit-field endpoint must not bypass restrictions added to the
+        PageContent admin, e.g., by djangocms-versioning for published content."""
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+        content_admin = site._registry[PageContent]
+        original_title = self.page.get_admin_content("en").title
+
+        with patch.object(content_admin, "has_change_permission", return_value=False) as has_change_permission:
+            with self.login_user_context(self.get_superuser()):
+                get_response = self.client.get(endpoint)
+                post_response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(get_response.status_code, 403)
+        self.assertEqual(post_response.status_code, 403)
+        has_change_permission.assert_called()
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+    def test_page_edit_field_endpoint_saves_with_page_content_change_permission(self):
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, "Changed title")
 
 
 class NoDBAdminTests(CMSTestCase):

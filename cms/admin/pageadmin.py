@@ -736,6 +736,12 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if not translation:
             raise Http404("No translation matches requested language.")
 
+        # Check the content object through the PageContent admin, too: content
+        # managers (e.g., djangocms-versioning) restrict changes there
+        content_admin = admin.site._registry.get(PageContent)
+        if content_admin and not content_admin.has_change_permission(request, obj=translation):
+            return HttpResponseForbidden(_("You do not have permission to edit this page"))
+
         saved_successfully = False
         raw_fields = request.GET.get("edit_fields", "title")
         edit_fields = [field for field in raw_fields.split(",") if field in self.title_frontend_editable_fields]
