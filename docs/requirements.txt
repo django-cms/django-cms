@@ -22,7 +22,7 @@ black==26.5.1
     # via docstrfmt
 build==1.5.0
     # via pip-tools
-certifi==2026.5.20
+certifi==2026.10.19
     # via requests
 charset-normalizer==3.4.7
     # via requests
