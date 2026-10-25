@@ -655,7 +655,10 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         # it is posted. They include the PageContent admin's permission hook and
         # editability checks, e.g., read-only published content.
         context = OperationContext.from_request(request, language=language)
-        permissions = AdminPageContentPermissions(admin.site._registry[PageContent], request)
+        # Use the content admin of the site serving this request; without one,
+        # the default page permissions apply
+        content_admin = self.admin_site._registry.get(PageContent)
+        permissions = AdminPageContentPermissions(content_admin, request) if content_admin else None
         verdict = can(
             operations.CHANGE_PAGE_TRANSLATION,
             context,

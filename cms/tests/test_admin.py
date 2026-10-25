@@ -647,6 +647,36 @@ class AdminTests(AdminTestsBase):
         self.assertContains(post_response, "Published content is read-only.", status_code=409)
         self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
 
+    def test_page_edit_field_endpoint_uses_content_admin_of_its_admin_site(self):
+        """On a separate admin site, the endpoint asks that site's PageContent admin."""
+        content_admin_class = type(site._registry[PageContent])
+
+        class ReadOnlyContentAdmin(content_admin_class):
+            def has_change_permission(self, request, obj=None):
+                return False
+
+        custom_site = admin.AdminSite(name="custom")
+        custom_site.register(Page, type(site._registry[Page]))
+        custom_site.register(PageContent, ReadOnlyContentAdmin)
+        page_admin = custom_site._registry[Page]
+        original_title = self.page.get_admin_content("en").title
+
+        request = self.get_request(post_data={"title": "Changed title"})
+        request.user = self.get_superuser()
+        response = page_admin.edit_title_fields(request, self.page.pk, "en")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+        # Without a PageContent admin on that site, the default page permissions apply
+        custom_site.unregister(PageContent)
+        request = self.get_request(path="/?edit_fields=title", post_data={"title": "Changed title"})
+        request.user = self.get_superuser()
+        response = page_admin.edit_title_fields(request, self.page.pk, "en")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, "Changed title")
+
     def test_page_edit_field_endpoint_saves_with_page_content_change_permission(self):
         endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
 
