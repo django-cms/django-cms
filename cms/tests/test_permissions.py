@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
-from django.db import OperationalError, ProgrammingError, connection
+from django.db import OperationalError, ProgrammingError, connection, transaction
 from django.test.utils import override_settings
 
 from cms.admin.forms import BasePermissionAdminForm
@@ -432,13 +432,32 @@ class PermissionCacheTreeChangeTests(CMSTestCase):
         self.assertTrue(user_can_change_page(user, self.granted))
 
     def test_move_page_invalidates_cache(self):
-        self.other.move_page(self.root, position='first-child')
+        with self.captureOnCommitCallbacks(execute=True):
+            self.other.move_page(self.root, position='first-child')
         self.assertPermissionsFollowPages(self.other)
         self.assertEqual(self.other.path, self.old_path)
 
     def test_insert_page_invalidates_cache(self):
-        newcomer = create_page('newcomer', 'nav_playground.html', 'en', parent=self.root, position='first-child')
+        with self.captureOnCommitCallbacks(execute=True):
+            newcomer = create_page('newcomer', 'nav_playground.html', 'en', parent=self.root, position='first-child')
         self.assertPermissionsFollowPages(newcomer)
+
+    def test_rolled_back_move_does_not_poison_cache(self):
+        # Cache invalidation is deferred to commit. A tree change inside a
+        # transaction that rolls back discards that on_commit callback, so a
+        # permission check made against the uncommitted paths must not leave
+        # them in the shared cache once the tree is restored.
+        with self.assertRaises(RuntimeError):
+            with transaction.atomic():
+                self.other.move_page(self.root, position='first-child')
+                # Would warm the shared cache from the uncommitted paths.
+                user_can_change_page(self.reload(self.user), self.other)
+                raise RuntimeError('roll back')
+        self.other.refresh_from_db()
+        self.granted.refresh_from_db()
+        user = self.reload(self.user)
+        self.assertTrue(user_can_change_page(user, self.granted))
+        self.assertFalse(user_can_change_page(user, self.other))
 
 
 @override_settings(CMS_PERMISSION=True)

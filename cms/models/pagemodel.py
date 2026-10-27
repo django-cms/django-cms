@@ -34,14 +34,18 @@ def _clear_permission_cache_on_tree_change():
     The permission cache stores grants by page path. Without invalidation, a
     cached grant would match whichever page took over the path of the granted
     page, and stop matching the granted page itself.
+
+    Invalidation is deferred to commit only. Clearing the shared cache
+    immediately would let a permission check later in the same transaction
+    repopulate it from the uncommitted paths; if that transaction then rolls
+    back, Django discards the ``on_commit`` callback and the stale paths would
+    survive against the restored tree until the cache expires.
     """
     if not get_cms_setting("PERMISSION"):
         return
 
     from cms.cache.permissions import clear_permission_cache
 
-    clear_permission_cache()
-    # A concurrent request can rebuild the cache before the new paths commit.
     transaction.on_commit(clear_permission_cache)
 
 
