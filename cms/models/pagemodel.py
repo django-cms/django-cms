@@ -28,6 +28,23 @@ from menus.menu_pool import menu_pool
 logger = getLogger(__name__)
 
 
+def _clear_permission_cache_on_tree_change():
+    """Invalidate cached page permissions after page paths changed.
+
+    The permission cache stores grants by page path. Without invalidation, a
+    cached grant would match whichever page took over the path of the granted
+    page, and stop matching the granted page itself.
+    """
+    if not get_cms_setting("PERMISSION"):
+        return
+
+    from cms.cache.permissions import clear_permission_cache
+
+    clear_permission_cache()
+    # A concurrent request can rebuild the cache before the new paths commit.
+    transaction.on_commit(clear_permission_cache)
+
+
 def _lock_tree_roots(*pages):
     # Serializes concurrent URL path updates by taking a row-level lock on the
     # tree root(s) of the given pages, which prevents deadlocks on cms_pageurl.
@@ -198,7 +215,20 @@ class Page(MP_Node):
             kwargs["instance"].parent_id = self.parent_id
         else:
             kwargs["parent_id"] = self.parent_id
-        return super().add_sibling(*args, **kwargs)
+        new_page = super().add_sibling(*args, **kwargs)
+        # Inserting between siblings renumbers the paths of those after it.
+        _clear_permission_cache_on_tree_change()
+        return new_page
+
+    def move(self, *args, **kwargs):
+        super().move(*args, **kwargs)
+        _clear_permission_cache_on_tree_change()
+
+    @classmethod
+    def fix_tree(cls, *args, **kwargs):
+        result = super().fix_tree(*args, **kwargs)
+        _clear_permission_cache_on_tree_change()
+        return result
 
     def get_cached_ancestors(self):
         if self._has_cached_hierarchy():

@@ -37,6 +37,7 @@ from cms.utils.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
     user_can_change_at_least_one_page,
+    user_can_change_page,
     user_can_change_page_advanced_settings,
     user_can_delete_page,
     user_can_move_page,
@@ -391,6 +392,53 @@ class PermissionCacheSiteIsolationTests(CMSTestCase):
 
         self.assertIsNone(get_permission_cache(self.user, self.site_a, 'change_page'))
         self.assertIsNone(get_permission_cache(self.user, self.site_b, 'change_page'))
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_CACHE_DURATIONS={
+        'menus': 60,
+        'content': 60,
+        'permissions': 60,
+    },
+)
+class PermissionCacheTreeChangeTests(CMSTestCase):
+    """Tree changes must invalidate the cached page permissions.
+
+    The cache stores grants by page path. Moving or inserting a page renumbers
+    the paths of its siblings, so a cached grant on one page would otherwise
+    match whichever page took over its old path.
+    """
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+        self.root = create_page('root', 'nav_playground.html', 'en')
+        self.granted = create_page('granted', 'nav_playground.html', 'en', parent=self.root)
+        self.other = create_page('other', 'nav_playground.html', 'en', parent=self.root)
+        self.user = self._create_user('editor', is_staff=True, add_default_permissions=True)
+        assign_user_to_page(self.granted, self.user, grant_on=ACCESS_PAGE, can_change=True)
+        # Warm the cache with the current paths.
+        self.assertTrue(user_can_change_page(self.user, self.granted))
+        self.assertFalse(user_can_change_page(self.user, self.other))
+        self.old_path = self.granted.path
+
+    def assertPermissionsFollowPages(self, newcomer):
+        # A new request works on a fresh user, so only the shared cache remains.
+        user = self.reload(self.user)
+        newcomer.refresh_from_db()
+        self.granted.refresh_from_db()
+        self.assertFalse(user_can_change_page(user, newcomer))
+        self.assertTrue(user_can_change_page(user, self.granted))
+
+    def test_move_page_invalidates_cache(self):
+        self.other.move_page(self.root, position='first-child')
+        self.assertPermissionsFollowPages(self.other)
+        self.assertEqual(self.other.path, self.old_path)
+
+    def test_insert_page_invalidates_cache(self):
+        newcomer = create_page('newcomer', 'nav_playground.html', 'en', parent=self.root, position='first-child')
+        self.assertPermissionsFollowPages(newcomer)
 
 
 @override_settings(CMS_PERMISSION=True)
@@ -1155,3 +1203,40 @@ class PagePermissionInlineAuthorizationTests(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self._assert_recipient_widget(response, ForeignKeyRawIdWidget)
         self.assertIs(relation.limit_choices_to, original_limits)
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_LANGUAGES={
+        1: [{'code': 'en', 'name': 'English'}],
+        2: [{'code': 'en', 'name': 'English'}],
+    },
+)
+class PagePermissionInlineSiteTests(CMSTestCase):
+    """The permissions inline must use the site of the edited page.
+
+    The admin can be served from one site while editing pages of another one.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.site_b = Site.objects.create(domain='b.example', name='B')
+        self.root = create_page('root-b', 'nav_playground.html', 'en', site=self.site_b)
+        self.page = create_page('page-b', 'nav_playground.html', 'en', site=self.site_b, parent=self.root)
+        self.manager = self._create_user('manager', is_staff=True)
+        self.manager.user_permissions.add(*Permission.objects.filter(codename__in=[
+            'change_page', 'add_pagepermission', 'change_pagepermission', 'delete_pagepermission',
+        ]))
+        assign_user_to_page(self.root, self.manager, can_change=True, can_change_permissions=True)
+        target = self._create_user('target', is_staff=True)
+        self.row = assign_user_to_page(self.page, target, can_change=True)
+
+    def test_rows_of_other_site_page_are_editable(self):
+        self.assertNotEqual(Site.objects.get_current(), self.site_b)
+        request = self.get_request('/')
+        request.user = self.manager
+        inline = PagePermissionInlineAdmin(Page, admin.site)
+
+        formset = inline.get_formset(request, obj=self.page)
+
+        self.assertIn(self.row, formset._queryset)
