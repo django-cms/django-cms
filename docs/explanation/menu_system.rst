@@ -106,7 +106,7 @@ There is one in cms for example, which examines the Pages in the database and ad
 as nodes.
 
 These classes are sub-classes of :py:class:`menus.base.Menu`. The one in cms is
-:py:class:`cms.menu.CMSMenu`.
+:py:class:`cms.cms_menus.CMSMenu`.
 
 In order to use a generator, its :py:meth:`~menus.base.Menu.get_nodes()` method must be
 called.
@@ -118,11 +118,11 @@ A modifier examines the nodes that have been assembled, and modifies them accord
 its requirements (adding or removing them, or manipulating their attributes, as it sees
 fit).
 
-An important one in cms (:py:class:`cms.menu.SoftRootCutter`) removes the nodes that are
+An important one in cms (:py:class:`cms.cms_menus.SoftRootCutter`) removes the nodes that are
 no longer required when a soft root is encountered.
 
 These classes are sub-classes of :py:class:`menus.base.Modifier`. Examples are
-:py:class:`cms.menu.NavExtender` and :py:class:`cms.menu.SoftRootCutter`.
+:py:class:`cms.cms_menus.NavExtender` and :py:class:`cms.cms_menus.SoftRootCutter`.
 
 In order to use a modifier, its :py:meth:`~menus.base.Modifier.modify()` method must be
 called.
@@ -209,7 +209,7 @@ The ``MenuPool.get_nodes()`` method
 
       - checks the cache to see if it should return cached nodes
       - loops over the Menus in self.menus (note: by default the only generator is
-        :py:class:`cms.menu.CMSMenu`); for each:
+        :py:class:`cms.cms_menus.CMSMenu`); for each:
 
             - calls its :py:meth:`menus.base.Menu.get_nodes()` - the menu generator
             - :py:func:`menus.menu_pool._build_nodes_inner_for_one_menu()`
