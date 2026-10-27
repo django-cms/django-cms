@@ -201,6 +201,23 @@ class CopyPermissionsTests(CMSTestCase):
         response = self.copy("on", source=self.secret)
         self.assertEqual(response.json()["status"], 403)
 
+    def test_actions_menu_offers_copy_to_view_only_user(self):
+        """The tree offers Copy on the same terms as the copy endpoint."""
+        self.assertTrue(page_permissions.user_can_view_page(self.actor, self.source))
+        self.assertFalse(page_permissions.user_can_change_page(self.actor, self.source))
+        with self.login_user_context(self.actor):
+            response = self.client.get(self.get_admin_url(Page, "actions_menu", self.source.pk))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["has_copy_page_permission"])
+        self.assertFalse(response.context["has_change_permission"])
+        self.assertFalse(response.context["has_move_page_permission"])
+        self.assertFalse(response.context["has_delete_permission"])
+
+    def test_actions_menu_denied_for_unreadable_page(self):
+        with self.login_user_context(self.actor):
+            response = self.client.get(self.get_admin_url(Page, "actions_menu", self.secret.pk))
+        self.assertEqual(response.status_code, 403)
+
 
 @override_settings(CMS_PERMISSION=True, CMS_PUBLIC_FOR="all")
 class MovePermissionsTests(CMSTestCase):
