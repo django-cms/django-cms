@@ -887,6 +887,126 @@ describe('CMS.StructureBoard', function() {
         });
     });
 
+    describe('dragging container plugins (#8949)', function() {
+        let board;
+
+        beforeEach(function() {
+            CMS.API.locked = false;
+            spyOn(Plugin, '_hideSettingsMenu');
+        });
+
+        afterEach(function() {
+            board.ui.sortables.nestedSortable('destroy');
+            board.ui.doc.off('keyup.cms.interrupt');
+            fixture.cleanup();
+        });
+
+        function setupContainers(populated, allowNesting) {
+            fixture.set(
+                '<style>' +
+                    '.cms-draggables.cms-hidden { display: none !important; }' +
+                    '.cms-draggable { display: block !important; }' +
+                    '.cms-droppable { height: 0; }' +
+                '</style>' +
+                '<div class="cms-structure-content" style="position: fixed; top: 40px; left: 40px; width: 500px">' +
+                '<div class="cms-placeholder-8949"></div>' +
+                '<div class="cms-dragarea cms-dragarea-8949"><div id="container-plugins" class="cms-draggables">' +
+                [1, 2, 3].map(id =>
+                    `<div class="cms-draggable cms-draggable-${id}">` +
+                    `<div class="cms-dragitem" style="height: 40px">Container ${id}</div>` +
+                    '<div class="cms-draggables cms-hidden" style="padding-left: 20px">' +
+                    (populated ? '<div class="cms-draggable"><div class="cms-dragitem">Child</div></div>' : '') +
+                    '</div></div>'
+                ).join('') + '</div></div></div>'
+            );
+            $('.cms-placeholder-8949').data('cms', { plugin_restriction: ['ContainerPlugin'] });
+            $('#container-plugins > .cms-draggable').data('cms', {
+                plugin_type: 'ContainerPlugin',
+                plugin_restriction: allowNesting ? ['ContainerPlugin'] : ['TextPlugin']
+            });
+            StructureBoard._initializeGlobalHandlers();
+            board = Object.create(StructureBoard.prototype);
+            board.ui = {
+                content: $('.cms-structure-content'),
+                sortables: $('.cms-draggables'),
+                window: $(window),
+                doc: $(document)
+            };
+            board._drag();
+            board.ui.sortables.nestedSortable('option', { delay: 0, scroll: false });
+        }
+
+        function dragThirdContainer(target, horizontalMovement = 0) {
+            const item = $('.cms-draggable-3 > .cms-dragitem');
+            const start = item.offset();
+            const destination = $(`.cms-draggable-${target} > .cms-dragitem`).offset();
+            const startX = start.left + 80;
+            const startY = start.top + 20;
+
+            item.trigger(new $.Event('mousedown', { which: 1, pageX: startX, pageY: startY }));
+            for (let step = 1; step <= 20; step++) {
+                $(document).trigger(new $.Event('mousemove', {
+                    which: 1,
+                    pageX: startX + horizontalMovement * step / 20,
+                    pageY: startY + (destination.top + 8 - startY) * step / 20
+                }));
+            }
+            $(document).trigger(new $.Event('mouseup'));
+        }
+
+        [false, true].forEach(populated => {
+            it(`reorders ${populated ? 'populated' : 'empty'} containers without nesting`, function() {
+                setupContainers(populated, false);
+                dragThirdContainer(2);
+                expect($('#container-plugins').children('.cms-draggable').map((i, el) => board.getId($(el))).get())
+                    .toEqual(['1', '3', '2']);
+            });
+        });
+
+        it('moves an empty container to first position', function() {
+            setupContainers(false, false);
+            dragThirdContainer(1);
+            expect($('#container-plugins > .cms-draggable').first()).toHaveClass('cms-draggable-3');
+        });
+
+        it('allows deliberate nesting into an empty container', function() {
+            setupContainers(false, true);
+            dragThirdContainer(2, 45);
+            expect($('.cms-draggable-3').parent().parent()).toHaveClass('cms-draggable-1');
+        });
+
+        [false, true].forEach(allowRoot => {
+            it(`${allowRoot ? 'allows' : 'rejects'} moving the last child to the placeholder root`, function() {
+                setupContainers(false, false);
+                const parent = $('.cms-draggable-1');
+                const children = parent.children('.cms-draggables').removeClass('cms-hidden');
+                const item = $('.cms-draggable-3').appendTo(children);
+
+                parent.data('cms').plugin_restriction = ['ItemPlugin'];
+                item.data('cms', { plugin_type: 'ItemPlugin', plugin_restriction: ['TextPlugin'] });
+                if (allowRoot) {
+                    $('.cms-placeholder-8949').data('cms').plugin_restriction.push('ItemPlugin');
+                }
+
+                const header = item.children('.cms-dragitem');
+                const start = header.offset();
+
+                header.trigger(new $.Event('mousedown', { which: 1, pageX: start.left + 80, pageY: start.top + 20 }));
+                // Start within the permitted parent, then outdent and release
+                // immediately, without another mousemove to recheck restrictions.
+                $(document).trigger(new $.Event('mousemove', {
+                    which: 1, pageX: start.left + 80, pageY: start.top + 22
+                }));
+                $(document).trigger(new $.Event('mousemove', {
+                    which: 1, pageX: start.left + 40, pageY: start.top + 23
+                }));
+                $(document).trigger(new $.Event('mouseup'));
+
+                expect(item.parent()[0]).toBe(allowRoot ? $('#container-plugins')[0] : children[0]);
+            });
+        });
+    });
+
     describe('._drag()', function() {
         var board;
         var options;
