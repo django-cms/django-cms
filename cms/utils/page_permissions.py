@@ -1,12 +1,12 @@
 from functools import wraps
 
-from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
-from cms.models import Page, PermissionTuple
+from cms.models import Page, PermissionTuple, PermissionTupleList
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
     cached_func,
+    get_cached_page_actions_for_user,
     get_model_permission_codename,
     get_page_actions_for_user,
     has_global_permission,
@@ -61,21 +61,8 @@ def _get_page_permission_tuples_for_action(user, site, action, check_global=True
         return GRANT_ALL_PERMISSIONS
 
     if use_cache:
-        # read from cache if possible
-        cached = get_permission_cache(user, site, action)
-        get_page_actions = get_page_actions_for_user
-    else:
-        cached = None
-        get_page_actions = get_page_actions_for_user.without_cache
-
-    if cached is not None:
-        return cached
-
-    page_actions = get_page_actions(user, site)
-    # Set cache for all actions calculated
-    for act, page_paths in page_actions.items():
-        set_permission_cache(user, site, act, list(page_paths))
-    return page_actions[action]
+        return get_cached_page_actions_for_user(user, site)[action]
+    return PermissionTupleList(get_page_actions_for_user.without_cache(user, site)[action])
 
 
 def auth_permission_required(action):
@@ -548,22 +535,24 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     elif site is None:
         site = Site.objects._get_site_by_id(page.site_id)
 
-    page_path = page.path
-    actions_map = {
-        'add_page': get_add_perm_tuples,
-        'change_page': get_change_perm_tuples,
-        'change_page_advanced_settings': get_change_advanced_settings_perm_tuples,
-        'change_page_permissions': get_change_permissions_perm_tuples,
-        'delete_page': get_delete_perm_tuples,
-        'delete_page_translation': get_delete_perm_tuples,
-        'publish_page': get_publish_perm_tuples,
-        'move_page': get_move_page_perm_tuples,
-        'view_page': get_view_perm_tuples,
-    }
-
-    func = actions_map[action]
+    func = _perm_tuples_by_action[action]
 
     page_perms = func(user, site, check_global=check_global, use_cache=use_cache)
-    return page_perms == GRANT_ALL_PERMISSIONS or any(
-        PermissionTuple(perm).contains(page_path) for perm in page_perms
-    )
+    if page_perms == GRANT_ALL_PERMISSIONS:
+        return True
+    if not isinstance(page_perms, PermissionTupleList):
+        page_perms = PermissionTupleList(page_perms)
+    return page_perms.contains(page.path)
+
+
+_perm_tuples_by_action = {
+    'add_page': get_add_perm_tuples,
+    'change_page': get_change_perm_tuples,
+    'change_page_advanced_settings': get_change_advanced_settings_perm_tuples,
+    'change_page_permissions': get_change_permissions_perm_tuples,
+    'delete_page': get_delete_perm_tuples,
+    'delete_page_translation': get_delete_perm_tuples,
+    'publish_page': get_publish_perm_tuples,
+    'move_page': get_move_page_perm_tuples,
+    'view_page': get_view_perm_tuples,
+}

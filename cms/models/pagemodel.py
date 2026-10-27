@@ -210,12 +210,12 @@ class Page(MP_Node):
             kwargs["parent"] = self
         return super().add_child(**kwargs)
 
-    def add_sibling(self, pos=None, *args, **kwargs):
+    def add_sibling(self, pos="last-sibling", *args, **kwargs):
         if len(kwargs) == 1 and "instance" in kwargs:
             kwargs["instance"].parent_id = self.parent_id
         else:
             kwargs["parent_id"] = self.parent_id
-        new_page = super().add_sibling(*args, **kwargs)
+        new_page = super().add_sibling(pos, *args, **kwargs)
         # Inserting between siblings renumbers the paths of those after it.
         _clear_permission_cache_on_tree_change()
         return new_page
