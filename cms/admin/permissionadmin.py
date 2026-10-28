@@ -75,8 +75,9 @@ class PagePermissionInlineAdmin(TabularInline):
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to himself)
         """
-        site = Site.objects.get_current(request)
+        return self._get_subordinate_queryset(request, Site.objects.get_current(request))
 
+    def _get_subordinate_queryset(self, request, site):
         try:
             # can see only permissions for users which are under him in tree
             qs = self.model.objects.subordinate_to_user(request.user, site)
@@ -107,9 +108,11 @@ class PagePermissionInlineAdmin(TabularInline):
         kwargs['exclude'] = exclude
         self.form._page = obj
         formset_cls = super().get_formset(request, obj=obj, **kwargs)
-        qs = self.get_queryset(request)
         if obj is not None:
-            qs = qs.filter(page=obj)
+            # The page may belong to another site than the one serving the admin.
+            qs = self._get_subordinate_queryset(request, obj.site).filter(page=obj)
+        else:
+            qs = self.get_queryset(request)
         formset_cls._queryset = qs
         return formset_cls
 

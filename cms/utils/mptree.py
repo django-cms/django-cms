@@ -421,14 +421,12 @@ class MaterializedPath:
                 # rebuild() which canonicalises root order.
                 pass
             return new
+        if position == "first-sibling":
+            return self.add_child(parent, position="first-child", instance=instance, **attrs)
+        # Appending already yields "last-sibling"; "left"/"right" are relative to `node`.
         new = self.add_child(parent, instance=instance, **attrs)
-        if position in ("last-sibling", "right"):
-            # 'right' relative to an arbitrary sibling still lands at the end in
-            # this minimal implementation unless it must sit immediately after
-            # `node`; place precisely:
+        if position in ("left", "right"):
             self._place_relative(new, node, after=(position == "right"))
-        elif position in ("first-sibling", "left"):
-            self._place_relative(new, node, after=False)
         return new
 
     def _place_relative(self, node, sibling, *, after):

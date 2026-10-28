@@ -4,7 +4,7 @@ from os.path import join
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.db import IntegrityError, connection, models, router
+from django.db import IntegrityError, connection, models, router, transaction
 from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.constraints import UniqueConstraint
@@ -26,6 +26,27 @@ from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
 logger = getLogger(__name__)
+
+
+def _clear_permission_cache_on_tree_change():
+    """Invalidate cached page permissions after page paths changed.
+
+    The permission cache stores grants by page path. Without invalidation, a
+    cached grant would match whichever page took over the path of the granted
+    page, and stop matching the granted page itself.
+
+    Invalidation is deferred to commit only. Clearing the shared cache
+    immediately would let a permission check later in the same transaction
+    repopulate it from the uncommitted paths; if that transaction then rolls
+    back, Django discards the ``on_commit`` callback and the stale paths would
+    survive against the restored tree until the cache expires.
+    """
+    if not get_cms_setting("PERMISSION"):
+        return
+
+    from cms.cache.permissions import clear_permission_cache
+
+    transaction.on_commit(clear_permission_cache)
 
 
 def _lock_tree_roots(*pages):
@@ -193,12 +214,25 @@ class Page(MP_Node):
             kwargs["parent"] = self
         return super().add_child(**kwargs)
 
-    def add_sibling(self, pos=None, *args, **kwargs):
+    def add_sibling(self, pos="last-sibling", *args, **kwargs):
         if len(kwargs) == 1 and "instance" in kwargs:
             kwargs["instance"].parent_id = self.parent_id
         else:
             kwargs["parent_id"] = self.parent_id
-        return super().add_sibling(*args, **kwargs)
+        new_page = super().add_sibling(pos, *args, **kwargs)
+        # Inserting between siblings renumbers the paths of those after it.
+        _clear_permission_cache_on_tree_change()
+        return new_page
+
+    def move(self, *args, **kwargs):
+        super().move(*args, **kwargs)
+        _clear_permission_cache_on_tree_change()
+
+    @classmethod
+    def fix_tree(cls, *args, **kwargs):
+        result = super().fix_tree(*args, **kwargs)
+        _clear_permission_cache_on_tree_change()
+        return result
 
     def get_cached_ancestors(self):
         if self._has_cached_hierarchy():

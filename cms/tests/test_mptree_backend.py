@@ -88,6 +88,26 @@ class TreeFieldParityTests(SimpleTestCase):
         self.assertNotIn("treebeard", type(Page.objects).__module__)
 
 
+class PagePositionTests(CMSTestCase):
+    """Inserting pages lands them where requested, on either tree backend."""
+
+    def test_create_page_positions(self):
+        root = create_page("root", TEMPLATE, "en")
+        a = create_page("a", TEMPLATE, "en", parent=root)
+        b = create_page("b", TEMPLATE, "en", parent=root)
+        create_page("first", TEMPLATE, "en", parent=root, position="first-child")
+        # For "left" and "right", ``parent`` is the sibling to insert next to.
+        # Treebeard plans from the in-memory path, so pass fresh instances.
+        create_page("right-of-a", TEMPLATE, "en", parent=self.reload(a), position="right")
+        create_page("left-of-b", TEMPLATE, "en", parent=self.reload(b), position="left")
+
+        children = Page.objects.filter(parent=root).order_by("path")
+        self.assertEqual(
+            [child.get_title("en") for child in children],
+            ["first", "a", "right-of-a", "left-of-b", "b"],
+        )
+
+
 @mptree_only
 class PageTreeBackendTests(CMSTestCase):
     """The page tree as built, queried and moved by the mptree backend."""
@@ -448,6 +468,10 @@ class MaterializedPathDriverTests(TestCase):
         self.mp.add_sibling(r, name="r2")
         self.mp.add_sibling(r, position="left", name="r3")
 
+        self.assertEqual(
+            list(self.mp.children(r).values_list("name", flat=True)),
+            ["s_first", "a", "s_right", "s_left", "b", "s_last"],
+        )
         self.assertEqual(self.mp.roots().count(), 3)
         self.assertEqual(Category.objects.count(), 9)
         # every node still has a path correctly nested under its parent
