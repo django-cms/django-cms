@@ -1097,6 +1097,43 @@ class PageTreeTests(CMSTestCase):
         child.refresh_from_db()
         self.assertEqual(child.get_absolute_url(language="en"), "/en/parent/child/")
 
+    def test_move_node_alters_descendants_in_all_languages(self):
+        """
+        Regression test: the URLs of the moved page are cached together with
+        those of its fallback languages, so its descendants could be rebuilt
+        from its old path in the languages processed after the first one.
+        """
+
+        def create_translated_page(slug, parent=None):
+            page = create_page(slug, "nav_playground.html", "en", slug=slug, parent=parent)
+            for language in ("de", "fr"):
+                create_page_content(language, slug, page, slug=f"{slug}-{language}")
+            return page
+
+        def get_paths(page):
+            return dict(page.urls.values_list("language", "path"))
+
+        parent = create_translated_page("parent")
+        page = create_translated_page("page")
+        child = create_translated_page("child", parent=page)
+        grandchild = create_translated_page("grandchild", parent=child)
+
+        Page.objects.get(pk=page.pk).move_page(parent)
+
+        self.assertEqual(get_paths(page), {"en": "parent/page", "de": "parent-de/page-de", "fr": "parent-fr/page-fr"})
+        self.assertEqual(
+            get_paths(child),
+            {"en": "parent/page/child", "de": "parent-de/page-de/child-de", "fr": "parent-fr/page-fr/child-fr"},
+        )
+        self.assertEqual(
+            get_paths(grandchild),
+            {
+                "en": "parent/page/child/grandchild",
+                "de": "parent-de/page-de/child-de/grandchild-de",
+                "fr": "parent-fr/page-fr/child-fr/grandchild-fr",
+            },
+        )
+
 
 class PageContentTests(CMSTestCase):
     def setUp(self):

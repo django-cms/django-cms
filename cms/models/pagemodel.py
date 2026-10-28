@@ -472,6 +472,9 @@ class Page(MP_Node):
         for language in languages:
             if not self.is_home:
                 self._update_url_path(language)
+                # Descendant paths derive from this page's path: drop the cached URLs, which
+                # are fetched together with the fallback languages and may hold the old path
+                self.urls_cache = {}
             self._update_url_path_recursive(language)
         self.clear_cache(menu=True)
 
