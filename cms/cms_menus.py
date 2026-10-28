@@ -179,8 +179,7 @@ class CMSMenu(Menu):
         """
         Transform a CMS page content object into a navigation node.
 
-        :param page: The page to transform.
-        :param languages: The list of the current language plus fallbacks used to render the menu.
+        :param page_content: The page content to transform.
         :param view_url: If given, serves as a "pattern" for a view url with the assumption that "/0/" is replaced
             by the actual page content pk. Default is None.
         :param cut: If True the parent_id is set to None. Default is False.
