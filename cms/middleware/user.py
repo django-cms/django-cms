@@ -10,7 +10,9 @@ class CurrentUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        from cms.cache.permissions import permission_cache_version_snapshot
         from cms.utils.permissions import set_current_user
 
         set_current_user(getattr(request, 'user', None))
-        return self.get_response(request)
+        with permission_cache_version_snapshot():
+            return self.get_response(request)
