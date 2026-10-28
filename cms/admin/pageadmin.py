@@ -53,7 +53,7 @@ from cms.admin.forms import (
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
-from cms.constants import MODAL_HTML_REDIRECT
+from cms.constants import GRANT_ALL_PERMISSIONS, MODAL_HTML_REDIRECT
 from cms.models import (
     CMSPlugin,
     GlobalPagePermission,
@@ -64,7 +64,6 @@ from cms.models import (
     Placeholder,
 )
 from cms.models.pagemodel import AdminCacheDict
-from cms.models.permissionmodels import PermissionTuple
 from cms.operations.helpers import (
     send_post_page_operation,
     send_pre_page_operation,
@@ -646,8 +645,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             if can_change_global_permissions:
                 can_change = True
             else:
-                page_path = permission.page.path
-                can_change = any(PermissionTuple(perm_tuple).contains(page_path) for perm_tuple in allowed_pages)
+                can_change = allowed_pages == GRANT_ALL_PERMISSIONS or allowed_pages.contains(permission.page.path)
 
             row = PermissionRow(
                 is_global=False,

@@ -9,7 +9,7 @@ from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import GlobalPagePermission, PagePermission
+from cms.models import GlobalPagePermission, PagePermission, PermissionTupleList
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
@@ -402,6 +402,7 @@ def clear_permission_lru_caches(user):
     """
     clear_func_cache(user, get_global_actions_for_user)
     clear_func_cache(user, get_page_actions_for_user)
+    clear_func_cache(user, get_cached_page_actions_for_user)
 
 
 @cached_func
@@ -435,6 +436,24 @@ def get_page_actions_for_user(user, site):
         for action in perm.get_configured_actions():
             actions[action].append(permission_tuple)
     return actions
+
+
+@cached_func
+def get_cached_page_actions_for_user(user, site):
+    """Like :func:`get_page_actions_for_user`, but shared through the permission cache.
+
+    All actions are read, and if needed written, in one round trip to the cache
+    backend. The result maps each action to a :class:`PermissionTupleList`.
+    """
+    from cms.cache.permissions import PERMISSION_KEYS, get_permission_caches, set_permission_caches
+
+    cached = get_permission_caches(user, site, PERMISSION_KEYS)
+
+    if len(cached) < len(PERMISSION_KEYS):
+        page_actions = get_page_actions_for_user(user, site)
+        cached = {action: list(page_actions[action]) for action in PERMISSION_KEYS}
+        set_permission_caches(user, site, cached)
+    return {action: PermissionTupleList(perm_tuples) for action, perm_tuples in cached.items()}
 
 
 def has_global_permission(user, site, action, use_cache=True):

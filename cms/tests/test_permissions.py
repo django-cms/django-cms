@@ -15,9 +15,15 @@ from cms.admin.forms import BasePermissionAdminForm
 from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import add_plugin, assign_user_to_page, create_page
 from cms.cache.permissions import (
+    _read_cache_permission_version,
+    clear_permission_cache,
     clear_user_permission_cache,
     get_cache_key,
+    get_cache_permission_version,
+    get_cache_permission_version_key,
     get_permission_cache,
+    get_permission_caches,
+    permission_cache_version_snapshot,
     set_permission_cache,
 )
 from cms.models import Page, PageContent
@@ -30,6 +36,7 @@ from cms.models.permissionmodels import (
     GlobalPagePermission,
     PagePermission,
     PermissionTuple,
+    PermissionTupleList,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
@@ -211,6 +218,20 @@ class PermissionTupleTests(CMSTestCase):
                 allowed = Page.objects.filter(perm.allow_list()).values_list("pk", flat=True)
                 self.assertEqual(set(allowed), expected)
 
+    def test_tuple_list_contains_matches_tuples(self):
+        pages = list(Page.objects.all())
+        grants = (ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
+                  ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS)
+        tuple_lists = [[(grant_on, anchor.path)] for grant_on in grants for anchor in pages]
+        tuple_lists.append([(ACCESS_PAGE, self.grandchild.path), (ACCESS_CHILDREN, self.root.path)])
+        tuple_lists.append([])
+        for perm_tuples in tuple_lists:
+            tuple_list = PermissionTupleList(perm_tuples)
+            for page in pages:
+                with self.subTest(perm_tuples=perm_tuples, page=page.path):
+                    expected = any(PermissionTuple(perm).contains(page.path) for perm in perm_tuples)
+                    self.assertEqual(tuple_list.contains(page.path), expected)
+
     def test_allow_list_with_related_field_prefix(self):
         user = self._create_user("perm-user", is_staff=True)
         for page in (self.root, self.child, self.grandchild, self.sibling):
@@ -279,6 +300,70 @@ class DeletePagePlaceholderPermissionTests(CMSTestCase):
         'permissions': 60,
     },
 )
+@override_settings(CMS_PERMISSION=True)
+class PermissionCacheRoundTripTests(CMSTestCase):
+    """Permission checks must not hit the cache backend for every check."""
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+        self.root = create_page('root', 'nav_playground.html', 'en')
+        self.pages = [
+            create_page(f'page-{index}', 'nav_playground.html', 'en', parent=self.root)
+            for index in range(3)
+        ]
+        self.user = self._create_user('editor', is_staff=True, add_default_permissions=True)
+        assign_user_to_page(self.root, self.user, can_change=True, can_publish=True)
+
+    def test_version_is_read_once_per_snapshot(self):
+        with patch('cms.cache.permissions._read_cache_permission_version', return_value=3) as read:
+            with permission_cache_version_snapshot():
+                self.assertEqual(get_cache_permission_version(), 3)
+                self.assertEqual(get_cache_permission_version(), 3)
+            get_cache_permission_version()
+        # Outside of the snapshot every call reads the cache again.
+        self.assertEqual(read.call_count, 2)
+
+    def test_version_bump_is_seen_within_snapshot(self):
+        with permission_cache_version_snapshot():
+            version = get_cache_permission_version()
+            clear_permission_cache()
+            self.assertGreater(get_cache_permission_version(), version)
+
+    def test_version_bump_ignores_stale_snapshot(self):
+        with permission_cache_version_snapshot():
+            cache.delete(get_cache_permission_version_key())
+            self.assertEqual(get_cache_permission_version(), 1)
+            # Another process bumps the version after the snapshot was taken.
+            cache.set(get_cache_permission_version_key(), 5)
+            clear_permission_cache()
+            # Bumping from the stale snapshot would reset it to 2.
+            self.assertEqual(get_cache_permission_version(), 6)
+
+    def test_page_permissions_are_read_once(self):
+        site = Site.objects.get_current()
+        with patch('cms.cache.permissions.get_permission_caches', wraps=get_permission_caches) as read:
+            for page in self.pages:
+                self.assertTrue(user_can_change_page(self.user, page, site))
+                self.assertTrue(user_can_publish_page(self.user, page, site))
+        self.assertEqual(read.call_count, 1)
+        # The next request reuses what the first one stored.
+        user = self.reload(self.user)
+        with patch('cms.utils.permissions.get_page_actions_for_user') as compute:
+            self.assertTrue(user_can_change_page(user, self.pages[0], site))
+        compute.assert_not_called()
+
+    def test_request_reads_version_once(self):
+        with patch(
+            'cms.cache.permissions._read_cache_permission_version',
+            wraps=_read_cache_permission_version,
+        ) as read:
+            with self.login_user_context(self.user):
+                response = self.client.get(self.get_admin_url(PageContent, 'get_tree'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(read.call_count, 1)
+
+
 class PermissionCacheInvalidationTests(CMSTestCase):
     """
     Saving or deleting users and changing their group memberships must
@@ -441,6 +526,7 @@ class PermissionCacheTreeChangeTests(CMSTestCase):
         with self.captureOnCommitCallbacks(execute=True):
             newcomer = create_page('newcomer', 'nav_playground.html', 'en', parent=self.root, position='first-child')
         self.assertPermissionsFollowPages(newcomer)
+        self.assertEqual(newcomer.path, self.old_path)
 
     def test_rolled_back_move_does_not_poison_cache(self):
         # Cache invalidation is deferred to commit. A tree change inside a
