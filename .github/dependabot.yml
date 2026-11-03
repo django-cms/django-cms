@@ -9,3 +9,12 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    groups:
+      pre-commit:
+        patterns:
+        - "*"
+    schedule:
+      interval: weekly
