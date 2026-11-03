@@ -242,6 +242,35 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
         return placeholder_plugin
 
+    def test_paste_empty_placeholder(self):
+        """Pasting an empty clipboard placeholder returns an empty plugin tree."""
+        superuser = self.get_superuser()
+        placeholder_plugin = self._create_clipboard_with_placeholder(superuser)
+        placeholder_plugin.placeholder_ref.get_plugins().delete()
+        target_placeholder = Placeholder.objects.create(slot="target")
+        existing_plugin = self._add_plugin_to_placeholder(target_placeholder)
+        original_position = existing_plugin.position
+
+        endpoint = self.get_move_plugin_uri(placeholder_plugin, language="en")
+        with self.login_user_context(superuser):
+            response = self.client.post(endpoint, {
+                "plugin_id": placeholder_plugin.pk,
+                "placeholder_id": target_placeholder.pk,
+                "move_a_copy": "true",
+                "target_language": "en",
+                "target_position": 1,
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            "html": "",
+            "plugins": [],
+            "source_placeholder_id": placeholder_plugin.placeholder_id,
+        })
+        existing_plugin.refresh_from_db()
+        self.assertEqual(existing_plugin.position, original_position)
+        self.assertEqual(target_placeholder.get_plugins().count(), 1)
+
     def test_paste_placeholder_shifts_positions_of_target_language(self):
         """
         Pasting a placeholder from the clipboard shifts the positions of the
