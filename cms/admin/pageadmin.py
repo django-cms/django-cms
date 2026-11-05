@@ -271,7 +271,9 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(object_id)
 
-        if not self.has_view_permission(request, obj=page):
+        # Each action is gated by its own permission below. Copying requires view
+        # permission only (see copy_page()), so view access opens the menu.
+        if not page_permissions.user_can_view_page(request.user, page, page.site):
             raise PermissionDenied("No permission for actions menu")
 
         site = get_site_from_request(request)
@@ -283,7 +285,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             "page_is_restricted": page.has_view_restrictions(site),
             "paste_enabled": paste_enabled,
             "has_add_permission": page_permissions.user_can_add_subpage(request.user, target=page),
-            "has_copy_page_permission": page_permissions.user_can_view_page_draft(request.user, page, site=site),
+            "has_copy_page_permission": page_permissions.user_can_view_page(request.user, page, page.site),
             "has_change_permission": self.has_change_permission(request, obj=page),
             "has_change_advanced_settings_permission": self.has_change_advanced_settings_permission(request, obj=page),
             "has_change_permissions_permission": self.has_change_permissions_permission(request, obj=page),
@@ -911,10 +913,10 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             raise self._get_404_exception(object_id)
 
         # ``add_view`` only checks that the user may add a page on the destination
-        # site. The source is read through the admin, so require what the admin
-        # requires to show it: CMS change permission on ``obj.page``, resolved
-        # against the page's own site. ``has_view_permission`` (overridden below,
-        # not Django's model-level check) is used rather than
+        # site. Duplicating is an editing action on the source, so require what
+        # the toolbar requires to offer it: CMS change permission on ``obj.page``,
+        # resolved against the page's own site. ``has_view_permission`` (overridden
+        # below, not Django's model-level check) is used rather than
         # ``has_change_permission`` because djangocms-versioning does not touch it.
         if not self.has_view_permission(request, obj):
             raise PermissionDenied

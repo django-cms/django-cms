@@ -261,6 +261,17 @@ they cannot view on the front end or edit. Per-page edit permissions
 gate the *actions* offered on each node (edit, move, delete), not
 whether the node is listed.
 
+The same holds for a page's content in the admin. A staff user who may
+view a page can open it in preview mode and on the structure board,
+and can copy and paste it into a part of the tree they may edit. All of
+these show the page's *current admin content*: with
+``djangocms-versioning`` installed, that is the latest draft, not only
+the published version. Edit permissions decide who may *change* a
+draft; they do not keep it hidden from staff users who may view the
+page. To keep work in progress away from some staff users, restrict
+their view access to the page — or, for content that must stay
+confidential, keep it on a separate site or outside the CMS.
+
 In other words, a page title or path is not a secret from your staff
 editors. If a page's *existence* must be hidden from some staff users,
 the page tree is the wrong tool: keep that content on a separate site

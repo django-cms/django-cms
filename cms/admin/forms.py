@@ -370,12 +370,13 @@ class AddPageForm(BasePageContentForm):
         The visible ``source`` select offers the page types of the current site,
         which anyone allowed to add a page may build on unless view restrictions
         apply. Forms whose ``source`` is a hidden, client-controlled field set
-        ``source_requires_change_permission``: ``Page.copy()`` reads the source's
-        *admin* content (with versioning: its latest draft), so they require what
-        the admin requires to show it -- change permission on the source, resolved
-        against the source's own site. This keeps cross-site copies possible for
-        users authorized on both sites while rejecting sources they could not open
-        in the admin.
+        ``source_requires_change_permission``: duplicating is an editing action,
+        offered only to users who can change the source page, and a crafted
+        request may name any page, including one on another site. These forms
+        therefore re-check the permission the UI action requires -- change
+        permission on the source, resolved against the source's own site rather
+        than the destination site checked by ``add_view``. This keeps cross-site
+        copies possible for users authorized on both sites.
         """
         if self.source_requires_change_permission:
             return user_can_change_page(self._user, source, site=source.site)

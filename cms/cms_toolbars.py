@@ -660,7 +660,7 @@ class PageToolbar(CMSToolbar):
                     disabled=not has_perm,
                 )
 
-            # Duplicating copies this page's admin content, so it requires
+            # Duplicating is an editing action on this page, so it requires
             # change permission on this page on top of add permission next to it.
             add_page_menu.add_modal_item(
                 _("Duplicate this Page"),
