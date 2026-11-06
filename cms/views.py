@@ -371,6 +371,10 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
             # An apphook might be attached to a PageContent object
             content_type_obj = model.admin_manager.select_related("page", "page__site").get(pk=object_id)
             request.current_page = content_type_obj.page
+            # Apphook views can return before render_page() checks page-view
+            # permission, so authorize the source before dispatching to them.
+            if not user_can_view_placeholder_source(request.user, content_type_obj):
+                raise Http404
             if (
                 content_type_obj.page.application_urls and
                 content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks()) and

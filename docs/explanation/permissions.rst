@@ -249,6 +249,15 @@ logged-in users (menu visibility), require login to view at all
 (login-required), and be further restricted to one group (view
 restriction).
 
+**Staff access to content versions.** Active staff users who can view
+a page may also preview all its content versions, including draft,
+unpublished, and archived versions, and inspect their structure. This
+does not require change permission. For unrestricted pages, this
+includes staff users with no CMS editing permissions. Publishing
+controls which version appears on the public site; it does not make
+other versions confidential from staff who can view the page. Editing
+content remains subject to change permissions.
+
 **These are front-end controls only.** View restrictions,
 login-required, and menu visibility all govern who can *see a
 published page on the public site*. They do **not** hide a page inside

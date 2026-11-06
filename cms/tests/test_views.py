@@ -1,5 +1,6 @@
 import re
 import sys
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -625,6 +626,35 @@ class EndpointPermissionTests(CMSTestCase):
         self.assertNotContains(
             response, "SuperSecretLinkName", status_code=404
         )
+
+    def test_apphook_endpoints_check_page_view_permission(self):
+        """Apphook dispatch must enforce view access without requiring edit rights."""
+        from cms.api import assign_user_to_page
+
+        self.page.application_urls = APP_NAME
+        self.page.save(update_fields=["application_urls"])
+        denied_staff = self.get_staff_user_with_no_permissions()
+        viewer = self._create_user("apphook_viewer", is_staff=True, is_superuser=False)
+        assign_user_to_page(self.page, viewer, can_view=True, can_change=False)
+        apphook_view = Mock(return_value=HttpResponse("Private apphook content"))
+
+        with patch("cms.views.resolve", return_value=(apphook_view, (), {})):
+            for user, expected_status in ((denied_staff, 404), (viewer, 200)):
+                with self.login_user_context(user):
+                    for name in (
+                        "cms_placeholder_render_object_edit",
+                        "cms_placeholder_render_object_preview",
+                    ):
+                        with self.subTest(user=user.username, endpoint=name):
+                            apphook_view.reset_mock()
+                            response = self.client.get(self._endpoint(name))
+                            self.assertEqual(response.status_code, expected_status)
+                            if expected_status == 404:
+                                apphook_view.assert_not_called()
+                                self.assertNotContains(response, "Private apphook content", status_code=404)
+                            else:
+                                apphook_view.assert_called_once()
+                                self.assertContains(response, "Private apphook content")
 
     def test_structure_endpoint_allows_permitted_user(self):
         """A user who may view the page still gets the structure board."""
