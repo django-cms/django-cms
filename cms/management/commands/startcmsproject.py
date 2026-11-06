@@ -490,8 +490,8 @@ class ExistingProjectMixin:
     INSTALL_RULES_FILENAME = "djangocms_install_rules.json"
 
     # Package specs are intentionally narrow: a package name plus an optional
-    # lower-bound version pin from trusted install rules.
-    SAFE_PACKAGE_RE = re.compile(r"^[A-Za-z0-9_-]+(>=[0-9][A-Za-z0-9_.-]*)?$")
+    # lower- or upper-bound version pin from trusted install rules.
+    SAFE_PACKAGE_RE = re.compile(r"^[A-Za-z0-9_-]+((?:>=|<)[0-9][A-Za-z0-9_.-]*)?$")
     BUNDLED_RULES_OPTION = "--use-bundled-install-rules"
 
     def get_install_rules_url(self):
@@ -1009,6 +1009,9 @@ class ExistingProjectMixin:
 
     def _finish_existing_project(self, apps, packages_map, options):
         """Offer to install the missing packages, then migrate and check."""
+        # Older remote rules omit treebeard because it used to be constrained
+        # by django CMS itself. Projects using its backend still need <6.
+        packages_map = {"treebeard": "django-treebeard<6", **packages_map}
         packages = ["django-cms"]
         for app in apps:
             # Sub-apps like "djangocms_frontend.contrib.grid" ship with their

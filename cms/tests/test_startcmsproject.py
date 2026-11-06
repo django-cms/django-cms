@@ -377,6 +377,16 @@ class EditingHelperTests(SimpleTestCase):
 
 
 class PackageDerivationTests(SimpleTestCase):
+    def test_treebeard_is_constrained_with_older_remote_rules(self):
+        command = make_command()
+        command.install_packages = mock.Mock()
+        command.run_management_command = mock.Mock()
+        command._finish_existing_project(["cms", "treebeard"], {}, {"interactive": False})
+        command.install_packages.assert_called_once_with(["django-cms", "django-treebeard<6"])
+
+    def test_bundled_rules_constrain_treebeard(self):
+        self.assertEqual(bundled_rules()["packages"]["treebeard"], "django-treebeard<6")
+
     def test_dotted_apps_resolve_to_their_top_level_package(self):
         command = make_command()
         command.install_packages = mock.Mock()
@@ -416,12 +426,15 @@ class PackageDerivationTests(SimpleTestCase):
             with self.assertRaises(CommandError):
                 command.install_packages([bad])
 
-    def test_install_packages_accepts_lower_bound_specs(self):
+    def test_install_packages_accepts_version_bounds(self):
         command = make_command()
         with mock.patch.object(command, "running_in_venv", return_value=True), mock.patch("subprocess.run") as run:
             run.return_value.returncode = 0
-            command.install_packages(["djangocms-history>=3"])
-        run.assert_called_once()
+            command.install_packages(["djangocms-history>=3", "django-treebeard<6"])
+        run.assert_called_once_with(
+            [sys.executable, "-m", "pip", "install", "djangocms-history>=3", "django-treebeard<6"],
+            check=False,
+        )
 
     def test_install_packages_refuses_outside_venv(self):
         # Outside a virtual environment (and without the opt-out env var) the
