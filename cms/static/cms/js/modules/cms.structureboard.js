@@ -746,7 +746,9 @@ class StructureBoard {
                 appendTo: '.cms-structure-content',
                 // appendTo: '.cms',
                 cursor: 'move',
-                cursorAt: { left: -15, top: -15 },
+                // Preserve the horizontal grab offset: nestedSortable uses the
+                // helper's left edge to distinguish reordering from nesting.
+                cursorAt: { top: -15 },
                 opacity: 1,
                 zIndex: 9999999,
                 delay: 100,
