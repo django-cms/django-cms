@@ -107,6 +107,27 @@ class PagePositionTests(CMSTestCase):
             ["first", "a", "right-of-a", "left-of-b", "b"],
         )
 
+    def test_create_page_positions_at_root_level(self):
+        a = create_page("a", TEMPLATE, "en")
+        b = create_page("b", TEMPLATE, "en")
+        create_page("right-of-a", TEMPLATE, "en", parent=self.reload(a), position="right")
+        create_page("left-of-b", TEMPLATE, "en", parent=self.reload(b), position="left")
+        create_page("left-of-a", TEMPLATE, "en", parent=self.reload(a), position="left")
+
+        roots = Page.objects.filter(parent__isnull=True).order_by("path")
+        self.assertEqual(
+            [root.get_title("en") for root in roots],
+            ["left-of-a", "a", "right-of-a", "left-of-b", "b"],
+        )
+
+    def test_add_sibling_first_sibling_at_root_level(self):
+        create_page("a", TEMPLATE, "en")
+        b = create_page("b", TEMPLATE, "en")
+        first = self.reload(b).add_sibling(pos="first-sibling", site=b.site)
+
+        roots = Page.objects.filter(parent__isnull=True).order_by("path")
+        self.assertEqual(roots.first().pk, first.pk)
+
 
 @mptree_only
 class PageTreeBackendTests(CMSTestCase):
@@ -464,9 +485,11 @@ class MaterializedPathDriverTests(TestCase):
         self.mp.add_sibling(b, position="left", name="s_left")
         self.mp.add_sibling(b, position="first-sibling", name="s_first")
 
-        # root siblings -> parent-None branch (last + left/no-op)
+        # root siblings -> parent-None branch (last + left)
         self.mp.add_sibling(r, name="r2")
         self.mp.add_sibling(r, position="left", name="r3")
+        r.refresh_from_db()  # inserting r3 on its left renumbers r
+        self.assertEqual(list(self.mp.roots().values_list("name", flat=True)), ["r3", "r", "r2"])
 
         self.assertEqual(
             list(self.mp.children(r).values_list("name", flat=True)),
