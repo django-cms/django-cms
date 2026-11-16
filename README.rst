@@ -13,7 +13,6 @@ Start here
 ==========
 
 * Read the docs: `Documentation (stable) <https://docs.django-cms.org/>`_
-* Installing / learning: `Installation <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ · `Docker quickstart <https://github.com/django-cms/django-cms-quickstart>`_ · `Tutorials <https://docs.django-cms.org/en/latest/introduction/>`_
 * Upgrading: `Release notes / Upgrade guide <https://docs.django-cms.org/en/latest/upgrade/index.html>`_
 * Get help: `Discord <https://discord-support-channel.django-cms.org>`_ or Stackoverflow
 * Contribute safely: `Contributing <CONTRIBUTING.rst>`_ · `Code of Conduct <CODE_OF_CONDUCT.rst>`_ · `Security <SECURITY.md>`_
@@ -106,7 +105,6 @@ Professional support
 
 Choose from a list of `trusted tech partner <https://www.django-cms.org/en/tech-partners/>`_ of the django CMS Association to get your website project delivered successfully.
 
-Choose a `trusted web host <https://www.django-cms.org/en/hosting-services/>`_ for your django CMS project and get your website online today.
 
 
 The django CMS Association
