@@ -94,6 +94,7 @@ packaging==26.2
     # via
     #   black
     #   build
+    #   django-cms
     #   sphinx
     #   wheel
 pathspec==1.1.1
@@ -134,7 +135,7 @@ roman-numerals==4.1.0
     # via sphinx
 snowballstemmer==3.1.1
     # via sphinx
-soupsieve==2.9
+soupsieve==4.0
     # via beautifulsoup4
 sphinx==9.1.0
     # via
