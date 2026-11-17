@@ -422,6 +422,9 @@ class MaterializedPath:
                 existing = [pk for pk in self._ordered_child_pks("", 0) if pk != new.pk]
                 self._layout("", 0, [new.pk] + existing)
                 self._refresh(new)
+            # The relayout may have renumbered `node`, so the caller's instance
+            # must not keep a path that now belongs to another root.
+            self._refresh(node)
             return new
         if position == "first-sibling":
             return self.add_child(parent, position="first-child", instance=instance, **attrs)
