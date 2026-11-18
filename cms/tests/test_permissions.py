@@ -34,6 +34,7 @@ from cms.utils.page_permissions import (
     user_can_delete_page,
     user_can_move_page,
     user_can_publish_page,
+    user_can_view_page,
 )
 
 
@@ -100,6 +101,45 @@ class PermissionCacheTests(CMSTestCase):
         self.assertEqual(
             {key: get_permission_cache(self.user_normal, key) for key in PERMISSION_KEYS},
             destination_cache,
+        )
+
+    @override_settings(CMS_LANGUAGES={"default": {"fallbacks": ["en"], "public": True}})
+    def test_view_permission_defaults_to_the_pages_site(self):
+        """A view grant on the current site must not open another site's pages."""
+        other_site = Site.objects.create(domain="other.example", name="Other")
+        other_page = create_page("other", "nav_playground.html", "en", site=other_site)
+        # Granting view to the superuser view-restricts the pages for everybody else.
+        assign_user_to_page(self.home_page, self.user_super, can_view=True)
+        assign_user_to_page(other_page, self.user_super, can_view=True)
+        viewer = self._create_user("viewer", is_staff=True)
+        grant = GlobalPagePermission.objects.create(user=viewer, can_view=True)
+
+        for granted_site, can_view_home, can_view_other in (
+            (Site.objects.get_current(), True, False),
+            (other_site, False, True),
+        ):
+            with self.subTest(granted_site=granted_site.domain):
+                grant.sites.set([granted_site])
+                # Permission results are memoized on the user instance.
+                viewer = type(viewer).objects.get(pk=viewer.pk)
+                self.assertEqual(user_can_view_page(viewer, self.home_page), can_view_home)
+                self.assertEqual(user_can_view_page(viewer, other_page), can_view_other)
+
+    @override_settings(CMS_LANGUAGES={"default": {"fallbacks": ["en"], "public": True}})
+    def test_cross_site_view_permission_preserves_current_site_cache(self):
+        other_site = Site.objects.create(domain="other.example", name="Other")
+        other_page = create_page("other", "nav_playground.html", "en", site=other_site)
+        viewer = self._create_user("viewer", is_staff=True)
+        assign_user_to_page(self.home_page, viewer, can_view=True)
+        assign_user_to_page(other_page, viewer, can_view=True)
+        self.assertTrue(user_can_view_page(viewer, self.home_page))
+        current_site_cache = {key: get_permission_cache(viewer, key) for key in PERMISSION_KEYS}
+        self.assertIsNotNone(current_site_cache["view_page"])
+
+        self.assertTrue(user_can_view_page(viewer, other_page))
+        self.assertEqual(
+            {key: get_permission_cache(viewer, key) for key in PERMISSION_KEYS},
+            current_site_cache,
         )
 
     def test_cached_permission_precedence(self):

@@ -258,8 +258,14 @@ def user_can_move_page(user, page, site=None):
 
 @cached_func
 def user_can_view_page(user, page, site=None):
+    current_site = get_current_site()
     if site is None:
-        site = get_current_site()
+        # Resolve permissions against the page's own site: a grant on the
+        # current site must not authorize viewing a page of another site.
+        site = current_site if page.site_id == current_site.pk else page.site
+    # The shared permission cache is keyed by user/action, not site. Read
+    # another site's permissions without reusing or replacing the cached ones.
+    use_cache = site.pk == current_site.pk
 
     if user.is_superuser:
         return True
@@ -286,7 +292,7 @@ def user_can_view_page(user, page, site=None):
         # Page has no restrictions but user can't see unrestricted pages
         return False
 
-    if user_can_change_page(user, page, site=site):
+    if user_can_change_page(user, page, site=site, use_cache=use_cache):
         # If user has change permissions on a page
         # then he can automatically view it.
         return True
@@ -297,6 +303,7 @@ def user_can_view_page(user, page, site=None):
         action='view_page',
         site=site,
         check_global=False,
+        use_cache=use_cache,
     )
     return has_perm
 
