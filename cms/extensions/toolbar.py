@@ -73,10 +73,13 @@ class ExtensionToolbar(CMSToolbar):
         :class:`~cms.models.contentmodels.PageContent` displayed.
 
         Return a tuple of the page content extension and the url; the extension is None
-        if no instance exists, the url is None is no admin is registered for the extension.
+        if no instance exists, the url is None if no admin is registered for the extension.
+        If there is no page content, both values are None.
         """
         self._get_page()
-        page_content = page_content_obj or self.page_content
+        page_content = self.page_content if page_content_obj is None else page_content_obj
+        if not page_content:
+            return None, None
         try:
             pagecontent_extension = self.model.objects.get(extended_object_id=page_content.pk)
         except self.model.DoesNotExist:

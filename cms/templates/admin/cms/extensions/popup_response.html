@@ -1,0 +1,6 @@
+{% if request.GET.cms_path %}
+    {# CMS toolbar dialogs use an iframe, which has no window.opener. #}
+    {% include "admin/cms/page/close_frame.html" %}
+{% else %}
+    {% include "admin/popup_response.html" %}
+{% endif %}

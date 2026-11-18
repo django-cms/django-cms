@@ -1,4 +1,6 @@
 from copy import deepcopy
+from unittest.mock import Mock
+from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -7,7 +9,7 @@ from django.contrib.sites.models import Site
 from cms.api import create_page, create_page_content
 from cms.extensions import PageContentExtension, PageExtension, extension_pool
 from cms.extensions.toolbar import ExtensionToolbar
-from cms.models import Page, PageContent
+from cms.models import EmptyPageContent, Page, PageContent
 from cms.test_utils.project.extensionapp.models import (
     MultiTablePageContentExtension,
     MultiTablePageExtension,
@@ -285,6 +287,93 @@ class ExtensionAdminTestCase(CMSTestCase):
             'A Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
         self.page_title_without_extension = self.page_without_extension.get_content_obj()
+
+    def test_page_content_extension_without_translation(self):
+        request = self.get_request(language='fr', page=self.page)
+        toolbar = ExtensionToolbar(request, Mock(get_object=Mock(return_value=None)), False, '')
+        toolbar.model = MyPageContentExtension
+        with self.assertNumQueries(0):
+            # Exercise both absent content and the missing-translation sentinel.
+            for content in (None, EmptyPageContent(language='fr', page=self.page)):
+                with self.subTest(content=content):
+                    toolbar.page = self.page
+                    toolbar.page_content = content
+                    self.assertEqual(toolbar.get_page_content_extension_admin(), (None, None))
+
+    def test_explicit_missing_translation_does_not_use_toolbar_content(self):
+        request = self.get_request(language='en', page=self.page)
+        toolbar = ExtensionToolbar(request, Mock(get_object=Mock(return_value=self.page_title)), False, '')
+        toolbar.model = MyPageContentExtension
+        missing_content = EmptyPageContent(language='fr', page=self.page)
+        with self.assertNumQueries(0):
+            self.assertEqual(toolbar.get_page_content_extension_admin(missing_content), (None, None))
+        self.assertEqual(
+            toolbar.get_page_content_extension_admin(),
+            (
+                self.title_extension,
+                admin_reverse('extensionapp_mypagecontentextension_change', args=(self.title_extension.pk,)),
+            ),
+        )
+
+    def test_existing_extension_redirect_preserves_popup_context(self):
+        cases = (
+            ('mypageextension', self.page, self.page_extension),
+            ('mypagecontentextension', self.page_title, self.title_extension),
+        )
+        with self.login_user_context(self.admin):
+            for model_name, extended_object, extension in cases:
+                for popup in (False, True):
+                    with self.subTest(model=model_name, popup=popup):
+                        query = {'extended_object': extended_object.pk}
+                        context = {'_popup': '1', 'cms_path': '/en/?edit&language=en', '_to_field': 'id'} if popup else {}
+                        query.update(context)
+                        url = admin_reverse(f'extensionapp_{model_name}_add') + '?' + urlencode(query)
+                        expected = admin_reverse(f'extensionapp_{model_name}_change', args=(extension.pk,))
+                        if context:
+                            expected += '?' + urlencode(context)
+                        response = self.client.get(url)
+                        self.assertRedirects(response, expected, fetch_redirect_response=False)
+
+    def test_extension_popup_responses(self):
+        """CMS iframe saves close without executing Django's window.opener callbacks."""
+        cases = (
+            (MyPageExtension, self.page_without_extension, 'extra'),
+            (MyPageContentExtension, self.page_title_without_extension, 'extra_title'),
+        )
+        with self.login_user_context(self.admin):
+            for model, extended_object, field in cases:
+                for cms_modal in (True, False):
+                    query = '?_popup=1'
+                    if cms_modal:
+                        query += '&cms_path=/'
+                    opts = model._meta
+                    prefix = f'{opts.app_label}_{opts.model_name}'
+                    for action in ('add', 'change', 'delete'):
+                        with self.subTest(model=model, cms_modal=cms_modal, action=action):
+                            if action == 'add':
+                                url = admin_reverse(f'{prefix}_add')
+                                url += query + f'&extended_object={extended_object.pk}'
+                                data = {field: 'created', '_popup': '1'}
+                            else:
+                                extension = model.objects.get(extended_object=extended_object)
+                                url = admin_reverse(f'{prefix}_{action}', args=(extension.pk,)) + query
+                                data = {'post': 'yes', '_popup': '1'} if action == 'delete' else {
+                                    field: 'updated', '_popup': '1',
+                                }
+                            response = self.client.post(url, data)
+                            self.assertEqual(response.status_code, 200)
+                            if cms_modal:
+                                self.assertContains(response, 'class="cms-close-frame"')
+                                self.assertContains(response, 'class="success"')
+                                self.assertNotContains(response, 'admin/js/popup_response.js')
+                            else:
+                                self.assertContains(response, 'admin/js/popup_response.js')
+                                self.assertNotContains(response, 'cms-close-frame')
+                            if action == 'delete':
+                                self.assertFalse(model.objects.filter(extended_object=extended_object).exists())
+                            else:
+                                extension = model.objects.get(extended_object=extended_object)
+                                self.assertEqual(getattr(extension, field), data[field])
 
     def test_duplicate_extensions(self):
         with self.login_user_context(self.admin):
