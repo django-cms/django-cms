@@ -74,6 +74,10 @@ one of four states.
     The version currently being edited. **Only one draft per
     language** at any time. Drafts are not visible to the public.
 
+    Staff users who can view the page can preview its drafts and
+    other versions before publication, even if they cannot edit them.
+    See :doc:`permissions` for staff access to content versions.
+
 **Published**
     The version currently visible on the site. **Only one published
     version per language** at any time. Published rows cannot be
