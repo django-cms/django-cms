@@ -1,5 +1,7 @@
+from urllib.parse import urlencode
+
 from django.contrib import admin
-from django.contrib.admin.options import csrf_protect_m
+from django.contrib.admin.options import IS_POPUP_VAR, TO_FIELD_VAR, csrf_protect_m
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -59,6 +61,13 @@ class PageExtensionAdmin(ExtensionAdmin):
                     args=(extension.pk,),
                     current_app=self.admin_site.name
                 )
+                # Keep the popup response and CMS iframe context after redirecting.
+                popup_context = {
+                    key: request.GET[key]
+                    for key in (IS_POPUP_VAR, TO_FIELD_VAR, 'cms_path') if key in request.GET
+                }
+                if popup_context:
+                    change_url += '?' + urlencode(popup_context)
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
@@ -106,6 +115,13 @@ class PageContentExtensionAdmin(ExtensionAdmin):
                     args=(extension.pk,),
                     current_app=self.admin_site.name
                 )
+                # Keep the popup response and CMS iframe context after redirecting.
+                popup_context = {
+                    key: request.GET[key]
+                    for key in (IS_POPUP_VAR, TO_FIELD_VAR, 'cms_path') if key in request.GET
+                }
+                if popup_context:
+                    change_url += '?' + urlencode(popup_context)
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
