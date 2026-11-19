@@ -726,6 +726,24 @@ class MaterializedPathMixin(models.Model):
         return result
 
 
+def treebeard_is_supported() -> bool:
+    """
+    Whether the installed django-treebeard works with the ``"treebeard"``
+    backend. django-treebeard 6 and newer do not. Only the distribution metadata
+    is read; treebeard itself is not imported.
+    """
+    from importlib.metadata import PackageNotFoundError, version
+
+    from packaging.version import InvalidVersion, Version
+
+    try:
+        return Version(version("django-treebeard")).major < 6
+    except (PackageNotFoundError, InvalidVersion):
+        # No usable metadata (not installed, or vendored without it): do not
+        # second-guess the installation.
+        return True
+
+
 def get_tree_backend() -> str:
     """
     The active page-tree backend: ``"treebeard"`` (default) or ``"mptree"``,
@@ -735,6 +753,12 @@ def get_tree_backend() -> str:
     module. Resolved at import time, so a change requires a process restart --
     but no migration, because both backends declare identical fields.
 
+    If neither the setting nor the env var selects a backend, the default is
+    ``"treebeard"`` unless the installed django-treebeard is one that backend
+    does not support (6 or newer): then ``"mptree"`` is used, so an unpinned
+    install keeps working. Explicitly selecting ``"treebeard"`` is never
+    overridden; ``validate_dependencies()`` rejects that combination instead.
+
     ``treebeard`` is imported lazily (only by the selectors below, only when this
     returns ``"treebeard"``), so the ``mptree`` backend never imports it.
     """
@@ -742,9 +766,10 @@ def get_tree_backend() -> str:
 
     from django.conf import settings
 
-    return getattr(settings, "CMS_TREE_BACKEND", None) or os.environ.get(
-        "CMS_TREE_BACKEND", "treebeard"
-    )
+    backend = getattr(settings, "CMS_TREE_BACKEND", None) or os.environ.get("CMS_TREE_BACKEND")
+    if backend:
+        return backend
+    return "treebeard" if treebeard_is_supported() else "mptree"
 
 
 def get_tree_base() -> type:
