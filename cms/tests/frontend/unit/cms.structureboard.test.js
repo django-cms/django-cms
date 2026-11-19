@@ -851,6 +851,12 @@ describe('CMS.StructureBoard', function() {
             fixture.cleanup();
         });
 
+        /**
+         * Renders three container plugins in one placeholder and makes them draggable.
+         *
+         * @param {Boolean} populated whether each container has a child
+         * @param {Boolean} allowNesting whether containers accept other containers
+         */
         function setupContainers(populated, allowNesting) {
             fixture.set(
                 '<style>' +
@@ -888,6 +894,12 @@ describe('CMS.StructureBoard', function() {
             board.ui.sortables.nestedSortable('option', { delay: 0, scroll: false });
         }
 
+        /**
+         * Drags the third container onto the header of another one.
+         *
+         * @param {Number} target id of the container to drag to
+         * @param {Number} [horizontalMovement=0] horizontal distance to drag
+         */
         function dragThirdContainer(target, horizontalMovement = 0) {
             const item = $('.cms-draggable-3 > .cms-dragitem');
             const start = item.offset();
