@@ -31,9 +31,9 @@ def post_save_user(instance, raw, created, **kwargs):
     if not creator or not created or creator.is_anonymous:
         return
 
-    page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
-    page_user.__dict__.update(instance.__dict__)
-    page_user.save()
+    # Only insert the PageUser row: a regular save would write the user row
+    # again and re-run the user's save signals.
+    PageUser(user_ptr_id=instance.pk, created_by=creator).save_base(raw=True, force_insert=True)
 
     clear_user_permission_cache(instance)
     menu_pool.clear(all=True)
@@ -56,13 +56,19 @@ def post_save_user_group(instance, raw, created, **kwargs):
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous:
         return
-    page_user = PageUserGroup(group_ptr_id=instance.pk, created_by=creator)
-    page_user.__dict__.update(instance.__dict__)
-    page_user.save()
+    # Only insert the PageUserGroup row, see post_save_user.
+    PageUserGroup(group_ptr_id=instance.pk, created_by=creator).save_base(raw=True, force_insert=True)
 
 
-def pre_save_user(instance, raw, **kwargs):
+#: User fields that neither grant permissions nor appear in menus. Django saves
+#: ``last_login`` alone on every login, which must not flush the caches.
+PERMISSION_IRRELEVANT_USER_FIELDS = frozenset({"last_login"})
+
+
+def pre_save_user(instance, raw, update_fields=None, **kwargs):
     if raw:
+        return
+    if update_fields and PERMISSION_IRRELEVANT_USER_FIELDS.issuperset(update_fields):
         return
     clear_user_permission_cache(instance)
     menu_pool.clear(all=True)

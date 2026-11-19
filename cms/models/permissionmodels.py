@@ -291,6 +291,32 @@ class PermissionTuple(tuple):
         return Q()
 
 
+class PermissionTupleList(list):
+    """A list of permission tuples that tells whether any of them contains a path.
+
+    A tuple can only contain a path if its own path is a prefix of it, so
+    :meth:`contains` walks the ancestors of the path instead of all tuples. The
+    index behind it is built on first use; the list must not change afterwards.
+    """
+
+    _index = None
+
+    def contains(self, path: str, steplen: int = Page.steplen) -> bool:
+        """Check if any tuple's scope contains the given path."""
+        if self._index is None:
+            index = {}
+            for grant_on, perm_path in self:
+                index.setdefault(perm_path, set()).add(grant_on)
+            self._index = index
+
+        for end in range(steplen, len(path) + 1, steplen):
+            perm_path = path[:end]
+            for grant_on in self._index.get(perm_path, ()):
+                if PermissionTuple((grant_on, perm_path)).contains(path, steplen):
+                    return True
+        return False
+
+
 class PagePermission(AbstractPagePermission):
     """Page permissions for a single page
     """
