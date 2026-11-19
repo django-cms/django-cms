@@ -1,9 +1,6 @@
-from importlib.metadata import version
-
 from django.core.exceptions import ImproperlyConfigured
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
-from packaging.version import Version
 
 from cms.app_registration import (
     autodiscover_cms_configs,
@@ -19,7 +16,7 @@ def validate_dependencies():
     """
     Check for installed apps, their versions and configuration options
     """
-    from cms.utils.mptree import get_tree_backend
+    from cms.utils.mptree import get_tree_backend, treebeard_is_supported
 
     # treebeard is only required for the (default) treebeard tree backend; the
     # dependency-free mptree backend neither imports nor needs it.
@@ -31,7 +28,9 @@ def validate_dependencies():
             'django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.'
         )
 
-    if Version(version("django-treebeard")).major >= 6:
+    # Only reached when the treebeard backend was selected explicitly: without
+    # an explicit choice, get_tree_backend() falls back to mptree.
+    if not treebeard_is_supported():
         raise ImproperlyConfigured(
             'django CMS does not support django-treebeard 6 or newer with the treebeard backend. '
             'Set CMS_TREE_BACKEND = "mptree", or install django-treebeard<6.'
