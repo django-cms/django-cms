@@ -872,7 +872,9 @@ describe('CMS.StructureBoard', function() {
             $('.cms-placeholder-8949').data('cms', { plugin_restriction: ['ContainerPlugin'] });
             $('#container-plugins > .cms-draggable').data('cms', {
                 plugin_type: 'ContainerPlugin',
-                plugin_restriction: allowNesting ? ['ContainerPlugin'] : ['TextPlugin']
+                plugin_restriction: allowNesting ? ['ContainerPlugin'] : ['TextPlugin'],
+                // 5.0 plugin data always carries the parent restrictions
+                plugin_parent_restriction: []
             });
             StructureBoard._initializeGlobalHandlers();
             board = Object.create(StructureBoard.prototype);
@@ -933,7 +935,11 @@ describe('CMS.StructureBoard', function() {
                 const item = $('.cms-draggable-3').appendTo(children);
 
                 parent.data('cms').plugin_restriction = ['ItemPlugin'];
-                item.data('cms', { plugin_type: 'ItemPlugin', plugin_restriction: ['TextPlugin'] });
+                item.data('cms', {
+                    plugin_type: 'ItemPlugin',
+                    plugin_restriction: ['TextPlugin'],
+                    plugin_parent_restriction: []
+                });
                 if (allowRoot) {
                     $('.cms-placeholder-8949').data('cms').plugin_restriction.push('ItemPlugin');
                 }
