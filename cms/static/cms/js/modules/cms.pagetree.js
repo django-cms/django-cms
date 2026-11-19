@@ -132,10 +132,12 @@ class PageTree {
                     value: function(node) {
                         // it needs to have the "colde" format and not "col-de"
                         // as jstree will convert "col-de" to "colde"
-                        // also we strip dashes, in case language code contains it
-                        // e.g. zh-hans, zh-cn etc
+                        // all dashes are stripped and the key is lowercased to
+                        // match the "data-col..." attribute rendered by
+                        // admin/cms/page/tree/menu.html, in case the language
+                        // code contains them, e.g. zh-hans, de-x-l, zh-Hant
                         if (node.data) {
-                            return node.data['col' + obj.key.replace('-', '')];
+                            return node.data['col' + obj.key.replace(/-/g, '').toLowerCase()];
                         }
 
                         return '';
@@ -411,6 +413,15 @@ class PageTree {
                 return;
             }
             that._paste(e);
+        });
+
+        // related-object lookup popup: clicking a node returns its id to the opener
+        this.ui.container.on(this.click, '.js-cms-pagetree-node-select', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.opener) {
+                window.opener.dismissRelatedLookupPopup(window, $(this).data('id'));
+            }
         });
 
         // advanced settings link handling
@@ -888,11 +899,22 @@ class PageTree {
                     parent = window.parent;
                 }
                 let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
-                let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                    ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
+                /* Build the form through the DOM API: the href and the token must never be
+                   interpolated into an HTML string, since jQuery hands back the *decoded*
+                   attribute value and a quote in it would break out of the attribute. */
+                let doc = parent.document;
+                let fakeForm = doc.createElement('form');
+                let tokenInput = doc.createElement('input');
 
-                $('<form method="post" action="' + element.attr('href') + '">' +
-                    csrfToken + '</form>')
+                fakeForm.setAttribute('method', 'post');
+                fakeForm.setAttribute('action', element.attr('href'));
+
+                tokenInput.setAttribute('type', 'hidden');
+                tokenInput.setAttribute('name', 'csrfmiddlewaretoken');
+                tokenInput.value = (formToken ? formToken.value : formToken) || window.CMS.config.csrf;
+                fakeForm.appendChild(tokenInput);
+
+                $(fakeForm)
                     .appendTo($(parent.document.body))
                     .submit();
                 return;

@@ -2,6 +2,7 @@ include AUTHORS
 include LICENSE
 include README.rst
 include CHANGELOG.txt
+include cms/management/commands/*.json
 recursive-include cms/locale *
 recursive-include cms/templates *
 recursive-include cms/static *

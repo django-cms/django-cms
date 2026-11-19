@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Optional
+from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
@@ -6,7 +7,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
-from cms.utils.urlutils import admin_reverse, relative_url_regex
+from cms.utils.urlutils import admin_reverse, path_segment_regex, relative_url_regex
 
 if TYPE_CHECKING:
     # Only needed for type hinting - avoid circular import
@@ -18,12 +19,58 @@ def validate_relative_url(value):
 
 
 def validate_url(value):
+    if "<" in value or ">" in value:
+        # ``relative_url_regex`` excludes angle brackets, but the absolute fallback below
+        # is Django's ``URLValidator``, whose path pattern accepts them as long as the
+        # value carries no space (``https://example.com/<script>alert(1)</script>``).
+        # Reject them before either branch runs, so markup cannot enter through a scheme.
+        raise ValidationError(
+            gettext("Enter a valid relative or absolute URL."),
+            code="invalid",
+        )
+
     try:
         # Validate relative urls first
         validate_relative_url(value)
     except ValidationError:
         # Fallback to absolute urls
         URLValidator()(value)
+    else:
+        # ``relative_url_regex`` only constrains the *characters* of a relative
+        # path, not the part before the first slash. Values such as
+        # ``javascript:alert(1)/x``, ``data:text/html,...`` or ``vbscript:.../x``
+        # therefore match the relative branch while still carrying a scheme that
+        # executes script when the value is later rendered into an ``href``
+        # (CWE-79). A genuine relative URL has no scheme, so reject any value
+        # that does. (Off-site targets such as ``https://example.com`` or
+        # ``//example.com`` are intentionally permitted -- this field allows
+        # absolute redirects -- and navigate rather than execute script.)
+        if urlsplit(value).scheme:
+            raise ValidationError(
+                gettext("Enter a valid relative or absolute URL."),
+                code="invalid",
+            )
+
+
+def validate_path_segment(value):
+    """Validate a single path segment, i.e. a path that contains no "/"."""
+    RegexValidator(
+        regex=path_segment_regex,
+        message=gettext("Enter a valid relative or absolute URL."),
+        code="invalid",
+    )(value)
+
+
+def validate_path(value):
+    """Validate a page path.
+
+    Unlike :func:`validate_url` this also accepts a single path segment such as ``contact``,
+    which ``relative_url_regex`` -- and therefore :func:`validate_url` -- never matches.
+    """
+    if "/" in value:
+        validate_url(value)
+    else:
+        validate_path_segment(value)
 
 
 def validate_url_uniqueness(
@@ -32,31 +79,15 @@ def validate_url_uniqueness(
     """Checks for conflicting urls"""
     from cms.models.pagemodel import PageUrl
 
-    if "/" in path:
-        validate_url(path)
+    # Single-segment paths used to skip validation entirely, so an "Overwrite URL" without a
+    # "/" could hold arbitrary characters.
+    validate_path(path)
 
     path = path.strip("/")
     page_urls = PageUrl.objects.get_for_site(site, language=language).filter(path=path)
 
     if exclude_page:
         page_urls = page_urls.exclude(page=exclude_page.pk)
-
-        # For parent-child relationships with same slug, check if this is valid
-        if exclude_page.parent_id is not None:
-            parent_path = (
-                PageUrl.objects.filter(page=exclude_page.parent_id, language=language)
-                .values_list("path", flat=True)
-                .first()
-                or ""
-            )
-
-            # Get the slug from the path
-            slug = path.split("/")[-1] if "/" in path else path
-            expected_path = f"{parent_path}/{slug}" if parent_path else slug
-
-            # If the path matches what we'd expect from the parent, it's valid
-            if path == expected_path:
-                return True
 
     try:
         conflict_page = page_urls[0].page

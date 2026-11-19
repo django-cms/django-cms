@@ -2,8 +2,10 @@ from copy import deepcopy
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, site
+from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext
 
 from cms.admin.forms import PageUserChangeForm, PageUserGroupForm
@@ -97,6 +99,27 @@ class PageUserAdmin(GenericCmsPermissionAdmin, admin_class):
             # their subordinates.
             fields = list(fields) + ['is_superuser']
         return fields
+
+    def has_change_permission(self, request, obj=None):
+        if obj is not None and obj.is_superuser and not request.user.is_superuser:
+            # Superusers are nobody's subordinate. get_queryset() already hides
+            # them, this guards the views that resolve an object by other means.
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None and obj.is_superuser and not request.user.is_superuser:
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def user_change_password(self, request, id, form_url=''):
+        # Django's password view only checks has_change_permission(), so a
+        # subordinate check has to happen before anything else.
+        user = self.get_object(request, unquote(id))
+
+        if user is not None and user.is_superuser and not request.user.is_superuser:
+            raise PermissionDenied
+        return super().user_change_password(request, id, form_url)
 
     def save_model(self, request, obj, form, change):
         if not change:

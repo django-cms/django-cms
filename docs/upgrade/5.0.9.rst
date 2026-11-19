@@ -1,0 +1,92 @@
+.. _upgrade-to-5.0.9:
+
+###################
+5.0.9 release notes
+###################
+
+*July 10, 2026*
+
+Welcome to django CMS 5.0.9!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you'll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We've begun the deprecation process for some
+features.
+
+*******************************
+Django and Python compatibility
+*******************************
+
+django CMS supports **Django 4.2, 5.0, 5.1, 5.2, and 6.0**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, 3.12, 3.13**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 5.0.9
+***********************
+
+Update your project’s ``requirements.txt`` file to require (at least) django CMS 5.0.9 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+*******************
+What's new in 5.0.9
+*******************
+
+Features:
+---------
+* Accessibility update for wizards (#8674) (#8679) (c91db51ce) -- Fabian Braun
+* Support django 6.1+ breadcrumb styles (#8689) (#8714) (ffd05c4f8) -- Fabian Braun
+
+Security Fixes
+--------------
+
+This release fixes three medium-severity security issues. We recommend that all
+users upgrade to django CMS 5.0.9 as soon as possible.
+
+* `GHSA-hvq6-2r72-p2x7 <https://github.com/django-cms/django-cms/security/advisories/GHSA-hvq6-2r72-p2x7>`_:
+  Stored cross-site scripting was possible in edit-mode plugin exception
+  rendering when stored content was included in an exception heading.
+* `GHSA-6x92-6vx4-5fwr <https://github.com/django-cms/django-cms/security/advisories/GHSA-6x92-6vx4-5fwr>`_:
+  Insufficient access control in the page duplication flow allowed a limited
+  staff user to copy and read the content of restricted or cross-site pages.
+* `GHSA-8qj2-c6q4-f399 <https://github.com/django-cms/django-cms/security/advisories/GHSA-8qj2-c6q4-f399>`_:
+  Missing object-level authorization in ``render_object_structure`` allowed a
+  low-privileged staff user to inspect the placeholder structure of
+  non-``PageContent`` objects they were not authorized to edit.
+
+Bug Fixes:
+----------
+* Corrupted plugin positions are now automatically healed (#8667) (#8670) (5a71802c9) -- Fabian Braun
+* Harden page duplication, group permissions and URL validator (#8704) (#8713) (3e1ccf757) -- Fabian Braun
+* Language selector triggered wrong toolbar (#8687) (#8693) (2b5de9f19) -- Fabian Braun
+* Missing authorization in ``render_object_structure`` disclosed non-PageContent placeholder structure (#8692) (#8703) (9c82abfeb) -- Fabian Braun
+* Page title leaked unescaped into rendering error message, clipboard could be cleared by get request (#8699) (#8711) (b56a56884) -- Fabian Braun
+* Replace left-over inline JS/CSS that might be blocked by CSP (#8690) (#8715) (3edf89a0a) -- Fabian Braun
+* Subpage wizard failed (#8698) (#8710) (27b1f6313) -- Fabian Braun
+* get_child_classes was always cached (#8677) (#8680) (330d4a36d) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 14 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (10 pull requests)
+
+With the review help of the following contributors:
+
+* Github Release Action
+* Vinit Kumar
+* sourcery-ai[bot]
+
+Thanks to all contributors for their efforts!

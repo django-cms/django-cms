@@ -4,7 +4,7 @@ from django.template import Context
 from django.test.utils import override_settings
 
 from cms.api import add_plugin, create_page
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin, Placeholder
 from cms.plugin_rendering import (
     ContentRenderer,
     LegacyRenderer,
@@ -222,6 +222,27 @@ class TestExceptionCatchers(CMSTestCase):
         self.assertIn('<div class="cms-rendering-exception">', markup)
         self.assertIn("ZeroDivisionError", markup)
         self.assertIn("division by zero", markup)
+
+    def test_exception_in_plugin_render_escapes_user_content_in_edit_mode(self):
+        # The exception heading interpolates user-controlled data such as the
+        # object title (``str(placeholder.source)``). It must be HTML-escaped
+        # before being returned as safe markup, otherwise a stored payload
+        # would execute in a staff user's browser in edit mode.
+        payload = '<img src=x onerror=alert(1)>'
+        page_content = self.cms_page.get_admin_content('en')
+        page_content.title = payload
+        page_content.save()
+        # Re-fetch the placeholder so its (generic) ``source`` is reloaded with
+        # the updated title rather than the value cached during ``setUp``.
+        placeholder = Placeholder.objects.get(pk=self.placeholder_1.pk)
+
+        plugin_context = Context()
+        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            markup = self.renderer.render_placeholder(placeholder, plugin_context, "en", editable=True)
+
+        self.assertIn('<div class="cms-rendering-exception">', markup)
+        self.assertNotIn(payload, markup)
+        self.assertIn('&lt;img src=x onerror=alert(1)&gt;', markup)
 
     def test_exception_in_plugin_render_is_silent_in_preview_mode(self):
         plugin_context = Context()

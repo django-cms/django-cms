@@ -1,13 +1,17 @@
 import copy
+from unittest.mock import MagicMock, patch
 
 from django.conf import settings
 from django.contrib.admin import site
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
+from django.db import connection
 from django.templatetags.static import static
+from django.test.utils import CaptureQueriesContext
 from django.utils.crypto import get_random_string
 from django.utils.translation import get_language, override as force_language
 
-from cms.admin.utils import CONTENT_PREFIX
+from cms.admin.utils import CONTENT_PREFIX, GrouperModelAdmin
 from cms.test_utils.project.sampleapp.models import (
     GrouperModel,
     GrouperModelContent,
@@ -149,6 +153,121 @@ class ChangeListActionsTestCase(SetupMixin, SimpleChangeListActionsTestCase):
 
 
 class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
+    def get_list_editable_post_data(self, response, **values):
+        formset = response.context["cl"].formset
+        data = {
+            "form-TOTAL_FORMS": formset.total_form_count(),
+            "form-INITIAL_FORMS": formset.initial_form_count(),
+            "form-MIN_NUM_FORMS": formset.min_num,
+            "form-MAX_NUM_FORMS": formset.max_num,
+            "_save": "Save",
+        }
+        for index, form in enumerate(formset.forms):
+            data[f"form-{index}-id"] = form.instance.pk
+            for field_name in self.admin.list_editable:
+                data[f"form-{index}-{field_name}"] = values.get(field_name, form[field_name].value())
+            data[f"form-{index}-_content_object_id"] = form["_content_object_id"].value() or ""
+        return data
+
+    def test_list_editable_saves_grouper_field(self):
+        with (
+            patch.object(self.admin, "list_display", ("category_name",)),
+            patch.object(self.admin, "list_display_links", None),
+            patch.object(self.admin, "list_editable", ("category_name",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=en")
+            data = self.get_list_editable_post_data(response, category_name="Changed grouper")
+            response = self.client.post(f"{self.changelist_url}?language=en", data)
+
+        self.assertEqual(response.status_code, 302)
+        self.grouper_instance.refresh_from_db()
+        self.assertEqual(self.grouper_instance.category_name, "Changed grouper")
+
+    def test_list_editable_saves_content_field_for_current_grouping(self):
+        english_content = self.createContentInstance("en")
+        german_content = self.createContentInstance("de")
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_editable", ("content__secret_greeting",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=de")
+            self.assertContains(response, 'name="form-0-_content_object_id"')
+            data = self.get_list_editable_post_data(response, content__secret_greeting="Guten Tag")
+            response = self.client.post(f"{self.changelist_url}?language=de", data)
+
+        self.assertEqual(response.status_code, 302)
+        english_content.refresh_from_db()
+        german_content.refresh_from_db()
+        self.assertNotEqual(english_content.secret_greeting, "Guten Tag")
+        self.assertEqual(german_content.secret_greeting, "Guten Tag")
+
+    def test_list_editable_saves_grouper_and_content_fields(self):
+        content = self.createContentInstance("en")
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_display_links", None),
+            patch.object(self.admin, "list_editable", ("category_name", "content__secret_greeting")),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=en")
+            data = self.get_list_editable_post_data(
+                response,
+                category_name="Changed grouper",
+                content__secret_greeting="Changed content",
+            )
+            response = self.client.post(f"{self.changelist_url}?language=en", data)
+
+        self.assertEqual(response.status_code, 302)
+        self.grouper_instance.refresh_from_db()
+        content.refresh_from_db()
+        self.assertEqual(self.grouper_instance.category_name, "Changed grouper")
+        self.assertEqual(content.secret_greeting, "Changed content")
+
+    def test_list_editable_creates_content_for_current_grouping(self):
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_editable", ("content__secret_greeting",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=de")
+            data = self.get_list_editable_post_data(response, content__secret_greeting="Guten Tag")
+            response = self.client.post(f"{self.changelist_url}?language=de", data)
+
+        self.assertEqual(response.status_code, 302)
+        content = GrouperModelContent.objects.get(grouper_model=self.grouper_instance)
+        self.assertEqual(content.language, "de")
+        self.assertEqual(content.secret_greeting, "Guten Tag")
+
+    def test_list_editable_rejects_content_from_another_grouper(self):
+        self.createContentInstance("en")
+        other_grouper = GrouperModel.objects.create(category_name="Other")
+        other_content = GrouperModelContent.objects.create(
+            grouper_model=other_grouper,
+            language="en",
+            secret_greeting="Other greeting",
+        )
+        with (
+            patch.object(self.admin, "list_display", ("category_name", "content__secret_greeting")),
+            patch.object(self.admin, "list_editable", ("content__secret_greeting",)),
+            self.login_user_context(self.admin_user),
+        ):
+            response = self.client.get(f"{self.changelist_url}?language=en")
+            data = self.get_list_editable_post_data(response, content__secret_greeting="Tampered")
+            form_index = next(
+                index
+                for index, form in enumerate(response.context["cl"].formset.forms)
+                if form.instance.pk == self.grouper_instance.pk
+            )
+            data[f"form-{form_index}-_content_object_id"] = other_content.pk
+            response = self.client.post(f"{self.changelist_url}?language=en", data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The selected content does not match this object and grouping.")
+        other_content.refresh_from_db()
+        self.assertEqual(other_content.secret_greeting, "Other greeting")
+
     def test_form_class_created(self):
         """The form class has automatically been enhanced with the GrouperAdminFormMixin for
         the appropriate content model (actually its parent class _GrouperAdminFormMixin)"""
@@ -158,6 +277,22 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         # Assert
         self.assertTrue(issubclass(self.admin.form, _GrouperAdminFormMixin))
         self.assertEqual(self.admin.form._content_model, GrouperModelContent)
+
+    def test_content_field_is_valid_in_list_editable(self):
+        admin = copy.copy(self.admin)
+        admin.list_display = ("category_name", "content__secret_greeting")
+        admin.list_editable = ("content__secret_greeting",)
+
+        self.assertEqual(admin.check(), [])
+
+    def test_grouping_field_is_invalid_in_list_editable(self):
+        admin = copy.copy(self.admin)
+        admin.list_display = ("category_name", "content__language")
+        admin.list_editable = ("content__language",)
+
+        errors = admin.check()
+
+        self.assertIn("admin.E125", [error.id for error in errors])
 
     def test_form_class_content_fields(self):
         """The content fields appear in the admin form with a prefix"""
@@ -236,15 +371,68 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
             "content__secret_greeting": ["category_name"],
             "category_name": ["content__secret_greeting"],
         }
-        admin._prepopulated_fields = admin.prepopulated_fields
 
         # Act
         readonly_fields = admin.get_readonly_fields(None)
+        prepopulated = admin.get_prepopulated_fields(None)
 
         # Assert
         self.assertIn("content__secret_greeting", readonly_fields)
-        self.assertNotIn("content__secret_greeting", admin.prepopulated_fields)
-        self.assertIn("category_name", admin.prepopulated_fields)
+        self.assertNotIn("content__secret_greeting", prepopulated)
+        self.assertIn("category_name", prepopulated)
+        # The class attribute is not mutated by get_readonly_fields/get_prepopulated_fields.
+        self.assertIn("content__secret_greeting", admin.prepopulated_fields)
+
+    def test_prepopulated_fields_respects_class_attribute_after_init(self):
+        """``cls.prepopulated_fields`` set after the admin is instantiated is honored."""
+        # Arrange
+        admin = copy.copy(self.admin)
+        admin.prepopulated_fields = {"category_name": ["content__secret_greeting"]}
+
+        # Act
+        prepopulated = admin.get_prepopulated_fields(None)
+
+        # Assert: no shadow instance attribute hides the class-level value.
+        self.assertEqual(prepopulated, {"category_name": ["content__secret_greeting"]})
+
+    def test_changelist_view_does_not_call_get_content_obj(self):
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            with patch.object(self.admin, "get_content_obj", wraps=self.admin.get_content_obj) as mocked_get_content_obj:
+                response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_get_content_obj.call_count, 0)
+
+    def test_change_view_calls_get_content_obj(self):
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            with patch.object(self.admin, "get_content_obj", wraps=self.admin.get_content_obj) as mocked_get_content_obj:
+                response = self.client.get(f"{self.change_url}?language=en", follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(mocked_get_content_obj.call_count, 0)
+        self.assertTrue(any(call.args and call.args[0] == self.grouper_instance for call in mocked_get_content_obj.call_args_list))
+
+    def test_get_content_obj_caches_on_grouper_object(self):
+        content_instance = self.createContentInstance("en")
+        self.admin.language = "en"
+        self.admin.clear_content_cache()
+
+        self.assertFalse(hasattr(self.grouper_instance, "_grouper_admin_content_obj_cache"))
+
+        with self.assertNumQueries(1):
+            cached_content = self.admin.get_content_obj(self.grouper_instance)
+
+        self.assertEqual(cached_content, content_instance)
+        self.assertTrue(hasattr(self.grouper_instance, "_grouper_admin_content_obj_cache"))
+
+        with self.assertNumQueries(0):
+            cached_again = self.admin.get_content_obj(self.grouper_instance)
+
+        self.assertIs(cached_again, cached_content)
 
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
@@ -296,6 +484,72 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
                 # Assert
                 self.assertContains(response, "Grouper Category")
                 self.assertContains(response, random_content[language])
+
+    def test_get_content_obj_uses_prefetch_cache(self) -> None:
+        """Iterating the admin queryset and calling ``get_content_obj`` on each grouper must
+        not issue per-row queries — the prefetch registered in ``get_queryset`` is expected
+        to populate ``_admin_prefetch_cache``, so the total query count stays constant."""
+        # Arrange: baseline + many grouper/content pairs.
+        self.createContentInstance("en")
+        for i in range(10):
+            extra = GrouperModel.objects.create(category_name=f"Grouper {i}")
+            GrouperModelContent.objects.create(
+                grouper_model=extra, language="en", secret_greeting=f"Greeting {i}"
+            )
+
+        request = self.get_request()
+        request.user = self.admin_user
+        self.admin.language = "en"
+
+        # Act: mimic what the changelist does — materialize the queryset, then look up
+        # each grouper's content object.
+        with CaptureQueriesContext(connection) as ctx:
+            groupers = list(self.admin.get_queryset(request))
+            for grouper in groupers:
+                self.assertIsNotNone(self.admin.get_content_obj(grouper))
+
+        # Assert: one query for groupers + one for the prefetch = 2.
+        # Without the prefetch we'd see 1 + N queries (12 here).
+        self.assertLessEqual(
+            len(ctx),
+            3,
+            f"Expected ≤ 3 queries for 11 groupers thanks to prefetch_related, got {len(ctx)}. "
+            f"Looks like ``get_content_obj`` is not using the prefetch cache.",
+        )
+
+    def test_changelist_view_has_no_n_plus_1(self) -> None:
+        """End-to-end regression guard: the query count of the changelist HTTP view must
+        not grow with the number of grouper instances. Protects against future n+1s
+        introduced by list_display getters, action buttons, or related hooks."""
+        # Arrange: baseline with a single grouper (from setUp) + one content object.
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            # Warm up the client/session so login-related queries don't pollute counts.
+            self.client.get(self.changelist_url + "?language=en")
+
+            with CaptureQueriesContext(connection) as baseline:
+                response = self.client.get(self.changelist_url + "?language=en")
+            self.assertEqual(response.status_code, 200)
+
+            # Act: add many more grouper/content pairs.
+            for i in range(10):
+                extra = GrouperModel.objects.create(category_name=f"Grouper {i}")
+                GrouperModelContent.objects.create(
+                    grouper_model=extra, language="en", secret_greeting=f"Greeting {i}"
+                )
+
+            with CaptureQueriesContext(connection) as scaled:
+                response = self.client.get(self.changelist_url + "?language=en")
+            self.assertEqual(response.status_code, 200)
+
+        # Assert: query count is invariant to number of rows.
+        self.assertEqual(
+            len(baseline),
+            len(scaled),
+            f"Changelist issued {len(baseline)} queries for 1 grouper but {len(scaled)} for 11. "
+            f"This suggests an n+1 has been introduced.",
+        )
 
 
 class SimpleGrouperChangeListTestCase(SimpleSetupMixin, CMSTestCase):
@@ -391,6 +645,124 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             # Assert
             self.assertContains(response, 'name="content__language" value="de"')
             self.assertNotContains(response, 'name="content__language" value="en"')
+
+    def test_is_latest_content_obj(self) -> None:
+        """The latest content object is recognized as such, a stale one is not, and the
+        add view (no content object) counts as latest."""
+        content = self.createContentInstance("en")
+        self.admin.language = "en"
+        try:
+            # The actual content object is the latest
+            self.assertTrue(self.admin.is_latest_content_obj(content, self.grouper_instance))
+            # A stale content object (different pk) is not the latest
+            stale = copy.copy(content)
+            stale.pk = content.pk + 1000
+            self.assertFalse(self.admin.is_latest_content_obj(stale, self.grouper_instance))
+            # The add view (no content object) always counts as latest
+            self.assertTrue(self.admin.is_latest_content_obj(None))
+        finally:
+            del self.admin.language
+
+    def test_language_selector_shown_for_latest_content(self) -> None:
+        """The change form offers the language selector when the latest content is shown."""
+        self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.change_url + "?language=en")
+            self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_language_selector_hidden_for_non_latest_content(self) -> None:
+        """The change form drops the language selector when an older (non-latest) content
+        object is shown. Switching languages back and forth would otherwise silently bring
+        up the latest content instead - confusing UX."""
+        content = self.createContentInstance("en")
+        # Simulate a versioning package that shows an older (non-latest) content object
+        stale = copy.copy(content)
+        stale.pk = content.pk + 1000
+        with patch.object(type(self.admin), "get_content_obj", return_value=stale):
+            with self.login_user_context(self.admin_user):
+                response = self.client.get(self.change_url + "?language=en")
+                self.assertNotContains(response, 'id="page_form_lang_tabs"')
+
+    def test_get_urls_declares_content_change_when_unregistered(self) -> None:
+        """The grouper admin provides a change URL for the (unregistered) content model."""
+        names = [url.name for url in self.admin.get_urls()]
+        self.assertIn("sampleapp_groupermodelcontent_change", names)
+
+    def test_get_urls_skips_content_change_when_registered(self) -> None:
+        """The declaration is dropped when the content model has its own admin."""
+        site.register(GrouperModelContent)
+        try:
+            names = [url.name for url in self.admin.get_urls()]
+            self.assertNotIn("sampleapp_groupermodelcontent_change", names)
+        finally:
+            site.unregister(GrouperModelContent)
+
+    def test_content_change_url_redirects_to_grouper(self) -> None:
+        """A content object's change URL redirects to the grouper change view, selecting that
+        specific content object and its grouping fields."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        content_change_url = admin_reverse("sampleapp_groupermodelcontent_change", args=(content.pk,))
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(content_change_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith(self.change_url))
+        self.assertIn(f"{param}={content.pk}", response.url)
+        self.assertIn("language=en", response.url)
+
+    def test_content_change_redirect_rejects_post(self) -> None:
+        """The redirect view is GET-only: a POST is rejected (405) rather than silently turned
+        into a GET that discards its payload."""
+        content = self.createContentInstance("en")
+        content_change_url = admin_reverse("sampleapp_groupermodelcontent_change", args=(content.pk,))
+        with self.login_user_context(self.admin_user):
+            response = self.client.post(content_change_url, data={"category_name": "changed"})
+        self.assertEqual(response.status_code, 405)
+
+    def test_specific_content_obj_shown_and_selector_dropped(self) -> None:
+        """Requesting a specific (non-latest) content object by pk shows exactly that object and
+        drops the language selector."""
+        param = self.admin.content_pk_url_param
+        latest = self.createContentInstance("en")  # lower pk: picked as latest by .first()
+        other = self.createContentInstance("en")  # higher pk: a different content object
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.change_url}?{param}={other.pk}")
+        # The requested (non-latest) content object is shown ...
+        self.assertContains(response, other.secret_greeting)
+        self.assertNotContains(response, latest.secret_greeting)
+        # ... and the language selector is dropped because it is not the latest content
+        self.assertNotContains(response, 'id="page_form_lang_tabs"')
+
+    def test_specific_latest_content_obj_keeps_selector(self) -> None:
+        """Requesting the latest content object by pk shows it and keeps the language selector."""
+        param = self.admin.content_pk_url_param
+        latest = self.createContentInstance("en")  # lower pk: picked as latest by .first()
+        self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.change_url}?{param}={latest.pk}")
+        self.assertContains(response, latest.secret_greeting)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_invalid_content_pk_falls_back_to_latest(self) -> None:
+        """An invalid content pk is ignored and the latest content is shown."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.change_url}?language=en&{param}=not-a-pk")
+        self.assertContains(response, content.secret_greeting)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
+
+    def test_nonexistent_content_pk_falls_back_to_latest(self) -> None:
+        """A syntactically valid but nonexistent content pk falls back to the latest content."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        nonexistent_pk = content.pk + 1
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(
+                f"{self.change_url}?language=en&{param}={nonexistent_pk}"
+            )
+        self.assertContains(response, content.secret_greeting)
+        self.assertContains(response, 'id="page_form_lang_tabs"')
 
     @wo_content_permission
     def test_change_form_wo_write_permit(self) -> None:
@@ -515,6 +887,275 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         self.assertEqual(content_instance_en.secret_greeting, random_content.secret_greeting)  # unchanged
         self.assertIsNotNone(content_instance_de)  # Exists?
         self.assertEqual(content_instance_de.secret_greeting, data["content__secret_greeting"])  # Has new content
+
+
+class SimpleGrouperContentSelectionTestCase(SimpleSetupMixin, CMSTestCase):
+    """The content object selected by :attr:`GrouperModelAdmin.content_pk_url_param` has to survive
+    the change form's submission: the form is posted to the url built from the preserved filters,
+    and "save and continue editing" returns to it."""
+
+    def get_change_form(self, content_obj, **values) -> tuple[str, dict]:
+        """Open the change form for a specific content object and return the url it is submitted
+        to together with the data of a full submission (mimicking the rendered form)."""
+        param = self.admin.content_pk_url_param
+        response = self.client.get(f"{self.change_url}?{param}={content_obj.pk}")
+        self.assertEqual(response.status_code, 200)
+        form = response.context["adminform"].form
+        data = {}
+        for name, field in form.fields.items():
+            value = form.initial.get(name, field.initial)
+            value = getattr(value, "pk", value)
+            if field.required and value in (None, ""):
+                value = "some content"
+            data[name] = "" if value is None else value
+        data[f"{CONTENT_PREFIX}secret_greeting"] = "Changed content"
+        data.update(values)
+        return self.change_url + response.context["form_url"], data
+
+    def test_change_form_saves_requested_content_obj(self) -> None:
+        """Saving writes to the content object shown, not to the latest one."""
+        param = self.admin.content_pk_url_param
+        latest = self.createContentInstance("en")  # lower pk: picked as latest by .first()
+        other = self.createContentInstance("en")  # higher pk: a different content object
+        with self.login_user_context(self.admin_user):
+            post_url, data = self.get_change_form(other)
+            self.assertIn(f"{param}={other.pk}", post_url)
+            response = self.client.post(post_url, data=data)
+        self.assertEqual(response.status_code, 302)
+        other.refresh_from_db()
+        latest.refresh_from_db()
+        self.assertEqual(other.secret_greeting, "Changed content")
+        self.assertNotEqual(latest.secret_greeting, "Changed content")
+
+    def test_save_and_continue_keeps_requested_content_obj(self) -> None:
+        """Saving and continuing to edit returns to the very content object that was edited."""
+        param = self.admin.content_pk_url_param
+        self.createContentInstance("en")
+        other = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            post_url, data = self.get_change_form(other)
+            response = self.client.post(post_url, data={**data, "_continue": "1"})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(f"{param}={other.pk}", response.url)
+
+    def test_save_returns_to_changelist_without_content_selection(self) -> None:
+        """Plain saving returns to the changelist, which always lists the latest content."""
+        param = self.admin.content_pk_url_param
+        self.createContentInstance("en")
+        other = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            post_url, data = self.get_change_form(other)
+            response = self.client.post(post_url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn(param, response.url)
+
+    def test_changelist_ignores_content_selection(self) -> None:
+        """The content selection is no filter: the changelist ignores it instead of rejecting it
+        as an unknown lookup."""
+        param = self.admin.content_pk_url_param
+        content = self.createContentInstance("en")
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(f"{self.changelist_url}?{param}={content.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, content.secret_greeting)
+
+
+class GrouperContentSelectionTestCase(SetupMixin, SimpleGrouperContentSelectionTestCase):
+    """Same, for a grouper admin that groups by language."""
+
+
+class GrouperCanChangeContentTestCase(SetupMixin, CMSTestCase):
+    """Tests for ``GrouperModelAdmin.can_change_content`` in both the add and change case.
+
+    The sampleapp's ``GrouperAdmin`` overrides ``can_change_content``, so we call the base
+    implementation directly. ``request.user`` is a ``MagicMock`` because Django's default
+    auth backend returns no object-level permissions for non-superusers, which would make
+    the change case impossible to exercise otherwise."""
+
+    def _can_change_content(self, request, content_obj):
+        return GrouperModelAdmin.can_change_content(self.admin, request, content_obj)
+
+    def _request(self, has_perm_return=True):
+        request = self.get_request()
+        request.user = MagicMock()
+        request.user.has_perm.return_value = has_perm_return
+        return request
+
+    def test_add_case_checks_add_permission(self):
+        """Without a content object, the content model's add permission is checked."""
+        request = self._request(has_perm_return=True)
+
+        self.assertTrue(self._can_change_content(request, None))
+
+        opts = GrouperModelContent._meta
+        expected_perm = f"{opts.app_label}.{get_permission_codename('add', opts)}"
+        request.user.has_perm.assert_called_once_with(expected_perm, None)
+
+    def test_add_case_denied_without_permission(self):
+        """Without the add permission, the add case returns False."""
+        request = self._request(has_perm_return=False)
+
+        self.assertFalse(self._can_change_content(request, None))
+
+    def test_change_case_checks_change_permission(self):
+        """With a content object, the change permission is checked, passing the object for
+        object-level backends."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=True)
+
+        self.assertTrue(self._can_change_content(request, content_obj))
+
+        opts = GrouperModelContent._meta
+        expected_perm = f"{opts.app_label}.{get_permission_codename('change', opts)}"
+        request.user.has_perm.assert_called_once_with(expected_perm, content_obj)
+
+    def test_change_case_denied_without_permission(self):
+        """Without the change permission, the change case returns False."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=False)
+
+        self.assertFalse(self._can_change_content(request, content_obj))
+
+    def test_change_case_respects_is_editable(self):
+        """When the content object exposes ``is_editable`` returning False, the user cannot
+        change it even with the permission."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: False
+        request = self._request(has_perm_return=True)
+
+        self.assertFalse(self._can_change_content(request, content_obj))
+
+    def test_superuser_can_change_content_in_both_cases(self):
+        """Superusers pass the permission check for both add and change cases."""
+        request = self.get_request()
+        request.user = self.admin_user
+
+        self.assertTrue(self._can_change_content(request, None))
+
+        content_obj = self.createContentInstance("en")
+        self.assertTrue(self._can_change_content(request, content_obj))
+
+
+class ReasonedBool(int):
+    """Test stand-in for a "rich bool" as returned by e.g. djangocms-versioning's
+    ``as_bool``: truthy/falsy via the int value, with the reason exposed by ``str()``."""
+
+    def __new__(cls, value, reason=""):
+        obj = super().__new__(cls, bool(value))
+        obj.reason = reason
+        return obj
+
+    def __str__(self):
+        return self.reason
+
+
+class GrouperReadonlyMessageTestCase(SetupMixin, CMSTestCase):
+    """Tests for ``GrouperModelAdmin.get_content_readonly_message``: the permission
+    case plus both plain-bool and rich-bool returns from ``is_editable``."""
+
+    def _message(self, request, content_obj):
+        return GrouperModelAdmin.get_content_readonly_message(self.admin, request, content_obj)
+
+    def _request(self, has_perm_return=True):
+        request = self.get_request()
+        request.user = MagicMock()
+        request.user.has_perm.return_value = has_perm_return
+        return request
+
+    def test_missing_permission_returns_permission_message(self):
+        """Without the change permission, the permission message is returned, regardless
+        of editability."""
+        content_obj = self.createContentInstance("en")
+        request = self._request(has_perm_return=False)
+
+        self.assertEqual(
+            self._message(request, content_obj),
+            "You do not have permission to change this content.",
+        )
+
+    def test_editable_content_returns_none(self):
+        """Editable content (with permission) has no read-only message."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: True
+        request = self._request(has_perm_return=True)
+
+        self.assertIsNone(self._message(request, content_obj))
+
+    def test_plain_false_returns_generic_message(self):
+        """A plain ``False`` from ``is_editable`` carries no reason, so the generic
+        message is used."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: False
+        request = self._request(has_perm_return=True)
+
+        self.assertEqual(self._message(request, content_obj), " ")
+
+    def test_rich_bool_returns_its_reason(self):
+        """A falsy rich bool surfaces its own reason via ``str()``."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: ReasonedBool(False, "Version is not a draft")
+        request = self._request(has_perm_return=True)
+
+        self.assertEqual(self._message(request, content_obj), "Version is not a draft")
+
+    def test_truthy_rich_bool_returns_none(self):
+        """A truthy rich bool means editable, so no message even though it has a str()."""
+        content_obj = self.createContentInstance("en")
+        content_obj.is_editable = lambda *_: ReasonedBool(True)
+        request = self._request(has_perm_return=True)
+
+        self.assertIsNone(self._message(request, content_obj))
+
+
+class GrouperReadonlyContextMixin:
+    """The change form has to be told whether the content object is read-only.
+
+    ``can_change_content_obj`` used to be added to the context only when ``language``
+    was among the extra grouping fields, so grouper admins without grouping fields
+    always rendered the read-only note -- even for perfectly editable content."""
+
+    readonly_note = "Some fields cannot be changed since they are read-only content."
+
+    def test_editable_content_sets_can_change_content_obj(self):
+        """Editable content: the flag is set and the read-only note is not rendered."""
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.change_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["can_change_content_obj"])
+        self.assertIsNone(response.context["content_readonly_message"])
+        self.assertNotContains(response, self.readonly_note)
+
+    @wo_content_permission
+    def test_readonly_content_clears_can_change_content_obj(self):
+        """Read-only content: the flag is cleared and the note is rendered."""
+        self.createContentInstance("en")
+
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.change_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["can_change_content_obj"])
+        self.assertContains(response, self.readonly_note)
+
+    def test_add_view_sets_can_change_content_obj(self):
+        """The add view has no content object yet, so content is never read-only there."""
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.add_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["can_change_content_obj"])
+        self.assertNotContains(response, self.readonly_note)
+
+
+class SimpleGrouperReadonlyContextTestCase(GrouperReadonlyContextMixin, SimpleSetupMixin, CMSTestCase):
+    """Grouper admin without extra grouping fields."""
+
+
+class GrouperReadonlyContextTestCase(GrouperReadonlyContextMixin, SetupMixin, CMSTestCase):
+    """Grouper admin with ``language`` as an extra grouping field."""
 
 
 class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):

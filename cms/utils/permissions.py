@@ -9,10 +9,32 @@ from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import GlobalPagePermission, PagePermission
+from cms.models import GlobalPagePermission, PagePermission, PermissionTupleList
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
+
+
+class _CurrentUserRef:
+    """Identity-comparable holder for the value of :data:`_current_user`.
+
+    ``request.user`` is a ``SimpleLazyObject``, and asgiref compares context
+    variables when it restores a context after handing control back to the
+    event loop (``asgiref.sync._restore_context``). Comparing a lazy user
+    evaluates it, which runs the auth backend's database query on the event
+    loop thread and raises ``SynchronousOnlyOperation`` -- in some asgiref
+    versions before the result future is completed, hanging the request.
+
+    Storing the user behind this wrapper keeps the context variable cheap to
+    compare (default identity equality) so the user is only evaluated where
+    django CMS actually reads it, in synchronous code.
+    """
+
+    __slots__ = ('user',)
+
+    def __init__(self, user):
+        self.user = user
+
 
 # context variable support for async-safe user tracking
 _current_user: ContextVar = ContextVar('current_user', default=None)
@@ -22,15 +44,27 @@ def set_current_user(user):
     """
     Assigns current user from request to context variable, used by
     CurrentUserMiddleware.
+
+    Returns the ``contextvars.Token`` for the change, so callers can restore
+    the previous value with :func:`reset_current_user`.
     """
-    _current_user.set(user)
+    return _current_user.set(_CurrentUserRef(user) if user is not None else None)
+
+
+def reset_current_user(token):
+    """
+    Restores the current user context variable to the value it held before the
+    ``set_current_user`` call that produced ``token``.
+    """
+    _current_user.reset(token)
 
 
 def get_current_user():
     """
     Returns current user, or None
     """
-    return _current_user.get()
+    ref = _current_user.get()
+    return ref.user if ref is not None else None
 
 
 def get_current_user_name():
@@ -57,6 +91,28 @@ def get_model_permission_codename(model, action):
     return opts.app_label + '.' + get_permission_codename(action, opts)
 
 
+def user_can_view_placeholder_source(user, source):
+    """Whether ``user`` may view the placeholders attached to ``source``.
+
+    Viewing the (read-only) structure board of a frontend-editable object
+    requires only *view* permission; mutating its plugins stays gated by
+    change permission at the plugin endpoints. This lets headless reviewers
+    inspect content structure without edit rights.
+
+    Honours a custom ``has_placeholder_view_permission`` hook on the object
+    and otherwise grants access to users holding the model/object ``view`` or
+    ``change`` permission (change implies the right to view).
+    """
+    if hasattr(source, "has_placeholder_view_permission"):
+        return source.has_placeholder_view_permission(user)
+    model = type(source)
+    perms = (
+        get_model_permission_codename(model, "view"),
+        get_model_permission_codename(model, "change"),
+    )
+    return any(user.has_perm(perm) or user.has_perm(perm, source) for perm in perms)
+
+
 def _has_global_permission(user, site, action):
     if not user.is_authenticated:
         return False
@@ -79,6 +135,175 @@ def _has_global_permission(user, site, action):
         .exists()
     )
     return has_perm
+
+
+def _global_permission_flags(queryset):
+    """OR together the ``can_*`` flags of every row in ``queryset``."""
+    flags = GlobalPagePermission.get_all_permissions()
+    granted = set()
+
+    for row in queryset.values(*flags):
+        granted.update(flag for flag in flags if row[flag])
+    return granted
+
+
+def _managed_global_permission_flags(queryset):
+    """Like :func:`_global_permission_flags`, but empty without ``can_change_permissions``.
+
+    Holding a flag on a site is not enough to hand it out there: the user must
+    also be allowed to manage permissions on that site.
+    """
+    granted = _global_permission_flags(queryset)
+    return granted if "can_change_permissions" in granted else set()
+
+
+def get_grantable_global_permissions(user, site_ids=None):
+    """Return the ``can_*`` flags ``user`` may hand out through a global permission.
+
+    A delegated permission manager must never grant a right they do not hold
+    themselves (see ``docs/explanation/permissions.rst``), so what is grantable
+    depends on the sites the grant would cover:
+
+    * ``site_ids=None`` -- the union of the flags the user holds on any site.
+      The widest set they could ever grant, used to decide which fields to
+      offer at all.
+    * ``site_ids=[]`` -- an empty ``GlobalPagePermission.sites`` means "every
+      site", so granting requires an equally unrestricted grant of the flag.
+    * a non-empty list -- the flags held on *every* one of those sites. A flag
+      held on one site alone cannot be used to grant it on another.
+
+    For ``[]`` and a list of sites, nothing is grantable on a site where the user
+    lacks ``can_change_permissions``, so ``"can_change_permissions" in result``
+    tells whether the user may manage permissions on all of those sites.
+
+    In every case a flag is only grantable if the user also holds the Django
+    model permissions that page actions require alongside it.
+    """
+    all_flags = set(GlobalPagePermission.get_all_permissions())
+
+    if not user or not user.is_authenticated:
+        return set()
+
+    if user.is_superuser or not get_cms_setting('PERMISSION'):
+        return all_flags
+
+    if site_ids is None:
+        held = _global_permission_flags(GlobalPagePermission.objects.with_user(user))
+    elif not site_ids:
+        held = _managed_global_permission_flags(
+            GlobalPagePermission.objects.with_user(user).filter(sites__isnull=True)
+        )
+    else:
+        held = all_flags
+        for site_id in site_ids:
+            held &= _managed_global_permission_flags(
+                GlobalPagePermission.objects.get_with_site(user, site_id)
+            )
+            if not held:
+                break
+    return held & _flags_with_django_permissions(user)
+
+
+# ``can_view`` has no Django permission counterpart: viewing restricted pages
+# is governed by CMS permissions alone.
+_global_permission_actions = {
+    "can_add": "add_page",
+    "can_change": "change_page",
+    "can_delete": "delete_page",
+    "can_publish": "publish_page",
+    "can_change_advanced_settings": "change_page_advanced_settings",
+    "can_change_permissions": "change_page_permissions",
+    "can_move_page": "move_page",
+}
+
+
+def _flags_with_django_permissions(user):
+    """Return the ``can_*`` flags whose Django model permissions ``user`` holds.
+
+    A CMS flag alone does not let a user act: the page permission checks also
+    require the corresponding Django permissions (``auth_permission_required``).
+    A manager holding the flag but not the Django permission does not have the
+    right, so they must not be able to hand it out either.
+    """
+    from cms.utils.page_permissions import _django_permissions_by_action
+
+    return {
+        flag for flag in GlobalPagePermission.get_all_permissions()
+        if flag not in _global_permission_actions
+        or user.has_perms(_django_permissions_by_action[_global_permission_actions[flag]])
+    }
+
+
+def _permission_scope_is_covered(page, grant_on, permission_tuples):
+    """Check coverage of a scope, including pages that may be created later.
+
+    Only grants anchored at the page or its ancestors can cover every future
+    branch. Their scopes are depth intervals, whose union must cover the
+    requested interval. Separate page-only and descendants grants can therefore
+    jointly authorize a page-and-descendants grant.
+    """
+    from cms.models.permissionmodels import (
+        ACCESS_CHILDREN,
+        ACCESS_DESCENDANTS,
+        ACCESS_PAGE,
+        ACCESS_PAGE_AND_CHILDREN,
+        ACCESS_PAGE_AND_DESCENDANTS,
+    )
+
+    offsets = {
+        ACCESS_PAGE: (0, 0),
+        ACCESS_CHILDREN: (1, 1),
+        ACCESS_PAGE_AND_CHILDREN: (0, 1),
+        ACCESS_DESCENDANTS: (1, float('inf')),
+        ACCESS_PAGE_AND_DESCENDANTS: (0, float('inf')),
+    }
+    if grant_on not in offsets:
+        return False
+    start, end = (page.depth + offset for offset in offsets[grant_on])
+    intervals = []
+    for scope, path in permission_tuples:
+        if scope in offsets and page.path.startswith(path):
+            depth = len(path) // page.steplen
+            intervals.append(tuple(depth + offset for offset in offsets[scope]))
+    for lower, upper in sorted(intervals):
+        if lower > start:
+            return False
+        if upper >= start:
+            if upper >= end:
+                return True
+            start = upper + 1
+    return False
+
+
+def get_grantable_page_permissions(user, page, grant_on):
+    """Return flags a manager may delegate throughout a page permission scope.
+
+    View restrictions require permission-management authority, rather than an
+    explicit can_view grant: managers can also restrict otherwise public pages.
+    Editing flags still require the corresponding CMS and Django permissions.
+    """
+    from cms.models.permissionmodels import ACCESS_CHOICES
+
+    if not user or not user.is_authenticated or grant_on not in dict(ACCESS_CHOICES):
+        return set()
+    all_flags = set(PagePermission.get_all_permissions())
+    if user.is_superuser or not get_cms_setting('PERMISSION'):
+        return all_flags
+
+    site = page.site
+    global_actions = get_global_actions_for_user(user, site)
+    page_actions = get_page_actions_for_user(user, site)
+    django_flags = _flags_with_django_permissions(user)
+    granted = {
+        flag for flag, action in _global_permission_actions.items()
+        if flag in django_flags and (
+            action in global_actions
+            or _permission_scope_is_covered(page, grant_on, page_actions.get(action, ()))
+        )
+    }
+    if 'can_change_permissions' not in granted:
+        return set()
+    return granted | {'can_view'}
 
 
 def user_can_add_global_permissions(user, site):
@@ -145,11 +370,16 @@ def get_user_permission_level(user, site):
 def cached_func(func):
     @wraps(func, assigned=available_attrs(func))
     def cached_func(user, *args, **kwargs):
-        func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+        from cms.cache.permissions import get_cache_permission_version
 
-        if not hasattr(user, func_cache_name):
+        func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+        func_version_name = '%s_version' % func_cache_name
+        version = get_cache_permission_version()
+
+        if not hasattr(user, func_cache_name) or getattr(user, func_version_name, None) != version:
             cached_func = lru_cache(maxsize=None)(func)
             setattr(user, func_cache_name, cached_func)
+            setattr(user, func_version_name, version)
         return getattr(user, func_cache_name)(user, *args, **kwargs)
 
     # Allows us to access the un-cached function
@@ -161,6 +391,9 @@ def clear_func_cache(user, func):
     func_cache_name = '_djangocms_cached_func_%s' % func.__name__
     if hasattr(user, func_cache_name):
         delattr(user, func_cache_name)
+    func_version_name = '%s_version' % func_cache_name
+    if hasattr(user, func_version_name):
+        delattr(user, func_version_name)
 
 
 def clear_permission_lru_caches(user):
@@ -169,6 +402,7 @@ def clear_permission_lru_caches(user):
     """
     clear_func_cache(user, get_global_actions_for_user)
     clear_func_cache(user, get_page_actions_for_user)
+    clear_func_cache(user, get_cached_page_actions_for_user)
 
 
 @cached_func
@@ -204,6 +438,24 @@ def get_page_actions_for_user(user, site):
     return actions
 
 
+@cached_func
+def get_cached_page_actions_for_user(user, site):
+    """Like :func:`get_page_actions_for_user`, but shared through the permission cache.
+
+    All actions are read, and if needed written, in one round trip to the cache
+    backend. The result maps each action to a :class:`PermissionTupleList`.
+    """
+    from cms.cache.permissions import PERMISSION_KEYS, get_permission_caches, set_permission_caches
+
+    cached = get_permission_caches(user, site, PERMISSION_KEYS)
+
+    if len(cached) < len(PERMISSION_KEYS):
+        page_actions = get_page_actions_for_user(user, site)
+        cached = {action: list(page_actions[action]) for action in PERMISSION_KEYS}
+        set_permission_caches(user, site, cached)
+    return {action: PermissionTupleList(perm_tuples) for action, perm_tuples in cached.items()}
+
+
 def has_global_permission(user, site, action, use_cache=True):
     if use_cache:
         actions = get_global_actions_for_user(user, site)
@@ -226,6 +478,10 @@ def get_subordinate_users(user, site):
     If user haves global permissions or is a superuser, then he can see all the
     users.
 
+    Superusers are never subordinate to a non-superuser, no matter how many
+    permissions the latter holds. Otherwise a delegated administrator could
+    manage - and take over - a superuser account.
+
     This function is currently used in PagePermissionInlineAdminForm for limit
     users in permission combobox.
 
@@ -244,6 +500,13 @@ def get_subordinate_users(user, site):
     """
     from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
+    def without_superusers(qs):
+        # A non-superuser must never be handed a superuser as a subordinate:
+        # being able to manage the account means being able to take it over.
+        if user.is_superuser:
+            return qs
+        return qs.exclude(is_superuser=True)
+
     try:
         user_level = get_user_permission_level(user, site)
     except NoPermissionsException:
@@ -254,10 +517,10 @@ def get_subordinate_users(user, site):
             Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
-        return qs
+        return without_superusers(qs)
 
     if user_level == ROOT_USER_LEVEL:
-        return get_user_model().objects.all()
+        return without_superusers(get_user_model().objects.all())
 
     from cms.models import PermissionTuple
     allow_list = Q()
@@ -273,7 +536,7 @@ def get_subordinate_users(user, site):
         )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
-    return qs
+    return without_superusers(qs)
 
 
 def get_subordinate_groups(user, site):

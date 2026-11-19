@@ -10,6 +10,8 @@ from cms.utils.conf import get_cms_setting
 
 
 class PageContent(models.Model):
+    # Field changes need a custom migration operation as in 0044: versioning packages drop the
+    # unique_together below in the database only, and SQLite rebuilds the table from the state.
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (constants.VISIBILITY_ALL, _("no limit set")),
         (constants.VISIBILITY_USERS, _("for logged in users only")),
@@ -35,6 +37,8 @@ class PageContent(models.Model):
     # a PageContent object to know if it has changed.
     editable_fields = [
         "title",
+        "slug",
+        "overwrite_url",
         "redirect",
         "page_title",
         "menu_title",
@@ -73,6 +77,22 @@ class PageContent(models.Model):
         blank=True,
         null=True,
         help_text=_("Redirects to this URL."),
+    )
+    #: The slug and overwrite URL are authored per page content object. The routable
+    #: :class:`~cms.models.pagemodel.PageUrl` objects are derived from the publicly
+    #: visible page content only (see :meth:`cms.models.pagemodel.Page.update_urls_from_content`),
+    #: so changing the slug of a draft version does not affect the published URL.
+    slug = models.SlugField(
+        verbose_name=_("slug"),
+        max_length=255,
+        help_text=_("The part of the title that is used in the URL"),
+    )
+    overwrite_url = models.CharField(
+        verbose_name=_("overwrite URL"),
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_("Keep this field empty if standard path should be used."),
     )
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
     creation_date = models.DateTimeField(verbose_name=_("creation date"), editable=False, default=timezone.now)
@@ -185,6 +205,9 @@ class PageContent(models.Model):
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)
 
+    def has_placeholder_view_permission(self, user):
+        return self.page.has_view_permission(user)
+
     def has_publish_permission(self, user):
         return self.page.has_publish_permission(user)
 
@@ -240,16 +263,31 @@ class PageContent(models.Model):
             self._placeholder_slot_cache = (self._placeholder_slot_cache,)
         return self._placeholder_slot_cache
 
-    def get_template(self):
+    def get_template(self, app_hooks=True):
         """
         get the template of this page if defined or if closer parent if
-        defined or DEFAULT_PAGE_TEMPLATE otherwise
+        defined or DEFAULT_PAGE_TEMPLATE otherwise.
+
+        If the page has an apphook assigned and its root view exposes a
+        template, that template wins — it's what the apphook actually renders
+        at the page URL, so the structure board's placeholder layout must
+        match it.
         """
         if hasattr(self, "_template_cache"):
             return self._template_cache
 
         if not get_cms_setting("TEMPLATES"):
             return ""
+
+        if app_hooks and self.page.application_urls:
+            from cms.apphook_pool import apphook_pool
+
+            apphook = apphook_pool.get_apphook(self.page.application_urls)
+            if apphook is not None:
+                apphook_template = apphook.get_root_template(page=self.page, language=self.language)
+                if apphook_template:
+                    self._template_cache = apphook_template
+                    return self._template_cache
 
         if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
             self._template_cache = self.template or self.template_choices[0][0]
@@ -287,6 +325,19 @@ class PageContent(models.Model):
         :rtype: ``bool``
         """
         return True
+
+    def is_public(self):
+        """Return whether this content object is visible to the public, i.e. whether
+        the default manager returns it. Without a versioning package every saved
+        page content is public; with a versioning package installed only published
+        versions are. The page's URL is only derived from public content
+        (see :meth:`cms.models.pagemodel.Page.update_urls_from_content`).
+
+        :rtype: ``bool``
+        """
+        if self.pk is None:
+            return False
+        return self.__class__.objects.filter(pk=self.pk).exists()
 
     def content_indicator(self):
         """returns the content indicator status. Without additional packages like
@@ -328,6 +379,8 @@ class EmptyPageContent:
     """
 
     title = ""
+    slug = ""
+    overwrite_url = None
     meta_description = ""
     redirect = ""
     application_urls = ""

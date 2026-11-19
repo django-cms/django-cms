@@ -5,7 +5,6 @@ import operator
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
-from treebeard.mp_tree import MP_NodeManager
 
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
@@ -14,7 +13,7 @@ from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.i18n import get_fallback_languages
 
 
-class PageManager(MP_NodeManager):
+class PageManager(models.Manager):
 
     def get_queryset(self):
         """Change standard model queryset to our own.
@@ -76,7 +75,7 @@ class WithUserMixin:
 
 class PageUrlManager(WithUserMixin, models.Manager):
     def get_for_site(self, site, **kwargs):
-        kwargs['page__site'] = site
+        kwargs['site'] = site
         return self.filter(**kwargs)
 
 

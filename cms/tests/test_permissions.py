@@ -1,19 +1,56 @@
+import warnings
+from unittest.mock import patch
+
+from django import forms
+from django.contrib import admin
+from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
+from django.db import OperationalError, ProgrammingError, connection, transaction
 from django.test.utils import override_settings
 
-from cms.api import assign_user_to_page, create_page
+from cms.admin.forms import BasePermissionAdminForm
+from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
+from cms.api import add_plugin, assign_user_to_page, create_page
 from cms.cache.permissions import (
+    _read_cache_permission_version,
+    clear_permission_cache,
     clear_user_permission_cache,
+    get_cache_key,
+    get_cache_permission_version,
+    get_cache_permission_version_key,
     get_permission_cache,
+    get_permission_caches,
+    permission_cache_version_snapshot,
     set_permission_cache,
 )
-from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
+from cms.models import Page, PageContent
+from cms.models.permissionmodels import (
+    ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_CHILDREN,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
+    PermissionTuple,
+    PermissionTupleList,
+)
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
+    user_can_change_at_least_one_page,
+    user_can_change_page,
+    user_can_change_page_advanced_settings,
+    user_can_delete_page,
+    user_can_move_page,
     user_can_publish_page,
 )
+from cms.utils.permissions import current_user, get_grantable_page_permissions
 
 
 @override_settings(
@@ -38,15 +75,15 @@ class PermissionCacheTests(CMSTestCase):
         """
         Test basic permissions cache get / set / clear low-level api
         """
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertIsNone(cached_permissions)
 
-        set_permission_cache(self.user_normal, "change_page", [self.home_page.id])
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        set_permission_cache(self.user_normal, Site.objects.get_current(), "change_page", [self.home_page.id])
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertEqual(cached_permissions, [self.home_page.id])
 
         clear_user_permission_cache(self.user_normal)
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertIsNone(cached_permissions)
 
     def test_permission_manager(self):
@@ -57,12 +94,13 @@ class PermissionCacheTests(CMSTestCase):
                              created_by=self.user_super)
         assign_user_to_page(page_b, self.user_normal, can_view=True,
                             can_change=True)
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
+        cached_permissions = get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page")
         self.assertIsNone(cached_permissions)
 
         live_permissions = get_change_perm_tuples(self.user_normal, Site.objects.get_current())
-        cached_permissions_permissions = get_permission_cache(self.user_normal,
-                                                              "change_page")
+        cached_permissions_permissions = get_permission_cache(
+            self.user_normal, Site.objects.get_current(), "change_page"
+        )
         self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
@@ -81,7 +119,7 @@ class PermissionCacheTests(CMSTestCase):
             user=self.user_normal,
         )
         page_permission.sites.add(Site.objects.get_current())
-        set_permission_cache(self.user_normal, "publish_page", [])
+        set_permission_cache(self.user_normal, Site.objects.get_current(), "publish_page", [])
 
         can_publish = user_can_publish_page(
             self.user_normal,
@@ -98,3 +136,1212 @@ class PermissionCacheTests(CMSTestCase):
 
         self.assertTrue(has_generic_permission(page_b, self.user_normal, "change_page"))
         self.assertFalse(has_generic_permission(page_b, self.user_normal, "publish_page"))
+
+
+@override_settings(CMS_PERMISSION=True, CMS_RAW_ID_USERS=1)
+class PermissionAdminMigrationSafetyTests(CMSTestCase):
+    """
+    Regression tests for the case where the user table does not yet exist
+    (e.g. during ``migrate`` on a fresh install with a custom user model).
+
+    Counting users then raises ``OperationalError`` on sqlite or
+    ``ProgrammingError`` on postgres. Both must be swallowed so that the
+    admin classes can still be imported and registered during migrations.
+    """
+
+    def _patched_user_model(self, exc):
+        class _BrokenManager:
+            def count(self):
+                raise exc
+
+        class _BrokenUserModel:
+            objects = _BrokenManager()
+
+        return patch(
+            'cms.admin.permissionadmin.get_user_model',
+            return_value=_BrokenUserModel,
+        )
+
+    def test_inline_raw_id_fields_swallows_db_errors(self):
+        for exc in (OperationalError("no such table"), ProgrammingError("relation does not exist")):
+            with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, [])
+
+    def test_global_admin_raw_id_fields_swallows_db_errors(self):
+        for exc in (OperationalError("no such table"), ProgrammingError("relation does not exist")):
+            with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, [])
+
+    def test_global_admin_get_list_filter_swallows_db_errors(self):
+        admin_instance = GlobalPagePermissionAdmin(GlobalPagePermission, admin_site=None)
+        for exc in (OperationalError("no such table"), ProgrammingError("relation does not exist")):
+            with self.subTest(exc=type(exc).__name__), self._patched_user_model(exc):
+                # Falls back to the unfiltered list_filter (still includes 'user')
+                self.assertIn('user', admin_instance.get_list_filter(request=None))
+
+
+class PermissionTupleTests(CMSTestCase):
+    """
+    Regression tests for ``PermissionTuple.allow_list()`` building invalid
+    lookups (``page____path__length``) for ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS and ACCESS_PAGE_AND_CHILDREN (#8661).
+    """
+
+    def setUp(self):
+        self.root = create_page("root", "nav_playground.html", "en")
+        self.child = create_page("child", "nav_playground.html", "en", parent=self.root)
+        self.grandchild = create_page("grandchild", "nav_playground.html", "en", parent=self.child)
+        self.sibling = create_page("sibling", "nav_playground.html", "en")
+
+    def test_allow_list_scopes(self):
+        cases = (
+            (ACCESS_PAGE, {self.root}),
+            (ACCESS_CHILDREN, {self.child}),
+            (ACCESS_PAGE_AND_CHILDREN, {self.root, self.child}),
+            (ACCESS_DESCENDANTS, {self.child, self.grandchild}),
+            (ACCESS_PAGE_AND_DESCENDANTS, {self.root, self.child, self.grandchild}),
+        )
+        for grant_on, expected in cases:
+            with self.subTest(grant_on=grant_on):
+                perm = PermissionTuple((grant_on, self.root.path))
+                allowed = Page.objects.filter(perm.allow_list())
+                self.assertEqual(set(allowed), expected)
+
+    def test_allow_list_matches_contains(self):
+        pages = list(Page.objects.all())
+        grants = (ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
+                  ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS)
+        for grant_on in grants:
+            with self.subTest(grant_on=grant_on):
+                perm = PermissionTuple((grant_on, self.root.path))
+                expected = {page.pk for page in pages if perm.contains(page.path)}
+                allowed = Page.objects.filter(perm.allow_list()).values_list("pk", flat=True)
+                self.assertEqual(set(allowed), expected)
+
+    def test_tuple_list_contains_matches_tuples(self):
+        pages = list(Page.objects.all())
+        grants = (ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
+                  ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS)
+        tuple_lists = [[(grant_on, anchor.path)] for grant_on in grants for anchor in pages]
+        tuple_lists.append([(ACCESS_PAGE, self.grandchild.path), (ACCESS_CHILDREN, self.root.path)])
+        tuple_lists.append([])
+        for perm_tuples in tuple_lists:
+            tuple_list = PermissionTupleList(perm_tuples)
+            for page in pages:
+                with self.subTest(perm_tuples=perm_tuples, page=page.path):
+                    expected = any(PermissionTuple(perm).contains(page.path) for perm in perm_tuples)
+                    self.assertEqual(tuple_list.contains(page.path), expected)
+
+    def test_allow_list_with_related_field_prefix(self):
+        user = self._create_user("perm-user", is_staff=True)
+        for page in (self.root, self.child, self.grandchild, self.sibling):
+            PagePermission.objects.create(page=page, user=user, grant_on=ACCESS_PAGE)
+        perm = PermissionTuple((ACCESS_PAGE_AND_CHILDREN, self.root.path))
+        matched = PagePermission.objects.filter(perm.allow_list("page"))
+        self.assertEqual({pp.page_id for pp in matched}, {self.root.pk, self.child.pk})
+@override_settings(CMS_PERMISSION=True)
+
+
+class DeletePagePlaceholderPermissionTests(CMSTestCase):
+    """
+    ``user_can_delete_page`` must evaluate the delete permission of the
+    plugins in each of the page's placeholders.
+
+    Regression tests for issue 03: the placeholder loop accessed ``.source``
+    on the queryset instead of the loop variable (``AttributeError``), and
+    the placeholder lookup filtered on the ``Placeholder`` content type
+    instead of ``PageContent``, so the loop never ran at all.
+    """
+
+    def _get_page_with_plugin(self):
+        page = self.get_permissions_test_page()
+        placeholder = page.get_placeholders("en").get(slot="body")
+        add_plugin(
+            placeholder,
+            "LinkPlugin",
+            "en",
+            name="A link",
+            external_link="https://www.django-cms.org",
+        )
+        return page
+
+    def test_user_with_plugin_permissions_can_delete_page(self):
+        page = self._get_page_with_plugin()
+        # add_default_permissions grants add/change/delete on the Link plugin model
+        user = self._create_user(
+            "page-deleter",
+            is_staff=True,
+            add_default_permissions=True,
+            permissions=["change_page", "delete_page"],
+        )
+        self.add_global_permission(user, can_change=True, can_delete=True)
+
+        self.assertTrue(user_can_delete_page(user, page))
+
+    def test_user_without_plugin_permissions_cannot_delete_page(self):
+        page = self._get_page_with_plugin()
+        # No plugin model permissions: deleting the page would delete the
+        # Link plugin in its placeholder, which this user may not do.
+        user = self._create_user(
+            "page-deleter-no-plugin-perms",
+            is_staff=True,
+            permissions=["change_page", "delete_page"],
+        )
+        self.add_global_permission(user, can_change=True, can_delete=True)
+
+        self.assertFalse(user_can_delete_page(user, page))
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_CACHE_DURATIONS={
+        'menus': 60,
+        'content': 60,
+        'permissions': 60,
+    },
+)
+@override_settings(CMS_PERMISSION=True)
+class PermissionCacheRoundTripTests(CMSTestCase):
+    """Permission checks must not hit the cache backend for every check."""
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+        self.root = create_page('root', 'nav_playground.html', 'en')
+        self.pages = [
+            create_page(f'page-{index}', 'nav_playground.html', 'en', parent=self.root)
+            for index in range(3)
+        ]
+        self.user = self._create_user('editor', is_staff=True, add_default_permissions=True)
+        assign_user_to_page(self.root, self.user, can_change=True, can_publish=True)
+
+    def test_version_is_read_once_per_snapshot(self):
+        with patch('cms.cache.permissions._read_cache_permission_version', return_value=3) as read:
+            with permission_cache_version_snapshot():
+                self.assertEqual(get_cache_permission_version(), 3)
+                self.assertEqual(get_cache_permission_version(), 3)
+            get_cache_permission_version()
+        # Outside of the snapshot every call reads the cache again.
+        self.assertEqual(read.call_count, 2)
+
+    def test_version_bump_is_seen_within_snapshot(self):
+        with permission_cache_version_snapshot():
+            version = get_cache_permission_version()
+            clear_permission_cache()
+            self.assertGreater(get_cache_permission_version(), version)
+
+    def test_version_bump_ignores_stale_snapshot(self):
+        with permission_cache_version_snapshot():
+            cache.delete(get_cache_permission_version_key())
+            self.assertEqual(get_cache_permission_version(), 1)
+            # Another process bumps the version after the snapshot was taken.
+            cache.set(get_cache_permission_version_key(), 5)
+            clear_permission_cache()
+            # Bumping from the stale snapshot would reset it to 2.
+            self.assertEqual(get_cache_permission_version(), 6)
+
+    def test_page_permissions_are_read_once(self):
+        site = Site.objects.get_current()
+        with patch('cms.cache.permissions.get_permission_caches', wraps=get_permission_caches) as read:
+            for page in self.pages:
+                self.assertTrue(user_can_change_page(self.user, page, site))
+                self.assertTrue(user_can_publish_page(self.user, page, site))
+        self.assertEqual(read.call_count, 1)
+        # The next request reuses what the first one stored.
+        user = self.reload(self.user)
+        with patch('cms.utils.permissions.get_page_actions_for_user') as compute:
+            self.assertTrue(user_can_change_page(user, self.pages[0], site))
+        compute.assert_not_called()
+
+    def test_request_reads_version_once(self):
+        with patch(
+            'cms.cache.permissions._read_cache_permission_version',
+            wraps=_read_cache_permission_version,
+        ) as read:
+            with self.login_user_context(self.user):
+                response = self.client.get(self.get_admin_url(PageContent, 'get_tree'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(read.call_count, 1)
+
+
+class PermissionCacheInvalidationTests(CMSTestCase):
+    """
+    Saving or deleting users and changing their group memberships must
+    invalidate the permission cache.
+
+    Regression tests for issue 10: the signal handlers were connected to the
+    hardcoded ``django.contrib.auth.models.User``, so projects with a custom
+    ``AUTH_USER_MODEL`` got no cache invalidation. These tests exercise the
+    handlers through the model returned by ``get_user_model()`` and fail in
+    test runs with a custom user model (``--auth-user-model``) if the
+    binding regresses.
+    """
+
+    def setUp(self):
+        self.user_super = self._create_user("super", is_staff=True, is_superuser=True)
+        self.user_normal = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        self.home_page = create_page("home", "nav_playground.html", "en", created_by=self.user_super)
+
+    def _fill_permission_cache(self):
+        set_permission_cache(self.user_normal, Site.objects.get_current(), "change_page", [self.home_page.id])
+        self.assertIsNotNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
+
+    def test_user_save_clears_permission_cache(self):
+        self._fill_permission_cache()
+        self.user_normal.save()
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
+
+    def test_user_delete_clears_permission_cache(self):
+        self._fill_permission_cache()
+        self.user_normal.delete()
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
+
+    def test_group_membership_change_clears_permission_cache(self):
+        group = Group.objects.create(name="permission-cache-group")
+        self._fill_permission_cache()
+        self.user_normal.groups.add(group)
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
+
+    def test_group_delete_clears_permission_cache_of_members(self):
+        group = Group.objects.create(name="permission-cache-group")
+        self.user_normal.groups.add(group)
+        self._fill_permission_cache()
+        group.delete()
+        self.assertIsNone(get_permission_cache(self.user_normal, Site.objects.get_current(), "change_page"))
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_CACHE_DURATIONS={
+        'menus': 60,
+        'content': 60,
+        'permissions': 60,
+    },
+    CMS_LANGUAGES={
+        1: [{'code': 'en', 'name': 'English'}],
+        2: [{'code': 'en', 'name': 'English'}],
+    },
+)
+class PermissionCacheSiteIsolationTests(CMSTestCase):
+    """The cached page permissions of one site must not be served for another.
+
+    ``get_page_actions_for_user`` filters by site, so a value warmed while
+    browsing a site the user works on used to satisfy the "can change at least
+    one page" gate of every other site, disclosing their page trees.
+    """
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+        self.site_a = Site.objects.get_current()
+        self.site_b = Site.objects.create(domain='b.example', name='B')
+        self.user = self._create_user('editor', is_staff=True, add_default_permissions=True)
+        self.page_a = create_page('site-a', 'nav_playground.html', 'en', site=self.site_a)
+        assign_user_to_page(self.page_a, self.user, can_view=True, can_change=True)
+        self.secret_b = create_page('SECRET-SITE-B', 'nav_playground.html', 'en', site=self.site_b)
+
+    def get_tree(self, site):
+        return self.client.get(self.get_admin_url(PageContent, 'get_tree') + f'?site={site.pk}')
+
+    def test_cache_key_includes_the_site(self):
+        self.assertNotEqual(
+            get_cache_key(self.user, self.site_a, 'change_page'),
+            get_cache_key(self.user, self.site_b, 'change_page'),
+        )
+
+    def test_cached_permissions_are_not_reused_across_sites(self):
+        self.assertTrue(user_can_change_at_least_one_page(self.user, self.site_a))
+        self.assertIsNotNone(get_permission_cache(self.user, self.site_a, 'change_page'))
+        self.assertIsNone(get_permission_cache(self.user, self.site_b, 'change_page'))
+        self.assertFalse(user_can_change_at_least_one_page(self.user, self.site_b))
+
+    def test_warming_one_site_does_not_disclose_another(self):
+        with self.login_user_context(self.user):
+            self.assertEqual(self.get_tree(self.site_a).status_code, 200)
+            # The gate of site B must not be satisfied by the value just warmed.
+            response = self.get_tree(self.site_b)
+        self.assertEqual(response.status_code, 403)
+
+    def test_own_site_stays_reachable_when_cache_is_warm(self):
+        with self.login_user_context(self.user):
+            self.get_tree(self.site_b)
+            response = self.get_tree(self.site_a)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'site-a')
+
+    def test_clear_user_permission_cache_clears_every_site(self):
+        set_permission_cache(self.user, self.site_a, 'change_page', [self.page_a.path])
+        set_permission_cache(self.user, self.site_b, 'change_page', [self.secret_b.path])
+
+        clear_user_permission_cache(self.user)
+
+        self.assertIsNone(get_permission_cache(self.user, self.site_a, 'change_page'))
+        self.assertIsNone(get_permission_cache(self.user, self.site_b, 'change_page'))
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_CACHE_DURATIONS={
+        'menus': 60,
+        'content': 60,
+        'permissions': 60,
+    },
+)
+class PermissionCacheTreeChangeTests(CMSTestCase):
+    """Tree changes must invalidate the cached page permissions.
+
+    The cache stores grants by page path. Moving or inserting a page renumbers
+    the paths of its siblings, so a cached grant on one page would otherwise
+    match whichever page took over its old path.
+    """
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+        self.root = create_page('root', 'nav_playground.html', 'en')
+        self.granted = create_page('granted', 'nav_playground.html', 'en', parent=self.root)
+        self.other = create_page('other', 'nav_playground.html', 'en', parent=self.root)
+        self.user = self._create_user('editor', is_staff=True, add_default_permissions=True)
+        assign_user_to_page(self.granted, self.user, grant_on=ACCESS_PAGE, can_change=True)
+        # Warm the cache with the current paths.
+        self.assertTrue(user_can_change_page(self.user, self.granted))
+        self.assertFalse(user_can_change_page(self.user, self.other))
+        self.old_path = self.granted.path
+
+    def assertPermissionsFollowPages(self, newcomer):
+        # A new request works on a fresh user, so only the shared cache remains.
+        user = self.reload(self.user)
+        newcomer.refresh_from_db()
+        self.granted.refresh_from_db()
+        self.assertFalse(user_can_change_page(user, newcomer))
+        self.assertTrue(user_can_change_page(user, self.granted))
+
+    def test_move_page_invalidates_cache(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            self.other.move_page(self.root, position='first-child')
+        self.assertPermissionsFollowPages(self.other)
+        self.assertEqual(self.other.path, self.old_path)
+
+    def test_insert_page_invalidates_cache(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            newcomer = create_page('newcomer', 'nav_playground.html', 'en', parent=self.root, position='first-child')
+        self.assertPermissionsFollowPages(newcomer)
+        self.assertEqual(newcomer.path, self.old_path)
+
+    def test_rolled_back_move_does_not_poison_cache(self):
+        # Cache invalidation is deferred to commit. A tree change inside a
+        # transaction that rolls back discards that on_commit callback, so a
+        # permission check made against the uncommitted paths must not leave
+        # them in the shared cache once the tree is restored.
+        with self.assertRaises(RuntimeError):
+            with transaction.atomic():
+                self.other.move_page(self.root, position='first-child')
+                # Would warm the shared cache from the uncommitted paths.
+                user_can_change_page(self.reload(self.user), self.other)
+                raise RuntimeError('roll back')
+        self.other.refresh_from_db()
+        self.granted.refresh_from_db()
+        user = self.reload(self.user)
+        self.assertTrue(user_can_change_page(user, self.granted))
+        self.assertFalse(user_can_change_page(user, self.other))
+
+
+@override_settings(CMS_PERMISSION=True)
+class DeprecatedSiteAccessHelperTests(CMSTestCase):
+    """``user_can_access_site``/``raise_site_permission_denied`` are unused.
+
+    Site isolation is enforced by ``PageContentAdmin.has_change_permission()``.
+    """
+
+    def get_admin(self):
+        return admin.site._registry[PageContent]
+
+    def test_user_can_access_site_warns(self):
+        request = self.get_request("/en/")
+        request.user = self.get_superuser()
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
+            self.assertTrue(self.get_admin().user_can_access_site(request))
+
+        self.assertTrue(
+            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
+            "Expected a deprecation warning from user_can_access_site().",
+        )
+
+    def test_raise_site_permission_denied_warns(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", RemovedInDjangoCMS60Warning)
+            with self.assertRaises(PermissionDenied):
+                self.get_admin().raise_site_permission_denied()
+
+        self.assertTrue(
+            any(issubclass(warning.category, RemovedInDjangoCMS60Warning) for warning in caught),
+            "Expected a deprecation warning from raise_site_permission_denied().",
+        )
+
+
+@override_settings(CMS_PERMISSION=True)
+class GlobalPagePermissionEscalationTests(CMSTestCase):
+    """A permission manager must not grant rights they do not hold themselves.
+
+    ``GlobalPagePermissionAdmin`` used to expose every ``can_*`` flag
+    unconditionally, so a delegate holding only ``can_change_permissions`` could
+    POST themselves ``can_publish``/``can_delete``/``can_change_advanced_settings``/
+    ``can_move_page`` site-wide (CWE-269).
+    """
+
+    add_url = '/en/admin/cms/globalpagepermission/add/'
+
+    def _create_delegate(self, username='delegate', sites=None, **flags):
+        user = self._create_user(username, is_staff=True, is_superuser=False)
+        for codename in ('add_globalpagepermission', 'change_globalpagepermission'):
+            user.user_permissions.add(Permission.objects.get(codename=codename))
+        # The page model permissions a delegated manager normally carries; the
+        # CMS grant below is what actually limits them.
+        user.user_permissions.add(
+            *Permission.objects.filter(codename__in=[
+                'change_page', 'publish_page', 'change_page_advanced_settings',
+                'move_page', 'delete_page',
+            ])
+        )
+        defaults = dict.fromkeys(GlobalPagePermission.get_all_permissions(), False)
+        defaults.update(can_change=True, can_change_permissions=True, **flags)
+        grant = GlobalPagePermission.objects.create(user=user, **defaults)
+        grant.sites.set(sites if sites is not None else [Site.objects.get_current()])
+        return self.reload(user), grant
+
+    def _post(self, actor, **extra):
+        data = {
+            'user': actor.pk,
+            'group': '',
+            'sites': [Site.objects.get_current().pk],
+            '_save': 'Save',
+        }
+        data.update(extra)
+        with self.login_user_context(actor):
+            return self.client.post(self.add_url, data)
+
+    def test_delegate_cannot_grant_flags_it_does_not_hold(self):
+        page = create_page('secret', 'nav_playground.html', 'en')
+        delegate, _grant = self._create_delegate()
+
+        self.assertFalse(user_can_publish_page.without_cache(delegate, page))
+
+        response = self._post(
+            delegate,
+            can_add='on', can_change='on', can_delete='on', can_publish='on',
+            can_change_advanced_settings='on', can_change_permissions='on',
+            can_move_page='on', can_view='on',
+        )
+        self.assertEqual(response.status_code, 302)
+
+        # A row is still created -- the manager may delegate what they hold --
+        # but only with the flags they actually have.
+        escalated = GlobalPagePermission.objects.filter(user=delegate).exclude(pk=_grant.pk)
+        self.assertEqual(escalated.count(), 1)
+        new_grant = escalated.get()
+        for flag in ('can_add', 'can_delete', 'can_publish',
+                     'can_change_advanced_settings', 'can_move_page', 'can_view'):
+            self.assertFalse(getattr(new_grant, flag), f'{flag} was granted')
+        # The two rights the delegate does hold are theirs to delegate.
+        self.assertTrue(new_grant.can_change)
+        self.assertTrue(new_grant.can_change_permissions)
+
+        clear_user_permission_cache(delegate)
+        delegate = self.reload(delegate)
+        self.assertFalse(user_can_publish_page.without_cache(delegate, page))
+        self.assertFalse(user_can_change_page_advanced_settings.without_cache(delegate, page))
+        self.assertFalse(user_can_move_page.without_cache(delegate, page))
+
+    def test_delegate_can_grant_flags_it_holds(self):
+        delegate, _grant = self._create_delegate(can_publish=True)
+        target = self._create_user('target', is_staff=True)
+
+        response = self._post(delegate, user=target.pk, can_change='on', can_publish='on')
+        self.assertEqual(response.status_code, 302)
+
+        new_grant = GlobalPagePermission.objects.get(user=target)
+        self.assertTrue(new_grant.can_change)
+        self.assertTrue(new_grant.can_publish)
+
+    def test_flag_held_on_one_site_cannot_be_granted_on_another(self):
+        other_site = Site.objects.create(domain='other.example.com', name='other')
+        delegate, _grant = self._create_delegate(can_publish=True)
+        # Permission management on both sites, publishing on the current one only.
+        other_grant = self._create_grant(delegate, sites=[other_site], can_change_permissions=True)
+        delegate = self.reload(delegate)
+
+        response = self._post(
+            delegate,
+            sites=[Site.objects.get_current().pk, other_site.pk],
+            can_change='on', can_publish='on',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('can_publish', response.context_data['adminform'].form.errors)
+        self.assertFalse(
+            GlobalPagePermission.objects.filter(user=delegate)
+            .exclude(pk__in=[_grant.pk, other_grant.pk]).exists()
+        )
+
+    def test_all_sites_grant_requires_unrestricted_rights(self):
+        """An empty ``sites`` means every site, so a site-scoped manager cannot use it."""
+        delegate, _grant = self._create_delegate(can_publish=True)
+
+        response = self._post(delegate, sites=[], can_change='on', can_publish='on')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('sites', response.context_data['adminform'].form.errors)
+
+    def _change_url(self, grant):
+        return f'/en/admin/cms/globalpagepermission/{grant.pk}/change/'
+
+    def _create_grant(self, user, sites=None, **flags):
+        defaults = dict.fromkeys(GlobalPagePermission.get_all_permissions(), False)
+        defaults.update(can_change=True, **flags)
+        grant = GlobalPagePermission.objects.create(user=user, **defaults)
+        grant.sites.set(sites if sites is not None else [Site.objects.get_current()])
+        return grant
+
+    def test_grant_with_untouchable_flags_cannot_be_changed(self):
+        """Flags the manager may not grant are also flags they may not strip."""
+        delegate, _grant = self._create_delegate()
+        target = self._create_user('target', is_staff=True)
+        existing = self._create_grant(
+            target, can_publish=True, can_delete=True, can_change_advanced_settings=True,
+        )
+
+        with self.login_user_context(delegate):
+            response = self.client.post(self._change_url(existing), {
+                'user': target.pk,
+                'group': '',
+                'sites': [Site.objects.get_current().pk],
+                'can_change': 'on',
+                '_save': 'Save',
+            })
+        self.assertEqual(response.status_code, 403)
+
+        existing.refresh_from_db()
+        self.assertTrue(existing.can_publish)
+        self.assertTrue(existing.can_delete)
+        self.assertTrue(existing.can_change_advanced_settings)
+
+    def test_grant_with_untouchable_flags_cannot_be_reassigned(self):
+        """Changing ``user`` must not move a flag the manager does not hold to themselves."""
+        page = create_page('secret', 'nav_playground.html', 'en')
+        delegate, _grant = self._create_delegate()
+        target = self._create_user('target', is_staff=True)
+        existing = self._create_grant(target, can_publish=True)
+
+        with self.login_user_context(delegate):
+            response = self.client.post(self._change_url(existing), {
+                'user': delegate.pk,
+                'group': '',
+                'sites': [Site.objects.get_current().pk],
+                'can_change': 'on',
+                'can_change_permissions': 'on',
+                '_save': 'Save',
+            })
+        self.assertEqual(response.status_code, 403)
+
+        existing.refresh_from_db()
+        self.assertEqual(existing.user, target)
+        clear_user_permission_cache(delegate)
+        self.assertFalse(user_can_publish_page.without_cache(self.reload(delegate), page))
+
+    def test_grant_on_other_site_cannot_be_changed(self):
+        """A flag held on one site does not reach a grant for another site."""
+        other_site = Site.objects.create(domain='other.example.com', name='other')
+        delegate, _grant = self._create_delegate(can_publish=True)
+        target = self._create_user('target', is_staff=True)
+        existing = self._create_grant(target, sites=[other_site], can_publish=True)
+
+        with self.login_user_context(delegate):
+            response = self.client.get(self._change_url(existing))
+        self.assertFalse(response.context_data['has_change_permission'])
+
+    def test_grant_with_untouchable_flags_cannot_be_deleted(self):
+        delegate, _grant = self._create_delegate()
+        delegate.user_permissions.add(Permission.objects.get(codename='delete_globalpagepermission'))
+        delegate = self.reload(delegate)
+        target = self._create_user('target', is_staff=True)
+        existing = self._create_grant(target, can_publish=True)
+
+        with self.login_user_context(delegate):
+            response = self.client.post(
+                f'/en/admin/cms/globalpagepermission/{existing.pk}/delete/', {'post': 'yes'},
+            )
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(GlobalPagePermission.objects.filter(pk=existing.pk).exists())
+
+    def test_grant_within_managers_rights_can_be_changed(self):
+        delegate, _grant = self._create_delegate(can_publish=True)
+        target = self._create_user('target', is_staff=True)
+        existing = self._create_grant(target, can_publish=True)
+
+        with self.login_user_context(delegate):
+            response = self.client.post(self._change_url(existing), {
+                'user': target.pk,
+                'group': '',
+                'sites': [Site.objects.get_current().pk],
+                'can_change': 'on',
+                '_save': 'Save',
+            })
+        self.assertEqual(response.status_code, 302)
+
+        existing.refresh_from_db()
+        self.assertTrue(existing.can_change)
+        self.assertFalse(existing.can_publish)
+
+    def test_flag_without_django_permission_cannot_be_granted(self):
+        """A CMS flag is no right without the Django permission page actions require."""
+        page = create_page('secret', 'nav_playground.html', 'en')
+        delegate, _grant = self._create_delegate(can_publish=True)
+        delegate.user_permissions.remove(Permission.objects.get(codename='publish_page'))
+        delegate = self.reload(delegate)
+        self.assertFalse(user_can_publish_page.without_cache(delegate, page))
+
+        target = self._create_user('target', is_staff=True)
+        target.user_permissions.add(
+            *Permission.objects.filter(codename__in=['change_page', 'publish_page'])
+        )
+        response = self._post(delegate, user=target.pk, can_change='on', can_publish='on')
+        self.assertEqual(response.status_code, 302)
+
+        new_grant = GlobalPagePermission.objects.get(user=target)
+        self.assertTrue(new_grant.can_change)
+        self.assertFalse(new_grant.can_publish)
+        self.assertFalse(user_can_publish_page.without_cache(self.reload(target), page))
+
+    def _create_manager_of_other_site(self):
+        """A delegate managing permissions on the current site only, but publishing on another."""
+        other_site = Site.objects.create(domain='other.example.com', name='other')
+        delegate, _grant = self._create_delegate()
+        self._create_grant(delegate, sites=[other_site], can_publish=True)
+        return self.reload(delegate), other_site
+
+    def test_grant_requires_permission_management_on_every_selected_site(self):
+        delegate, other_site = self._create_manager_of_other_site()
+        target = self._create_user('target', is_staff=True)
+
+        response = self._post(
+            delegate, user=target.pk, sites=[other_site.pk], can_change='on', can_publish='on',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('sites', response.context_data['adminform'].form.errors)
+        self.assertFalse(GlobalPagePermission.objects.filter(user=target).exists())
+
+    def test_grant_on_site_without_permission_management_cannot_be_changed(self):
+        delegate, other_site = self._create_manager_of_other_site()
+        target = self._create_user('target', is_staff=True)
+        existing = self._create_grant(target, sites=[other_site], can_publish=True)
+
+        with self.login_user_context(delegate):
+            response = self.client.post(self._change_url(existing), {
+                'user': delegate.pk,
+                'group': '',
+                'sites': [other_site.pk],
+                'can_change': 'on',
+                'can_publish': 'on',
+                '_save': 'Save',
+            })
+        self.assertEqual(response.status_code, 403)
+        existing.refresh_from_db()
+        self.assertEqual(existing.user, target)
+
+    def test_superuser_is_unrestricted(self):
+        superuser = self.get_superuser()
+        target = self._create_user('target', is_staff=True)
+
+        response = self._post(
+            superuser, user=target.pk,
+            can_change='on', can_publish='on', can_delete='on',
+            can_change_advanced_settings='on', can_move_page='on',
+        )
+        self.assertEqual(response.status_code, 302)
+
+        new_grant = GlobalPagePermission.objects.get(user=target)
+        self.assertTrue(new_grant.can_publish)
+        self.assertTrue(new_grant.can_change_advanced_settings)
+        self.assertTrue(new_grant.can_move_page)
+
+
+@override_settings(CMS_PERMISSION=True)
+class PagePermissionInlineAuthorizationTests(CMSTestCase):
+    restricted_flags = (
+        'can_add', 'can_delete', 'can_publish',
+        'can_change_advanced_settings', 'can_move_page',
+    )
+
+    def setUp(self):
+        self.page = create_page('Permission test', 'nav_playground.html', 'en')
+        self.manager = self._create_user('manager', is_staff=True)
+        self.manager.user_permissions.add(*Permission.objects.filter(codename__in=[
+            'change_page', 'add_page', 'delete_page', 'publish_page',
+            'change_page_advanced_settings', 'move_page',
+            'add_pagepermission', 'change_pagepermission', 'delete_pagepermission',
+        ]))
+        flags = dict.fromkeys(GlobalPagePermission.get_all_permissions(), False)
+        flags.update(can_change=True, can_change_permissions=True)
+        self.manager_grant = GlobalPagePermission.objects.create(user=self.manager, **flags)
+        self.manager_grant.sites.add(Site.objects.get_current())
+        self.target = self._create_user('target', is_staff=True)
+        self.group = Group.objects.create(name='target group')
+        self.url = f'/en/admin/cms/page/{self.page.pk}/advanced-settings/?language=en'
+
+    def _grant(self, **flags):
+        defaults = dict.fromkeys(PagePermission.get_all_permissions(), False)
+        defaults.update({'can_change': True, **flags})
+        return PagePermission.objects.create(
+            page=self.page, user=self.target, grant_on=ACCESS_PAGE_AND_DESCENDANTS, **defaults,
+        )
+
+    def _post(self, row=None, actor=None, **changes):
+        """Submit rendered fields, injecting a hidden row when testing forged IDs."""
+        with self.login_user_context(actor or self.manager):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 200)
+            data = {'_save': 'Save'}
+
+            def add_form(form):
+                for bound in form:
+                    value = bound.value()
+                    if isinstance(bound.field, forms.BooleanField):
+                        if value:
+                            data[bound.html_name] = 'on'
+                    elif value is not None:
+                        data[bound.html_name] = value
+
+            add_form(response.context_data['adminform'].form)
+            for inline in response.context_data['inline_admin_formsets']:
+                formset = inline.formset
+                add_form(formset.management_form)
+                for form in formset.forms:
+                    add_form(form)
+                is_view_restriction = bool(row and row.can_view)
+                if inline.opts.show_with_view_permissions != is_view_restriction:
+                    continue
+                form = next((form for form in formset.forms if row and form.instance.pk == row.pk), None)
+                if form is not None:
+                    prefix = form.prefix
+                else:
+                    index = formset.total_form_count()
+                    prefix = f'{formset.prefix}-{index}'
+                    data[f'{formset.prefix}-TOTAL_FORMS'] = index + 1
+                    if row:
+                        data[f'{formset.prefix}-INITIAL_FORMS'] = index + 1
+                    with current_user(actor or self.manager):
+                        fields = formset.empty_form.fields
+                    for field in fields:
+                        if row and hasattr(row, field):
+                            value = getattr(row, field)
+                            if isinstance(value, bool):
+                                value = 'on' if value else ''
+                            elif hasattr(value, 'pk'):
+                                value = value.pk
+                            data[f'{prefix}-{field}'] = '' if value is None else value
+                    data[f'{prefix}-user'] = row.user_id if row else self.target.pk
+                    data[f'{prefix}-page'] = self.page.pk
+                    data[f'{prefix}-grant_on'] = row.grant_on if row else ACCESS_PAGE_AND_DESCENDANTS
+                    data[f'{prefix}-can_change'] = 'on'
+                for field, value in changes.items():
+                    data[f'{prefix}-{field}'] = value
+            return self.client.post(self.url, data)
+
+    def test_ungrantable_rows_are_not_editable(self):
+        rows = [self._grant(**{flag: True}) for flag in self.restricted_flags]
+        allowed = self._grant()
+        with self.login_user_context(self.manager):
+            response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        visible_ids = {
+            form.instance.pk
+            for inline in response.context_data['inline_admin_formsets']
+            for form in inline.formset.forms
+        }
+        self.assertIn(allowed.pk, visible_ids)
+        for row in rows:
+            self.assertNotIn(row.pk, visible_ids)
+
+    def test_forged_edits_cannot_change_protected_rows(self):
+        for flag in self.restricted_flags:
+            row = self._grant(**{flag: True})
+            original = PagePermission.objects.filter(pk=row.pk).values().get()
+            for changes in (
+                {'grant_on': ACCESS_PAGE},
+                {'user': self.manager.pk},
+                {'user': '', 'group': self.group.pk},
+                {'can_change': ''},
+                {'DELETE': 'on'},
+            ):
+                with self.subTest(flag=flag, changes=changes):
+                    before = list(PagePermission.objects.order_by('pk').values())
+                    response = self._post(row, **changes)
+                    self.assertEqual(response.status_code, 302)
+                    self.assertEqual(PagePermission.objects.filter(pk=row.pk).values().get(), original)
+                    self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+        self.assertFalse(user_can_publish_page.without_cache(self.reload(self.manager), self.page))
+
+    def test_saving_editable_row_preserves_protected_row(self):
+        protected = self._grant(can_publish=True)
+        editable = self._grant()
+        response = self._post(editable, grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        protected.refresh_from_db()
+        editable.refresh_from_db()
+        self.assertTrue(protected.can_publish)
+        self.assertEqual(protected.grant_on, ACCESS_PAGE_AND_DESCENDANTS)
+        self.assertEqual(editable.grant_on, ACCESS_PAGE)
+
+    def test_new_rows_ignore_forged_flags_and_permissive_defaults(self):
+        response = self._post(**dict.fromkeys(self.restricted_flags, 'on'))
+        self.assertEqual(response.status_code, 302)
+        row = PagePermission.objects.get(user=self.target)
+        for flag in self.restricted_flags:
+            self.assertFalse(getattr(row, flag), flag)
+        self.assertTrue(row.can_change)
+
+    def test_existing_rows_ignore_forged_flags(self):
+        row = self._grant()
+        response = self._post(row, grant_on=ACCESS_PAGE, **dict.fromkeys(self.restricted_flags, 'on'))
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+        for flag in self.restricted_flags:
+            self.assertFalse(getattr(row, flag), flag)
+
+    def test_authorized_manager_can_grant_revoke_and_delete(self):
+        self.manager_grant.can_publish = True
+        self.manager_grant.save()
+        self.manager = self.reload(self.manager)
+        response = self._post(can_publish='on')
+        self.assertEqual(response.status_code, 302)
+        row = PagePermission.objects.get(user=self.target)
+        self.assertTrue(row.can_publish)
+        response = self._post(row, can_publish='')
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertFalse(row.can_publish)
+        response = self._post(row, DELETE='on')
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(PagePermission.objects.filter(pk=row.pk).exists())
+
+    def test_superuser_can_manage_protected_row(self):
+        row = self._grant(can_publish=True)
+        response = self._post(row, actor=self.get_superuser(), can_publish='', grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertFalse(row.can_publish)
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+
+    def test_view_restrictions_remain_editable(self):
+        row = self._grant(can_change=False, can_view=True)
+        response = self._post(row, grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertTrue(row.can_view)
+        self.assertFalse(row.can_change)
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+        for flag in self.restricted_flags:
+            self.assertFalse(getattr(row, flag), flag)
+
+    def test_view_restriction_cannot_transfer_hidden_editing_rights(self):
+        row = self._grant(can_view=True, can_publish=True)
+        for changes in ({'user': self.manager.pk}, {'grant_on': ACCESS_PAGE}, {'DELETE': 'on'}):
+            with self.subTest(changes=changes):
+                before = list(PagePermission.objects.order_by('pk').values())
+                response = self._post(row, **changes)
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+                row.refresh_from_db()
+                self.assertEqual(row.user_id, self.target.pk)
+                self.assertEqual(row.grant_on, ACCESS_PAGE_AND_DESCENDANTS)
+                self.assertTrue(row.can_publish)
+                self.assertTrue(row.can_view)
+
+    def test_authorized_view_restriction_edit_preserves_hidden_flags(self):
+        self.manager_grant.can_publish = True
+        self.manager_grant.save()
+        self.manager = self.reload(self.manager)
+        row = self._grant(can_view=True, can_publish=True)
+        response = self._post(row, grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        row.refresh_from_db()
+        self.assertTrue(row.can_publish)
+        self.assertTrue(row.can_change)
+        self.assertTrue(row.can_view)
+        self.assertEqual(row.grant_on, ACCESS_PAGE)
+
+    def test_excluded_flags_are_preserved_on_existing_instances(self):
+        row = self._grant(can_publish=True)
+        form_class = forms.modelform_factory(
+            PagePermission, form=BasePermissionAdminForm,
+            fields=['user', 'can_change', 'grant_on'],
+        )
+        form = form_class(instance=row, data={
+            'user': self.target.pk, 'can_change': 'on', 'grant_on': ACCESS_PAGE,
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        row.refresh_from_db()
+        self.assertTrue(row.can_publish)
+
+    def test_formsets_keep_their_own_page(self):
+        other = create_page('Other', 'nav_playground.html', 'en')
+        inline = PagePermissionInlineAdmin(Page, admin.site)
+        request = self.get_request(self.url)
+        request.user = self.manager
+        with current_user(self.manager):
+            first = inline.get_formset(request, self.page)
+            second = inline.get_formset(request, other)
+        self.assertEqual(first.form._page, self.page)
+        self.assertEqual(second.form._page, other)
+
+    def _manager_page_grant(self, scope, **flags):
+        defaults = dict.fromkeys(PagePermission.get_all_permissions(), False)
+        defaults.update(can_change=True, **flags)
+        return PagePermission.objects.create(
+            page=self.page, user=self.manager, grant_on=scope, **defaults,
+        )
+
+    def test_grantable_scope_matrix_includes_future_pages(self):
+        scopes = (
+            ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
+            ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS,
+        )
+        covered = {
+            ACCESS_PAGE: {ACCESS_PAGE},
+            ACCESS_CHILDREN: {ACCESS_CHILDREN},
+            ACCESS_PAGE_AND_CHILDREN: {ACCESS_PAGE, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN},
+            ACCESS_DESCENDANTS: {ACCESS_CHILDREN, ACCESS_DESCENDANTS},
+            ACCESS_PAGE_AND_DESCENDANTS: set(scopes),
+        }
+        # The page has no children: authorization must still cover future ones.
+        for held_scope in scopes:
+            grant = self._manager_page_grant(held_scope, can_publish=True)
+            self.manager = self.reload(self.manager)
+            for requested_scope in scopes:
+                with self.subTest(held=held_scope, requested=requested_scope):
+                    grantable = get_grantable_page_permissions(self.manager, self.page, requested_scope)
+                    self.assertEqual('can_publish' in grantable, requested_scope in covered[held_scope])
+            grant.delete()
+
+    def test_scope_coverage_combines_user_group_and_ancestor_grants(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        self.manager.groups.add(self.group)
+        group_grant = self._grant(can_publish=True)
+        group_grant.user = None
+        group_grant.group = self.group
+        group_grant.grant_on = ACCESS_DESCENDANTS
+        group_grant.save()
+        child = create_page('Child', 'nav_playground.html', 'en', parent=self.page)
+        for page in (self.page, child):
+            with self.subTest(page=page.pk):
+                self.assertIn('can_publish', get_grantable_page_permissions(
+                    self.manager, page, ACCESS_PAGE_AND_DESCENDANTS,
+                ))
+
+    def test_grants_on_existing_children_do_not_cover_future_siblings(self):
+        child = create_page('Child', 'nav_playground.html', 'en', parent=self.page)
+        grant = self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_publish=True)
+        grant.page = child
+        grant.save()
+        self.assertNotIn('can_publish', get_grantable_page_permissions(
+            self.manager, self.page, ACCESS_DESCENDANTS,
+        ))
+
+    def test_ancestor_children_grant_covers_only_child_itself(self):
+        self._manager_page_grant(ACCESS_CHILDREN, can_publish=True)
+        child = create_page('Child', 'nav_playground.html', 'en', parent=self.page)
+        self.assertIn('can_publish', get_grantable_page_permissions(self.manager, child, ACCESS_PAGE))
+        self.assertNotIn('can_publish', get_grantable_page_permissions(
+            self.manager, child, ACCESS_PAGE_AND_CHILDREN,
+        ))
+
+    def test_scope_requires_django_permission(self):
+        self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_publish=True)
+        self.manager.user_permissions.remove(Permission.objects.get(codename='publish_page'))
+        self.assertNotIn('can_publish', get_grantable_page_permissions(
+            self.reload(self.manager), self.page, ACCESS_PAGE_AND_DESCENDANTS,
+        ))
+
+    def test_new_grant_cannot_exceed_flag_scope(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(can_publish='on')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'throughout the selected scope')
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+        response = self._post(can_publish='on', grant_on=ACCESS_PAGE)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(PagePermission.objects.get(user=self.target).can_publish)
+
+    def test_new_grant_requires_management_throughout_scope(self):
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.can_publish = True
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE, can_change_permissions=True)
+        self._grant()  # Make the recipient subordinate to the page manager.
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(can_publish='on')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'throughout the selected scope')
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    def test_existing_scope_protects_against_forged_changes(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        for view in (False, True):
+            row = self._grant(can_publish=True, can_view=view)
+            for changes in (
+                {'grant_on': ACCESS_PAGE}, {'user': self.manager.pk},
+                {'user': '', 'group': self.group.pk}, {'DELETE': 'on'},
+            ):
+                with self.subTest(view=view, changes=changes):
+                    before = list(PagePermission.objects.order_by('pk').values())
+                    response = self._post(row, **changes)
+                    self.assertIn(response.status_code, (200, 302))
+                    self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    def test_existing_scope_requires_management_authority(self):
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE, can_change_permissions=True)
+        row = self._grant()
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(row, DELETE='on')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    def test_scope_expansion_checks_visible_and_hidden_flags(self):
+        self._manager_page_grant(ACCESS_PAGE, can_publish=True)
+        for view in (False, True):
+            row = self._grant(can_publish=True, can_view=view)
+            row.grant_on = ACCESS_PAGE
+            row.save()
+            with self.subTest(view=view):
+                before = list(PagePermission.objects.order_by('pk').values())
+                response = self._post(row, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'throughout the selected scope')
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_raw_id_recipient_must_be_subordinate(self):
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_change_permissions=True)
+        row = self._grant()
+        outsider = self._create_user('outsider', is_staff=True)
+        before = list(PagePermission.objects.order_by('pk').values())
+        for existing in (None, row):
+            with self.subTest(existing=existing):
+                response = self._post(existing, user=outsider.pk)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'Select a valid choice')
+                self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+                self._assert_recipient_widget(response, ForeignKeyRawIdWidget)
+        self.assertEqual(self._post(row, user=self.target.pk).status_code, 302)
+
+    def _assert_recipient_widget(self, response, widget_class):
+        inline = next(
+            inline for inline in response.context_data['inline_admin_formsets']
+            if not inline.opts.show_with_view_permissions
+        )
+        self.assertIsInstance(inline.formset.forms[0].fields['user'].widget, widget_class)
+
+    def _bulk_users(self):
+        user_model = type(self.manager)
+        usernames = [f'raw-id-user-{index}@example.com' for index in range(500)]
+        user_model.objects.bulk_create([
+            user_model(**{user_model.USERNAME_FIELD: username}, is_staff=True)
+            for username in usernames
+        ])
+        # MySQL does not populate generated primary keys on bulk-created users.
+        return user_model.objects.filter(**{f'{user_model.USERNAME_FIELD}__in': usernames})
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_large_subordinate_set_uses_restricted_select(self):
+        from cms.forms.widgets import UserSelectAdminWidget
+
+        self.manager_grant.can_change_permissions = False
+        self.manager_grant.save()
+        self._manager_page_grant(ACCESS_PAGE_AND_DESCENDANTS, can_change_permissions=True)
+        row = self._grant()
+        flags = dict.fromkeys(PagePermission.get_all_permissions(), False)
+        flags['can_change'] = True
+        child = create_page('Subordinates', 'nav_playground.html', 'en', parent=self.page)
+        # Exercise MySQL's lack of bulk-insert IDs on every test backend.
+        with patch.object(type(connection.features), 'can_return_rows_from_bulk_insert', False):
+            users = self._bulk_users()
+        PagePermission.objects.bulk_create([
+            PagePermission(page=child, user=user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, **flags)
+            for user in users
+        ])
+        outsider = self._create_user('outsider', is_staff=True)
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(row, user=outsider.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Select a valid choice')
+        self._assert_recipient_widget(response, UserSelectAdminWidget)
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+        self.assertEqual(self._post(row, user=self.target.pk).status_code, 302)
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_root_level_raw_id_recipient_excludes_superusers(self):
+        self._bulk_users()
+        row = self._grant()
+        superuser = self.get_superuser()
+        before = list(PagePermission.objects.order_by('pk').values())
+        response = self._post(row, user=superuser.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Select a valid choice')
+        self._assert_recipient_widget(response, ForeignKeyRawIdWidget)
+        self.assertEqual(list(PagePermission.objects.order_by('pk').values()), before)
+        self.assertEqual(self._post(row, user=self.target.pk).status_code, 302)
+
+    @override_settings(CMS_RAW_ID_USERS=1)
+    def test_raw_id_lookup_does_not_mutate_shared_relation(self):
+        relation = PagePermission._meta.get_field('user').remote_field
+        original_limits = relation.limit_choices_to
+        self._grant()
+        with self.login_user_context(self.manager):
+            response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self._assert_recipient_widget(response, ForeignKeyRawIdWidget)
+        self.assertIs(relation.limit_choices_to, original_limits)
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_LANGUAGES={
+        1: [{'code': 'en', 'name': 'English'}],
+        2: [{'code': 'en', 'name': 'English'}],
+    },
+)
+class PagePermissionInlineSiteTests(CMSTestCase):
+    """The permissions inline must use the site of the edited page.
+
+    The admin can be served from one site while editing pages of another one.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.site_b = Site.objects.create(domain='b.example', name='B')
+        self.root = create_page('root-b', 'nav_playground.html', 'en', site=self.site_b)
+        self.page = create_page('page-b', 'nav_playground.html', 'en', site=self.site_b, parent=self.root)
+        self.manager = self._create_user('manager', is_staff=True)
+        self.manager.user_permissions.add(*Permission.objects.filter(codename__in=[
+            'change_page', 'add_pagepermission', 'change_pagepermission', 'delete_pagepermission',
+        ]))
+        assign_user_to_page(self.root, self.manager, can_change=True, can_change_permissions=True)
+        target = self._create_user('target', is_staff=True)
+        self.row = assign_user_to_page(self.page, target, can_change=True)
+
+    def test_rows_of_other_site_page_are_editable(self):
+        self.assertNotEqual(Site.objects.get_current(), self.site_b)
+        request = self.get_request('/')
+        request.user = self.manager
+        inline = PagePermissionInlineAdmin(Page, admin.site)
+
+        formset = inline.get_formset(request, obj=self.page)
+
+        self.assertIn(self.row, formset._queryset)

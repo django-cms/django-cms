@@ -52,8 +52,10 @@ module.exports = [
                 $: 'readonly',
                 jQuery: 'readonly',
 
-                // Jasmine
+                // Jasmine (through the vitest compatibility layer)
                 jasmine: 'readonly',
+                vi: 'readonly',
+                vitest: 'readonly',
                 describe: 'readonly',
                 it: 'readonly',
                 xit: 'readonly',
@@ -66,6 +68,7 @@ module.exports = [
                 spyOnEvent: 'readonly',
                 pending: 'readonly',
                 fixture: 'readonly',
+                CMS_PATH: 'readonly',
 
                 // Custom globals
                 CMS: 'readonly',

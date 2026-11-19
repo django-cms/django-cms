@@ -5,7 +5,8 @@ from django.contrib.admin import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.sites.models import Site
-from django.db import OperationalError
+from django.db import OperationalError, ProgrammingError
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import (
@@ -15,6 +16,7 @@ from cms.admin.forms import (
 )
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
+from cms.models.permissionmodels import ACCESS_CHOICES
 from cms.utils import page_permissions, permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
@@ -58,12 +60,12 @@ class PagePermissionInlineAdmin(TabularInline):
 
         # Given a fresh django-cms install and a django settings with the
         # CMS_RAW_ID_USERS = CMS_PERMISSION = True
-        # django throws an OperationalError when running
-        # ./manage migrate
-        # because auth_user doesn't exists yet
+        # django throws an OperationalError (sqlite) or ProgrammingError
+        # (postgres) when running ./manage migrate because the user table
+        # doesn't exist yet.
         try:
             threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
+        except (OperationalError, ProgrammingError):
             threshold = False
 
         return ['user'] if threshold else []
@@ -75,8 +77,9 @@ class PagePermissionInlineAdmin(TabularInline):
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to himself)
         """
-        site = Site.objects.get_current(request)
+        return self._get_subordinate_queryset(request, Site.objects.get_current(request))
 
+    def _get_subordinate_queryset(self, request, site):
         try:
             # can see only permissions for users which are under him in tree
             qs = self.model.objects.subordinate_to_user(request.user, site)
@@ -90,7 +93,7 @@ class PagePermissionInlineAdmin(TabularInline):
         permissions which are available for him. E.g. if user does not haves
         can_change flag, he can't change assign can_change permissions.
         """
-        exclude = self.exclude or []
+        exclude = list(self.exclude or [])
         if obj:
             user = request.user
             if not obj.has_add_permission(user):
@@ -105,11 +108,33 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_move_page')
 
         kwargs['exclude'] = exclude
-        self.form._page = obj
         formset_cls = super().get_formset(request, obj=obj, **kwargs)
-        qs = self.get_queryset(request)
+        formset_cls.form._page = obj
+        formset_cls.form._current_user = request.user
         if obj is not None:
-            qs = qs.filter(page=obj)
+            # The page may belong to another site than the one serving the admin.
+            qs = self._get_subordinate_queryset(request, obj.site).filter(page=obj)
+        else:
+            qs = self.get_queryset(request)
+        # Preserving hidden flags alone would let a manager transfer them via
+        # user/group, change their scope via grant_on, or revoke them by deleting
+        # the row. Like global grants, these rows must be outside the manager's
+        # editable queryset. Django also uses this queryset to resolve posted
+        # inline IDs, so crafted edits and deletions cannot reach them.
+        qs = qs.filter(**{
+            field: False for field in exclude
+            if field in self.model.get_all_permissions()
+        })
+        if obj is not None:
+            allowed = Q(pk__in=[])
+            for scope, _label in ACCESS_CHOICES:
+                grantable = permissions.get_grantable_page_permissions(request.user, obj, scope)
+                if 'can_change_permissions' in grantable:
+                    allowed |= Q(grant_on=scope, **{
+                        field: False for field in self.model.get_all_permissions()
+                        if field not in grantable
+                    })
+            qs = qs.filter(allowed)
         formset_cls._queryset = qs
         return formset_cls
 
@@ -139,12 +164,39 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
         threshold = get_cms_setting('RAW_ID_USERS')
         try:
             threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
+        except (OperationalError, ProgrammingError):
             threshold = False
         filter_copy = deepcopy(self.list_filter)
         if threshold:
             filter_copy.remove('user')
         return filter_copy
+
+    def get_exclude(self, request, obj=None):
+        """Offer only the ``can_*`` flags the acting user may hand out.
+
+        Mirrors ``PagePermissionInlineAdmin.get_formset``: a manager must not be
+        able to grant -- to themselves or anyone else -- a right they do not hold
+        (CWE-269). Excluding the field keeps it out of the rendered form *and*
+        out of a crafted POST. Whether a flag the manager holds on some site may
+        be granted for the sites actually picked is settled in the form's
+        ``clean()``, once ``sites`` is known.
+        """
+        exclude = list(super().get_exclude(request, obj) or [])
+        grantable = permissions.get_grantable_global_permissions(request.user)
+        exclude.extend(
+            field for field in GlobalPagePermission.get_all_permissions()
+            if field not in grantable and field not in exclude
+        )
+        return exclude
+
+    def get_form(self, request, obj=None, **kwargs):
+        form_class = super().get_form(request, obj, **kwargs)
+        # The form caps each granted flag to the sites the manager holds it on,
+        # so it needs to know who is acting. ``modelform_factory`` returns a
+        # fresh subclass per call, so this is per-request state rather than
+        # shared mutation of the declared form class.
+        form_class._current_user = request.user
+        return form_class
 
     def has_add_permission(self, request):
         site = Site.objects.get_current(request)
@@ -152,11 +204,32 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         site = Site.objects.get_current(request)
-        return permissions.user_can_change_global_permissions(request.user, site)
+        return (
+            permissions.user_can_change_global_permissions(request.user, site)
+            and self._can_manage_grant(request, obj)
+        )
 
     def has_delete_permission(self, request, obj=None):
         site = Site.objects.get_current(request)
-        return permissions.user_can_delete_global_permissions(request.user, site)
+        return (
+            permissions.user_can_delete_global_permissions(request.user, site)
+            and self._can_manage_grant(request, obj)
+        )
+
+    def _can_manage_grant(self, request, obj):
+        """Only let a manager edit or delete a grant they could have created.
+
+        A grant for a site the manager may not manage permissions on, or holding
+        flags they may not hand out on its sites, is out of reach: its ``user``,
+        ``group`` and ``sites`` would otherwise let them move those flags to
+        themselves or to other sites (CWE-269).
+        """
+        if obj is None:
+            return True
+        held = {flag for flag in GlobalPagePermission.get_all_permissions() if getattr(obj, flag)}
+        site_ids = list(obj.sites.values_list("pk", flat=True))
+        grantable = permissions.get_grantable_global_permissions(request.user, site_ids)
+        return "can_change_permissions" in grantable and held <= grantable
 
     @classproperty
     def raw_id_fields(cls):
@@ -165,12 +238,12 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
 
         # Given a fresh django-cms install and a django settings with the
         # CMS_RAW_ID_USERS = CMS_PERMISSION = True
-        # django throws an OperationalError when running
-        # ./manage migrate
-        # because auth_user doesn't exists yet
+        # django throws an OperationalError (sqlite) or ProgrammingError
+        # (postgres) when running ./manage migrate because the user table
+        # doesn't exist yet.
         try:
             threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
+        except (OperationalError, ProgrammingError):
             threshold = False
 
         return ['user'] if threshold else []

@@ -1,3 +1,4 @@
+import fnmatch
 from collections import defaultdict
 from functools import lru_cache
 from operator import attrgetter
@@ -18,12 +19,19 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_base import CMSPluginBase
 from cms.utils.helpers import normalize_name
 
+_GLOB_CHARS = ("*", "?", "[")
+
+
+def _has_glob(pattern: str) -> bool:
+    """Return ``True`` if ``pattern`` looks like a glob (contains ``*``, ``?`` or ``[``)."""
+    return isinstance(pattern, str) and any(char in pattern for char in _GLOB_CHARS)
+
 
 class PluginPool:
     plugins: dict[str, type[CMSPluginBase]]
     root_plugin_cache: dict[str, list[type[CMSPluginBase]]]
     discovered: bool
-    global_restrictions_cache: defaultdict[str, dict]
+    global_restrictions_cache: defaultdict[tuple[str, str, str], dict]
 
     def __init__(self):
         self.plugins = {}
@@ -33,17 +41,64 @@ class PluginPool:
 
     @property
     def global_template_restrictions(self) -> bool:
-        return any(".htm" in (key or "") for key in self.global_restrictions_cache)
+        """``True`` if ``CMS_PLACEHOLDER_CONF`` contains template-specific keys"""
+        from cms.utils import placeholder
+
+        return placeholder._template_in_conf
 
     def _clear_cached(self) -> None:
         self.root_plugin_cache = {}
+        self.global_restrictions_cache = defaultdict(dict)
         self.get_all_plugins_for_model.cache_clear()
+        self.expand_plugin_patterns.cache_clear()
         if "registered_plugins" in self.__dict__:
             del self.__dict__["registered_plugins"]
         if "plugins_with_extra_menu" in self.__dict__:
             del self.__dict__["plugins_with_extra_menu"]
         if "plugins_with_extra_placeholder_menu" in self.__dict__:
             del self.__dict__["plugins_with_extra_placeholder_menu"]
+
+    @lru_cache  # noqa: B019
+    def expand_plugin_patterns(self, patterns: tuple[str, ...]) -> frozenset[str]:
+        """
+        Expand a tuple of plugin-name patterns into the set of matching plugin names.
+
+        Literal names are kept verbatim (so an unregistered literal simply matches no
+        installed plugin, preserving historic behaviour). Glob patterns -- ``*``, ``?``
+        and ``[seq]`` -- are matched case-sensitively against the names of all registered
+        plugins.
+
+        The result is memoized; the cache is cleared whenever plugins are (un)registered
+        (see :meth:`_clear_cached`), so the registry is only scanned on the first use of a
+        given pattern tuple. This keeps restriction evaluation -- which is on the critical
+        rendering path -- cheap.
+        """
+        globs = [pattern for pattern in patterns if _has_glob(pattern)]
+        if not globs:
+            # Fast path: no globs, nothing to expand against the registry.
+            return frozenset(patterns)
+        names = tuple(self.plugins)
+        matched = {pattern for pattern in patterns if not _has_glob(pattern)}
+        for pattern in globs:
+            matched.update(name for name in names if fnmatch.fnmatchcase(name, pattern))
+        return frozenset(matched)
+
+    def resolve_plugin_patterns(self, patterns: list[str] | None) -> list[str] | None:
+        """
+        Resolve a ``child_classes``/``parent_classes`` value, expanding any glob patterns.
+
+        ``None`` (no restriction) is returned unchanged. A list without glob patterns is
+        returned as-is, both to avoid overhead and to preserve its ordering. A list with at
+        least one glob is expanded to the sorted list of matching registered plugin names.
+
+        Expansion happens *before* emptiness is interpreted, so a glob that matches nothing
+        yields an empty list -- i.e. "no plugins allowed", just like an explicit ``[]``.
+        """
+        if patterns is None:
+            return None
+        if not any(_has_glob(pattern) for pattern in patterns):
+            return patterns
+        return sorted(self.expand_plugin_patterns(tuple(patterns)))
 
     def discover_plugins(self) -> None:
         if self.discovered:
@@ -193,14 +248,16 @@ class PluginPool:
             lazy(page.get_template, str)() if page and hasattr(page, "get_template") else None
         )  # Make template lazy to avoid unnecessary db access
 
+        # ``setting_key=None`` skips the placeholder's allow list (``excluded_plugins`` still applies)
         allowed_plugins = (
             get_placeholder_conf(
                 setting_key,
                 placeholder,
                 template,
             )
-            or ()
-        )
+            if setting_key
+            else None
+        ) or ()
         excluded_plugins = (
             get_placeholder_conf(
                 "excluded_plugins",
@@ -217,6 +274,11 @@ class PluginPool:
         if excluded_plugins:
             # Check that plugins are not in the list of the excluded ones
             plugins = (plugin for plugin in plugins if plugin.__name__ not in excluded_plugins)
+
+        if placeholder is not None:
+            # Honour each plugin's allowed_slots restriction (plugin-side counterpart to the
+            # placeholder's plugins/excluded_plugins config).
+            plugins = (plugin for plugin in plugins if plugin.is_allowed_in_slot(placeholder))
 
         if root_plugin:
             # Filters out any plugin that requires a parent or has set parent classes
@@ -281,7 +343,7 @@ class PluginPool:
 
     def get_restrictions_cache(
         self, request_cache: dict, instance: CMSPluginBase, obj: models.Model | None
-    ) -> defaultdict[str, dict]:
+    ) -> dict:
         """
         Retrieve the restrictions cache for a given plugin instance.
 
@@ -289,9 +351,10 @@ class PluginPool:
         plugin restrictions only depend on template and placeholder slot as described by the
         CMS_PLACEHOLDER_CONF setting.
 
-        If it can, it retrieves the appropriate restrictions cache based on the template and slot
-        of the plugin instance's placeholder. If not, it returns the (local) request cache which will
-        be recalculated for each request.
+        If it can, it retrieves the restrictions cache for the object class, slot and (if
+        ``CMS_PLACEHOLDER_CONF`` contains template-specific keys) template of the plugin instance's
+        placeholder. If not, it returns the (local) request cache which will be recalculated for
+        each request.
 
         Args:
             request_cache (dict): The current request cache (only filled is non globally cacheable).
@@ -311,15 +374,16 @@ class PluginPool:
         else:
             template = ""
 
-        if template and f"{object_class}:{template} {slot}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{object_class}:{template} {slot}"]
-        if template and f"{object_class}:{template}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{object_class}:{template}"]
-        if slot and f"{object_class}:{slot}" in self.global_restrictions_cache:
-            return self.global_restrictions_cache[f"{object_class}:{slot}"]
-        return self.global_restrictions_cache[object_class]
+        # Restrictions are resolved per setting from different CMS_PLACEHOLDER_CONF keys (see
+        # get_placeholder_conf). Hence, each slot (and template) needs its own cache.
+        return self.global_restrictions_cache[(object_class, template, slot)]
 
-    restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
+    restriction_methods = (
+        "get_require_parent",
+        "get_child_class_overrides",
+        "get_parent_classes",
+        "get_child_classes",
+    )
 
     def can_cache_globally(self, plugin_class: type[CMSPluginBase]) -> bool:
         """

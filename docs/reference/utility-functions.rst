@@ -28,6 +28,15 @@ Grouper admin
     :show-inheritance:
 
 
+*****
+Pages
+*****
+
+.. module:: cms.utils.page
+
+.. autofunction:: get_page_from_request
+
+
 ************
 Placeholders
 ************
@@ -44,21 +53,31 @@ Plugins
 *******
 
 .. module:: cms.utils.plugins
+   :noindex:
 
 .. autofunction:: get_plugins
+   :noindex:
 
 .. autofunction:: assign_plugins
+   :noindex:
 
 .. autofunction:: has_reached_plugin_limit
+   :noindex:
 
 .. autofunction:: get_plugin_class
+   :noindex:
 
 .. autofunction:: get_plugin_model
+   :noindex:
 
 .. autofunction:: get_plugins_as_layered_tree
+   :noindex:
 
 .. autofunction:: copy_plugins_to_placeholder
+   :noindex:
 
 .. autofunction:: downcast_plugins
+   :noindex:
 
 .. autofunction:: get_bound_plugins
+   :noindex:

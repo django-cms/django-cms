@@ -351,6 +351,16 @@
 
         _mouseStop: function(event, noPropagation) {
 
+            // Outdenting and switching connected containers can move the
+            // placeholder after the last permission check. Validate the actual
+            // destination before committing the drop.
+            var parentItem = this.placeholder.parent().parent(),
+                level = this._getLevel(this.placeholder);
+            if (!parentItem.closest('.ui-sortable').length) {
+                parentItem = null;
+            }
+            this._isAllowed(parentItem, level, level + this._getChildLevels(this.helper));
+
             // mjs - if the item is in a position not allowed, send it back
             if (this.beyondMaxLevels) {
 

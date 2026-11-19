@@ -59,6 +59,7 @@ class CMSSitemap(Sitemap):
         - In a public language for the Site
         - Not redirects
         - Not login_required
+        - Not page types
 
         The site is taken from the ``SITE_ID`` setting or identified from the current request
         using the Sites framework. (A custom site middelware is ignored by Django's sitemap
@@ -96,6 +97,9 @@ class CMSSitemap(Sitemap):
         return (
             PageUrl.objects.get_for_site(site)
             .filter(language__in=languages, path__isnull=False, page__login_required=False)
+            # Page types are blueprints for new pages, not content, and are not
+            # served on the public site.
+            .exclude(page__is_page_type=True)
             .order_by("page__path")
             .select_related("page")
             .annotate(

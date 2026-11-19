@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib import admin
@@ -28,7 +29,6 @@ from cms.test_utils.testcases import (
     CMSTestCase,
 )
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
@@ -272,6 +272,21 @@ class AdminTestCase(AdminTestsBase):
         self.assertFalse(PageContent.objects.filter(page=page, language="es-mx").exists())
         self.assertFalse(PageUrl.objects.filter(page=page, language="de").exists())
         self.assertFalse(PageUrl.objects.filter(page=page, language="es-mx").exists())
+
+    def test_delete_translation_without_page_url(self):
+        # A translation may exist without a PageUrl (e.g., never published with versioning)
+        admin_user = self.get_superuser()
+        page = create_page("delete-page-translation", "nav_playground.html", "en", created_by=admin_user)
+        create_page_content("de", "delete-page-translation-de", page, slug="delete-page-translation-de")
+        PageUrl.objects.filter(page=page, language="de").delete()
+
+        with self.login_user_context(admin_user):
+            response = self.client.post(self.get_page_delete_translation_uri("de", page), data={"post": "yes"})
+            self.assertRedirects(response, self.get_pages_admin_list_uri("de"))
+
+        self.assertTrue(PageContent.objects.filter(page=page, language="en").exists())
+        self.assertTrue(PageUrl.objects.filter(page=page, language="en").exists())
+        self.assertFalse(PageContent.objects.filter(page=page, language="de").exists())
 
     def test_change_template(self):
         template = get_cms_setting("TEMPLATES")[0][0]
@@ -594,13 +609,36 @@ class AdminTests(AdminTestsBase):
         )
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(endpoint)
-        if DJANGO_4_2:
-            self.assertContains(response, '<input type="text" name="page_title" maxlength="255" id="id_page_title">')
-        else:
-            self.assertContains(
-                response,
-                '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">',
-            )
+        self.assertContains(
+            response,
+            '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">',
+        )
+
+    def test_page_edit_field_endpoint_respects_page_content_change_permission(self):
+        """The edit-field endpoint must not bypass restrictions added to the
+        PageContent admin, e.g., by djangocms-versioning for published content."""
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+        content_admin = site._registry[PageContent]
+        original_title = self.page.get_admin_content("en").title
+
+        with patch.object(content_admin, "has_change_permission", return_value=False) as has_change_permission:
+            with self.login_user_context(self.get_superuser()):
+                get_response = self.client.get(endpoint)
+                post_response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(get_response.status_code, 403)
+        self.assertEqual(post_response.status_code, 403)
+        has_change_permission.assert_called()
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, original_title)
+
+    def test_page_edit_field_endpoint_saves_with_page_content_change_permission(self):
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?edit_fields=title"
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(endpoint, {"title": "Changed title"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PageContent.admin_manager.get(page=self.page, language="en").title, "Changed title")
 
 
 class NoDBAdminTests(CMSTestCase):
@@ -610,17 +648,11 @@ class NoDBAdminTests(CMSTestCase):
 
     def test_lookup_allowed_site__exact(self):
         request = self.get_request()
-        if DJANGO_5_1:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1"))
-        else:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
+        self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
 
     def test_lookup_allowed_published(self):
         request = self.get_request()
-        if DJANGO_5_1:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1"))
-        else:
-            self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
+        self.assertTrue(self.admin_class.lookup_allowed("site__exact", "1", request=request))
 
 
 class PluginPermissionTests(AdminTestsBase):
@@ -735,15 +767,10 @@ class AdminFormsTests(AdminTestsBase):
             # Invalid parent
             endpoint = self.get_page_add_uri("en")
             response = self.client.post(endpoint, new_page_data)
-            if DJANGO_5_1:
-                expected_error = (
-                    '<ul class="errorlist">' "<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>"
-                )
-            else:
-                expected_error = (
-                    '<ul class="errorlist" id="id_parent_page_error">'
-                    "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
-                )
+            expected_error = (
+                '<ul class="errorlist" id="id_parent_page_error">'
+                "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
+            )
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
@@ -762,15 +789,10 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid parent
             response = self.client.post(endpoint, new_page_data)
-            if DJANGO_5_1:
-                expected_error = (
-                    '<ul class="errorlist">' "<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>"
-                )
-            else:
-                expected_error = (
-                    '<ul class="errorlist" id="id_parent_page_error">'
-                    "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
-                )
+            expected_error = (
+                '<ul class="errorlist" id="id_parent_page_error">'
+                "<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>"
+            )
 
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
@@ -784,16 +806,10 @@ class AdminFormsTests(AdminTestsBase):
             with self.login_user_context(superuser):
                 # Invalid slug
                 response = self.client.post(endpoint, new_page_data)
-                if DJANGO_5_1:
-                    expected_error = (
-                        '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, '
-                        "underscores or hyphens.</li></ul>"
-                    )
-                else:
-                    expected_error = (
-                        '<ul class="errorlist" id="id_slug_error"><li>Enter a valid “slug” consisting of '
-                        "letters, numbers, underscores or hyphens.</li></ul>"
-                    )
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error"><li>Enter a valid “slug” consisting of '
+                    "letters, numbers, underscores or hyphens.</li></ul>"
+                )
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_error, html=True)
@@ -807,18 +823,11 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             with self.subTest("Duplicate slug / path"):
                 response = self.client.post(endpoint, new_page_data)
-                if DJANGO_5_1:
-                    expected_error = (
-                        '<ul class="errorlist"><li>Page '
-                        '<a href="{}" target="_blank">test</a> '
-                        "has the same url 'test' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page2))
-                else:
-                    expected_error = (
-                        '<ul class="errorlist" id="id_slug_error"><li>Page '
-                        '<a href="{}" target="_blank">test</a> '
-                        "has the same url 'test' as current page.</li></ul>"
-                    ).format(self.get_page_change_uri("en", page2))
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error"><li>Page '
+                    '<a href="{}" target="_blank">test</a> '
+                    "has the same url 'test' as current page.</li></ul>"
+                ).format(self.get_page_change_uri("en", page2))
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected_error, html=True)

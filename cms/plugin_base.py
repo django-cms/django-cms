@@ -1,3 +1,4 @@
+import fnmatch
 import json
 import re
 from collections.abc import Callable
@@ -11,12 +12,14 @@ from django.template import Context
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_str, smart_str
 from django.utils.functional import lazy
-from django.utils.html import escapejs
+from django.utils.html import conditional_escape, escapejs
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin, Page
+from cms.models.placeholdermodel import Placeholder
 from cms.toolbar.utils import get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
@@ -206,6 +209,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     See also: Model's ``allowed_plugins`` attribute for model-level restrictions.
     """
 
+    allowed_slots = None
+    """Plugin-level restriction: A list of placeholder slot names where this plugin can be added.
+
+    Each entry may be an exact slot name or a glob pattern (e.g. ``"content"`` or ``"footer_*"``),
+    matched against the placeholder's ``slot``.
+
+    - If ``None`` (default): The plugin can be added to any slot.
+    - If a list/tuple is provided: The plugin can only be added to slots matching one of the entries.
+    - If an empty list ``[]``: The plugin cannot be added to any slot.
+
+    This is the plugin-side counterpart to the ``plugins``/``excluded_plugins`` keys of
+    ``CMS_PLACEHOLDER_CONF``. Both filters must pass for the plugin to be available in a slot.
+
+    See also: :attr:`allowed_models`, ``CMS_PLACEHOLDER_CONF``.
+    """
+
     allow_children = False
     """Allows this plugin to have child plugins - other plugins placed inside it?
 
@@ -229,15 +248,23 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     """
 
     #: A list of Plugin Class Names. If this is set, only plugins listed here can be added to this plugin.
-    #: See also: :attr:`parent_classes`.
+    #: Entries may be glob patterns (e.g. ``"Bootstrap*"`` or ``"*Link*"``), which are expanded against the
+    #: names of all registered plugins. An empty list (``[]``), or a list of patterns that match no installed
+    #: plugin, means that no plugins are allowed as children, whereas ``None`` (the default) means there is no
+    #: restriction. As a special case, the string ``"auto"`` allows exactly those plugins that explicitly name
+    #: this plugin in their :attr:`parent_classes` -- i.e. the restriction is driven by the children opting in,
+    #: rather than the parent listing them. See also: :attr:`parent_classes`.
     child_classes = None
 
     #: Is it required that this plugin is a child of another plugin? Or can it be added to any placeholder, even one
     #: attached to a page. See also: :attr:`child_classes`, :attr:`parent_classes`.
     require_parent = False
 
-    #: A list of the names of permissible parent classes for this plugin. See also: :attr:`child_classes`,
-    #: :attr:`require_parent`.
+    #: A list of the names of permissible parent classes for this plugin. Entries may be glob patterns
+    #: (e.g. ``"Bootstrap*"`` or ``"*Link*"``), which are expanded against the names of all registered plugins.
+    #: An empty list (``[]``), or a list of patterns that match no installed plugin, means that the plugin allows
+    #: no parents and can therefore only be added to a placeholder, whereas ``None`` (the default) means there is
+    #: no restriction. See also: :attr:`child_classes`, :attr:`require_parent`.
     parent_classes = None
 
     #: Disables *dragging* of child plugins in structure mode.
@@ -322,15 +349,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             raise ValidationError("plugin has no render_template: %s" % self.__class__)
         return template
 
-    if DJANGO_5_1:
-        # Avoid a bug in Django's template engine that is incompatible with Python 3.9+
-        # type hinting. By default, the parent class has no __class_getitem__ method.
-        # There exist third-party packages, however, that inject type hinting into Django.
-        # This ensures, that any type hinting is ignored for CMSPlugin (below Django 5.2)
-        # See https://github.com/django-cms/django-cms/issues/7948
-        def __class_getitem__(cls, item):
-            raise TypeError
-
     @classmethod
     def get_render_queryset(cls):
         return cls.model._default_manager.all()
@@ -365,6 +383,20 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         context["instance"] = instance
         context["placeholder"] = placeholder
         return context
+
+    @classmethod
+    def is_allowed_in_slot(cls, slot: str | None) -> bool:
+        """Return whether this plugin may be added to a placeholder with the given ``slot``.
+
+        Honours the :attr:`allowed_slots` plugin-level restriction. A ``slot`` of ``None``
+        (an unbound query, e.g. the global plugin listing) is always allowed.
+        """
+        if cls.allowed_slots is None or slot is None:
+            return True
+        # Tolerate a bare string (e.g. ``allowed_slots = "content"``) instead of
+        # iterating over its characters, which would silently misbehave.
+        patterns = [cls.allowed_slots] if isinstance(cls.allowed_slots, str) else cls.allowed_slots
+        return any(fnmatch.fnmatchcase(slot, pattern) for pattern in patterns)
 
     @classmethod
     def requires_parent_plugin(cls, slot, page):
@@ -611,7 +643,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             operation_kwargs["operation"] = operations.CHANGE_PLUGIN
         else:
             parent_id = obj.parent.pk if obj.parent else None
-            tree_order = obj.placeholder.get_plugin_tree_order(parent_id)
+            tree_order = obj.placeholder.get_plugin_tree_order(obj.language, parent_id)
             operation_kwargs["plugin"] = obj
             operation_kwargs["operation"] = operations.ADD_PLUGIN
             operation_kwargs["tree_order"] = tree_order
@@ -641,8 +673,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {"name": force_str(opts.verbose_name), "obj": force_str(obj)}
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
+        msg_dict = {
+            "name": conditional_escape(force_str(opts.verbose_name)),
+            "obj": conditional_escape(force_str(obj)),
+        }
+        msg = mark_safe(_('The %(name)s "%(obj)s" was changed successfully.') % msg_dict)
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj, action="change")
 
@@ -739,13 +774,16 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Returns a list of plugin types that are allowed
         as children of this plugin.
         """
+        from cms.plugin_pool import plugin_pool
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf("child_classes", slot, template, default={})
-        return ph_conf.get(cls.__name__, cls.child_classes)
+        child_classes = ph_conf.get(cls.__name__, cls.child_classes)
+        # Expand any glob patterns (e.g. "Bootstrap*") to concrete plugin names.
+        return plugin_pool.resolve_plugin_patterns(child_classes)
 
     @classmethod
     def get_child_plugin_candidates(cls, slot: str, page: Page | None = None) -> list:
@@ -753,6 +791,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Returns a list of all plugin classes
         that will be considered when fetching
         all available child classes for this plugin.
+
+        These are the plugins allowed in the placeholder (its ``plugins`` setting) plus the
+        plugins explicitly related to this plugin, i.e., named literally in this plugin's
+        ``child_classes`` or naming this plugin literally in their ``parent_classes`` (either
+        on the plugin class or in ``CMS_PLACEHOLDER_CONF``). Glob patterns do not count as
+        explicit relations. ``excluded_plugins`` and ``allowed_slots`` always apply.
         """
         # Adding this as a separate method,
         # we allow other plugins to affect
@@ -760,8 +804,34 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Useful in cases like djangocms-text
         # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
+        from cms.utils.placeholder import get_placeholder_conf
 
-        return plugin_pool.get_all_plugins(slot, page, root_plugin=False)
+        template = cls._get_template_for_conf(page, None)
+        allowed_plugins = get_placeholder_conf("plugins", slot, template)
+        if not allowed_plugins:
+            # No restriction: All plugins are candidates anyway
+            return list(plugin_pool.get_all_plugins(slot, page, root_plugin=False))
+
+        declared_children = get_placeholder_conf("child_classes", slot, template, default={}).get(
+            cls.__name__, cls.child_classes
+        )
+        if isinstance(declared_children, str):  # "auto" is covered by the children's parent_classes
+            declared_children = None
+        # Membership tests below are literal: glob patterns never equal a plugin name
+        declared_children = set(declared_children or ())
+        conf_parent_classes = get_placeholder_conf("parent_classes", slot, template, default={})
+
+        def is_candidate(plugin: type[CMSPluginBase]) -> bool:
+            name = plugin.__name__
+            if name in allowed_plugins or name in declared_children:
+                return True
+            return cls.__name__ in (conf_parent_classes.get(name, plugin.parent_classes) or ())
+
+        return [
+            plugin
+            for plugin in plugin_pool.get_all_plugins(slot, page, setting_key=None, root_plugin=False)
+            if is_candidate(plugin)
+        ]
 
     @classmethod
     @template_slot_caching
@@ -774,15 +844,31 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         # Placeholder overrides are highest in priority
         child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
-        # Get all child plugin candidates
-        installed_plugins = cls.get_child_plugin_candidates(slot, page)
+        # Get all child plugin candidates - for the same source (and template) as the overrides
+        source = instance.placeholder.source if page is None and instance is not None else page
+        installed_plugins = cls.get_child_plugin_candidates(slot, source)
+        if only_uncached:
+            # Cached child classes are already known to the caller
+            installed_plugins = [plugin for plugin in installed_plugins if not plugin.cache_parent_classes]
 
-        if child_classes:
+        if child_classes == "auto":
+            from cms.utils.placeholder import get_placeholder_conf
+
+            # Allow all plugins as children that explicitly declare this plugin as parent,
+            # either on the plugin class or in the placeholder configuration
+            template = cls._get_template_for_conf(page, instance)
+            conf_parent_classes = get_placeholder_conf("parent_classes", slot, template, default={})
+            return [
+                plugin.__name__
+                for plugin in installed_plugins
+                if cls.__name__ in (conf_parent_classes.get(plugin.__name__, plugin.parent_classes) or ())
+            ]
+        elif child_classes is not None:
+            # An explicit list of allowed child classes (possibly empty).
+            # An empty list means that no plugins are allowed as children, whereas
+            # ``None`` (handled below) means there is no restriction.
             # Override skips check if current class is valid parent of child classes
             return [plugin.__name__ for plugin in installed_plugins if plugin.__name__ in child_classes]
-
-        if only_uncached:
-            installed_plugins = [plugin for plugin in installed_plugins if not plugin.cache_parent_classes]
 
         child_classes = []
         plugin_type = cls.__name__
@@ -797,9 +883,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # is a valid child class.
         for plugin_class in installed_plugins:
             allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
-            if not allowed_parents or plugin_type in allowed_parents:
-                # Plugin has no parent restrictions or
-                # Current plugin (self) is a configured parent
+            if allowed_parents is None or plugin_type in allowed_parents:
+                # Plugin has no parent restrictions (``None``) or
+                # current plugin (self) is a configured parent.
+                # An empty ``parent_classes`` list means the plugin allows no
+                # parents and is therefore never a valid child.
                 child_classes.append(plugin_class.__name__)
 
         return child_classes
@@ -807,6 +895,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     @classmethod
     @template_slot_caching
     def get_parent_classes(cls, slot: str, page: Page | None = None, instance: CMSPlugin | None = None) -> list[str]:
+        from cms.plugin_pool import plugin_pool
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)
@@ -814,9 +903,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # config overrides..
         ph_conf = get_placeholder_conf("parent_classes", slot, template, default={})
         parent_classes = ph_conf.get(cls.__name__, cls.parent_classes)
-        return parent_classes
+        # Expand any glob patterns (e.g. "Bootstrap*") to concrete plugin names.
+        return plugin_pool.resolve_plugin_patterns(parent_classes)
 
-    def get_plugin_urls(self):
+    def get_plugin_urls(self) -> list:
         """
         Returns the URL patterns the plugin wants to register views for.
         They are included under django CMS's page admin URLS in the plugin path
@@ -833,7 +923,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     plugin_urls = property(plugin_urls)
 
     @classmethod
-    def get_extra_placeholder_menu_items(self, request, placeholder):
+    def get_extra_placeholder_menu_items(cls, request: HttpRequest, placeholder: Placeholder) -> list["PluginMenuItem"] | None:
         """Extends the placeholder context menu for all placeholders.
 
         To add one or more custom context menu items that are displayed in the context menu for all placeholders when
@@ -843,7 +933,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         pass
 
     @classmethod
-    def get_extra_plugin_menu_items(cls, request, plugin):
+    def get_extra_plugin_menu_items(cls, request: HttpRequest, plugin: CMSPlugin) -> list["PluginMenuItem"] | None:
         """Extends the plugin context menu for all plugins.
 
         To add one or more custom context menu items that are displayed in the context menu for all plugins when in

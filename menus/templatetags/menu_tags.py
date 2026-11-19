@@ -16,6 +16,7 @@ from cms.utils.i18n import (
     get_language_object,
     get_public_languages,
 )
+from menus.base import detach_from_parents
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -36,11 +37,10 @@ def cut_after(node, levels, removed=None):
     if levels <= 0:
         node.children = []
     else:
+        # Filter before recursing: removing while iterating skipped the next child.
+        node.children[:] = [child for child in node.children if child.visible]
         for child in node.children:
-            if child.visible:
-                cut_after(child, levels - 1)
-            else:
-                node.children.remove(child)
+            cut_after(child, levels - 1)
 
 
 def remove(node, removed):
@@ -55,7 +55,9 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     cutting nodes away from menus
     """
     final = []
+    invisible = []
     selected = None
+    ancestor_levels = {}
     for node in nodes:
         if getattr(node, "level", None) == from_level and node.visible:
             if node.level <= extra_inactive or node.selected or node.ancestor or node.descendant:
@@ -64,21 +66,27 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             else:
                 # Find level of nearest active ancestor
                 parent = node.parent
-                while parent:
-                    if parent.ancestor:
-                        if parent.level + extra_inactive + 1 >= from_level:
-                            final.append(node)
-                        break
+                path = []
+                while parent and not parent.ancestor and id(parent) not in ancestor_levels:
+                    path.append(parent)
                     parent = parent.parent
-        elif not node.visible and node.parent and node in node.parent.children:
-            # Cut out invisible child nodes
-            node.parent.children.remove(node)
+                level = parent.level if parent and parent.ancestor else ancestor_levels.get(id(parent))
+                # Siblings and cousins share the result for their parent chain.
+                for ancestor in path:
+                    ancestor_levels[id(ancestor)] = level
+                if level is not None and level + extra_inactive + 1 >= from_level:
+                    final.append(node)
+        elif not node.visible:
+            # Cut out invisible child nodes after the loop
+            invisible.append(node)
         if getattr(node, "level", None) == to_level:
             # Cut at to_level
             node.children = []
         if node.selected:
             # Mark selected node
             selected = node
+
+    detach_from_parents(invisible)
 
     def cut_inactive(final_nodes):
         """Recursively cut inactive nodes from the tree."""
@@ -99,9 +107,15 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
 
 def flatten(nodes):
     flat = []
-    for node in nodes:
+    # Preserve preorder without copying each subtree into every ancestor list.
+    pending = [iter(nodes)]
+    while pending:
+        node = next(pending[-1], None)
+        if node is None:
+            pending.pop()
+            continue
         flat.append(node)
-        flat.extend(flatten(node.children))
+        pending.append(iter(node.children))
     return flat
 
 

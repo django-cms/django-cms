@@ -1,11 +1,13 @@
 import warnings
 
 from django.conf import settings
+from django.core.signals import request_finished
 from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.models import Page, UrlconfRevision
 from cms.signals import move_page, urls_need_reloading
+from cms.signals.apphook import DISPATCH_UID
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks, signal_tester
@@ -19,6 +21,18 @@ overrides = {
 
 @override_settings(**overrides)
 class SignalTests(CMSTestCase):
+    def _discard_pending_reload(self):
+        # Creating a page with an apphook outside of a request schedules a reload
+        # for the end of the next request, which would be credited to the operation
+        # under test
+        request_finished.disconnect(dispatch_uid=DISPATCH_UID)
+
+    def _move_page(self, page, target, position=0):
+        endpoint = self.get_admin_url(Page, 'move_page', page.pk)
+        response = self.client.post(endpoint, {'id': page.pk, 'position': position, 'target': target.pk})
+        # The endpoint reports the outcome of the move in its JSON payload
+        self.assertEqual(response.json()['status'], 200)
+
     def test_move_page_signal_warns_on_connect(self):
         def receiver(**kwargs):
             return None
@@ -71,6 +85,7 @@ class SignalTests(CMSTestCase):
                     apphook="SampleApp",
                     apphook_namespace="test"
                 )
+                self._discard_pending_reload()
 
                 with signal_tester(urls_need_reloading) as env:
                     endpoint = self.get_admin_url(Page, 'delete', page.pk)
@@ -109,3 +124,64 @@ class SignalTests(CMSTestCase):
                     self.assertEqual(env.call_count, 1)
                     new_revision, _ = UrlconfRevision.get_or_create_revision()
                     self.assertNotEqual(current_revision, new_revision)
+
+    def test_urls_need_reloading_signal_delete_ancestor(self):
+        parent = create_page("parent", "nav_playground.html", "en")
+        create_page("apphooked-page", "nav_playground.html", "en", parent=parent, apphook="SampleApp")
+        self._discard_pending_reload()
+
+        with self.login_user_context(self.get_superuser()):
+            with signal_tester(urls_need_reloading) as env:
+                current_revision, _ = UrlconfRevision.get_or_create_revision()
+                self.client.post(self.get_admin_url(Page, 'delete', parent.pk), {'post': 'yes'})
+                # The apphooked page is deleted along with its parent
+                self.assertFalse(Page.objects.exists())
+                self.assertEqual(env.call_count, 1)
+                new_revision, _ = UrlconfRevision.get_or_create_revision()
+                self.assertNotEqual(current_revision, new_revision)
+
+    def test_urls_need_reloading_signal_move_ancestor(self):
+        parent_1 = create_page("parent-1", "nav_playground.html", "en")
+        parent_2 = create_page("parent-2", "nav_playground.html", "en")
+        page = create_page("apphooked-page", "nav_playground.html", "en", parent=parent_1, apphook="SampleApp")
+        self._discard_pending_reload()
+
+        with self.login_user_context(self.get_superuser()):
+            with signal_tester(urls_need_reloading) as env:
+                current_revision, _ = UrlconfRevision.get_or_create_revision()
+                self._move_page(parent_1, parent_2)
+                self.assertEqual(page.urls.get(language="en").path, "parent-2/parent-1/apphooked-page")
+                self.assertEqual(env.call_count, 1)
+                new_revision, _ = UrlconfRevision.get_or_create_revision()
+                self.assertNotEqual(current_revision, new_revision)
+
+    def test_no_urls_need_reloading_signal_move_unchanged_url(self):
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        page = create_page("apphooked-page", "nav_playground.html", "en", apphook="SampleApp")
+        self._discard_pending_reload()
+
+        with self.login_user_context(self.get_superuser()):
+            with signal_tester(urls_need_reloading) as env:
+                # The page gets a new parent, but children of the home page live at
+                # the root: its url does not change
+                self._move_page(page, home)
+                self.assertEqual(Page.objects.get(pk=page.pk).parent, home)
+                self.assertEqual(page.urls.get(language="en").path, "apphooked-page")
+                self.assertEqual(env.call_count, 0)
+
+    def test_no_urls_need_reloading_signal_without_apphook(self):
+        # Only a page outside of the moved and deleted subtree has an apphook
+        create_page("apphooked-page", "nav_playground.html", "en", apphook="SampleApp")
+        parent_1 = create_page("parent-1", "nav_playground.html", "en")
+        parent_2 = create_page("parent-2", "nav_playground.html", "en")
+        page = create_page("page", "nav_playground.html", "en", parent=parent_1)
+        self._discard_pending_reload()
+
+        with self.login_user_context(self.get_superuser()):
+            with signal_tester(urls_need_reloading) as env:
+                self._move_page(page, parent_2)
+                self.assertEqual(page.urls.get(language="en").path, "parent-2/page")
+                self.client.post(self.get_admin_url(Page, 'delete', parent_2.pk), {'post': 'yes'})
+                self.assertEqual(Page.objects.count(), 2)
+                self.assertEqual(env.call_count, 0)

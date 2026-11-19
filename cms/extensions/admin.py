@@ -1,16 +1,25 @@
+from urllib.parse import urlencode
+
 from django.contrib import admin
-from django.contrib.admin.options import csrf_protect_m
+from django.contrib.admin.options import IS_POPUP_VAR, TO_FIELD_VAR, csrf_protect_m
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from cms.models import Page, PageContent
 from cms.utils.page_permissions import user_can_change_page
+from cms.utils.urlutils import static_with_version
 
 
 class ExtensionAdmin(admin.ModelAdmin):
     change_form_template = "admin/cms/extensions/change_form.html"
     add_form_template = "admin/cms/extensions/change_form.html"
+    # Toolbar popups are iframes, so Django's popup response cannot use
+    # window.opener. Keep Django's callbacks for regular related-object popups.
+    popup_response_template = "admin/cms/extensions/popup_response.html"
+
+    class Media:
+        css = {"all": (static_with_version("cms/css/cms.admin.css"),)}
 
 
 class PageExtensionAdmin(ExtensionAdmin):
@@ -52,6 +61,13 @@ class PageExtensionAdmin(ExtensionAdmin):
                     args=(extension.pk,),
                     current_app=self.admin_site.name
                 )
+                # Keep the popup response and CMS iframe context after redirecting.
+                popup_context = {
+                    key: request.GET[key]
+                    for key in (IS_POPUP_VAR, TO_FIELD_VAR, 'cms_path') if key in request.GET
+                }
+                if popup_context:
+                    change_url += '?' + urlencode(popup_context)
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
@@ -99,6 +115,13 @@ class PageContentExtensionAdmin(ExtensionAdmin):
                     args=(extension.pk,),
                     current_app=self.admin_site.name
                 )
+                # Keep the popup response and CMS iframe context after redirecting.
+                popup_context = {
+                    key: request.GET[key]
+                    for key in (IS_POPUP_VAR, TO_FIELD_VAR, 'cms_path') if key in request.GET
+                }
+                if popup_context:
+                    change_url += '?' + urlencode(popup_context)
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass

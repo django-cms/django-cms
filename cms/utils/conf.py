@@ -4,7 +4,9 @@ from typing import Any
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.connection import ConnectionProxy
 from django.utils.translation import gettext_lazy as _
 
 from cms import __version__, constants
@@ -23,12 +25,19 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from importlib.machinery import SourceFileLoader
+    from importlib.util import module_from_spec, spec_from_file_location
 
-    imported = None
-    if module_path:
-        imported = SourceFileLoader("mod", module_path).load_module()
-    return imported
+    if not module_path:
+        return None
+
+    spec = spec_from_file_location("mod", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load template config: {module_path}")
+
+    # Python 3.15 removed the legacy load_module() API.
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def default(name):
@@ -39,7 +48,7 @@ def default(name):
             return wrapped()
 
         update_wrapper(wrapper, wrapped)
-        return wrapped
+        return wrapper
 
     return decorator
 
@@ -64,6 +73,7 @@ DEFAULTS = {
     'PAGE_CACHE': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
+    'MENU_CACHE_BACKEND': 'default',
     'CACHE_PREFIX': f'cms_{__version__}_',
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
@@ -84,7 +94,6 @@ DEFAULTS = {
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
     'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
     'SIDEFRAME_ENABLED': True,
-    'CONFIRM_VERSION4': False,
     'ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED': False,
     'ENDPOINT_LIVE_URL_QUERYSTRING_PARAM': "live-url",
     'REDIRECT_PRESERVE_QUERY_PARAMS': False,
@@ -115,6 +124,10 @@ def get_cache_durations():
         'content': 60,
         'permissions': 60 * 60,
     })
+
+
+def get_menu_cache():
+    return ConnectionProxy(caches, get_cms_setting('MENU_CACHE_BACKEND'))
 
 
 @default('CMS_MEDIA_ROOT')

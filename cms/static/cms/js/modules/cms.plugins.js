@@ -50,7 +50,6 @@ class Plugin {
             plugin_id: null,
             plugin_parent: null,
             plugin_restriction: [],
-            plugin_parent_restriction: [],
             urls: {
                 add_plugin: '',
                 edit_plugin: '',
@@ -62,6 +61,7 @@ class Plugin {
 
         // create an unique for this component to use it internally
         this.uid = uid();
+        this.container = container;
 
         // this property will be filled later
         this.modal = null;
@@ -494,16 +494,11 @@ class Plugin {
         if (clipboardDraggable.data('cms')) {
             var clipboardPluginData = clipboardDraggable.data('cms');
             var type = clipboardPluginData.plugin_type;
-            var parent_bounds = $.grep(clipboardPluginData.plugin_parent_restriction, function(restriction) {
-                // special case when PlaceholderPlugin has a parent restriction named "0"
-                return restriction !== '0';
-            });
-            var currentPluginType = this.options.plugin_type;
 
-            if (
-                (bounds.length && $.inArray(type, bounds) === -1) ||
-                (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)
-            ) {
+            // The target's child list (bounds) already encodes which plugins it accepts -- including
+            // the placeholder's root list, which excludes plugins that require a parent. So a single
+            // membership check is enough.
+            if (bounds.length && $.inArray(type, bounds) === -1) {
                 pasteItem.addClass('cms-submenu-item-disabled');
                 pasteItem.find('a').attr('tabindex', '-1').attr('aria-disabled', 'true');
                 pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
@@ -1093,7 +1088,7 @@ class Plugin {
         var isTouching;
         var plugins;
 
-        var initModal = once(function initModal() {
+        var initModal = once(function initializeModal() {
             var placeholder = $(
                 '<div class="cms-add-plugin-placeholder">' + CMS.config.lang.addPluginPlaceholder + '</div>'
             );
@@ -2259,7 +2254,7 @@ Plugin.staticPlaceholderDuplicatesMap = {};
 Plugin._initializeTree = function _initializeTree() {
     const plugins = {};
 
-    document.body.querySelectorAll(
+    document.querySelectorAll(
         'script[data-cms-plugin], ' +
         'script[data-cms-placeholder], ' +
         'script[data-cms-general]'
@@ -2301,7 +2296,7 @@ Plugin._refreshPlugins = function refreshPlugins() {
     Plugin.staticPlaceholderDuplicatesMap = {};
 
     // Re-read front-end editable fields ("general" plugins) from DOM
-    document.body.querySelectorAll('script[data-cms-general]').forEach(script => {
+    document.querySelectorAll('script[data-cms-general]').forEach(script => {
         CMS._plugins.push([script.id, JSON.parse(script.textContent)]);
     });
     // Remove duplicates
@@ -2325,21 +2320,19 @@ Plugin._refreshPlugins = function refreshPlugins() {
         }
     });
 
-    CMS._plugins.forEach(([type, opts]) => {
+    CMS._plugins.forEach(([container, opts]) => {
         if (opts.type !== 'placeholder' && opts.type !== 'plugin') {
-            const instance = CMS._instances.find(
-                i => i.options.type === opts.type && Number(i.options.plugin_id) === Number(opts.plugin_id)
-            );
+            const instance = CMS._instances.find(i => i.container === container);
 
             if (instance) {
                 // update
-                instance._setupUI(type);
+                instance._setupUI(container);
                 instance._ensureData();
                 instance.ui.container.data('cms').push(instance.options);
                 instance._setGeneric();
             } else {
                 // create
-                CMS._instances.push(new Plugin(type, opts));
+                CMS._instances.push(new Plugin(container, opts));
             }
         }
     });

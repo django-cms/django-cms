@@ -4,7 +4,7 @@ from os.path import join
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.db import IntegrityError, models
+from django.db import IntegrityError, connection, models, router, transaction
 from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.constraints import UniqueConstraint
@@ -14,7 +14,6 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.timezone import now
 from django.utils.translation import get_language, gettext_lazy as _, override as force_language
-from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.models.managers import PageManager, PageUrlManager
@@ -22,10 +21,42 @@ from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
+from cms.utils.mptree import get_tree_base
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
 logger = getLogger(__name__)
+
+
+def _clear_permission_cache_on_tree_change():
+    """Invalidate cached page permissions after page paths changed.
+
+    The permission cache stores grants by page path. Without invalidation, a
+    cached grant would match whichever page took over the path of the granted
+    page, and stop matching the granted page itself.
+
+    Invalidation is deferred to commit only. Clearing the shared cache
+    immediately would let a permission check later in the same transaction
+    repopulate it from the uncommitted paths; if that transaction then rolls
+    back, Django discards the ``on_commit`` callback and the stale paths would
+    survive against the restored tree until the cache expires.
+    """
+    if not get_cms_setting("PERMISSION"):
+        return
+
+    from cms.cache.permissions import clear_permission_cache
+
+    transaction.on_commit(clear_permission_cache)
+
+
+def _lock_tree_roots(*pages):
+    # Serializes concurrent URL path updates by taking a row-level lock on the
+    # tree root(s) of the given pages, which prevents deadlocks on cms_pageurl.
+    # Locks are acquired in pk order to avoid deadlocks between the locks
+    # themselves when two roots are involved.
+    assert connection.in_atomic_block, "_lock_tree_roots requires an active transaction"
+    pks = sorted({page.get_root().pk for page in pages})
+    list(Page.objects.filter(pk__in=pks).order_by("pk").select_for_update())
 
 
 class AdminCacheDict(dict):
@@ -34,6 +65,8 @@ class AdminCacheDict(dict):
     def __setitem__(self, key, value):
         raise ValueError("Do not set individual items in the admin cache dict. Use the clear_cache method instead.")
 
+
+MP_Node = get_tree_base()
 
 class Page(MP_Node):
     """
@@ -141,7 +174,7 @@ class Page(MP_Node):
         #: Internal cache for page urls
         self.page_content_cache = {}
         #: Internal cache for page content objects visible publicly
-        self.admin_content_cache = AdminCacheDict()
+        self.admin_content_cache = None
         #: Internal cache for page content objects visible in the admin (i.e. to staff users.)
         #: Might be larger than the page_content_cache
 
@@ -181,12 +214,25 @@ class Page(MP_Node):
             kwargs["parent"] = self
         return super().add_child(**kwargs)
 
-    def add_sibling(self, pos=None, *args, **kwargs):
+    def add_sibling(self, pos="last-sibling", *args, **kwargs):
         if len(kwargs) == 1 and "instance" in kwargs:
             kwargs["instance"].parent_id = self.parent_id
         else:
             kwargs["parent_id"] = self.parent_id
-        return super().add_sibling(*args, **kwargs)
+        new_page = super().add_sibling(pos, *args, **kwargs)
+        # Inserting between siblings renumbers the paths of those after it.
+        _clear_permission_cache_on_tree_change()
+        return new_page
+
+    def move(self, *args, **kwargs):
+        super().move(*args, **kwargs)
+        _clear_permission_cache_on_tree_change()
+
+    @classmethod
+    def fix_tree(cls, *args, **kwargs):
+        result = super().fix_tree(*args, **kwargs)
+        _clear_permission_cache_on_tree_change()
+        return result
 
     def get_cached_ancestors(self):
         if self._has_cached_hierarchy():
@@ -201,7 +247,7 @@ class Page(MP_Node):
     def _clear_internal_cache(self):
         self.urls_cache = {}
         self.page_content_cache = {}
-        self.admin_content_cache = AdminCacheDict()
+        self.admin_content_cache = None
 
         if hasattr(self, "_prefetched_objects_cache"):
             del self._prefetched_objects_cache
@@ -237,8 +283,11 @@ class Page(MP_Node):
                 site=self.site_id,
             )
         except self.__class__.DoesNotExist:
+            _lock_tree_roots(self)
             old_home_tree = []
         else:
+            _lock_tree_roots(self, old_home)
+
             old_home.update(
                 is_home=False,
                 changed_by=changed_by,
@@ -296,19 +345,42 @@ class Page(MP_Node):
         )  # TODO: Update or create?
 
     def _update_url_path_recursive(self, language):
+        """Rebuild the managed URL paths of all descendant pages for
+        ``language``, level by level: each page's path derives from its
+        parent's effective path. Unmanaged (overwritten) URLs keep their fixed
+        path but still serve as the base for their own descendants.
+
+        Costs one SELECT and at most one bulk UPDATE per tree level instead of
+        two queries per descendant page.
+        """
         if self.is_leaf() or language not in self.get_languages():
             return
 
-        pages = self.get_child_pages()
-        base_path = self.get_path(language)
-        new_path = self._get_path_sql_value(base_path)
+        base_paths = {self.pk: self.get_path(language)}
 
-        (
-            PageUrl.objects.filter(language=language, page__in=pages).exclude(managed=False).update(path=new_path)
-        )  # TODO: Update or create?
-
-        for child in pages.filter(urls__language=language).iterator():
-            child._update_url_path_recursive(language)
+        while base_paths:
+            urls = PageUrl.objects.filter(page__parent_id__in=base_paths, language=language).values_list(
+                "pk", "page_id", "page__parent_id", "slug", "managed", "path"
+            )
+            changed = []
+            next_base_paths = {}
+            for pk, page_id, parent_id, slug, managed, path in urls:
+                if managed:
+                    base = base_paths[parent_id]
+                    if base is None:
+                        # an unreachable parent makes the page unreachable too
+                        new_path = None
+                    else:
+                        # an empty base means the parent is the home page
+                        new_path = f"{base}/{slug}" if base else slug
+                    if new_path != path:
+                        changed.append(PageUrl(pk=pk, path=new_path))
+                    next_base_paths[page_id] = new_path
+                else:
+                    next_base_paths[page_id] = path
+            if changed:
+                PageUrl.objects.bulk_update(changed, ["path"])
+            base_paths = next_base_paths
 
     def _set_title_root_path(self):
         page_tree = self.__class__.get_tree(self)
@@ -348,6 +420,9 @@ class Page(MP_Node):
         return not self.is_home and bool(self.is_root())
 
     def get_absolute_url(self, language=None, fallback=True):
+        """Return the absolute URL of the page for the given language, or
+        ``None`` if the page has no reachable path (e.g. it or an ancestor
+        is unpublished)."""
         if not language:
             language = get_current_language()
 
@@ -355,9 +430,7 @@ class Page(MP_Node):
             try:
                 if self.is_home:
                     return reverse("pages-root")
-                path = self.get_path(language, fallback) or self.get_slug(
-                    language, fallback
-                )  # TODO: Disallow get_slug
+                path = self.get_path(language, fallback)
                 return reverse("pages-details-by-slug", kwargs={"slug": path}) if path else None
             except NoReverseMatch:
                 return None
@@ -384,7 +457,7 @@ class Page(MP_Node):
         else:
             self.parent.add_sibling(pos=position, instance=self)
 
-    def move_page(self, target_page, position="first-child"):
+    def move_page(self, target_page, position="first-child", user=None):
         """
         Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
@@ -392,6 +465,10 @@ class Page(MP_Node):
         """
         assert isinstance(target_page, Page), f"{target_page} is not an instance of Page."
         inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
+
+        # Snapshot before the move: the ancestors protecting this subtree stop
+        # doing so as soon as its path changes.
+        inherited_restrictions = self.get_view_restrictions(inherited_only=True)
 
         if inherited_template and target_page.is_root() and position in ("left", "right"):
             # The page is being moved to a root position.
@@ -416,15 +493,32 @@ class Page(MP_Node):
         self.update(parent=self.parent)
         self.refresh_from_db(fields=("path", "depth"))
 
-        # Update the urls for the page being moved
-        # and is descendants.
+        # The subtree left the ancestors it inherited its view restrictions
+        # from, so they have to be materialized on its new root.
+        self.apply_view_restrictions(inherited_restrictions, user=user)
+
+        # Update the urls for the page being moved and its descendants.
+        _lock_tree_roots(self)
+
         languages = self.urls.values_list("language", flat=True)
+        old_paths = dict(self.urls.values_list("language", "path"))
 
         for language in languages:
             if not self.is_home:
                 self._update_url_path(language)
+                # Descendant paths derive from this page's path: drop the cached URLs, which
+                # are fetched together with the fallback languages and may hold the old path
+                self.urls_cache = {}
             self._update_url_path_recursive(language)
         self.clear_cache(menu=True)
+
+        new_paths = dict(self.urls.values_list("language", "path"))
+        if new_paths != old_paths and self.__class__.get_tree(self).has_apphooks():
+            # Apphook patterns are built from the PageUrl table: reload them if the
+            # URLs of this page, from which those of its descendants derive, changed
+            from cms.signals.apphook import set_restart_trigger
+
+            set_restart_trigger()
         return self
 
     def _clear_placeholders(self, language):
@@ -435,6 +529,86 @@ class Page(MP_Node):
         plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids, language=language)
         models.query.QuerySet.delete(plugins)
         return placeholders
+
+    def get_view_restrictions(self, inherited_only=False):
+        """Snapshot the ``can_view`` grants that currently protect this page.
+
+        Each entry is a ``(user_id, group_id, grant_on)`` tuple whose scope is
+        expressed relative to *this* page: a grant inherited from an ancestor
+        becomes ``ACCESS_PAGE_AND_DESCENDANTS`` when it also covers what is
+        below this page, and ``ACCESS_PAGE`` when it stops here. The page's own
+        rows keep their own scope.
+        """
+        from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_DESCENDANTS, PagePermission
+        from cms.models.permissionmodels import MASK_DESCENDANTS
+
+        if not get_cms_setting("PERMISSION"):
+            return []
+
+        restrictions = [
+            (
+                permission.user_id,
+                permission.group_id,
+                ACCESS_PAGE_AND_DESCENDANTS if permission.grant_on & MASK_DESCENDANTS else ACCESS_PAGE,
+            )
+            for permission in PagePermission.objects.for_page(self).filter(can_view=True)
+            if permission.page_id != self.pk
+        ]
+
+        if not inherited_only:
+            restrictions += [
+                (permission.user_id, permission.group_id, permission.grant_on)
+                for permission in self.pagepermission_set.filter(can_view=True)
+            ]
+        return restrictions
+
+    def apply_view_restrictions(self, restrictions, user=None):
+        """Recreate ``restrictions`` (from ``get_view_restrictions``) on this page.
+
+        Used when a page leaves the subtree its view restrictions came from: the
+        ancestors that protected it no longer do, so their grants have to be
+        materialized here. Only ``can_view`` is carried over -- the editing
+        privileges attached to the original rows are not privileges of the new
+        location. Grants the page already inherits at its new position with at
+        least the same scope are skipped, so repeated moves do not pile up
+        redundant rows.
+        """
+        from cms.cache.permissions import clear_permission_cache
+        from cms.models import PagePermission
+        from cms.models.permissionmodels import MASK_DESCENDANTS
+        from cms.utils.permissions import clear_permission_lru_caches
+
+        if not restrictions or not get_cms_setting("PERMISSION"):
+            return []
+
+        def scope(grant_on):
+            return 2 if grant_on & MASK_DESCENDANTS else 1
+
+        covered = {}
+        for permission in PagePermission.objects.for_page(self).filter(can_view=True):
+            audience = (permission.user_id, permission.group_id)
+            covered[audience] = max(covered.get(audience, 0), scope(permission.grant_on))
+
+        new_permissions = [
+            PagePermission(
+                page=self,
+                user_id=user_id,
+                group_id=group_id,
+                grant_on=grant_on,
+                **{flag: flag == "can_view" for flag in PagePermission.get_all_permissions()},
+            )
+            for user_id, group_id, grant_on in restrictions
+            if scope(grant_on) > covered.get((user_id, group_id), 0)
+        ]
+
+        if new_permissions:
+            PagePermission.objects.bulk_create(new_permissions)
+            # bulk_create does not emit the permission signals.
+            clear_permission_cache()
+            if user is not None:
+                clear_permission_lru_caches(user)
+            transaction.on_commit(clear_permission_cache)
+        return new_permissions
 
     def copy(
         self,
@@ -462,47 +636,43 @@ class Page(MP_Node):
             parent_page = parent_page or parent_node
 
         if parent_page:
-            new_page = parent_page.add_child(site=site)
+            new_page = parent_page.add_child(site=site, login_required=self.login_required)
         else:
-            new_page = Page.add_root(site=site)
+            new_page = Page.add_root(site=site, login_required=self.login_required)
 
         new_page._state = ModelState()
         new_page._clear_internal_cache()
 
         if language and translations:
-            page_urls = self.urls.filter(language=language)
             translations = self.pagecontent_set(manager="admin_manager").filter(language=language)
         elif translations:
-            page_urls = self.urls.all()
             translations = self.pagecontent_set(manager="admin_manager")
         else:
-            page_urls = self.urls.none()
             translations = self.pagecontent_set(manager="admin_manager").none()
         translations = translations.prefetch_related("placeholders")
-
-        for page_url in page_urls:
-            new_url = model_to_dict(page_url)
-            new_url.pop("id", None)  # No PK
-            new_url.pop("site", None)  # Let the save method handle this
-            new_url["page"] = new_page
-
-            if parent_page:
-                base = parent_page.get_path(page_url.language)
-                path = f"{base}/{page_url.slug}" if base else page_url.slug
-            else:
-                base = ""
-                path = page_url.slug
-
-            new_url["slug"] = get_available_slug(site, path, page_url.language)
-            new_url["path"] = "{}/{}".format(base, new_url["slug"]) if base else new_url["slug"]
-            PageUrl.objects.with_user(user).create(**new_url)
 
         # copy titles of this page
         for title in translations.current_content():
             new_title = model_to_dict(title)
             new_title.pop("id", None)  # No PK
             new_title["page"] = new_page
+
+            if parent_page:
+                base = parent_page.get_path(title.language)
+                path = f"{base}/{title.slug}" if base else title.slug
+            else:
+                base = ""
+                path = title.slug
+
+            new_title["slug"] = get_available_slug(site, path, title.language)
+            if title.overwrite_url:
+                new_title["overwrite_url"] = "{}/{}".format(base, new_title["slug"]) if base else new_title["slug"]
             new_title = PageContent.objects.with_user(user).create(**new_title)
+            if new_title.is_public():
+                # The page URL is derived from public content only. With a
+                # versioning package installed the copy is created as a draft
+                # and gets its URL on first publish.
+                new_page.update_urls_from_content(new_title.language)
 
             for placeholder in title.placeholders.all():
                 # copy the placeholders (and plugins on those placeholders!)
@@ -529,7 +699,15 @@ class Page(MP_Node):
                 permissions_new.append(permission)
 
             if permissions_new:
+                from cms.cache.permissions import clear_permission_cache
+                from cms.utils.permissions import clear_permission_lru_caches
+
                 new_page.pagepermission_set.bulk_create(permissions_new)
+                # bulk_create does not emit the permission signals.
+                clear_permission_cache()
+                clear_permission_lru_caches(user)
+                # A concurrent request can rebuild the cache before these rows commit.
+                transaction.on_commit(clear_permission_cache)
         return new_page
 
     def copy_with_descendants(
@@ -566,7 +744,10 @@ class Page(MP_Node):
                 Prefetch("pagecontent_set", queryset=PageContent.admin_manager.all()),
             )
         )
-        new_root_page = self.copy(target_site, parent_page=parent_page, user=user)
+        if copy_permissions:
+            # Snapshot paths before inserting the copy can move source nodes.
+            inherited_restrictions = self.get_view_restrictions(inherited_only=True)
+        new_root_page = self.copy(target_site, parent_page=parent_page, permissions=copy_permissions, user=user)
 
         if target_page and position in ("first-child"):
             # target page is a parent and user has requested to
@@ -585,13 +766,20 @@ class Page(MP_Node):
             pages_by_id[page.id] = page.copy(
                 target_site, parent_page=parent, translations=True, permissions=copy_permissions, user=user
             )
+
+        if copy_permissions:
+            # Ancestors outside the copied subtree will no longer protect it.
+            new_root_page.apply_view_restrictions(inherited_restrictions, user=user)
         return new_root_page
 
     def delete(self, *args, **kwargs):
-        Page.get_tree(self).delete_fast()
+        using = self._state.db or router.db_for_write(Page, instance=self)
+        Page.get_tree(self).using(using).delete_fast()
 
-        if self.parent:
-            Page.objects.filter(id=self.parent_id).update(numchild=models.F("numchild") - 1)
+        if self.parent_id:
+            Page.objects.using(using).filter(id=self.parent_id).update(
+                numchild=models.F("numchild") - 1
+            )
         self.clear_cache(menu=True)
 
     def delete_translations(self, language=None):
@@ -667,7 +855,9 @@ class Page(MP_Node):
         return self.get_descendants().order_by("path")
 
     def get_root(self):
-        return self.__class__.objects.get(path=self.path[0 : self.steplen])
+        return self.__class__.objects.using(self._state.db).get(
+            path=self.path[0 : self.steplen]
+        )
 
     def get_parent_page(self):
         warnings.warn(
@@ -689,7 +879,7 @@ class Page(MP_Node):
     def get_languages(self, admin_manager=True):
         """Returns available languages for the page. This is potentially costly."""
         if admin_manager:
-            if not self.admin_content_cache:
+            if self.admin_content_cache is None:
                 self.set_admin_content_cache()
             return list(self.admin_content_cache.keys())
         if not self.page_content_cache:
@@ -736,7 +926,7 @@ class Page(MP_Node):
     def get_admin_content(self, language, fallback=False):
         from cms.models.contentmodels import EmptyPageContent
 
-        if not self.admin_content_cache:
+        if self.admin_content_cache is None:
             self.set_admin_content_cache()
         page_content = self.admin_content_cache.get(language, EmptyPageContent(language=language, page=self))
         if not page_content and fallback:
@@ -757,12 +947,31 @@ class Page(MP_Node):
             return ""
 
         if self.parent:
-            base = self.parent.get_path(language, fallback=True)
-            # base can be empty when the parent is a home-page
-            path = f"{base}/{slug}" if base else slug
+            if self.parent.is_home:
+                # children of the home page live directly at the root
+                path = slug
+            else:
+                base = self.parent.get_path(language, fallback=True)
+                # a non-home parent without a path (e.g. unpublished) means
+                # this page has no reachable path either
+                path = f"{base}/{slug}" if base else None
         else:
             path = slug
         return path
+
+    def get_url_data(self, slug, overwrite_url, language):
+        """Derive the :class:`~cms.models.pagemodel.PageUrl` fields (``slug``,
+        ``path``, ``managed``) from an authored slug and overwrite URL."""
+        if overwrite_url and not self.is_home:
+            path = overwrite_url.strip("/")
+        else:
+            # the home page always lives at the root path
+            path = self.get_path_for_slug(slug, language)
+        return {
+            "slug": slug,
+            "path": path,
+            "managed": not bool(overwrite_url),
+        }
 
     def get_url(self, language):
         return self.get_urls().get(language=language)
@@ -788,7 +997,7 @@ class Page(MP_Node):
                     PageUrl.objects.filter(
                         language=lang,
                         path=new_path,
-                        page__site=self.site,
+                        site=self.site_id,
                     )
                     .exclude(pk__in=page_urls_qs.filter(language=lang).values("pk"))
                     .exists()
@@ -806,6 +1015,66 @@ class Page(MP_Node):
 
         # If no collision detected, proceed with the update
         return page_urls_qs.update(**data)
+
+    def update_urls_from_content(self, language):
+        """Derive this page's :class:`~cms.models.pagemodel.PageUrl` for ``language``
+        from the publicly visible :class:`~cms.models.contentmodels.PageContent`
+        object, then update the paths of all descendant pages.
+
+        The slug and overwrite URL are authored on the page content object.
+        ``PageUrl`` is a routing table that must only ever reflect published
+        content: without a versioning package every saved content is public and
+        this runs on every save; with a versioning package installed it must be
+        called when a version is published or unpublished.
+
+        When no public content exists, the URL's path is set to ``None`` so the
+        page stops resolving while the slug stays reserved for the page.
+
+        Raises ``IntegrityError`` if the derived path collides with the URL of
+        another page on the same site.
+        """
+        from cms.models import PageContent
+
+        content = PageContent.objects.filter(page=self, language=language).first()
+        url = self.urls.filter(language=language).first()
+
+        if content is None:
+            if url is None or url.path is None:
+                return
+            self.urls.filter(language=language).update(path=None)
+        else:
+            data = self.get_url_data(content.slug, content.overwrite_url, language)
+            path = data["path"]
+            if url is not None:
+                if (url.slug, url.path, url.managed) == (data["slug"], data["path"], data["managed"]):
+                    # the URL already reflects the content; descendant paths derive
+                    # from this page's path, so they are up to date as well
+                    return
+                self.update_urls(language, **data)  # includes the path collision check
+            else:
+                collision = (
+                    path is not None
+                    and PageUrl.objects.filter(language=language, path=path, site=self.site_id).exists()
+                )
+                if collision:
+                    raise IntegrityError(
+                        f"Cannot create URL. A page URL with path='{path}' and "
+                        f"language='{language}' already exists for another page on the same site."
+                    )
+                self.urls.create(page=self, site_id=self.site_id, language=language, **data)
+
+        self.urls_cache = {}
+        self._update_url_path_recursive(language)
+
+        if (
+            self.application_urls
+            or self.get_descendants().exclude(application_urls__isnull=True).exclude(application_urls="").exists()
+        ):
+            # Apphook patterns are built from the PageUrl table: reload them
+            # once the URL of this page (or a descendant) has changed
+            from cms.signals.apphook import set_restart_trigger
+
+            set_restart_trigger()
 
     def get_fallbacks(self, language):
         return i18n.get_fallback_languages(language, site_id=self.site_id)
@@ -969,7 +1238,7 @@ class Page(MP_Node):
     def get_template(self, language=None, fallback=True, force_reload=False):
         content = self.get_content_obj(language, fallback, force_reload)
         if content:
-            return content.get_template()
+            return content.get_template(app_hooks=False)
         return get_cms_setting("TEMPLATES")[0][0] if get_cms_setting("TEMPLATES") else ""
 
     def get_template_name(self):
@@ -1102,6 +1371,15 @@ class PageUrl(models.Model):
         verbose_name=_("page"),
         related_name="urls",
     )
+    #: Denormalized from ``page.site`` so path uniqueness per site can be
+    #: enforced by the database.
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        verbose_name=_("site"),
+        related_name="djangocms_urls",
+        editable=False,
+    )
     managed = models.BooleanField(default=False)
     objects = PageUrlManager()
 
@@ -1110,10 +1388,18 @@ class PageUrl(models.Model):
         default_permissions = []
         constraints = [
             UniqueConstraint(fields=["page", "language"], name="unique_together_page_language"),
+            # NULL paths (unreachable pages) are distinct on all supported
+            # backends, so any number of them may coexist.
+            UniqueConstraint(fields=["site", "language", "path"], name="unique_site_language_path"),
         ]
 
     def __str__(self):
         return f"{self.path or self.slug} ({self.language})"
+
+    def save(self, *args, **kwargs):
+        if self.site_id is None:
+            self.site_id = self.page.site_id
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:

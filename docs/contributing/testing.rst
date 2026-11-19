@@ -1,3 +1,4 @@
+.. _testing:
 
 Running and writing tests
 =========================
@@ -39,8 +40,8 @@ There's more than one way to do this, but here's one to help you get started:
     git clone https://github.com/django-cms/django-cms.git
 
     # install the dependencies for testing
-    # note that requirements files for other Django versions are also provided
-    pip install -r django-cms/test_requirements/django-X.Y.txt
+    # choose one of the supported Django versions in test_requirements/
+    pip install -r django-cms/test_requirements/django-5.2.txt
 
     # run the test suite
     # note that you must be in the django-cms directory when you do this,
@@ -119,57 +120,78 @@ command.
 To use a different database, set the ``DATABASE_URL`` environment variable to a
 dj-database-url compatible value.
 
-Running Frontend Tests
+Running frontend tests
 ----------------------
 
-We have two types of frontend tests: unit tests and integration tests. For unit tests we
-are using `Karma <http://karma-runner.github.io/>`_ as a test runner and `Jasmine
-<http://jasmine.github.io/>`_ as a test framework.
+We have two types of frontend tests: unit tests and integration tests. Unit tests use
+`Vitest <https://vitest.dev/>`_ as the test runner, in browser mode, so they execute in
+a real Chromium instance driven by `Playwright <https://playwright.dev/>`_ - a lot of
+the assertions depend on real layout and CSS. The specs themselves are still written in
+the Jasmine style: a compatibility layer in ``cms/tests/frontend/unit/helpers`` maps
+``jasmine.createSpy``, ``spyOn``, ``jasmine.clock``, the ``done`` callbacks and the
+vendored jasmine-jquery matchers onto vitest. Integration tests use Playwright too.
 
 In order to be able to run them you need to install necessary dependencies as outlined
 in :ref:`frontend tooling installation instructions <contributing_frontend>`.
 
-Linting runs against the test files as well with ``gulp lint``. In order to run
+Linting runs against the test files as well with ``npx gulp lint``. To run
 linting continuously, do:
 
 .. code-block::
 
-    gulp watch
+    npx gulp watch
 
 Unit tests
 ~~~~~~~~~~
 
-Unit tests can be run like this:
+Install the browser they run in once, after installing the Node dependencies:
 
 .. code-block::
 
-    gulp unitTest
+    npx playwright install chromium
 
-If your code is failing and you want to run only specific files, you can provide the
-``--tests`` parameter with comma separated file names, like this:
-
-.. code-block::
-
-    gulp unitTest --tests=cms.base,cms.modal
-
-If you want to run tests continuously you can use the watch command:
+Unit tests can then be run like this:
 
 .. code-block::
 
-    gulp unitTest --watch
+    npm run test:unit
 
-This will rerun the suite whenever source or test file is changed. By default the tests
-are running on `PhantomJS <http://phantomjs.org/>`_, but when running Karma in watch
-mode you can also visit the server it spawns with an actual browser.
+If your code is failing and you want to run only specific files, pass them to vitest:
 
-    INFO [karma]: Karma v0.13.15 server started at http://localhost:9876/
+.. code-block::
 
-On Travis CI we are using SauceLabs integration to run tests in a set of different real
-browsers, but you can opt out of running them on saucelabs using ``[skip saucelabs]``
-marker in the commit message, similar to how you would skip the build entirely using
-``[skip ci]``.
+    npx vitest run cms/tests/frontend/unit/cms.base.test.js
 
-We're using Jasmine as a test framework and Istanbul as a code coverage tool.
+``npm run test:unit:watch`` re-runs the affected specs as you edit, and
+``npm run test:unit:coverage`` writes a coverage report to
+``cms/tests/frontend/coverage``. ``npx gulp unitTest`` still works and simply
+delegates to vitest.
+
+Integration tests
+~~~~~~~~~~~~~~~~~
+
+Install Playwright's Chromium browser once after installing the Node dependencies:
+
+.. code-block:: sh
+
+    npx playwright install chromium
+
+Run the integration suite with:
+
+.. code-block:: sh
+
+    npx gulp testsIntegration
+
+This task starts the Django test server on port 9009, runs the Playwright tests, and
+stops the server afterwards. It uses ``.venv/bin/python`` when that file exists and
+otherwise uses ``python`` from ``PATH``. To run selected test files, provide a
+comma-separated list:
+
+.. code-block:: sh
+
+    npx gulp testsIntegration --testFiles=loginAdmin.spec.js,touch-action.spec.js
+
+Use ``npx gulp tests`` to run the unit and integration suites in sequence.
 
 Writing tests
 -------------

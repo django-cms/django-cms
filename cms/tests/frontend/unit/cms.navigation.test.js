@@ -1,9 +1,8 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Navigation = require('../../../static/cms/js/modules/cms.navigation').default;
-var $ = require('jquery');
-
-window.CMS = window.CMS || CMS;
+import CMS from '../../../static/cms/js/modules/cms.base';
+import Navigation from '../../../static/cms/js/modules/cms.navigation';
+import $ from 'jquery';
+window.CMS = CMS;
 CMS.Navigation = Navigation;
 
 describe('CMS.Navigation', function () {

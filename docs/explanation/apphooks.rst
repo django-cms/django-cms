@@ -3,6 +3,12 @@
 Application hooks ("apphooks")
 ==============================
 
+.. seealso::
+
+  - :ref:`How django CMS is composed <composition>` — where apphooks
+    fit alongside pages and plugins, including the plugin-vs-apphook
+    decision aid.
+
 An *Application Hook* (usually simply *apphook*) attaches a Django application's URL tree to a
 django CMS page.
 
@@ -76,6 +82,9 @@ for the mechanics).
 
   - An apphook does not serve any public traffic until the page is **published**.
   - This also implies that parent pages on the path need to be published.
+  - Publishing is per language: the application serves a language only once the page is
+    published in it. In other languages, its URLs redirect to a fallback language (see
+    :ref:`apphooks_language_fallback`).
 
 Implications and trade-offs
 ---------------------------

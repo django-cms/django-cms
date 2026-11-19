@@ -26,7 +26,9 @@ from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
     user_can_change_page,
     user_can_delete_page,
+    user_can_view_page,
 )
+from cms.utils.permissions import user_can_view_placeholder_source
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
 
@@ -73,7 +75,6 @@ TOOLBAR_DISABLE_BREAK = "Toolbar disable Break"
 SHORTCUTS_BREAK = "Shortcuts Break"
 
 DEFAULT_HELP_MENU_ITEMS = (
-    (_("Getting started developer guide"), "https://docs.django-cms.org/en/stable/introduction/index.html"),
     (_("Documentation"), "https://docs.django-cms.org/en/stable/"),
     (_("User guide"), "https://user-guide.django-cms.org"),
     (_("Discord community"), "https://www.django-cms.org/discord"),
@@ -157,6 +158,17 @@ class PlaceholderToolbar(CMSToolbar):
             return False
         return any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user))
 
+    def _has_page_view_perm(self):
+        if self.page and user_can_view_page(self.request.user, self.page):
+            return True
+        return False
+
+    def _has_placeholder_view_perm(self):
+        obj = self.toolbar.obj
+        if obj is None:
+            return False
+        return user_can_view_placeholder_source(self.request.user, obj)
+
     def _can_add_button(self):
         if self._has_page_change_perm():
             return True
@@ -165,12 +177,16 @@ class PlaceholderToolbar(CMSToolbar):
         return False
 
     def _can_add_structure_mode(self):
+        # Viewing the structure board only requires view permission: editing
+        # the plugins stays gated by change permission at the plugin endpoints.
+        # This lets headless reviewers (and view-only staff) inspect content
+        # structure without edit rights.
         if not self.request.user.has_perm("cms.use_structure"):
             return False
 
-        if self.page and not self.page.application_urls and self._has_page_change_perm():
+        if self.page and not self.page.application_urls and self._has_page_view_perm():
             return True
-        elif self._has_placeholder_change_perm():
+        elif self._has_placeholder_view_perm():
             return True
         return False
 
@@ -644,10 +660,12 @@ class PageToolbar(CMSToolbar):
                     disabled=not has_perm,
                 )
 
+            # Duplicating is an editing action on this page, so it requires
+            # change permission on this page on top of add permission next to it.
             add_page_menu.add_modal_item(
                 _("Duplicate this Page"),
                 url=add_url_parameters(duplicate_page_url, {"language": self.toolbar.request_language}),
-                disabled=not can_add_sibling_page,
+                disabled=not (can_add_sibling_page and can_change),
             )
 
             # first break
@@ -673,29 +691,26 @@ class PageToolbar(CMSToolbar):
             if edit_mode:
                 action = admin_reverse("cms_pagecontent_change_template", args=(self.page_content.pk,))
 
-                if can_change_advanced:
-                    if get_cms_setting("TEMPLATES"):
-                        options = self.page_content.template_choices
-                        template_menu = _("Templates")
-                    else:
-                        options = [
-                            (placeholders[0], placeholders[2]) for placeholders in get_cms_setting("PLACEHOLDERS")
-                        ]
-                        template_menu = _("Placeholders")
-                    if options:
-                        templates_menu = current_page_menu.get_or_create_menu(
-                            "templates",
-                            template_menu,
-                            disabled=not can_change,
-                        )
+                if get_cms_setting("TEMPLATES"):
+                    options = self.page_content.template_choices
+                    template_menu = _("Templates")
+                else:
+                    options = [(placeholders[0], placeholders[2]) for placeholders in get_cms_setting("PLACEHOLDERS")]
+                    template_menu = _("Placeholders")
+                if options:
+                    templates_menu = current_page_menu.get_or_create_menu(
+                        "templates",
+                        template_menu,
+                        disabled=not can_change,
+                    )
 
-                        for path, name in options:
-                            active = self.page_content.template == path
-                            if path == TEMPLATE_INHERITANCE_MAGIC:
-                                templates_menu.add_break(TEMPLATE_MENU_BREAK)
-                            templates_menu.add_ajax_item(
-                                name, action=action, data={"template": path}, active=active, on_success=refresh
-                            )
+                    for path, name in options:
+                        active = self.page_content.template == path
+                        if path == TEMPLATE_INHERITANCE_MAGIC:
+                            templates_menu.add_break(TEMPLATE_MENU_BREAK)
+                        templates_menu.add_ajax_item(
+                            name, action=action, data={"template": path}, active=active, on_success=refresh
+                        )
 
             # navigation toggle
             in_navigation = self.page_content.in_navigation
@@ -711,7 +726,7 @@ class PageToolbar(CMSToolbar):
             # delete
             delete_url = admin_reverse("cms_page_delete", args=(self.page.pk,))
             delete_disabled = not edit_mode or not user_can_delete_page(self.request.user, page=self.page)
-            on_delete_redirect_url = self.get_on_delete_redirect_url()
+            on_delete_redirect_url = self.get_on_delete_redirect_url() if not delete_disabled else None
             current_page_menu.add_modal_item(
                 _("Delete page"), url=delete_url, on_close=on_delete_redirect_url, disabled=delete_disabled
             )

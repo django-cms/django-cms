@@ -3,14 +3,19 @@ from html import unescape
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.test import override_settings
 from django.utils.translation import override as force_language
 
 from cms.admin import forms
 from cms.admin.forms import (
+    AddPageForm,
+    DuplicatePageForm,
     GlobalPagePermissionAdminForm,
     PagePermissionInlineAdminForm,
     PageUserGroupForm,
     ViewRestrictionInlineAdminForm,
+    get_permission_accessor,
 )
 from cms.api import assign_user_to_page, create_page, create_page_content
 from cms.forms.fields import PageSelectFormField
@@ -20,12 +25,13 @@ from cms.forms.utils import (
     update_site_and_page_choices,
 )
 from cms.forms.widgets import ApplicationConfigSelect
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, Page, PageContent
 from cms.test_utils.testcases import (
     URL_CMS_PAGE_ADVANCED_CHANGE,
     URL_CMS_PAGE_PERMISSIONS,
     CMSTestCase,
 )
+from cms.utils.permissions import current_user
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
@@ -280,6 +286,123 @@ class FormsTestCase(CMSTestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("You can&#x27;t move the home page inside another page", str(form.errors["target"]))
 
+    def test_move_page_form_without_urls(self):
+        target = create_page("Target", "nav_playground.html", "en")
+        page = create_page("Unpublished", "nav_playground.html", "en")
+        # A never-published page can have content but no public URL yet.
+        page.urls.all().delete()
+
+        for destination in ("", target.pk):
+            with self.subTest(target=destination):
+                form = forms.MovePageForm(
+                    data={"target": destination, "position": 0}, page=page, site=self.site
+                )
+                self.assertTrue(form.is_valid(), form.errors)
+                form.move_page()
+                page.refresh_from_db()
+                self.assertEqual(page.parent_id, destination or None)
+                self.assertFalse(page.urls.exists())
+
+    def test_move_page_form_checks_all_url_languages(self):
+        source = create_page("Source", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind")
+        create_page("Kind", "nav_playground.html", "de", parent=target, slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 0}, page=page, site=self.site
+            )
+            self.assertFalse(form.is_valid())
+            self.assertIn("You cannot have two pages with the same slug", str(form.errors["__all__"]))
+
+    def test_move_page_form_keeps_overwritten_urls(self):
+        source = create_page("Source", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind", overwrite_url="custom")
+        # Would collide with the synthesized path "ziel/kind", but the
+        # overwritten German URL stays at "custom" after the move.
+        create_page("Kind", "nav_playground.html", "de", parent=target, slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 0}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertEqual(page.get_path("de"), "custom")
+
+    def test_move_page_form_keeps_overwritten_urls_next_to_sibling(self):
+        source = create_page("Source", "nav_playground.html", "en")
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind", overwrite_url="custom")
+        create_page("Other", "nav_playground.html", "en", parent=target)
+        # A sibling with the same German slug does not collide with the
+        # overwritten German URL, whatever the insert position.
+        create_page("Kind", "nav_playground.html", "de", parent=target, slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 1}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertEqual(page.get_path("de"), "custom")
+
+    def test_move_page_form_reorders_home_page(self):
+        home = create_page("Home", "nav_playground.html", "en")
+        create_page_content("de", "Start", home, slug="start")
+        home.set_as_homepage()
+        other = create_page("Other", "nav_playground.html", "en")
+        # Matches the German slug of the home page, whose URLs never change
+        # when it is reordered among the root pages.
+        create_page_content("de", "Andere", other, slug="andere", overwrite_url="start")
+
+        with force_language("en"):
+            form = forms.MovePageForm(data={"target": "", "position": 1}, page=home, site=self.site)
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        home.refresh_from_db()
+        self.assertTrue(home.is_home)
+        self.assertEqual(home.get_path("de"), "")
+
+    def test_move_page_form_below_unreachable_parent(self):
+        target = create_page("Target", "nav_playground.html", "en")
+        create_page_content("de", "Ziel", target, slug="ziel")
+        # The German translation of the target has no public path.
+        target.urls.filter(language="de").update(path=None)
+        source = create_page("Source", "nav_playground.html", "en")
+        create_page_content("de", "Quelle", source, slug="quelle")
+        page = create_page("Child", "nav_playground.html", "en", parent=source)
+        create_page_content("de", "Kind", page, slug="kind")
+        # Would collide if the page were checked as a root page, but below an
+        # unreachable parent its German URL stays unreachable.
+        create_page("Kind", "nav_playground.html", "de", slug="kind")
+
+        with force_language("en"):
+            form = forms.MovePageForm(
+                data={"target": target.pk, "position": 0}, page=page, site=self.site
+            )
+            self.assertTrue(form.is_valid(), form.errors)
+            form.move_page()
+
+        page.refresh_from_db()
+        self.assertEqual(page.parent_id, target.pk)
+        self.assertIsNone(page.get_path("de"))
+
     def test_move_page_form_positions(self):
         """Test different position options in MovePageForm"""
         parent = create_page("Parent", "nav_playground.html", "en")
@@ -333,6 +456,26 @@ class FormsTestCase(CMSTestCase):
             "Form should report slug collision error",
         )
 
+    def test_move_root_page_form_ignores_other_sites(self):
+        """Moving a root page must only check its siblings on the page's own site (#8830)"""
+        site2 = Site.objects.create(pk=2, domain="site2.com", name="site2")
+
+        # Identical root level trees on both sites, as produced by ``manage.py cms copy-site``
+        for site in (self.site, site2):
+            create_page("A", "nav_playground.html", "de", slug="a", site=site)
+            create_page("B", "nav_playground.html", "de", slug="b", site=site)
+
+        page_b = Page.objects.filter(site=site2, urls__slug="b", urls__language="de").distinct().get()
+
+        data = {
+            "target": "",  # root level
+            "position": 0,
+            "site": site2.pk,
+        }
+        with force_language("de"):
+            form = forms.MovePageForm(data=data, page=page_b, site=site2)
+            self.assertTrue(form.is_valid(), form.errors)
+
     def test_move_page_form_child_parent_slug_collision(self):
         """Test that pages cannot be moved to create duplicate slugs at the same level"""
         # Create grandparent page
@@ -374,7 +517,7 @@ class PermissionFormTestCase(CMSTestCase):
             response = self.client.get(URL_CMS_PAGE_PERMISSIONS % page.pk)
             self.assertEqual(response.status_code, 200)
 
-        with self.settings(CMS_RAW_ID_USERS=True):
+        with self.settings(CMS_RAW_ID_USERS=True), current_user(self.get_superuser()):
             data = {
                 "page": page.pk,
                 "grant_on": "hello",
@@ -401,8 +544,8 @@ class PermissionFormTestCase(CMSTestCase):
             form = PagePermissionInlineAdminForm(data=data, files=None)
 
             error_message = (
-                "<li>Users can't create a page without permissions "
-                "to change the created page. Edit permissions required.</li>"
+                "<li>Users can't create a page without also being able to "
+                "change it. Please also enable 'Can edit'.</li>"
             )
             self.assertFalse(form.is_valid())
             self.assertTrue(error_message in unescape(str(form.errors)))
@@ -460,3 +603,325 @@ class PermissionFormTestCase(CMSTestCase):
         form._current_user = user
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
+
+    def test_page_user_group_form_drops_unauthorized_permissions(self):
+        """A delegated manager must not be able to grant a group permissions
+        they do not hold themselves, even by POSTing the hidden ``can_*``
+        fields that ``get_fieldsets`` never rendered for them (CWE-269).
+        """
+        # Manager holds change_page but NOT any pagepermission/pageuser perms.
+        manager = self._create_user("manager", is_staff=True, permissions=["change_page"])
+        self.assertTrue(manager.has_perm("cms.change_page"))
+        self.assertFalse(manager.has_perm("cms.change_pagepermission"))
+
+        data = {
+            "name": "evil_group",
+            "can_change_page": True,           # held by the manager -> must be kept
+            "can_change_pagepermission": True,  # NOT held -> must be dropped
+            "can_add_pagepermission": True,     # NOT held -> must be dropped
+            "can_change_pageuser": True,        # NOT held -> must be dropped
+        }
+        form = PageUserGroupForm(data=data, files=None)
+        form._current_user = manager
+        self.assertTrue(form.is_valid(), form.errors)
+        group = form.save()
+
+        granted = set(get_permission_accessor(group).values_list("codename", flat=True))
+        self.assertIn("change_page", granted)
+        self.assertNotIn("change_pagepermission", granted)
+        self.assertNotIn("add_pagepermission", granted)
+        self.assertNotIn("change_pageuser", granted)
+
+    def test_page_user_group_form_superuser_can_grant_anything(self):
+        """A superuser holds every permission, so nothing is dropped."""
+        superuser = self.get_superuser()
+        data = {
+            "name": "trusted_group",
+            "can_change_page": True,
+            "can_change_pagepermission": True,
+        }
+        form = PageUserGroupForm(data=data, files=None)
+        form._current_user = superuser
+        self.assertTrue(form.is_valid(), form.errors)
+        group = form.save()
+
+        granted = set(get_permission_accessor(group).values_list("codename", flat=True))
+        self.assertIn("change_page", granted)
+        self.assertIn("change_pagepermission", granted)
+
+
+class DuplicatePageFormSecurityTestCase(CMSTestCase):
+    def _build_form(self, user, source):
+        request = self.get_request("/en/")
+        request.user = user
+        # The admin sets ``_site``/``_request`` as class attributes via
+        # ``get_form`` before instantiation (they are read in ``__init__``).
+        form_cls = type(
+            "TestDuplicatePageForm",
+            (DuplicatePageForm,),
+            {"_site": Site.objects.get_current(), "_request": request},
+        )
+        return form_cls(data={"source": source.pk, "title": "x", "slug": "x"})
+
+    def test_duplicate_rejects_source_user_cannot_view(self):
+        """A staff user with only 'add page' rights must not be able to copy a
+        page they are not allowed to view (CWE-639 / CWE-862). ``source`` is a
+        hidden, client-controlled field whose queryset spans every page.
+        """
+        superuser = self.get_superuser()
+        secret = create_page("secret", "nav_playground.html", "en", created_by=superuser)
+        # Add a view restriction so the page is only viewable by the superuser.
+        self.add_page_permission(superuser, secret, can_view=True)
+
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, secret)
+            self.assertFalse(form.is_valid())
+            self.assertIn("source", form.errors)
+
+    def test_duplicate_allows_source_user_can_view(self):
+        """Copying a page the user is allowed to view keeps working."""
+        superuser = self.get_superuser()
+        source = create_page("source", "nav_playground.html", "en", created_by=superuser)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(superuser, source)
+            # ``source`` must not be the reason the form is (in)valid.
+            form.is_valid()
+            self.assertNotIn("source", form.errors)
+
+
+class AddPageFormSecurityTestCase(CMSTestCase):
+    def _build_form(self, user, page, site):
+        request = self.get_request("/en/")
+        request.user = user
+        form_cls = type(
+            "TestAddPageForm",
+            (AddPageForm,),
+            # Admin form construction can omit ``source``, causing
+            # AddPageForm.__init__ to return before narrowing cms_page.
+            {
+                "source": None,
+                "_site": site,
+                "_request": request,
+                "Meta": type("Meta", (AddPageForm.Meta,), {"fields": []}),
+            },
+        )
+        return form_cls(data={"cms_page": page.pk, "title": "French", "slug": "french"})
+
+    def test_rejects_cms_page_from_another_site(self):
+        owner = self.get_superuser()
+        site = Site.objects.get_current()
+        other_site = Site.objects.create(domain="other.example.com", name="other.example.com")
+        allowed_page = create_page("allowed", "nav_playground.html", "en", site=site, created_by=owner)
+        page = create_page("secret", "nav_playground.html", "de", site=other_site, created_by=owner)
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(allowed_page, attacker, can_change=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, page, site)
+            self.assertFalse(form.is_valid())
+            self.assertIn("cms_page", form.errors)
+
+    def test_rejects_cms_page_user_cannot_change(self):
+        owner = self.get_superuser()
+        site = Site.objects.get_current()
+        allowed_page = create_page("allowed", "nav_playground.html", "en", site=site, created_by=owner)
+        page = create_page("secret", "nav_playground.html", "en", site=site, created_by=owner)
+        attacker = self._create_user("attacker", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(allowed_page, attacker, can_change=True)
+
+        with self.settings(CMS_PERMISSION=True):
+            form = self._build_form(attacker, page, site)
+            self.assertFalse(form.is_valid())
+            self.assertIn("cms_page", form.errors)
+
+
+class ValidateUrlTestCase(CMSTestCase):
+    """Regression tests for the dangerous-scheme bypass in ``validate_url``.
+
+    ``relative_url_regex`` matches any value whose first segment contains no
+    ``/<>``; a scheme such as ``javascript:`` was therefore accepted as a
+    "relative URL" and never reached ``URLValidator``. Such schemes execute
+    script when the value is later rendered into an ``href`` (CWE-79).
+    """
+
+    # Script-executing schemes -- these are the actual XSS vector.
+    DANGEROUS = [
+        "javascript:alert(1)/x",
+        "JavaScript:alert(document.domain)/a",
+        "data:text/html,<script>alert(1)</script>",
+        "vbscript:msgbox(1)/x",
+    ]
+
+    # Markup anywhere in the path -- ``relative_url_regex`` used to constrain only the
+    # first character after the first "/", so prefixing the markup with a safe character
+    # was enough to slip it through.
+    MARKUP = [
+        "foo/a<img src=x onerror=alert(1)>",
+        "/a<script>alert(1)</script>",
+        "foo/bar/<img src=x>",
+        "/en/x'\"><img src=x onerror=alert(1)>",
+        # A value carrying a scheme takes the ``URLValidator`` branch instead, whose path
+        # pattern accepts "<" and ">" as long as the value has no space. Markup must be
+        # rejected there too.
+        "https://example.com/<script>alert(1)</script>",
+        "https://example.com/<svg/onload=alert(1)>",
+        "https://example.com/a<b",
+    ]
+
+    VALID_RELATIVE = [
+        "/foo/bar",
+        "/foo/bar/",
+        "foo/bar",
+        "../page/",
+        "./page/",
+        "/en/some-slug/",
+    ]
+
+    VALID_ABSOLUTE = [
+        "http://example.com/x",
+        "https://example.com/x?y=1",
+        # Protocol-relative / off-site targets navigate (not execute script)
+        # and are an intended capability of this field; they must be accepted
+        # just like an explicit ``https://`` URL.
+        "//example.com",
+        "//example.com/path",
+    ]
+
+    def test_dangerous_schemes_are_rejected(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.DANGEROUS:
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validate_url(value)
+
+    def test_markup_in_any_path_segment_is_rejected(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.MARKUP:
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validate_url(value)
+
+    def test_valid_relative_urls_are_accepted(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.VALID_RELATIVE:
+            with self.subTest(value=value):
+                validate_url(value)  # must not raise
+
+    def test_valid_absolute_urls_are_accepted(self):
+        from cms.forms.validators import validate_url
+
+        for value in self.VALID_ABSOLUTE:
+            with self.subTest(value=value):
+                validate_url(value)  # must not raise
+
+
+class ValidatePathSegmentTestCase(CMSTestCase):
+    """``validate_url_uniqueness`` only ran ``validate_url`` on paths containing a "/", so a
+    single-segment "Overwrite URL" such as ``<img src=x onerror=alert(1)>`` skipped validation
+    altogether and was stored verbatim.
+    """
+
+    def test_markup_is_rejected(self):
+        from cms.forms.validators import validate_path_segment
+
+        for value in ("<img src=x onerror=alert(1)>", "a<b", "a>b"):
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validate_path_segment(value)
+
+    def test_plain_segments_are_accepted(self):
+        from cms.forms.validators import validate_path_segment
+
+        # "" is the home page's path
+        for value in ("", "contact", "contact-us", "Kontakt", "a.b_c"):
+            with self.subTest(value=value):
+                validate_path_segment(value)  # must not raise
+
+    def test_validate_url_uniqueness_rejects_markup(self):
+        from cms.forms.validators import validate_url_uniqueness
+
+        page = create_page("home", "nav_playground.html", "en")
+        with self.assertRaises(ValidationError):
+            validate_url_uniqueness(page.site, path="<img src=x onerror=alert(1)>", language="en", exclude_page=page)
+
+
+@override_settings(CMS_PERMISSION=False)
+class OverwriteUrlFormValidationTestCase(CMSTestCase):
+    """``ChangePageForm`` must reject markup in "Overwrite URL".
+
+    ``clean()`` returns early for the home page, so the check cannot live there: the value is
+    persisted regardless and becomes the live ``PageUrl.path`` as soon as the page stops being
+    the home page.
+    """
+
+    payload = "<img src=x onerror=alert(187)>"
+
+    def _post_overwrite_url(self, content, user, payload=None):
+        data = {
+            "title": content.title,
+            "slug": content.slug,
+            "overwrite_url": self.payload if payload is None else payload,
+            "template": "nav_playground.html",
+            "_continue": "1",
+        }
+        with self.login_user_context(user):
+            return self.client.post(self.get_admin_url(PageContent, "change", content.pk), data)
+
+    def _editor(self):
+        editor = self.get_staff_user_with_no_permissions()
+        self.add_permission(editor, "change_page")
+        return editor
+
+    def test_rejected_on_regular_page(self):
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        page = create_page("victim", "nav_playground.html", "en", parent=home)
+        content = page.get_content_obj("en")
+
+        response = self._post_overwrite_url(content, self._editor())
+
+        self.assertEqual(response.status_code, 200)  # re-rendered with errors, not a 302 redirect
+        self.assertIn("overwrite_url", response.context["adminform"].form.errors)
+        content.refresh_from_db()
+        self.assertIsNone(content.overwrite_url)
+
+    def test_rejected_in_later_path_segment(self):
+        """Markup preceded by a safe character in a multi-segment path must not slip through."""
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        page = create_page("victim", "nav_playground.html", "en", parent=home)
+        content = page.get_content_obj("en")
+
+        response = self._post_overwrite_url(content, self._editor(), payload="foo/a<img src=x onerror=alert(187)>")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("overwrite_url", response.context["adminform"].form.errors)
+        content.refresh_from_db()
+        self.assertIsNone(content.overwrite_url)
+
+    def test_rejected_on_home_page(self):
+        home = create_page("home", "nav_playground.html", "en")
+        home.set_as_homepage()
+        other = create_page("other", "nav_playground.html", "en")
+        content = home.get_content_obj("en")
+
+        response = self._post_overwrite_url(content, self._editor())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("overwrite_url", response.context["adminform"].form.errors)
+        content.refresh_from_db()
+        self.assertIsNone(content.overwrite_url)
+
+        # the value must not resurface once the page is no longer the home page
+        other.set_as_homepage()
+        home = Page.objects.get(pk=home.pk)
+        home._clear_internal_cache()
+        home.update_urls_from_content("en")
+        home._clear_internal_cache()
+        self.assertEqual(home.urls.get(language="en").path, "home")

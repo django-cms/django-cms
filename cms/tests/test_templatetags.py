@@ -2,6 +2,7 @@ import os
 from copy import deepcopy
 from unittest.mock import patch
 
+import django
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -21,6 +22,7 @@ from djangocms_text.cms_plugins import TextPlugin
 from sekizai.context import SekizaiContext
 
 import cms
+from cms.admin.pageadmin import PageContentAdmin
 from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import (
@@ -29,7 +31,7 @@ from cms.models import (
     PageContent,
     Placeholder,
 )
-from cms.templatetags.cms_admin import get_page_display_name
+from cms.templatetags.cms_admin import django_version_gte, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
@@ -37,11 +39,16 @@ from cms.templatetags.cms_tags import (
     render_plugin,
 )
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
+from cms.test_utils.mail import MAILERS_SUPPORTED
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
+from cms.utils.urlutils import admin_reverse
+
+TEST_MANAGERS = ["Jenkins <tests@django-cms.org>"] if MAILERS_SUPPORTED else [("Jenkins", "tests@django-cms.org")]
 
 
 class TemplatetagTests(CMSTestCase):
@@ -88,6 +95,25 @@ class TemplatetagTests(CMSTestCase):
         self.assertIn(expected_for_page, output)
         self.assertIn(expected_for_german_content, output)
 
+    def test_get_preview_url_object_without_language(self):
+        """A frontend-editable object that has no ``language`` attribute falls back
+        to the active request language instead of raising ``AttributeError``."""
+        example = Example1.objects.create(char_1="a", char_2="b", char_3="c", char_4="d")
+        self.assertFalse(hasattr(example, "language"))
+
+        template = """
+            {% load cms_admin %}
+            preview={% get_preview_url example %}
+            edit={% get_edit_url example %}
+        """
+        with force_language("en"):
+            output = self.render_template_obj(template, {"example": example}, self.get_request())
+            expected_preview = f"preview={get_object_preview_url(example, language='en')}"
+            expected_edit = f"edit={get_object_edit_url(example, language='en')}"
+
+        self.assertIn(expected_preview, output)
+        self.assertIn(expected_edit, output)
+
     def test_get_edit_url(self):
         """The get_edit_url template tag returns the content edit url for its language:
         If a page is given, take the current language (en), if a page_content is given,
@@ -111,8 +137,8 @@ class TemplatetagTests(CMSTestCase):
     def test_placeholder_is_immutable_filter(self):
         template = """
             {% load cms_admin %}
-            non-placeholder={{ True|placeholder_is_immutable:request.user }}
-            placeholder={{ placeholder|placeholder_is_immutable:request.user }}
+            non-placeholder={{ True|placeholder_is_immutable:user }}
+            placeholder={{ placeholder|placeholder_is_immutable:user }}
         """
         from unittest.mock import patch
 
@@ -122,11 +148,25 @@ class TemplatetagTests(CMSTestCase):
         placeholder = page.get_placeholders("en").first()
         request = self.get_request()
 
+        # A placeholder is mutable only if the source permits editing *and* the
+        # user may change it: a user with change permission gets the editable
+        # board (placeholder=False).
         with patch.object(Placeholder, "check_source", wraps=placeholder.check_source) as mock_check_source:
-            output = self.render_template_obj(template, {"placeholder": placeholder}, request=request)
+            output = self.render_template_obj(
+                template, {"placeholder": placeholder, "user": self.get_superuser()}, request=request
+            )
             self.assertIn("non-placeholder=True", output)
             self.assertIn("placeholder=False", output)
             self.assertEqual(mock_check_source.call_count, 1)
+
+        # A user without change permission only gets a read-only board, even
+        # though the source itself permits editing (placeholder=True).
+        output = self.render_template_obj(
+            template,
+            {"placeholder": placeholder, "user": self.get_staff_user_with_no_permissions()},
+            request=request,
+        )
+        self.assertIn("placeholder=True", output)
 
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en", slug="slug-test2")
@@ -318,7 +358,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         with self.settings(
             MIDDLEWARE=settings.MIDDLEWARE + ["django.middleware.common.BrokenLinkEmailsMiddleware"],
             DEBUG=False,
-            MANAGERS=[("Jenkins", "tests@django-cms.org")],
+            MANAGERS=TEST_MANAGERS,
         ):
             request = self.get_request("/")
             page = _get_page_by_untyped_arg({"pk": 1003}, request, 1)
@@ -331,7 +371,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
                 mw for mw in settings.MIDDLEWARE if mw != "django.middleware.common.BrokenLinkEmailsMiddleware"
             ],
             DEBUG=False,
-            MANAGERS=[("Jenkins", "tests@django-cms.org")],
+            MANAGERS=TEST_MANAGERS,
         ):
             request = self.get_request("/")
             page = _get_page_by_untyped_arg({"pk": 1003}, request, 1)
@@ -341,6 +381,18 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
     def test_get_page_by_untyped_arg_fail(self):
         request = self.get_request("/")
         self.assertRaises(TypeError, _get_page_by_untyped_arg, [], request, 1)
+
+    @override_settings(DEBUG=False, MIDDLEWARE=["django.middleware.common.BrokenLinkEmailsMiddleware"])
+    def test_missing_page_mail_error(self):
+        with patch("cms.templatetags.cms_tags.mail_managers", side_effect=ConnectionError):
+            page = _get_page_by_untyped_arg({"pk": 1003}, self.get_request("/"), 1)
+        self.assertIsNone(page)
+
+    @override_settings(DEBUG=False, MIDDLEWARE=["django.middleware.common.BrokenLinkEmailsMiddleware"])
+    def test_missing_page_code_error(self):
+        with patch("cms.templatetags.cms_tags.mail_managers", side_effect=ValueError):
+            with self.assertRaises(ValueError):
+                _get_page_by_untyped_arg({"pk": 1003}, self.get_request("/"), 1)
 
     def test_show_placeholder_for_page_content_does_not_exist(self):
         """
@@ -687,6 +739,67 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         expected = "foo"
         self.assertEqual(expected, output)
 
+    def test_render_model_does_not_reverse_plugin_action_urls(self):
+        """Generic objects only use their edit url: the plugin action urls are neither reversed nor rendered."""
+        import json
+        import re
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        category = Category.objects.create(name="foo", depth=1)
+        page = create_page("Test", "col_two.html", "en")
+        template = "{% load cms_tags sekizai_tags %}{% render_model category 'name' %}{% render_block 'js' %}"
+        request = RequestFactory().get(get_object_edit_url(self.get_pagecontent_obj(page)))
+        request.user = self._create_user("admin", True, True)
+        request.current_page = page
+        request.session = SessionBase()
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+
+        with patch("cms.templatetags.cms_tags.admin_reverse", wraps=admin_reverse) as reverse_mock:
+            output = self.render_template_obj(template, {"category": category}, request)
+
+        reverse_mock.assert_not_called()
+        self.assertNotIn("/admin/cms/placeholder/", output)
+        script = re.search(r'<script id="cms-plugin-sampleapp-category-name-\d+"[^>]*>(.*?)</script>', output, re.S)
+        urls = json.loads(script.group(1))["urls"]
+        # Not HTML-escaped: the frontend reads the JSON with JSON.parse(script.textContent)
+        self.assertEqual(
+            urls["edit_plugin"],
+            admin_reverse("sampleapp_category_change", args=(category.pk,)) + "?language=en&_popup=1",
+        )
+        self.assertEqual(
+            [urls[key] for key in ("add_plugin", "move_plugin", "delete_plugin", "copy_plugin")],
+            ["", "", "", ""],
+        )
+
+    def test_render_model_urls_cannot_break_out_of_script(self):
+        """Urls are JSON-escaped, not HTML-escaped: they must still not end the script element."""
+        import json
+        import re
+
+        from cms.test_utils.project.sampleapp.models import Category
+
+        category = Category.objects.create(name="foo", depth=1)
+        category.evil_url = '/edit/?a=1&b="</script><script>alert(1)</script>'
+        page = create_page("Test", "col_two.html", "en")
+        template = (
+            "{% load cms_tags sekizai_tags %}{% render_model category 'name' '' '' '' '' 'evil_url' %}"
+            "{% render_block 'js' %}"
+        )
+        request = RequestFactory().get(get_object_edit_url(self.get_pagecontent_obj(page)))
+        request.user = self._create_user("admin", True, True)
+        request.current_page = page
+        request.session = SessionBase()
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+
+        output = self.render_template_obj(template, {"category": category}, request)
+
+        self.assertNotIn("<script>alert(1)", output)
+        script = re.search(r'<script id="cms-plugin-sampleapp-category-[^"]*"[^>]*>(.*?)</script>', output, re.S)
+        self.assertEqual(json.loads(script.group(1))["urls"]["edit_plugin"], category.evil_url + "?language=en")
+
     def test_render_model_add(self):
         from django.core.cache import cache
 
@@ -814,3 +927,151 @@ class CmsTagTemplateTagTests(CMSTestCase):
             self.fail("NoReverseMatch should not be raised.")
 
         self.assertEqual(rendered.strip(), "")
+
+
+class AdminBreadcrumbMarkupTests(CMSTestCase):
+    """Django 6.1 changed the admin breadcrumbs markup from
+    ``<div class="breadcrumbs">`` (with ``&rsaquo;`` separators) to a semantic
+    ``<ol class="breadcrumbs">`` whose CSS is element-qualified
+    (``ol.breadcrumbs``) and no longer styles a ``<div>``. The cms admin
+    overrides switch markup on the running Django version via the
+    ``{% django_version_gte %}`` tag, so they render correctly on both the
+    legacy (4.2-6.0) and the new (6.1+) admin.
+    """
+
+    # Plausible version tuples mirroring ``django.VERSION`` for both branches.
+    DJANGO_5_2 = (5, 2, 0, "final", 0)
+    DJANGO_6_1 = (6, 1, 0, "final", 0)
+
+    def test_django_version_gte_tag(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            self.assertFalse(django_version_gte(6, 1))
+            self.assertTrue(django_version_gte(5, 2))
+            self.assertTrue(django_version_gte(4, 2))
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            self.assertTrue(django_version_gte(6, 1))
+            self.assertTrue(django_version_gte(6))
+            self.assertFalse(django_version_gte(7))
+
+    def _get_admin_html(self, uri):
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(uri)
+        self.assertEqual(response.status_code, 200)
+        return response.content.decode("utf-8")
+
+    # -- page tree changelist: admin/cms/page/tree/base.html --
+
+    def test_pagetree_breadcrumbs_legacy_div_below_6_1(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
+        self.assertIn('<div class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+        self.assertNotIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+
+    def test_pagetree_breadcrumbs_ol_on_6_1(self):
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            html = self._get_admin_html(self.get_pages_admin_list_uri("en"))
+        self.assertIn('<ol class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+        self.assertIn('<li aria-current="page">Pages</li>', html)
+        self.assertNotIn('<div class="breadcrumbs cms-pagetree-breadcrumbs">', html)
+
+    # -- page change form: admin/cms/page/change_form.html --
+
+    def test_page_change_form_breadcrumbs_legacy_div_below_6_1(self):
+        page = create_page("Home", "nav_playground.html", "en")
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_5_2):
+            html = self._get_admin_html(self.get_page_change_uri("en", page))
+        self.assertIn('<div class="breadcrumbs">', html)
+        self.assertNotIn('<ol class="breadcrumbs">', html)
+
+    def test_page_change_form_breadcrumbs_ol_on_6_1(self):
+        page = create_page("Home", "nav_playground.html", "en")
+        with patch("cms.templatetags.cms_admin.django.VERSION", self.DJANGO_6_1):
+            html = self._get_admin_html(self.get_page_change_uri("en", page))
+        self.assertIn('<ol class="breadcrumbs">', html)
+        self.assertIn('aria-current="page"', html)
+        self.assertNotIn('<div class="breadcrumbs">', html)
+
+
+class AdminObjectToolsPlacementTests(CMSTestCase):
+    """Django 6.1 moved ``{% block object-tools %}`` out of ``{% block content %}``: it is now a
+    top-level block that ``admin/base.html`` renders in the ``.titles-and-tools`` bar next to the
+    page title. ``admin/cms/page/change_form.html`` still has to *define* the block nested inside
+    its own ``content`` override (that is what suppresses the admin's default History tool), so the
+    block node has to be rendered conditionally -- otherwise Django renders it both from the 6.1
+    top-level position and again from the nested one, and every downstream override shows up twice.
+    """
+
+    #: ``True`` when the running Django renders ``object-tools`` outside ``content``.
+    OBJECT_TOOLS_OUTSIDE_CONTENT = django.VERSION[:2] >= (6, 1)
+
+    #: A real child template overriding ``{% block object-tools %}``, the way a project or a
+    #: third-party app (djangocms-versioning, djangocms-alias, ...) would.
+    DOWNSTREAM_TEMPLATE = "admin/cms/page/change_form_object_tools_test.html"
+    DOWNSTREAM_MARKER = "downstream-tool-link"
+
+    def _get_page_change_html(self, page, change_form_template=None):
+        with self.login_user_context(self.get_superuser()):
+            if change_form_template is None:
+                response = self.client.get(self.get_page_change_uri("en", page))
+            else:
+                with patch.object(PageContentAdmin, "change_form_template", change_form_template):
+                    response = self.client.get(self.get_page_change_uri("en", page))
+        self.assertEqual(response.status_code, 200)
+        return response.content.decode("utf-8")
+
+    # -- downstream overrides of {% block object-tools %} --
+
+    def test_downstream_object_tools_rendered_once(self):
+        """A child template's object-tools must not be emitted twice on Django 6.1."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page, self.DOWNSTREAM_TEMPLATE)
+        self.assertEqual(
+            html.count(self.DOWNSTREAM_MARKER),
+            1,
+            "Downstream object-tools override must render exactly once.",
+        )
+
+    def test_downstream_object_tools_placement_relative_to_content_main(self):
+        """The single render must sit in the position the running Django expects."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page, self.DOWNSTREAM_TEMPLATE)
+
+        content_main_index = html.index('id="content-main"')
+
+        if self.OBJECT_TOOLS_OUTSIDE_CONTENT:
+            # ``rindex``: the *last* occurrence must already be before #content-main, so a stray
+            # second render in the legacy nested position fails here too.
+            self.assertLess(
+                html.rindex(self.DOWNSTREAM_MARKER),
+                content_main_index,
+                "On Django >= 6.1 object-tools belong outside (before) #content-main.",
+            )
+        else:
+            self.assertGreater(
+                html.index(self.DOWNSTREAM_MARKER),
+                content_main_index,
+                "On Django < 6.1 object-tools belong in the legacy position inside #content-main.",
+            )
+
+    # -- the default page actions shipped by django CMS --
+
+    def test_default_page_object_tools_rendered_once(self):
+        """django CMS' own "View on site" tool renders once, and replaces the admin default."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page)
+
+        self.assertEqual(html.count('class="object-tools hide-in-modal"'), 1)
+        self.assertEqual(html.count("View on site"), 1)
+        # The admin's default object tools are replaced, not added to.
+        self.assertNotIn("historylink", html)
+
+    def test_default_page_object_tools_outside_content_main(self):
+        """The page actions render in the title/tools area, never inside the form column."""
+        page = create_page("Home", "nav_playground.html", "en")
+        html = self._get_page_change_html(page)
+
+        self.assertLess(
+            html.index('class="object-tools hide-in-modal"'),
+            html.index('id="content-main"'),
+        )
+

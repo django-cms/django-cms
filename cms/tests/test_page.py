@@ -268,6 +268,28 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get(child.get_absolute_url("en"))
         self.assertEqual(response.status_code, 200)
 
+    def test_validate_url_uniqueness_child_page_sibling_conflict(self):
+        """A child page's natural path is checked for conflicts with its siblings (#8902)"""
+        site = _get_current_site()
+        parent = create_page("Parent", "nav_playground.html", "en", slug="parent")
+        create_page("A", "nav_playground.html", "en", parent=parent, slug="a")
+        page_b = create_page("B", "nav_playground.html", "en", parent=parent, slug="b")
+
+        # B may keep its own path
+        self.assertTrue(validate_url_uniqueness(site, path="parent/b", language="en", exclude_page=page_b))
+        # but not take A's path
+        with self.assertRaises(ValidationError):
+            validate_url_uniqueness(site, path="parent/a", language="en", exclude_page=page_b)
+
+    def test_validate_url_uniqueness_parent_child_same_slug(self):
+        """A child with the same slug as its parent has a different path and is valid"""
+        site = _get_current_site()
+        parent = create_page("parent", "nav_playground.html", "en", slug="foo")
+        child = create_page("child", "nav_playground.html", "en", parent=parent, slug="foo")
+
+        self.assertTrue(validate_url_uniqueness(site, path="foo/foo", language="en", exclude_page=child))
+        self.assertTrue(validate_url_uniqueness(site, path="foo", language="en", exclude_page=parent))
+
     def test_validate_url_uniqueness_escapes_html_in_error_message(self):
         """
         validate_url_uniqueness raises a ValidationError whose message is
@@ -878,6 +900,47 @@ class PagesTestCase(TransactionCMSTestCase):
             resp = self.client.get(page.get_absolute_url("en"))
             self.assertEqual(resp.get("X-Frame-Options"), None)
 
+    def test_xframe_options_inherit_with_cms_page_cache_and_clickjacking_middleware(self):
+        # A cached "Inherit" page must still receive the clickjacking
+        # middleware's X-Frame-Options header. Regression: the cached copy used
+        # to be served with xframe_options_exempt=True, which suppressed the
+        # middleware and dropped the header, leaving cached inherit pages
+        # framable while the uncached copy was protected.
+        if getattr(settings, "MIDDLEWARE", None):
+            override = {
+                "MIDDLEWARE": settings.MIDDLEWARE
+                + [
+                    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+                ]
+            }
+        else:
+            override = {
+                "MIDDLEWARE_CLASSES": settings.MIDDLEWARE_CLASSES
+                + [
+                    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+                ]
+            }
+
+        override["CMS_PAGE_CACHE"] = True
+        override["X_FRAME_OPTIONS"] = "SAMEORIGIN"
+
+        with self.settings(**override):
+            page = create_page(
+                "inherit page",
+                "nav_playground.html",
+                "en",
+                xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
+            )
+
+            # Fresh response from render_page: the middleware adds the site
+            # default because the page defers to it (inherit).
+            resp = self.client.get(page.get_absolute_url("en"))
+            self.assertEqual(resp.get("X-Frame-Options"), "SAMEORIGIN")
+
+            # Response from page cache must carry the same protection.
+            resp = self.client.get(page.get_absolute_url("en"))
+            self.assertEqual(resp.get("X-Frame-Options"), "SAMEORIGIN")
+
     def test_page_cache_basic(self):
         """
         Test that the page cache works in its basic form
@@ -893,7 +956,7 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(cached_data)
 
         # Verify cache contents
-        cached_content, cached_headers, expires = cached_data
+        cached_content, cached_headers, expires, xframe_options_exempt = cached_data
         self.assertEqual(cached_content, response.content)
 
     def test_page_cache_language_handling(self):
@@ -1033,6 +1096,43 @@ class PageTreeTests(CMSTestCase):
         child.move_page(parent)
         child.refresh_from_db()
         self.assertEqual(child.get_absolute_url(language="en"), "/en/parent/child/")
+
+    def test_move_node_alters_descendants_in_all_languages(self):
+        """
+        Regression test: the URLs of the moved page are cached together with
+        those of its fallback languages, so its descendants could be rebuilt
+        from its old path in the languages processed after the first one.
+        """
+
+        def create_translated_page(slug, parent=None):
+            page = create_page(slug, "nav_playground.html", "en", slug=slug, parent=parent)
+            for language in ("de", "fr"):
+                create_page_content(language, slug, page, slug=f"{slug}-{language}")
+            return page
+
+        def get_paths(page):
+            return dict(page.urls.values_list("language", "path"))
+
+        parent = create_translated_page("parent")
+        page = create_translated_page("page")
+        child = create_translated_page("child", parent=page)
+        grandchild = create_translated_page("grandchild", parent=child)
+
+        Page.objects.get(pk=page.pk).move_page(parent)
+
+        self.assertEqual(get_paths(page), {"en": "parent/page", "de": "parent-de/page-de", "fr": "parent-fr/page-fr"})
+        self.assertEqual(
+            get_paths(child),
+            {"en": "parent/page/child", "de": "parent-de/page-de/child-de", "fr": "parent-fr/page-fr/child-fr"},
+        )
+        self.assertEqual(
+            get_paths(grandchild),
+            {
+                "en": "parent/page/child/grandchild",
+                "de": "parent-de/page-de/child-de/grandchild-de",
+                "fr": "parent-fr/page-fr/child-fr/grandchild-fr",
+            },
+        )
 
 
 class PageContentTests(CMSTestCase):

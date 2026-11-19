@@ -1,12 +1,12 @@
 from functools import wraps
 
-from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
-from cms.models import Page, PermissionTuple
+from cms.models import Page, PermissionTuple, PermissionTupleList
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
     cached_func,
+    get_cached_page_actions_for_user,
     get_model_permission_codename,
     get_page_actions_for_user,
     has_global_permission,
@@ -40,7 +40,7 @@ def _get_all_placeholders(page, language=None):
     page_contents = PageContent.admin_manager.filter(page=page)
     if language:
         page_contents = page_contents.filter(language=language)
-    content_type = ContentType.objects.get_for_model(Placeholder)
+    content_type = ContentType.objects.get_for_model(PageContent)
     return Placeholder.objects.filter(
         content_type=content_type,
         object_id__in=page_contents.values_list('pk', flat=True)
@@ -61,21 +61,8 @@ def _get_page_permission_tuples_for_action(user, site, action, check_global=True
         return GRANT_ALL_PERMISSIONS
 
     if use_cache:
-        # read from cache if possible
-        cached = get_permission_cache(user, action)
-        get_page_actions = get_page_actions_for_user
-    else:
-        cached = None
-        get_page_actions = get_page_actions_for_user.without_cache
-
-    if cached is not None:
-        return cached
-
-    page_actions = get_page_actions(user, site)
-    # Set cache for all actions calculated
-    for act, page_paths in page_actions.items():
-        set_permission_cache(user, act, list(page_paths))
-    return page_actions[action]
+        return get_cached_page_actions_for_user(user, site)[action]
+    return PermissionTupleList(get_page_actions_for_user.without_cache(user, site)[action])
 
 
 def auth_permission_required(action):
@@ -186,7 +173,7 @@ def user_can_delete_page(user, page, site=None):
 
     placeholders = _get_all_placeholders(page)
     for placeholder in placeholders:
-        if not placeholder.has_delete_plugins_permission(user, [placeholders.source.language]):
+        if not placeholder.has_delete_plugins_permission(user, [placeholder.source.language]):
             return False
     return True
 
@@ -364,6 +351,59 @@ def user_can_view_all_pages(user, site):
     return has_global_permission(user, site, action='view_page')
 
 
+def user_can_relocate_descendants(user, page, site, parent_page, keep_restrictions=True):
+    """Allow unreadable descendants only when they stay unreadable at ``parent_page``.
+
+    The caller checks root view access and destination add access separately.
+    ``copy_with_descendants`` and ``Page.move_page`` preserve inherited source
+    view restrictions. Destination grants can nevertheless widen access: change
+    permission also confers view access, even on a restricted page.
+    """
+    unreadable = [
+        descendant for descendant in page.get_descendant_pages()
+        if not user_can_view_page(user, descendant, page.site)
+    ]
+    if not unreadable:
+        return True
+    if not keep_restrictions:
+        return False
+
+    # Fetch destination permissions without reusing source-site permission caches.
+    view_permissions = get_view_perm_tuples(user, site, use_cache=False)
+    change_permissions = (
+        get_change_perm_tuples(user, site, use_cache=False)
+        if user.has_perm(PAGE_CHANGE_CODENAME) else []
+    )
+    if GRANT_ALL_PERMISSIONS in (view_permissions, change_permissions):
+        return False
+
+    # An all-zero segment cannot identify an existing page. Only permissions
+    # inherited from the destination ancestors can match these prospective paths.
+    root_path = (parent_page.path if parent_page else '') + '0' * Page.steplen
+    destination_permissions = [PermissionTuple(perm) for perm in (*view_permissions, *change_permissions)]
+    return not any(
+        permission.contains(root_path + descendant.path[len(page.path):])
+        for descendant in unreadable
+        for permission in destination_permissions
+    )
+
+
+def user_can_copy_descendants(user, page, site, parent_page, copy_permissions):
+    """Whether ``page`` may be copied below ``parent_page`` with its descendants."""
+    return user_can_relocate_descendants(
+        user, page, site, parent_page, keep_restrictions=copy_permissions
+    )
+
+
+def user_can_move_descendants(user, page, site, parent_page):
+    """Whether ``page`` may be moved below ``parent_page`` with its descendants.
+
+    A move always preserves the subtree's view restrictions, so only the
+    destination's own grants can widen access.
+    """
+    return user_can_relocate_descendants(user, page, site, parent_page)
+
+
 def get_add_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has add page rights or the string
@@ -495,22 +535,24 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     elif site is None:
         site = Site.objects._get_site_by_id(page.site_id)
 
-    page_path = page.path
-    actions_map = {
-        'add_page': get_add_perm_tuples,
-        'change_page': get_change_perm_tuples,
-        'change_page_advanced_settings': get_change_advanced_settings_perm_tuples,
-        'change_page_permissions': get_change_permissions_perm_tuples,
-        'delete_page': get_delete_perm_tuples,
-        'delete_page_translation': get_delete_perm_tuples,
-        'publish_page': get_publish_perm_tuples,
-        'move_page': get_move_page_perm_tuples,
-        'view_page': get_view_perm_tuples,
-    }
-
-    func = actions_map[action]
+    func = _perm_tuples_by_action[action]
 
     page_perms = func(user, site, check_global=check_global, use_cache=use_cache)
-    return page_perms == GRANT_ALL_PERMISSIONS or any(
-        PermissionTuple(perm).contains(page_path) for perm in page_perms
-    )
+    if page_perms == GRANT_ALL_PERMISSIONS:
+        return True
+    if not isinstance(page_perms, PermissionTupleList):
+        page_perms = PermissionTupleList(page_perms)
+    return page_perms.contains(page.path)
+
+
+_perm_tuples_by_action = {
+    'add_page': get_add_perm_tuples,
+    'change_page': get_change_perm_tuples,
+    'change_page_advanced_settings': get_change_advanced_settings_perm_tuples,
+    'change_page_permissions': get_change_permissions_perm_tuples,
+    'delete_page': get_delete_perm_tuples,
+    'delete_page_translation': get_delete_perm_tuples,
+    'publish_page': get_publish_perm_tuples,
+    'move_page': get_move_page_perm_tuples,
+    'view_page': get_view_perm_tuples,
+}

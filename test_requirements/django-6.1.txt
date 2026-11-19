@@ -1,0 +1,2 @@
+-r requirements_base.txt
+Django>=6.1a1,<6.2

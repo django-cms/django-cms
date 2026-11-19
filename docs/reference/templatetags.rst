@@ -8,7 +8,7 @@ Template Tags
 CMS template tags
 *****************
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 To use any of the following template tags you first need to load them at the
 top of your template::
@@ -18,6 +18,24 @@ top of your template::
 
 Placeholders
 ============
+
+django CMS provides two template tags for placeholders:
+
+- :ttag:`placeholder` **declares and renders** a placeholder inside a template. Use it for
+  page contents, and (since django CMS 5.1) for any apphooked model that uses a
+  :class:`~cms.models.fields.PlaceholderRelationField` — see
+  :ref:`using_placeholders_on_apphooked_pages`. Because :ttag:`placeholder` also *declares*
+  the placeholder, django CMS can auto-detect it and expose it to editors. In a
+  :ref:`structure template <placeholders_outside_cms>` the :ttag:`placeholder` tag is used
+  for the declaration only; the actual rendering happens in a separate user-facing template
+  via :ttag:`render_placeholder`.
+- :ttag:`render_placeholder` **only renders** an existing placeholder; it does not declare
+  one. It takes a :class:`~cms.models.placeholdermodel.Placeholder` instance as a parameter,
+  which the model must provide — typically by retrieving it from a
+  :class:`~cms.models.fields.PlaceholderRelationField` via
+  :func:`~cms.utils.placeholder.get_placeholder_from_slot`. Use it for existing apphooks that
+  already pass a placeholder instance, and for models that expose pre-defined placeholders
+  this way.
 
 ..  templatetag:: placeholder
 
@@ -75,6 +93,12 @@ context variables and change some other placeholder behaviour.
 
     ``{% placeholder %}`` will only work inside the template's ``<body>``.
 
+.. versionchanged:: 5.1
+
+    The :ttag:`placeholder` tag can also be used in templates rendered by apphook views.
+    It resolves against the current page's content by default, or against the toolbar
+    object if the apphook view sets one. See :ref:`using_placeholders_on_apphooked_pages`.
+
 
 ..  templatetag:: static_placeholder
 
@@ -94,10 +118,11 @@ The ``static_placeholder`` template tag does **not** work with django CMS 4. It 
 ..  templatetag:: render_placeholder
 
 render_placeholder
-==================
+------------------
 
-``{% render_placeholder %}`` is used if you have a PlaceholderField in your own model and want
-to render it in the template.
+``{% render_placeholder %}`` is used if you have a
+:class:`~cms.models.fields.PlaceholderRelationField` on your own model and want to render one
+of its placeholders in the template.
 
 The :ttag:`render_placeholder` tag takes the following parameters:
 
@@ -777,7 +802,7 @@ If the current URL has no CMS Page and is handled by a navigation extender and
 the URL changes based on the language, you will need to set a ``language_changer``
 function with the ``set_language_changer`` function in ``menus.utils``.
 
-For more information, see :doc:`/topics/i18n`.
+For more information, see :doc:`/explanation/multiple_languages`.
 
 
 ..  templatetag:: language_chooser
@@ -811,7 +836,7 @@ If the current URL has no CMS Page and is handled by a navigation extender and
 the URL changes based on the language, you will need to set a ``language_changer``
 function with the ``set_language_changer`` function in ``menus.utils``.
 
-For more information, see :doc:`/topics/i18n`.
+For more information, see :doc:`/explanation/multiple_languages`.
 
 
 ..  templatetag:: cms_toolbar
@@ -820,7 +845,7 @@ For more information, see :doc:`/topics/i18n`.
 Toolbar template tags
 *********************
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the required
 CSS and javascript to the sekizai blocks in the base template. The template tag must be placed

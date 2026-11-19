@@ -96,6 +96,14 @@ Note: Used for accessibility - traps focus within modals
 
 ${'='.repeat(80)}
 
+Package: Bootstrap Icons
+License: MIT License
+License URL: https://github.com/twbs/icons/blob/main/LICENSE
+Copyright (c) 2019-2024 The Bootstrap Authors
+Website: https://icons.getbootstrap.com
+
+${'='.repeat(80)}
+
 `;
 
 

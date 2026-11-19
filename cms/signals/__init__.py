@@ -1,12 +1,11 @@
 import warnings
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.db.models import signals
-from django.db.models.signals import pre_migrate
-from django.dispatch import Signal, receiver
+from django.dispatch import Signal
 
-from cms.exceptions import ConfirmationOfVersion4Required
 from cms.models import (
     GlobalPagePermission,
     PagePermission,
@@ -36,20 +35,6 @@ from cms.signals.permissions import (
 )
 from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
-
-
-@receiver(pre_migrate)
-def check_v4_confirmation(**kwargs):
-    """
-    Signal handler to get the confirmation that using version 4 is intentional.
-
-    This is a temporary step to ensure people only migrate their databases intentionally.
-    """
-    if not get_cms_setting("CONFIRM_VERSION4"):
-        raise ConfirmationOfVersion4Required(
-            "You must confirm your intention to use django-cms version 4 with the setting CMS_CONFIRM_VERSION4"
-        )
-
 
 # ################### Our own signals ###################
 
@@ -110,6 +95,7 @@ post_placeholder_operation.connect(log_placeholder_operations)
 
 if get_cms_setting("PERMISSION"):
     # only if permissions are in use
+    User = get_user_model()
     signals.pre_save.connect(pre_save_user, sender=User, dispatch_uid="cms_pre_save_user")
     signals.post_save.connect(post_save_user, sender=User, dispatch_uid="cms_post_save_user")
     signals.pre_delete.connect(pre_delete_user, sender=User, dispatch_uid="cms_pre_delete_user")
@@ -120,7 +106,7 @@ if get_cms_setting("PERMISSION"):
 
     signals.pre_save.connect(pre_save_group, sender=Group, dispatch_uid="cms_pre_save_group")
     signals.post_save.connect(post_save_user_group, sender=Group, dispatch_uid="cms_post_save_group")
-    signals.pre_delete.connect(pre_delete_group, sender=Group, dispatch_uid="cms_post_save_group")
+    signals.pre_delete.connect(pre_delete_group, sender=Group, dispatch_uid="cms_pre_delete_group")
 
     signals.pre_save.connect(pre_save_group, sender=PageUserGroup, dispatch_uid="cms_pre_save_pageusergroup")
     signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup, dispatch_uid="cms_pre_delete_pageusergroup")

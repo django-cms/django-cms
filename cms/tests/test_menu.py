@@ -2,14 +2,17 @@ import copy
 
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
+from django.core.cache import caches
+from django.db import connection
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
-from django.test.utils import override_settings
+from django.test import SimpleTestCase
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils.translation import activate, override as force_language
 
 from cms.api import create_page, create_page_content
 from cms.apphook_pool import apphook_pool
-from cms.cms_menus import get_visible_page_contents
+from cms.cms_menus import CMSMenu, SoftRootCutter, get_visible_page_contents
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, PageContent
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (
@@ -36,6 +39,7 @@ from cms.utils.i18n import get_default_language_for_site
 from menus.base import NavigationNode
 from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
 from menus.models import CacheKey
+from menus.templatetags.menu_tags import cut_after
 from menus.utils import cut_levels, find_selected, mark_descendants
 
 
@@ -437,7 +441,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
 
-    def test_show_menu_cache_key_leak(self):
+    def test_show__key_leak(self):
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         self.assertEqual(CacheKey.objects.count(), 0)
@@ -482,6 +486,35 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             #     get all page url objects
             #     set the menu cache key
             Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+    def test_menu_cache_default_is_default_cache(self):
+        from cms.utils.conf import get_menu_cache
+
+        menu_cache = get_menu_cache()  # Re-read the patched settings
+        menu_cache.get("something")  # Resolve lazy cache
+
+        self.assertEqual(menu_cache, caches["default"], "Menu cache is not \"default\"")
+
+    @override_settings(
+        CMS_MENU_CACHE_BACKEND="secondary",
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "menu-test-default",
+            },
+            "secondary": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "menu-test-secondary",
+            },
+        },
+    )
+    def test_menu_cache_uses_configured_backend(self):
+        from cms.utils.conf import get_menu_cache
+
+        menu_cache = get_menu_cache()  # Re-read the patched settings
+        menu_cache.get("something")  # Resolve lazy cache
+
+        self.assertEqual(menu_cache, caches["secondary"], "Menu cache ignores CMS_MENU_CACHE_BACKEND setting")
 
     def test_menu_keys_duplicate_clear(self):
         """
@@ -996,6 +1029,30 @@ class MenuTests(BaseMenuTest):
         tree_nodes, flat_nodes = self._get_nodes()
         self.assertEqual(cut_levels(tree_nodes, 1), [flat_nodes[1]])
 
+    def test_cut_after_removes_consecutive_invisible_children(self):
+        parent = NavigationNode("parent", "/parent/", 1)
+        hidden1 = NavigationNode("hidden1", "/hidden1/", 2, 1, visible=False)
+        hidden2 = NavigationNode("hidden2", "/hidden2/", 3, 1, visible=False)
+        shown = NavigationNode("shown", "/shown/", 4, 1)
+        parent.children = [hidden1, hidden2, shown]
+
+        cut_after(parent, 1)
+
+        self.assertEqual(parent.children, [shown])
+
+    def test_cut_after_cuts_child_following_invisible_child(self):
+        parent = NavigationNode("parent", "/parent/", 1)
+        hidden = NavigationNode("hidden", "/hidden/", 2, 1, visible=False)
+        shown = NavigationNode("shown", "/shown/", 3, 1)
+        grandchild = NavigationNode("grandchild", "/grandchild/", 4, 3)
+        parent.children = [hidden, shown]
+        shown.children = [grandchild]
+
+        cut_after(parent, 1)
+
+        self.assertEqual(parent.children, [shown])
+        self.assertEqual(shown.children, [])
+
     def test_empty_menu(self):
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1205,6 +1262,94 @@ class MenuTests(BaseMenuTest):
         # Should fall back to site's default language
         expected_language = get_default_language_for_site(site.pk)
         self.assertEqual(renderer.request_language, expected_language)
+
+    def test_cmsnavigationnode_attr(self):
+        """
+        Test population of the attr object of the CMSNavigationNode from pages
+        """
+        page_defaults = {
+            "template": "nav_playground.html",
+            "language": "en",
+        }
+        home = create_page("Normal Page", in_navigation=True, reverse_id="normal-page", **page_defaults)
+        home.set_as_homepage()
+        create_page("Redirected Page", in_navigation=True, reverse_id="redirected-page", redirect='https://redirect.example.com', **page_defaults)
+
+        request = self.get_request("/en/")
+        context = Context()
+        context["request"] = request
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+
+        expected_normal_attr = {
+            "is_page": True,
+            "soft_root": False,
+            "redirect_url": None,
+            "auth_required": False,
+            "reverse_id": "normal-page",
+            "is_home": True,
+            "visible_for_authenticated": True,
+            "visible_for_anonymous": True,
+            "navigation_extenders": [],
+        }
+
+        expected_redirect_attr = {
+            "is_page": True,
+            "soft_root": False,
+            "redirect_url": "https://redirect.example.com",
+            "auth_required": False,
+            "reverse_id": "redirected-page",
+            "is_home": False,
+            "visible_for_authenticated": True,
+            "visible_for_anonymous": True,
+            "navigation_extenders": [],
+        }
+
+        self.assertEqual(2, len(nodes))
+        self.assertEqual(expected_normal_attr, nodes[0].attr)
+        self.assertEqual(expected_redirect_attr, nodes[1].attr)
+
+
+class SoftRootCutterTests(SimpleTestCase):
+    def test_prune_soft_root_children(self):
+        root = NavigationNode("root", "/", 1)
+        soft_root = NavigationNode("soft root", "/soft/", 2, 1, attr={"soft_root": True})
+        child = NavigationNode("child", "/soft/child/", 3, 2)
+        grandchild = NavigationNode("grandchild", "/soft/child/grandchild/", 4, 3)
+        sibling = NavigationNode("sibling", "/sibling/", 5, 1)
+        sibling_child = NavigationNode("sibling child", "/sibling/child/", 6, 5)
+        nodes = _build_nodes_inner_for_one_menu(
+            [root, soft_root, child, grandchild, sibling, sibling_child], "test"
+        )
+
+        # Direct callers must apply collected removals to the original list.
+        result = SoftRootCutter(None).find_and_remove_children(root, nodes)
+
+        self.assertIs(result, nodes)
+        self.assertEqual(nodes, [root, soft_root, sibling, sibling_child])
+        self.assertEqual(root.children, [soft_root, sibling])
+        self.assertEqual(soft_root.children, [])
+        self.assertEqual(child.children, [])
+        self.assertEqual(grandchild.children, [])
+        self.assertEqual(sibling.children, [sibling_child])
+        self.assertIs(sibling_child.parent, sibling)
+
+    def test_prune_without_removals(self):
+        for attributes in ({}, {"soft_root": True}):
+            with self.subTest(attributes=attributes):
+                root = NavigationNode("root", "/", 1)
+                child = NavigationNode("child", "/child/", 2, 1, attr=attributes)
+                nodes = _build_nodes_inner_for_one_menu([root, child], "test")
+
+                # Ordinary children and soft-root leaves stay in place.
+                result = SoftRootCutter(None).find_and_remove_children(root, nodes)
+
+                self.assertIs(result, nodes)
+                self.assertEqual(nodes, [root, child])
+                self.assertEqual(root.children, [child])
+                self.assertEqual(child.children, [])
+                self.assertIs(child.parent, root)
 
 
 @override_settings(CMS_PERMISSION=False)
@@ -1838,6 +1983,52 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         page_contents = get_visible_page_contents(self.request, page_contents, self.site)
         titles = [page_content.title for page_content in page_contents]
         self.assertSequenceEqual(sorted(titles), ["a", "b1", "c1", "c2"])
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR="all",
+)
+class ViewPermissionMenuQueryTests(CMSTestCase):
+    """
+    Regression tests: building the menu must not run one query per page.
+
+    ``CMSMenu.get_nodes`` restricts the loaded fields with ``only()``. Every
+    field accessed by the view-restriction check in
+    ``get_visible_page_contents`` (such as ``page.path``) has to be part of
+    that ``only()`` call, otherwise each page triggers an extra query to
+    load the deferred field.
+    """
+
+    template = "nav_playground.html"
+
+    def _get_menu_query_count(self):
+        request = self.get_request("/")
+        renderer = menu_pool.get_renderer(request)
+        menu = CMSMenu(renderer)
+        with CaptureQueriesContext(connection) as queries:
+            menu.get_nodes(request)
+        return len(queries.captured_queries)
+
+    def test_number_of_queries_does_not_scale_with_page_count(self):
+        create_page("home", self.template, "en", in_navigation=True)
+        restricted = create_page("restricted", self.template, "en", in_navigation=True)
+        PagePermission.objects.create(
+            page=restricted,
+            user=self.get_standard_user(),
+            can_view=True,
+            grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+        )
+        for index in range(3):
+            create_page(f"page-{index}", self.template, "en", in_navigation=True)
+
+        self._get_menu_query_count()  # warm up caches (site, content types, ...)
+        query_count = self._get_menu_query_count()
+
+        for index in range(5):
+            create_page(f"extra-{index}", self.template, "en", in_navigation=True)
+
+        self.assertEqual(self._get_menu_query_count(), query_count)
 
 
 @override_settings(CMS_PERMISSION=False)

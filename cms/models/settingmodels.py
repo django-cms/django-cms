@@ -5,9 +5,13 @@ from django.utils.translation import gettext_lazy as _
 
 
 class PlaceholderForeignKey(models.ForeignKey):
-    def run_checks(self, *args, **kwargs):
-        # User always has permission to change their own clipboard
-        return True
+    def run_checks(self, placeholder, user):
+        # A clipboard is private to its owner: only they have permission to
+        # change it. Other users must not be able to read from or write to it.
+        try:
+            return placeholder.source.has_placeholder_change_permission(user)
+        except AttributeError:
+            return False
 
 
 class UserSettings(models.Model):
@@ -36,5 +40,7 @@ class UserSettings(models.Model):
         return force_str(self.user)
 
     def has_placeholder_change_permission(self, user):
-        # User always has permission to change their own clipboard
-        return True
+        # User always has permission to change their own clipboard, but only
+        # their own: a clipboard may contain content other users are not
+        # allowed to see.
+        return self.user_id == user.pk or user.is_superuser

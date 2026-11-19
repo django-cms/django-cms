@@ -112,6 +112,10 @@ class ToolbarEnabledModelsTestCase(CMSTestCase):
         unsupported model returns 400 response.
         """
         request = self.get_request('/')
+        # The view is called directly here, bypassing the admin_view staff gate,
+        # so give the request an authorized user: the endpoint now runs an
+        # object-level view check before the "supported model" check.
+        request.user = self.get_superuser()
         request.toolbar = CMSToolbar(request)
         ctype = ContentType.objects.get_for_model(Page)
         page = create_page('home', 'nav_playground.html', 'en')
@@ -172,6 +176,9 @@ class ToolbarEnabledModelsTestCase(CMSTestCase):
         with provided model in CMS config.
         """
         request = self.get_request('/')
+        # See test_render_preview_not_supported: the direct call needs an
+        # authorized user for the object-level view check.
+        request.user = self.get_superuser()
         request.toolbar = CMSToolbar(request)
         ctype = ContentType.objects.get_for_model(Page)
         page = create_page('home', 'nav_playground.html', 'en')

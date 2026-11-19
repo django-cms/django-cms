@@ -6,6 +6,11 @@ from menus.menu_pool import menu_pool
 
 User = get_user_model()
 
+#: Signals sent while a fixture is being loaded carry ``raw=True``. Related objects
+#: are not guaranteed to exist yet at that point, so receivers must not touch the
+#: database or the caches. See
+#: https://docs.djangoproject.com/en/stable/topics/db/fixtures/#how-fixtures-are-saved-to-the-database
+
 
 def post_save_user(instance, raw, created, **kwargs):
     """Signal called when new user is created, required only when CMS_PERMISSION.
@@ -16,6 +21,9 @@ def post_save_user(instance, raw, created, **kwargs):
 
     requires: CurrentUserMiddleware
     """
+    if raw:
+        return
+
     from cms.utils.permissions import get_current_user
 
     # read current user from thread locals
@@ -23,9 +31,9 @@ def post_save_user(instance, raw, created, **kwargs):
     if not creator or not created or creator.is_anonymous:
         return
 
-    page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
-    page_user.__dict__.update(instance.__dict__)
-    page_user.save()
+    # Only insert the PageUser row: a regular save would write the user row
+    # again and re-run the user's save signals.
+    PageUser(user_ptr_id=instance.pk, created_by=creator).save_base(raw=True, force_insert=True)
 
     clear_user_permission_cache(instance)
     menu_pool.clear(all=True)
@@ -39,18 +47,29 @@ def post_save_user_group(instance, raw, created, **kwargs):
 
     requires: CurrentUserMiddleware
     """
+    if raw:
+        return
+
     from cms.utils.permissions import get_current_user
 
     # read current user from thread locals
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous:
         return
-    page_user = PageUserGroup(group_ptr_id=instance.pk, created_by=creator)
-    page_user.__dict__.update(instance.__dict__)
-    page_user.save()
+    # Only insert the PageUserGroup row, see post_save_user.
+    PageUserGroup(group_ptr_id=instance.pk, created_by=creator).save_base(raw=True, force_insert=True)
 
 
-def pre_save_user(instance, raw, **kwargs):
+#: User fields that neither grant permissions nor appear in menus. Django saves
+#: ``last_login`` alone on every login, which must not flush the caches.
+PERMISSION_IRRELEVANT_USER_FIELDS = frozenset({"last_login"})
+
+
+def pre_save_user(instance, raw, update_fields=None, **kwargs):
+    if raw:
+        return
+    if update_fields and PERMISSION_IRRELEVANT_USER_FIELDS.issuperset(update_fields):
+        return
     clear_user_permission_cache(instance)
     menu_pool.clear(all=True)
 
@@ -61,6 +80,8 @@ def pre_delete_user(instance, **kwargs):
 
 
 def pre_save_group(instance, raw, **kwargs):
+    if raw:
+        return
     if instance.pk:
         menu_pool.clear(all=True)
         user_set = instance.user_set
@@ -75,7 +96,10 @@ def pre_delete_group(instance, **kwargs):
         clear_user_permission_cache(user)
 
 
-def user_m2m_changed(instance, action, reverse, pk_set, **kwargs):
+def user_m2m_changed(instance, action, reverse, pk_set, raw=False, **kwargs):
+    # Django >= 6.1 forwards ``raw`` to m2m_changed; older versions never send it.
+    if raw:
+        return
     if action in (
         "pre_add",
         "pre_remove",
@@ -100,6 +124,8 @@ def _clear_users_permissions(instance):
 
 
 def pre_save_pagepermission(instance, raw, **kwargs):
+    if raw:
+        return
     _clear_users_permissions(instance)
 
 
@@ -108,6 +134,8 @@ def pre_delete_pagepermission(instance, **kwargs):
 
 
 def pre_save_globalpagepermission(instance, raw, **kwargs):
+    if raw:
+        return
     _clear_users_permissions(instance)
 
 

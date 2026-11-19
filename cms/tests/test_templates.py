@@ -1,16 +1,18 @@
 import os.path
-from importlib.machinery import SourceFileLoader
+from importlib.machinery import ModuleSpec
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, loader
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import _load_from_file, get_cms_setting
 
 PATH_PREFIX = os.path.join("inner_dir", "custom_templates")
 GOOD_PATH = os.path.join(settings.PROJECT_PATH, "project", "templates", PATH_PREFIX)
@@ -19,6 +21,25 @@ SITE_PATH = {
     1: os.path.join(settings.PROJECT_PATH, "project", "templates", PATH_PREFIX),
     2: os.path.join(settings.PROJECT_PATH, "project", "templates", "%s_2" % PATH_PREFIX),
 }
+
+
+class LoadFromFileTests(SimpleTestCase):
+    def test_empty_path_returns_none(self):
+        for module_path in (None, ""):
+            with self.subTest(module_path=module_path):
+                self.assertIsNone(_load_from_file(module_path))
+
+    def test_unsupported_file_type_raises_import_error(self):
+        module_path = os.path.join(GOOD_PATH, "base.html")
+        with self.assertRaisesMessage(ImportError, f"Cannot load template config: {module_path}"):
+            _load_from_file(module_path)
+
+    def test_spec_without_loader_raises_import_error(self):
+        module_path = os.path.join(GOOD_PATH, "__init__.py")
+        spec = ModuleSpec("mod", loader=None)
+        with patch("importlib.util.spec_from_file_location", return_value=spec):
+            with self.assertRaisesMessage(ImportError, f"Cannot load template config: {module_path}"):
+                _load_from_file(module_path)
 
 
 class TemplatesConfig(CMSTestCase):
@@ -35,29 +56,22 @@ class TemplatesConfig(CMSTestCase):
 
     @override_settings(CMS_TEMPLATES_DIR=GOOD_PATH)
     def test_custom_templates(self):
-        """
-        Test that using CMS_TEMPLATES_DIR both template list and template labels are extracted from the new directory
-        """
+        """Load template names and labels from the configured directory."""
         config_path = os.path.join(settings.CMS_TEMPLATES_DIR, "__init__.py")
-        mod = None
-        try:
-            mod = SourceFileLoader("mod", config_path).load_module()
-        except FileNotFoundError:
-            print(f"file not found at {config_path}")
-        except Exception as e:
-            print(f"An error occurred: {e}")
-        if mod:
-            original_labels = [force_str(_(template[1])) for template in mod.TEMPLATES.items()]
-            original_files = [os.path.join(PATH_PREFIX, template[0].strip()) for template in mod.TEMPLATES.items()]
-            templates = get_cms_setting("TEMPLATES")
-            self.assertEqual(len(templates), 3)
-            labels = [force_str(template[1]) for template in templates]
-            files = [template[0] for template in templates]
-            if get_cms_setting("TEMPLATE_INHERITANCE"):
-                original_labels.append(force_str(_("Inherit the template of the nearest ancestor")))
-                original_files.append(constants.TEMPLATE_INHERITANCE_MAGIC)
-            self.assertEqual(set(labels), set(original_labels))
-            self.assertEqual(set(files), set(original_files))
+        mod = _load_from_file(config_path)
+        self.assertIsNotNone(mod)
+
+        original_labels = [force_str(_(template[1])) for template in mod.TEMPLATES.items()]
+        original_files = [os.path.join(PATH_PREFIX, template[0].strip()) for template in mod.TEMPLATES.items()]
+        templates = get_cms_setting("TEMPLATES")
+        self.assertEqual(len(templates), 3)
+        labels = [force_str(template[1]) for template in templates]
+        files = [template[0] for template in templates]
+        if get_cms_setting("TEMPLATE_INHERITANCE"):
+            original_labels.append(force_str(_("Inherit the template of the nearest ancestor")))
+            original_files.append(constants.TEMPLATE_INHERITANCE_MAGIC)
+        self.assertEqual(set(labels), set(original_labels))
+        self.assertEqual(set(files), set(original_files))
 
     @override_settings(CMS_TEMPLATES_DIR=GOOD_PATH)
     def test_custom_templates_loading(self):

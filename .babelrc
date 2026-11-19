@@ -4,21 +4,5 @@
             "modules": false
         }]
     ],
-    "plugins": ["@babel/plugin-transform-runtime"],
-    "env": {
-        "production": {},
-        "test": {
-            "presets": [
-                ["@babel/preset-env", {
-                    "loose": true
-                }]
-            ],
-            "plugins": [
-                "rewire",
-                ["babel-plugin-istanbul", {
-                    "exclude": ["**/*.spec.js", "**/libs/**", "**/addons/**"]
-                }]
-            ]
-        }
-    }
+    "plugins": ["@babel/plugin-transform-runtime"]
 }

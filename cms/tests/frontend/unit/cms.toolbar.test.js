@@ -1,16 +1,53 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Sideframe = require('../../../static/cms/js/modules/cms.sideframe').default;
-var Messages = require('../../../static/cms/js/modules/cms.messages').default;
-var $ = require('jquery');
+import CMS, { Helpers, KEYS } from '../../../static/cms/js/modules/cms.base';
+import Sideframe from '../../../static/cms/js/modules/cms.sideframe';
+import Messages from '../../../static/cms/js/modules/cms.messages';
+import $ from 'jquery';
 import Toolbar from '../../../static/cms/js/modules/cms.toolbar';
 import Modal from '../../../static/cms/js/modules/cms.modal';
 
-CMS.API = CMS.API || {};
-CMS.API.Helpers = Toolbar.__GetDependency__('Helpers');
-CMS.KEYS = Toolbar.__GetDependency__('KEYS');
+import { rewire, resetRewire } from './helpers/rewire';
 
-window.CMS = window.CMS || CMS;
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.modal', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('cms.modal', await vi.importActual('../../../static/cms/js/modules/cms.modal'));
+    return lazyMock('cms.modal', { default: 'Modal' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.sideframe', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('cms.sideframe', await vi.importActual('../../../static/cms/js/modules/cms.sideframe'));
+    return lazyMock('cms.sideframe', { default: 'Sideframe' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.navigation', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('cms.navigation', await vi.importActual('../../../static/cms/js/modules/cms.navigation'));
+    return lazyMock('cms.navigation', { default: 'Navigation' });
+});
+
+vi.mock('../../../static/cms/js/modules/dom-diff', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('dom-diff', await vi.importActual('../../../static/cms/js/modules/dom-diff'));
+    return lazyMock('dom-diff', { DiffDOM: 'DiffDOM', nodeToObj: 'nodeToObj' });
+});
+
+CMS.API = CMS.API || {};
+CMS.API.Helpers = Helpers;
+CMS.KEYS = KEYS;
+
+window.CMS = CMS;
 CMS.Toolbar = Toolbar;
 CMS.Modal = Modal;
 CMS.Sideframe = Sideframe;
@@ -26,15 +63,15 @@ describe('CMS.Toolbar', function () {
     beforeEach(() => {
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        Toolbar.__Rewire__('showLoader', showLoader);
-        Toolbar.__Rewire__('hideLoader', hideLoader);
-        Toolbar.__Rewire__('Navigation', Navigation);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
+        rewire('Navigation', Navigation);
     });
 
     afterEach(() => {
-        Toolbar.__ResetDependency__('Navigation');
-        Toolbar.__ResetDependency__('showLoader');
-        Toolbar.__ResetDependency__('hideLoader');
+        resetRewire('Navigation');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     it('creates a Toolbar class', function () {
@@ -121,6 +158,9 @@ describe('CMS.Toolbar', function () {
     describe('.openAjax()', function () {
         var toolbar;
         beforeEach(function (done) {
+            // the module reaches for CMS.API.StructureBoard; karma had it left over
+            // from another spec file
+            CMS.API.StructureBoard = { invalidateState: jasmine.createSpy() };
             fixture.load('toolbar.html');
             CMS.config = {};
             CMS.settings = $.extend(CMS.settings, {
@@ -260,6 +300,90 @@ describe('CMS.Toolbar', function () {
                 url: '/url'
             });
 
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
+        });
+
+        it('evaluates a JSON data bridge from the response instead of reloading', function () {
+            var dataBridge = { action: 'edit', plugin_id: 1 };
+
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback(dataBridge);
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalled();
+            expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
+            expect(hideLoader).toHaveBeenCalled();
+        });
+
+        it('evaluates an HTML data bridge from the response instead of reloading', function () {
+            var dataBridge = { action: 'delete', plugin_id: 2 };
+            var html = '<!DOCTYPE html><html><body class="cms-close-frame">' +
+                '<script id="data-bridge" type="application/json">' +
+                JSON.stringify(dataBridge) + '</script></body></html>';
+
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback(html);
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalled();
+            expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
+        });
+
+        it('reloads if the response is a JSON object without a valid data bridge', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback({ foo: 'bar' });
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.Helpers.onPluginSave).not.toHaveBeenCalled();
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
+        });
+
+        it('reloads if the HTML response does not contain a data bridge', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback('<html><body>no bridge here</body></html>');
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'onPluginSave');
+
+            toolbar.openAjax({ url: '/url' });
+
+            expect(CMS.API.Helpers.onPluginSave).not.toHaveBeenCalled();
             expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
         });
 
@@ -458,7 +582,6 @@ describe('CMS.Toolbar', function () {
             expect(toolbar.ui.window).toHandle(toolbar.resize + '.menu.reset');
         });
 
-
         it('handles mousemove over top level toolbar items', function () {
             var firstMenuItem = $(toolbar.ui.navigations.find('> li')[0]);
             var secondMenuItem = $(toolbar.ui.navigations.find('> li')[1]);
@@ -535,37 +658,6 @@ describe('CMS.Toolbar', function () {
 
     });
 
-    describe('._screenBlock()', function () {
-        var toolbar;
-        beforeEach(function (done) {
-            fixture.load('toolbar.html');
-            CMS.config = {};
-            CMS.settings = $.extend(CMS.settings, {
-                toolbar: 'expanded'
-            });
-            $(function () {
-                spyOn(CMS.Toolbar.prototype, '_initialStates');
-                toolbar = new CMS.Toolbar();
-                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
-                    return $.extend(true, CMS.settings, input);
-                });
-                toolbar.ui.window = $('<div></div>');
-                toolbar.ui.screenBlock = $('<div></div>');
-                spyOn($.fn, 'css').and.callThrough();
-                done();
-            });
-        });
-
-        afterEach(function () {
-            var timeoutId = setInterval(function () {
-            }, 10);
-
-            for (var i; i <= timeoutId; i++) {
-                clearInterval(i);
-            }
-            fixture.cleanup();
-        });
-    });
 
     describe('._delegate()', function () {
         var toolbar;
@@ -595,8 +687,8 @@ describe('CMS.Toolbar', function () {
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
-                Toolbar.__Rewire__('Modal', FakeModal);
-                Toolbar.__Rewire__('Sideframe', FakeSideframe);
+                rewire('Modal', FakeModal);
+                rewire('Sideframe', FakeSideframe);
                 spyOn(toolbar, 'openAjax');
                 spyOn(CMS.API.Helpers, '_getWindow').and.returnValue(fakeWindow);
                 spyOn(CMS.API.Messages, 'open');
@@ -608,8 +700,8 @@ describe('CMS.Toolbar', function () {
         });
 
         afterEach(function (done) {
-            Toolbar.__ResetDependency__('Modal');
-            Toolbar.__ResetDependency__('Sideframe');
+            resetRewire('Modal');
+            resetRewire('Sideframe');
             fixture.cleanup();
             setTimeout(function () {
                 done();
@@ -695,6 +787,41 @@ describe('CMS.Toolbar', function () {
                 $('<div href="href"></div>')
             );
             expect(fakeWindow.location.href).toEqual('href');
+        });
+
+        describe('POST requests', function () {
+            var hostileToken = '"><img class="injected-token">';
+            var hostileHref = '/publish/"><img class="injected-href">';
+
+            beforeEach(function () {
+                fakeWindow.document = document;
+                CMS.config.csrf = 'fallback-token';
+                // Has to be the first form in the document so that the token
+                // lookup picks it up.
+                $('<form class="cms-post-request-test"><input name="csrfmiddlewaretoken"></form>')
+                    .prependTo('body')
+                    .find('input')
+                    .val(hostileToken);
+                spyOn(window.HTMLFormElement.prototype, 'submit');
+            });
+
+            afterEach(function () {
+                $('form.cms-post-request-test').remove();
+            });
+
+            it('treats href and token as values, not as markup', function () {
+                toolbar._sendPostRequest($('<a class="cms-form-post-method"></a>').attr('href', hostileHref));
+
+                var form = $('body > form').last().addClass('cms-post-request-test');
+
+                expect(window.HTMLFormElement.prototype.submit).toHaveBeenCalled();
+                expect(form.attr('action')).toEqual(hostileHref);
+                expect(form.attr('method')).toEqual('POST');
+                expect(form.find('input[name="csrfmiddlewaretoken"]').val()).toEqual(hostileToken);
+                // Nothing was parsed as HTML, so no elements were injected.
+                expect(form.find('img').length).toEqual(0);
+                expect($('img.injected-href, img.injected-token').length).toEqual(0);
+            });
         });
     });
 
@@ -790,8 +917,8 @@ describe('CMS.Toolbar', function () {
                 toolbar: 'expanded'
             });
             $(function () {
-                Toolbar.__Rewire__('Navigation', FakeNavigation);
-                Toolbar.__Rewire__('DiffDOM', DiffDOM);
+                rewire('Navigation', FakeNavigation);
+                rewire('DiffDOM', DiffDOM);
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
                 spyOn(toolbar, 'setSettings').and.callFake(function (input) {
@@ -811,8 +938,8 @@ describe('CMS.Toolbar', function () {
 
         afterEach(function (done) {
             jasmine.clock().uninstall();
-            Toolbar.__ResetDependency__('Navigation');
-            Toolbar.__ResetDependency__('DiffDOM');
+            resetRewire('Navigation');
+            resetRewire('DiffDOM');
             fixture.cleanup();
             setTimeout(function () {
                 done();
@@ -827,6 +954,20 @@ describe('CMS.Toolbar', function () {
             expect(toolbar.navigation instanceof FakeNavigation).toEqual(true);
             expect(trigger).toHaveBeenCalledWith('resize');
             expect(CMS.API.Clipboard._toolbarEvents).toHaveBeenCalledTimes(1);
+        });
+
+        it('only takes markup from the first matched toolbar', () => {
+            // Callers search a whole refreshed page for .cms-toolbar, so the
+            // collection can contain an element authored in editable content.
+            const toolbars = $(
+                '<div class="cms-toolbar"><span class="official-item"></span></div>' +
+                '<div class="cms-toolbar"><span class="injected-item"></span></div>'
+            );
+
+            toolbar._refreshMarkup(toolbars);
+
+            expect(toolbar.ui.toolbar.find('.official-item').length).toEqual(1);
+            expect(toolbar.ui.toolbar.find('.injected-item').length).toEqual(0);
         });
     });
 });

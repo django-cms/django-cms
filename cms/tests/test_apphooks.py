@@ -1,6 +1,10 @@
 import sys
+import types
+import uuid
+from copy import deepcopy
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -8,13 +12,17 @@ from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
 from django.core.checks.urls import check_url_config
+from django.core.signals import request_finished
 from django.http import Http404, HttpResponse
+from django.shortcuts import render
 from django.template import Context, Template
-from django.test import RequestFactory
+from django.template.response import TemplateResponse
+from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, clear_url_caches, include, path, resolve, reverse
 from django.utils.timezone import now
 from django.utils.translation import activate, override as force_language
+from django.views.generic import TemplateView
 
 from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_page_content
@@ -22,7 +30,8 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.middleware.page import get_page
-from cms.models import PageContent
+from cms.models import Page, PageContent
+from cms.signals.apphook import DISPATCH_UID
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
@@ -168,6 +177,37 @@ class ApphooksTestCase(BaseApphooksTestCase):
 
         self.apphook_clear()
 
+    def test_pagecontent_get_template_uses_apphook_root_template(self):
+        """When the apphook exposes a root template, PageContent.get_template
+        returns it instead of the page's own template — so the structure board
+        can show placeholders matching what the apphook actually renders."""
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        page = create_page(
+            'apphooked-page', 'nav_playground.html', 'en',
+            created_by=superuser, apphook=APP_NAME,
+        )
+        page_content = page.pagecontent_set.get(language='en')
+
+        # SampleApp's root view is a function-based view, so without a custom
+        # get_root_template override the lookup returns None and PageContent
+        # falls back to the page's configured template.
+        self.assertEqual(page_content.get_template(), 'nav_playground.html')
+
+        sample_app = apphook_pool.get_apphook(APP_NAME)
+        original = sample_app.get_root_template
+        sample_app.get_root_template = lambda **kwargs: 'apphook/from_root_view.html'
+        try:
+            del page_content._template_cache
+            self.assertEqual(
+                page_content.get_template(),
+                'apphook/from_root_view.html',
+            )
+        finally:
+            sample_app.get_root_template = original
+
+        self.apphook_clear()
+
     def test_apphook_without_landing_page(self):
         """test rendering the apphook without landing page.
 
@@ -290,6 +330,25 @@ class ApphooksTestCase(BaseApphooksTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'sampleapp/home.html')
         self.assertContains(response, de_title.title)
+        self.apphook_clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_on_page_type_is_not_routed(self):
+        """Page types are not served on the public site. An apphook attached to
+        one must not be dispatched either -- its patterns are matched before the
+        catch-all ``cms.views.details`` route, which would bypass the check
+        there."""
+        en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
+
+        with force_language("en"):
+            path = reverse('sample-settings')
+
+        self.assertEqual(self.client.get(path).status_code, 200)
+
+        en_title.page.update(is_page_type=True)
+        self.reload_urls()
+
+        self.assertEqual(self.client.get(path).status_code, 404)
         self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
@@ -580,6 +639,154 @@ class ApphooksTestCase(BaseApphooksTestCase):
             resolver = urlpatterns[0]
             url = resolver.reverse('sample-root')
             self.assertEqual(url, 'child/not-home/subchild/')
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls_2')
+    def test_apphook_on_page_without_path_is_skipped(self):
+        """A page whose ``PageUrl.path`` is ``None`` must not break url resolution.
+
+        Regression test for #8886: ``_get_app_patterns`` built ``page_url.path + "/"``
+        unconditionally, so a single such page raised ``TypeError`` and took down every
+        apphook on the site -- including the admin -- until the database was edited by hand.
+        Unpublishing a page with djangocms-versioning leaves exactly this state.
+        """
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("live-app", "nav_playground.html", "en", parent=home, apphook='SampleApp')
+        pathless = create_page("pathless-app", "nav_playground.html", "en", parent=home, apphook='SampleApp')
+
+        # Without page content the url keeps its slug but loses its path -- the core
+        # equivalent of an unpublished page.
+        PageContent.objects.filter(page=pathless, language="en").delete()
+        pathless.update_urls_from_content("en")
+        self.assertIsNone(pathless.urls.get(language="en").path)
+
+        with force_language("en"):
+            self.reload_urls()
+            urlpatterns = get_app_patterns()  # must not raise TypeError
+
+            # the remaining apphook still resolves, i.e. the pathless page was skipped
+            # rather than the whole pattern list being abandoned
+            self.assertEqual(urlpatterns[0].reverse('sample-root'), 'live-app/')
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_sub_url_redirects_to_fallback_language(self):
+        # The apphook page has no German URL: app sub-URLs in German redirect to
+        # the same sub-URL in the fallback language (de falls back to en)
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        self.reload_urls()
+
+        response = self.client.get("/de/blog/settings/?page=2")
+
+        self.assertRedirects(
+            response, "/en/blog/settings/?page=2", status_code=302, fetch_redirect_response=False
+        )
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_fallback_redirect_applies_page_permissions(self):
+        # Fallback routes are subject to the same access checks as the app's patterns:
+        # anonymous users are sent to the login page instead of the fallback URL
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME, login_required=True)
+        self.reload_urls()
+
+        response = self.client.get("/de/blog/settings/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(settings.LOGIN_URL, response["Location"])
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get("/de/blog/settings/")
+
+        self.assertRedirects(response, "/en/blog/settings/", status_code=302, fetch_redirect_response=False)
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_fallback_redirect_hides_non_public_languages(self):
+        # Like pages, languages which are not public are only available to staff
+        languages = deepcopy(settings.CMS_LANGUAGES)
+        for language in languages[1]:
+            if language["code"] == "de":
+                language["public"] = False
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+
+        with self.settings(CMS_LANGUAGES=languages):
+            self.reload_urls()
+            response = self.client.get("/de/blog/settings/")
+            self.assertEqual(response.status_code, 404)
+
+            with self.login_user_context(self.get_superuser()):
+                response = self.client.get("/de/blog/settings/")
+            self.assertRedirects(response, "/en/blog/settings/", status_code=302, fetch_redirect_response=False)
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_page_root_is_not_redirected_by_fallback_patterns(self):
+        # The page root stays with cms.views.details and redirect_on_fallback
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        self.reload_urls()
+
+        with force_language("de"):
+            resolver = get_app_patterns()[0]
+            with self.assertRaises(Resolver404):
+                resolver.resolve("blog/")
+            self.assertEqual(resolver.resolve("blog/settings/").kwargs, {"rest": "settings/"})
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_sub_url_served_once_language_is_published(self):
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        blog = create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        create_page_content("de", "Blog", blog, slug="blog")
+        self.reload_urls()
+
+        response = self.client.get("/de/blog/settings/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "sample settings page")
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_fallback_does_not_shadow_pages_in_language(self):
+        # Another page published in German at the apphook page's path takes precedence
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        create_page("blog", "nav_playground.html", "en", parent=home, apphook=APP_NAME)
+        other = create_page("other", "nav_playground.html", "en", parent=home)
+        create_page_content("de", "Blog", other, slug="blog")
+        self.reload_urls()
+
+        with force_language("de"):
+            self.assertEqual(get_app_patterns()[0].url_patterns, [])
+
+    @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls')
+    def test_apphook_on_home_page_has_no_fallback_redirect(self):
+        # A catch-all below the home page would capture every URL of the language
+        self.create_homepage("home", "nav_playground.html", "en", apphook=APP_NAME)
+        self.reload_urls()
+
+        with force_language("de"):
+            self.assertEqual(get_app_patterns()[0].url_patterns, [])
+
+    @override_settings(
+        CMS_PERMISSION=False,
+        ROOT_URLCONF='cms.test_utils.project.urls',
+        MIDDLEWARE=['cms.middleware.utils.ApphookReloadMiddleware', *settings.MIDDLEWARE],
+    )
+    def test_apphook_urls_follow_moved_page(self):
+        # Moving a page changes the urls of its apphook: the reload middleware has
+        # to serve them at the new location without a server restart
+        parent_1 = create_page("parent-1", "nav_playground.html", "en")
+        parent_2 = create_page("parent-2", "nav_playground.html", "en")
+        page = create_page("blog", "nav_playground.html", "en", parent=parent_1, apphook=APP_NAME)
+        # Creating the page scheduled a reload for the end of the next request. Drop
+        # it: the app's url patterns are built by the request below.
+        request_finished.disconnect(dispatch_uid=DISPATCH_UID)
+        self.assertEqual(self.client.get("/en/parent-1/blog/extra_1/").status_code, 200)
+
+        with self.login_user_context(self.get_superuser()):
+            endpoint = self.get_admin_url(Page, "move_page", page.pk)
+            response = self.client.post(endpoint, {"id": page.pk, "position": 0, "target": parent_2.pk})
+        self.assertEqual(response.json()["status"], 200)
+
+        self.assertEqual(self.client.get("/en/parent-2/blog/extra_1/").status_code, 200)
+        self.assertEqual(self.client.get("/en/parent-1/blog/extra_1/").status_code, 404)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
     def test_apphook_urlpattern_order(self):
@@ -1232,6 +1439,11 @@ class ApphooksSiteTestCase(BaseApphooksTestCase):
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphook_site_filter_preserves_view_name(self):
         self.create_pages()
+        # Force a fresh import of the urlconf now that the apphook pages exist so
+        # that the global APP_RESOLVERS are rebuilt for the overridden
+        # ROOT_URLCONF. Without this, reverse() below depends on whether prior
+        # tests left the url modules cached in sys.modules (order dependence).
+        self.reload_urls()
 
         view_names = (
             ('sample-settings', 'sample_view'),
@@ -1303,3 +1515,155 @@ class ApphookFrontendEditingTests(BaseApphooksTestCase):
                 cms_extension.toolbar_enabled_models[Category] = original_renderer
             elif Category in cms_extension.toolbar_enabled_models:
                 del cms_extension.toolbar_enabled_models[Category]
+
+
+def _register_root_template_urlconf(patterns):
+    """Build a unique, throwaway urlconf module so it can be referenced by
+    string path (which is what ``django.urls.get_resolver`` expects)."""
+    name = f'cms.tests._root_template_test_urlconf_{uuid.uuid4().hex}'
+    module = types.ModuleType(name)
+    module.urlpatterns = patterns
+    sys.modules[name] = module
+    return name
+
+
+class GetRootTemplateTests(SimpleTestCase):
+    """Unit tests for :meth:`cms.app_base.CMSApp.get_root_template`."""
+
+    def setUp(self):
+        clear_url_caches()
+
+    def tearDown(self):
+        clear_url_caches()
+
+    def _make_app(self, urlconf):
+        class _App(CMSApp):
+            _urls = [urlconf]
+        return _App()
+
+    def test_class_based_view_with_class_level_template_name(self):
+        class HomeView(TemplateView):
+            template_name = 'apphook/cbv_home.html'
+
+        urlconf = _register_root_template_urlconf([path('', HomeView.as_view())])
+
+        self.assertEqual(
+            self._make_app(urlconf).get_root_template(),
+            'apphook/cbv_home.html',
+        )
+
+    def test_class_based_view_with_template_name_via_as_view_kwargs(self):
+        # ``TemplateView.as_view(template_name=...)`` stashes the template on
+        # ``view_initkwargs``; the lookup must pick it up from there.
+        urlconf = _register_root_template_urlconf([
+            path('', TemplateView.as_view(template_name='apphook/inline.html')),
+        ])
+
+        self.assertEqual(
+            self._make_app(urlconf).get_root_template(),
+            'apphook/inline.html',
+        )
+
+    def test_fbv_returning_template_response_returns_none(self):
+        # The template name lives inside the response, not on the callable.
+        # Without rendering the view, get_root_template can't see it.
+        def home(request):
+            return TemplateResponse(request, 'apphook/fbv_tr.html', {})
+
+        urlconf = _register_root_template_urlconf([path('', home)])
+
+        self.assertIsNone(self._make_app(urlconf).get_root_template())
+
+    def test_fbv_using_render_shortcut_returns_none(self):
+        # ``render()`` returns a plain HttpResponse with the body already
+        # rendered — by the time we'd inspect a response, the template name
+        # is gone.
+        def home(request):
+            return render(request, 'apphook/fbv_render.html')
+
+        urlconf = _register_root_template_urlconf([path('', home)])
+
+        self.assertIsNone(self._make_app(urlconf).get_root_template())
+
+    def test_subclass_can_override_get_root_template(self):
+        # The advertised escape hatch when inference doesn't fit: override
+        # the method on the apphook subclass.
+        class _App(CMSApp):
+            _urls = []
+
+            def get_root_template(self, page=None, language=None, **kwargs):
+                return 'apphook/manual.html'
+
+        self.assertEqual(_App().get_root_template(), 'apphook/manual.html')
+
+    def test_returns_none_when_no_root_pattern(self):
+        class DetailView(TemplateView):
+            template_name = 'apphook/detail.html'
+
+        urlconf = _register_root_template_urlconf([
+            path('detail/', DetailView.as_view()),
+        ])
+
+        self.assertIsNone(self._make_app(urlconf).get_root_template())
+
+    def test_root_pattern_via_include(self):
+        # ``path('', include(...))`` — the root pattern lives inside the
+        # included urlconf and must still be discovered.
+        class HomeView(TemplateView):
+            template_name = 'apphook/inner_home.html'
+
+        inner = _register_root_template_urlconf([path('', HomeView.as_view())])
+        outer = _register_root_template_urlconf([path('', include(inner))])
+
+        self.assertEqual(
+            self._make_app(outer).get_root_template(),
+            'apphook/inner_home.html',
+        )
+
+    def test_non_root_pattern_template_is_ignored(self):
+        # When the root view doesn't expose a template, we must NOT fall back
+        # to a sibling pattern's template — that would be misleading.
+        def root_fbv(request):
+            return TemplateResponse(request, 'apphook/root.html', {})
+
+        class AboutView(TemplateView):
+            template_name = 'apphook/about.html'
+
+        urlconf = _register_root_template_urlconf([
+            path('', root_fbv),
+            path('about/', AboutView.as_view()),
+        ])
+
+        self.assertIsNone(self._make_app(urlconf).get_root_template())
+
+    def test_inferred_template_is_not_cached(self):
+        # Inferred templates must NOT be cached on the apphook instance:
+        # apphook instances are shared singletons, and apphooks like
+        # VariableUrlsApp return different urlconfs depending on page/language.
+        # Caching the first inferred template would lock it in for every
+        # subsequent (possibly differently-routed) call.
+        class HomeOne(TemplateView):
+            template_name = 'apphook/one.html'
+
+        class HomeTwo(TemplateView):
+            template_name = 'apphook/two.html'
+
+        urlconf_one = _register_root_template_urlconf([path('', HomeOne.as_view())])
+        urlconf_two = _register_root_template_urlconf([path('', HomeTwo.as_view())])
+
+        urlconfs = iter([urlconf_one, urlconf_two])
+
+        class _App(CMSApp):
+            def get_urls(self, page=None, language=None, **kwargs):
+                return [next(urlconfs)]
+
+        app = _App()
+        self.assertEqual(app.get_root_template(), 'apphook/one.html')
+        self.assertEqual(app.get_root_template(), 'apphook/two.html')
+
+    def test_invalid_urlconf_string_returns_none(self):
+        # A urlconf that fails to import shouldn't crash the lookup.
+        class _App(CMSApp):
+            _urls = ['cms.tests._does_not_exist_xyz']
+
+        self.assertIsNone(_App().get_root_template())

@@ -10,7 +10,7 @@ Color schemes (light/dark) with django CMS
     and the responsibility of the site developer.
 
     The admin interfaces will only reflect the described behavior if the package
-    ``djangocms-admin-style`` is installed (version 3.2 or later). If it is not
+    ``djangocms-simple-admin-style`` is installed. If it is not
     installed, the admin interface is managed by your underlying Django installation,
     which usually uses the browser's color scheme.
 
@@ -66,12 +66,12 @@ Make your own admin CSS color scheme aware
 ------------------------------------------
 
 Plugin forms or any admin forms use Django's admin app which itself supports light and
-dark color schemes. djangocms-admin-style introduces django CMS' color scheme to the
-admin app. Just as Django does, djangocms-admin-style defines CSS variables for frequent
+dark color schemes. djangocms-simple-admin-style introduces django CMS' color scheme to the
+admin app. Just as Django does, djangocms-simple-admin-style defines CSS variables for frequent
 colors.
 
 We recommend writing at least your reusable apps in a way which allows them to respect
-the color scheme with djangocms-admin-style and with Django's admin style.
+the color scheme with djangocms-simple-admin-style and with Django's admin style.
 
 Here are some recommendations for making your app work as seamlessly as possible:
 
@@ -82,12 +82,12 @@ Here are some recommendations for making your app work as seamlessly as possible
 - Use the following pattern: ``var(--dca-color-var, var(--fallback-color-var,
   #xxxxxx))`` where ``#xxxxxx`` represents the light version of the color. This tries
   django CMS color scheme first and falls back to Django color scheme if
-  djangocms-admin-style is not available.
+  djangocms-simple-admin-style is not available.
 - Avoid media queries like ``@media (prefers-color-scheme: dark)`` since they would
   ignore forced settings to light or dark.
 
 The admin frontend pulls the style from django admin styles and - if present - from
-djangocms-admin-style. Django itself also uses CSS variables to implement admin mode,
+djangocms-simple-admin-style. Django itself also uses CSS variables to implement admin mode,
 these can be used as dark mode-aware fall-back colors.
 
 Here's a table of django CMS' CSS color variables and their Django fallbacks:

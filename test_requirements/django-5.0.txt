@@ -1,2 +1,0 @@
--r requirements_base.txt
-Django>=5.0,<5.1

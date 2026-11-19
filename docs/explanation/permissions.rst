@@ -2,7 +2,11 @@
 Permissions
 ###########
 
-The django CMS permissions system is flexible, granular and multi-layered.
+django CMS sits on top of Django's standard auth system and adds a
+second, optional layer of **per-page permissions** for projects that
+need finer control. This page explains how those two layers fit
+together, the roles they are designed to support, and the trade-offs
+that come with each.
 
 
 ****************
@@ -82,132 +86,431 @@ In Page permissions mode, you also need to give users permission to the right pa
 .. _global-and-per-page-permissions:
 
 Global and per-page permissions
-===============================
-
-This can be done in two ways, *globally* or *per-page*.
-
-.. _pages-global-permissions:
-
-**Global page permissions** apply to all pages (or all pages on a sub-site in a multi-site
-project). Global page permissions are managed in the admin at *django CMS* > *Pages global
-permissions*.
-
-**Per-page permissions** apply to a specific page and/or its children and/or its descendants.
-Per-page permissions are managed via the toolbar (*Page* > *Permissions*) when on the page in
-question, in edit mode.
-
-Your users (unless they are Django superusers) will need at least one of global page permissions or
-per-page permissions granted to them in order to be able to edit any pages at all.
-
-They will **also** need appropriate :ref:`user permissions <key-user-permissions>`, otherwise they
-will have no edit rights to pages.
-
-.. _page-permission-options:
-
-Page permission options
-=======================
-
-Both global page permissions and per-page permissions can be assigned to users or groups of users.
-They include:
-
-* *Can add*
-* *Can edit*
-* *Can delete*
-* *Can publish*
-* *Can change advanced settings*
-* *Can change permissions*
-* *Can move*
-
-.. _important:
-
-    Even though a user may have *Can edit* permissions on a page, that doesn't give them
-    permissions to add or change plugins *within* that page. In order to be able to
-    add/change/delete plugins on any page, you will need to go through :ref:`the standard Django
-    permissions <key-user-permissions>` to provide users with the actions they can perform, for
-    example:
-
-    * ``cms | page | Can publish page`` to publish it
-    * ``cms | cms plugins | Can edit cms plugin`` to edit plugins on the page
-
-
-.. _pages-specific-permissions:
-
-Per-page permissions
-====================
-
-Per-page permissions are controlled by selecting *Permissions* from the *Page* menu in the toolbar
-when on the page (this options is only available when ``CMS_PERMISSION`` mode is on).
-
-*Login required* determines whether anonymous visitors will be able to see the page at all.
-
-*Menu visibility* determines who'll be able to see the page in navigation menus - everyone, or logged in or anonymous users
-only.
-
-.. _view-restrictions:
-
-*View restrictions* determine which groups and users will be able to see the page when it is
-published. Adding a view restriction will allow you to set this. Note that this doesn't apply any
-restrictions to users who are also editors with appropriate permissions.
-
-*Page permissions* determine what editors can do to a page (or hierarchy of pages). They are
-described above in :ref:`page-permission-options`.
-
-
-New admin models
-----------------
-
-When ``CMS_PERMISSION`` is enabled, as well as :ref:`Pages global permissions
-<pages-global-permissions>` you will find two new models available in the CMS admin:
-
-* *User groups (page)*
-* *Users (page)*
-
-You will find that the latter two simply reflect the Django Groups and User permissions that
-already exist in the system, and can be ignored.
-
-
-.. _permission-strategies:
 
 *********************
-Permission strategies
+Roles, not just users
 *********************
 
-For a simple site with only a few users you may not need to be concerned about this, but with
-thousands of pages belonging to different departments and users with greatly differing levels of
-authority and expertise, it is important to understand who is able to do what on your site.
+A team using a CMS usually has more than one kind of user. django CMS
+is shaped around four loose roles, even though Django itself only
+knows about users and groups:
+
+**Author**
+    Creates and edits draft content. Cannot publish. Often the
+    largest group on a content-heavy site.
+
+**Editor**
+    Reviews, edits, and publishes. The role that needs publish
+    permission; otherwise looks like an author with more rights.
+
+**Designer**
+    Owns templates, styles, and the layout vocabulary. Works in
+    code, not in the toolbar. Permission-wise this is usually a
+    developer with deployment access — not a CMS user role at all.
+
+**Site administrator**
+    Manages users, groups, permissions, deployment, and project
+    configuration. Often a Django superuser.
+
+The permission system below is the mechanism that lets you map these
+roles onto users and groups. The system does not care what you call
+your groups; it only enforces what each group is allowed to do.
 
 
-.. _use-permissions-on-groups:
+*********************
+Two layers, two modes
+*********************
 
-Use permissions on Groups, not on Users
-=======================================
+There are two layers of permissions in any django CMS project:
 
-Avoid applying permissions to individual users unless strictly necessary. It's far better to apply
-them to Groups, and add Users to Groups. Otherwise, you risk ending up with large numbers of Users
-with unknown or inappropriate permissions.
+1. **Django auth permissions** (always on). The standard
+   per-model add / change / delete permissions Django gives to every
+   model. CMS models — ``Page``, ``PageContent``, ``Placeholder``,
+   ``CMSPlugin``, and so on — participate in this system like any
+   other Django model. Configured in the Django admin under
+   *Authentication and Authorization*.
+2. **CMS per-page permissions** (off by default). Row-level
+   permissions on individual pages or page subtrees: "this group can
+   edit pages under ``/legal/``, but not under ``/marketing/``".
+   Configured per project by the :setting:`CMS_PERMISSION` setting.
+
+The setting controls which model the second layer follows:
+
+* ``CMS_PERMISSION = False`` — only Django auth applies. Whoever can
+  edit pages can edit *all* pages. Simple, predictable, sufficient
+  for small teams and single-domain sites.
+* ``CMS_PERMISSION = True`` — Django auth still applies, *and* on top
+  of it the CMS checks per-page permissions for each request. Needed
+  when different groups should own different parts of the page tree,
+  or when a multi-site project needs editors scoped to one site.
+
+Turning ``CMS_PERMISSION`` on is not free: every page operation now
+involves additional database lookups, and the admin grows several new
+forms that a small team may find more confusing than helpful. Switch
+it on when you need it, not by default.
+
+****************************
+Two dimensions of permission
+****************************
+
+Whichever mode is on, permissions divide along **two independent
+dimensions**:
+
+* **What** the user is allowed to do — add, change, delete, publish,
+  change advanced settings, move pages in the tree.
+* **Where** they are allowed to do it — globally (all pages on a
+  site), or only on a specific page subtree.
+
+A *Basic editor* group might have "can change" on the *what* axis
+and "all pages on site X" on the *where* axis. A *Legal team*
+group might have the same *what* permissions but be restricted to
+the ``/legal/`` subtree on the *where* axis.
+
+The *where* dimension only exists when ``CMS_PERMISSION = True``. In
+the simpler mode, every CMS permission applies to every page.
+
+The two models that implement the *where* dimension are:
+
+* :class:`~cms.models.permissionmodels.GlobalPagePermission` — applies
+  to all pages of one or more sites.
+* :class:`~cms.models.permissionmodels.PagePermission` — applies to a
+  specific page, optionally cascading to its descendants.
 
 
-Use Groups to build up permissions
+***************************************
+Permissions for plugins, not just pages
+***************************************
+
+A common surprise: granting a user "can change" on a page does *not*
+let them add or edit the plugins inside that page. Plugins are their
+own model with their own permissions.
+
+The split is intentional. Plugins are reusable components defined by
+add-on packages; their permissions are managed alongside the package
+that defines them, not alongside the page. To grant an editor the
+right to add and edit plugins on a page they can already edit, give
+their group the standard Django auth permissions on the relevant
+plugin models (``djangocms_text.text``, ``djangocms_frontend.uiitem``,
+your custom plugin model, and so on).
+
+If this feels like permission sprawl, you are not alone. The
+:doc:`/how_to/20-cms-config` mechanism and convenience admin actions
+exist partly to reduce the per-package plumbing.
+
+*************************************
+Publishing and the versioning package
+*************************************
+
+"Can publish" is the most-asked-about CMS permission. It is also the
+one most affected by which versioning package is installed.
+
+Without a versioning package, **there is no publish action** to
+permit. Saving a ``PageContent`` row is what makes it visible. See
+:ref:`publishing`.
+
+With ``djangocms-versioning`` installed, **publish becomes a distinct
+step** with its own permission, separate from "change". A common
+group design is:
+
+* *Authors* — can add and change page content; cannot publish.
+* *Editors* — same as authors, plus can publish.
+
+The "Can publish" permission is granted on the relevant content
+version models exposed by ``djangocms-versioning`` (e.g.
+``django CMS Versioning | page content version``). Different
+versioning packages may model this differently; check the package's
+own documentation for the exact permission names.
+
+If your project uses :doc:`/how_to/20-cms-config` to register custom
+content models, those models participate in the same versioning
+contract and inherit the same publish permission model.
+
+*************************************
+View restrictions vs edit permissions
+*************************************
+
+A separate concern, often confused with edit permissions: who is
+allowed to *see* a published page.
+
+* **Login-required pages.** Available without ``CMS_PERMISSION``. A
+  page can be marked as requiring login; anonymous visitors are
+  redirected to log in.
+* **View restrictions per group.** Available only with
+  ``CMS_PERMISSION = True``. A page can be restricted so that only
+  members of specific groups can see it. Useful for intranet
+  sections, customer portals, or pre-launch staging pages.
+* **Menu visibility.** Independent of view restrictions: a page can
+  be hidden from menus while remaining reachable by URL, or shown
+  only to anonymous (logged-out) visitors, or only to authenticated
+  ones.
+
+These three controls are layered. A page can be in the menu for
+logged-in users (menu visibility), require login to view at all
+(login-required), and be further restricted to one group (view
+restriction).
+
+**Staff access to content versions.** Active staff users who can view
+a page may also preview all its content versions, including draft,
+unpublished, and archived versions, and inspect their structure. This
+does not require change permission. For unrestricted pages, this
+includes staff users with no CMS editing permissions. Publishing
+controls which version appears on the public site; it does not make
+other versions confidential from staff who can view the page. Editing
+content remains subject to change permissions.
+
+**These are front-end controls only.** View restrictions,
+login-required, and menu visibility all govern who can *see a
+published page on the public site*. They do **not** hide a page inside
+the admin. The page tree in the admin — and the page-link
+autocomplete used by the smart-link field, which mirrors it — list
+*every* page on a site to any staff user who can edit at least one
+page on that site. Such a user can therefore see the titles, paths,
+and URLs of restricted, login-required, and draft pages, even ones
+they cannot view on the front end or edit. Per-page edit permissions
+gate the *actions* offered on each node (edit, move, delete), not
+whether the node is listed.
+
+The same holds for a page's content in the admin. A staff user who may
+view a page can open it in preview mode and on the structure board,
+and can copy and paste it into a part of the tree they may edit. All of
+these show the page's *current admin content*: with
+``djangocms-versioning`` installed, that is the latest draft, not only
+the published version. Edit permissions decide who may *change* a
+draft; they do not keep it hidden from staff users who may view the
+page. To keep work in progress away from some staff users, restrict
+their view access to the page — or, for content that must stay
+confidential, keep it on a separate site or outside the CMS.
+
+In other words, a page title or path is not a secret from your staff
+editors. If a page's *existence* must be hidden from some staff users,
+the page tree is the wrong tool: keep that content on a separate site
+(see :setting:`CMS_PERMISSION` and multi-site setups) or outside the
+CMS, rather than relying on a view restriction to conceal it in the
+admin.
+
+
+**********************************
+Moving, copying and deleting pages
+**********************************
+
+Because a view restriction can cascade to a page's descendants, who is
+allowed to see a page depends on *where that page sits* in the tree.
+Moving or copying a page therefore raises a question no permission form
+can answer on its own: should the page keep the audience it had, or
+adopt the one implied by its new position?
+
+django CMS answers it conservatively. No relocation may hand you — or
+the public — content you were not allowed to read in the first place,
+and a restriction is never dropped by accident:
+
+* **Move.** When a page leaves the branch whose ancestors restricted
+  it, those view grants are written onto the moved page itself. The
+  page, and everything below it, stays as restricted at its new
+  position as it was at the old one. Publishing it is a separate,
+  deliberate act: remove the restriction, which requires the *can
+  change permissions* right on the page.
+* **Copy and paste.** Here you choose. The *Copy permissions* checkbox
+  in the paste dialog — shown only with ``CMS_PERMISSION = True`` —
+  decides whether the pasted pages keep the permission rows of the
+  originals, edit rights included. Ticked, the copy is as restricted as
+  the source, inherited restrictions included. Cleared, the copy has no
+  permissions at all, and the paste is refused if the subtree contains
+  a page you are not allowed to view.
+* **Duplicate.** Duplicating a single page always carries its view
+  restrictions across, its own and the ones it inherited. It never
+  copies edit rights.
+
+Both move and paste are refused outright when the subtree contains
+pages you may not view *and* the destination would grant you access to
+them — for instance when you hold "can change" on the target page and
+its descendants. Change permission implies view permission, so such a
+relocation would hand you content you could not read before.
+
+Deleting needs no rule of its own: deleting a page deletes its
+descendants, and the confirmation step checks your delete permission on
+every one of them. A branch that contains a page you may not delete
+cannot be deleted at its root either.
+
+So an editor who owns a restricted branch cannot publish it by dragging
+it out of the branch, nor by duplicating it. Copying it with *Copy
+permissions* cleared does produce an unrestricted copy — but only of
+pages that editor was already allowed to read.
+
+..  versionchanged:: 5.2
+    Earlier versions dropped the inherited view restrictions when a page
+    was moved, copied with descendants, or duplicated, and authorized
+    only the root of a copied or moved subtree.
+
+
+*************************
+Delegated user management
+*************************
+
+With ``CMS_PERMISSION = True`` a non-superuser can be given the right
+to manage *other* users — the "Users" and "User groups" entries in the
+admin become available to anyone who has the ``change`` permission on
+the CMS user/group models and a page-permission level of their own.
+These users are **page-user managers**. They are not superusers, yet
+inside their own corner of the system they act with superuser-like
+authority.
+
+The mental model is deliberate: **a page-user manager is a superuser
+for their subordinate users only.** A user is "subordinate" when the
+manager created them, or when they sit at the same or a lower level in
+the page tree the manager controls.
+
+The size of that set depends on where the manager's own authority comes
+from. A manager whose ``can_change_permissions`` right is granted by a
+:class:`~cms.models.permissionmodels.PagePermission` on part of the tree
+has only the users at or below that point. A manager granted the right
+by a :class:`~cms.models.permissionmodels.GlobalPagePermission` sits at
+the top of the hierarchy, and every non-superuser account on the site is
+subordinate to them — not merely the ones they created. Grant global
+permissions with that in mind.
+
+Within the subordinate set, the manager can do almost everything a
+superuser could do to those accounts:
+
+* create new staff users (new page-users are made staff automatically);
+* grant and revoke any permission or group the manager *themselves*
+  holds — they cannot hand out rights they do not have;
+* edit account status fields, including ``is_staff`` (admin-login
+  capability) and ``is_active`` (whether the account may log in at
+  all).
+
+The single boundary a manager cannot cross is **superuser status**,
+and it holds in both directions:
+
+* A manager can never *grant* superuser status. ``is_superuser`` is
+  read-only for non-superusers, so neither a subordinate nor the
+  manager themselves can be promoted.
+* A manager can never *manage an account that already has it*.
+  Superusers are never subordinate to a non-superuser, however many
+  permissions the manager holds. A superuser account is therefore
+  absent from the manager's user list entirely — they cannot edit it,
+  delete it, or change its password.
+
+The second half matters as much as the first. Being able to set an
+account's password is equivalent to being that account, so a manager
+who could reach a superuser's password would hold superuser rights in
+all but name. Both halves are enforced by the same rule — the
+subordinate set excludes superusers — rather than by the read-only
+field alone.
+
+**A manager can reverse a setting a superuser made.** This follows
+directly from the model and is worth stating plainly. If a superuser
+disables a subordinate account (``is_active = False``) or removes its
+staff flag (``is_staff = False``), a page-user manager with that user
+in their subordinate set can switch it back on. The manager's authority
+over a subordinate is not subordinate to the superuser's earlier edit;
+it is the *same* authority over that account, minus the ability to
+grant superuser. If you need a deactivation or a demotion to be
+permanent against a manager, the user must be moved out of that
+manager's subordinate set — for example by deleting the account, or by
+re-parenting it above the manager's page-tree level — rather than
+relying on the status flag alone.
+
+This is intentional delegation, not a gap: the whole point of a
+page-user manager is to off-load routine account administration from
+the superuser. Hand the role only to people you would trust with the
+accounts it covers.
+
+Delegating per-page permissions
+==============================
+
+With ``CMS_PERMISSION=True``, a manager with ``can_change_permissions``
+can manage subordinate permission grants through a page's advanced settings.
+The inline offers only the permission flags the manager can grant on that page.
+Existing grants containing flags they cannot grant are omitted from the editable
+inlines, including view restrictions that also carry such editing rights.
+Those grants cannot be changed or deleted by submitting their IDs manually.
+This also prevents transferring protected rights to another user or group, or
+changing their scope through ``grant_on``. A manager authorized to grant all
+the row's rights, or a superuser, must make those changes.
+
+The manager must hold both permission-management authority and the editing
+rights being granted throughout the selected scope (page, children, or
+descendants). Rights on the parent alone do not authorize grants for its
+descendants. This applies to new grants and scope changes, and existing grants
+outside the manager's authority cannot be edited or deleted. Scope checks also
+cover future pages, even when the selected subtree is currently empty.
+User, group, and global grants can jointly provide the required authority.
+View restrictions require permission-management authority over their scope;
+any editing rights stored on the same grant are checked as well.
+
+Recipient user IDs are validated against the manager's subordinate users,
+including when the admin uses a raw-ID widget.
+
+
+Delegating global page permissions
 ==================================
 
-Different users may require different subsets of permissions. For example, you could define a
-*Basic content editor* group, who can edit and publish pages and content, but who don't have
-permission to create new ones; that permission would be granted to a *Lead content editor* Group.
-Another Group could have permissions to use the weblog.
+A non-superuser with the ``add`` or ``change`` permission on
+:class:`~cms.models.permissionmodels.GlobalPagePermission` and
+``can_change_permissions`` of their own can manage global page
+permissions in the admin. The same rule applies as for users: **they
+cannot hand out rights they do not have** — not to others, and not to
+themselves.
 
-Then, when managing a user, place the user into the appropriate groups.
+* The form offers only the ``can_*`` flags the manager holds, and saving
+  accepts a flag only if they hold it on *every* site the grant covers.
+  A flag held on one site cannot be granted for another. A grant with no sites selected covers
+  all sites, so it requires an equally unrestricted grant.
+* The manager must also hold ``can_change_permissions`` on every site
+  the grant covers. Managing permissions on one site does not extend to
+  sites where the manager merely holds other rights.
+* A flag counts only together with the Django permissions the matching
+  page action requires — ``can_publish``, for example, needs
+  ``cms.change_page`` and ``cms.publish_page``. A manager who holds the
+  flag but not those permissions cannot act on it, and so cannot grant
+  it either. ``can_view`` has no Django counterpart.
+* An existing grant is out of reach if it contains a flag the manager
+  could not grant on its sites, or covers a site where they cannot
+  manage permissions. They can neither change nor delete it, so its
+  user, group or sites cannot be used to move those rights elsewhere.
 
 
-Two dimensions of permissions
------------------------------
 
-You can divide your users' permissions across two dimensions:
+********
+Strategy
+********
 
-* what sort of things this user or group of user should be allowed to do (e.g. publish pages, add
-  new plugins, create new users, etc)
-* which sections of the site the user should be allowed to do them on (the home page, a limited set
-  of departmental pages, etc)
+A few guidelines that hold regardless of which mode you are in:
 
-Groups are very useful for managing this. For example, you can create a *Europe* group for editors
-who are allowed to edit the Europe page hierarchy or sub-site. The group can then be added to a
-:ref:`global or per-page permission <global-and-per-page-permissions>`.
+**Apply permissions to Groups, not Users.** Per-user permissions
+drift quickly. After a year, no one will remember why a specific
+user has a specific permission. Group-based grants survive staff
+changes and are auditable.
+
+**Compose Groups by responsibility, not by person.** A *Basic
+editor* group, a *Lead editor* group, a *Blog editor* group, a
+*Legal* group. Users land in one or more of these based on what
+they do. Avoid groups named after individuals or departments
+("Marketing") unless the departmental boundary is also the
+permission boundary.
+
+**Start in simple mode.** Leave ``CMS_PERMISSION = False`` until you
+have a concrete reason to switch. Most teams that turn it on at
+the start later wish they had not — the additional admin surface is
+real, and re-engineering away from it is harder than adopting it
+later.
+
+**Permissions are not a substitute for trust.** The "change
+permissions" right cannot be used to grant rights its holder does not
+have, but within those rights it is broad: a manager can hand them and
+their groups to any account in their subordinate set, and reactivate
+those accounts. The boundary that matters most in practice is who gets
+superuser; tighten that first.
+
+****************
+Where to go next
+****************
+
+* :ref:`content_objects` — pages, page content, and the grouper /
+  content split that the permission system protects.
+* :ref:`publishing` — how publishing depends on the versioning
+  package, and what that means for the "Can publish" permission.
+* :doc:`/reference/permissions` — the authoritative list of CMS
+  permission models and fields.
+* :doc:`/reference/configuration` — the :setting:`CMS_PERMISSION`
+  setting and related options.

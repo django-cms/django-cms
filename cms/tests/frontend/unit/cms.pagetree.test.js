@@ -1,10 +1,21 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var PageTree = require('../../../static/cms/js/modules/cms.pagetree').default;
-var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown').default;
-var $ = require('jquery');
+import CMS from '../../../static/cms/js/modules/cms.base';
+import PageTree from '../../../static/cms/js/modules/cms.pagetree';
+import PageTreeDropdowns from '../../../static/cms/js/modules/cms.pagetree.dropdown';
+import $ from 'jquery';
 
-window.CMS = window.CMS || CMS;
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/cms.pagetree.dropdown', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    const actual = await vi.importActual('../../../static/cms/js/modules/cms.pagetree.dropdown');
+
+    registerActual('cms.pagetree.dropdown', actual);
+    return lazyMock('cms.pagetree.dropdown', { default: 'PageTreeDropdowns' });
+});
+
+window.CMS = CMS;
 CMS.PageTree = PageTree;
 CMS.PageTreeDropdowns = PageTreeDropdowns;
 
@@ -22,12 +33,12 @@ describe('CMS.PageTree', function () {
         fixture.load('pagetree.html');
         jasmine.Ajax.install();
         // Use rewiring to inject fake PageTreeDropdowns
-        PageTree.__Rewire__('PageTreeDropdowns', FakePageTreeDropdowns);
+        rewire('PageTreeDropdowns', FakePageTreeDropdowns);
     });
     afterEach(function () {
         fixture.cleanup();
         jasmine.Ajax.uninstall();
-        PageTree.__ResetDependency__('PageTreeDropdowns');
+        resetRewire('PageTreeDropdowns');
     });
 
     it('creates a PageTree class', function () {
@@ -292,6 +303,48 @@ describe('CMS.PageTree', function () {
             expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col');
             expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_111_col');
             expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_104_col');
+        });
+    });
+
+    describe('_setup() column values', function () {
+        var pagetree;
+
+        // resolves a column by its header, as the value functions are anonymous
+        function columnFor(header) {
+            return pagetree.ui.tree
+                .jstree(true)
+                .settings.grid.columns.filter(function (column) {
+                    return column.header === header;
+                })[0];
+        }
+
+        beforeEach(function (done) {
+            $(function () {
+                // the template renders "data-col<language>" with every dash
+                // stripped, so the lookup key has to be stripped the same way
+                var opts = $('.js-cms-pagetree').data('json');
+
+                opts.columns.push({ title: 'DE-X-L', key: 'de-x-l' });
+                opts.columns.push({ title: 'ZH-Hant', key: 'zh-Hant' });
+                $('.js-cms-pagetree').data('json', opts);
+
+                pagetree = new CMS.PageTree();
+                done();
+            });
+        });
+
+        it('reads the cell from the matching data attribute', function () {
+            expect(columnFor('EN').value({ data: { colen: 'en cell' } })).toEqual('en cell');
+            expect(columnFor('Menu').value({ data: { colmenu: 'menu cell' } })).toEqual('menu cell');
+        });
+
+        it('strips every dash of the language code, not only the first one', function () {
+            expect(columnFor('ZH-CN').value({ data: { colzhcn: 'zh-cn cell' } })).toEqual('zh-cn cell');
+            expect(columnFor('DE-X-L').value({ data: { coldexl: 'de-x-l cell' } })).toEqual('de-x-l cell');
+        });
+
+        it('lowercases the language code', function () {
+            expect(columnFor('ZH-Hant').value({ data: { colzhhant: 'zh-Hant cell' } })).toEqual('zh-Hant cell');
         });
     });
 

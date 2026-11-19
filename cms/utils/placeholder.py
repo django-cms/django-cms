@@ -68,9 +68,11 @@ def _get_placeholder_settings():
         visited.add(key)
         if "inherit" in conf[key]:
             return resolve_inheritance(conf[key]["inherit"], visited) | {
-                k: v for k, v in conf.items() if k != "inherit"
+                k: v for k, v in conf[key].items() if k != "inherit"
             }
-        return conf[key]
+        # Return a copy: the caller updates the result in place, which must
+        # not leak into the inherited-from slot's own configuration.
+        return dict(conf[key])
 
     new_conf = {}
     for key, value in conf.items():
@@ -93,8 +95,12 @@ _placeholder_settings, _template_in_conf = _get_placeholder_settings()
 
 def _clear_placeholder_conf_cache():
     # Needed by the override_placeholder_conf context manager for tests
+    from cms.plugin_pool import plugin_pool
+
     global _placeholder_settings, _template_in_conf
     _placeholder_settings, _template_in_conf = _get_placeholder_settings()
+    # Globally cached plugin restrictions depend on the placeholder configuration
+    plugin_pool.global_restrictions_cache.clear()
 
 
 def get_placeholder_conf(setting: str, placeholder: str, template: str | None = None, default=None):

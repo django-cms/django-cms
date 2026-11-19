@@ -1,7 +1,8 @@
 /*
- * Copyright https://github.com/divio/django-cms
+ * Copyright https://github.com/django-cms/django-cms
  */
 
+/* global DOMParser */
 import $ from 'jquery';
 import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
@@ -523,6 +524,9 @@ class Toolbar {
                     } else {
                         Helpers.reloadBrowser(onSuccess);
                     }
+                } else if (that._evaluateDataBridge(response)) {
+                    // response carried a data bridge that was evaluated in-place
+                    hideLoader();
                 } else {
                     // reload
                     Helpers.reloadBrowser();
@@ -536,6 +540,45 @@ class Toolbar {
                     error: true
                 });
             });
+    }
+
+    /**
+     * Checks whether an ajax response carries a valid data bridge - either as
+     * an HTML document containing a `script#data-bridge` element or as a JSON
+     * object that is itself the data bridge - and, if so, triggers its
+     * evaluation (in-place structure/content update) instead of a full reload.
+     *
+     * @method _evaluateDataBridge
+     * @private
+     * @param {Object|String} response ajax response (parsed JSON or HTML string)
+     * @returns {Boolean} true if a valid data bridge was found and evaluated
+     */
+    _evaluateDataBridge(response) {
+        var dataBridge;
+
+        if (typeof response === 'string') {
+            // response is HTML - look for the embedded data bridge script
+            var node = new DOMParser()
+                .parseFromString(response, 'text/html')
+                .querySelector('script#data-bridge');
+
+            if (node) {
+                try {
+                    dataBridge = JSON.parse(node.textContent);
+                } catch {
+                    return false;
+                }
+            }
+        } else if (response && typeof response === 'object' && response.action) {
+            // response is already parsed JSON and looks like a data bridge
+            dataBridge = response;
+        }
+
+        if (!dataBridge || !dataBridge.action) {
+            return false;
+        }
+        CMS.API.StructureBoard.invalidateState(dataBridge.action.toUpperCase(), dataBridge);
+        return true;
     }
 
     /**
@@ -574,7 +617,7 @@ class Toolbar {
                 });
 
                 modal.open({
-                    url: Helpers.updateUrlWithPath(el.attr('href')) + '&_popup=1',
+                    url: Helpers.updateUrlWithPath(el.attr('href'), [['_popup', 1]]),
                     title: el.data('name')
                 });
                 break;
@@ -625,15 +668,28 @@ class Toolbar {
 
     _sendPostRequest(el) {
         /* Allow post method to be used */
-        var formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
-        var csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-            ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
-        var fakeForm = $(
-            '<form style="display: none" action="' + el.attr('href') + '" method="POST">' + csrfToken +
-            '</form>'
-        );
+        var targetDocument = Helpers._getWindow().document;
+        var formToken = targetDocument.querySelector('form input[name="csrfmiddlewaretoken"]');
 
-        fakeForm.appendTo(Helpers._getWindow().document.body).submit();
+        // Build the form through DOM APIs rather than an HTML string: both the
+        // href and the token end up as attribute *values*, never as markup, so
+        // quotes or angle brackets in either cannot break out of the attribute.
+        var fakeForm = $(targetDocument.createElement('form'))
+            .css('display', 'none')
+            .attr({
+                action: el.attr('href'),
+                method: 'POST'
+            });
+
+        $(targetDocument.createElement('input'))
+            .attr({
+                type: 'hidden',
+                name: 'csrfmiddlewaretoken'
+            })
+            .val((formToken ? formToken.value : formToken) || window.CMS.config.csrf)
+            .appendTo(fakeForm);
+
+        fakeForm.appendTo(targetDocument.body).submit();
     }
 
     /**
@@ -751,7 +807,11 @@ class Toolbar {
     _refreshMarkup(newToolbar) {
         const switcher = this.ui.toolbarSwitcher.detach();
 
-        $(this.ui.toolbar).html(newToolbar.children());
+        // Only ever take the first match: callers build this collection with a
+        // page-wide .cms-toolbar search, and jQuery's children() would collect
+        // from every match. Editable content rendering a .cms-toolbar element
+        // must not get its markup copied into the live toolbar.
+        $(this.ui.toolbar).html(newToolbar.first().children());
 
         $('.cms-toolbar-item-cms-mode-switcher').replaceWith(switcher);
 

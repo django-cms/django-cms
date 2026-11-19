@@ -1,5 +1,6 @@
 import re
 import sys
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -14,7 +15,7 @@ from django.utils import translation
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import override as force_language
 
-from cms.api import create_page, create_page_content
+from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings
 from cms.page_rendering import _handle_no_page
@@ -88,6 +89,33 @@ class ViewTests(CMSTestCase):
             response = self.client.get("/en/")
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.template_name, "cms/welcome.html")
+
+    def _create_page_type(self, title="my type"):
+        from cms import constants
+        from cms.models import Page
+
+        root = create_page("Page Types", "nav_playground.html", "en", reverse_id=constants.PAGE_TYPES_ID)
+        page_type = create_page(title, "nav_playground.html", "en", parent=root)
+        Page.objects.filter(pk__in=(root.pk, page_type.pk)).update(is_page_type=True)
+        return Page.objects.get(pk=page_type.pk)
+
+    def test_page_types_are_not_served(self):
+        """
+        Page types are blueprints used to create new pages, not content, so they
+        must not be rendered on the public site -- not even for a superuser.
+        """
+        page_type = self._create_page_type()
+        add_plugin(page_type.get_placeholders("en").get(slot="body"), "TextPlugin", "en", body="blueprint")
+        url = page_type.get_absolute_url("en")
+
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+        with self.login_user_context(self.get_superuser()):
+            self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_page_types_root_is_not_served(self):
+        page_type = self._create_page_type()
+        self.assertEqual(self.client.get(page_type.parent.get_absolute_url("en")).status_code, 404)
 
     def test_handle_no_page(self):
         """
@@ -536,3 +564,268 @@ class EndpointTests(CMSTestCase):
 
             response = self.client.get(structure_endpoint_url)
             self.assertContains(response, "<strong>Text</strong>")
+
+
+class EndpointPermissionTests(CMSTestCase):
+    """Security tests for the object render endpoints (edit/preview/structure).
+
+    The structure endpoint must enforce the same page-view permission as the
+    edit and preview endpoints, which deny access to staff users that cannot
+    view a restricted page.
+    """
+
+    def setUp(self) -> None:
+        from cms.api import add_plugin, assign_user_to_page
+
+        self.page = create_page("restricted", "simple.html", "en")
+        self.page_content = self.page.get_content_obj("en")
+        placeholder = self.page_content.get_placeholders().first()
+        # Secret content that must not leak to unauthorized staff users.
+        add_plugin(
+            placeholder,
+            "LinkPlugin",
+            "en",
+            name="SuperSecretLinkName",
+            external_link="https://secret.example.com",
+        )
+        # Restrict the page to view: granting view to the superuser turns the
+        # page into a view-restricted page for everybody else.
+        assign_user_to_page(self.page, self.get_superuser(), can_view=True)
+        self.content_type = ContentType.objects.get_for_model(PageContent)
+
+    def _endpoint(self, name):
+        return admin_reverse(name, args=(self.content_type.id, self.page_content.pk))
+
+    def test_edit_and_preview_endpoints_deny_view_restricted_page(self):
+        """Baseline: edit and preview already deny access via render_page()."""
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            for name in (
+                "cms_placeholder_render_object_edit",
+                "cms_placeholder_render_object_preview",
+            ):
+                response = self.client.get(self._endpoint(name))
+                self.assertEqual(
+                    response.status_code,
+                    404,
+                    msg=f"{name} leaked a view-restricted page (status {response.status_code})",
+                )
+
+    def test_structure_endpoint_denies_view_restricted_page(self):
+        """The structure endpoint must not render a page the user cannot view."""
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            response = self.client.get(
+                self._endpoint("cms_placeholder_render_object_structure")
+            )
+        self.assertEqual(
+            response.status_code,
+            404,
+            msg="structure endpoint leaked a view-restricted page",
+        )
+        self.assertNotContains(
+            response, "SuperSecretLinkName", status_code=404
+        )
+
+    def test_apphook_endpoints_check_page_view_permission(self):
+        """Apphook dispatch must enforce view access without requiring edit rights."""
+        from cms.api import assign_user_to_page
+
+        self.page.application_urls = APP_NAME
+        self.page.save(update_fields=["application_urls"])
+        denied_staff = self.get_staff_user_with_no_permissions()
+        viewer = self._create_user("apphook_viewer", is_staff=True, is_superuser=False)
+        assign_user_to_page(self.page, viewer, can_view=True, can_change=False)
+        apphook_view = Mock(return_value=HttpResponse("Private apphook content"))
+
+        with patch("cms.views.resolve", return_value=(apphook_view, (), {})):
+            for user, expected_status in ((denied_staff, 404), (viewer, 200)):
+                with self.login_user_context(user):
+                    for name in (
+                        "cms_placeholder_render_object_edit",
+                        "cms_placeholder_render_object_preview",
+                    ):
+                        with self.subTest(user=user.username, endpoint=name):
+                            apphook_view.reset_mock()
+                            response = self.client.get(self._endpoint(name))
+                            self.assertEqual(response.status_code, expected_status)
+                            if expected_status == 404:
+                                apphook_view.assert_not_called()
+                                self.assertNotContains(response, "Private apphook content", status_code=404)
+                            else:
+                                apphook_view.assert_called_once()
+                                self.assertContains(response, "Private apphook content")
+
+    def test_structure_endpoint_allows_permitted_user(self):
+        """A user who may view the page still gets the structure board."""
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(
+                self._endpoint("cms_placeholder_render_object_structure")
+            )
+        self.assertContains(response, "SuperSecretLinkName")
+
+
+class NonPageContentStructureEndpointTests(CMSTestCase):
+    """The structure endpoint must also authorize non-PageContent objects.
+
+    Registered through ``admin_site.admin_view`` the endpoint only requires an
+    active staff user. Without an object-level check, any staff user could read
+    the placeholder/plugin structure of a frontend-editable object (e.g. a model
+    using ``PlaceholderRelationField``) without permission to view it.
+
+    Viewing the (read-only) structure board requires only *view* permission;
+    mutating the plugins stays gated by change permission at the plugin
+    endpoints. This supports headless reviewers inspecting structure without
+    edit rights.
+    """
+
+    def setUp(self) -> None:
+        from cms.test_utils.project.placeholder_relation_field_app.models import (
+            FancyPoll,
+        )
+        from cms.utils.placeholder import rescan_placeholders_for_obj
+
+        self.target = FancyPoll.objects.create(name="private-fancy-poll")
+        self.placeholder = rescan_placeholders_for_obj(self.target)["content"]
+
+    def _url(self):
+        return get_object_structure_url(self.target, language="en")
+
+    def _marker(self):
+        return f'"placeholder_id": "{self.placeholder.pk}"'
+
+    def _staff_with_perm(self, codename):
+        staff = self._create_user(f"staff_{codename}", is_staff=True, is_superuser=False)
+        staff.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="placeholder_relation_field_app",
+                codename=codename,
+            )
+        )
+        return staff
+
+    def test_denies_staff_without_view_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertEqual(
+            response.status_code,
+            404,
+            msg="structure endpoint leaked a non-PageContent object's structure",
+        )
+        self.assertNotContains(response, self._marker(), status_code=404)
+
+    def test_allows_staff_with_view_permission(self):
+        # Headless / read-only reviewers may inspect structure with view rights.
+        staff = self._staff_with_perm("view_fancypoll")
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+
+    def test_view_only_user_gets_read_only_structure_board(self):
+        """View permission opens the board, but the editing UX is disabled.
+
+        Mutations stay gated by change permission at the plugin endpoints, so
+        the structure board must render read-only (no drag/add/cut/delete) for a
+        user who may view but not change the object.
+        """
+        view_only = self._staff_with_perm("view_fancypoll")
+        with self.login_user_context(view_only):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+        # Read-only markers from toolbar_with_structure.html / dragbar / dragitem.
+        self.assertContains(response, "cms-drag-disabled")
+        self.assertContains(response, "Placeholder not editable")
+
+        # A user who may change the object still gets the editable board.
+        editor = self._staff_with_perm("change_fancypoll")
+        with self.login_user_context(editor):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+        self.assertNotContains(response, "Placeholder not editable")
+
+    def test_allows_staff_with_change_permission(self):
+        staff = self._staff_with_perm("change_fancypoll")
+        with self.login_user_context(staff):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+
+    def test_allows_superuser(self):
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(self._url())
+        self.assertContains(response, self._marker())
+
+
+class NonPageContentObjectEndpointTests(CMSTestCase):
+    """The preview and edit endpoints must also authorize non-PageContent objects.
+
+    Companion to :class:`NonPageContentStructureEndpointTests`. Registered
+    through ``admin_site.admin_view`` these endpoints only require an active
+    staff user, and unlike the structure board they render the object's full
+    plugin output. Without an object-level check, any staff user could read the
+    rendered content of any frontend-editable object (e.g. a model registered
+    via ``cms_toolbar_enabled_models``) without permission to view it.
+    """
+
+    def setUp(self) -> None:
+        from cms.api import add_plugin
+        from cms.test_utils.project.placeholderapp.models import Example1
+
+        self.target = Example1.objects.create(
+            char_1="private-object", char_2="b", char_3="c", char_4="d",
+        )
+        self.placeholder = self.target.placeholder
+        add_plugin(
+            self.placeholder, "LinkPlugin", "en",
+            name="SuperSecretLinkName", external_link="https://secret.example.com",
+        )
+
+    def _staff_with_perm(self, codename):
+        staff = self._create_user(f"staff_{codename}", is_staff=True, is_superuser=False)
+        staff.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="placeholderapp", codename=codename
+            )
+        )
+        return staff
+
+    def _urls(self):
+        return {
+            "preview": get_object_preview_url(self.target, language="en"),
+            "edit": get_object_edit_url(self.target, language="en"),
+        }
+
+    def test_denies_staff_without_view_permission(self):
+        staff = self.get_staff_user_with_no_permissions()
+        with self.login_user_context(staff):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    response = self.client.get(url)
+                    self.assertEqual(
+                        response.status_code,
+                        404,
+                        msg=f"{name} endpoint leaked a non-PageContent object's content",
+                    )
+                    self.assertNotContains(
+                        response, "SuperSecretLinkName", status_code=404
+                    )
+
+    def test_allows_staff_with_view_permission(self):
+        staff = self._staff_with_perm("view_example1")
+        with self.login_user_context(staff):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    self.assertContains(self.client.get(url), "SuperSecretLinkName")
+
+    def test_allows_staff_with_change_permission(self):
+        staff = self._staff_with_perm("change_example1")
+        with self.login_user_context(staff):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    self.assertContains(self.client.get(url), "SuperSecretLinkName")
+
+    def test_allows_superuser(self):
+        with self.login_user_context(self.get_superuser()):
+            for name, url in self._urls().items():
+                with self.subTest(endpoint=name):
+                    self.assertContains(self.client.get(url), "SuperSecretLinkName")

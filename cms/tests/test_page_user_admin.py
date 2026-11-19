@@ -1,10 +1,16 @@
+from unittest.mock import patch
+
+from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.messages.storage.cookie import CookieStorage
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
 from cms.models.permissionmodels import PageUser
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.permissions import get_subordinate_users
 from cms.utils.urlutils import admin_reverse
 
 
@@ -542,3 +548,138 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertTrue(msgs[0], PageUser._meta.verbose_name)
             self.assertTrue(msgs[0], 'ID "%s"' % staff_user_2.pk)
             self.assertTrue(self._user_exists(username))
+
+
+@override_settings(CMS_PERMISSION=True)
+class SuperuserProtectionTest(PermissionsOnTestCase):
+    """
+    A superuser is nobody's subordinate. A staff user holding the cms user
+    permissions plus can_change_permissions must not be able to manage - and
+    thereby take over - a superuser account.
+    """
+
+    def _get_superuser_page_user(self):
+        parent_link_field = list(PageUser._meta.parents.values())[0]
+        user = self._create_user('perms-superuser', is_staff=True, is_superuser=True)
+        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
+        data[parent_link_field.name] = user
+        data['created_by'] = user
+        page_user = PageUser.objects.create(**data)
+        page_user.set_password('original-password')
+        page_user.save()
+        return page_user
+
+    def _get_delegated_admin(self):
+        staff_user = self.get_staff_user_with_no_permissions()
+        self.add_permission(staff_user, 'change_pageuser')
+        self.add_permission(staff_user, 'delete_pageuser')
+        self.add_permission(staff_user, self._get_delete_perm())
+        self.add_global_permission(staff_user, can_change_permissions=True)
+        return staff_user
+
+    def test_superuser_not_subordinate_to_delegated_admin(self):
+        site = Site.objects.get_current()
+        superuser = self._get_superuser_page_user()
+        staff_user = self._get_delegated_admin()
+
+        subordinates = get_subordinate_users(staff_user, site)
+        self.assertNotIn(superuser.pk, subordinates.values_list('pk', flat=True))
+
+    def test_superuser_sees_superuser_as_subordinate(self):
+        site = Site.objects.get_current()
+        superuser = self._get_superuser_page_user()
+
+        subordinates = get_subordinate_users(self.get_superuser(), site)
+        self.assertIn(superuser.pk, subordinates.values_list('pk', flat=True))
+
+    def test_superuser_hidden_from_changelist(self):
+        superuser = self._get_superuser_page_user()
+        staff_user = self._get_delegated_admin()
+        endpoint = self.get_admin_url(PageUser, 'changelist')
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(
+                response,
+                getattr(superuser, superuser.USERNAME_FIELD),
+            )
+
+    def test_delegated_admin_cant_open_superuser_change_view(self):
+        superuser = self._get_superuser_page_user()
+        staff_user = self._get_delegated_admin()
+        endpoint = self.get_admin_url(PageUser, 'change', superuser.pk)
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 302)
+
+    def test_delegated_admin_cant_change_superuser_password(self):
+        superuser = self._get_superuser_page_user()
+        staff_user = self._get_delegated_admin()
+        endpoint = self.get_admin_url(PageUser, 'change', superuser.pk)
+        endpoint = endpoint.replace('/change/', '/password/')
+
+        data = {
+            'password1': 'hijacked-password',
+            'password2': 'hijacked-password',
+            'usable_password': 'true',
+        }
+
+        with self.login_user_context(staff_user):
+            # 404 rather than 403: the superuser is not in the admin's
+            # queryset at all, so it does not even leak its existence.
+            self.assertEqual(self.client.get(endpoint).status_code, 404)
+            self.assertEqual(self.client.post(endpoint, data).status_code, 404)
+
+        superuser.refresh_from_db()
+        self.assertFalse(superuser.check_password('hijacked-password'))
+        self.assertTrue(superuser.check_password('original-password'))
+
+    def test_admin_denies_change_permission_on_superuser(self):
+        """
+        Second line of defence, for the case where the admin's queryset is
+        widened again: the object level checks refuse a superuser outright.
+        """
+        superuser = self._get_superuser_page_user()
+        staff_user = self._get_delegated_admin()
+        model_admin = admin.site._registry[PageUser]
+        request = self.get_request()
+        request.user = staff_user
+
+        self.assertFalse(model_admin.has_change_permission(request, superuser))
+        self.assertFalse(model_admin.has_view_permission(request, superuser))
+        self.assertFalse(model_admin.has_delete_permission(request, superuser))
+
+        with self.assertRaises(PermissionDenied):
+            with patch.object(model_admin, 'get_object', return_value=superuser):
+                model_admin.user_change_password(request, str(superuser.pk))
+
+    def test_superuser_can_change_superuser_password(self):
+        superuser = self._get_superuser_page_user()
+        endpoint = self.get_admin_url(PageUser, 'change', superuser.pk)
+        endpoint = endpoint.replace('/change/', '/password/')
+
+        data = {
+            'password1': 'a-new-password',
+            'password2': 'a-new-password',
+            'usable_password': 'true',
+        }
+
+        with self.login_user_context(self.get_superuser()):
+            self.assertEqual(self.client.get(endpoint).status_code, 200)
+            self.assertEqual(self.client.post(endpoint, data).status_code, 302)
+
+        superuser.refresh_from_db()
+        self.assertTrue(superuser.check_password('a-new-password'))
+
+    def test_delegated_admin_cant_delete_superuser(self):
+        superuser = self._get_superuser_page_user()
+        staff_user = self._get_delegated_admin()
+        endpoint = self.get_admin_url(PageUser, 'delete', superuser.pk)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, {'post': 'yes'})
+            self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(PageUser.objects.filter(pk=superuser.pk).exists())

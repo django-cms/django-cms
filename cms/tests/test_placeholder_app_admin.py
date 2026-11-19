@@ -620,6 +620,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
             clipboard=Placeholder.objects.create(),
         )
 
+        self.add_permission(staff_user, 'change_example1')
         self.add_permission(staff_user, 'add_link')
         self.add_permission(staff_user, 'add_style')
 

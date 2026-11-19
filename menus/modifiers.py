@@ -1,4 +1,4 @@
-from menus.base import Modifier
+from menus.base import Modifier, detach_from_parents
 from menus.menu_pool import menu_pool
 
 
@@ -83,12 +83,15 @@ class AuthVisibility(Modifier):
         if post_cut or breadcrumb:
             return nodes
         final = []
+        hidden = []
         for node in nodes:
             if (node.attr.get('visible_for_authenticated', True) and request.user.is_authenticated) or \
                     (node.attr.get('visible_for_anonymous', True) and not request.user.is_authenticated):
                 final.append(node)
-            elif node.parent and node in node.parent.children:
-                node.parent.children.remove(node)
+            else:
+                hidden.append(node)
+
+        detach_from_parents(hidden)
         return final
 
 

@@ -56,9 +56,37 @@ class WizardCreateView(SessionWizardView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # The wizard is always shown inside the CMS modal. Surface ``is_popup`` to the
+        # template context so that ``admin/base.html`` natively omits the header.
+        context['is_popup'] = True
+
         if self.is_second_step():
             context['wizard_entry'] = self.get_selected_entry()
         return context
+
+    def get_form_list(self):
+        """
+        Resolve the wizard's form list.
+
+        Step ``'1'`` is declared with a placeholder ``Form`` because the real
+        form depends on the entry chosen in step ``'0'``. Once step 0 has been
+        completed, the real form is built and substituted here. Doing the
+        substitution in ``get_form_list`` -- instead of mutating the shared
+        ``self.form_list`` -- keeps the swap visible to django-formtools 2.6+,
+        which caches ``get_form_list`` results.
+        """
+        form_list = super().get_form_list()
+        # ``_building_step_2`` guards against infinite recursion: building the
+        # step-2 form needs step 0's cleaned data, which itself resolves the
+        # form list again.
+        if '1' in form_list and not getattr(self, '_building_step_2', False):
+            self._building_step_2 = True
+            try:
+                if self.get_cleaned_data_for_step('0') is not None:
+                    form_list['1'] = self.get_step_2_form()
+            finally:
+                self._building_step_2 = False
+        return form_list
 
     def get_form(self, step=None, data=None, files=None):
         if step is None:
@@ -66,15 +94,22 @@ class WizardCreateView(SessionWizardView):
 
         # We need to grab the page from pre-validated data so that the wizard
         # has it to prepare the list of valid entries.
+        #
+        # ``get_form`` is re-entered while a form is built: resolving the step-2
+        # form list (``get_form_list``) calls ``get_cleaned_data_for_step('0')``,
+        # which rebuilds the step-0 form -- and, with empty storage, would reset
+        # ``page_pk`` to ``None``. Save and restore it so the inner call can't
+        # clobber the value the outer call still needs in ``get_form_kwargs``.
+        previous_page_pk = getattr(self, 'page_pk', None)
         if data:
             page_key = f"{step}-page"
             self.page_pk = data.get(page_key, None)
         else:
             self.page_pk = None
-
-        if self.is_second_step(step):
-            self.form_list[step] = self.get_step_2_form(step, data, files)
-        return super().get_form(step, data, files)
+        try:
+            return super().get_form(step, data, files)
+        finally:
+            self.page_pk = previous_page_pk
 
     def get_form_kwargs(self, step=None):
         """This is called by self.get_form()"""
@@ -87,7 +122,7 @@ class WizardCreateView(SessionWizardView):
         else:
             page_pk = self.page_pk or self.request.GET.get('page', None)
             if page_pk and page_pk != 'None':
-                kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
+                kwargs['wizard_page'] = Page.objects.filter(pk=page_pk, site=self.site).first()
             else:
                 kwargs['wizard_page'] = None
             kwargs['wizard_language'] = get_site_language_from_request(

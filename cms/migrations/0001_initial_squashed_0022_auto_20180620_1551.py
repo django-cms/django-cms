@@ -6,6 +6,10 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
+# Handle custom AUTH_USER_MODEL as in 0002_auto_20140816_1918.py
+user_model_label = settings.AUTH_USER_MODEL.lower()
+user_ptr_name = f"{settings.AUTH_USER_MODEL.rsplit('.', 1)[1].lower()}_ptr"
+
 
 class Migration(migrations.Migration):
     replaces = [
@@ -370,7 +374,7 @@ class Migration(migrations.Migration):
             name="PageUser",
             fields=[
                 (
-                    "user_ptr",
+                    user_ptr_name,
                     models.OneToOneField(
                         auto_created=True,
                         on_delete=django.db.models.deletion.CASCADE,
@@ -393,7 +397,7 @@ class Migration(migrations.Migration):
                 "verbose_name": "User (page)",
                 "verbose_name_plural": "Users (page)",
             },
-            bases=("auth.user",),
+            bases=(user_model_label,),
         ),
         migrations.CreateModel(
             name="AliasPluginModel",

@@ -86,8 +86,17 @@ class Dropdown {
     }
 
     keydown(e) {
-        if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return;
         const toggleEl = e.currentTarget;
+        const isToggle = toggleEl.classList.contains('cms-dropdown-toggle');
+
+        // 38/40 = up/down (traverse items), 27 = esc (close), 32 = space, 13 = enter.
+        // Space and enter must activate the toggle itself, which is an
+        // <a role="button"> without href, so the browser fires no click for these
+        // keys. Enter on a menu item is left to the browser so the real link
+        // activates normally.
+        if (/input|textarea/i.test(e.target.tagName)) return;
+        if (!/(13|38|40|27|32)/.test(e.which)) return;
+        if (e.which === 13 && !isToggle) return;
 
         e.preventDefault();
         e.stopPropagation();

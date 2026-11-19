@@ -4,7 +4,17 @@ How-to guides
 =============
 
 These guides presuppose some familiarity with django CMS. They cover some of the same
-territory as the :doc:`/introduction/index`, but in more detail.
+territory as the :doc:`/tutorials/index`, but in more detail.
+
+Installation & deployment
+-------------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    Install with Docker <22-docker-installation>
+    Install manually <23-manual-installation>
+    Add django CMS to an existing project <24-add-to-existing-project>
 
 Using core functionality
 ------------------------
@@ -17,6 +27,7 @@ Using core functionality
     Serve multiple sites <03-multi-site>
     Work with templates <04-templates>
     Manage caching <05-caching>
+    Use a Content Security Policy <25-content_security_policy>
     Enable frontend editing for Page and Django models <06-frontend_models>
     Create sitemaps <07-sitemaps>
     Manage Page Types <08-page_types>

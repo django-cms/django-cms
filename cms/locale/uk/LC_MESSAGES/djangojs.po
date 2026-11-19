@@ -8,6 +8,7 @@
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Volodymyr Bergman <wowkalucky@gmail.com>, 2017
+# Volodymyr Bergman <wowkalucky@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict, deque
-from typing import Any, Optional
+from collections.abc import Sequence
+from typing import Any
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -22,11 +23,17 @@ from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.models import CMSPlugin, PageContent, Placeholder
+from cms.models.pluginmodel import get_plugin_action_urls
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[str] | None = None) -> str:
+def get_placeholder_toolbar_js(
+    placeholder: Placeholder,
+    allowed_plugins: list[str] | None = None,
+    action_urls: dict[str, str] | None = None,
+) -> str:
+    action_urls = action_urls or get_plugin_action_urls()
     label = placeholder.get_label() or ''
     help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -39,14 +46,24 @@ def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: list[s
         'plugin_restriction': allowed_plugins or [],
         'addPluginHelpTitle': force_str(help_text),
         'urls': {
-            'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
-            'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
+            'add_plugin': action_urls["add"],
+            'copy_plugin': action_urls["copy"],
         }
     }
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> dict[str, Any]:
+def get_plugin_toolbar_info(
+    plugin: CMSPlugin,
+    children: list[str] | None = None,
+    parents: list[str] | None = None,
+    action_urls: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    # ``parents`` is deprecated (see CMSPlugin.get_plugin_info); forwarded for backwards compatibility.
+    if action_urls:
+        # Passed as an attribute to keep get_plugin_info/get_action_urls overrides with the
+        # original signatures working
+        plugin._action_urls = action_urls
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
@@ -60,11 +77,18 @@ def get_plugin_toolbar_info(plugin: CMSPlugin, children: list[str] | None = None
     return data
 
 
-def get_plugin_toolbar_js(plugin: CMSPlugin, children: list[str] | None = None, parents: list[str] | None = None) -> str:
+def get_plugin_toolbar_js(
+    plugin: CMSPlugin,
+    children: list[str] | None = None,
+    parents: list[str] | None = None,
+    action_urls: dict[str, str] | None = None,
+) -> str:
+    # ``parents`` is deprecated (see CMSPlugin.get_plugin_info); forwarded for backwards compatibility.
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
         parents=parents,
+        action_urls=action_urls,
     )
     return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
 
@@ -88,7 +112,7 @@ def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]
 
 def get_plugin_tree(
     request: HttpRequest,
-    plugins: list[CMSPlugin],
+    plugins: Sequence[CMSPlugin],
     restrictions: dict | None = None,
     target_plugin: CMSPlugin | None = None,
 ) -> dict[str, Any]:
@@ -119,20 +143,23 @@ def get_plugin_tree(
     template = toolbar.templates.drag_item_template
     get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
-    copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
+    copy_to_clipboard = toolbar.clipboard and placeholder.pk == toolbar.clipboard.pk
     plugins = list(downcast_plugins(plugins, select_placeholder=True))
     root_plugins = create_child_plugin_references(plugins)
 
     def collect_plugin_data(plugin):
-        child_classes, parent_classes = get_plugin_restrictions(
+        child_classes, _ = get_plugin_restrictions(
             plugin=plugin,
             restrictions_cache=restrictions,
             page=placeholder.source,
         )
+        # Make the resolved restrictions available to the drag-item template so it can decide
+        # whether children may be added without recomputing them per access.
+        plugin.child_class_restrictions = child_classes
         plugin_info = get_plugin_info(
             plugin,
             children=child_classes,
-            parents=parent_classes,
+            action_urls=action_urls,
         )
 
         tree_data.append(plugin_info)
@@ -141,6 +168,7 @@ def get_plugin_tree(
             collect_plugin_data(plugin_instance)
 
     with force_language(toolbar.toolbar_language):
+        action_urls = toolbar.get_plugin_action_urls()
         for root_plugin in root_plugins:
             collect_plugin_data(root_plugin)
             context = {
@@ -178,14 +206,15 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin]
     renderer._placeholders_are_editable = True
     sekizai_context = SekizaiContext({'request': request, **context})
     try:
-        return [{
-            "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
-            "js": "".join(sekizai_context[get_varname()].get("js", [])),
-            "css": "".join(sekizai_context[get_varname()].get("css", [])),
-            "position": plugin.position,
-            "placeholder_id": plugin.placeholder_id,
-            "pluginIds": get_plugin_tree_ids(plugin),
-        } for plugin in plugin_list]
+        with force_language(plugin_list[0].language):
+            return [{
+                "html": renderer.render_plugin(plugin, sekizai_context, placeholder=plugin.placeholder, editable=True),
+                "js": "".join(sekizai_context[get_varname()].get("js", [])),
+                "css": "".join(sekizai_context[get_varname()].get("css", [])),
+                "position": plugin.position,
+                "placeholder_id": plugin.placeholder_id,
+                "pluginIds": get_plugin_tree_ids(plugin),
+            } for plugin in plugin_list]
     except Exception:
         return []  # do not deliver content if rendering fails
 
@@ -301,6 +330,8 @@ def get_object_live_url(obj: models.Model, language: str | None = None, site: Si
 
     with force_language(language):
         absolute_url = obj.get_absolute_url()
+        if not absolute_url:
+            return None
         url_param = get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM")
         if params and url_param in params:
             params = params.copy()

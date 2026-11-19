@@ -6,11 +6,12 @@ sphinx-copybutton
 sphinxext-opengraph
 sphinxcontrib-spelling
 sphinx-design
+sphinx-reredirects
 pyenchant>3
 sphinx-autobuild
 datetime
 coverage
-django~=4.2
+django~=5.2
 git+https://github.com/django-cms/django-cms@main
 codespell
 pip-tools

@@ -18,7 +18,7 @@ test.describe('Touch Action CSS Classes', () => {
     await cms.logout();
   });
 
-  test('should apply touch-action classes to toolbar elements', async ({ page }) => {
+  test('should apply touch-action classes to toolbar elements', async ({ cms, page }) => {
     await page.goto(settings.editUrl);
 
     await page.waitForSelector('.cms-toolbar');
@@ -38,11 +38,12 @@ test.describe('Touch Action CSS Classes', () => {
     expect(touchAction).toBe('none');
   });
 
-  test('should apply touch-action classes to modal elements', async ({ page }) => {
+  test('should apply touch-action classes to modal elements', async ({ cms, page }) => {
     await page.goto(settings.editUrl);
     await page.waitForSelector('.cms-toolbar');
 
     // Open a modal (e.g., page settings)
+    await cms.openMenu('Page');
     await page.click('.cms-toolbar-item-navigation a[href*="/change/"][data-rel="modal"]');
     await page.waitForSelector('.cms-modal', { state: 'visible' });
 
@@ -74,13 +75,13 @@ test.describe('Touch Action CSS Classes', () => {
     expect(breadcrumbTouchAction).toBe('pan-x');
   });
 
-  test('should apply touch-action classes to structure board', async ({ page }) => {
+  test('should apply touch-action classes to structure board', async ({ cms, page }) => {
     await page.goto(settings.editUrl);
     await page.waitForSelector('.cms-toolbar');
 
     // Switch to structure mode
-    await page.click('.cms-btn-switch-edit');
-    await page.waitForSelector('.cms-structure', { state: 'visible' });
+    await cms.enterEditMode();
+    await cms.openStructureBoard();
 
     // Check structure content has touch-action-pan-y class
     const structureContent = page.locator('.cms-structure-content');
@@ -107,13 +108,13 @@ test.describe('Touch Action CSS Classes', () => {
     }
   });
 
-  test('should apply touch-action classes to dropdown menus', async ({ page }) => {
+  test('should apply touch-action classes to dropdown menus', async ({ cms, page }) => {
     await page.goto(settings.editUrl);
     await page.waitForSelector('.cms-toolbar');
 
     // Switch to structure mode to find dropdown menus
-    await page.click('.cms-btn-switch-edit');
-    await page.waitForSelector('.cms-structure', { state: 'visible' });
+    await cms.enterEditMode();
+    await cms.openStructureBoard();
 
     // Find and check submenu dropdowns
     const dropdowns = page.locator('.cms-submenu-dropdown-settings');
@@ -130,13 +131,13 @@ test.describe('Touch Action CSS Classes', () => {
     }
   });
 
-  test('should not have any data-touch-action attributes in DOM', async ({ page }) => {
+  test('should not have any data-touch-action attributes in DOM', async ({ cms, page }) => {
     await page.goto(settings.editUrl);
     await page.waitForSelector('.cms-toolbar');
 
     // Switch to structure mode for full UI
-    await page.click('.cms-btn-switch-edit');
-    await page.waitForSelector('.cms-structure', { state: 'visible' });
+    await cms.enterEditMode();
+    await cms.openStructureBoard();
 
     // Comprehensive check: no data-touch-action attributes should exist
     const allElementsWithAttr = await page.locator('[data-touch-action]').count();
@@ -154,13 +155,13 @@ test.describe('Touch Action CSS Classes', () => {
     expect(touchActionPanX).toBeGreaterThanOrEqual(0);
   });
 
-  test('should maintain touch-action during drag operations', async ({ page }) => {
+  test('should maintain touch-action during drag operations', async ({ cms, page }) => {
     await page.goto(settings.editUrl);
     await page.waitForSelector('.cms-toolbar');
 
     // Switch to structure mode
-    await page.click('.cms-btn-switch-edit');
-    await page.waitForSelector('.cms-structure', { state: 'visible' });
+    await cms.enterEditMode();
+    await cms.openStructureBoard();
 
     // Get structure content element
     const structureContent = page.locator('.cms-structure-content').first();
@@ -185,7 +186,7 @@ test.describe('Touch Action CSS Classes', () => {
     }
   });
 
-  test('should have proper CSS rules defined', async ({ page }) => {
+  test('should have proper CSS rules defined', async ({ cms, page }) => {
     await page.goto(settings.editUrl);
     await page.waitForSelector('.cms-toolbar');
 

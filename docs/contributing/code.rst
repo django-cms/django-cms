@@ -125,7 +125,7 @@ linter you need to do this:
 
     npx gulp lint
 
-Or you can also run the watcher by just running ``gulp``.
+Run ``npx gulp watch`` to lint JavaScript files whenever they change.
 
 
 Process
@@ -168,19 +168,20 @@ Frontend
 In order to be able to work with the frontend tooling contributing to the
 django CMS you need to have the following dependencies installed:
 
-    1. `Node <https://nodejs.org/>`_ version 18.19.0 (will install npm 10.2.3 as well).
+    1. `Node <https://nodejs.org/>`_ version 24 (the version used by continuous integration).
        We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
        the correct version of Node.
-    2. gulp - see `Gulp's Getting Started notes <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md>`_
-    3. Local dependencies ``npm install``
+    2. Local dependencies, installed with ``npm install``.
+
+Use ``npx gulp`` for the commands below. This runs the repository's local gulp version,
+so a global gulp installation is not required.
 
 Styles
 ======
 
-We use `Sass <http://sass-lang.com/>`_ for our styles. The files
-are located within ``cms/static/cms/sass`` and can be compiled using the
-`libsass <http://libsass.org/>`_ implementation of Sass compiler through
-`gulp <http://gulpjs.com/>`_.
+We use `Sass <https://sass-lang.com/>`_ for our styles. The files are located
+within ``cms/static/cms/sass`` and are compiled with Dart Sass through
+`gulp <https://gulpjs.com/>`_.
 
 In order to compile the stylesheets you need to run this command from the repo
 root::

@@ -25,10 +25,25 @@ reference — so you can quickly find the information you need.
 If you are looking for editor or administrator documentation, see the
 `django CMS User Guide <https://user-guide.django-cms.org/>`_.
 
-----
+🚀 Immediate pet project
+------------------------
+
+Create a fully configured django CMS project in minutes:
+
+.. code-block:: bash
+
+    python -m venv .venv
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+    pip install django-cms
+    djangocms mysite
+
+Already have a Django project? Run ``djangocms .`` in its root directory to
+:ref:`add django CMS to it <add_to_existing_project>`. See the
+:ref:`djangocms command <djangocms-command>` reference for all options.
+
 
 🧭 Choose your path
-------------------
+--------------------
 
 .. grid:: 2
    :gutter: 3
@@ -61,10 +76,9 @@ If you are looking for editor or administrator documentation, see the
       Authoritative technical reference for APIs, settings,
       commands, and internals.
 
-----
 
 ✨ Why django CMS?
------------------
+-------------------
 
 django CMS is a mature, open-source content management system built on
 Django. It is designed for projects that require flexibility, long-term
@@ -90,8 +104,6 @@ Compared to other Django-based CMS platforms, django CMS stands out for:
   framework
 - an active, long-running open-source community
 - an emphasis on code quality, testing, and long-term support
-
-----
 
 🤝 Community & contribution
 ---------------------------
@@ -124,7 +136,6 @@ to improving documentation or contributing code.
       Learn more about the people and organisations
       behind django CMS.
 
-----
 
 📦 Versions, compatibility & support
 ------------------------------------
@@ -134,6 +145,8 @@ This documentation refers to django CMS version |release|.
 django CMS follows Django’s
 `long-term support (LTS) policy <https://www.djangoproject.com/download/#supported-versions>`_
 and provides aligned LTS releases.
+
+.. _lts:
 
 Current LTS versions
 ++++++++++++++++++++
@@ -150,6 +163,8 @@ The following LTS versions are **no longer supported**:
 
 .. include:: autogenerate/past_lts.include
 
+.. _requirements:
+
 Django / Python compatibility
 +++++++++++++++++++++++++++++
 
@@ -165,13 +180,12 @@ For dependency details, see the project’s ``pyproject.toml`` or the
 The :ref:`Commonly Used Plugin section <commonly-used-plugins>` lists
 additional packages commonly used in django CMS projects.
 
-----
+
 
 .. toctree::
    :maxdepth: 2
    :hidden:
 
-   introduction/index
    tutorials/index
    explanation/index
    how_to/index

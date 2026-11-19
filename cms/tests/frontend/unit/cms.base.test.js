@@ -1,7 +1,17 @@
 'use strict';
 
 import CMS, { Helpers, KEYS, uid } from '../../../static/cms/js/modules/cms.base';
-var jQuery = require('jquery');
+import jQuery from 'jquery';
+
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
 var $ = jQuery;
 var showLoader;
 var hideLoader;
@@ -9,7 +19,7 @@ var hideLoader;
 CMS.API.Helpers = Helpers;
 CMS.KEYS = KEYS;
 
-window.CMS = window.CMS || CMS;
+window.CMS = CMS;
 
 describe('cms.base.js', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -30,13 +40,13 @@ describe('cms.base.js', function() {
     beforeEach(() => {
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        CMS.__Rewire__('showLoader', showLoader);
-        CMS.__Rewire__('hideLoader', hideLoader);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
     });
 
     afterEach(() => {
-        CMS.__ResetDependency__('showLoader');
-        CMS.__ResetDependency__('hideLoader');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     it('creates CMS namespace', function() {
@@ -828,6 +838,32 @@ describe('cms.base.js', function() {
                 });
 
                 expect(CMS.API.Helpers.updateUrlWithPath('/')).toEqual('/?cms_path=%2Fde%2F%3Flanguage%3Den');
+            });
+
+            it('sets additional params on urls that have no query string yet', function() {
+                spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+                    location: {
+                        pathname: '/de/',
+                        search: ''
+                    }
+                });
+
+                expect(CMS.API.Helpers.updateUrlWithPath('/admin/app/model/1/change/', [['_popup', 1]])).toEqual(
+                    '/admin/app/model/1/change/?cms_path=%2Fde%2F&_popup=1'
+                );
+            });
+
+            it('sets additional params on urls that already have a query string', function() {
+                spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+                    location: {
+                        pathname: '/de/',
+                        search: ''
+                    }
+                });
+
+                expect(
+                    CMS.API.Helpers.updateUrlWithPath('/admin/app/model/1/change/?language=en', [['_popup', 1]])
+                ).toEqual('/admin/app/model/1/change/?language=en&cms_path=%2Fde%2F&_popup=1');
             });
         });
 

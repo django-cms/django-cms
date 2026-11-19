@@ -10,7 +10,14 @@ class CurrentUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        from cms.utils.permissions import set_current_user
+        from cms.cache.permissions import permission_cache_version_snapshot
+        from cms.utils.permissions import reset_current_user, set_current_user
 
-        set_current_user(getattr(request, 'user', None))
-        return self.get_response(request)
+        token = set_current_user(getattr(request, 'user', None))
+        try:
+            with permission_cache_version_snapshot():
+                return self.get_response(request)
+        finally:
+            # Reset at the request boundary so the current user does not leak
+            # into the next request handled by a reused worker thread.
+            reset_current_user(token)

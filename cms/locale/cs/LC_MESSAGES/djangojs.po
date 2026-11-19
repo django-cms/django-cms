@@ -5,6 +5,7 @@
 # Translators:
 # Translators:
 # Jakub Dorňák <jakub.dornak@misli.cz>, 2013
+# Jakub Dorňák <jakub.dornak@misli.cz>, 2013
 # xlu <xlu@seznam.cz>, 2013
 # xlu <xlu@seznam.cz>, 2013
 msgid ""

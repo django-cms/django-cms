@@ -2,7 +2,6 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-/* eslint-env es6 */
 /* jshint esversion: 6 */
 
 import $ from 'jquery';
@@ -747,7 +746,9 @@ class StructureBoard {
                 appendTo: '.cms-structure-content',
                 // appendTo: '.cms',
                 cursor: 'move',
-                cursorAt: { left: -15, top: -15 },
+                // Preserve the horizontal grab offset: nestedSortable uses the
+                // helper's left edge to distinguish reordering from nesting.
+                cursorAt: { top: -15 },
                 opacity: 1,
                 zIndex: 9999999,
                 delay: 100,
@@ -866,7 +867,6 @@ class StructureBoard {
                     }
                     // getting restriction array
                     let bounds = [];
-                    let immediateParentType;
 
                     if (placeholder && placeholder.closest('.cms-clipboard-containers').length) {
                         return false;
@@ -891,10 +891,6 @@ class StructureBoard {
                         return false;
                     }
                     const originalItemData = original.data('cms');
-                    const parent_bounds = $.grep(originalItemData.plugin_parent_restriction, function(r) {
-                        // special case when PlaceholderPlugin has a parent restriction named "0"
-                        return r !== '0';
-                    });
                     const type = originalItemData.plugin_type;
                     // prepare variables for bound
                     const holderId = that.getId(placeholder.closest('.cms-dragarea'));
@@ -913,20 +909,15 @@ class StructureBoard {
                     // istanbul ignore else
                     if (holder.length) {
                         bounds = holder.data('cms').plugin_restriction;
-                        immediateParentType = holder.data('cms').plugin_type;
                     }
                     if (plugin.length) {
                         bounds = plugin.data('cms').plugin_restriction;
-                        immediateParentType = plugin.data('cms').plugin_type;
                     }
 
-                    // if restrictions is still empty, proceed
+                    // The target's child list (bounds) already encodes which plugins it accepts --
+                    // including the placeholder's root list, which excludes plugins that require a
+                    // parent. If restrictions is still empty, proceed.
                     that.state = !(bounds.length && $.inArray(type, bounds) === -1);
-
-                    // check if we have a parent restriction
-                    if (parent_bounds.length) {
-                        that.state = $.inArray(immediateParentType, parent_bounds) !== -1;
-                    }
 
                     return that.state;
                 }
@@ -1179,7 +1170,7 @@ class StructureBoard {
             location = document.head;
         } else if (block === 'js') {
             selector = 'script';
-            current = document.body.querySelectorAll(selector);
+            current = document.querySelectorAll(selector);
             location = document.body;
         } else {
             return;
@@ -1190,9 +1181,9 @@ class StructureBoard {
 
         template.innerHTML = data[block];
 
-        // Collect deferred scripts to ensure firing
-        this.scriptReferenceCount = 0;
-
+        // scriptReferenceCount is not reset here: it still counts scripts inserted earlier (by another
+        // content item or a previous update) that are loading. A matching script found below may be one
+        // of them, so the refresh events must wait for it as well.
         for (const element of template.content.querySelectorAll(selector)) {
             if (StructureBoard._elementPresent(current, element)) {
                 element.remove();

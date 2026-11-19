@@ -1,25 +1,74 @@
 'use strict';
 import StructureBoard from '../../../static/cms/js/modules/cms.structureboard';
 import Plugin from '../../../static/cms/js/modules/cms.plugins';
-var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var $ = require('jquery');
-var keyboard = require('../../../static/cms/js/modules/keyboard').default;
+import CMS, { Helpers, KEYS } from '../../../static/cms/js/modules/cms.base';
+import $ from 'jquery';
+import keyboard from '../../../static/cms/js/modules/keyboard';
+
+import { rewire, resetRewire } from './helpers/rewire';
+
+vi.mock('../../../static/cms/js/modules/loader', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('loader', await vi.importActual('../../../static/cms/js/modules/loader'));
+    return lazyMock('loader', { showLoader: 'showLoader', hideLoader: 'hideLoader' });
+});
+
+vi.mock('../../../static/cms/js/modules/cms.plugins', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+    const namespace = lazyMock('cms.plugins', { default: 'Plugin' });
+
+    // not awaited on purpose: cms.plugins is part of the plugins/structureboard/
+    // clipboard import cycle, and awaiting it here deadlocks the mock
+    vi.importActual('../../../static/cms/js/modules/cms.plugins')
+        .then(actual => registerActual('cms.plugins', actual));
+    return namespace;
+});
+
+vi.mock('../../../static/cms/js/modules/cms.clipboard', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+    const namespace = lazyMock('cms.clipboard', { default: 'Clipboard' });
+
+    // not awaited on purpose: cms.clipboard is part of the plugins/structureboard/
+    // clipboard import cycle, and awaiting it here deadlocks the mock
+    vi.importActual('../../../static/cms/js/modules/cms.clipboard')
+        .then(actual => registerActual('cms.clipboard', actual));
+    return namespace;
+});
+
+vi.mock('../../../static/cms/js/modules/dom-diff', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('dom-diff', await vi.importActual('../../../static/cms/js/modules/dom-diff'));
+    return lazyMock('dom-diff', { DiffDOM: 'DiffDOM', nodeToObj: 'nodeToObj' });
+});
+
+vi.mock('../../../static/cms/js/modules/preload-images', async () => {
+    const { lazyMock, registerActual } = await import('./helpers/rewire');
+
+    registerActual('preload-images', await vi.importActual('../../../static/cms/js/modules/preload-images'));
+    return lazyMock('preload-images', { default: 'preloadImagesFromMarkup' });
+});
+
 var showLoader;
 var hideLoader;
 
-window.CMS = window.CMS || CMS;
+window.CMS = CMS;
 CMS.StructureBoard = StructureBoard;
 CMS.Plugin = Plugin;
 CMS.API = CMS.API || {};
-CMS.API.Helpers = StructureBoard.__GetDependency__('Helpers');
-CMS.KEYS = StructureBoard.__GetDependency__('KEYS');
+CMS.API.Helpers = Helpers;
+CMS.KEYS = KEYS;
 CMS.$ = $;
 
 const pluginConstructor = jasmine.createSpy();
-const originalPlugin = StructureBoard.__GetDependency__('Plugin');
+// the real class, not the rewirable stand-in: FakePlugin._updateClipboard()
+// delegates to it, which would otherwise recurse into itself
+const originalPlugin = (await vi.importActual('../../../static/cms/js/modules/cms.plugins')).default;
 class FakePlugin {
     constructor(container, opts) {
         this.options = opts;
+        this.container = container;
         const el = $('<div></div>');
 
         el.data('cms', []);
@@ -39,6 +88,7 @@ FakePlugin.aliasPluginDuplicatesMap = {};
 FakePlugin._refreshPlugins = jasmine.createSpy().and.callFake(() => {
     originalPlugin._refreshPlugins();
 });
+
 FakePlugin.prototype._setupUI = jasmine.createSpy();
 FakePlugin.prototype._ensureData = jasmine.createSpy();
 FakePlugin.prototype._setGeneric = jasmine.createSpy();
@@ -56,8 +106,8 @@ describe('CMS.StructureBoard', function() {
         };
         showLoader = jasmine.createSpy();
         hideLoader = jasmine.createSpy();
-        StructureBoard.__Rewire__('showLoader', showLoader);
-        StructureBoard.__Rewire__('hideLoader', hideLoader);
+        rewire('showLoader', showLoader);
+        rewire('hideLoader', hideLoader);
     });
 
     afterEach(() => {
@@ -70,8 +120,8 @@ describe('CMS.StructureBoard', function() {
         FakePlugin.prototype._setPluginContentEvents.calls.reset();
         FakePlugin.prototype._setPluginStructureEvents.calls.reset();
         FakePlugin._refreshPlugins.calls.reset();
-        StructureBoard.__ResetDependency__('showLoader');
-        StructureBoard.__ResetDependency__('hideLoader');
+        resetRewire('showLoader');
+        resetRewire('hideLoader');
     });
 
     it('creates a StructureBoard class', function() {
@@ -837,6 +887,126 @@ describe('CMS.StructureBoard', function() {
         });
     });
 
+    describe('dragging container plugins (#8949)', function() {
+        let board;
+
+        beforeEach(function() {
+            CMS.API.locked = false;
+            spyOn(Plugin, '_hideSettingsMenu');
+        });
+
+        afterEach(function() {
+            board.ui.sortables.nestedSortable('destroy');
+            board.ui.doc.off('keyup.cms.interrupt');
+            fixture.cleanup();
+        });
+
+        function setupContainers(populated, allowNesting) {
+            fixture.set(
+                '<style>' +
+                    '.cms-draggables.cms-hidden { display: none !important; }' +
+                    '.cms-draggable { display: block !important; }' +
+                    '.cms-droppable { height: 0; }' +
+                '</style>' +
+                '<div class="cms-structure-content" style="position: fixed; top: 40px; left: 40px; width: 500px">' +
+                '<div class="cms-placeholder-8949"></div>' +
+                '<div class="cms-dragarea cms-dragarea-8949"><div id="container-plugins" class="cms-draggables">' +
+                [1, 2, 3].map(id =>
+                    `<div class="cms-draggable cms-draggable-${id}">` +
+                    `<div class="cms-dragitem" style="height: 40px">Container ${id}</div>` +
+                    '<div class="cms-draggables cms-hidden" style="padding-left: 20px">' +
+                    (populated ? '<div class="cms-draggable"><div class="cms-dragitem">Child</div></div>' : '') +
+                    '</div></div>'
+                ).join('') + '</div></div></div>'
+            );
+            $('.cms-placeholder-8949').data('cms', { plugin_restriction: ['ContainerPlugin'] });
+            $('#container-plugins > .cms-draggable').data('cms', {
+                plugin_type: 'ContainerPlugin',
+                plugin_restriction: allowNesting ? ['ContainerPlugin'] : ['TextPlugin']
+            });
+            StructureBoard._initializeGlobalHandlers();
+            board = Object.create(StructureBoard.prototype);
+            board.ui = {
+                content: $('.cms-structure-content'),
+                sortables: $('.cms-draggables'),
+                window: $(window),
+                doc: $(document)
+            };
+            board._drag();
+            board.ui.sortables.nestedSortable('option', { delay: 0, scroll: false });
+        }
+
+        function dragThirdContainer(target, horizontalMovement = 0) {
+            const item = $('.cms-draggable-3 > .cms-dragitem');
+            const start = item.offset();
+            const destination = $(`.cms-draggable-${target} > .cms-dragitem`).offset();
+            const startX = start.left + 80;
+            const startY = start.top + 20;
+
+            item.trigger(new $.Event('mousedown', { which: 1, pageX: startX, pageY: startY }));
+            for (let step = 1; step <= 20; step++) {
+                $(document).trigger(new $.Event('mousemove', {
+                    which: 1,
+                    pageX: startX + horizontalMovement * step / 20,
+                    pageY: startY + (destination.top + 8 - startY) * step / 20
+                }));
+            }
+            $(document).trigger(new $.Event('mouseup'));
+        }
+
+        [false, true].forEach(populated => {
+            it(`reorders ${populated ? 'populated' : 'empty'} containers without nesting`, function() {
+                setupContainers(populated, false);
+                dragThirdContainer(2);
+                expect($('#container-plugins').children('.cms-draggable').map((i, el) => board.getId($(el))).get())
+                    .toEqual(['1', '3', '2']);
+            });
+        });
+
+        it('moves an empty container to first position', function() {
+            setupContainers(false, false);
+            dragThirdContainer(1);
+            expect($('#container-plugins > .cms-draggable').first()).toHaveClass('cms-draggable-3');
+        });
+
+        it('allows deliberate nesting into an empty container', function() {
+            setupContainers(false, true);
+            dragThirdContainer(2, 45);
+            expect($('.cms-draggable-3').parent().parent()).toHaveClass('cms-draggable-1');
+        });
+
+        [false, true].forEach(allowRoot => {
+            it(`${allowRoot ? 'allows' : 'rejects'} moving the last child to the placeholder root`, function() {
+                setupContainers(false, false);
+                const parent = $('.cms-draggable-1');
+                const children = parent.children('.cms-draggables').removeClass('cms-hidden');
+                const item = $('.cms-draggable-3').appendTo(children);
+
+                parent.data('cms').plugin_restriction = ['ItemPlugin'];
+                item.data('cms', { plugin_type: 'ItemPlugin', plugin_restriction: ['TextPlugin'] });
+                if (allowRoot) {
+                    $('.cms-placeholder-8949').data('cms').plugin_restriction.push('ItemPlugin');
+                }
+
+                const header = item.children('.cms-dragitem');
+                const start = header.offset();
+
+                header.trigger(new $.Event('mousedown', { which: 1, pageX: start.left + 80, pageY: start.top + 20 }));
+                // Start within the permitted parent, then outdent and release
+                // immediately, without another mousemove to recheck restrictions.
+                $(document).trigger(new $.Event('mousemove', {
+                    which: 1, pageX: start.left + 80, pageY: start.top + 22
+                }));
+                $(document).trigger(new $.Event('mousemove', {
+                    which: 1, pageX: start.left + 40, pageY: start.top + 23
+                }));
+                $(document).trigger(new $.Event('mouseup'));
+
+                expect(item.parent()[0]).toBe(allowRoot ? $('#container-plugins')[0] : children[0]);
+            });
+        });
+    });
+
     describe('._drag()', function() {
         var board;
         var options;
@@ -1320,7 +1490,7 @@ describe('CMS.StructureBoard', function() {
                 var placeholder = $('.cms-draggables').eq(0);
                 placeholder.parent().addClass('cms-draggable-disabled');
                 $('.cms-placeholder-1').remove();
-                pluginEdit.data('cms', { plugin_parent_restriction: [] });
+                pluginEdit.data('cms', {});
 
                 expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                 expect(board.state).toEqual('mock');
@@ -1333,7 +1503,7 @@ describe('CMS.StructureBoard', function() {
                 var placeholder = $('.cms-draggables').eq(0);
                 placeholder.parent().addClass('cms-clipboard-containers');
                 $('.cms-placeholder-1').remove();
-                pluginEdit.data('cms', { plugin_parent_restriction: [] });
+                pluginEdit.data('cms', {});
 
                 expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                 expect(board.state).toEqual('mock');
@@ -1345,7 +1515,7 @@ describe('CMS.StructureBoard', function() {
                     var pluginStructure = $('.cms-draggable-1');
                     var placeholder = $('.cms-dragarea-1 > .cms-draggables');
                     var placeholderEdit = $('.cms-placeholder-1');
-                    pluginStructure.data('cms', { plugin_parent_restriction: [] });
+                    pluginStructure.data('cms', {});
                     placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
@@ -1357,7 +1527,7 @@ describe('CMS.StructureBoard', function() {
                     var pluginStructure = $('.cms-draggable-1');
                     var placeholder = $('.cms-dragarea-1 > .cms-draggables');
                     var placeholderEdit = $('.cms-placeholder-1');
-                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OnlyThisPlugin' });
+                    pluginStructure.data('cms', { plugin_type: 'OnlyThisPlugin' });
                     placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(true);
@@ -1373,7 +1543,7 @@ describe('CMS.StructureBoard', function() {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    pluginStructure.data('cms', { plugin_type: 'OtherPlugin' });
                     parentPluginStructure.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
                     placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
@@ -1390,7 +1560,7 @@ describe('CMS.StructureBoard', function() {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    pluginStructure.data('cms', { plugin_type: 'OtherPlugin' });
                     parentPluginStructure.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
                     placeholderEdit.data('cms', { plugin_restriction: ['OtherPlugin'] });
 
@@ -1407,7 +1577,7 @@ describe('CMS.StructureBoard', function() {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    pluginStructure.data('cms', { plugin_type: 'OtherPlugin' });
                     parentPluginStructure.data('cms', { plugin_restriction: [] });
                     placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
@@ -1424,7 +1594,7 @@ describe('CMS.StructureBoard', function() {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    pluginStructure.data('cms', { plugin_type: 'OtherPlugin' });
                     parentPluginStructure.data('cms', { plugin_restriction: [] });
                     placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
@@ -1434,63 +1604,19 @@ describe('CMS.StructureBoard', function() {
                 });
             });
 
-            describe('parent bonds of the plugin', function() {
-                it('respects parent bounds of the plugin', function() {
-                    board.state = 'mock';
-                    var pluginStructure = $('.cms-draggable-1');
-                    var parentPluginStructure = $('.cms-draggable-2');
-                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
-                    var placeholderEdit = $('.cms-placeholder-1');
+            it('blocks a plugin that the target placeholder does not allow at its root', function() {
+                // A plugin that requires a parent is excluded from the placeholder's root list
+                // server-side, so it is blocked at the root purely by the bounds (child list) check.
+                board.state = 'mock';
+                var pluginStructure = $('.cms-draggable-1');
+                var placeholder = $('.cms-dragarea-1 > .cms-draggables');
+                var placeholderEdit = $('.cms-placeholder-1');
 
-                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+                pluginStructure.data('cms', { plugin_type: 'OtherPlugin' });
+                placeholderEdit.data('cms', { plugin_restriction: ['OnlyRootPlugin'] });
 
-                    pluginStructure.data('cms', {
-                        plugin_parent_restriction: ['TestPlugin'],
-                        plugin_type: 'OtherPlugin'
-                    });
-                    parentPluginStructure.data('cms', { plugin_restriction: [], plugin_type: 'TestPlugin' });
-                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
-
-                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
-                    expect(board.state).toEqual(true);
-                });
-
-                it('respects parent bounds of the plugin', function() {
-                    board.state = 'mock';
-                    var pluginStructure = $('.cms-draggable-1');
-                    var parentPluginStructure = $('.cms-draggable-2');
-                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
-                    var placeholderEdit = $('.cms-placeholder-1');
-
-                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
-
-                    pluginStructure.data('cms', {
-                        plugin_parent_restriction: ['TestPlugin'],
-                        plugin_type: 'OtherPlugin'
-                    });
-                    parentPluginStructure.data('cms', { plugin_restriction: [], plugin_type: 'OtherType' });
-                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
-
-                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
-                    expect(board.state).toEqual(false);
-                });
-
-                it('works around "0" parent restriction for PlaceholderPlugin', function() {
-                    board.state = 'mock';
-                    var pluginStructure = $('.cms-draggable-1');
-                    var parentPluginStructure = $('.cms-draggable-2');
-                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
-                    var placeholderEdit = $('.cms-placeholder-1');
-
-                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
-
-                    pluginStructure.data('cms', { plugin_parent_restriction: ['0'], plugin_type: 'OtherPlugin' });
-                    parentPluginStructure.data('cms', { plugin_restriction: [], plugin_type: 'OtherType' });
-                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
-
-                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
-                    expect(board.state).toEqual(true);
-                });
+                expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
+                expect(board.state).toEqual(false);
             });
         });
     });
@@ -1501,7 +1627,7 @@ describe('CMS.StructureBoard', function() {
         beforeEach(done => {
             fixture.load('plugins.html');
             board = new CMS.StructureBoard();
-            StructureBoard.__Rewire__('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
             spyOn(StructureBoard, 'actualizePluginCollapseStatus');
             spyOn(StructureBoard, 'actualizePlaceholders');
             spyOn(StructureBoard, 'actualizePluginsCollapsibleStatus');
@@ -1514,7 +1640,7 @@ describe('CMS.StructureBoard', function() {
 
         afterEach(() => {
             fixture.cleanup();
-            StructureBoard.__ResetDependency__('Plugin');
+            resetRewire('Plugin');
         });
 
         describe('itself', () => {
@@ -2053,13 +2179,13 @@ describe('CMS.StructureBoard', function() {
                     populate: jasmine.createSpy(),
                     _enableTriggers: jasmine.createSpy()
                 };
-                StructureBoard.__Rewire__('Clipboard', FakeClipboard);
-                StructureBoard.__Rewire__('Plugin', FakePlugin);
+                rewire('Clipboard', FakeClipboard);
+                rewire('Plugin', FakePlugin);
                 fixture.load('clipboard.html');
             });
             afterEach(() => {
-                StructureBoard.__ResetDependency__('Clipboard');
-                StructureBoard.__ResetDependency__('Plugin');
+                resetRewire('Clipboard');
+                resetRewire('Plugin');
             });
 
             it('updates the clipboard', () => {
@@ -2144,11 +2270,11 @@ describe('CMS.StructureBoard', function() {
 
         beforeEach(() => {
             board = new StructureBoard();
-            StructureBoard.__Rewire__('preloadImagesFromMarkup', preloadImages);
+            rewire('preloadImagesFromMarkup', preloadImages);
         });
 
         afterEach(() => {
-            StructureBoard.__ResetDependency__('preloadImagesFromMarkup');
+            resetRewire('preloadImagesFromMarkup');
             preloadImages.calls.reset();
         });
 
@@ -2248,12 +2374,12 @@ describe('CMS.StructureBoard', function() {
                     };
                 }
             });
-            StructureBoard.__Rewire__('Plugin', FakePlugin);
-            Plugin.__Rewire__('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
         });
         afterEach(() => {
-            StructureBoard.__ResetDependency__('Plugin');
-            Plugin.__ResetDependency__('Plugin', FakePlugin);
+            resetRewire('Plugin');
+            resetRewire('Plugin', FakePlugin);
         });
 
         it('resolves immediately when content mode is already loaded', done => {
@@ -2301,6 +2427,23 @@ describe('CMS.StructureBoard', function() {
 
             expect(board._loadedContent).not.toBeDefined();
             pluginConstructor.calls.reset();
+
+            // FakePlugin._refreshPlugins() delegates to the real implementation,
+            // and that one instantiates cms.plugins' own reference to itself -
+            // something vi.mock cannot swap, so the instances it creates are real
+            // plugins and the spies have to sit on the real prototype.
+            spyOn(originalPlugin.prototype, '_setupUI').and.callFake(function() {
+                const el = $('<div></div>');
+
+                el.data('cms', []);
+                this.ui = { container: el };
+            });
+            spyOn(originalPlugin.prototype, '_ensureData');
+            spyOn(originalPlugin.prototype, '_setGeneric');
+            spyOn(originalPlugin.prototype, '_setPluginContentEvents');
+
+            const instancesBefore = CMS._instances.length;
+
             board._loadContent().then(() => {
                 expect(showLoader).toHaveBeenCalled();
                 expect(hideLoader).toHaveBeenCalled();
@@ -2312,9 +2455,10 @@ describe('CMS.StructureBoard', function() {
                 expect($('.new-content')).toBeInDOM();
 
                 expect(FakePlugin.prototype._ensureData).toHaveBeenCalledTimes(3);
-                expect(FakePlugin.prototype._setGeneric).toHaveBeenCalledTimes(1);
+                expect(originalPlugin.prototype._ensureData).toHaveBeenCalledTimes(1);
+                expect(originalPlugin.prototype._setGeneric).toHaveBeenCalledTimes(1);
                 expect(FakePlugin.prototype._setPluginContentEvents).toHaveBeenCalledTimes(1);
-                expect(pluginConstructor).toHaveBeenCalledTimes(1);
+                expect(CMS._instances.length).toEqual(instancesBefore + 1);
 
                 $('.new-content').remove();
                 expect(board._loadedContent).toBe(true);
@@ -2359,10 +2503,10 @@ describe('CMS.StructureBoard', function() {
                     };
                 }
             });
-            StructureBoard.__Rewire__('Plugin', FakePlugin);
+            rewire('Plugin', FakePlugin);
         });
         afterEach(() => {
-            StructureBoard.__ResetDependency__('Plugin');
+            resetRewire('Plugin');
         });
 
         it('resolves immediately when structure mode is already loaded', done => {
@@ -2561,6 +2705,8 @@ describe('CMS.StructureBoard', function() {
         DiffDOM.prototype.diff = jasmine.createSpy();
         DiffDOM.prototype.apply = jasmine.createSpy();
 
+        let originalDOMParser;
+
         class FakeDOMParser {}
         FakeDOMParser.prototype.parseFromString = jasmine.createSpy().and.returnValue({
             head: 'fakeNewHead',
@@ -2568,8 +2714,10 @@ describe('CMS.StructureBoard', function() {
         });
 
         beforeEach(() => {
-            StructureBoard.__Rewire__('DiffDOM', DiffDOM);
-            StructureBoard.__Rewire__('DOMParser', FakeDOMParser);
+            rewire('DiffDOM', DiffDOM);
+            // DOMParser is a browser global in the module under test
+            originalDOMParser = window.DOMParser;
+            window.DOMParser = FakeDOMParser;
 
             board = new StructureBoard();
 
@@ -2584,8 +2732,8 @@ describe('CMS.StructureBoard', function() {
         });
 
         afterEach(() => {
-            StructureBoard.__ResetDependency__('DiffDOM');
-            StructureBoard.__ResetDependency__('DOMParser');
+            resetRewire('DiffDOM');
+            window.DOMParser = originalDOMParser;
         });
 
         it('resets loaded content flag', () => {
@@ -2701,6 +2849,89 @@ describe('CMS.StructureBoard', function() {
             expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'js');
             expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
         });
+
+        describe('with external sekizai scripts', () => {
+            let src;
+            let loads;
+
+            const content = (pluginId, js) => ({
+                pluginIds: [pluginId],
+                html: `<div class="cms-plugin cms-plugin-${pluginId}"></div>`,
+                placeholder_id: 1,
+                position: pluginId,
+                js: js
+            });
+            const waitForRefresh = () => new Promise(resolve => {
+                StructureBoard._triggerRefreshEvents.and.callFake(resolve);
+            });
+            const settle = () => new Promise(resolve => setTimeout(resolve, 50));
+
+            beforeEach(() => {
+                // A unique script per test, so that it is neither cached nor already present
+                const marker = `__cmsScriptLoads${Date.now()}${Math.random().toString().slice(2)}`;
+
+                src = `data:text/javascript,window.${marker}=(window.${marker}||0)+1`;
+                loads = () => window[marker];
+                spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
+                spyOn(CMS.API.StructureBoard, '_contentChanged');
+                spyOn(StructureBoard, '_triggerRefreshEvents');
+            });
+
+            afterEach(() => {
+                document.querySelectorAll(`script[src="${src}"]`).forEach(script => script.remove());
+            });
+
+            it('triggers refresh events once, after a script shared by two content items has loaded', async () => {
+                const data = {
+                    content: [
+                        content(1, `<script src="${src}"></script>`),
+                        content(2, `<script src="${src}"></script>`)
+                    ]
+                };
+                const refresh = waitForRefresh();
+
+                expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(false);
+                expect(StructureBoard._triggerRefreshEvents).not.toHaveBeenCalled();
+                expect(document.querySelectorAll(`script[src="${src}"]`).length).toBe(1);
+
+                await refresh;
+                expect(loads()).toBe(1);
+                await settle();
+                expect(StructureBoard._triggerRefreshEvents).toHaveBeenCalledTimes(1);
+            });
+
+            it('waits for a script loaded by an earlier content item', async () => {
+                const data = {
+                    content: [content(1, `<script src="${src}"></script>`), content(2, '<script>void 0;</script>')]
+                };
+                const refresh = waitForRefresh();
+
+                CMS.API.StructureBoard._updateContentFromDataBridge(data);
+                expect(StructureBoard._triggerRefreshEvents).not.toHaveBeenCalled();
+
+                await refresh;
+                expect(loads()).toBe(1);
+                await settle();
+                expect(StructureBoard._triggerRefreshEvents).toHaveBeenCalledTimes(1);
+            });
+
+            it('waits for a script still loading from a previous update', async () => {
+                const refresh = waitForRefresh();
+
+                CMS.API.StructureBoard._updateContentFromDataBridge({
+                    content: [content(1, `<script src="${src}"></script>`)]
+                });
+                CMS.API.StructureBoard._updateContentFromDataBridge({
+                    content: [content(2, `<script src="${src}"></script>`)]
+                });
+                expect(StructureBoard._triggerRefreshEvents).not.toHaveBeenCalled();
+
+                await refresh;
+                expect(loads()).toBe(1);
+                await settle();
+                expect(StructureBoard._triggerRefreshEvents).toHaveBeenCalledTimes(1);
+            });
+        });
     });
 
     describe('_preloadOppositeMode', () => {
@@ -2709,9 +2940,7 @@ describe('CMS.StructureBoard', function() {
                 const div = document.createElement('div');
                 const _getWindow = jasmine.createSpy().and.returnValue(div);
 
-                StructureBoard.__Rewire__('Helpers', {
-                    _getWindow
-                });
+                spyOn(Helpers, '_getWindow').and.callFake(_getWindow);
 
                 const board = new StructureBoard();
 
@@ -2734,8 +2963,6 @@ describe('CMS.StructureBoard', function() {
                 expect(board._requestMode).toHaveBeenCalledWith(mode === 'content' ? 'structure' : 'content');
 
                 jasmine.clock().uninstall();
-
-                StructureBoard.__ResetDependency__('Helpers');
             });
         });
 
@@ -2743,9 +2970,7 @@ describe('CMS.StructureBoard', function() {
             const div = document.createElement('div');
             const _getWindow = jasmine.createSpy().and.returnValue(div);
 
-            StructureBoard.__Rewire__('Helpers', {
-                _getWindow
-            });
+            spyOn(Helpers, '_getWindow').and.callFake(_getWindow);
 
             const board = new StructureBoard();
 
@@ -2765,8 +2990,6 @@ describe('CMS.StructureBoard', function() {
             expect(board._requestMode).not.toHaveBeenCalled();
 
             jasmine.clock().uninstall();
-
-            StructureBoard.__ResetDependency__('Helpers');
         });
     });
 
@@ -2790,6 +3013,53 @@ describe('CMS.StructureBoard', function() {
             expect('.cms-draggable-1 .cms-dragitem').toHaveClass('cms-dragitem-expanded');
 
             $('#fixture_container').empty();
+        });
+    });
+
+    describe('_updateSekizai', () => {
+        let board;
+
+        beforeEach(() => {
+            board = new StructureBoard();
+        });
+
+        afterEach(() => {
+            $('script[data-test-sekizai]').remove();
+        });
+
+        it('does nothing if the block is empty', () => {
+            expect(board._updateSekizai({ js: '' }, 'js')).not.toBeDefined();
+            expect(board._updateSekizai({}, 'js')).not.toBeDefined();
+            expect(board._updateSekizai({ js: '<script data-test-sekizai></script>' }, 'unknown')).not.toBeDefined();
+            expect($('script[data-test-sekizai]').length).toBe(0);
+        });
+
+        it('appends inline scripts that are not yet in the document to the body', () => {
+            const js = '<script data-test-sekizai id="cms-plugin-app-model-field-1" type="application/json" ' +
+                'data-cms-general>{"type":"generic"}</script>';
+
+            expect(board._updateSekizai({ js }, 'js')).toBe(false);
+            expect($('body > script[data-test-sekizai]').length).toBe(1);
+            expect($('#cms-plugin-app-model-field-1').text()).toBe('{"type":"generic"}');
+        });
+
+        it('does not add scripts again that are already in the body', () => {
+            const js = '<script data-test-sekizai id="cms-plugin-app-model-field-1" type="application/json" ' +
+                'data-cms-general>{"type":"generic"}</script>';
+
+            $('body').append(js);
+            board._updateSekizai({ js }, 'js');
+            expect($('script[data-test-sekizai]').length).toBe(1);
+        });
+
+        it('does not add scripts again that are already in the head', () => {
+            const js = '<script data-test-sekizai id="cms-plugin-app-model-field-1" type="application/json" ' +
+                'data-cms-general>{"type":"generic"}</script>';
+
+            $('head').append(js);
+            board._updateSekizai({ js }, 'js');
+            expect($('script[data-test-sekizai]').length).toBe(1);
+            expect($('head > script[data-test-sekizai]').length).toBe(1);
         });
     });
 });

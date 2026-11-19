@@ -1,4 +1,3 @@
-/* eslint-env browser */
 /* global DOMParser */
 /*
  * Copyright https://github.com/django-cms/django-cms
