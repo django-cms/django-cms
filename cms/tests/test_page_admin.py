@@ -1650,6 +1650,46 @@ class PageTest(PageTestBase):
                 response = self.client.get(change_url)
         self.assertNotContains(response, 'id="page_form_lang_tabs"')
 
+    def test_change_view_shows_full_page_path(self):
+        """The page content change view shows the full URL path of the edited page content."""
+        superuser = self.get_superuser()
+        root = create_page("root", "nav_playground.html", "en")
+        parent = create_page("parent", "nav_playground.html", "en", parent=root, slug="parent")
+        child = create_page("child", "nav_playground.html", "en", parent=parent, slug="child")
+        content = self.get_pagecontent_obj(child, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        with self.login_user_context(superuser):
+            response = self.client.get(change_url)
+        self.assertEqual(response.context_data["page_path"], "/en/root/parent/child/")
+        self.assertContains(response, '<p class="cms-page-path"')
+        self.assertContains(response, "/en/root/parent/child/</p>")
+
+    def test_change_view_shows_page_path_in_edited_language(self):
+        superuser = self.get_superuser()
+        page = create_page("english", "nav_playground.html", "en", slug="english")
+        create_page_content("de", "deutsch", page, slug="deutsch")
+        content = self.get_pagecontent_obj(page, "de")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        with self.login_user_context(superuser):
+            response = self.client.get(change_url)
+        self.assertEqual(response.context_data["page_path"], "/de/deutsch/")
+
+    def test_change_view_omits_page_path_without_reachable_path(self):
+        superuser = self.get_superuser()
+        page = self.get_page()
+        content = self.get_pagecontent_obj(page, "en")
+        change_url = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        with patch("cms.models.pagemodel.Page.get_absolute_url", return_value=None):
+            with self.login_user_context(superuser):
+                response = self.client.get(change_url)
+        self.assertNotContains(response, 'class="cms-page-path"')
+
+    def test_add_view_does_not_show_page_path(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get(admin_reverse("cms_pagecontent_add") + "?language=en")
+        self.assertNotContains(response, 'class="cms-page-path"')
+
     def _parse_page_tree(self, response, parser_class):
         content = response.content
         content = content.decode(response.charset)

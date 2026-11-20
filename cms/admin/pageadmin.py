@@ -981,6 +981,8 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             "language": obj.language,
             "language_tabs": get_language_tuple(site.pk),
             "filled_languages": self.get_filled_languages(request, obj.page),
+            # Full URL path of the page in the edited language (None if the page has no reachable path)
+            "page_path": obj.page.get_absolute_url(obj.language, fallback=False),
         }
         # Only offer the language selector for the latest content. Switching the language always
         # navigates to the latest content of the target language, so for an older content object
