@@ -416,10 +416,15 @@ class MaterializedPath:
         parent = node.parent
         if parent is None:
             new = self.add_root(instance=instance, **attrs)
-            if position in ("first-sibling", "left"):
-                # rare: reorder roots is not exercised by django-cms; left to
-                # rebuild() which canonicalises root order.
-                pass
+            if position in ("left", "right"):
+                self._place_relative(new, node, after=(position == "right"))
+            elif position == "first-sibling":
+                existing = [pk for pk in self._ordered_child_pks("", 0) if pk != new.pk]
+                self._layout("", 0, [new.pk] + existing)
+                self._refresh(new)
+            # The relayout may have renumbered `node`, so the caller's instance
+            # must not keep a path that now belongs to another root.
+            self._refresh(node)
             return new
         if position == "first-sibling":
             return self.add_child(parent, position="first-child", instance=instance, **attrs)
