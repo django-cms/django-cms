@@ -705,6 +705,33 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Result(**kwargs)
 
+    def test_a_result_may_be_a_model_that_declares_its_fields(self):
+        """A received model object may name the fields it answers with.
+
+        Unlike an Argument, which is a pk or an object or a set of fields and
+        exactly one. A result can be both, and the serializer emits both: the
+        declared fields, plus the object's model and pk. Forbidding it left
+        get_page_content and search_pages able to answer only with a label.
+        """
+        Result = operations.Result
+        result = Result(
+            model="cms.PageContent",
+            fields={"title": Result(type=str)},
+            description="The content.",
+        )
+        self.assertEqual(result.model, "cms.PageContent")
+        self.assertEqual([name for name, _ in result.fields], ["title"])
+
+        schema = result.json_schema()
+        self.assertEqual(schema["type"], "object")
+        # The declared field, and the model/pk the serializer adds beside it.
+        self.assertEqual(schema["properties"]["title"], {"type": "string"})
+        self.assertIn("model", schema["properties"])
+        self.assertIn("pk", schema["properties"])
+        # Still marked as the model it is, so a client knows what it received
+        # and the scope machinery still recognises it.
+        self.assertEqual(schema["x-cms-model"], "cms.pagecontent")
+
 
 class QueryRegistryTest(RegistryIsolationMixin, CMSTestCase):
     """Declared reads: what REST GET endpoints and MCP resources describe."""

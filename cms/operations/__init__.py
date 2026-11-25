@@ -219,8 +219,23 @@ class Result:
     def __post_init__(self):
         fields = tuple(self.fields.items()) if isinstance(self.fields, dict) else tuple(self.fields)
         object.__setattr__(self, "fields", fields)
-        if sum(bool(part) for part in (self.type is not None, self.model is not None, fields)) > 1:
-            raise ValueError("A result is a value, a model object or an object with fields, not several.")
+        # A result is a value, OR a model object -- which may additionally
+        # describe the fields it answers with. That last combination is the
+        # one an Argument does not have: an argument you *supply* is a pk or
+        # an object or a set of fields, exactly one. A result you *receive* can
+        # legitimately be both, because a model object has fields worth naming.
+        #
+        # Forbidding it made `get_page_content` and `search_pages` answer with
+        # only {model, pk, label}: the serializer can emit a model's fields,
+        # but there was no way to declare them, so a caller had to run a full
+        # export to learn a page's title. Meanwhile the consumer had supported
+        # the combination all along -- it serializes the declared fields and
+        # then adds model/pk -- so this rule contradicted the code that reads
+        # it. The scope machinery is unaffected either way: both the
+        # collection of returned objects and the "is this read confinable"
+        # decision key off `model` alone.
+        if self.type is not None and (self.model is not None or fields):
+            raise ValueError("A result is a value, or a model object, not both.")
         types = self.type if isinstance(self.type, tuple) else (self.type,)
         if self.type is not None and any(value not in _JSON_TYPES for value in types):
             raise ValueError(f"A result has a type JSON cannot carry: {self.type!r}.")
@@ -254,6 +269,15 @@ class Result:
                 "properties": {name: value.json_schema() for name, value in self.fields},
                 "required": [name for name, _ in self.fields],
             }
+            if self.model is not None:
+                # Both: the serializer emits the declared fields AND the
+                # object's model and pk, so the schema has to say so. Marking
+                # it only as an object would describe a payload the caller does
+                # not receive.
+                models = self.models
+                schema["x-cms-model"] = models[0] if len(models) == 1 else list(models)
+                schema["properties"]["model"] = {"type": "string"}
+                schema["properties"]["pk"] = {"type": "integer"}
         elif self.model is not None:
             models = self.models
             schema = {"type": "object", "x-cms-model": models[0] if len(models) == 1 else list(models)}
