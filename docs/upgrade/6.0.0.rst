@@ -385,6 +385,13 @@ hook binds the plugin's ``form`` (the plugin's own, or the generated
 service directly. Plugins whose form needs the request override the hook. The
 admin passes the form it already validated, so data is not cleaned twice.
 
+For a change, ``data`` only needs the fields that change: the rest are filled
+from the form the editor would be shown, read through ``BoundField.value()`` so
+that a field whose value is not a model attribute -- as under
+django-entangled -- is seen as well. ``CMSPluginBase.data_form_class()`` is the
+form class used for both, so what describes a plugin's accepted fields and what
+validates them are the same object.
+
 One frame for all services
 ==========================
 
