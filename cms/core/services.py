@@ -664,6 +664,39 @@ def clear_placeholder(
 # Summaries are shown to editors and translated; descriptions are read by API
 # schemas and assistant tool definitions and stay plain English.
 
+#: What a plugin write answers with besides the plugin itself.
+#:
+#: Every plugin write requires an ``expected_token`` and used to return none,
+#: so a caller had to re-read the placeholder to get the next one -- 126 plugin
+#: writes cost around 250 extra reads for nothing but tokens. The token is a
+#: property of the plugin, which already knows its placeholder and its
+#: language, so the services still return the plugin unchanged -- their
+#: Python callers assign it straight to ``saved_object`` -- and this only
+#: declares what to serialise alongside it.
+#:
+#: Applied to the writes that return ONE plugin -- add, change, move, cut and
+#: paste. Deliberately not applied to the two that return many
+#: (``paste_placeholder``, ``add_plugins_from_placeholder``): the token is read
+#: per returned object, so a bulk paste of 126 plugins would run 126 token
+#: queries to answer with the same token 126 times, which costs more than the
+#: single read it saves. One read after one bulk write is proportionate; it was
+#: a read *per plugin* that this ticket measured.
+#:
+#: ``delete_plugin`` and ``clear_placeholder`` require a token and cannot carry
+#: one back: they answer with a list of deleted ids and with nothing at all, so
+#: attaching a token means changing a published result shape rather than adding
+#: to it. Left as-is, and raised rather than decided here.
+_PLUGIN_WRITE_FIELDS = (
+    ("expected_token", Result(
+        type=str,
+        description=(
+            "The placeholder's token after this write. Pass it as "
+            "expected_token on the next write to the same placeholder; no "
+            "separate read is needed."
+        ),
+    )),
+)
+
 for _declaration in (
     Operation(
         operations.ADD_PLUGIN,
@@ -712,7 +745,11 @@ for _declaration in (
                 ),
             ),
         ),
-        returns=Result(model="cms.CMSPlugin", description="The new plugin, as its own plugin model."),
+        returns=Result(
+            model="cms.CMSPlugin",
+            fields=_PLUGIN_WRITE_FIELDS,
+            description="The new plugin, as its own plugin model, with the placeholder's new token.",
+        ),
     ),
     Operation(
         operations.CHANGE_PLUGIN,
@@ -742,7 +779,11 @@ for _declaration in (
                 ),
             ),
         ),
-        returns=Result(model="cms.CMSPlugin", description="The changed plugin."),
+        returns=Result(
+            model="cms.CMSPlugin",
+            fields=_PLUGIN_WRITE_FIELDS,
+            description="The changed plugin, with the placeholder's new token.",
+        ),
     ),
     Operation(
         operations.MOVE_PLUGIN,
@@ -780,7 +821,11 @@ for _declaration in (
                 ),
             ),
         ),
-        returns=Result(model="cms.CMSPlugin", description="The moved plugin."),
+        returns=Result(
+            model="cms.CMSPlugin",
+            fields=_PLUGIN_WRITE_FIELDS,
+            description="The moved plugin, with its placeholder's new token (the target's, after the move).",
+        ),
     ),
     Operation(
         operations.CUT_PLUGIN,
@@ -804,7 +849,11 @@ for _declaration in (
                 ),
             ),
         ),
-        returns=Result(model="cms.CMSPlugin", description="The plugin, now in the clipboard."),
+        returns=Result(
+            model="cms.CMSPlugin",
+            fields=_PLUGIN_WRITE_FIELDS,
+            description="The plugin, now in the clipboard, with the clipboard placeholder's token.",
+        ),
     ),
     Operation(
         operations.PASTE_PLUGIN,
@@ -837,7 +886,11 @@ for _declaration in (
                 ),
             ),
         ),
-        returns=Result(model="cms.CMSPlugin", description="The copy of the plugin."),
+        returns=Result(
+            model="cms.CMSPlugin",
+            fields=_PLUGIN_WRITE_FIELDS,
+            description="The copy of the plugin, with the target placeholder's new token.",
+        ),
     ),
     Operation(
         operations.PASTE_PLACEHOLDER,

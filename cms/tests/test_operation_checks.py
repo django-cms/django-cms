@@ -670,10 +670,24 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
                         self.assertIn(model.__name__, annotation)
 
     def test_output_schema(self):
+        # A bare model result: the object and nothing else. MOVE_PLUGIN used to
+        # be the example here, until it started answering with the placeholder's
+        # new token as well, so a genuinely bare one is used instead
+        # and the fields case is asserted separately below.
         self.assertEqual(
-            operations.get_operation(operations.MOVE_PLUGIN).output_schema(),
-            {"type": "object", "x-cms-model": "cms.cmsplugin", "description": "The moved plugin."},
+            operations.get_operation(operations.MOVE_PAGE).output_schema(),
+            {"type": "object", "x-cms-model": "cms.page", "description": "The moved page."},
         )
+        # A model result that also answers with declared fields. The model must
+        # survive alongside them: a downstream connector decides whether a read
+        # can be confined
+        # to a credential's sites from `x-cms-model`, so a write that lost it
+        # while gaining a field would quietly change how it is scoped.
+        moved_plugin = operations.get_operation(operations.MOVE_PLUGIN).output_schema()
+        self.assertEqual(moved_plugin["x-cms-model"], "cms.cmsplugin")
+        self.assertEqual(moved_plugin["required"], ["expected_token"])
+        self.assertEqual(moved_plugin["properties"]["expected_token"]["type"], "string")
+        self.assertEqual(moved_plugin["properties"]["pk"]["type"], "integer")
         self.assertEqual(operations.get_operation(operations.DELETE_PAGE).output_schema(), {"type": "null"})
         self.assertEqual(
             operations.get_operation(operations.COPY_PAGE_LANGUAGE).output_schema()["items"], {"type": "string"}

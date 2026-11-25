@@ -197,6 +197,27 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         total = 1
         text_enabled = False
 
+    @property
+    def expected_token(self) -> str:
+        """The token of this plugin's placeholder, in this plugin's language.
+
+        What a caller must pass as ``expected_token`` on its next write to the
+        same placeholder. Read off the plugin it just wrote, so a sequence of
+        writes chains without a separate read between each one: every plugin
+        write used to require an ``expected_token`` and return none, so a
+        caller had to re-read the tree to get the next one -- 126 plugins cost
+        about 250 extra reads for nothing but tokens.
+
+        A property rather than something the services return, because the token
+        is derivable from the plugin: it already knows its placeholder and its
+        language. That keeps ``add_plugin`` and ``change_plugin`` returning the
+        plugin itself, which their Python callers assign straight to
+        ``saved_object``.
+        """
+        from cms.core.queries import placeholder_token
+
+        return placeholder_token(self.placeholder, self.language)
+
     def __str__(self):
         return force_str(self.pk)
 
