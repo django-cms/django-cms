@@ -2,6 +2,7 @@ import datetime
 import functools
 import os.path
 from unittest import skipIf
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -27,6 +28,7 @@ from cms.pages.utils import (
     get_page_from_request,
 )
 from cms.sitemaps import CMSSitemap
+from cms.test_utils.project.pluginapp.plugins.revdesc.models import UnalteredPM
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 
@@ -1027,6 +1029,48 @@ class PagesTestCase(TransactionCMSTestCase):
         # Search with language that has no content
         results = Page.objects.search("more random", language="en")
         self.assertEqual(len(results), 0)
+
+    def test_page_objects_search_skips_a_search_field_that_is_not_a_field(self):
+        """One plugin's bad declaration must not break search for the whole site.
+
+        ``search_page_contents`` builds a filter per ``search_fields`` entry of
+        every registered plugin. An entry the plugin's model has no field for
+        resolves onto its ``OneToOneRel`` rather than a column, so the ORM
+        raises ``FieldError`` when the queryset is evaluated -- which took down
+        every page search on the site, not just the searching of that one
+        plugin. djangocms-charts declaring ``search_fields = ['name',
+        'table_data']`` on two models that have neither was enough to do it.
+
+        The entry is skipped and named in the log instead.
+        """
+        page = create_page("test page 1", "nav_playground.html", "en", slug="test-page-1")
+        create_page_content("de", "some random content", page)
+
+        with patch.object(UnalteredPM, "search_fields", ["title", "no_such_field"]):
+            with self.assertLogs("cms.pages.models.managers", level="WARNING") as captured:
+                # Evaluated inside the block on purpose: FieldError was raised
+                # when the queryset was evaluated, not when it was built.
+                results = list(Page.objects.search("test"))
+
+        self.assertEqual([found.pk for found in results], [page.pk])
+        self.assertEqual(len(captured.output), 1)
+        self.assertIn("no_such_field", captured.output[0])
+        self.assertIn("UnalteredPM", captured.output[0])
+
+    def test_page_objects_search_still_traverses_a_relation(self):
+        """A search_fields entry may legitimately traverse a relation.
+
+        Only the first segment is checked, so ``placeholder__slot`` is built
+        and evaluated as before. What is rejected is a name the model has no
+        field for at all, so this must not be skipped.
+        """
+        create_page("another page", "nav_playground.html", "en", slug="another-page")
+
+        with patch.object(UnalteredPM, "search_fields", ["placeholder__slot"]):
+            with self.assertNoLogs("cms.pages.models.managers", level="WARNING"):
+                results = list(Page.objects.search("no-such-slot"))
+
+        self.assertEqual(results, [])
 
 
 class PageTreeTests(CMSTestCase):

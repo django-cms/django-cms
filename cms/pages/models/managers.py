@@ -5,10 +5,15 @@
 content managers use it: it threads the acting user through a queryset so that
 permission-aware managers can filter on it.
 """
+import logging
+
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models import Q
 
 from cms.pages.models.query import PageQuerySet
+
+logger = logging.getLogger(__name__)
 
 
 class PageManager(models.Manager):
@@ -47,6 +52,21 @@ class PageManager(models.Manager):
         return qs.filter(pk__in=matching.values("page_id")).distinct()
 
 
+def _is_searchable_field(model, name):
+    """Whether *name* names something ``search_page_contents`` can filter on.
+
+    Only the first segment is checked, so a declaration that legitimately
+    traverses a relation (``author__name``) still works; what is rejected is a
+    name the model has no field for at all, which is the case that raises
+    FieldError and takes the whole search down.
+    """
+    try:
+        model._meta.get_field(name.split('__', 1)[0])
+    except FieldDoesNotExist:
+        return False
+    return True
+
+
 def search_page_contents(page_contents, q, language=None):
     """The contents among ``page_contents`` matching ``q``, as :meth:`PageManager.search` matches.
 
@@ -67,10 +87,30 @@ def search_page_contents(page_contents, q, language=None):
             hasattr(cmsplugin, 'search_fields') and hasattr(cmsplugin, 'cmsplugin_ptr')
         ):
             continue
-        field = cmsplugin.cmsplugin_ptr.field
-        related_query_name = field.related_query_name()
+        ptr_field = cmsplugin.cmsplugin_ptr.field
+        related_query_name = ptr_field.related_query_name()
         if related_query_name and not related_query_name.startswith('+'):
             for field in cmsplugin.search_fields:
+                if not _is_searchable_field(cmsplugin, field):
+                    # Skipped, not fatal. A plugin naming a search field its
+                    # model does not have used to break search for the WHOLE
+                    # SITE: the path below resolves onto the plugin's
+                    # OneToOneRel instead of a column, and the ORM raises
+                    # FieldError when the queryset is evaluated -- so every
+                    # page search answered 500. djangocms-charts declares
+                    # search_fields = ['name', 'table_data'] on two models
+                    # that have neither, and that alone was enough.
+                    #
+                    # One package's bad declaration must not decide whether
+                    # search works at all, so the entry is dropped and named
+                    # in the log rather than taken on trust.
+                    logger.warning(
+                        "%s declares search_fields entry %r, which is not a "
+                        "field on %s -- skipped. Searching it would raise "
+                        "FieldError and fail every page search.",
+                        plugin.__name__, field, cmsplugin._meta.label,
+                    )
+                    continue
                 qp |= Q(**{f'placeholders__cmsplugin__{related_query_name}__{field}__icontains': q})
     if language:
         qt &= Q(language=language)
