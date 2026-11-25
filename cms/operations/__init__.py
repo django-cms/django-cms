@@ -88,6 +88,23 @@ class Argument:
     labels. A model argument names a stored object by primary key, which the
     adapter resolves for the acting user; with ``instance`` it is an object the
     caller builds instead -- a new one, or a stored one with changed fields.
+
+    A ``dict`` argument may declare the ``fields`` it carries, as further
+    :class:`Argument` declarations::
+
+        Argument(
+            "content_data",
+            type=dict,
+            description="The first translation's fields.",
+            fields=(
+                Argument("title", type=str, description="The title."),
+                Argument("slug", type=str, description="The slug.", required=False),
+            ),
+        )
+
+    :meth:`json_schema` then describes the object, so a caller outside Python
+    can validate its input before sending it. Without them the schema is a bare
+    ``{"type": "object"}`` and the fields have to be learnt some other way.
     """
 
     #: The service's keyword argument.
@@ -107,6 +124,11 @@ class Argument:
     choices: tuple = ()
     #: The caller builds the model object rather than naming a stored one.
     instance: bool = False
+    #: For a ``dict`` argument, the fields it carries, as :class:`Argument`
+    #: declarations. Without these the generated schema is a bare
+    #: ``{"type": "object"}``, which a caller outside Python cannot validate
+    #: against, so it has to learn the fields some other way.
+    fields: tuple = ()
 
     def __post_init__(self):
         if not self.name.isidentifier():
@@ -119,6 +141,21 @@ class Argument:
         if self.instance and self.model is None:
             raise ValueError(f"Argument {self.name!r} is an instance, but of no model.")
         object.__setattr__(self, "choices", tuple(self.choices))
+        object.__setattr__(self, "fields", tuple(self.fields))
+        if self.fields:
+            if self.model is not None:
+                raise ValueError(
+                    f"Argument {self.name!r} has fields and a model; a model "
+                    f"argument's shape is the model's."
+                )
+            if not any(value in (dict, object) for value in types):
+                raise ValueError(
+                    f"Argument {self.name!r} has fields but is not a dict."
+                )
+            if any(not isinstance(value, Argument) for value in self.fields):
+                raise ValueError(
+                    f"The fields of argument {self.name!r} must be Argument declarations."
+                )
 
     @property
     def models(self) -> tuple[str, ...]:
@@ -144,6 +181,11 @@ class Argument:
             types = self.type if isinstance(self.type, tuple) else (self.type,)
             names = list(dict.fromkeys(_JSON_TYPES[value] for value in types))
             schema = {"type": names[0] if len(names) == 1 else names}
+            if self.fields:
+                # The same composition as the top level, so the nesting needs no
+                # rules of its own. Applied before the many/null wrappers below,
+                # so a list of objects describes its items.
+                schema = _arguments_schema(self.fields)
         if self.choices:
             schema["enum"] = list(self.choices)
         if self.many:

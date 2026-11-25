@@ -528,6 +528,54 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
             (Argument("owner", model=("auth.User", "auth.Group")), {
                 "type": ["integer", "string"], "x-cms-model": ["auth.user", "auth.group"]
             }),
+            # a dict without declared fields stays as it was
+            (Argument("data", type=dict), {"type": "object"}),
+            (Argument("content_data", type=dict, fields=(
+                Argument("title", type=str),
+                Argument("slug", type=str, required=False),
+            )), {
+                "type": "object",
+                "properties": {"title": {"type": "string"}, "slug": {"type": "string"}},
+                "additionalProperties": False,
+                "required": ["title"],
+            }),
+            # the wrappers apply outside the described object
+            (Argument("rows", type=dict, many=True, fields=(Argument("pk", type=int),)), {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {"pk": {"type": "integer"}},
+                    "additionalProperties": False,
+                    "required": ["pk"],
+                },
+            }),
+            (Argument("maybe", type=dict, null=True, fields=(Argument("a", type=str),)), {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "properties": {"a": {"type": "string"}},
+                        "additionalProperties": False,
+                        "required": ["a"],
+                    },
+                    {"type": "null"},
+                ],
+            }),
+            # fields nest, because they are Arguments like any other
+            (Argument("outer", type=dict, fields=(
+                Argument("inner", type=dict, fields=(Argument("leaf", type=str),)),
+            )), {
+                "type": "object",
+                "properties": {
+                    "inner": {
+                        "type": "object",
+                        "properties": {"leaf": {"type": "string"}},
+                        "additionalProperties": False,
+                        "required": ["leaf"],
+                    },
+                },
+                "additionalProperties": False,
+                "required": ["inner"],
+            }),
         ):
             with self.subTest(argument=argument.name):
                 self.assertEqual(argument.json_schema(), schema)
@@ -543,6 +591,10 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
             {"name": "page", "type": set},
             {"name": "page", "type": str, "instance": True},
             {"name": "not a name", "type": str},
+            # fields describe a dict, so they need one, and not a model
+            {"name": "page", "model": "cms.Page", "fields": (Argument("a", type=str),)},
+            {"name": "page", "type": str, "fields": (Argument("a", type=str),)},
+            {"name": "page", "type": dict, "fields": ({"a": 1},)},
         ):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Argument(**kwargs)
