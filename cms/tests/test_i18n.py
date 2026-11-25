@@ -40,6 +40,66 @@ class TestLanguages(CMSTestCase):
         self.assertEqual(i18n.get_language_code('en', site_id=1), 'en')
         self.assertEqual(i18n.get_current_language(), 'en')
 
+    def test_a_value_that_is_not_a_language_tag_does_not_travel_on(self):
+        """A non-language is replaced by the site's default, not handed back.
+
+        This function promises to return a code "while making sure it's in
+        LANGUAGES", and its fall-through used to break that promise by
+        returning whatever it was given. A malformed editor URL carrying
+        `?language=en-gb?language=en-gb` therefore put a 20-character
+        "language" into the operation context, and from there into
+        djangocms-history's `language` column -- a varchar(15), like cms's own
+        -- so every Text plugin save answered 500.
+        """
+        for value in ('en?language=en', 'en-gb?language=en-gb', 'en gb', 'en/gb', '../en'):
+            with self.subTest(value=value):
+                self.assertIn(
+                    i18n.get_language_code(value, site_id=1),
+                    i18n.get_language_list(site_id=1),
+                )
+
+    def test_a_language_tag_this_site_does_not_serve_is_handed_back(self):
+        """Behaviour preserved: an unserved but well-formed tag is returned.
+
+        It may be served by another site in the same project, so deciding for
+        the caller here would hide a real misconfiguration. Only values that
+        are not language tags at all are replaced.
+        """
+        self.assertEqual(i18n.get_language_code('pt-br', site_id=1), 'pt-br')
+
+    def test_a_well_formed_but_overlong_code_does_not_travel_on(self):
+        """Shape is not the whole invariant: it must also be storable.
+
+        `"a" * 40` matches the language-tag pattern, so the shape check alone
+        handed it straight back and the original varchar(15) overflow stayed
+        reachable through a different input. Found by running the fixed
+        function against the live database rather than by re-reading it.
+        """
+        for value in ('a' * 16, 'a' * 40, 'en-' + 'x' * 20):
+            with self.subTest(value=value):
+                got = i18n.get_language_code(value, site_id=1)
+                self.assertIn(got, i18n.get_language_list(site_id=1))
+                self.assertLessEqual(len(got), i18n.MAX_LANGUAGE_CODE_LENGTH)
+
+    def test_the_length_limit_matches_the_narrowest_language_column(self):
+        """The limit is the storage reality, not a guess.
+
+        Widening a `language` field without widening this would leave the
+        limit stranded below the schema; narrowing one below it would make the
+        overflow reachable again. Either way this fails rather than a write.
+        """
+        from cms.models import CMSPlugin, PageContent
+
+        widths = [
+            model._meta.get_field('language').max_length
+            for model in (CMSPlugin, PageContent)
+        ]
+        self.assertEqual(i18n.MAX_LANGUAGE_CODE_LENGTH, min(widths), widths)
+
+    def test_an_empty_language_code_is_still_none(self):
+        self.assertIsNone(i18n.get_language_code('', site_id=1))
+        self.assertIsNone(i18n.get_language_code(None, site_id=1))
+
     def test_get_languages_default_site(self):
         result = i18n.get_languages(1)
         self.assertEqual(2, len(result))
