@@ -89,12 +89,12 @@ class Argument:
     adapter resolves for the acting user; with ``instance`` it is an object the
     caller builds instead -- a new one, or a stored one with changed fields.
 
-    A ``dict`` argument may declare the ``fields`` it carries, as further
-    :class:`Argument` declarations::
+    An argument may instead declare the ``fields`` it carries, as further
+    :class:`Argument` declarations -- a value, a model object or an object with
+    fields, and exactly one of those, as a :class:`Result` is::
 
         Argument(
             "content_data",
-            type=dict,
             description="The first translation's fields.",
             fields=(
                 Argument("title", type=str, description="The title."),
@@ -133,29 +133,26 @@ class Argument:
     def __post_init__(self):
         if not self.name.isidentifier():
             raise ValueError(f"Argument name {self.name!r} is not an identifier.")
-        if (self.type is None) == (self.model is None):
-            raise ValueError(f"Argument {self.name!r} needs either a type or a model.")
+        # An Argument carries its own name, unlike a Result's fields, so this is
+        # a plain tuple of them rather than name/value pairs.
+        object.__setattr__(self, "fields", tuple(self.fields))
+        kinds = sum(bool(part) for part in
+                    (self.type is not None, self.model is not None, self.fields))
+        if kinds != 1:
+            raise ValueError(
+                f"Argument {self.name!r} is a value, a model object or an object "
+                f"with fields, and exactly one of those."
+            )
         types = self.type if isinstance(self.type, tuple) else (self.type,)
         if self.type is not None and any(value not in _JSON_TYPES for value in types):
             raise ValueError(f"Argument {self.name!r} has a type JSON cannot carry: {self.type!r}.")
         if self.instance and self.model is None:
             raise ValueError(f"Argument {self.name!r} is an instance, but of no model.")
         object.__setattr__(self, "choices", tuple(self.choices))
-        object.__setattr__(self, "fields", tuple(self.fields))
-        if self.fields:
-            if self.model is not None:
-                raise ValueError(
-                    f"Argument {self.name!r} has fields and a model; a model "
-                    f"argument's shape is the model's."
-                )
-            if not any(value in (dict, object) for value in types):
-                raise ValueError(
-                    f"Argument {self.name!r} has fields but is not a dict."
-                )
-            if any(not isinstance(value, Argument) for value in self.fields):
-                raise ValueError(
-                    f"The fields of argument {self.name!r} must be Argument declarations."
-                )
+        if any(not isinstance(value, Argument) for value in self.fields):
+            raise ValueError(
+                f"Every field of argument {self.name!r} is an Argument."
+            )
 
     @property
     def models(self) -> tuple[str, ...]:
@@ -177,15 +174,15 @@ class Argument:
             schema["x-cms-model"] = models[0] if len(models) == 1 else list(models)
             if self.instance:
                 schema["x-cms-instance"] = True
+        elif self.fields:
+            # The same composition as the top level, so the nesting needs no
+            # rules of its own. Built before the many/null wrappers below, so a
+            # list of objects describes its items.
+            schema = _arguments_schema(self.fields)
         else:
             types = self.type if isinstance(self.type, tuple) else (self.type,)
             names = list(dict.fromkeys(_JSON_TYPES[value] for value in types))
             schema = {"type": names[0] if len(names) == 1 else names}
-            if self.fields:
-                # The same composition as the top level, so the nesting needs no
-                # rules of its own. Applied before the many/null wrappers below,
-                # so a list of objects describes its items.
-                schema = _arguments_schema(self.fields)
         if self.choices:
             schema["enum"] = list(self.choices)
         if self.many:

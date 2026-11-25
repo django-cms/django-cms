@@ -530,7 +530,7 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
             }),
             # a dict without declared fields stays as it was
             (Argument("data", type=dict), {"type": "object"}),
-            (Argument("content_data", type=dict, fields=(
+            (Argument("content_data", fields=(
                 Argument("title", type=str),
                 Argument("slug", type=str, required=False),
             )), {
@@ -540,7 +540,7 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
                 "required": ["title"],
             }),
             # the wrappers apply outside the described object
-            (Argument("rows", type=dict, many=True, fields=(Argument("pk", type=int),)), {
+            (Argument("rows", many=True, fields=(Argument("pk", type=int),)), {
                 "type": "array",
                 "items": {
                     "type": "object",
@@ -549,7 +549,7 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
                     "required": ["pk"],
                 },
             }),
-            (Argument("maybe", type=dict, null=True, fields=(Argument("a", type=str),)), {
+            (Argument("maybe", null=True, fields=(Argument("a", type=str),)), {
                 "anyOf": [
                     {
                         "type": "object",
@@ -561,8 +561,8 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
                 ],
             }),
             # fields nest, because they are Arguments like any other
-            (Argument("outer", type=dict, fields=(
-                Argument("inner", type=dict, fields=(Argument("leaf", type=str),)),
+            (Argument("outer", fields=(
+                Argument("inner", fields=(Argument("leaf", type=str),)),
             )), {
                 "type": "object",
                 "properties": {
@@ -591,10 +591,10 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
             {"name": "page", "type": set},
             {"name": "page", "type": str, "instance": True},
             {"name": "not a name", "type": str},
-            # fields describe a dict, so they need one, and not a model
+            # a value, a model object or an object with fields: exactly one
             {"name": "page", "model": "cms.Page", "fields": (Argument("a", type=str),)},
             {"name": "page", "type": str, "fields": (Argument("a", type=str),)},
-            {"name": "page", "type": dict, "fields": ({"a": 1},)},
+            {"name": "page", "fields": ({"a": 1},)},
         ):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Argument(**kwargs)
