@@ -672,9 +672,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         they ask the same object. An introspection that read
         ``cls.form.base_fields`` instead answered about a different field list:
         a form may build fields in its own ``__init__``, and ``base_fields``
-        omits those -- on one real site, 36 of its 135 installed plugin types
-        had form fields no schema reported while the write validated against
-        them.
+        omits those -- measured on one deployment, 36 of 135 installed plugin
+        types had form fields no schema reported while the write validated
+        against them.
         """
         from django.contrib.admin.utils import flatten_fieldsets
         from django.forms.models import modelform_factory
@@ -704,7 +704,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         form would show. A plugin whose form needs the request -- for its fields,
         its choices or its validation -- overrides this classmethod.
 
-        One step stands between ``data`` and the bound form, and it exists
+        Two steps stand between ``data`` and the bound form, and both exist
         because a form's ``data`` is an HTML POST while a caller here has no
         browser:
 
@@ -718,10 +718,16 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
           model's attributes instead (``model_to_dict``) could see neither: a
           one-field change to an entangled plugin was refused as missing
           required fields that were plainly set on it.
+        * **Widget-shaped input.** A composite widget reads keys of its own
+          rather than ``data[name]``, so the values are encoded as
+          :mod:`cms.forms.widget_data` describes, and a value no widget would
+          read is refused there rather than written as empty.
 
         :raises ~django.core.exceptions.ValidationError: keyed by field name,
-            for data the form rejects.
+            for data the form rejects and for values no widget would read.
         """
+        from cms.forms.widget_data import as_widget_data, refuse_unreadable
+
         form_class = cls.data_form_class()
 
         # Unbound, and on the instance for a change. `.fields` rather than
@@ -729,13 +735,17 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # field in its __init__, and the list that counts is the one the bound
         # form a moment later will validate against.
         editor_form = form_class(instance=instance)
+        form_fields = editor_form.fields
 
-        values = dict(data)
+        stored, values = {}, dict(data)
         if instance is not None:
-            stored = {name: editor_form[name].value() for name in editor_form.fields}
+            stored = {name: editor_form[name].value() for name in form_fields}
             values = {**stored, **data}
 
-        form = form_class(data=values, instance=instance)
+        encoded = as_widget_data(form_fields, values)
+        refuse_unreadable(form_fields, data, stored, encoded)
+
+        form = form_class(data=encoded, instance=instance)
         if not form.is_valid():
             raise ValidationError(form.errors)
         return form

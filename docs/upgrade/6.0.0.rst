@@ -392,6 +392,12 @@ django-entangled -- is seen as well. ``CMSPluginBase.data_form_class()`` is the
 form class used for both, so what describes a plugin's accepted fields and what
 validates them are the same object.
 
+Values are encoded the way each field's widget reads them, since a form's
+``data`` is an HTML POST and a composite widget does not read ``data[name]``.
+``cms.forms.widget_data`` does that, and refuses a value no widget would read
+rather than writing the field as empty. A widget may declare its own inverse by
+defining ``value_to_datadict()`` instead of being guessed at.
+
 One frame for all services
 ==========================
 
