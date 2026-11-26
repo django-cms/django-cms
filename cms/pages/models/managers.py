@@ -5,10 +5,16 @@
 content managers use it: it threads the acting user through a queryset so that
 permission-aware managers can filter on it.
 """
+import functools
+import logging
+
+from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models import Q
 
 from cms.pages.models.query import PageQuerySet
+
+logger = logging.getLogger(__name__)
 
 
 class PageManager(models.Manager):
@@ -47,6 +53,30 @@ class PageManager(models.Manager):
         return qs.filter(pk__in=matching.values("page_id")).distinct()
 
 
+@functools.cache
+def _is_searchable_field(model, name):
+    """Whether ``name``, a ``search_fields`` entry of plugin model ``model``, can be searched.
+
+    Django resolves the lookup itself, so a path through a relation
+    (``author__name``) is checked to its end, and a field that does not support
+    ``icontains`` is refused like one that does not exist. Building the filter
+    does not query the database.
+
+    Cached: an entry is resolved once per process, and one that cannot be
+    searched is logged once, not on every search.
+    """
+    try:
+        model._base_manager.filter(**{f"{name}__icontains": ""})
+    except FieldError:
+        logger.warning(
+            "%s declares the search_fields entry %r, which cannot be searched. "
+            "It is skipped; searching it would fail every page search.",
+            model._meta.label, name,
+        )
+        return False
+    return True
+
+
 def search_page_contents(page_contents, q, language=None):
     """The contents among ``page_contents`` matching ``q``, as :meth:`PageManager.search` matches.
 
@@ -67,14 +97,21 @@ def search_page_contents(page_contents, q, language=None):
             hasattr(cmsplugin, 'search_fields') and hasattr(cmsplugin, 'cmsplugin_ptr')
         ):
             continue
-        field = cmsplugin.cmsplugin_ptr.field
-        related_query_name = field.related_query_name()
+        ptr_field = cmsplugin.cmsplugin_ptr.field
+        related_query_name = ptr_field.related_query_name()
         if related_query_name and not related_query_name.startswith('+'):
             for field in cmsplugin.search_fields:
+                # The filters of all plugins are OR'd into one query, so a single
+                # entry that cannot be searched would fail every page search.
+                if not _is_searchable_field(cmsplugin, field):
+                    continue
                 qp |= Q(**{f'placeholders__cmsplugin__{related_query_name}__{field}__icontains': q})
     if language:
         qt &= Q(language=language)
-        qp &= Q(placeholders__cmsplugin__language=language)
+        if qp:
+            # Without a plugin filter, the language alone would match every
+            # content that has a plugin in that language.
+            qp &= Q(placeholders__cmsplugin__language=language)
 
     return page_contents.filter(qt | qp).distinct()
 
