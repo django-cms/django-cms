@@ -344,9 +344,21 @@ from. A manager whose ``can_change_permissions`` right is granted by a
 :class:`~cms.permissions.models.PagePermission` on part of the tree
 has only the users at or below that point. A manager granted the right
 by a :class:`~cms.permissions.models.GlobalPagePermission` sits at
-the top of the hierarchy, and every non-superuser account on the site is
+the top of the hierarchy, and every non-superuser account is
 subordinate to them — not merely the ones they created. Grant global
 permissions with that in mind.
+
+In a multi-site project, the top of the hierarchy reaches only as far as
+the global permission does. A global permission with no sites selected
+covers every site and every non-superuser account. One restricted to
+particular sites covers the accounts and groups whose page and global
+permissions all lie within those sites. An account that also holds
+permissions on another site — or a global permission with no sites
+selected — is not subordinate, because managing it would hand the
+manager rights on a site they do not manage. Such an account has to be
+managed by someone whose authority covers all of its sites, or by a
+superuser. Accounts holding no page or global permissions belong to no
+site and are subordinate to every such manager.
 
 Within the subordinate set, the manager can do almost everything a
 superuser could do to those accounts:

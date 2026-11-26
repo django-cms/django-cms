@@ -2,14 +2,16 @@ from unittest.mock import patch
 
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
-from cms.permissions.models import PageUser
-from cms.permissions.utils import get_subordinate_users
+from cms.api import create_page
+from cms.permissions.models import GlobalPagePermission, PageUser
+from cms.permissions.utils import get_subordinate_groups, get_subordinate_users
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
 
@@ -683,3 +685,161 @@ class SuperuserProtectionTest(PermissionsOnTestCase):
             self.assertEqual(response.status_code, 302)
 
         self.assertTrue(PageUser.objects.filter(pk=superuser.pk).exists())
+
+
+@override_settings(CMS_PERMISSION=True)
+class SiteScopedSubordinatesTest(PermissionsOnTestCase):
+    """
+    Global permissions on one site put a user at the top of the hierarchy of
+    that site only. Accounts and groups holding permissions on another site -
+    or on all sites - are not subordinate: being able to manage such an account
+    (set its password, for one) means taking over its rights on a site the
+    manager has no authority on.
+    """
+
+    def setUp(self):
+        self.site1 = Site.objects.get_current()
+        self.site2 = Site.objects.create(domain='site2.example.com', name='site2')
+        self.manager = self._create_user('site1-manager', is_staff=True)
+        self.add_permission(self.manager, 'change_pageuser')
+        self.add_permission(self.manager, 'delete_pageuser')
+        self.add_permission(self.manager, self._get_delete_perm())
+        self.manager_grant = GlobalPagePermission.objects.create(
+            user=self.manager, can_change=True, can_change_permissions=True,
+        )
+        self.manager_grant.sites.set([self.site1])
+
+    def _get_page_user(self, username):
+        parent_link_field = list(PageUser._meta.parents.values())[0]
+        user = self._create_user(username, is_staff=True)
+        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
+        data[parent_link_field.name] = user
+        data['created_by'] = self.get_superuser()
+        page_user = PageUser.objects.create(**data)
+        page_user.set_password('original-password')
+        page_user.save()
+        return page_user
+
+    def _get_password_url(self, user):
+        change_url = self.get_admin_url(PageUser, 'change', user.pk)
+        self.assertTrue(change_url.endswith('/change/'))
+        return change_url[:-len('change/')] + 'password/'
+
+    def _global_grant(self, sites, **kwargs):
+        grant = GlobalPagePermission.objects.create(can_change=True, **kwargs)
+        grant.sites.set(sites)
+        return grant
+
+    def _subordinate_user_ids(self, site=None):
+        return set(get_subordinate_users(self.manager, site or self.site1).values_list('pk', flat=True))
+
+    def _subordinate_group_ids(self):
+        return set(get_subordinate_groups(self.manager, self.site1).values_list('pk', flat=True))
+
+    def test_user_with_global_permission_on_other_site_not_subordinate(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_global_permission_on_all_sites_not_subordinate(self):
+        target = self._get_page_user('all-sites-user')
+        self._global_grant([], user=target)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_global_permission_on_both_sites_not_subordinate(self):
+        target = self._get_page_user('both-sites-user')
+        self._global_grant([self.site1, self.site2], user=target)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_page_permission_on_other_site_not_subordinate(self):
+        target = self._get_page_user('site2-page-user')
+        page = create_page('site2 page', 'nav_playground.html', 'de', site=self.site2)
+        self.add_page_permission(target, page, can_change=True)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_group_permission_on_other_site_not_subordinate(self):
+        target = self._get_page_user('site2-group-user')
+        global_group = Group.objects.create(name='site2 global')
+        self._global_grant([self.site2], group=global_group)
+        page_group = Group.objects.create(name='site2 page')
+        page = create_page('site2 page', 'nav_playground.html', 'de', site=self.site2)
+        self.add_page_permission(None, page, group=page_group, can_change=True)
+        bystander = self._get_page_user('site2-page-group-user')
+        target.groups.add(global_group)
+        bystander.groups.add(page_group)
+
+        subordinates = self._subordinate_user_ids()
+        self.assertNotIn(target.pk, subordinates)
+        self.assertNotIn(bystander.pk, subordinates)
+        groups = self._subordinate_group_ids()
+        self.assertNotIn(global_group.pk, groups)
+        self.assertNotIn(page_group.pk, groups)
+
+    def test_users_within_managed_site_stay_subordinate(self):
+        global_user = self._get_page_user('site1-global-user')
+        self._global_grant([self.site1], user=global_user)
+        page_user = self._get_page_user('site1-page-user')
+        page = create_page('site1 page', 'nav_playground.html', 'en', site=self.site1)
+        self.add_page_permission(page_user, page, can_change=True)
+        unassigned = self._get_page_user('unassigned-user')
+        group = Group.objects.create(name='site1 group')
+        self._global_grant([self.site1], group=group)
+
+        subordinates = self._subordinate_user_ids()
+        self.assertIn(global_user.pk, subordinates)
+        self.assertIn(page_user.pk, subordinates)
+        self.assertIn(unassigned.pk, subordinates)
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_manager_of_all_sites_sees_users_of_every_site(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target)
+        everywhere = self._get_page_user('all-sites-user')
+        self._global_grant([], user=everywhere)
+        group = Group.objects.create(name='site2 group')
+        self._global_grant([self.site2], group=group)
+
+        self.manager_grant.sites.clear()
+
+        for site in (self.site1, self.site2):
+            subordinates = self._subordinate_user_ids(site)
+            self.assertIn(target.pk, subordinates)
+            self.assertIn(everywhere.pk, subordinates)
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_manager_of_both_sites_sees_users_of_both(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target)
+        self._global_grant([self.site2], user=self.manager, can_change_permissions=True)
+        self.assertIn(target.pk, self._subordinate_user_ids())
+
+    def test_cannot_take_over_account_of_other_site(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target, can_change_permissions=True)
+        change_url = self.get_admin_url(PageUser, 'change', target.pk)
+        password_url = self._get_password_url(target)
+        delete_url = self.get_admin_url(PageUser, 'delete', target.pk)
+        data = {'password1': 'taken-over-123', 'password2': 'taken-over-123'}
+
+        with self.login_user_context(self.manager):
+            response = self.client.get(self.get_admin_url(PageUser, 'changelist'))
+            self.assertEqual(response.status_code, 200)
+            self.assertNotIn(target.pk, [obj.pk for obj in response.context['cl'].result_list])
+            self.assertNotEqual(self.client.get(change_url).status_code, 200)
+            self.assertNotEqual(self.client.post(password_url, data).status_code, 200)
+            self.client.post(delete_url, {'post': 'yes'})
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('original-password'))
+
+    def test_can_still_manage_account_of_own_site(self):
+        target = self._get_page_user('site1-user')
+        self._global_grant([self.site1], user=target)
+        password_url = self._get_password_url(target)
+        data = {'password1': 'changed-by-manager-123', 'password2': 'changed-by-manager-123'}
+
+        with self.login_user_context(self.manager):
+            self.assertEqual(self.client.post(password_url, data).status_code, 302)
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('changed-by-manager-123'))
