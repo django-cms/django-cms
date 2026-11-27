@@ -705,9 +705,6 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
             {"type": set},
             {"fields": {"token": str}},
             {"type": str, "fields": {"token": Result(type=str)}},
-            # these name a model object itself, so it cannot declare them
-            {"model": "cms.Page", "fields": {"pk": Result(type=int)}},
-            {"model": "cms.Page", "fields": {"title": Result(type=str), "model": Result(type=str)}},
         ):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Result(**kwargs)
@@ -716,9 +713,8 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
         """A received model object may name the fields it answers with.
 
         Unlike an Argument, which is a pk or an object or a set of fields and
-        exactly one. A result can be both, and the serializer emits both: the
-        declared fields, plus the object's model and pk. Forbidding it left
-        get_page_content and search_pages able to answer only with a label.
+        exactly one. A result can be both. Forbidding it left get_page_content
+        and search_pages able to answer only with what identifies the object.
         """
         Result = operations.Result
         result = Result(
@@ -731,20 +727,21 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
 
         schema = result.json_schema()
         self.assertEqual(schema["type"], "object")
-        # The declared field, and the model/pk the serializer adds beside it.
-        self.assertEqual(schema["properties"]["title"], {"type": "string"})
-        self.assertEqual(schema["properties"]["model"], {"type": "string"})
-        # As a model argument's: not every primary key is an integer.
-        self.assertEqual(schema["properties"]["pk"], {"type": ["integer", "string"]})
+        # The declared fields and nothing else: what an adapter identifies the
+        # object by is the adapter's to add, and the schema leaves room for it.
+        self.assertEqual(schema["properties"], {"title": {"type": "string"}})
+        self.assertEqual(schema["required"], ["title"])
+        self.assertNotIn("additionalProperties", schema)
         # Still marked as the model it is, so a client knows what it received
         # and the scope machinery still recognises it.
         self.assertEqual(schema["x-cms-model"], "cms.pagecontent")
 
 
-    def test_a_result_without_a_model_may_name_a_field_pk(self):
+    def test_a_model_result_may_declare_its_primary_key_as_a_field(self):
+        """No field name is reserved: ``pk`` is declared like any other."""
         Result = operations.Result
-        schema = Result(fields={"pk": Result(type=int)}).json_schema()
-        self.assertEqual(schema["properties"], {"pk": {"type": "integer"}})
+        schema = Result(model="cms.Page", fields={"pk": Result(type=(int, str))}).json_schema()
+        self.assertEqual(schema["properties"], {"pk": {"type": ["integer", "string"]}})
 
     def test_every_page_content_result_declares_the_same_fields(self):
         """Whichever query answers with a page content, it has the same shape."""

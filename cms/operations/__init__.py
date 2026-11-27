@@ -206,10 +206,6 @@ class Argument:
         return schema
 
 
-#: What names a model object in an answer, besides the fields it declares.
-_MODEL_RESULT_KEYS = frozenset({"model", "pk"})
-
-
 @dataclass(frozen=True)
 class Result:
     """What a service returns, for an adapter to describe its response.
@@ -218,8 +214,9 @@ class Result:
     (``model``, a label or a tuple of labels) that the adapter serializes, or an
     object with named ``fields``, each a :class:`Result` (a dataclass such as
     :class:`~cms.core.queries.PlaceholderContent`). A model object may name
-    ``fields`` as well: the ones it answers with, besides its ``model`` and
-    ``pk``. ``Result()`` with none of them: the service returns nothing.
+    ``fields`` as well: the ones it answers with, besides whatever the adapter
+    identifies the object by. ``Result()`` with none of them: the service
+    returns nothing.
     """
 
     #: Plain English, for API schemas and tool definitions. Not translated.
@@ -258,11 +255,6 @@ class Result:
             raise ValueError(f"A result has a type JSON cannot carry: {self.type!r}.")
         if any(not isinstance(value, Result) for _, value in fields):
             raise ValueError("Every field of a result is a Result.")
-        reserved = sorted({name for name, _ in fields} & _MODEL_RESULT_KEYS) if self.model is not None else ()
-        if reserved:
-            # They name the object itself, see json_schema(): a field of the
-            # same name would be replaced, in the schema and in the answer.
-            raise ValueError(f"A model result cannot declare a field named {', '.join(reserved)}.")
 
     @property
     def is_empty(self) -> bool:
@@ -280,8 +272,10 @@ class Result:
     def json_schema(self) -> dict:
         """The JSON Schema of the result.
 
-        A model object is an object marked with its label as ``x-cms-model``: its
-        fields are the adapter's serializer's to describe. Nothing is ``null``.
+        A model object is an object marked with its label as ``x-cms-model``.
+        The schema describes the fields it declares, if any. How the object is
+        identified in an answer -- its model, its primary key, a label -- is the
+        adapter's serializer's to add and to describe. Nothing is ``null``.
         """
         if self.is_empty:
             schema = {"type": "null"}
@@ -292,15 +286,11 @@ class Result:
                 "required": [name for name, _ in self.fields],
             }
             if self.model is not None:
-                # Both: the serializer emits the declared fields AND the
-                # object's model and pk, so the schema has to say so. Marking
-                # it only as an object would describe a payload the caller does
-                # not receive.
+                # Marked as the model it is, as a model result without fields.
+                # The adapter knows from this to add what it identifies the
+                # object by; the properties stay open for that.
                 models = self.models
                 schema["x-cms-model"] = models[0] if len(models) == 1 else list(models)
-                schema["properties"]["model"] = {"type": "string"}
-                # As a model argument's: not every primary key is an integer.
-                schema["properties"]["pk"] = {"type": ["integer", "string"]}
         elif self.model is not None:
             models = self.models
             schema = {"type": "object", "x-cms-model": models[0] if len(models) == 1 else list(models)}
