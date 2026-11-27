@@ -367,7 +367,9 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         try:
             page_services.set_home(
                 page,
-                context=OperationContext.from_request(request, language=request.GET.get("language")),
+                context=OperationContext.from_request(
+                    request, language=request.GET.get("language"), site=page.site
+                ),
                 permissions=AdminPagePermissions(self, request),
             )
         except ValidationError as error:
@@ -549,7 +551,9 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             page_services.move_page(
                 page,
                 *form.get_tree_options(),
-                context=OperationContext.from_request(request, language=request.GET.get("language")),
+                context=OperationContext.from_request(
+                    request, language=request.GET.get("language"), site=page.site
+                ),
                 permissions=AdminPagePermissions(self, request),
             )
         except PermissionDenied as error:
@@ -659,7 +663,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         # Ask the content's change checks before showing the form, not only when
         # it is posted. They include the PageContent admin's permission hook and
         # editability checks, e.g., read-only published content.
-        context = OperationContext.from_request(request, language=language)
+        context = OperationContext.from_request(request, language=language, site=page.site)
         # Use the content admin of the site serving this request; without one,
         # the default page permissions apply
         content_admin = self.admin_site._registry.get(PageContent)
