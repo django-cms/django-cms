@@ -689,10 +689,10 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
         # while gaining a field would quietly change how it is scoped.
         moved_plugin = operations.get_operation(operations.MOVE_PLUGIN).output_schema()
         self.assertEqual(moved_plugin["x-cms-model"], "cms.cmsplugin")
-        self.assertEqual(moved_plugin["required"], ["expected_token"])
-        # The declared field and nothing else: what identifies the plugin is
+        self.assertEqual(moved_plugin["required"], ["expected_token", "source_token"])
+        # The declared fields and nothing else: what identifies the plugin is
         # the adapter's to add.
-        self.assertEqual(list(moved_plugin["properties"]), ["expected_token"])
+        self.assertEqual(list(moved_plugin["properties"]), ["expected_token", "source_token"])
         self.assertEqual(moved_plugin["properties"]["expected_token"]["type"], "string")
         self.assertEqual(operations.get_operation(operations.DELETE_PAGE).output_schema(), {"type": "null"})
         self.assertEqual(

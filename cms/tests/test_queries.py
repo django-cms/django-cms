@@ -176,6 +176,80 @@ class ReadServicesTest(CMSTestCase):
             plugin_services.move_plugin(self.reload(self.second), 1, context=self.context, expected_token=token)
         self.assertEqual(self.reload(self.second).position, 3)
 
+    # -- the token a write answers with ---------------------------------------
+
+    def test_writes_chain_on_the_token_they_return(self):
+        token = queries.get_plugin_tree(self.placeholder, "en", self.context, admin=True).token
+
+        added = plugin_services.add_plugin(
+            self.placeholder, "TextPlugin", "en", {"body": "x"}, context=self.context, expected_token=token
+        )
+        changed = plugin_services.change_plugin(
+            added, {"body": "y"}, context=self.context, expected_token=added.expected_token
+        )
+        moved = plugin_services.move_plugin(
+            self.reload(changed), 1, context=self.context, expected_token=changed.expected_token
+        )
+
+        self.assertEqual(moved.expected_token, queries.placeholder_token(self.placeholder, "en"))
+        # It stayed in its placeholder: there is one token to carry on with.
+        self.assertEqual(moved.source_token, moved.expected_token)
+        for operation_id in (operations.ADD_PLUGIN, operations.CHANGE_PLUGIN, operations.PASTE_PLUGIN):
+            fields = [name for name, _ in operations.get_operation(operation_id).returns.fields]
+            self.assertEqual(fields, ["expected_token"])
+        for operation_id in (operations.MOVE_PLUGIN, operations.CUT_PLUGIN):
+            fields = [name for name, _ in operations.get_operation(operation_id).returns.fields]
+            self.assertEqual(fields, ["expected_token", "source_token"])
+
+    def test_the_returned_token_is_the_one_the_write_left(self):
+        added = plugin_services.add_plugin(self.placeholder, "TextPlugin", "en", {"body": "x"}, context=self.context)
+        token = queries.placeholder_token(self.placeholder, "en")
+        # Another editor changes the placeholder before the result is serialised.
+        plugin_services.change_plugin(self.reload(self.child), {"body": "theirs"}, context=self.context)
+
+        with self.assertNumQueries(0):
+            self.assertEqual(added.expected_token, token)
+        # So the caller's next write is refused, not applied over the change.
+        with self.assertRaises(OperationBlocked):
+            plugin_services.change_plugin(
+                added, {"body": "mine"}, context=self.context, expected_token=added.expected_token
+            )
+        # A plugin no write returned reads the token when asked.
+        self.assertEqual(self.reload(added).expected_token, queries.placeholder_token(self.placeholder, "en"))
+
+    def test_a_move_to_another_placeholder_returns_both_tokens(self):
+        other = self.content.get_placeholders().exclude(pk=self.placeholder.pk).first()
+        token = queries.placeholder_token(self.placeholder, "en")
+
+        moved = plugin_services.move_plugin(
+            self.reload(self.second), 1, other, context=self.context, expected_token=token
+        )
+
+        self.assertEqual(moved.expected_token, queries.placeholder_token(other, "en"))
+        self.assertEqual(moved.source_token, queries.placeholder_token(self.placeholder, "en"))
+        self.assertNotEqual(moved.source_token, moved.expected_token)
+        # The next plugin leaves the same placeholder without a read in between.
+        plugin_services.move_plugin(
+            self.reload(self.first), 1, other, context=self.context, expected_token=moved.source_token
+        )
+        self.assertEqual(self.placeholder.get_plugins("en").count(), 0)
+
+    def test_a_cut_returns_the_token_of_the_placeholder_it_cut_from(self):
+        clipboard = Placeholder.objects.create(slot="clipboard")
+        clipboard.source = UserSettings.objects.create(user=self.admin, language="en", clipboard=clipboard)
+        clipboard.save()
+        token = queries.placeholder_token(self.placeholder, "en")
+
+        cut = plugin_services.cut_plugin(
+            self.reload(self.second), "en", clipboard, context=self.context, expected_token=token
+        )
+
+        self.assertEqual(cut.source_token, queries.placeholder_token(self.placeholder, "en"))
+        self.assertEqual(cut.expected_token, queries.placeholder_token(clipboard, "en"))
+        plugin_services.change_plugin(
+            self.reload(self.child), {"body": "next"}, context=self.context, expected_token=cut.source_token
+        )
+
     def test_a_write_with_a_token_locks_the_placeholder(self):
         from django.db import connection as db
         from django.db.models.query import QuerySet

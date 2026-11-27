@@ -117,6 +117,23 @@ def _resolve_position(placeholder, language: str, position, target):
     raise ValueError(f"Unsupported plugin position {position!r} (target: {target!r}).")
 
 
+def _record_tokens(plugin: CMSPlugin, placeholder, language: str, source=None) -> None:
+    """Record on ``plugin`` the tokens its write leaves behind.
+
+    Called at the end of a write, inside its transaction, so the tokens describe
+    the content as this write left it. ``placeholder`` and ``language`` are
+    where the plugin now is; ``source`` is the ``(placeholder, language)`` it
+    left, for the writes that take it out of one.
+    """
+    from cms.core.queries import placeholder_token
+
+    plugin._expected_token = placeholder_token(placeholder, language)
+    if source is not None:
+        plugin.source_token = (
+            plugin._expected_token if source == (placeholder, language) else placeholder_token(*source)
+        )
+
+
 def add_plugin(
     placeholder,
     plugin_type: str,
@@ -190,6 +207,7 @@ def add_plugin(
             placeholder.clear_cache(language)
             signal_kwargs["plugin"] = plugin
             signal_kwargs["tree_order"] = placeholder.get_plugin_tree_order(language, plugin.parent_id)
+            _record_tokens(plugin, placeholder, language)
     return plugin
 
 
@@ -243,6 +261,7 @@ def change_plugin(
             if save_m2m:
                 form.save_m2m()
             placeholder.clear_cache(new_plugin.language)
+            _record_tokens(new_plugin, placeholder, new_plugin.language)
     return new_plugin
 
 
@@ -301,6 +320,12 @@ def move_plugin(
         source_placeholder.clear_cache(language)
 
         signal_kwargs["plugin"] = updated_plugin.get_bound_plugin()
+        _record_tokens(
+            updated_plugin,
+            target_placeholder or source_placeholder,
+            language,
+            source=(source_placeholder, language),
+        )
     return updated_plugin
 
 
@@ -352,6 +377,12 @@ def cut_plugin(
 
         signal_kwargs["plugin"] = updated_plugin.get_bound_plugin()
         signal_kwargs["source_order"] = source_placeholder.get_plugin_tree_order(source_language, source_parent_id)
+        _record_tokens(
+            updated_plugin,
+            target_placeholder,
+            updated_plugin.language,
+            source=(source_placeholder, source_language),
+        )
     return updated_plugin
 
 
@@ -420,6 +451,7 @@ def paste_plugin(
         # Fetch from db to update position and other tree values
         root_plugin.refresh_from_db()
         signal_kwargs["plugin"] = root_plugin.get_bound_plugin()
+        _record_tokens(root_plugin, target_placeholder, target_language)
     return root_plugin
 
 
@@ -668,10 +700,10 @@ def clear_placeholder(
 #:
 #: Every plugin write requires an ``expected_token`` and used to return none,
 #: so a caller had to re-read the placeholder to get the next one -- 126 plugin
-#: writes cost around 250 extra reads for nothing but tokens. The token is a
-#: property of the plugin, which already knows its placeholder and its
-#: language, so the services still return the plugin unchanged -- their
-#: Python callers assign it straight to ``saved_object`` -- and this only
+#: writes cost around 250 extra reads for nothing but tokens. Each write records
+#: the token on the plugin it returns, inside its transaction
+#: (:func:`_record_tokens`), so the services still return the plugin itself --
+#: their Python callers assign it straight to ``saved_object`` -- and this only
 #: declares what to serialise alongside it.
 #:
 #: Applied to the writes that return ONE plugin -- add, change, move, cut and
@@ -693,6 +725,23 @@ _PLUGIN_WRITE_FIELDS = (
             "The placeholder's token after this write. Pass it as "
             "expected_token on the next write to the same placeholder; no "
             "separate read is needed."
+        ),
+    )),
+)
+
+#: Move and cut take the plugin out of a placeholder, and it is that source
+#: placeholder their own ``expected_token`` is checked against. The next write
+#: there -- moving the next plugin out, say -- needs the source's token, which
+#: is not the token of where the plugin went.
+_PLUGIN_MOVE_FIELDS = (
+    *_PLUGIN_WRITE_FIELDS,
+    ("source_token", Result(
+        type=str,
+        description=(
+            "The token, after this write, of the placeholder the plugin was "
+            "taken from. Pass it as expected_token on the next write to that "
+            "placeholder. Equal to expected_token if the plugin stayed in its "
+            "placeholder."
         ),
     )),
 )
@@ -823,8 +872,11 @@ for _declaration in (
         ),
         returns=Result(
             model="cms.CMSPlugin",
-            fields=_PLUGIN_WRITE_FIELDS,
-            description="The moved plugin, with its placeholder's new token (the target's, after the move).",
+            fields=_PLUGIN_MOVE_FIELDS,
+            description=(
+                "The moved plugin, with its placeholder's new token (the target's, after the move) "
+                "and the new token of the placeholder it left."
+            ),
         ),
     ),
     Operation(
@@ -851,8 +903,11 @@ for _declaration in (
         ),
         returns=Result(
             model="cms.CMSPlugin",
-            fields=_PLUGIN_WRITE_FIELDS,
-            description="The plugin, now in the clipboard, with the clipboard placeholder's token.",
+            fields=_PLUGIN_MOVE_FIELDS,
+            description=(
+                "The plugin, now in the clipboard, with the clipboard placeholder's token "
+                "and the new token of the placeholder it was cut from."
+            ),
         ),
     ),
     Operation(

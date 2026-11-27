@@ -208,15 +208,22 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         caller had to re-read the tree to get the next one -- 126 plugins cost
         about 250 extra reads for nothing but tokens.
 
-        A property rather than something the services return, because the token
-        is derivable from the plugin: it already knows its placeholder and its
-        language. That keeps ``add_plugin`` and ``change_plugin`` returning the
-        plugin itself, which their Python callers assign straight to
-        ``saved_object``.
-        """
-        from cms.core.queries import placeholder_token
+        On a plugin a write service returned, this is the token that write
+        recorded inside its own transaction: the placeholder as the write left
+        it, not as it is when the result happens to be serialised. Reading it
+        later would hand the caller a token for changes it has not seen.
 
-        return placeholder_token(self.placeholder, self.language)
+        A property rather than something the services return, so ``add_plugin``
+        and ``change_plugin`` keep returning the plugin itself, which their
+        Python callers assign straight to ``saved_object``. On any other plugin
+        it is read from the database when asked for.
+        """
+        token = self.__dict__.get("_expected_token")
+        if token is None:
+            from cms.core.queries import placeholder_token
+
+            token = placeholder_token(self.placeholder, self.language)
+        return token
 
     def __str__(self):
         return force_str(self.pk)

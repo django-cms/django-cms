@@ -549,6 +549,17 @@ changed since, and :func:`~cms.shared.checks.can` reports it. Without
 The token covers the placeholder the operation changes: the plugin's own
 placeholder for ``move_plugin``, not the target.
 
+The operations that return one plugin -- ``add_plugin``, ``change_plugin``,
+``move_plugin``, ``cut_plugin`` and ``paste_plugin`` -- answer with the token
+their write left behind, so a sequence of writes needs no read in between. The
+plugin they return carries it as ``expected_token``: the token of the
+placeholder the plugin is now in, recorded inside the write's transaction.
+``move_plugin`` and ``cut_plugin`` take the plugin out of a placeholder and
+also answer with ``source_token``, the new token of the placeholder it left.
+That is the one to pass to the next write there; it equals ``expected_token``
+if the plugin stayed in its placeholder. The other operations return no token:
+read the tree again after them.
+
 Declared reads
 ==============
 
