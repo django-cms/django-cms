@@ -254,10 +254,15 @@ def add_live_url_querystring_param(obj: models.Model, url: str, language: str | 
 
 
 def _add_query(url: str, query: str) -> str:
-    """Appends an encoded query to a url that may already carry one."""
+    """Appends an encoded query to a url that may already carry one.
+
+    The query goes before a fragment: behind it, it would be part of the
+    fragment and never reach the server.
+    """
     if not query:
         return url
-    return f"{url}{'&' if '?' in url else '?'}{query}"
+    url, hash_sign, fragment = url.partition("#")
+    return f"{url}{'&' if '?' in url else '?'}{query}{hash_sign}{fragment}"
 
 
 def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
