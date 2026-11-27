@@ -159,6 +159,23 @@ def template_slot_caching(method: Callable) -> Callable:
     return method
 
 
+def _widget_data(widget, name: str, value) -> dict:
+    """``value`` under the keys ``widget`` reads the field ``name`` from.
+
+    One key, the field's name, for most widgets. A ``MultiWidget`` reads one key
+    per sub-widget instead, and takes the value apart for them as it does to
+    render them.
+    """
+    if not isinstance(widget, forms.MultiWidget):
+        return {name: value}
+    if not isinstance(value, (list, tuple)):
+        value = widget.decompress(value)
+    data = {}
+    for suffix, subwidget, part in zip(widget.widgets_names, widget.widgets, value, strict=False):
+        data.update(_widget_data(subwidget, name + suffix, part))
+    return data
+
+
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     """
     Inherits :class:`django:django.contrib.admin.ModelAdmin` and in most respects behaves like a
@@ -719,20 +736,26 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
           one-field change to an entangled plugin was refused as missing
           required fields that were plainly set on it.
 
+          The value goes in under the keys the field's widget reads it from. A
+          ``MultiWidget`` reads one key per sub-widget (``name_0``, ``name_1``)
+          and none under the field's own name, so a split date and time left
+          under ``name`` would be read back as empty.
+
         :raises ~django.core.exceptions.ValidationError: keyed by field name,
             for data the form rejects.
         """
         form_class = cls.data_form_class()
 
-        # Unbound, and on the instance for a change. `.fields` rather than
+        # Unbound, on the instance, for a change. `.fields` rather than
         # `.base_fields` throughout: the two differ for any form that builds a
         # field in its __init__, and the list that counts is the one the bound
         # form a moment later will validate against.
-        editor_form = form_class(instance=instance)
-
         values = dict(data)
         if instance is not None:
-            stored = {name: editor_form[name].value() for name in editor_form.fields}
+            editor_form = form_class(instance=instance)
+            stored = {}
+            for name, field in editor_form.fields.items():
+                stored.update(_widget_data(field.widget, name, editor_form[name].value()))
             values = {**stored, **data}
 
         form = form_class(data=values, instance=instance)

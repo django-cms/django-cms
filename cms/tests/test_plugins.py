@@ -2575,6 +2575,41 @@ class CleanPluginDataTest(CMSTestCase):
         self.assertEqual(form.cleaned_data["nickname"], "original")
         self.assertEqual(form.cleaned_data["external_link"], "https://example.com/original")
 
+    def test_a_change_keeps_a_value_its_widget_reads_from_several_keys(self):
+        """The baseline goes in under the keys the widget reads.
+
+        A ``MultiWidget`` reads ``name_0`` and ``name_1`` and nothing under
+        ``name``. A value left there was read back as empty: an optional field
+        was silently cleared, a required one refused as missing.
+        """
+        shown = datetime.datetime(2026, 5, 4, 10, 30)
+
+        def form_with(**field_kwargs):
+            class SplitForm(forms.ModelForm):
+                shown_at = forms.SplitDateTimeField(**field_kwargs)
+
+                class Meta:
+                    model = Link
+                    fields = ["name", "external_link"]
+
+                def __init__(self, *args, **kwargs):
+                    super().__init__(*args, **kwargs)
+                    self.initial["shown_at"] = shown
+
+            return SplitForm
+
+        for required in (False, True):
+            with self.subTest(required=required), mock.patch.object(LinkPlugin, "form", form_with(required=required)):
+                form = self._clean({"name": "Renamed"}, instance=self.link)
+                self.assertEqual(form.cleaned_data["shown_at"], shown)
+
+                # Still the caller's to change, and to clear, by the widget's keys.
+                form = self._clean({"shown_at_1": "11:45"}, instance=self.link)
+                self.assertEqual(form.cleaned_data["shown_at"], shown.replace(hour=11, minute=45))
+        with mock.patch.object(LinkPlugin, "form", form_with(required=False)):
+            form = self._clean({"shown_at_0": "", "shown_at_1": ""}, instance=self.link)
+            self.assertIsNone(form.cleaned_data["shown_at"])
+
     def test_data_form_class_reports_the_fields_the_write_validates(self):
         """Describing what a plugin accepts and validating it must agree.
 
