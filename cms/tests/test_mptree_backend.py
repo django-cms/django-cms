@@ -107,6 +107,27 @@ class PagePositionTests(CMSTestCase):
             ["first", "a", "right-of-a", "left-of-b", "b"],
         )
 
+    def test_create_page_positions_at_root_level(self):
+        a = create_page("a", TEMPLATE, "en")
+        b = create_page("b", TEMPLATE, "en")
+        create_page("right-of-a", TEMPLATE, "en", parent=a, position="right")
+        create_page("left-of-b", TEMPLATE, "en", parent=b, position="left")
+        create_page("left-of-a", TEMPLATE, "en", parent=a, position="left")
+
+        roots = Page.objects.filter(parent__isnull=True).order_by("path")
+        self.assertEqual(
+            [root.get_title("en") for root in roots],
+            ["left-of-a", "a", "right-of-a", "left-of-b", "b"],
+        )
+
+    def test_add_sibling_first_sibling_at_root_level(self):
+        create_page("a", TEMPLATE, "en")
+        b = create_page("b", TEMPLATE, "en")
+        first = b.add_sibling(pos="first-sibling", site=b.site)
+
+        roots = Page.objects.filter(parent__isnull=True).order_by("path")
+        self.assertEqual(roots.first().pk, first.pk)
+
 
 @mptree_only
 class PageTreeBackendTests(CMSTestCase):
@@ -464,9 +485,10 @@ class MaterializedPathDriverTests(TestCase):
         self.mp.add_sibling(b, position="left", name="s_left")
         self.mp.add_sibling(b, position="first-sibling", name="s_first")
 
-        # root siblings -> parent-None branch (last + left/no-op)
+        # root siblings -> parent-None branch (last + left)
         self.mp.add_sibling(r, name="r2")
         self.mp.add_sibling(r, position="left", name="r3")
+        self.assertEqual(list(self.mp.roots().values_list("name", flat=True)), ["r3", "r", "r2"])
 
         self.assertEqual(
             list(self.mp.children(r).values_list("name", flat=True)),
@@ -478,6 +500,68 @@ class MaterializedPathDriverTests(TestCase):
         for cat in Category.objects.all():
             if cat.parent_id:
                 self.assertTrue(cat.path.startswith(cat.parent.path))
+
+    def _root_subtrees(self):
+        """Each root's name, step and subtree as (name, path suffix, depth, numchild, parent)."""
+        out = []
+        for root in self.mp.roots():
+            rows = []
+            for cat in self.mp.tree(root).exclude(pk=root.pk).order_by("path"):
+                self.assertTrue(cat.path.startswith(root.path), cat.name)
+                rows.append(
+                    (cat.name, cat.path[len(root.path) :], cat.depth, cat.numchild, cat.parent.name)
+                )
+            out.append((root.name, self.mp._str2int(root.path), rows))
+        return out
+
+    def _build_roots_with_descendants(self):
+        # Three roots with children two levels deep, and a gap in the root
+        # steps (step 2 is deleted), so the relayout has to move whole subtrees.
+        r1 = self.mp.add_root(name="r1")
+        c1 = self.mp.add_child(r1, name="r1c1")
+        self.mp.add_child(c1, name="r1c1g1")
+        self.mp.add_child(c1, name="r1c1g2")
+        self.mp.add_child(r1, name="r1c2")
+        gap = self.mp.add_root(name="gap")
+        r3 = self.mp.add_root(name="r3")
+        c3 = self.mp.add_child(r3, name="r3c1")
+        self.mp.add_child(c3, name="r3c1g1")
+        Category.objects.filter(pk=gap.pk).delete()
+        self.assertEqual([self.mp._str2int(x.path) for x in self.mp.roots()], [1, 3])
+        return r1, r3
+
+    def _assert_roots(self, names, before):
+        after = self._root_subtrees()
+        self.assertEqual([name for name, _, _ in after], names)
+        # gaps in the root steps are closed
+        self.assertEqual([step for _, step, _ in after], list(range(1, len(names) + 1)))
+        # descendants carry the new root prefix, and numchild/parent are unchanged
+        by_name = {name: rows for name, _, rows in after}
+        for name, rows in before.items():
+            self.assertEqual(by_name[name], rows)
+
+    def test_add_sibling_left_of_root_with_descendants(self):
+        r1, r3 = self._build_roots_with_descendants()
+        before = {name: rows for name, _, rows in self._root_subtrees()}
+        self.mp.add_sibling(r1, position="left", name="new")
+        self._assert_roots(["new", "r1", "r3"], before)
+        # the caller's instances follow their rows
+        self.assertEqual(r1.path, Category.objects.get(pk=r1.pk).path)
+        self.assertEqual(
+            sorted(self.mp.descendants(r1).values_list("name", flat=True)),
+            ["r1c1", "r1c1g1", "r1c1g2", "r1c2"],
+        )
+
+    def test_add_sibling_first_sibling_of_root_with_descendants(self):
+        r1, r3 = self._build_roots_with_descendants()
+        before = {name: rows for name, _, rows in self._root_subtrees()}
+        self.mp.add_sibling(r3, position="first-sibling", name="new")
+        self._assert_roots(["new", "r1", "r3"], before)
+        self.assertEqual(r3.path, Category.objects.get(pk=r3.pk).path)
+        self.assertEqual(
+            list(self.mp.children(r3).values_list("name", flat=True)),
+            ["r3c1"],
+        )
 
     def test_move_left_and_right_into_middle(self):
         r = self.mp.add_root(name="r")
