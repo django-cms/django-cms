@@ -342,7 +342,11 @@ the page tree the manager controls.
 The size of that set depends on where the manager's own authority comes
 from. A manager whose ``can_change_permissions`` right is granted by a
 :class:`~cms.permissions.models.PagePermission` on part of the tree
-has only the users at or below that point. A manager granted the right
+has only the users at or below that point. A user or group that also
+holds permissions beyond it — a global permission, or a page permission
+higher up, in another branch of the tree or on another site — is not
+subordinate, whether the permission is held directly or through a
+group. A manager granted the right
 by a :class:`~cms.permissions.models.GlobalPagePermission` sits at
 the top of the hierarchy, and every non-superuser account is
 subordinate to them — not merely the ones they created. Grant global
