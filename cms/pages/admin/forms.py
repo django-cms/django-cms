@@ -321,7 +321,7 @@ class AddPageForm(BasePageContentForm):
     def user_can_use_source(self, source):
         return can(
             COPY_PAGE_FROM_SOURCE,
-            OperationContext.from_request(self._request, language=self._language),
+            OperationContext.from_request(self._request, language=self._language, site=self._site),
             source=source,
             target_site=self._site,
             allow_view_only_page_type=not self.source_requires_change,
@@ -351,7 +351,7 @@ class AddPageForm(BasePageContentForm):
         # created under -- the same ``ADD_PAGE`` checks the service runs on save.
         verdict = can(
             ADD_PAGE,
-            OperationContext.from_request(self._request, language=self._language),
+            OperationContext.from_request(self._request, language=self._language, site=self._site),
             site=self._site,
             parent_page=page_services.resolve_add_parent(
                 self._site, parent_page, is_page_type=self.creates_page_type
@@ -400,7 +400,7 @@ class AddPageForm(BasePageContentForm):
             page,
             language=self._language,
             content_data=data,
-            context=OperationContext.from_request(self._request, language=self._language),
+            context=OperationContext.from_request(self._request, language=self._language, site=self._site),
         )
 
     def from_source(self, source, parent=None):
@@ -410,7 +410,7 @@ class AddPageForm(BasePageContentForm):
             parent_page=parent,
             language=self._language,
             allow_view_only_page_type=not self.source_requires_change,
-            context=OperationContext.from_request(self._request, language=self._language),
+            context=OperationContext.from_request(self._request, language=self._language, site=self._site),
         )
 
     def get_template(self):
@@ -428,7 +428,7 @@ class AddPageForm(BasePageContentForm):
                 page,
                 language=self._language,
                 content_data=self.get_translation_data(),
-                context=OperationContext.from_request(self._request, language=self._language),
+                context=OperationContext.from_request(self._request, language=self._language, site=self._site),
                 permissions=(
                     AdminPageContentPermissions(self._page_admin, self._request)
                     if self._page_admin else None
@@ -442,7 +442,7 @@ class AddPageForm(BasePageContentForm):
             content_data=self.get_translation_data(),
             is_page_type=self.creates_page_type,
             allow_view_only_page_type=not self.source_requires_change,
-            context=OperationContext.from_request(self._request, language=self._language),
+            context=OperationContext.from_request(self._request, language=self._language, site=self._site),
             permissions=(
                 AdminPageContentPermissions(self._page_admin, self._request) if self._page_admin else None
             ),
@@ -493,7 +493,7 @@ class AddPageTypeForm(AddPageForm):
             parent_page=parent,
             language=self._language,
             create_page_type=True,
-            context=OperationContext.from_request(self._request, language=self._language),
+            context=OperationContext.from_request(self._request, language=self._language, site=self._site),
         )
 
 
@@ -629,7 +629,7 @@ class ChangePageForm(BasePageContentForm):
         return page_services.change_page_content(
             page_content,
             data={name: value for name, value in self.cleaned_data.items() if name in validation.CONTENT_FIELDS},
-            context=OperationContext.from_request(self._request, language=self._language),
+            context=OperationContext.from_request(self._request, language=self._language, site=self._site),
             permissions=(
                 AdminPageContentPermissions(self._page_admin, self._request)
                 if self._page_admin else None
@@ -762,7 +762,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             return page
         return page_services.change_advanced_settings(
             page,
-            context=OperationContext.from_request(self._request, language=self._language),
+            context=OperationContext.from_request(self._request, language=self._language, site=self._site),
             permissions=(
                 AdminPagePermissions(self._page_admin, self._request)
                 if self._page_admin else None

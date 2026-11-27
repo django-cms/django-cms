@@ -21,7 +21,7 @@ class UserSettings(models.Model):
         editable=False,
         related_name='djangocms_usersettings',
     )
-    language = models.CharField(_("Language"), max_length=10, choices=settings.LANGUAGES,
+    language = models.CharField(_("Language"), max_length=15, choices=settings.LANGUAGES,
                                 help_text=_("The language for the admin interface and toolbar"))
     clipboard = PlaceholderForeignKey(
         'cms.Placeholder',
