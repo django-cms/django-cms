@@ -465,57 +465,28 @@ def has_global_permission(user, site, action, use_cache=True):
     return action in actions
 
 
-def _get_permission_managed_site_ids(user):
+def _beyond_managed_sites(user, model):
     """
-    Returns the ids of the sites on which ``user`` manages permissions through
-    a :class:`~cms.models.GlobalPagePermission`, or ``None`` if that authority
-    is not limited to particular sites (superusers, permissions switched off,
-    or a global permission with no sites selected).
+    Returns the users or groups (``model``) holding page or global permissions
+    on sites where ``user`` does not manage permissions globally. Nobody is
+    beyond the reach of a superuser or of a global permission with no sites
+    selected, which covers every site.
     """
-    if user.is_superuser or not get_cms_setting('PERMISSION'):
-        return None
-
     grants = GlobalPagePermission.objects.with_user(user).filter(can_change_permissions=True)
-    if grants.filter(sites__isnull=True).exists():
-        return None
-    return set(grants.values_list('sites', flat=True))
+    if user.is_superuser or not get_cms_setting('PERMISSION') or grants.filter(sites__isnull=True).exists():
+        return model.objects.none()
 
-
-def _get_permissions_beyond_sites(site_ids):
-    """
-    Returns the page permissions and the global page permissions which reach
-    beyond the sites in ``site_ids``. A global permission with no sites selected
-    covers every site and therefore always reaches beyond them.
-    """
-    other_sites = Site.objects.exclude(pk__in=site_ids)
-    page_permissions = PagePermission.objects.filter(page__site__in=other_sites)
-    global_permissions = GlobalPagePermission.objects.filter(
-        Q(sites__isnull=True) | Q(sites__in=other_sites)
+    other_sites = Site.objects.exclude(pk__in=grants.values('sites'))
+    beyond = (
+        Q(pagepermission__page__site__in=other_sites)
+        | Q(globalpagepermission__sites__in=other_sites)
+        # No sites selected: the permission covers every site.
+        | Q(globalpagepermission__isnull=False, globalpagepermission__sites__isnull=True)
     )
-    return page_permissions, global_permissions
-
-
-def _get_groups_beyond_sites(site_ids):
-    """Returns the groups holding permissions beyond the sites in ``site_ids``."""
-    page_permissions, global_permissions = _get_permissions_beyond_sites(site_ids)
-    return Group.objects.filter(
-        Q(pk__in=page_permissions.filter(group__isnull=False).values('group_id'))
-        | Q(pk__in=global_permissions.filter(group__isnull=False).values('group_id'))
-    )
-
-
-def _get_users_beyond_sites(site_ids):
-    """
-    Returns the users holding permissions beyond the sites in ``site_ids``,
-    either directly or through one of their groups.
-    """
-    page_permissions, global_permissions = _get_permissions_beyond_sites(site_ids)
-    User = get_user_model()
-    return User.objects.filter(
-        Q(pk__in=page_permissions.filter(user__isnull=False).values('user_id'))
-        | Q(pk__in=global_permissions.filter(user__isnull=False).values('user_id'))
-        | Q(pk__in=User.objects.filter(groups__in=_get_groups_beyond_sites(site_ids)).values('pk'))
-    )
+    groups = Group.objects.filter(beyond)
+    if model is Group:
+        return groups
+    return model.objects.filter(beyond | Q(groups__in=groups))
 
 
 def get_subordinate_users(user, site):
@@ -581,13 +552,10 @@ def get_subordinate_users(user, site):
         return without_superusers(qs)
 
     if user_level == ROOT_USER_LEVEL:
-        qs = get_user_model().objects.all()
-        site_ids = _get_permission_managed_site_ids(user)
-        if site_ids is not None:
-            # Global permissions on some sites do not reach the accounts of
-            # the other sites.
-            qs = qs.exclude(pk__in=_get_users_beyond_sites(site_ids).values('pk'))
-        return without_superusers(qs)
+        # Global permissions on some sites do not reach the accounts holding
+        # permissions on other sites.
+        User = get_user_model()
+        return without_superusers(User.objects.exclude(pk__in=_beyond_managed_sites(user, User)))
 
     from cms.models import PermissionTuple
     allow_list = Q()
@@ -635,10 +603,7 @@ def get_subordinate_groups(user, site):
         return groups
 
     if user_level == ROOT_USER_LEVEL:
-        site_ids = _get_permission_managed_site_ids(user)
-        if site_ids is None:
-            return Group.objects.all()
-        return Group.objects.exclude(pk__in=_get_groups_beyond_sites(site_ids).values('pk'))
+        return Group.objects.exclude(pk__in=_beyond_managed_sites(user, Group))
 
     from cms.models import PermissionTuple
     allow_list = Q()
