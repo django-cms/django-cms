@@ -70,6 +70,38 @@ class OperationContextTest(CMSTestCase):
         self.assertTrue(context.emit_signals)
         self.assertIsNone(context.origin)
 
+    def test_an_explicit_language_is_resolved_against_the_site(self):
+        """A language handed in by the caller is no more trusted than one read
+        from ``cms_path``: endpoints pass it on from their GET query."""
+        for url in (
+            "/en/admin/cms/page/1/set-home/",
+            "/en/admin/cms/placeholder/?cms_path=/de/some-page/",
+        ):
+            with self.subTest(url=url):
+                request = self.get_request(url)
+                request.user = self.get_superuser()
+
+                context = OperationContext.from_request(request, language="en-us")
+
+                self.assertEqual(context.language, "en")
+
+    def test_an_explicit_language_wins_over_the_origin(self):
+        request = self.get_request("/en/admin/cms/placeholder/?cms_path=/de/some-page/")
+        request.user = self.get_superuser()
+
+        context = OperationContext.from_request(request, language="fr")
+
+        self.assertEqual(context.language, "fr")
+        self.assertEqual(context.origin, "/de/some-page/")
+
+    def test_user_settings_hold_any_language_code_content_can(self):
+        """The toolbar saves the request's language to the user's settings, so
+        the column must not be narrower than the ones content is stored in."""
+        self.assertEqual(
+            UserSettings._meta.get_field("language").max_length,
+            PageContent._meta.get_field("language").max_length,
+        )
+
 
 class PageDataValidationTest(CMSTestCase):
     """Forms, services and preflight share page validation before any mutation."""

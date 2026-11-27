@@ -82,19 +82,16 @@ class OperationContext:
         page the user was actually looking at, which is not the endpoint being
         called; the context's ``origin`` and ``language`` come from it. Without
         it, the context has no origin, but the operation is still announced.
-        """
-        cms_path = request.GET.get("cms_path") if hasattr(request, "GET") else None
-        if not cms_path:
-            return cls(user=request.user, language=language, request=request)
-        return cls._from_cms_path(request, cms_path, language)
 
-    @classmethod
-    def _from_cms_path(cls, request, cms_path: str, language: str | None) -> OperationContext:
+        A ``language`` given explicitly takes precedence over the one of the
+        ``cms_path``. Either way it is resolved against the site's languages.
+        """
         from cms.utils import get_current_site
         from cms.utils.i18n import get_language_code
 
-        parsed_url = urlparse(cms_path)
-        if language is None:
+        cms_path = request.GET.get("cms_path") if hasattr(request, "GET") else None
+        parsed_url = urlparse(cms_path) if cms_path else None
+        if language is None and parsed_url is not None:
             # The ?language GET query has a special meaning in the CMS: it shows
             # another language while keeping the same URL, so the language of the
             # operation comes from the originating path, not from the endpoint.
@@ -104,9 +101,18 @@ class OperationContext:
                 from django.utils.translation import get_language_from_path
 
                 language = get_language_from_path(parsed_url.path)
+        if language:
+            # Wherever the language came from -- the caller often passes it on
+            # from a GET query -- it is only a candidate until resolved against
+            # the site's languages, like any other language read from a request.
             language = get_language_code(language, site_id=get_current_site(request).pk)
 
-        return cls(user=request.user, language=language, origin=parsed_url.path, request=request)
+        return cls(
+            user=request.user,
+            language=language,
+            origin=parsed_url.path if parsed_url is not None else None,
+            request=request,
+        )
 
 
 @contextmanager
