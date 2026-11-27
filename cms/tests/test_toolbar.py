@@ -2635,6 +2635,22 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
             edit_url = get_object_edit_url(page_content)
         self.assertEqual(QueryDict(edit_url.split("?", 1)[1]).dict(), {"test-live-link": "/en/?a=1&b=2"})
 
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
+    def test_add_live_url_querystring_param_goes_before_a_fragment(self):
+        """Appended behind a fragment, the query would never reach the server."""
+        page = create_page("home", "nav_playground.html", "en")
+        page_content = page.get_content_obj()
+        live_url = page.get_absolute_url()
+
+        self.assertEqual(
+            add_live_url_querystring_param(page_content, "/admin/edit/1/2/#section"),
+            f"/admin/edit/1/2/?test-live-link={live_url}#section",
+        )
+        self.assertEqual(
+            add_live_url_querystring_param(page_content, "/admin/edit/1/2/?foo=bar#section?"),
+            f"/admin/edit/1/2/?foo=bar&test-live-link={live_url}#section?",
+        )
+
     def test_add_live_url_querystring_param_no_querystring_setting_disabled(self):
         """
         With the querystring param configured, but CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED not set True,
