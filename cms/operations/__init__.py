@@ -127,10 +127,10 @@ class Argument:
     choices: tuple = ()
     #: The caller builds the model object rather than naming a stored one.
     instance: bool = False
-    #: For a ``dict`` argument, the fields it carries, as :class:`Argument`
-    #: declarations. Without these the generated schema is a bare
-    #: ``{"type": "object"}``, which a caller outside Python cannot validate
-    #: against, so it has to learn the fields some other way.
+    #: The fields an object argument carries, as :class:`Argument`
+    #: declarations, given instead of ``type=dict``. A plain ``type=dict``
+    #: generates a bare ``{"type": "object"}``, which a caller outside Python
+    #: cannot validate against, so it has to learn the fields some other way.
     fields: tuple = ()
 
     def __post_init__(self):
@@ -206,6 +206,10 @@ class Argument:
         return schema
 
 
+#: What names a model object in an answer, besides the fields it declares.
+_MODEL_RESULT_KEYS = frozenset({"model", "pk"})
+
+
 @dataclass(frozen=True)
 class Result:
     """What a service returns, for an adapter to describe its response.
@@ -213,8 +217,9 @@ class Result:
     One of: a value (``type``, as for :class:`Argument`), a model object
     (``model``, a label or a tuple of labels) that the adapter serializes, or an
     object with named ``fields``, each a :class:`Result` (a dataclass such as
-    :class:`~cms.core.queries.PlaceholderContent`). ``Result()`` with none of
-    them: the service returns nothing.
+    :class:`~cms.core.queries.PlaceholderContent`). A model object may name
+    ``fields`` as well: the ones it answers with, besides its ``model`` and
+    ``pk``. ``Result()`` with none of them: the service returns nothing.
     """
 
     #: Plain English, for API schemas and tool definitions. Not translated.
@@ -253,6 +258,11 @@ class Result:
             raise ValueError(f"A result has a type JSON cannot carry: {self.type!r}.")
         if any(not isinstance(value, Result) for _, value in fields):
             raise ValueError("Every field of a result is a Result.")
+        reserved = sorted({name for name, _ in fields} & _MODEL_RESULT_KEYS) if self.model is not None else ()
+        if reserved:
+            # They name the object itself, see json_schema(): a field of the
+            # same name would be replaced, in the schema and in the answer.
+            raise ValueError(f"A model result cannot declare a field named {', '.join(reserved)}.")
 
     @property
     def is_empty(self) -> bool:
@@ -289,7 +299,8 @@ class Result:
                 models = self.models
                 schema["x-cms-model"] = models[0] if len(models) == 1 else list(models)
                 schema["properties"]["model"] = {"type": "string"}
-                schema["properties"]["pk"] = {"type": "integer"}
+                # As a model argument's: not every primary key is an integer.
+                schema["properties"]["pk"] = {"type": ["integer", "string"]}
         elif self.model is not None:
             models = self.models
             schema = {"type": "object", "x-cms-model": models[0] if len(models) == 1 else list(models)}

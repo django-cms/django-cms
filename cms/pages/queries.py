@@ -394,7 +394,11 @@ for _declaration in (
             _LANGUAGE,
             _FALLBACK,
         ),
-        returns=Result(model="cms.PageContent", description="The content; content.page is set, with its URLs."),
+        returns=Result(
+            model="cms.PageContent",
+            fields=_CONTENT_FIELDS,
+            description="The content, with its own fields; content.page is set, with its URLs.",
+        ),
         modes=_BOTH,
     ),
     Query(
@@ -421,7 +425,11 @@ for _declaration in (
         returns=Result(
             many=True,
             fields={
-                "content": Result(model="cms.PageContent", description="The page's content; content.page is set."),
+                "content": Result(
+                    model="cms.PageContent",
+                    fields=_CONTENT_FIELDS,
+                    description="The page's content, with its own fields; content.page is set.",
+                ),
                 "children": Result(type=list, description="The child nodes, of the same shape, in tree order."),
             },
             description="The root nodes.",

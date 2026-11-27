@@ -705,6 +705,9 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
             {"type": set},
             {"fields": {"token": str}},
             {"type": str, "fields": {"token": Result(type=str)}},
+            # these name a model object itself, so it cannot declare them
+            {"model": "cms.Page", "fields": {"pk": Result(type=int)}},
+            {"model": "cms.Page", "fields": {"title": Result(type=str), "model": Result(type=str)}},
         ):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Result(**kwargs)
@@ -730,11 +733,38 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
         self.assertEqual(schema["type"], "object")
         # The declared field, and the model/pk the serializer adds beside it.
         self.assertEqual(schema["properties"]["title"], {"type": "string"})
-        self.assertIn("model", schema["properties"])
-        self.assertIn("pk", schema["properties"])
+        self.assertEqual(schema["properties"]["model"], {"type": "string"})
+        # As a model argument's: not every primary key is an integer.
+        self.assertEqual(schema["properties"]["pk"], {"type": ["integer", "string"]})
         # Still marked as the model it is, so a client knows what it received
         # and the scope machinery still recognises it.
         self.assertEqual(schema["x-cms-model"], "cms.pagecontent")
+
+
+    def test_a_result_without_a_model_may_name_a_field_pk(self):
+        Result = operations.Result
+        schema = Result(fields={"pk": Result(type=int)}).json_schema()
+        self.assertEqual(schema["properties"], {"pk": {"type": "integer"}})
+
+    def test_every_page_content_result_declares_the_same_fields(self):
+        """Whichever query answers with a page content, it has the same shape."""
+        from cms.pages.queries import _CONTENT_FIELDS
+
+        def content_results(result):
+            if "cms.pagecontent" in result.models:
+                yield result
+            for _, field in result.fields:
+                yield from content_results(field)
+
+        found = [
+            (query.id, result)
+            for query in operations.get_queries()
+            for result in content_results(query.returns)
+        ]
+        self.assertGreaterEqual(len(found), 4)
+        for query_id, result in found:
+            with self.subTest(query=query_id):
+                self.assertEqual(result.fields, _CONTENT_FIELDS)
 
 
 class QueryRegistryTest(RegistryIsolationMixin, CMSTestCase):
