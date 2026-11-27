@@ -407,8 +407,12 @@ operation, including those that installed apps declare:
   body or an MCP ``inputSchema``. A model argument is the object's primary key,
   marked with its model's label as ``x-cms-model``.
 * ``output_schema()`` describes the result, from ``op.returns``. A model object
-  in it is marked ``x-cms-model``; your serializer for that model fills in its
-  fields.
+  in it is marked ``x-cms-model``. If it declares fields, they are its
+  ``properties``; if not, your serializer for that model decides what it
+  contains. Either way the schema says nothing about how the object is
+  identified: add the properties your serializer emits for every model object
+  -- its model, its primary key, a label -- before you publish the schema. See
+  :ref:`operation-schemas`.
 
 Reads are declared the same way, as queries: ``get_queries()`` and
 ``get_query()`` return them with ``arguments``, ``returns`` and the ``modes``
@@ -431,6 +435,32 @@ objects the acting user may see -- and call the service with keywords:
                 value = lookup(argument.models[0], value, context, admin=True)  # cms.shared.lookups
             kwargs[argument.name] = value
         return op.service(**kwargs, context=context)
+
+To answer, serialize what the service returned as its ``Result`` declares it.
+For a model object, read the declared fields off the object and add what
+identifies it:
+
+.. code-block:: python
+
+    def serialize(result, value):
+        if value is None:
+            return None
+        if result.many:
+            item = dataclasses.replace(result, many=False)
+            return [serialize(item, entry) for entry in value]
+        if result.models:
+            data = {"model": value._meta.label_lower, "pk": value.pk}  # your choice of keys
+        elif result.fields:
+            data = {}
+        else:
+            return value
+        for name, field in result.fields:
+            entry = value[name] if isinstance(value, dict) else getattr(value, name)
+            data[name] = serialize(field, entry)
+        return data
+
+The ``model`` and ``pk`` keys are this adapter's decision, not part of the
+declaration, so they are also this adapter's to add to the schema it publishes.
 
 The declared arguments are exactly what :func:`~cms.shared.checks.can` needs:
 every check requires only declared arguments (``manage.py cms check`` reports
