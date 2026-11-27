@@ -10,7 +10,7 @@ from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
 from cms.api import create_page
-from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PageUser
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PageUser, PageUserGroup
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.permissions import get_subordinate_groups, get_subordinate_users
 from cms.utils.urlutils import admin_reverse
@@ -946,3 +946,55 @@ class PageScopedSubordinatesTest(SubordinatesTestMixin, PermissionsOnTestCase):
 
         target = PageUser.objects.get(pk=target.pk)
         self.assertTrue(target.check_password('changed-by-manager-123'))
+
+
+@override_settings(CMS_PERMISSION=True)
+class UnassignedManagerSubordinatesTest(SubordinatesTestMixin, PermissionsOnTestCase):
+    """
+    A manager holding no ``can_change_permissions`` right on the site - neither
+    global nor on a page - falls back to the accounts and groups they created
+    which are not assigned to a page. Once such an account or group holds
+    permissions - a global permission, or any permission through a group - it
+    is beyond the manager's authority and not subordinate anymore.
+    """
+
+    def setUp(self):
+        self.site1 = Site.objects.get_current()
+        self.page = create_page('page', 'nav_playground.html', 'en', site=self.site1)
+        self.manager = self._create_user('unassigned-manager', is_staff=True)
+
+    def _get_created_group(self, name):
+        return PageUserGroup.objects.create(name=name, created_by=self.manager)
+
+    def test_created_user_and_group_without_permissions_are_subordinate(self):
+        target = self._get_page_user('created-user', created_by=self.manager)
+        group = self._get_created_group('created group')
+
+        self.assertIn(target.pk, self._subordinate_user_ids())
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_created_user_with_global_permission_not_subordinate(self):
+        for sites in ([], [self.site1]):
+            with self.subTest(sites=sites):
+                target = self._get_page_user(f'created-user-{len(sites)}', created_by=self.manager)
+                self._global_grant(sites, user=target)
+                self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_created_user_with_group_permission_not_subordinate(self):
+        global_group = Group.objects.create(name='global group')
+        self._global_grant([self.site1], group=global_group)
+        page_group = Group.objects.create(name='page group')
+        self.add_page_permission(None, self.page, group=page_group, can_change=True)
+
+        for group in (global_group, page_group):
+            with self.subTest(group=group.name):
+                target = self._get_page_user(f'created-user-{group.pk}', created_by=self.manager)
+                target.groups.add(group)
+                self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_created_group_with_global_permission_not_subordinate(self):
+        for sites in ([], [self.site1]):
+            with self.subTest(sites=sites):
+                group = self._get_created_group(f'created group {len(sites)}')
+                self._global_grant(sites, group=group)
+                self.assertNotIn(group.pk, self._subordinate_group_ids())

@@ -518,6 +518,19 @@ def _beyond_managed_pages(user, site, user_level, model):
     )
 
 
+def _beyond_unassigned(model):
+    """
+    Returns the users or groups (``model``) holding any global permission or
+    any permission on a page. They are beyond the reach of a user who manages
+    permissions nowhere and only sees the unassigned accounts they created.
+    """
+    return _holders(
+        model,
+        PagePermission.objects.filter(page__isnull=False),
+        GlobalPagePermission.objects.all(),
+    )
+
+
 def get_subordinate_users(user, site):
     """
     Returns users queryset, containing all subordinate users to given user
@@ -533,6 +546,10 @@ def get_subordinate_users(user, site):
     page permission higher up, in another branch or on another site - is not
     subordinate, also if the permission is held through a group: managing that
     account would hand over rights the user has no authority on.
+
+    The same holds for a user managing permissions nowhere, who only sees the
+    unassigned users they created: once such an account holds a global
+    permission, or any permission through a group, it is not subordinate.
 
     If user is a superuser, or has global permissions on all sites, then they
     can see all the users.
@@ -583,6 +600,7 @@ def get_subordinate_users(user, site):
             Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
+        qs = qs.exclude(pk__in=_beyond_unassigned(get_user_model()))
         return without_superusers(qs)
 
     if user_level == ROOT_USER_LEVEL:
@@ -637,7 +655,7 @@ def get_subordinate_groups(user, site):
         )
         # no permission no records
         # page_id_allow_list is empty
-        return groups
+        return groups.exclude(pk__in=_beyond_unassigned(Group))
 
     if user_level == ROOT_USER_LEVEL:
         return Group.objects.exclude(pk__in=_beyond_managed_sites(user, Group))
