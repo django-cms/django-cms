@@ -90,8 +90,11 @@ class Argument:
     caller builds instead -- a new one, or a stored one with changed fields.
 
     An argument may instead declare the ``fields`` it carries, as further
-    :class:`Argument` declarations -- a value, a model object or an object with
-    fields, and exactly one of those, as a :class:`Result` is::
+    :class:`Argument` declarations. It then is an object with fields rather
+    than a value or a model object -- exactly one of the three, as a
+    :class:`Result` is. A field is a value or an object with fields of its own,
+    not a model object: an adapter resolves the model arguments of an operation
+    for the acting user, and does not look for them inside fields::
 
         Argument(
             "content_data",
@@ -124,10 +127,10 @@ class Argument:
     choices: tuple = ()
     #: The caller builds the model object rather than naming a stored one.
     instance: bool = False
-    #: For a ``dict`` argument, the fields it carries, as :class:`Argument`
-    #: declarations. Without these the generated schema is a bare
-    #: ``{"type": "object"}``, which a caller outside Python cannot validate
-    #: against, so it has to learn the fields some other way.
+    #: The fields an object argument carries, as :class:`Argument`
+    #: declarations, given instead of ``type=dict``. A plain ``type=dict``
+    #: generates a bare ``{"type": "object"}``, which a caller outside Python
+    #: cannot validate against, so it has to learn the fields some other way.
     fields: tuple = ()
 
     def __post_init__(self):
@@ -153,6 +156,15 @@ class Argument:
             raise ValueError(
                 f"Every field of argument {self.name!r} is an Argument."
             )
+        names = [field.name for field in self.fields]
+        duplicates = sorted({name for name in names if names.count(name) > 1})
+        if duplicates:
+            raise ValueError(f"Argument {self.name!r} declares {', '.join(duplicates)} more than once.")
+        if any(field.model is not None for field in self.fields):
+            # Adapters resolve model arguments -- and scope them to the acting
+            # user -- from the operation's own arguments. A model inside fields
+            # would reach the service as an unresolved primary key.
+            raise ValueError(f"A field of argument {self.name!r} cannot be a model object.")
 
     @property
     def models(self) -> tuple[str, ...]:
@@ -201,8 +213,10 @@ class Result:
     One of: a value (``type``, as for :class:`Argument`), a model object
     (``model``, a label or a tuple of labels) that the adapter serializes, or an
     object with named ``fields``, each a :class:`Result` (a dataclass such as
-    :class:`~cms.core.queries.PlaceholderContent`). ``Result()`` with none of
-    them: the service returns nothing.
+    :class:`~cms.core.queries.PlaceholderContent`). A model object may name
+    ``fields`` as well: the ones it answers with, besides whatever the adapter
+    identifies the object by. ``Result()`` with none of them: the service
+    returns nothing.
     """
 
     #: Plain English, for API schemas and tool definitions. Not translated.
@@ -258,8 +272,10 @@ class Result:
     def json_schema(self) -> dict:
         """The JSON Schema of the result.
 
-        A model object is an object marked with its label as ``x-cms-model``: its
-        fields are the adapter's serializer's to describe. Nothing is ``null``.
+        A model object is an object marked with its label as ``x-cms-model``.
+        The schema describes the fields it declares, if any. How the object is
+        identified in an answer -- its model, its primary key, a label -- is the
+        adapter's serializer's to add and to describe. Nothing is ``null``.
         """
         if self.is_empty:
             schema = {"type": "null"}
@@ -270,14 +286,11 @@ class Result:
                 "required": [name for name, _ in self.fields],
             }
             if self.model is not None:
-                # Both: the serializer emits the declared fields AND the
-                # object's model and pk, so the schema has to say so. Marking
-                # it only as an object would describe a payload the caller does
-                # not receive.
+                # Marked as the model it is, as a model result without fields.
+                # The adapter knows from this to add what it identifies the
+                # object by; the properties stay open for that.
                 models = self.models
                 schema["x-cms-model"] = models[0] if len(models) == 1 else list(models)
-                schema["properties"]["model"] = {"type": "string"}
-                schema["properties"]["pk"] = {"type": "integer"}
         elif self.model is not None:
             models = self.models
             schema = {"type": "object", "x-cms-model": models[0] if len(models) == 1 else list(models)}
