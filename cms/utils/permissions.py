@@ -465,6 +465,18 @@ def has_global_permission(user, site, action, use_cache=True):
     return action in actions
 
 
+def _holders(model, page_permissions, global_permissions):
+    """
+    Returns the users or groups (``model``) holding any of the given page or
+    global permissions. Users also hold the permissions of their groups.
+    """
+    held = Q(pagepermission__in=page_permissions) | Q(globalpagepermission__in=global_permissions)
+    groups = Group.objects.filter(held)
+    if model is Group:
+        return groups
+    return model.objects.filter(held | Q(groups__in=groups))
+
+
 def _beyond_managed_sites(user, model):
     """
     Returns the users or groups (``model``) holding page or global permissions
@@ -477,16 +489,33 @@ def _beyond_managed_sites(user, model):
         return model.objects.none()
 
     other_sites = Site.objects.exclude(pk__in=grants.values('sites'))
-    beyond = (
-        Q(pagepermission__page__site__in=other_sites)
-        | Q(globalpagepermission__sites__in=other_sites)
+    return _holders(
+        model,
+        PagePermission.objects.filter(page__site__in=other_sites),
         # No sites selected: the permission covers every site.
-        | Q(globalpagepermission__isnull=False, globalpagepermission__sites__isnull=True)
+        GlobalPagePermission.objects.filter(Q(sites__isnull=True) | Q(sites__in=other_sites)),
     )
-    groups = Group.objects.filter(beyond)
-    if model is Group:
-        return groups
-    return model.objects.filter(beyond | Q(groups__in=groups))
+
+
+def _beyond_managed_pages(user, site, user_level, model):
+    """
+    Returns the users or groups (``model``) holding permissions beyond the part
+    of the page tree where ``user`` manages permissions: any global permission,
+    or a page permission on a page outside of it - higher up, in another
+    branch, or on another site.
+    """
+    from cms.models import PermissionTuple
+    from cms.utils.page_permissions import get_change_permissions_perm_tuples
+
+    managed = Q()
+    for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
+        managed |= PermissionTuple(perm_tuple).allow_list("page")
+
+    return _holders(
+        model,
+        PagePermission.objects.exclude(managed & Q(page__depth__gte=user_level)),
+        GlobalPagePermission.objects.all(),
+    )
 
 
 def get_subordinate_users(user, site):
@@ -499,6 +528,11 @@ def get_subordinate_users(user, site):
 
     Only users created_by given user which are on the same, or lover level are
     returned.
+
+    A user holding permissions beyond those pages - a global permission, or a
+    page permission higher up, in another branch or on another site - is not
+    subordinate, also if the permission is held through a group: managing that
+    account would hand over rights the user has no authority on.
 
     If user is a superuser, or has global permissions on all sites, then they
     can see all the users.
@@ -571,6 +605,7 @@ def get_subordinate_users(user, site):
         )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
+    qs = qs.exclude(pk__in=_beyond_managed_pages(user, site, user_level, get_user_model()))
     return without_superusers(qs)
 
 
@@ -580,7 +615,9 @@ def get_subordinate_groups(user, site):
     of Users.
 
     As for users, global permissions on some sites only do not make the groups
-    subordinate which hold permissions on another site, or on all sites.
+    subordinate which hold permissions on another site, or on all sites, and
+    page permissions do not make the groups subordinate which hold permissions
+    beyond the pages they cover.
     """
     from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
@@ -616,7 +653,7 @@ def get_subordinate_groups(user, site):
         ) | (
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )
-    )
+    ).exclude(pk__in=_beyond_managed_pages(user, site, user_level, Group))
 
 
 def has_plugin_permission(user, plugin_type, permission_type):
