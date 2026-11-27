@@ -117,19 +117,29 @@ def _resolve_position(placeholder, language: str, position, target):
     raise ValueError(f"Unsupported plugin position {position!r} (target: {target!r}).")
 
 
-def _record_tokens(plugin: CMSPlugin, placeholder, language: str, source=None) -> None:
+def _record_tokens(plugin: CMSPlugin, expected_token, placeholder, language: str, source=None) -> None:
     """Record on ``plugin`` the tokens its write leaves behind.
 
-    Called at the end of a write, inside its transaction, so the tokens describe
-    the content as this write left it. ``placeholder`` and ``language`` are
-    where the plugin now is; ``source`` is the ``(placeholder, language)`` it
-    left, for the writes that take it out of one.
+    Called at the end of a write, inside its transaction. ``placeholder`` and
+    ``language`` are where the plugin now is; ``source`` is the
+    ``(placeholder, language)`` it left, for the writes that take it out of one.
+
+    Only a write that was given an ``expected_token`` reads them here: its
+    caller is chaining writes on tokens, and the check has locked the
+    placeholder, so this is the content as the write left it. Any other write
+    notes where the plugin came from and reads nothing; the plugin's
+    ``expected_token`` and ``source_token`` then read the tokens if and when
+    they are asked for.
     """
+    if expected_token is None:
+        if source is not None:
+            plugin._token_source = source
+        return
     from cms.core.queries import placeholder_token
 
     plugin._expected_token = placeholder_token(placeholder, language)
     if source is not None:
-        plugin.source_token = (
+        plugin._source_token = (
             plugin._expected_token if source == (placeholder, language) else placeholder_token(*source)
         )
 
@@ -207,7 +217,7 @@ def add_plugin(
             placeholder.clear_cache(language)
             signal_kwargs["plugin"] = plugin
             signal_kwargs["tree_order"] = placeholder.get_plugin_tree_order(language, plugin.parent_id)
-            _record_tokens(plugin, placeholder, language)
+            _record_tokens(plugin, expected_token, placeholder, language)
     return plugin
 
 
@@ -261,7 +271,7 @@ def change_plugin(
             if save_m2m:
                 form.save_m2m()
             placeholder.clear_cache(new_plugin.language)
-            _record_tokens(new_plugin, placeholder, new_plugin.language)
+            _record_tokens(new_plugin, expected_token, placeholder, new_plugin.language)
     return new_plugin
 
 
@@ -322,6 +332,7 @@ def move_plugin(
         signal_kwargs["plugin"] = updated_plugin.get_bound_plugin()
         _record_tokens(
             updated_plugin,
+            expected_token,
             target_placeholder or source_placeholder,
             language,
             source=(source_placeholder, language),
@@ -379,6 +390,7 @@ def cut_plugin(
         signal_kwargs["source_order"] = source_placeholder.get_plugin_tree_order(source_language, source_parent_id)
         _record_tokens(
             updated_plugin,
+            expected_token,
             target_placeholder,
             updated_plugin.language,
             source=(source_placeholder, source_language),
@@ -451,7 +463,7 @@ def paste_plugin(
         # Fetch from db to update position and other tree values
         root_plugin.refresh_from_db()
         signal_kwargs["plugin"] = root_plugin.get_bound_plugin()
-        _record_tokens(root_plugin, target_placeholder, target_language)
+        _record_tokens(root_plugin, expected_token, target_placeholder, target_language)
     return root_plugin
 
 
@@ -700,8 +712,8 @@ def clear_placeholder(
 #:
 #: Every plugin write requires an ``expected_token`` and used to return none,
 #: so a caller had to re-read the placeholder to get the next one -- 126 plugin
-#: writes cost around 250 extra reads for nothing but tokens. Each write records
-#: the token on the plugin it returns, inside its transaction
+#: writes cost around 250 extra reads for nothing but tokens. A write given a
+#: token records the next one on the plugin it returns, inside its transaction
 #: (:func:`_record_tokens`), so the services still return the plugin itself --
 #: their Python callers assign it straight to ``saved_object`` -- and this only
 #: declares what to serialise alongside it.

@@ -202,7 +202,10 @@ class ReadServicesTest(CMSTestCase):
             self.assertEqual(fields, ["expected_token", "source_token"])
 
     def test_the_returned_token_is_the_one_the_write_left(self):
-        added = plugin_services.add_plugin(self.placeholder, "TextPlugin", "en", {"body": "x"}, context=self.context)
+        added = plugin_services.add_plugin(
+            self.placeholder, "TextPlugin", "en", {"body": "x"}, context=self.context,
+            expected_token=queries.placeholder_token(self.placeholder, "en"),
+        )
         token = queries.placeholder_token(self.placeholder, "en")
         # Another editor changes the placeholder before the result is serialised.
         plugin_services.change_plugin(self.reload(self.child), {"body": "theirs"}, context=self.context)
@@ -216,6 +219,28 @@ class ReadServicesTest(CMSTestCase):
             )
         # A plugin no write returned reads the token when asked.
         self.assertEqual(self.reload(added).expected_token, queries.placeholder_token(self.placeholder, "en"))
+
+    def test_a_write_without_a_token_reads_none(self):
+        other = self.content.get_placeholders().exclude(pk=self.placeholder.pk).first()
+        token_reads = []
+        original = queries.placeholder_token
+
+        def placeholder_token(placeholder, language, **kwargs):
+            token_reads.append(placeholder)
+            return original(placeholder, language, **kwargs)
+
+        with patch.object(queries, "placeholder_token", side_effect=placeholder_token):
+            added = plugin_services.add_plugin(
+                self.placeholder, "TextPlugin", "en", {"body": "x"}, context=self.context
+            )
+            plugin_services.change_plugin(added, {"body": "y"}, context=self.context)
+            moved = plugin_services.move_plugin(self.reload(self.second), 1, other, context=self.context)
+            self.assertEqual(token_reads, [])
+
+            # Still there for whoever asks, read at that moment.
+            self.assertEqual(moved.expected_token, original(other, "en"))
+            self.assertEqual(moved.source_token, original(self.placeholder, "en"))
+            self.assertEqual(added.source_token, added.expected_token)
 
     def test_a_move_to_another_placeholder_returns_both_tokens(self):
         other = self.content.get_placeholders().exclude(pk=self.placeholder.pk).first()

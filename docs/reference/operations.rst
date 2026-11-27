@@ -553,7 +553,9 @@ The operations that return one plugin -- ``add_plugin``, ``change_plugin``,
 ``move_plugin``, ``cut_plugin`` and ``paste_plugin`` -- answer with the token
 their write left behind, so a sequence of writes needs no read in between. The
 plugin they return carries it as ``expected_token``: the token of the
-placeholder the plugin is now in, recorded inside the write's transaction.
+placeholder the plugin is now in. A write that was given an ``expected_token``
+records it inside its own transaction; after a write without one it is read
+when asked for, so callers that do not use tokens pay nothing for it.
 ``move_plugin`` and ``cut_plugin`` take the plugin out of a placeholder and
 also answer with ``source_token``, the new token of the placeholder it left.
 That is the one to pass to the next write there; it equals ``expected_token``
