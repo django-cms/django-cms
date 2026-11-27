@@ -33,7 +33,9 @@ objects to carry a version number and version state. The states are:
 
     - **draft**: This is the version which currently can be edited. Only draft versions
       can be edited and only one draft version per language is allowed. Changes made to
-      draft pages are not visible to the public.
+      draft pages are not visible to the public. Staff users who can view the page
+      can preview its drafts and other versions before publication, even if they
+      cannot edit them. See :doc:`permissions` for staff access to content versions.
     - **published**: This is the version currently visible on the website to the public.
       Only one version per language can be public. It cannot be changed. If it needs to
       be changed a new draft is created based on a published page and the published page

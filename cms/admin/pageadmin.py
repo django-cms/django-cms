@@ -253,7 +253,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             pat(r"^list/$", self.get_list),
             pat(r"^([0-9]+)/actions-menu/$", self.actions_menu),
             pat(r"^([0-9]+)/([a-z\-]+)/edit-field/$", self.edit_title_fields),
-            pat(r"^([0-9]+)/advanced-settings/$", self.advanced),
+            pat(r"^(?P<object_id>[0-9]+)/advanced-settings/$", self.advanced),
             pat(r"^([0-9]+)/move-page/$", self.move_page),
             pat(r"^([0-9]+)/copy-page/$", self.copy_page),
             pat(r"^([0-9]+)/dialog/copy/$", self.get_copy_dialog),  # copy dialog

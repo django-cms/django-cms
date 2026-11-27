@@ -170,6 +170,15 @@ logged-in users (menu visibility), require login to view at all
 (login-required), and be further restricted to one group (view
 restriction).
 
+**Staff access to content versions.** Active staff users who can view
+a page may also preview all its content versions, including draft,
+unpublished, and archived versions, and inspect their structure. This
+does not require change permission. For unrestricted pages, this
+includes staff users with no CMS editing permissions. Publishing
+controls which version appears on the public site; it does not make
+other versions confidential from staff who can view the page. Editing
+content remains subject to change permissions.
+
 **These are front-end controls only.** View restrictions,
 login-required, and menu visibility all govern who can *see a
 published page on the public site*. They do **not** hide a page inside
@@ -315,6 +324,33 @@ This is intentional delegation, not a gap: the whole point of a
 page-user manager is to off-load routine account administration from
 the superuser. Hand the role only to people you would trust with the
 accounts it covers.
+
+Delegating per-page permissions
+==============================
+
+With ``CMS_PERMISSION=True``, a manager with ``can_change_permissions``
+can manage subordinate permission grants through a page's advanced settings.
+The inline offers only the permission flags the manager can grant on that page.
+Existing grants containing flags they cannot grant are omitted from the editable
+inlines, including view restrictions that also carry such editing rights.
+Those grants cannot be changed or deleted by submitting their IDs manually.
+This also prevents transferring protected rights to another user or group, or
+changing their scope through ``grant_on``. A manager authorized to grant all
+the row's rights, or a superuser, must make those changes.
+
+The manager must hold both permission-management authority and the editing
+rights being granted throughout the selected scope (page, children, or
+descendants). Rights on the parent alone do not authorize grants for its
+descendants. This applies to new grants and scope changes, and existing grants
+outside the manager's authority cannot be edited or deleted. Scope checks also
+cover future pages, even when the selected subtree is currently empty.
+User, group, and global grants can jointly provide the required authority.
+View restrictions require permission-management authority over their scope;
+any editing rights stored on the same grant are checked as well.
+
+Recipient user IDs are validated against the manager's subordinate users,
+including when the admin uses a raw-ID widget.
+
 
 Delegating global page permissions
 ==================================

@@ -1,5 +1,6 @@
 import re
 import sys
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -599,6 +600,35 @@ class EndpointPermissionTests(CMSTestCase):
             response, "SuperSecretLinkName", status_code=404
         )
 
+    def test_apphook_endpoints_check_page_view_permission(self):
+        """Apphook dispatch must enforce view access without requiring edit rights."""
+        from cms.api import assign_user_to_page
+
+        self.page.application_urls = APP_NAME
+        self.page.save(update_fields=["application_urls"])
+        denied_staff = self.get_staff_user_with_no_permissions()
+        viewer = self._create_user("apphook_viewer", is_staff=True, is_superuser=False)
+        assign_user_to_page(self.page, viewer, can_view=True, can_change=False)
+        apphook_view = Mock(return_value=HttpResponse("Private apphook content"))
+
+        with patch("cms.views.resolve", return_value=(apphook_view, (), {})):
+            for user, expected_status in ((denied_staff, 404), (viewer, 200)):
+                with self.login_user_context(user):
+                    for name in (
+                        "cms_placeholder_render_object_edit",
+                        "cms_placeholder_render_object_preview",
+                    ):
+                        with self.subTest(user=user.username, endpoint=name):
+                            apphook_view.reset_mock()
+                            response = self.client.get(self._endpoint(name))
+                            self.assertEqual(response.status_code, expected_status)
+                            if expected_status == 404:
+                                apphook_view.assert_not_called()
+                                self.assertNotContains(response, "Private apphook content", status_code=404)
+                            else:
+                                apphook_view.assert_called_once()
+                                self.assertContains(response, "Private apphook content")
+
     def test_structure_endpoint_allows_permitted_user(self):
         """A user who may view the page still gets the structure board."""
         with self.login_user_context(self.get_superuser()):
@@ -606,6 +636,47 @@ class EndpointPermissionTests(CMSTestCase):
                 self._endpoint("cms_placeholder_render_object_structure")
             )
         self.assertContains(response, "SuperSecretLinkName")
+
+    @override_settings(CMS_LANGUAGES={"default": {"fallbacks": ["en"], "public": True}})
+    def test_endpoints_check_view_permission_on_the_pages_site(self):
+        """A view grant on the request's site must not expose another site's page."""
+        from django.contrib.sites.models import Site
+
+        from cms.api import add_plugin, assign_user_to_page
+        from cms.models import GlobalPagePermission
+
+        other_site = Site.objects.create(domain="other.example", name="Other")
+        page = create_page("other site", "simple.html", "en", site=other_site)
+        page_content = page.get_content_obj("en")
+        add_plugin(
+            page_content.get_placeholders().first(),
+            "LinkPlugin",
+            "en",
+            name="OtherSiteSecretLinkName",
+            external_link="https://secret.example.com",
+        )
+        assign_user_to_page(page, self.get_superuser(), can_view=True)
+        staff = self.get_staff_user_with_no_permissions()
+        grant = GlobalPagePermission.objects.create(user=staff, can_view=True)
+        grant.sites.add(Site.objects.get_current())
+
+        with self.login_user_context(staff):
+            for name in (
+                "cms_placeholder_render_object_edit",
+                "cms_placeholder_render_object_preview",
+                "cms_placeholder_render_object_structure",
+            ):
+                with self.subTest(endpoint=name):
+                    response = self.client.get(admin_reverse(name, args=(self.content_type.id, page_content.pk)))
+                    self.assertEqual(response.status_code, 404)
+                    self.assertNotContains(response, "OtherSiteSecretLinkName", status_code=404)
+
+            # A grant on the page's own site still opens the structure board.
+            grant.sites.set([other_site])
+            response = self.client.get(
+                admin_reverse("cms_placeholder_render_object_structure", args=(self.content_type.id, page_content.pk))
+            )
+            self.assertContains(response, "OtherSiteSecretLinkName")
 
 
 class NonPageContentStructureEndpointTests(CMSTestCase):

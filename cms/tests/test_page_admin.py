@@ -1342,6 +1342,35 @@ class PageTest(PageTestBase):
             yield
 
     @override_settings(CMS_PERMISSION=False)
+    def test_advanced_settings_form_popup(self):
+        superuser = self.get_superuser()
+        cms_page = create_page("page", "nav_playground.html", "en")
+        endpoint = self.get_admin_url(Page, "advanced", cms_page.pk)
+        page_data = {
+            "reverse_id": "popup-page",
+            "navigation_extenders": "",
+            "application_urls": "",
+            "application_namespace": "",
+            "_popup": "1",
+        }
+
+        with self.login_user_context(superuser):
+            response = self.client.post(endpoint, page_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.context["popup_response_data"]),
+            {
+                "action": "change",
+                "value": str(cms_page.pk),
+                "obj": str(cms_page),
+                "new_value": str(cms_page.pk),
+            },
+        )
+        cms_page.refresh_from_db()
+        self.assertEqual(cms_page.reverse_id, "popup-page")
+
+    @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):
         superuser = self.get_superuser()
         cms_page = create_page('app', 'nav_playground.html', 'en')
