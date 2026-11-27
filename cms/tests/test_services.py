@@ -94,6 +94,45 @@ class OperationContextTest(CMSTestCase):
         self.assertEqual(context.language, "fr")
         self.assertEqual(context.origin, "/de/some-page/")
 
+    def test_an_explicit_language_is_resolved_against_the_given_site(self):
+        """The admin edits pages of sites other than the one serving the
+        request; their language must not be remapped to the request site's."""
+        other_site = Site.objects.create(domain="other.example.com", name="other")
+        request = self.get_request("/en/admin/cms/page/1/set-home/")
+        request.user = self.get_superuser()
+        languages = {
+            1: [{"code": "en-gb", "name": "British English"}],
+            other_site.pk: [{"code": "en", "name": "English"}],
+        }
+
+        with self.settings(CMS_LANGUAGES=languages, LANGUAGES=[("en", "English"), ("en-gb", "British English")]):
+            self.assertEqual(OperationContext.from_request(request, language="en").language, "en-gb")
+            self.assertEqual(OperationContext.from_request(request, language="en", site=other_site).language, "en")
+
+    def test_an_unusable_explicit_language_does_not_travel_on(self):
+        """A doubled query string must not reach the operation signals."""
+        for url in (
+            "/en/admin/cms/page/1/set-home/",
+            "/en/admin/cms/placeholder/?cms_path=/de/some-page/",
+        ):
+            with self.subTest(url=url):
+                request = self.get_request(url)
+                request.user = self.get_superuser()
+
+                context = OperationContext.from_request(request, language="en?language=en")
+
+                self.assertEqual(context.language, "en")
+
+    def test_an_empty_explicit_language_counts_as_none(self):
+        """``request.GET.get("language")`` is an empty string for ``?language=``."""
+        request = self.get_request("/en/admin/cms/page/1/set-home/")
+        request.user = self.get_superuser()
+        self.assertIsNone(OperationContext.from_request(request, language="").language)
+
+        request = self.get_request("/en/admin/cms/placeholder/?cms_path=/de/some-page/")
+        request.user = self.get_superuser()
+        self.assertEqual(OperationContext.from_request(request, language="").language, "de")
+
     def test_user_settings_hold_any_language_code_content_can(self):
         """The toolbar saves the request's language to the user's settings, so
         the column must not be narrower than the ones content is stored in."""

@@ -75,7 +75,7 @@ class OperationContext:
         return cls(user=user, language=language, system_reason=reason, policy=policy)
 
     @classmethod
-    def from_request(cls, request, language: str | None = None) -> OperationContext:
+    def from_request(cls, request, language: str | None = None, *, site=None) -> OperationContext:
         """Build a context from an admin request.
 
         The frontend editor's endpoints carry a ``cms_path`` GET query naming the
@@ -84,14 +84,16 @@ class OperationContext:
         it, the context has no origin, but the operation is still announced.
 
         A ``language`` given explicitly takes precedence over the one of the
-        ``cms_path``. Either way it is resolved against the site's languages.
+        ``cms_path``. Either way it is resolved against the languages of
+        ``site`` -- the site the operation applies to, which need not be the one
+        serving the request. Without it, the request's site is used.
         """
         from cms.utils import get_current_site
         from cms.utils.i18n import get_language_code
 
         cms_path = request.GET.get("cms_path") if hasattr(request, "GET") else None
         parsed_url = urlparse(cms_path) if cms_path else None
-        if language is None and parsed_url is not None:
+        if not language and parsed_url is not None:
             # The ?language GET query has a special meaning in the CMS: it shows
             # another language while keeping the same URL, so the language of the
             # operation comes from the originating path, not from the endpoint.
@@ -105,11 +107,12 @@ class OperationContext:
             # Wherever the language came from -- the caller often passes it on
             # from a GET query -- it is only a candidate until resolved against
             # the site's languages, like any other language read from a request.
-            language = get_language_code(language, site_id=get_current_site(request).pk)
+            site_id = site.pk if site is not None else get_current_site(request).pk
+            language = get_language_code(language, site_id=site_id)
 
         return cls(
             user=request.user,
-            language=language,
+            language=language or None,
             origin=parsed_url.path if parsed_url is not None else None,
             request=request,
         )
