@@ -2594,6 +2594,63 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(edit_url.count("&"), 1)
         self.assertEqual(preview_url.count("&"), 1)
 
+    def test_object_url_appends_to_an_existing_querystring(self):
+        """A reversed url that already carries a query gets ``&``, not a second ``?``."""
+        page_content = create_page("home", "nav_playground.html", "en").get_content_obj()
+
+        with patch.object(utils, "admin_reverse", return_value="/admin/edit/1/2/?base_qsp=base_value"):
+            edit_url = get_object_edit_url(page_content)
+
+        self.assertEqual(edit_url, "/admin/edit/1/2/?base_qsp=base_value&language=en")
+
+    def test_object_url_language_comes_from_the_object_not_the_params(self):
+        """A ``language`` carried over in ``params`` must not contradict the object's."""
+        from django.http import QueryDict
+
+        page_content = create_page("home", "nav_playground.html", "en").get_content_obj()
+
+        edit_url = get_object_edit_url(page_content, params=QueryDict("language=de&foo=bar"))
+        self.assertTrue(edit_url.startswith("/en/"))
+        self.assertTrue(edit_url.endswith("?foo=bar"), edit_url)
+
+        with patch.object(utils, "admin_reverse", return_value="/admin/edit/1/2/"):
+            edit_url = get_object_edit_url(page_content, params=QueryDict("language=de&foo=bar"))
+        self.assertEqual(edit_url, "/admin/edit/1/2/?foo=bar&language=en")
+
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
+    def test_object_url_carries_one_encoded_live_url(self):
+        """The live url carried over in ``params`` is replaced, not repeated, and
+        a live url with a query of its own does not leak into the object url's."""
+        from django.http import QueryDict
+
+        page = create_page("home", "nav_playground.html", "en")
+        page_content = page.get_content_obj()
+        params = QueryDict("test-live-link=/en/stale/&foo=bar")
+
+        edit_url = get_object_edit_url(page_content, params=params)
+        self.assertTrue(edit_url.endswith(f"?foo=bar&test-live-link={page.get_absolute_url()}"), edit_url)
+
+        with patch.object(type(page_content), "get_absolute_url", return_value="/en/?a=1&b=2"):
+            edit_url = get_object_edit_url(page_content)
+        self.assertEqual(QueryDict(edit_url.split("?", 1)[1]).dict(), {"test-live-link": "/en/?a=1&b=2"})
+
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
+    def test_add_live_url_querystring_param_goes_before_a_fragment(self):
+        """Appended behind a fragment, the query would never reach the server."""
+        page = create_page("home", "nav_playground.html", "en")
+        page_content = page.get_content_obj()
+        live_url = page.get_absolute_url()
+
+        self.assertEqual(
+            add_live_url_querystring_param(page_content, "/admin/edit/1/2/#section"),
+            f"/admin/edit/1/2/?test-live-link={live_url}#section",
+        )
+        self.assertEqual(
+            add_live_url_querystring_param(page_content, "/admin/edit/1/2/?foo=bar#section?"),
+            f"/admin/edit/1/2/?foo=bar&test-live-link={live_url}#section?",
+        )
+
     def test_add_live_url_querystring_param_no_querystring_setting_disabled(self):
         """
         With the querystring param configured, but CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED not set True,
