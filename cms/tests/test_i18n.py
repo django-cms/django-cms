@@ -51,12 +51,22 @@ class TestLanguages(CMSTestCase):
         djangocms-history's `language` column -- a varchar(15), like cms's own
         -- so every Text plugin save answered 500.
         """
-        for value in ('en?language=en', 'en-gb?language=en-gb', 'en gb', 'en/gb', '../en'):
+        for value in ('en?language=en', 'en-gb?language=en-gb', 'en gb', 'en/gb', '../en', 'en\n'):
             with self.subTest(value=value):
-                self.assertIn(
-                    i18n.get_language_code(value, site_id=1),
-                    i18n.get_language_list(site_id=1),
-                )
+                self.assertEqual(i18n.get_language_code(value, site_id=1), 'en')
+
+    def test_the_fallback_is_a_language_the_site_serves(self):
+        """The fallback neither recurses nor leaves the site's languages.
+
+        An unusable `LANGUAGE_CODE` must not be sent through the same refusal
+        again, and one the site does not serve must not be handed back.
+        """
+        for language_code in ('a' * 16, 'de'):
+            languages = (('en', 'English'), (language_code, 'Other'))
+            with self.subTest(LANGUAGE_CODE=language_code), override_settings(
+                LANGUAGE_CODE=language_code, LANGUAGES=languages
+            ):
+                self.assertEqual(i18n.get_language_code('en gb', site_id=1), 'en')
 
     def test_a_language_tag_this_site_does_not_serve_is_handed_back(self):
         """Behaviour preserved: an unserved but well-formed tag is returned.
@@ -88,11 +98,11 @@ class TestLanguages(CMSTestCase):
         limit stranded below the schema; narrowing one below it would make the
         overflow reachable again. Either way this fails rather than a write.
         """
-        from cms.models import CMSPlugin, PageContent
+        from cms.models import CMSPlugin, PageContent, PageUrl
 
         widths = [
             model._meta.get_field('language').max_length
-            for model in (CMSPlugin, PageContent)
+            for model in (CMSPlugin, PageContent, PageUrl)
         ]
         self.assertEqual(i18n.MAX_LANGUAGE_CODE_LENGTH, min(widths), widths)
 
