@@ -159,6 +159,23 @@ def template_slot_caching(method: Callable) -> Callable:
     return method
 
 
+def _widget_data(widget, name: str, value) -> dict:
+    """``value`` under the keys ``widget`` reads the field ``name`` from.
+
+    One key, the field's name, for most widgets. A ``MultiWidget`` reads one key
+    per sub-widget instead, and takes the value apart for them as it does to
+    render them.
+    """
+    if not isinstance(widget, forms.MultiWidget):
+        return {name: value}
+    if not isinstance(value, (list, tuple)):
+        value = widget.decompress(value)
+    data = {}
+    for suffix, subwidget, part in zip(widget.widgets_names, widget.widgets, value, strict=False):
+        data.update(_widget_data(subwidget, name + suffix, part))
+    return data
+
+
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     """
     Inherits :class:`django:django.contrib.admin.ModelAdmin` and in most respects behaves like a
@@ -660,6 +677,34 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     tree_fields = ("placeholder", "parent", "position", "language", "plugin_type", "path", "depth")
 
     @classmethod
+    def data_form_class(cls):
+        """The form class :meth:`clean_plugin_data` validates ``data`` against.
+
+        The plugin's :attr:`form` restricted to the fields its admin form would
+        show, with the tree fields and anything read-only excluded, because a
+        caller supplies data and not a plugin's position.
+
+        Published rather than private because *describing* what a plugin accepts
+        and *validating* what it was sent have to agree, and they only agree if
+        they ask the same object. An introspection that read
+        ``cls.form.base_fields`` instead answered about a different field list:
+        a form may build fields in its own ``__init__``, and ``base_fields``
+        omits those -- on one real site, 36 of its 135 installed plugin types
+        had form fields no schema reported while the write validated against
+        them.
+        """
+        from django.contrib.admin.utils import flatten_fieldsets
+        from django.forms.models import modelform_factory
+
+        fields = flatten_fieldsets(cls.fieldsets) if cls.fieldsets else cls.fields
+        excluded = {*cls.tree_fields, *(cls.readonly_fields or ())}
+        exclude = list(cls.exclude or getattr(cls.form._meta, "exclude", None) or ())
+        exclude += [name for name in excluded if name not in exclude]
+        if fields:
+            fields = [name for name in fields if name not in excluded]
+        return modelform_factory(cls.model, form=cls.form, fields=fields or None, exclude=exclude)
+
+    @classmethod
     def clean_plugin_data(cls, obj, data, *, instance=None):
         """Validate and clean ``data`` for a plugin of this type, without a request.
 
@@ -675,21 +720,45 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         The default binds the plugin's :attr:`form` with the fields its admin
         form would show. A plugin whose form needs the request -- for its fields,
         its choices or its validation -- overrides this classmethod.
+
+        One step stands between ``data`` and the bound form, and it exists
+        because a form's ``data`` is an HTML POST while a caller here has no
+        browser:
+
+        * **The change baseline.** A bound form reads an absent key as an empty
+          submission, so for a change the fields the caller left out are filled
+          from the form the editor would be shown -- an unbound form on this
+          instance, read through ``BoundField.value()``. That is Django's own
+          answer to "what is in this field", so it covers a field the form adds
+          in its ``__init__`` and a field stored somewhere other than a model
+          attribute, which under django-entangled is most of them. Reading the
+          model's attributes instead (``model_to_dict``) could see neither: a
+          one-field change to an entangled plugin was refused as missing
+          required fields that were plainly set on it.
+
+          The value goes in under the keys the field's widget reads it from. A
+          ``MultiWidget`` reads one key per sub-widget (``name_0``, ``name_1``)
+          and none under the field's own name, so a split date and time left
+          under ``name`` would be read back as empty.
+
+        :raises ~django.core.exceptions.ValidationError: keyed by field name,
+            for data the form rejects.
         """
-        from django.contrib.admin.utils import flatten_fieldsets
-        from django.forms.models import model_to_dict, modelform_factory
+        form_class = cls.data_form_class()
 
-        fields = flatten_fieldsets(cls.fieldsets) if cls.fieldsets else cls.fields
-        excluded = {*cls.tree_fields, *(cls.readonly_fields or ())}
-        exclude = list(cls.exclude or getattr(cls.form._meta, "exclude", None) or ())
-        exclude += [name for name in excluded if name not in exclude]
-        if fields:
-            fields = [name for name in fields if name not in excluded]
-        form_class = modelform_factory(cls.model, form=cls.form, fields=fields or None, exclude=exclude)
-
+        # Unbound, on the instance, for a change. `.fields` rather than
+        # `.base_fields` throughout: the two differ for any form that builds a
+        # field in its __init__, and the list that counts is the one the bound
+        # form a moment later will validate against.
+        values = dict(data)
         if instance is not None:
-            data = {**model_to_dict(instance, fields=list(form_class.base_fields)), **data}
-        form = form_class(data=data, instance=instance)
+            editor_form = form_class(instance=instance)
+            stored = {}
+            for name, field in editor_form.fields.items():
+                stored.update(_widget_data(field.widget, name, editor_form[name].value()))
+            values = {**stored, **data}
+
+        form = form_class(data=values, instance=instance)
         if not form.is_valid():
             raise ValidationError(form.errors)
         return form
