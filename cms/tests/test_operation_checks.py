@@ -595,6 +595,10 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
             {"name": "page", "model": "cms.Page", "fields": (Argument("a", type=str),)},
             {"name": "page", "type": str, "fields": (Argument("a", type=str),)},
             {"name": "page", "fields": ({"a": 1},)},
+            # a field is declared once, or the schema loses one of them
+            {"name": "page", "fields": (Argument("a", type=str), Argument("a", type=int))},
+            # adapters resolve model arguments at the top level only
+            {"name": "page", "fields": (Argument("parent", model="cms.Page"),)},
         ):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Argument(**kwargs)
