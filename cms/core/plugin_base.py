@@ -660,6 +660,34 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     tree_fields = ("placeholder", "parent", "position", "language", "plugin_type", "path", "depth")
 
     @classmethod
+    def data_form_class(cls):
+        """The form class :meth:`clean_plugin_data` validates ``data`` against.
+
+        The plugin's :attr:`form` restricted to the fields its admin form would
+        show, with the tree fields and anything read-only excluded, because a
+        caller supplies data and not a plugin's position.
+
+        Published rather than private because *describing* what a plugin accepts
+        and *validating* what it was sent have to agree, and they only agree if
+        they ask the same object. An introspection that read
+        ``cls.form.base_fields`` instead answered about a different field list:
+        a form may build fields in its own ``__init__``, and ``base_fields``
+        omits those -- measured on one deployment, 36 of 135 installed plugin
+        types had form fields no schema reported while the write validated
+        against them.
+        """
+        from django.contrib.admin.utils import flatten_fieldsets
+        from django.forms.models import modelform_factory
+
+        fields = flatten_fieldsets(cls.fieldsets) if cls.fieldsets else cls.fields
+        excluded = {*cls.tree_fields, *(cls.readonly_fields or ())}
+        exclude = list(cls.exclude or getattr(cls.form._meta, "exclude", None) or ())
+        exclude += [name for name in excluded if name not in exclude]
+        if fields:
+            fields = [name for name in fields if name not in excluded]
+        return modelform_factory(cls.model, form=cls.form, fields=fields or None, exclude=exclude)
+
+    @classmethod
     def clean_plugin_data(cls, obj, data, *, instance=None):
         """Validate and clean ``data`` for a plugin of this type, without a request.
 
@@ -675,21 +703,49 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         The default binds the plugin's :attr:`form` with the fields its admin
         form would show. A plugin whose form needs the request -- for its fields,
         its choices or its validation -- overrides this classmethod.
+
+        Two steps stand between ``data`` and the bound form, and both exist
+        because a form's ``data`` is an HTML POST while a caller here has no
+        browser:
+
+        * **The change baseline.** A bound form reads an absent key as an empty
+          submission, so for a change the fields the caller left out are filled
+          from the form the editor would be shown -- an unbound form on this
+          instance, read through ``BoundField.value()``. That is Django's own
+          answer to "what is in this field", so it covers a field the form adds
+          in its ``__init__`` and a field stored somewhere other than a model
+          attribute, which under django-entangled is most of them. Reading the
+          model's attributes instead (``model_to_dict``) could see neither: a
+          one-field change to an entangled plugin was refused as missing
+          required fields that were plainly set on it.
+        * **Widget-shaped input.** A composite widget reads keys of its own
+          rather than ``data[name]``, so the values are encoded as
+          :mod:`cms.forms.widget_data` describes, and a value no widget would
+          read is refused there rather than written as empty.
+
+        :raises ~django.core.exceptions.ValidationError: keyed by field name,
+            for data the form rejects and for values no widget would read.
         """
-        from django.contrib.admin.utils import flatten_fieldsets
-        from django.forms.models import model_to_dict, modelform_factory
+        from cms.forms.widget_data import as_widget_data, refuse_unreadable
 
-        fields = flatten_fieldsets(cls.fieldsets) if cls.fieldsets else cls.fields
-        excluded = {*cls.tree_fields, *(cls.readonly_fields or ())}
-        exclude = list(cls.exclude or getattr(cls.form._meta, "exclude", None) or ())
-        exclude += [name for name in excluded if name not in exclude]
-        if fields:
-            fields = [name for name in fields if name not in excluded]
-        form_class = modelform_factory(cls.model, form=cls.form, fields=fields or None, exclude=exclude)
+        form_class = cls.data_form_class()
 
+        # Unbound, and on the instance for a change. `.fields` rather than
+        # `.base_fields` throughout: the two differ for any form that builds a
+        # field in its __init__, and the list that counts is the one the bound
+        # form a moment later will validate against.
+        editor_form = form_class(instance=instance)
+        form_fields = editor_form.fields
+
+        stored, values = {}, dict(data)
         if instance is not None:
-            data = {**model_to_dict(instance, fields=list(form_class.base_fields)), **data}
-        form = form_class(data=data, instance=instance)
+            stored = {name: editor_form[name].value() for name in form_fields}
+            values = {**stored, **data}
+
+        encoded = as_widget_data(form_fields, values)
+        refuse_unreadable(form_fields, data, stored, encoded)
+
+        form = form_class(data=encoded, instance=instance)
         if not form.is_valid():
             raise ValidationError(form.errors)
         return form

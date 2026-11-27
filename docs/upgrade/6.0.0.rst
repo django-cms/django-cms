@@ -385,6 +385,19 @@ hook binds the plugin's ``form`` (the plugin's own, or the generated
 service directly. Plugins whose form needs the request override the hook. The
 admin passes the form it already validated, so data is not cleaned twice.
 
+For a change, ``data`` only needs the fields that change: the rest are filled
+from the form the editor would be shown, read through ``BoundField.value()`` so
+that a field whose value is not a model attribute -- as under
+django-entangled -- is seen as well. ``CMSPluginBase.data_form_class()`` is the
+form class used for both, so what describes a plugin's accepted fields and what
+validates them are the same object.
+
+Values are encoded the way each field's widget reads them, since a form's
+``data`` is an HTML POST and a composite widget does not read ``data[name]``.
+``cms.forms.widget_data`` does that, and refuses a value no widget would read
+rather than writing the field as empty. A widget may declare its own inverse by
+defining ``value_to_datadict()`` instead of being guessed at.
+
 One frame for all services
 ==========================
 

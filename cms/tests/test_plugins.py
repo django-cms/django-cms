@@ -4,12 +4,12 @@ import warnings
 from contextlib import contextmanager
 from unittest import mock, skipIf
 
-from django import http
+from django import forms, http
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
 from django.urls import re_path, reverse
@@ -29,6 +29,8 @@ from cms.exceptions import DontUsePageAttributeWarning, PluginAlreadyRegistered,
 from cms.models import Page, Placeholder
 from cms.shared.editing_urls import get_object_edit_url
 from cms.sitemaps.cms_sitemap import CMSSitemap
+from cms.test_utils.project.pluginapp.plugins.link.cms_plugins import LinkPlugin
+from cms.test_utils.project.pluginapp.plugins.link.models import Link
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, ArticlePluginModel, Section
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
     TestPlugin,
@@ -2481,3 +2483,162 @@ class LegacyPageKeywordCompatTests(CMSTestCase):
         renderer = ContentRenderer(request)
         with self.assertWarns(RemovedInDjangoCMS70Warning):
             renderer.get_placeholder_toolbar_js(placeholder, page=page)
+
+
+class CleanPluginDataTest(CMSTestCase):
+    """The step between a caller's ``data`` and the plugin's bound form."""
+
+    def setUp(self):
+        page = create_page("home", "nav_playground.html", "en")
+        self.placeholder = page.get_placeholders("en").get(slot="body")
+        self.link = api.add_plugin(
+            self.placeholder,
+            "LinkPlugin",
+            "en",
+            name="Original",
+            external_link="https://example.com/original",
+        )
+
+    def _clean(self, data, instance=None):
+        return LinkPlugin.clean_plugin_data(self.placeholder.source, data, instance=instance)
+
+    # -- the change baseline -------------------------------------------------
+    def test_a_change_keeps_the_fields_it_was_not_sent(self):
+        form = self._clean({"name": "Renamed"}, instance=self.link)
+        changed = form.save(commit=False)
+
+        self.assertEqual(changed.name, "Renamed")
+        self.assertEqual(changed.external_link, "https://example.com/original")
+
+    def test_a_change_sending_nothing_changes_nothing(self):
+        form = self._clean({}, instance=self.link)
+        unchanged = form.save(commit=False)
+
+        self.assertEqual(unchanged.name, "Original")
+        self.assertEqual(unchanged.external_link, "https://example.com/original")
+
+    def test_a_change_can_still_clear_a_field_by_naming_it(self):
+        # The baseline fills in what was left out; it does not override what
+        # was sent, so clearing stays possible and stays explicit.
+        with self.assertRaises(ValidationError) as caught:
+            self._clean({"name": ""}, instance=self.link)
+
+        self.assertIn("name", caught.exception.message_dict)
+
+    def test_an_add_has_no_baseline_and_still_requires_its_fields(self):
+        with self.assertRaises(ValidationError) as caught:
+            self._clean({"name": "Only a name"})
+
+        self.assertIn("external_link", caught.exception.message_dict)
+
+    def test_add_and_change_accept_the_same_payload(self):
+        payload = {"name": "Both", "external_link": "https://example.com/both"}
+
+        added = self._clean(payload).save(commit=False)
+        changed = self._clean(payload, instance=self.link).save(commit=False)
+
+        self.assertEqual(added.name, changed.name)
+        self.assertEqual(added.external_link, changed.external_link)
+
+    # -- the form that counts is the instantiated one ------------------------
+    def test_a_change_keeps_a_value_not_stored_as_a_model_attribute(self):
+        """The baseline has to see what the editor's form would show.
+
+        It is read off an unbound form through ``BoundField.value()``, which is
+        Django's own answer to "what is in this field". That covers a field
+        whose value is not a model attribute, because the form seeds
+        ``self.initial`` for it in its own ``__init__`` -- which is how
+        django-entangled stores most plugin fields, inside another column.
+
+        Reading the model's attributes instead (``model_to_dict``) cannot see
+        such a field at all, so a one-field change was refused as missing
+        required fields that were plainly set on the plugin.
+        """
+        class EntangledLikeForm(forms.ModelForm):
+            #: Not a model attribute: the real value lives elsewhere.
+            nickname = forms.CharField(required=True)
+
+            class Meta:
+                model = Link
+                fields = ["name", "external_link"]
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                if self.instance.pk:
+                    self.initial["nickname"] = (self.instance.name or "").lower()
+
+        with mock.patch.object(LinkPlugin, "form", EntangledLikeForm):
+            # Mentions neither external_link nor nickname.
+            form = self._clean({"name": "Renamed"}, instance=self.link)
+
+        self.assertEqual(form.cleaned_data["name"], "Renamed")
+        self.assertEqual(form.cleaned_data["nickname"], "original")
+        self.assertEqual(form.cleaned_data["external_link"], "https://example.com/original")
+
+    def test_data_form_class_reports_the_fields_the_write_validates(self):
+        """Describing what a plugin accepts and validating it must agree.
+
+        They only agree if they ask the same object, which is why this is
+        published rather than private: an introspection that read
+        ``cls.form.base_fields`` would answer about a different field list.
+        """
+        class LateFieldForm(forms.ModelForm):
+            class Meta:
+                model = Link
+                fields = ["name"]
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fields["external_link"] = forms.CharField(required=True)
+
+        with mock.patch.object(LinkPlugin, "form", LateFieldForm):
+            fields = LinkPlugin.data_form_class()().fields
+
+        self.assertIn("name", fields)
+        self.assertIn("external_link", fields)
+        # The tree fields are a plugin's position, not a caller's to supply.
+        for tree_field in LinkPlugin.tree_fields:
+            self.assertNotIn(tree_field, fields)
+
+    def test_a_field_the_form_builds_in_its_init_is_the_one_validated(self):
+        class DynamicForm(forms.ModelForm):
+            class Meta:
+                model = Link
+                fields = ["name", "external_link"]
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fields["name"] = forms.ChoiceField(choices=[("ok", "Ok")])
+
+        with mock.patch.object(LinkPlugin, "form", DynamicForm):
+            with self.assertRaises(ValidationError) as caught:
+                self._clean(
+                    {"name": "not-a-choice", "external_link": "https://example.com/"}
+                )
+            self.assertIn("name", caught.exception.message_dict)
+
+            form = self._clean(
+                {"name": "ok", "external_link": "https://example.com/"}
+            )
+            self.assertEqual(form.cleaned_data["name"], "ok")
+
+    def test_every_installed_plugin_type_can_be_introspected_unbound(self):
+        # The baseline is read off an unbound form, so a plugin whose form
+        # cannot be built that way would fail every change rather than one.
+        from django.forms.models import modelform_factory
+
+        unbuildable = []
+        for plugin_type, plugin_class in plugin_pool.plugins.items():
+            if getattr(plugin_class, "form", None) is None:
+                continue
+            try:
+                modelform_factory(
+                    plugin_class.model,
+                    form=plugin_class.form,
+                    fields=None,
+                    exclude=list(plugin_class.tree_fields),
+                )()
+            except Exception as error:  # noqa: BLE001 -- reported, not raised
+                unbuildable.append(f"{plugin_type}: {type(error).__name__}")
+
+        self.assertEqual(unbuildable, [])
