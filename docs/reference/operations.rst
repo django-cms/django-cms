@@ -48,7 +48,8 @@ description, the service performing it and the arguments a caller supplies.
     What the service returns, as a :class:`Result`.
     :meth:`Operation.output_schema` describes it as JSON Schema, for a REST
     response or an MCP ``outputSchema``. A model object is marked with its
-    label as ``x-cms-model``: serializing it is the adapter's job.
+    label as ``x-cms-model``: serializing it is the adapter's job, see
+    :ref:`operation-schemas`.
 
 .. autoclass:: cms.operations.Operation
     :members: id, summary, description, service, arguments, returns, json_schema, output_schema
@@ -77,6 +78,103 @@ schema is ``{"type": ["integer", "string"], "x-cms-model": "cms.page"}``. With
 ``instance=True`` the caller builds the object instead -- a new grant, or a
 page with changed advanced settings -- and the schema is an object marked
 ``"x-cms-instance": true``.
+
+.. _operation-schemas:
+
+What the schemas describe
+=========================
+
+The registry describes what a service takes and what it returns. It does not
+describe a wire format: django CMS ships no REST or MCP adapter and no
+serializer. An adapter reads the declarations, publishes them as its own
+OpenAPI schema or tool definitions, and translates each call.
+
+.. list-table::
+    :header-rows: 1
+    :widths: 30 35 35
+
+    * -
+      - Declared by django CMS and apps
+      - Added by the adapter
+    * - Arguments
+      - Names, types, descriptions, which are required. Model arguments as
+        primary keys, marked ``x-cms-model``.
+      - Resolving a primary key to an object the acting user may see.
+    * - Results
+      - Types, descriptions and the declared fields. Model objects marked
+        ``x-cms-model``.
+      - How a model object is identified in an answer -- its model, its
+        primary key, a label, a URL -- and the schema for that.
+
+**Arguments are closed.** The schema of an operation's arguments, and of an
+argument with fields, sets ``"additionalProperties": false``: a caller sends
+what is declared and nothing else.
+
+**Results are open.** The schema of a result never sets
+``additionalProperties``. It lists the fields the service answers with; an
+adapter is free to add to them.
+
+Objects with fields
+===================
+
+An argument that carries a mapping of values declares its ``fields``, each an
+:class:`Argument`, instead of ``type=dict``. Its schema is then an object with
+those properties, rather than a bare ``{"type": "object"}``:
+
+.. code-block:: python
+
+    Argument(
+        "content_data",
+        description="The translation's fields.",
+        fields=(
+            Argument("title", type=str, description="The title."),
+            Argument("slug", type=str, required=False),
+        ),
+    ).json_schema()
+    # {"type": "object",
+    #  "properties": {"title": {"type": "string", "description": "The title."},
+    #                 "slug": {"type": "string"}},
+    #  "additionalProperties": false,
+    #  "required": ["title"],
+    #  "description": "The translation's fields."}
+
+An argument is a value (``type``), a model object (``model``) or an object with
+``fields``, and exactly one of them. Fields nest, and ``many`` and ``null``
+apply to the object as a whole. A field's name is declared once, and a field is
+not a model object: adapters resolve the model arguments of the operation
+itself, and would pass a primary key inside ``fields`` on to the service
+unresolved.
+
+A result is a value, a model object, or an object with ``fields`` (a mapping of
+names to :class:`Result`). Unlike an argument, a model result may declare
+fields as well -- the attributes of the object the service answers with:
+
+.. code-block:: python
+
+    Result(
+        model="cms.PageContent",
+        fields={
+            "title": Result(type=str, description="The content's title."),
+            "slug": Result(type=str, description="The slug this content is addressed by."),
+        },
+        description="The content, with its own fields.",
+    ).json_schema()
+    # {"type": "object",
+    #  "properties": {"title": {"type": "string", "description": "The content's title."},
+    #                 "slug": {"type": "string", "description": "The slug this content is addressed by."}},
+    #  "required": ["title", "slug"],
+    #  "x-cms-model": "cms.pagecontent",
+    #  "description": "The content, with its own fields."}
+
+The schema holds the declared fields and the ``x-cms-model`` marker, and
+nothing that identifies the object: no ``pk`` or ``model`` property is added.
+An adapter that sees ``x-cms-model`` adds the properties its serializer emits
+for every model object. No field name is reserved, so a declaration that wants
+the primary key in the answer names it like any other field:
+``"pk": Result(type=(int, str))``.
+
+A model result without fields is ``{"type": "object", "x-cms-model": ...}``:
+the adapter's serializer for that model decides what it contains.
 
 .. autofunction:: cms.operations.register_operation
 

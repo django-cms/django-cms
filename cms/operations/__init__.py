@@ -127,10 +127,10 @@ class Argument:
     choices: tuple = ()
     #: The caller builds the model object rather than naming a stored one.
     instance: bool = False
-    #: For a ``dict`` argument, the fields it carries, as :class:`Argument`
-    #: declarations. Without these the generated schema is a bare
-    #: ``{"type": "object"}``, which a caller outside Python cannot validate
-    #: against, so it has to learn the fields some other way.
+    #: The fields an object argument carries, as :class:`Argument`
+    #: declarations, given instead of ``type=dict``. A plain ``type=dict``
+    #: generates a bare ``{"type": "object"}``, which a caller outside Python
+    #: cannot validate against, so it has to learn the fields some other way.
     fields: tuple = ()
 
     def __post_init__(self):
@@ -213,8 +213,10 @@ class Result:
     One of: a value (``type``, as for :class:`Argument`), a model object
     (``model``, a label or a tuple of labels) that the adapter serializes, or an
     object with named ``fields``, each a :class:`Result` (a dataclass such as
-    :class:`~cms.core.queries.PlaceholderContent`). ``Result()`` with none of
-    them: the service returns nothing.
+    :class:`~cms.core.queries.PlaceholderContent`). A model object may name
+    ``fields`` as well: the ones it answers with, besides whatever the adapter
+    identifies the object by. ``Result()`` with none of them: the service
+    returns nothing.
     """
 
     #: Plain English, for API schemas and tool definitions. Not translated.
@@ -231,8 +233,23 @@ class Result:
     def __post_init__(self):
         fields = tuple(self.fields.items()) if isinstance(self.fields, dict) else tuple(self.fields)
         object.__setattr__(self, "fields", fields)
-        if sum(bool(part) for part in (self.type is not None, self.model is not None, fields)) > 1:
-            raise ValueError("A result is a value, a model object or an object with fields, not several.")
+        # A result is a value, OR a model object -- which may additionally
+        # describe the fields it answers with. That last combination is the
+        # one an Argument does not have: an argument you *supply* is a pk or
+        # an object or a set of fields, exactly one. A result you *receive* can
+        # legitimately be both, because a model object has fields worth naming.
+        #
+        # Forbidding it made `get_page_content` and `search_pages` answer with
+        # only {model, pk, label}: the serializer can emit a model's fields,
+        # but there was no way to declare them, so a caller had to run a full
+        # export to learn a page's title. Meanwhile the consumer had supported
+        # the combination all along -- it serializes the declared fields and
+        # then adds model/pk -- so this rule contradicted the code that reads
+        # it. The scope machinery is unaffected either way: both the
+        # collection of returned objects and the "is this read confinable"
+        # decision key off `model` alone.
+        if self.type is not None and (self.model is not None or fields):
+            raise ValueError("A result is a value, or a model object, not both.")
         types = self.type if isinstance(self.type, tuple) else (self.type,)
         if self.type is not None and any(value not in _JSON_TYPES for value in types):
             raise ValueError(f"A result has a type JSON cannot carry: {self.type!r}.")
@@ -255,8 +272,10 @@ class Result:
     def json_schema(self) -> dict:
         """The JSON Schema of the result.
 
-        A model object is an object marked with its label as ``x-cms-model``: its
-        fields are the adapter's serializer's to describe. Nothing is ``null``.
+        A model object is an object marked with its label as ``x-cms-model``.
+        The schema describes the fields it declares, if any. How the object is
+        identified in an answer -- its model, its primary key, a label -- is the
+        adapter's serializer's to add and to describe. Nothing is ``null``.
         """
         if self.is_empty:
             schema = {"type": "null"}
@@ -266,6 +285,12 @@ class Result:
                 "properties": {name: value.json_schema() for name, value in self.fields},
                 "required": [name for name, _ in self.fields],
             }
+            if self.model is not None:
+                # Marked as the model it is, as a model result without fields.
+                # The adapter knows from this to add what it identifies the
+                # object by; the properties stay open for that.
+                models = self.models
+                schema["x-cms-model"] = models[0] if len(models) == 1 else list(models)
         elif self.model is not None:
             models = self.models
             schema = {"type": "object", "x-cms-model": models[0] if len(models) == 1 else list(models)}

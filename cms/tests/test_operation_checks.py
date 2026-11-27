@@ -709,6 +709,60 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Result(**kwargs)
 
+    def test_a_result_may_be_a_model_that_declares_its_fields(self):
+        """A received model object may name the fields it answers with.
+
+        Unlike an Argument, which is a pk or an object or a set of fields and
+        exactly one. A result can be both. Forbidding it left get_page_content
+        and search_pages able to answer only with what identifies the object.
+        """
+        Result = operations.Result
+        result = Result(
+            model="cms.PageContent",
+            fields={"title": Result(type=str)},
+            description="The content.",
+        )
+        self.assertEqual(result.model, "cms.PageContent")
+        self.assertEqual([name for name, _ in result.fields], ["title"])
+
+        schema = result.json_schema()
+        self.assertEqual(schema["type"], "object")
+        # The declared fields and nothing else: what an adapter identifies the
+        # object by is the adapter's to add, and the schema leaves room for it.
+        self.assertEqual(schema["properties"], {"title": {"type": "string"}})
+        self.assertEqual(schema["required"], ["title"])
+        self.assertNotIn("additionalProperties", schema)
+        # Still marked as the model it is, so a client knows what it received
+        # and the scope machinery still recognises it.
+        self.assertEqual(schema["x-cms-model"], "cms.pagecontent")
+
+
+    def test_a_model_result_may_declare_its_primary_key_as_a_field(self):
+        """No field name is reserved: ``pk`` is declared like any other."""
+        Result = operations.Result
+        schema = Result(model="cms.Page", fields={"pk": Result(type=(int, str))}).json_schema()
+        self.assertEqual(schema["properties"], {"pk": {"type": ["integer", "string"]}})
+
+    def test_every_page_content_result_declares_the_same_fields(self):
+        """Whichever query answers with a page content, it has the same shape."""
+        from cms.pages.queries import _CONTENT_FIELDS
+
+        def content_results(result):
+            if "cms.pagecontent" in result.models:
+                yield result
+            for _, field in result.fields:
+                yield from content_results(field)
+
+        found = [
+            (query.id, result)
+            for query in operations.get_queries()
+            for result in content_results(query.returns)
+        ]
+        self.assertGreaterEqual(len(found), 4)
+        for query_id, result in found:
+            with self.subTest(query=query_id):
+                self.assertEqual(result.fields, _CONTENT_FIELDS)
+
 
 class QueryRegistryTest(RegistryIsolationMixin, CMSTestCase):
     """Declared reads: what REST GET endpoints and MCP resources describe."""
