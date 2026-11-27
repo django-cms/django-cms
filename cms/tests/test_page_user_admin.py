@@ -2,15 +2,26 @@ from unittest.mock import patch
 
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
-from cms.models.permissionmodels import PageUser
+from cms.api import create_page
+from cms.models.permissionmodels import (
+    ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
+    PageUser,
+    PageUserGroup,
+)
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.permissions import get_subordinate_users
+from cms.utils.permissions import get_subordinate_groups, get_subordinate_users
 from cms.utils.urlutils import admin_reverse
 
 
@@ -683,3 +694,377 @@ class SuperuserProtectionTest(PermissionsOnTestCase):
             self.assertEqual(response.status_code, 302)
 
         self.assertTrue(PageUser.objects.filter(pk=superuser.pk).exists())
+
+
+class SubordinatesTestMixin:
+
+    def _get_page_user(self, username, created_by=None):
+        parent_link_field = list(PageUser._meta.parents.values())[0]
+        user = self._create_user(username, is_staff=True)
+        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
+        data[parent_link_field.name] = user
+        data['created_by'] = created_by or self.get_superuser()
+        page_user = PageUser.objects.create(**data)
+        page_user.set_password('original-password')
+        page_user.save()
+        return page_user
+
+    def _get_password_url(self, user):
+        change_url = self.get_admin_url(PageUser, 'change', user.pk)
+        self.assertTrue(change_url.endswith('/change/'))
+        return change_url[:-len('change/')] + 'password/'
+
+    def _global_grant(self, sites, **kwargs):
+        grant = GlobalPagePermission.objects.create(can_change=True, **kwargs)
+        grant.sites.set(sites)
+        return grant
+
+    def _subordinate_user_ids(self, site=None):
+        return set(get_subordinate_users(self.manager, site or self.site1).values_list('pk', flat=True))
+
+    def _subordinate_group_ids(self):
+        return set(get_subordinate_groups(self.manager, self.site1).values_list('pk', flat=True))
+
+
+@override_settings(CMS_PERMISSION=True)
+class SiteScopedSubordinatesTest(SubordinatesTestMixin, PermissionsOnTestCase):
+    """
+    Global permissions on one site put a user at the top of the hierarchy of
+    that site only. Accounts and groups holding permissions on another site -
+    or on all sites - are not subordinate: being able to manage such an account
+    (set its password, for one) means taking over its rights on a site the
+    manager has no authority on.
+    """
+
+    def setUp(self):
+        self.site1 = Site.objects.get_current()
+        self.site2 = Site.objects.create(domain='site2.example.com', name='site2')
+        self.manager = self._create_user('site1-manager', is_staff=True)
+        self.add_permission(self.manager, 'change_pageuser')
+        self.add_permission(self.manager, 'delete_pageuser')
+        self.add_permission(self.manager, self._get_delete_perm())
+        self.manager_grant = GlobalPagePermission.objects.create(
+            user=self.manager, can_change=True, can_change_permissions=True,
+        )
+        self.manager_grant.sites.set([self.site1])
+
+    def test_user_with_global_permission_on_other_site_not_subordinate(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_global_permission_on_all_sites_not_subordinate(self):
+        target = self._get_page_user('all-sites-user')
+        self._global_grant([], user=target)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_global_permission_on_both_sites_not_subordinate(self):
+        target = self._get_page_user('both-sites-user')
+        self._global_grant([self.site1, self.site2], user=target)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_page_permission_on_other_site_not_subordinate(self):
+        target = self._get_page_user('site2-page-user')
+        page = create_page('site2 page', 'nav_playground.html', 'de', site=self.site2)
+        self.add_page_permission(target, page, can_change=True)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_group_permission_on_other_site_not_subordinate(self):
+        target = self._get_page_user('site2-group-user')
+        global_group = Group.objects.create(name='site2 global')
+        self._global_grant([self.site2], group=global_group)
+        page_group = Group.objects.create(name='site2 page')
+        page = create_page('site2 page', 'nav_playground.html', 'de', site=self.site2)
+        self.add_page_permission(None, page, group=page_group, can_change=True)
+        bystander = self._get_page_user('site2-page-group-user')
+        target.groups.add(global_group)
+        bystander.groups.add(page_group)
+
+        subordinates = self._subordinate_user_ids()
+        self.assertNotIn(target.pk, subordinates)
+        self.assertNotIn(bystander.pk, subordinates)
+        groups = self._subordinate_group_ids()
+        self.assertNotIn(global_group.pk, groups)
+        self.assertNotIn(page_group.pk, groups)
+
+    def test_users_within_managed_site_stay_subordinate(self):
+        global_user = self._get_page_user('site1-global-user')
+        self._global_grant([self.site1], user=global_user)
+        page_user = self._get_page_user('site1-page-user')
+        page = create_page('site1 page', 'nav_playground.html', 'en', site=self.site1)
+        self.add_page_permission(page_user, page, can_change=True)
+        unassigned = self._get_page_user('unassigned-user')
+        group = Group.objects.create(name='site1 group')
+        self._global_grant([self.site1], group=group)
+
+        subordinates = self._subordinate_user_ids()
+        self.assertIn(global_user.pk, subordinates)
+        self.assertIn(page_user.pk, subordinates)
+        self.assertIn(unassigned.pk, subordinates)
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_manager_of_all_sites_sees_users_of_every_site(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target)
+        everywhere = self._get_page_user('all-sites-user')
+        self._global_grant([], user=everywhere)
+        group = Group.objects.create(name='site2 group')
+        self._global_grant([self.site2], group=group)
+
+        self.manager_grant.sites.clear()
+
+        for site in (self.site1, self.site2):
+            subordinates = self._subordinate_user_ids(site)
+            self.assertIn(target.pk, subordinates)
+            self.assertIn(everywhere.pk, subordinates)
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_manager_of_both_sites_sees_users_of_both(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target)
+        self._global_grant([self.site2], user=self.manager, can_change_permissions=True)
+        self.assertIn(target.pk, self._subordinate_user_ids())
+
+    def test_cannot_take_over_account_of_other_site(self):
+        target = self._get_page_user('site2-user')
+        self._global_grant([self.site2], user=target, can_change_permissions=True)
+        change_url = self.get_admin_url(PageUser, 'change', target.pk)
+        password_url = self._get_password_url(target)
+        delete_url = self.get_admin_url(PageUser, 'delete', target.pk)
+        data = {'password1': 'taken-over-123', 'password2': 'taken-over-123'}
+
+        with self.login_user_context(self.manager):
+            response = self.client.get(self.get_admin_url(PageUser, 'changelist'))
+            self.assertEqual(response.status_code, 200)
+            self.assertNotIn(target.pk, [obj.pk for obj in response.context['cl'].result_list])
+            self.assertNotEqual(self.client.get(change_url).status_code, 200)
+            self.assertNotEqual(self.client.post(password_url, data).status_code, 200)
+            self.client.post(delete_url, {'post': 'yes'})
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('original-password'))
+
+    def test_can_still_manage_account_of_own_site(self):
+        target = self._get_page_user('site1-user')
+        self._global_grant([self.site1], user=target)
+        password_url = self._get_password_url(target)
+        data = {'password1': 'changed-by-manager-123', 'password2': 'changed-by-manager-123'}
+
+        with self.login_user_context(self.manager):
+            self.assertEqual(self.client.post(password_url, data).status_code, 302)
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('changed-by-manager-123'))
+
+
+@override_settings(CMS_PERMISSION=True)
+class PageScopedSubordinatesTest(SubordinatesTestMixin, PermissionsOnTestCase):
+    """
+    A manager whose authority comes from a page permission manages the users
+    and groups of that part of the page tree. Accounts and groups also holding
+    permissions beyond it - a global permission, or a page permission higher
+    up, in another branch or on another site - are not subordinate.
+    """
+
+    def setUp(self):
+        self.site1 = Site.objects.get_current()
+        self.site2 = Site.objects.create(domain='site2.example.com', name='site2')
+        self.root = create_page('root', 'nav_playground.html', 'en', site=self.site1)
+        self.branch = create_page('branch', 'nav_playground.html', 'en', parent=self.root)
+        self.leaf = create_page('leaf', 'nav_playground.html', 'en', parent=self.branch)
+        self.other_branch = create_page('other branch', 'nav_playground.html', 'en', parent=self.root)
+        self.site2_page = create_page('site2 page', 'nav_playground.html', 'de', site=self.site2)
+
+        self.manager = self._create_user('branch-manager', is_staff=True)
+        self.add_permission(self.manager, 'change_pageuser')
+        self.add_permission(self.manager, 'delete_pageuser')
+        self.add_permission(self.manager, self._get_delete_perm())
+        self.add_page_permission(
+            self.manager, self.branch, can_change=True, can_change_permissions=True,
+            grant_on=ACCESS_PAGE_AND_DESCENDANTS,
+        )
+
+    def _get_leaf_user(self, username):
+        user = self._get_page_user(username)
+        self.add_page_permission(user, self.leaf, can_change=True)
+        return user
+
+    def test_user_within_managed_pages_is_subordinate(self):
+        target = self._get_leaf_user('leaf-user')
+        unassigned = self._get_page_user('unassigned-user', created_by=self.manager)
+        group = Group.objects.create(name='leaf group')
+        self.add_page_permission(None, self.leaf, group=group, can_change=True)
+
+        subordinates = self._subordinate_user_ids()
+        self.assertIn(target.pk, subordinates)
+        self.assertIn(unassigned.pk, subordinates)
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_user_with_global_permission_not_subordinate(self):
+        for sites in ([], [self.site1], [self.site2]):
+            with self.subTest(sites=sites):
+                target = self._get_leaf_user(f'leaf-user-{len(sites)}-{sites[0].pk if sites else 0}')
+                self._global_grant(sites, user=target)
+                self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_unassigned_user_with_global_permission_not_subordinate(self):
+        target = self._get_page_user('unassigned-user', created_by=self.manager)
+        self._global_grant([self.site1], user=target)
+        self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_page_permission_beyond_managed_pages_not_subordinate(self):
+        for page in (self.root, self.other_branch, self.site2_page):
+            with self.subTest(page=page.pk):
+                target = self._get_leaf_user(f'leaf-user-{page.pk}')
+                self.add_page_permission(target, page, can_change=True)
+                self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_user_with_group_permission_beyond_managed_pages_not_subordinate(self):
+        global_group = Group.objects.create(name='global group')
+        self._global_grant([self.site1], group=global_group)
+        page_group = Group.objects.create(name='other branch group')
+        self.add_page_permission(None, self.other_branch, group=page_group, can_change=True)
+        self.add_page_permission(None, self.leaf, group=page_group, can_change=True)
+
+        for group in (global_group, page_group):
+            with self.subTest(group=group.name):
+                target = self._get_leaf_user(f'leaf-user-{group.pk}')
+                target.groups.add(group)
+                self.assertNotIn(target.pk, self._subordinate_user_ids())
+                self.assertNotIn(group.pk, self._subordinate_group_ids())
+
+    def _manage_branch_page_only(self):
+        PagePermission.objects.filter(user=self.manager).update(grant_on=ACCESS_PAGE)
+
+    def _get_branch_holders(self, name, grant_on):
+        user = self._get_page_user(f'{name}-user')
+        self.add_page_permission(user, self.branch, can_change=True, grant_on=grant_on)
+        group = Group.objects.create(name=f'{name} group')
+        self.add_page_permission(None, self.branch, group=group, can_change=True, grant_on=grant_on)
+        return user, group
+
+    def test_permission_reaching_beyond_managed_scope_not_subordinate(self):
+        # The permission is attached to a page the manager manages, but reaches
+        # to pages the manager does not.
+        self._manage_branch_page_only()
+
+        for grant_on in (ACCESS_PAGE_AND_DESCENDANTS, ACCESS_DESCENDANTS, ACCESS_CHILDREN):
+            with self.subTest(grant_on=grant_on):
+                user, group = self._get_branch_holders(f'wide-{grant_on}', grant_on)
+                self.assertNotIn(user.pk, self._subordinate_user_ids())
+                self.assertNotIn(group.pk, self._subordinate_group_ids())
+
+        member = self._get_page_user('member-user')
+        self.add_page_permission(member, self.branch, can_change=True, grant_on=ACCESS_PAGE)
+        self.assertIn(member.pk, self._subordinate_user_ids())
+        member.groups.add(group)
+        self.assertNotIn(member.pk, self._subordinate_user_ids())
+
+    def test_permission_within_managed_scope_is_subordinate(self):
+        self._manage_branch_page_only()
+        user, group = self._get_branch_holders('page-only', ACCESS_PAGE)
+
+        self.assertIn(user.pk, self._subordinate_user_ids())
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_combined_manager_scopes_cover_permission(self):
+        self._manage_branch_page_only()
+        user, group = self._get_branch_holders('wide', ACCESS_PAGE_AND_DESCENDANTS)
+        self.assertNotIn(user.pk, self._subordinate_user_ids())
+
+        self.add_page_permission(
+            self.manager, self.branch, can_change=True, can_change_permissions=True,
+            grant_on=ACCESS_DESCENDANTS,
+        )
+
+        # Permissions are cached on the user object for the time of a request.
+        self.manager = get_user_model().objects.get(pk=self.manager.pk)
+
+        self.assertIn(user.pk, self._subordinate_user_ids())
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_cannot_take_over_account_reaching_beyond_managed_scope(self):
+        self._manage_branch_page_only()
+        target, _ = self._get_branch_holders('wide', ACCESS_PAGE_AND_DESCENDANTS)
+        data = {'password1': 'taken-over-123', 'password2': 'taken-over-123'}
+
+        with self.login_user_context(self.manager):
+            self.assertNotEqual(self.client.post(self._get_password_url(target), data).status_code, 302)
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('original-password'))
+
+    def test_cannot_take_over_account_beyond_managed_pages(self):
+        target = self._get_leaf_user('leaf-user')
+        self._global_grant([self.site1], user=target, can_change_permissions=True)
+        data = {'password1': 'taken-over-123', 'password2': 'taken-over-123'}
+
+        with self.login_user_context(self.manager):
+            self.assertNotEqual(self.client.get(self.get_admin_url(PageUser, 'change', target.pk)).status_code, 200)
+            self.assertNotEqual(self.client.post(self._get_password_url(target), data).status_code, 200)
+            self.client.post(self.get_admin_url(PageUser, 'delete', target.pk), {'post': 'yes'})
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('original-password'))
+
+    def test_can_still_manage_account_within_managed_pages(self):
+        target = self._get_leaf_user('leaf-user')
+        data = {'password1': 'changed-by-manager-123', 'password2': 'changed-by-manager-123'}
+
+        with self.login_user_context(self.manager):
+            self.assertEqual(self.client.post(self._get_password_url(target), data).status_code, 302)
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('changed-by-manager-123'))
+
+
+@override_settings(CMS_PERMISSION=True)
+class UnassignedManagerSubordinatesTest(SubordinatesTestMixin, PermissionsOnTestCase):
+    """
+    A manager holding no ``can_change_permissions`` right on the site - neither
+    global nor on a page - falls back to the accounts and groups they created
+    which are not assigned to a page. Once such an account or group holds
+    permissions - a global permission, or any permission through a group - it
+    is beyond the manager's authority and not subordinate anymore.
+    """
+
+    def setUp(self):
+        self.site1 = Site.objects.get_current()
+        self.page = create_page('page', 'nav_playground.html', 'en', site=self.site1)
+        self.manager = self._create_user('unassigned-manager', is_staff=True)
+
+    def _get_created_group(self, name):
+        return PageUserGroup.objects.create(name=name, created_by=self.manager)
+
+    def test_created_user_and_group_without_permissions_are_subordinate(self):
+        target = self._get_page_user('created-user', created_by=self.manager)
+        group = self._get_created_group('created group')
+
+        self.assertIn(target.pk, self._subordinate_user_ids())
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_created_user_with_global_permission_not_subordinate(self):
+        for sites in ([], [self.site1]):
+            with self.subTest(sites=sites):
+                target = self._get_page_user(f'created-user-{len(sites)}', created_by=self.manager)
+                self._global_grant(sites, user=target)
+                self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_created_user_with_group_permission_not_subordinate(self):
+        global_group = Group.objects.create(name='global group')
+        self._global_grant([self.site1], group=global_group)
+        page_group = Group.objects.create(name='page group')
+        self.add_page_permission(None, self.page, group=page_group, can_change=True)
+
+        for group in (global_group, page_group):
+            with self.subTest(group=group.name):
+                target = self._get_page_user(f'created-user-{group.pk}', created_by=self.manager)
+                target.groups.add(group)
+                self.assertNotIn(target.pk, self._subordinate_user_ids())
+
+    def test_created_group_with_global_permission_not_subordinate(self):
+        for sites in ([], [self.site1]):
+            with self.subTest(sites=sites):
+                group = self._get_created_group(f'created group {len(sites)}')
+                self._global_grant(sites, group=group)
+                self.assertNotIn(group.pk, self._subordinate_group_ids())

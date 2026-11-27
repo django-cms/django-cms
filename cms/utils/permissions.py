@@ -5,6 +5,7 @@ from functools import lru_cache, wraps
 
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
+from django.contrib.sites.models import Site
 from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
@@ -332,8 +333,8 @@ def get_user_permission_level(user, site):
                         /     \
                       C,X     D,Y,W                  level 2
 
-        Users A, W have user level 0. GroupE and all his users have user level 1
-        If user D is a member of GroupE, his user level will be 1, otherwise is
+        Users A, W have user level 0. GroupE and all its users have user level 1
+        If user D is a member of GroupE, their user level will be 1, otherwise is
         2.
 
     """
@@ -464,6 +465,80 @@ def has_global_permission(user, site, action, use_cache=True):
     return action in actions
 
 
+def _holders(model, page_permissions, global_permissions):
+    """
+    Returns the users or groups (``model``) holding any of the given page or
+    global permissions. Users also hold the permissions of their groups.
+    """
+    held = Q(pagepermission__in=page_permissions) | Q(globalpagepermission__in=global_permissions)
+    groups = Group.objects.filter(held)
+    if model is Group:
+        return groups
+    return model.objects.filter(held | Q(groups__in=groups))
+
+
+def _beyond_managed_sites(user, model):
+    """
+    Returns the users or groups (``model``) holding page or global permissions
+    on sites where ``user`` does not manage permissions globally. Nobody is
+    beyond the reach of a superuser or of a global permission with no sites
+    selected, which covers every site.
+    """
+    grants = GlobalPagePermission.objects.with_user(user).filter(can_change_permissions=True)
+    if user.is_superuser or not get_cms_setting('PERMISSION') or grants.filter(sites__isnull=True).exists():
+        return model.objects.none()
+
+    other_sites = Site.objects.exclude(pk__in=grants.values('sites'))
+    return _holders(
+        model,
+        PagePermission.objects.filter(page__site__in=other_sites),
+        # No sites selected: the permission covers every site.
+        GlobalPagePermission.objects.filter(Q(sites__isnull=True) | Q(sites__in=other_sites)),
+    )
+
+
+def _beyond_managed_pages(user, site, model):
+    """
+    Returns the users or groups (``model``) holding permissions beyond the part
+    of the page tree where ``user`` manages permissions: any global permission,
+    or a page permission whose scope is not covered by it. A page permission
+    counts with its full scope (``grant_on``), not only with the page it is
+    attached to: one reaching to descendants the user does not manage lies
+    beyond, as does one higher up, in another branch, or on another site.
+    """
+    from cms.utils.page_permissions import get_change_permissions_perm_tuples
+
+    managed = get_change_permissions_perm_tuples(user, site, check_global=False)
+    # Only permissions attached at or below a page the user manages can be
+    # covered; their scope is compared to the user's combined scopes.
+    anchored = Q()
+    for _grant_on, path in managed:
+        anchored |= Q(page__path__startswith=path)
+    candidates = PagePermission.objects.filter(anchored).select_related('page') if managed else ()
+    covered = [
+        permission.pk for permission in candidates
+        if _permission_scope_is_covered(permission.page, permission.grant_on, managed)
+    ]
+    return _holders(
+        model,
+        PagePermission.objects.filter(page__isnull=False).exclude(pk__in=covered),
+        GlobalPagePermission.objects.all(),
+    )
+
+
+def _beyond_unassigned(model):
+    """
+    Returns the users or groups (``model``) holding any global permission or
+    any permission on a page. They are beyond the reach of a user who manages
+    permissions nowhere and only sees the unassigned accounts they created.
+    """
+    return _holders(
+        model,
+        PagePermission.objects.filter(page__isnull=False),
+        GlobalPagePermission.objects.all(),
+    )
+
+
 def get_subordinate_users(user, site):
     """
     Returns users queryset, containing all subordinate users to given user
@@ -475,8 +550,24 @@ def get_subordinate_users(user, site):
     Only users created_by given user which are on the same, or lover level are
     returned.
 
-    If user haves global permissions or is a superuser, then he can see all the
-    users.
+    A user holding permissions beyond those pages - a global permission, or a
+    page permission higher up, in another branch, on another site or reaching
+    to pages the given user does not manage - is not subordinate, also if the permission is held through a group: managing that
+    account would hand over rights the user has no authority on.
+
+    The same holds for a user managing permissions nowhere, who only sees the
+    unassigned users they created: once such an account holds a global
+    permission, or any permission through a group, it is not subordinate.
+
+    If user is a superuser, or has global permissions on all sites, then they
+    can see all the users.
+
+    If user has global permissions on some sites only, they can see the users
+    whose page and global permissions all lie within those sites. A user who
+    also holds permissions on another site - or on all sites - is not
+    subordinate: managing that account would hand over rights on a site the
+    user does not manage. Users holding no permissions at all belong to no
+    site and remain visible.
 
     Superusers are never subordinate to a non-superuser, no matter how many
     permissions the latter holds. Otherwise a delegated administrator could
@@ -517,10 +608,14 @@ def get_subordinate_users(user, site):
             Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
+        qs = qs.exclude(pk__in=_beyond_unassigned(get_user_model()))
         return without_superusers(qs)
 
     if user_level == ROOT_USER_LEVEL:
-        return without_superusers(get_user_model().objects.all())
+        # Global permissions on some sites do not reach the accounts holding
+        # permissions on other sites.
+        User = get_user_model()
+        return without_superusers(User.objects.exclude(pk__in=_beyond_managed_sites(user, User)))
 
     from cms.models import PermissionTuple
     allow_list = Q()
@@ -536,6 +631,7 @@ def get_subordinate_users(user, site):
         )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
+    qs = qs.exclude(pk__in=_beyond_managed_pages(user, site, get_user_model()))
     return without_superusers(qs)
 
 
@@ -543,6 +639,11 @@ def get_subordinate_groups(user, site):
     """
     Similar to get_subordinate_users, but returns queryset of Groups instead
     of Users.
+
+    As for users, global permissions on some sites only do not make the groups
+    subordinate which hold permissions on another site, or on all sites, and
+    page permissions do not make the groups subordinate which hold permissions
+    beyond the pages they cover.
     """
     from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
@@ -562,10 +663,10 @@ def get_subordinate_groups(user, site):
         )
         # no permission no records
         # page_id_allow_list is empty
-        return groups
+        return groups.exclude(pk__in=_beyond_unassigned(Group))
 
     if user_level == ROOT_USER_LEVEL:
-        return Group.objects.all()
+        return Group.objects.exclude(pk__in=_beyond_managed_sites(user, Group))
 
     from cms.models import PermissionTuple
     allow_list = Q()
@@ -578,7 +679,7 @@ def get_subordinate_groups(user, site):
         ) | (
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )
-    )
+    ).exclude(pk__in=_beyond_managed_pages(user, site, Group))
 
 
 def has_plugin_permission(user, plugin_type, permission_type):
