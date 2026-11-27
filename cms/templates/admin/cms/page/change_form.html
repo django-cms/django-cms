@@ -32,6 +32,7 @@
 {% block content_title %}
     {% django_version_gte 6 1 as object_tools_in_title_bar %}
     {% if title %}<h1>{{ title }}</h1>{% endif %}
+    {% if page_path and not add %}<p class="cms-page-path" title="{% trans 'Full path of this page' %}">{{ page_path }}</p>{% endif %}
     {# Django 6.1 has a dedicated tools slot next to the title: see the object-tools block below. #}
     {% if not object_tools_in_title_bar %}{% include "admin/cms/page/includes/object_tools.html" %}{% endif %}
 {% endblock %}
