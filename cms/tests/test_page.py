@@ -2,6 +2,7 @@ import datetime
 import functools
 import os.path
 from unittest import skipIf
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -19,14 +20,17 @@ from cms import constants
 from cms.api import add_plugin, create_page, create_page_content
 from cms.core.models.placeholder import Placeholder
 from cms.core.models.plugin import CMSPlugin
+from cms.core.plugin_pool import plugin_pool
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, PageContent
 from cms.pages.cache import get_page_cache
+from cms.pages.models.managers import _is_searchable_field
 from cms.pages.utils import (
     get_available_slug,
     get_page_from_request,
 )
 from cms.sitemaps import CMSSitemap
+from cms.test_utils.project.pluginapp.plugins.revdesc.models import UnalteredPM
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 
@@ -1027,6 +1031,72 @@ class PagesTestCase(TransactionCMSTestCase):
         # Search with language that has no content
         results = Page.objects.search("more random", language="en")
         self.assertEqual(len(results), 0)
+
+    def _page_with_plugin(self, plugin_title):
+        """A page whose only text matching ``plugin_title`` is in a plugin."""
+        # Which entries can be searched is cached per process.
+        _is_searchable_field.cache_clear()
+        self.addCleanup(_is_searchable_field.cache_clear)
+
+        page = create_page("page", "nav_playground.html", "en", slug="page")
+        placeholder = page.get_placeholders("en")[0]
+        add_plugin(placeholder, "RevDescUnalteredP", "en", title=plugin_title)
+        return page, placeholder
+
+    def test_page_objects_search_skips_search_fields_that_cannot_be_searched(self):
+        """One plugin's bad declaration must not break search for the whole site.
+
+        The filters of all plugins are OR'd into one query, so an entry that
+        raises ``FieldError`` failed every page search. Such an entry is skipped
+        and logged; the plugin's other entries are still searched.
+        """
+        page, _ = self._page_with_plugin("needle")
+
+        for entry in (
+            "no_such_field",  # not a field
+            "placeholder__no_such_field",  # a relation, but not to this
+            "placeholder",  # a field that cannot be searched for text
+        ):
+            with self.subTest(entry=entry):
+                with patch.object(UnalteredPM, "search_fields", ["title", entry]):
+                    with self.assertLogs("cms.pages.models.managers", level="WARNING") as captured:
+                        results = list(Page.objects.search("needle"))
+
+                # Found through the plugin's valid entry, not the page's title
+                self.assertEqual([found.pk for found in results], [page.pk])
+                self.assertEqual(len(captured.output), 1)
+                self.assertIn(repr(entry), captured.output[0])
+                self.assertIn("UnalteredPM", captured.output[0])
+
+    def test_page_objects_search_logs_an_unsearchable_entry_once(self):
+        self._page_with_plugin("needle")
+
+        with patch.object(UnalteredPM, "search_fields", ["title", "no_such_field"]):
+            with self.assertLogs("cms.pages.models.managers", level="WARNING") as captured:
+                list(Page.objects.search("needle"))
+                list(Page.objects.search("needle"))
+
+        self.assertEqual(len(captured.output), 1)
+
+    def test_page_objects_search_still_traverses_a_relation(self):
+        """A search_fields entry may legitimately traverse a relation."""
+        page, placeholder = self._page_with_plugin("needle")
+
+        with patch.object(UnalteredPM, "search_fields", ["placeholder__slot"]):
+            with self.assertNoLogs("cms.pages.models.managers", level="WARNING"):
+                results = list(Page.objects.search(placeholder.slot))
+
+        # Found through the relation: nothing else on the page holds the slot name
+        self.assertEqual([found.pk for found in results], [page.pk])
+
+    def test_page_objects_search_in_a_language_without_searchable_plugins(self):
+        """Without any plugin filter, a plugin's language alone is not a match."""
+        self._page_with_plugin("needle")
+
+        with patch.object(plugin_pool, "registered_plugins", []):
+            results = list(Page.objects.search("nonexistent", language="en"))
+
+        self.assertEqual(results, [])
 
 
 class PageTreeTests(CMSTestCase):
