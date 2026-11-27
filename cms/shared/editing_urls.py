@@ -11,6 +11,8 @@ import is the reason ``menus`` appeared to depend on the toolbar container.
 
 from __future__ import annotations
 
+from urllib.parse import urlencode
+
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -54,12 +56,19 @@ def add_live_url_querystring_param(obj: models.Model, url: str, language: str | 
         live_url = obj.get_absolute_url()
     except NoReverseMatch:
         return url
-    url_fragments = url.split('?')
-    if len(url_fragments) > 1:
-        url += f'&{url_param}={live_url}'
-    else:
-        url += f'?{url_param}={live_url}'
-    return url
+    return _add_query(url, urlencode({url_param: live_url}, safe="/"))
+
+
+def _add_query(url: str, query: str) -> str:
+    """Appends an encoded query to a url that may already carry one.
+
+    The query goes before a fragment: behind it, it would be part of the
+    fragment and never reach the server.
+    """
+    if not query:
+        return url
+    url, hash_sign, fragment = url.partition("#")
+    return f"{url}{'&' if '?' in url else '?'}{query}{hash_sign}{fragment}"
 
 
 def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, params: QueryDict | None = None) -> str:
@@ -72,11 +81,16 @@ def _get_object_url(reverse_name: str, obj: models.Model, language: str = None, 
     with force_language(language):
         url = admin_reverse(reverse_name, args=[content_type.pk, obj.pk])
         get_params = params.copy() if params else QueryDict(mutable=True)
+        # ``params`` usually is the current request's query. Its language and
+        # live url belong to the page it was made for, not to this object.
+        get_params.pop("language", None)
         if not get_language_from_path(url):
             get_params["language"] = language
-        if get_params:
-            url = url + "?" + get_params.urlencode()
-    if get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED"):
+        live_url_enabled = get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED")
+        if live_url_enabled:
+            get_params.pop(get_cms_setting("ENDPOINT_LIVE_URL_QUERYSTRING_PARAM"), None)
+        url = _add_query(url, get_params.urlencode())
+    if live_url_enabled:
         url = add_live_url_querystring_param(obj, url, language)
     return url
 

@@ -791,7 +791,20 @@ register_core_check(
 # The caller passes the token it read (``cms.core.queries.get_plugin_tree``) as
 # ``expected_token``; without one the check does nothing.
 
-STALE_CONTENT = _("The content has changed since it was read. Reload it and try again.")
+#: Deliberately does NOT carry the placeholder's current token.
+#:
+#: Returning it would let a caller repeat the write with the new token and no
+#: idea what changed, which is the one thing the token exists to prevent: it is
+#: a precondition saying "decide again", not a nonce to be refreshed. A token
+#: on its own does not say what moved, so a caller that wants to proceed has to
+#: read the tree regardless -- and the read it needs is named here so that is
+#: one step rather than a hunt.
+STALE_CONTENT = _(
+    "The content has changed since it was read, so this write was refused "
+    "rather than applied over the change. Read the placeholder again "
+    "(cms.core.queries.get_plugin_tree), decide against what it now holds, "
+    "and write again with the expected_token that read returns."
+)
 
 
 def _content_unchanged(target):

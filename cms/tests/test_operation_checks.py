@@ -528,6 +528,54 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
             (Argument("owner", model=("auth.User", "auth.Group")), {
                 "type": ["integer", "string"], "x-cms-model": ["auth.user", "auth.group"]
             }),
+            # a dict without declared fields stays as it was
+            (Argument("data", type=dict), {"type": "object"}),
+            (Argument("content_data", fields=(
+                Argument("title", type=str),
+                Argument("slug", type=str, required=False),
+            )), {
+                "type": "object",
+                "properties": {"title": {"type": "string"}, "slug": {"type": "string"}},
+                "additionalProperties": False,
+                "required": ["title"],
+            }),
+            # the wrappers apply outside the described object
+            (Argument("rows", many=True, fields=(Argument("pk", type=int),)), {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {"pk": {"type": "integer"}},
+                    "additionalProperties": False,
+                    "required": ["pk"],
+                },
+            }),
+            (Argument("maybe", null=True, fields=(Argument("a", type=str),)), {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "properties": {"a": {"type": "string"}},
+                        "additionalProperties": False,
+                        "required": ["a"],
+                    },
+                    {"type": "null"},
+                ],
+            }),
+            # fields nest, because they are Arguments like any other
+            (Argument("outer", fields=(
+                Argument("inner", fields=(Argument("leaf", type=str),)),
+            )), {
+                "type": "object",
+                "properties": {
+                    "inner": {
+                        "type": "object",
+                        "properties": {"leaf": {"type": "string"}},
+                        "additionalProperties": False,
+                        "required": ["leaf"],
+                    },
+                },
+                "additionalProperties": False,
+                "required": ["inner"],
+            }),
         ):
             with self.subTest(argument=argument.name):
                 self.assertEqual(argument.json_schema(), schema)
@@ -543,6 +591,14 @@ class OperationArgumentsTest(RegistryIsolationMixin, CMSTestCase):
             {"name": "page", "type": set},
             {"name": "page", "type": str, "instance": True},
             {"name": "not a name", "type": str},
+            # a value, a model object or an object with fields: exactly one
+            {"name": "page", "model": "cms.Page", "fields": (Argument("a", type=str),)},
+            {"name": "page", "type": str, "fields": (Argument("a", type=str),)},
+            {"name": "page", "fields": ({"a": 1},)},
+            # a field is declared once, or the schema loses one of them
+            {"name": "page", "fields": (Argument("a", type=str), Argument("a", type=int))},
+            # adapters resolve model arguments at the top level only
+            {"name": "page", "fields": (Argument("parent", model="cms.Page"),)},
         ):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Argument(**kwargs)
@@ -618,10 +674,26 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
                         self.assertIn(model.__name__, annotation)
 
     def test_output_schema(self):
+        # A bare model result: the object and nothing else. MOVE_PLUGIN used to
+        # be the example here, until it started answering with the placeholder's
+        # new token as well, so a genuinely bare one is used instead
+        # and the fields case is asserted separately below.
         self.assertEqual(
-            operations.get_operation(operations.MOVE_PLUGIN).output_schema(),
-            {"type": "object", "x-cms-model": "cms.cmsplugin", "description": "The moved plugin."},
+            operations.get_operation(operations.MOVE_PAGE).output_schema(),
+            {"type": "object", "x-cms-model": "cms.page", "description": "The moved page."},
         )
+        # A model result that also answers with declared fields. The model must
+        # survive alongside them: a downstream connector decides whether a read
+        # can be confined
+        # to a credential's sites from `x-cms-model`, so a write that lost it
+        # while gaining a field would quietly change how it is scoped.
+        moved_plugin = operations.get_operation(operations.MOVE_PLUGIN).output_schema()
+        self.assertEqual(moved_plugin["x-cms-model"], "cms.cmsplugin")
+        self.assertEqual(moved_plugin["required"], ["expected_token", "source_token"])
+        # The declared fields and nothing else: what identifies the plugin is
+        # the adapter's to add.
+        self.assertEqual(list(moved_plugin["properties"]), ["expected_token", "source_token"])
+        self.assertEqual(moved_plugin["properties"]["expected_token"]["type"], "string")
         self.assertEqual(operations.get_operation(operations.DELETE_PAGE).output_schema(), {"type": "null"})
         self.assertEqual(
             operations.get_operation(operations.COPY_PAGE_LANGUAGE).output_schema()["items"], {"type": "string"}
@@ -652,6 +724,60 @@ class OperationResultsTest(RegistryIsolationMixin, CMSTestCase):
         ):
             with self.subTest(**{key: str(value) for key, value in kwargs.items()}), self.assertRaises(ValueError):
                 Result(**kwargs)
+
+    def test_a_result_may_be_a_model_that_declares_its_fields(self):
+        """A received model object may name the fields it answers with.
+
+        Unlike an Argument, which is a pk or an object or a set of fields and
+        exactly one. A result can be both. Forbidding it left get_page_content
+        and search_pages able to answer only with what identifies the object.
+        """
+        Result = operations.Result
+        result = Result(
+            model="cms.PageContent",
+            fields={"title": Result(type=str)},
+            description="The content.",
+        )
+        self.assertEqual(result.model, "cms.PageContent")
+        self.assertEqual([name for name, _ in result.fields], ["title"])
+
+        schema = result.json_schema()
+        self.assertEqual(schema["type"], "object")
+        # The declared fields and nothing else: what an adapter identifies the
+        # object by is the adapter's to add, and the schema leaves room for it.
+        self.assertEqual(schema["properties"], {"title": {"type": "string"}})
+        self.assertEqual(schema["required"], ["title"])
+        self.assertNotIn("additionalProperties", schema)
+        # Still marked as the model it is, so a client knows what it received
+        # and the scope machinery still recognises it.
+        self.assertEqual(schema["x-cms-model"], "cms.pagecontent")
+
+
+    def test_a_model_result_may_declare_its_primary_key_as_a_field(self):
+        """No field name is reserved: ``pk`` is declared like any other."""
+        Result = operations.Result
+        schema = Result(model="cms.Page", fields={"pk": Result(type=(int, str))}).json_schema()
+        self.assertEqual(schema["properties"], {"pk": {"type": ["integer", "string"]}})
+
+    def test_every_page_content_result_declares_the_same_fields(self):
+        """Whichever query answers with a page content, it has the same shape."""
+        from cms.pages.queries import _CONTENT_FIELDS
+
+        def content_results(result):
+            if "cms.pagecontent" in result.models:
+                yield result
+            for _, field in result.fields:
+                yield from content_results(field)
+
+        found = [
+            (query.id, result)
+            for query in operations.get_queries()
+            for result in content_results(query.returns)
+        ]
+        self.assertGreaterEqual(len(found), 4)
+        for query_id, result in found:
+            with self.subTest(query=query_id):
+                self.assertEqual(result.fields, _CONTENT_FIELDS)
 
 
 class QueryRegistryTest(RegistryIsolationMixin, CMSTestCase):

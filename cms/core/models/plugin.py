@@ -197,6 +197,56 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         total = 1
         text_enabled = False
 
+    @property
+    def expected_token(self) -> str:
+        """The token of this plugin's placeholder, in this plugin's language.
+
+        What a caller must pass as ``expected_token`` on its next write to the
+        same placeholder. Read off the plugin it just wrote, so a sequence of
+        writes chains without a separate read between each one: every plugin
+        write used to require an ``expected_token`` and return none, so a
+        caller had to re-read the tree to get the next one -- 126 plugins cost
+        about 250 extra reads for nothing but tokens.
+
+        On a plugin returned by a write that was itself given an
+        ``expected_token``, this is the token that write recorded inside its
+        own transaction, with the placeholder locked: the content as the write
+        left it, not as it is when the result happens to be serialised. Reading
+        it later would hand the caller a token for changes it has not seen.
+
+        On any other plugin -- one a write without a token returned, or one
+        that was simply read -- it is read from the database when asked for,
+        so a caller that never looks at it pays nothing.
+
+        A property rather than something the services return, so ``add_plugin``
+        and ``change_plugin`` keep returning the plugin itself, which their
+        Python callers assign straight to ``saved_object``.
+        """
+        token = self.__dict__.get("_expected_token")
+        if token is None:
+            from cms.core.queries import placeholder_token
+
+            token = placeholder_token(self.placeholder, self.language)
+        return token
+
+    @property
+    def source_token(self) -> str:
+        """The token of the placeholder a move or cut took this plugin out of.
+
+        What a caller passes as ``expected_token`` on its next write to that
+        placeholder. Recorded or read as :attr:`expected_token` is, and equal
+        to it for a plugin that did not leave its placeholder.
+        """
+        token = self.__dict__.get("_source_token")
+        if token is None:
+            source = self.__dict__.get("_token_source")
+            if source is None or source == (self.placeholder, self.language):
+                return self.expected_token
+            from cms.core.queries import placeholder_token
+
+            token = placeholder_token(*source)
+        return token
+
     def __str__(self):
         return force_str(self.pk)
 

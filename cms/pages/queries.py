@@ -291,8 +291,40 @@ _FALLBACK = Argument(
     required=False,
     description="Use the site's fallback languages for a page without content in the language (default true).",
 )
+#: The fields of a page content worth answering with.
+#:
+#: Declared because without them there was nothing to answer with: a Result
+#: that names a model and no fields serialises to {model, pk, label}, so
+#: `get_page_content` returned a label and a caller had to run a full export
+#: just to learn a page's title. `search_pages` answered the same way for the
+#: same reason, which is why these are declared once and shared.
+#:
+#: Scalars only, and deliberately so. `placeholders` is a reverse generic
+#: manager rather than a value, so it is not readable by attribute here --
+#: `cms.core.queries.get_plugin_tree` is the read that answers that question.
+#: The publish state lives on the version rather than the content, so
+#: djangocms-versioning owns it.
+_CONTENT_FIELDS = (
+    ("title", Result(type=str, description="The content's title.")),
+    ("slug", Result(type=str, description="The slug this content is addressed by.")),
+    ("language", Result(type=str, description="The language this content is in.")),
+    ("template", Result(type=str, description="The template it renders with.")),
+    ("page_title", Result(type=str, null=True, description="The <title>, where it differs from the title.")),
+    ("menu_title", Result(type=str, null=True, description="The title menus show, where it differs.")),
+    ("meta_description", Result(type=str, null=True, description="The meta description.")),
+    ("redirect", Result(type=str, null=True, description="Where this content redirects to, if anywhere.")),
+    ("overwrite_url", Result(type=str, null=True, description="A URL set by hand, overriding the slug.")),
+    ("in_navigation", Result(type=bool, description="Whether menus include it.")),
+    ("soft_root", Result(type=bool, description="Whether menus treat it as a root.")),
+    ("limit_visibility_in_menu", Result(type=int, null=True, description="Menu visibility restriction, if any.")),
+    ("xframe_options", Result(type=int, description="The X-Frame-Options policy.")),
+)
+
 _CONTENTS = Result(
-    model="cms.PageContent", many=True, description="One content per page, in page tree order; content.page is set."
+    model="cms.PageContent",
+    many=True,
+    fields=_CONTENT_FIELDS,
+    description="One content per page, in page tree order; content.page is set.",
 )
 
 for _declaration in (
@@ -339,7 +371,11 @@ for _declaration in (
             _LANGUAGE,
             _FALLBACK,
         ),
-        returns=Result(model="cms.PageContent", description="The content."),
+        returns=Result(
+            model="cms.PageContent",
+            fields=_CONTENT_FIELDS,
+            description="The content, with its own fields.",
+        ),
         modes=_BOTH,
     ),
     Query(
@@ -358,7 +394,11 @@ for _declaration in (
             _LANGUAGE,
             _FALLBACK,
         ),
-        returns=Result(model="cms.PageContent", description="The content; content.page is set, with its URLs."),
+        returns=Result(
+            model="cms.PageContent",
+            fields=_CONTENT_FIELDS,
+            description="The content, with its own fields; content.page is set, with its URLs.",
+        ),
         modes=_BOTH,
     ),
     Query(
@@ -385,7 +425,11 @@ for _declaration in (
         returns=Result(
             many=True,
             fields={
-                "content": Result(model="cms.PageContent", description="The page's content; content.page is set."),
+                "content": Result(
+                    model="cms.PageContent",
+                    fields=_CONTENT_FIELDS,
+                    description="The page's content, with its own fields; content.page is set.",
+                ),
                 "children": Result(type=list, description="The child nodes, of the same shape, in tree order."),
             },
             description="The root nodes.",
