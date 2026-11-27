@@ -10,7 +10,16 @@ from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
 from cms.api import create_page
-from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PageUser, PageUserGroup
+from cms.models.permissionmodels import (
+    ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
+    PageUser,
+    PageUserGroup,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.permissions import get_subordinate_groups, get_subordinate_users
 from cms.utils.urlutils import admin_reverse
@@ -923,6 +932,67 @@ class PageScopedSubordinatesTest(SubordinatesTestMixin, PermissionsOnTestCase):
                 target.groups.add(group)
                 self.assertNotIn(target.pk, self._subordinate_user_ids())
                 self.assertNotIn(group.pk, self._subordinate_group_ids())
+
+    def _manage_branch_page_only(self):
+        PagePermission.objects.filter(user=self.manager).update(grant_on=ACCESS_PAGE)
+
+    def _get_branch_holders(self, name, grant_on):
+        user = self._get_page_user(f'{name}-user')
+        self.add_page_permission(user, self.branch, can_change=True, grant_on=grant_on)
+        group = Group.objects.create(name=f'{name} group')
+        self.add_page_permission(None, self.branch, group=group, can_change=True, grant_on=grant_on)
+        return user, group
+
+    def test_permission_reaching_beyond_managed_scope_not_subordinate(self):
+        # The permission is attached to a page the manager manages, but reaches
+        # to pages the manager does not.
+        self._manage_branch_page_only()
+
+        for grant_on in (ACCESS_PAGE_AND_DESCENDANTS, ACCESS_DESCENDANTS, ACCESS_CHILDREN):
+            with self.subTest(grant_on=grant_on):
+                user, group = self._get_branch_holders(f'wide-{grant_on}', grant_on)
+                self.assertNotIn(user.pk, self._subordinate_user_ids())
+                self.assertNotIn(group.pk, self._subordinate_group_ids())
+
+        member = self._get_page_user('member-user')
+        self.add_page_permission(member, self.branch, can_change=True, grant_on=ACCESS_PAGE)
+        self.assertIn(member.pk, self._subordinate_user_ids())
+        member.groups.add(group)
+        self.assertNotIn(member.pk, self._subordinate_user_ids())
+
+    def test_permission_within_managed_scope_is_subordinate(self):
+        self._manage_branch_page_only()
+        user, group = self._get_branch_holders('page-only', ACCESS_PAGE)
+
+        self.assertIn(user.pk, self._subordinate_user_ids())
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_combined_manager_scopes_cover_permission(self):
+        self._manage_branch_page_only()
+        user, group = self._get_branch_holders('wide', ACCESS_PAGE_AND_DESCENDANTS)
+        self.assertNotIn(user.pk, self._subordinate_user_ids())
+
+        self.add_page_permission(
+            self.manager, self.branch, can_change=True, can_change_permissions=True,
+            grant_on=ACCESS_DESCENDANTS,
+        )
+
+        # Permissions are cached on the user object for the time of a request.
+        self.manager = get_user_model().objects.get(pk=self.manager.pk)
+
+        self.assertIn(user.pk, self._subordinate_user_ids())
+        self.assertIn(group.pk, self._subordinate_group_ids())
+
+    def test_cannot_take_over_account_reaching_beyond_managed_scope(self):
+        self._manage_branch_page_only()
+        target, _ = self._get_branch_holders('wide', ACCESS_PAGE_AND_DESCENDANTS)
+        data = {'password1': 'taken-over-123', 'password2': 'taken-over-123'}
+
+        with self.login_user_context(self.manager):
+            self.assertNotEqual(self.client.post(self._get_password_url(target), data).status_code, 302)
+
+        target = PageUser.objects.get(pk=target.pk)
+        self.assertTrue(target.check_password('original-password'))
 
     def test_cannot_take_over_account_beyond_managed_pages(self):
         target = self._get_leaf_user('leaf-user')

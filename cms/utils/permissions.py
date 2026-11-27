@@ -497,23 +497,31 @@ def _beyond_managed_sites(user, model):
     )
 
 
-def _beyond_managed_pages(user, site, user_level, model):
+def _beyond_managed_pages(user, site, model):
     """
     Returns the users or groups (``model``) holding permissions beyond the part
     of the page tree where ``user`` manages permissions: any global permission,
-    or a page permission on a page outside of it - higher up, in another
-    branch, or on another site.
+    or a page permission whose scope is not covered by it. A page permission
+    counts with its full scope (``grant_on``), not only with the page it is
+    attached to: one reaching to descendants the user does not manage lies
+    beyond, as does one higher up, in another branch, or on another site.
     """
-    from cms.models import PermissionTuple
     from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
-    managed = Q()
-    for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
-        managed |= PermissionTuple(perm_tuple).allow_list("page")
-
+    managed = get_change_permissions_perm_tuples(user, site, check_global=False)
+    # Only permissions attached at or below a page the user manages can be
+    # covered; their scope is compared to the user's combined scopes.
+    anchored = Q()
+    for _grant_on, path in managed:
+        anchored |= Q(page__path__startswith=path)
+    candidates = PagePermission.objects.filter(anchored).select_related('page') if managed else ()
+    covered = [
+        permission.pk for permission in candidates
+        if _permission_scope_is_covered(permission.page, permission.grant_on, managed)
+    ]
     return _holders(
         model,
-        PagePermission.objects.exclude(managed & Q(page__depth__gte=user_level)),
+        PagePermission.objects.filter(page__isnull=False).exclude(pk__in=covered),
         GlobalPagePermission.objects.all(),
     )
 
@@ -543,8 +551,8 @@ def get_subordinate_users(user, site):
     returned.
 
     A user holding permissions beyond those pages - a global permission, or a
-    page permission higher up, in another branch or on another site - is not
-    subordinate, also if the permission is held through a group: managing that
+    page permission higher up, in another branch, on another site or reaching
+    to pages the given user does not manage - is not subordinate, also if the permission is held through a group: managing that
     account would hand over rights the user has no authority on.
 
     The same holds for a user managing permissions nowhere, who only sees the
@@ -623,7 +631,7 @@ def get_subordinate_users(user, site):
         )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
-    qs = qs.exclude(pk__in=_beyond_managed_pages(user, site, user_level, get_user_model()))
+    qs = qs.exclude(pk__in=_beyond_managed_pages(user, site, get_user_model()))
     return without_superusers(qs)
 
 
@@ -671,7 +679,7 @@ def get_subordinate_groups(user, site):
         ) | (
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )
-    ).exclude(pk__in=_beyond_managed_pages(user, site, user_level, Group))
+    ).exclude(pk__in=_beyond_managed_pages(user, site, Group))
 
 
 def has_plugin_permission(user, plugin_type, permission_type):
