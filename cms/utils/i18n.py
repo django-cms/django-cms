@@ -1,3 +1,5 @@
+import logging
+import re
 from contextlib import contextmanager
 
 from django.conf import settings
@@ -7,6 +9,8 @@ from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import LanguageError
 from cms.utils.conf import get_cms_setting, get_site_id
+
+logger = logging.getLogger(__name__)
 
 
 @contextmanager
@@ -52,12 +56,46 @@ def get_site_language_from_request(request, site_id=None):
     return get_default_language_for_site(site_id=site_id)
 
 
+#: What a language tag may be made of (RFC 5646 is subtags of letters and
+#: digits joined by hyphens). Used to tell "a language this site does not
+#: serve" -- which a caller may legitimately pass -- from "not a language at
+#: all", which no caller means and which must not be handed on.
+_LANGUAGE_TAG = re.compile(r'^[A-Za-z0-9]+(-[A-Za-z0-9]+)*\Z')
+
+#: The widest language code cms can store in a content ``language`` column:
+#: ``CMSPlugin``, ``PageContent`` and ``PageUrl`` are all ``max_length=15``, so
+#: a longer value cannot be a language this installation can use, whatever its
+#: shape, and is refused here rather than at the INSERT.
+#: ``cms.tests.test_i18n`` asserts this matches the narrowest of those columns,
+#: so widening a field cannot silently leave this behind.
+MAX_LANGUAGE_CODE_LENGTH = 15
+
+
 def get_language_code(language_code, site_id):
     """
     Returns language code while making sure it's in LANGUAGES
     """
     if not language_code:
         return None
+
+    if (not _LANGUAGE_TAG.match(language_code)
+            or len(language_code) > MAX_LANGUAGE_CODE_LENGTH):
+        # Not a usable language tag, so there is nothing to match and nothing
+        # to hand back: returning it unchanged would let a malformed value
+        # (e.g., from a doubled query string) travel on as this site's language
+        # and overflow the ``language`` columns it is written to.
+        logger.warning(
+            "Ignoring %r, which is not a usable language code (it is not a "
+            "language tag, or is longer than the %d characters a language "
+            "code may be), and using this site's default instead. "
+            "Something built a malformed language value -- a doubled query "
+            "string in a URL will do it.",
+            language_code, MAX_LANGUAGE_CODE_LENGTH,
+        )
+        # Not get_default_language(): it calls back into this function and may
+        # return a settings.LANGUAGE_CODE this site does not serve.
+        languages = get_language_list(site_id)
+        return settings.LANGUAGE_CODE if settings.LANGUAGE_CODE in languages else languages[0]
 
     languages = get_language_list(site_id)
 
@@ -69,6 +107,9 @@ def get_language_code(language_code, site_id):
             return lang
         if lang.split('-')[0] == language_code:  # base language hit
             return lang
+    # A language tag this site does not serve is handed back as it arrived: it
+    # may be served by another site in the same project, and deciding for the
+    # caller here would hide a real misconfiguration.
     return language_code
 
 
